@@ -36,11 +36,16 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.3 - 2008-04-06: (small beta test)
+SuRun 1.1.0.3 - 2008-04-08: (small beta test)
 ----------------------------
-* SuRun warns the user after login if any administrators have empty passwords
+* SuRun warns SuRunners and Administrators after login if any Administrators 
+  have empty passwords
 * Background Screen fades in and out
 * SuRuns "Run as..." and Administrator authentification respect group policies.
+---
+SuRun 1.1.0.3 - 2008-04-06: (small beta test)
+---
+* Background Screen fades in
 * Changed Icons
 * Balloon Tops only if user name is different from logged on user
 ---
