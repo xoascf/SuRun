@@ -668,66 +668,70 @@ DWORD PrepareSuRun()
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   //Create the new desktop
-  if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
+  if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
+    return RETVAL_NODESKTOP;
+  __try
   {
-    __try
+    //secure desktop created...
+    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
+      return RETVAL_CANCELLED;
+    DBGTrace("PrepareSuRun...");
+    //Is User Restricted?
+    DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
+    if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
+      return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+    DBGTrace("PrepareSuRun...");
+    DWORD l=0;
+    if (!PwOk)
     {
-      //secure desktop created...
-      if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
-        return RETVAL_CANCELLED;
-      //Is User Restricted?
-      DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
-      if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
-        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
-      DWORD l=0;
-      if (!PwOk)
-      {
-        l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
-            BeautifyCmdLine(g_RunData.cmdLine));
-        if (GetSavePW && (l&1))
-          SavePassword(g_RunData.UserName,g_RunPwd);
-      }else
-        l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
-            BeautifyCmdLine(g_RunData.cmdLine));
-      DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
-      if((l&1)==0)
-      {
-        if (!GetNoRunSetup(g_RunData.UserName))
-        {
-          //Cancel:
-          if(g_RunData.bShlExHook)
-          {
-            //ShellExecHook:
-            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_CANCEL_SX,(l&2)!=0);
-            if((l&2)!=0)
-              SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,0);
-          }else
-          {
-            //SuRun cmdline:
-            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
-            if((l&2)!=0)
-              SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
-          }
-        }
-        return RETVAL_CANCELLED;
-      }
-      //Ok:
+      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+          BeautifyCmdLine(g_RunData.cmdLine));
+      if (GetSavePW && (l&1))
+        SavePassword(g_RunData.UserName,g_RunPwd);
+      DBGTrace("PrepareSuRun...");
+    }else
+      l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+          BeautifyCmdLine(g_RunData.cmdLine));
+    DBGTrace("PrepareSuRun...DSD");
+    DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
+    DBGTrace("PrepareSuRun...");
+    if((l&1)==0)
+    {
       if (!GetNoRunSetup(g_RunData.UserName))
       {
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
-        if((l&2)!=0)
-          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,
-          g_RunData.bShlExHook?FLAG_CANCEL_SX:FLAG_AUTOCANCEL,0);
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
+        //Cancel:
+        if(g_RunData.bShlExHook)
+        {
+          //ShellExecHook:
+          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_CANCEL_SX,(l&2)!=0);
+          if((l&2)!=0)
+            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,0);
+        }else
+        {
+          //SuRun cmdline:
+          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
+          if((l&2)!=0)
+            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
+        }
       }
-      return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-    }__except(1)
-    {
-      DBGTrace("FATAL: Exception in PrepareSuRun()");
+      return RETVAL_CANCELLED;
     }
+    //Ok:
+    if (!GetNoRunSetup(g_RunData.UserName))
+    {
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
+      if((l&2)!=0)
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,
+        g_RunData.bShlExHook?FLAG_CANCEL_SX:FLAG_AUTOCANCEL,0);
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
+    }
+    return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+  }__except(1)
+  {
+    DBGTrace("FATAL: Exception in PrepareSuRun()");
     DeleteSafeDesktop(false);
+    return RETVAL_CANCELLED;
   }
-  return RETVAL_NODESKTOP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
