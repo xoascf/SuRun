@@ -215,7 +215,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Gebrauch:\tSuRun.exe Programm [Parameter]\r\n oder\t\tSuRun.exe /SETUP"
+    IDS_USAGE               "Gebrauch:\r\n\tSuRun.exe Programm [Parameter]\r\noder\tSuRun.exe /SETUP"
     IDS_ASKOK               "Der Befehl:\r\n%s\r\n\r\nsoll mit administratien Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
@@ -444,7 +444,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Usage:\tSuRun.exe program [parameters]\r\n or\t\tSuRun.exe /Setup"
+    IDS_USAGE               "Usage:\r\n\tSuRun.exe program [parameters]\r\nor\tSuRun.exe /Setup"
     IDS_ASKOK               "The command:\r\n%s\r\n\r\nis about to be started with administrative privileges."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
