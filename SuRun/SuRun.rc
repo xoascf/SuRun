@@ -1,0 +1,483 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// German (Germany) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// 24
+//
+
+1                       24      MOVEABLE PURE   "app.manifest"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAINICON            ICON    DISCARDABLE     "main.ico"
+IDI_SHIELD              ICON    DISCARDABLE     "ico10605.ico"
+IDI_SHIELD2             ICON    DISCARDABLE     "ico10606.ico"
+IDI_SHIELD1             ICON    DISCARDABLE     "ico10607.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_LOGONDLG DIALOG DISCARDABLE  0, 0, 229, 135
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Benutzerdaten Erforderlich"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,229,65
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
+    ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Bitte identifizieren Sie sich als berechtigte Person:",
+                    IDC_DLGQUESTION,52,7,166,51,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,73,47,46
+    LTEXT           "Benutzer",IDC_STATIC,65,83,29,8
+    LTEXT           "Passwort",IDC_STATIC,65,101,30,8
+    CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,98,81,69,86
+    EDITTEXT        IDC_PASSWORD,98,98,69,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Abbruch",IDCANCEL,172,81,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,172,98,50,14
+    CTEXT           "Falls Sie unsicher sind, was das hier ist, dücken Sie Abbruch!",
+                    IDC_STATIC,0,123,229,12,SS_CENTERIMAGE
+END
+
+IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 229, 182
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Passwort erforderlich"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "",IDC_HINTBK,0,66,229,56,NOT WS_GROUP
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,229,65
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    EDITTEXT        IDC_DLGQUESTION,7,8,214,52,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER | WS_HSCROLL
+    LTEXT           "Wenn das Programm mit administrativen Rechten ausgeführt werden soll, gebenn Sie Ihr persönliches Passwort ein.\r\n\r\nAnsonsten drücken Sie Abbruch!",
+                    IDC_HINT,48,68,172,49,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,127,47,46
+    LTEXT           "Benutzer",IDC_STATIC,65,137,29,8
+    LTEXT           "Passwort",IDC_STATIC,65,155,30,8
+    CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,98,135,69,86
+    EDITTEXT        IDC_PASSWORD,98,152,69,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Abbruch",IDCANCEL,172,135,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,172,152,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,121,230,1
+END
+
+IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 229, 182
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Bestätigung erforderlich"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "",IDC_HINTBK,0,66,229,56,NOT WS_GROUP
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,229,65
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    EDITTEXT        IDC_DLGQUESTION,7,8,214,52,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER | WS_HSCROLL
+    LTEXT           "Wenn das Programm mit administrativen Rechten ausgeführt werden soll, drücken Sie OK.\r\n\r\nAnsonsten drücken Sie Abbruch!",
+                    IDC_HINT,48,68,172,49,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,127,47,46
+    LTEXT           "Benutzer",IDC_STATIC,65,137,29,8
+    LTEXT           "Passwort",IDC_STATIC,65,155,30,8
+    CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,98,135,69,86
+    EDITTEXT        IDC_PASSWORD,98,152,69,14,ES_PASSWORD | ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    DEFPUSHBUTTON   "&Abbruch",IDCANCEL,172,135,50,14
+    PUSHBUTTON      "&OK",IDOK,172,152,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,121,230,1
+END
+
+IDD_SETUP DIALOG DISCARDABLE  0, 0, 152, 118
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SuRun Einstellungen"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,151,85
+    CONTROL         "",-1,"Static",SS_ETCHEDHORZ,0,85,151,1
+    ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
+    GROUPBOX        "Frage um Erlaubnis",-1,46,7,82,49
+    CONTROL         "&immer",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,52,18,34,10
+    CONTROL         "&nach:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,52,31,31,
+                    10
+    EDITTEXT        IDC_ASKTIMEOUT,87,29,18,14,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min",-1,110,31,12,8
+    LTEXT           "0 min = Frage einmal",-1,50,44,73,8
+    CONTROL         "Benutzer-&Desktop als Hintergrund (langsam)",
+                    IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,52,63,83,20
+    DEFPUSHBUTTON   "&Speichern",IDOK,7,97,50,14
+    PUSHBUTTON      "&Abbruch",IDCANCEL,95,97,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_LOGONDLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 130
+    END
+
+    IDD_CURUSRLOGON, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 177
+    END
+
+    IDD_CURUSRACK, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 177
+    END
+
+    IDD_SETUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 145
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 111
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_USAGE               "Gebrauch:\tSuRun.exe Programm [Parameter]\r\n oder\t\tSuRun.exe /SETUP"
+    IDS_ASKOK               "Der Befehl:\r\n%s\r\n\r\nsoll mit administratien Rechten ausgeführt werden."
+    IDS_APPNAME             "SuRun"
+    IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
+    IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
+    IDS_ASKINSTALL          "SuRun verwendet einen Windows Dienst, um die Benutzeranmeldung in einer gesicherten Umgebung durchzuführen.\r\n\r\nDieser Dienst ist momentan nicht installiert oder nicht gestartet.\r\n\r\nSoll er installiert bzw. gestartet werden?"
+    IDS_UNINSTALLADMIN      "Sie benötigen Administrator-Rechte, um den SuRun Dienst zu löschen.\r\n\r\nIdentifizieren Sie sich als Computer-Administrator:"
+    IDS_INSTALLADMIN        "Sie benötigen Administrator-Rechte, um den SuRun Dienst zu installieren.\r\n\r\nIdentifizieren Sie sich als Computer-Administrator:"
+    IDS_LOGONFAILED         "Anmeldung fehlgeschlagen!\r\n\r\nDer Benutzername und/oder das Passwort sind falsch.\r\n\r\nAchten Sie auf Groß- und Kleinschreibung."
+    IDS_NOADMIN             "Fehler!\r\n\r\nBenutzer %s ist kein Administrator."
+    IDS_NOSUDOER            "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuDoers"" sein.\r\n\r\nIdentifizieren Sie sich als Administrator, um Mitglied von ""SuDoers"" zu werden.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
+    IDS_ASKSUDOER           "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuDoers"" sein.\r\n\r\nWollen Sie Mitglied der ""SuDoers"" Gruppe und aus der Administratoren Gruppe ausgetragen werden?\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
+    IDS_BUILTINADMIN        "Sie sind ein vordefinierter Administrator!\r\n\r\nSie können SuRun nicht benutzen, weil Sie nicht zum normalen Benutzer degradiert werden können."
+    IDS_SUDOER_OK           "Sie sind erfolgreich als Mitglied in die Gruppe ""SuDoers"" aufgenommen worden."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SUDOER_ERR          "Fehler!\r\n\r\nSie konnten nicht in die ""SuDoers"" Gruppe aufgenommen werden!"
+    IDS_LOGOFFON            "Sie sind erfolgreich in die Gruppe ""SuDoers"" aufgenommen und aus\r\nder Administratoren-Gruppe ausgetragen worden.\r\n\r\nSie müssen sich jetzt ab und wieder anmelden, \r\num mit eingeschränkten Rechten zu arbeiten."
+END
+
+#endif    // German (Germany) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_LOGONDLG DIALOG DISCARDABLE  0, 0, 229, 135
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Authorisation required"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,229,65
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
+    ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Identify yourself as authorized person",IDC_DLGQUESTION,
+                    52,7,166,51,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,73,47,46
+    LTEXT           "User Name",IDC_STATIC,58,83,36,8
+    LTEXT           "Password",IDC_STATIC,58,101,32,8
+    CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,98,81,69,86
+    EDITTEXT        IDC_PASSWORD,98,98,69,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Cancel",IDCANCEL,172,81,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,172,98,50,14
+    CTEXT           "If you are not sure what this here is about, press Cancel!",
+                    IDC_STATIC,0,123,229,12,SS_CENTERIMAGE
+END
+
+IDD_SETUP DIALOG DISCARDABLE  0, 0, 152, 118
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SuRun Settings"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,151,85
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,1,85,151,1
+    ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
+    GROUPBOX        "Ask for permission",IDC_STATIC,46,7,82,49
+    CONTROL         "&always",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,52,18,37,10
+    CONTROL         "&every:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,52,31,
+                    31,10
+    EDITTEXT        IDC_ASKTIMEOUT,87,29,18,14,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min",IDC_STATIC,110,31,12,8
+    LTEXT           "0 min = Ask only once",IDC_STATIC,50,44,73,8
+    CONTROL         "Show user &desktop as background (slow)",
+                    IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,52,63,93,20
+    DEFPUSHBUTTON   "&Save",IDOK,7,97,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,95,97,50,14
+END
+
+IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 229, 182
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Passwort required"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "",IDC_HINTBK,0,66,229,56,NOT WS_GROUP
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,229,65
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    EDITTEXT        IDC_DLGQUESTION,7,8,214,52,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER | WS_HSCROLL
+    LTEXT           "If the application should be started with administrative rights, enter you password.\r\n\r\nIf not, press Cancel!",
+                    IDC_HINT,48,68,172,49,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,127,47,46
+    LTEXT           "User Name",IDC_STATIC,58,137,36,8
+    LTEXT           "Password",IDC_STATIC,57,155,32,8
+    CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,98,135,69,86
+    EDITTEXT        IDC_PASSWORD,98,152,69,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Cancel",IDCANCEL,172,135,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,172,152,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,121,230,1
+END
+
+IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 229, 182
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Authorisation required"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "",IDC_HINTBK,0,66,229,56,NOT WS_GROUP
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,229,65
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    EDITTEXT        IDC_DLGQUESTION,7,8,214,52,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER | WS_HSCROLL
+    LTEXT           "If the application should be started with administrative rights, press OK.\r\n\r\nIf not, press Cancel!",
+                    IDC_HINT,48,68,172,49,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,127,47,46
+    LTEXT           "User Name",IDC_STATIC,58,137,36,8
+    LTEXT           "Password",IDC_STATIC,57,155,32,8
+    CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,98,135,69,86
+    EDITTEXT        IDC_PASSWORD,98,152,69,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Cancel",IDCANCEL,172,135,50,14
+    PUSHBUTTON      "&OK",IDOK,172,152,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,121,230,1
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_LOGONDLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 130
+    END
+
+    IDD_SETUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 145
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 111
+    END
+
+    IDD_CURUSRLOGON, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 177
+    END
+
+    IDD_CURUSRACK, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 177
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Kay Bruns\0"
+            VALUE "FileDescription", "SuperUserRun\0"
+            VALUE "FileVersion", "1, 0, 0, 0\0"
+            VALUE "InternalName", "SuRun\0"
+            VALUE "LegalCopyright", "Copyright © 2007\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "SuRun.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "SuperUserRun\0"
+            VALUE "ProductVersion", "1, 0, 0, 0\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_USAGE               "Usage:\tSuRun.exe program [parameters]\r\n or\t\tSuRun.exe /Setup"
+    IDS_ASKOK               "The command:\r\n%s\r\n\r\nis about to be started with administrative privileges."
+    IDS_APPNAME             "SuRun"
+    IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
+    IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
+    IDS_ASKINSTALL          "SuRun uses a windows service to handle the user logon in a secured environment.\r\n\r\nThis service is currently not installed or not running.\r\n\r\nDo you want to install/start this service now?"
+    IDS_UNINSTALLADMIN      "You need to have administrative rights to delete the SuRun service.\r\n\r\nPlease enter the credentials of an Administrator for this system:"
+    IDS_INSTALLADMIN        "You need to have administrative rights to install the SuRun service.\r\n\r\nPlease enter the credentials of an Administrator for this system:"
+    IDS_LOGONFAILED         "Logon failed!\r\n\r\nCheck the users name and password and try again!\r\n\r\nNote that the user name and password are case sensitive."
+    IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
+    IDS_NOSUDOER            "You need to be member of the ""SuDoers"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuDoers"" member.\r\n\r\nOtherwise click ""Cancel""."
+    IDS_ASKSUDOER           "You need to be member of the ""SuDoers"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuDoers"" member?\r\n\r\nIf you're not sure what you're doing, click ""No""."
+    IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot youse SuRun because you cannot act as normal user!"
+    IDS_SUDOER_OK           "You have successfully been added to the ""SuDoers"" user group."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SUDOER_ERR          "Error!\r\n\r\nPutting your account into the ""SuDoers"" user group failed."
+    IDS_LOGOFFON            "You have successfully been added to the ""SuDoers"" and removed from the Administrators user groups.\r\n\r\nTo continue using you computer with limited access rights you need to logoff and logon."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
