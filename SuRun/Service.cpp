@@ -256,6 +256,22 @@ int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  KillProcess
+// 
+//////////////////////////////////////////////////////////////////////////////
+void KillProcess(DWORD PID)
+{
+  if (!PID)
+    return;
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
+  if(!hProcess)
+    return;
+  TerminateProcess(hProcess,0);
+  CloseHandle(hProcess);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  RunAsUser
 // 
 //  Start CommandLine as specific user of a logon session.
@@ -372,6 +388,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         TCHAR UserName[CNLEN+DNLEN+2]={0};
         TCHAR cmdLine[4096]={0};
         TCHAR CurDir[MAX_PATH]={0};
+        DWORD KillPID=0;
         DWORD nRead=0;
         //Read Client Process ID and command line
         BOOL DoSuRun=ReadFile(g_hPipe,&SessionID,sizeof(SessionID),&nRead,0)
@@ -379,7 +396,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                   && ReadFile(g_hPipe,Desk,sizeof(Desk)-sizeof(TCHAR),&nRead,0)
                   && ReadFile(g_hPipe,UserName,sizeof(UserName)-sizeof(TCHAR),&nRead,0)
                   && ReadFile(g_hPipe,cmdLine,sizeof(cmdLine)-sizeof(TCHAR),&nRead,0)
-                  && ReadFile(g_hPipe,CurDir,sizeof(CurDir)-sizeof(TCHAR),&nRead,0);
+                  && ReadFile(g_hPipe,CurDir,sizeof(CurDir)-sizeof(TCHAR),&nRead,0)
+                  && ReadFile(g_hPipe,&KillPID,sizeof(KillPID),&nRead,0);
         //Disconnect client
         DisconnectNamedPipe(g_hPipe);
         if(DoSuRun)
@@ -393,6 +411,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             Setup();
           }else
           {
+            KillProcess(KillPID);
             //Start execution
             int nUser=PrepareSuRun(SessionID,UserName,Password,cmdLine);
             if (nUser!=-1)
@@ -471,20 +490,37 @@ DWORD CheckServiceStatus()
   return ss.dwCurrentState;
 }
 
+BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat)
+{
+  TCHAR ModName[MAX_PATH];
+  TCHAR cmdLine[4096];
+  GetModuleFileName(NULL,ModName,MAX_PATH);
+  NetworkPathToUNCPath(ModName);
+  PathQuoteSpaces(ModName);
+  if (CheckServiceStatus()==SERVICE_RUNNING)
+  {
+    _stprintf(cmdLine,_T("%s %s %s"),ModName,ModName,cmd);
+    STARTUPINFO si={0};
+    PROCESS_INFORMATION pi;
+    si.cb = sizeof(si);
+    if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+    {
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
+      WaitFor(CheckServiceStatus()==WaitStat);
+    }
+  }
+  _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
+  if (!RunAsAdmin(cmdLine,IDS_UNINSTALLADMIN))
+    return FALSE;
+  WaitFor(CheckServiceStatus()==WaitStat);
+}
+
+
 BOOL InstallService()
 {
   if (!IsAdmin())
-  {
-    TCHAR ModName[MAX_PATH];
-    TCHAR cmdLine[4096];
-    GetModuleFileName(NULL,ModName,MAX_PATH);
-    NetworkPathToUNCPath(ModName);
-    PathQuoteSpaces(ModName);
-    _stprintf(cmdLine,_T("%s /InstallService"),ModName);
-    if (!RunAsAdmin(cmdLine,IDS_INSTALLADMIN))
-      return FALSE;
-    WaitFor(CheckServiceStatus()==SERVICE_RUNNING)
-  }
+    return RunThisAsAdmin(_T("/InstallService"),SERVICE_RUNNING);
   DeleteService();
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
@@ -519,17 +555,7 @@ BOOL InstallService()
 BOOL DeleteService()
 {
   if (!IsAdmin())
-  {
-    TCHAR ModName[MAX_PATH];
-    TCHAR cmdLine[4096];
-    GetModuleFileName(NULL,ModName,MAX_PATH);
-    NetworkPathToUNCPath(ModName);
-    PathQuoteSpaces(ModName);
-    _stprintf(cmdLine,_T("%s /DeleteService"),ModName);
-    if (!RunAsAdmin(cmdLine,IDS_UNINSTALLADMIN))
-      return FALSE;
-    WaitFor(CheckServiceStatus()==0);
-  }
+    return RunThisAsAdmin(_T("/DeleteService"),0);
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
   {
