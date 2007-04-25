@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by SuRun.rc
+// Used by SuRunExt.rc
 //
 
 // Next default values for new objects
