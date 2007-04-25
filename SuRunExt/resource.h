@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by SuDoExt.rc
+// Used by SuRun.rc
 //
 
 // Next default values for new objects
