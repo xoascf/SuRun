@@ -11,8 +11,6 @@
 //  Copyright (C) 2001.  Microsoft Corporation.  All rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 #define SECURITY_WIN32
-#define _WIN32_WINNT 0x0500
-#define WINVER       0x0500
 #include <windows.h>
 #include <tchar.h>
 #include <sspi.h>
@@ -230,11 +228,11 @@ HANDLE SSPLogonUser(LPCTSTR szDomain,LPCTSTR szUser,LPCTSTR szPassword)
     // Initialize auth identity structure
     ZeroMemory(&ai,sizeof(ai));
 #if defined(UNICODE) || defined(_UNICODE)
-    ai.Domain = (WORD*)szDomain;
+    ai.Domain = (LPTSTR)szDomain;
     ai.DomainLength = lstrlen(szDomain);
-    ai.User = (WORD*)szUser;
+    ai.User = (LPTSTR)szUser;
     ai.UserLength = lstrlen(szUser);
-    ai.Password = (WORD*)szPassword;
+    ai.Password = (LPTSTR)szPassword;
     ai.PasswordLength = lstrlen(szPassword);
     ai.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
 #else      
