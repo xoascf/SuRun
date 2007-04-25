@@ -1,4 +1,4 @@
-//SuRunExt.h
+#pragma once
 
 #include <shlobj.h>
 #include <initguid.h>
@@ -8,35 +8,18 @@
 #pragma comment(lib,"ole32.lib")
 #pragma comment(lib,"Shell32.lib")
 
-#define SUDOEXE	L"sudo.exe "
-#define SEPARATOR L"\\"
-#define SUDOMENU L"* sudo "
-#define SUDOCPL L"* sudo Control Panel"
-#define INSTALLMSI L"install "
-#define REMOVEMSI L"uninstall "
-
-#define _MAX_MENU	_MAX_PATH+16
-#define _MAX_CMD	_MAX_PATH*2
-
-// Initialize GUIDs (should be done only and at-least once per DLL/EXE)
-// NOTE!!!  If you use this shell extension as a starting point,
-// you MUST change the GUID below.
-// Simply run GUIDGEN.EXE to generate a new GUID.
-
-// SudoExt class GUID:
-// {7DB2D002-7357-11DB-9693-00E08161165F}
-// {0x7db2d002, 0x7357, 0x11db, {0x96, 0x93, 0x00, 0xe0, 0x81, 0x61, 0x16, 0x5f}}
+#define SURUNEXE	  L"SuRun.exe "
+#define SEPARATOR   L"\\"
+#define SUDOMENU    L"* SuRun "
+#define SUDOCPL     L"* SuRun Control Panel"
+#define INSTALLMSI  L"install "
+#define REMOVEMSI   L"uninstall "
 
 #pragma data_seg(".text")
 #define INITGUID
 
-#ifndef wcscpy_s
-#define wcscpy_s(s1,l,s2) wcscpy(s1,s2)
-#define wcscat_s(s1,l,s2) wcscat(s1,s2)
-#define _wsplitpath_s(p,d,ds,D,Ds,f,fs,e,es)     _wsplitpath(p,d,D,f,e)
-#endif wcscpy_s
-
-DEFINE_GUID(CLSID_ShellExtension, 0x7db2d002, 0x7357, 0x11db, 0x96, 0x93, 0x00, 0xe0, 0x81, 0x61, 0x16, 0x5f);
+// {2C7B6088-5A77-4d48-BE43-30337DCA9A86}
+DEFINE_GUID(CLSID_ShellExtension,0x2c7b6088,0x5a77,0x4d48,0xbe,0x43,0x30,0x33,0x7d,0xca,0x9a,0x86);
 
 // this class factory object creates context menu handlers for windows 32 shell
 class CShellExtClassFactory : public IClassFactory
@@ -65,8 +48,7 @@ class CShellExt : public IContextMenu, IShellExtInit
 {
 protected:
   ULONG	 m_cRef;
-  LPDATAOBJECT m_pDataObj;
-  TCHAR m_runcmd[_MAX_PATH];
+  BOOL m_bDeskTop;
 public:
   CShellExt();
   ~CShellExt();
