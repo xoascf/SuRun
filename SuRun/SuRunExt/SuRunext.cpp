@@ -1,4 +1,6 @@
 /*
+based on:
+
 sudoext.cpp	http://sudown.mine.nu
 by Gábor Iglói (sudown at gmail dot com)
 General Public License (c) 2006
@@ -8,7 +10,7 @@ General Public License (c) 2006
   at ftp://ftp.vim.org/pub/vim/pc/vim70src.zip.
 */
 
-#include "sudoext.h"
+#include "SuRunExt.h"
 
 UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 
@@ -235,7 +237,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
       CloseHandle( pi.hThread );
       hr = NOERROR;
     }else
-      MessageBoxW(lpcmi->hwnd, L"File not found: sudo.exe", L"sudoext.dll error", MB_OK);
+      MessageBoxW(lpcmi->hwnd, L"File not found: SuRun.exe", L"SuRunExt.dll error", MB_OK);
   }
   return hr;
 }
