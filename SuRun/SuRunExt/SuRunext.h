@@ -1,4 +1,4 @@
-//sudoext.h
+//SuRunExt.h
 
 #include <shlobj.h>
 #include <initguid.h>
