@@ -14,7 +14,6 @@
 #include <windows.h>
 #include <tchar.h>
 #include <sspi.h>
-#include <strsafe.h>
 #include "sspi_auth.h"
 
 typedef struct _AUTH_SEQ 
