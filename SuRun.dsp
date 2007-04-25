@@ -218,10 +218,6 @@ SOURCE=.\ico10607.ico
 
 SOURCE=.\main.ico
 # End Source File
-# Begin Source File
-
-SOURCE=.\Security.ico
-# End Source File
 # End Group
 # End Target
 # End Project
