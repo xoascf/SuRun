@@ -1,14 +1,9 @@
-/*
-based on:
-
-sudoext.cpp	http://sudown.mine.nu
-by Gábor Iglói (sudown at gmail dot com)
-General Public License (c) 2006
-
-  SudoExt is a context menu handler shell extension for Sudown
-  based on Tianmiao Hu's excellent GVimExt gvim extension v1.0.0.1
-  at ftp://ftp.vim.org/pub/vim/pc/vim70src.zip.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// based on: SuDowns sudoext.cpp http://sudown.sourceforge.net
+//           Tianmiao Hu's excellent GVimExt gvim extension v1.0.0.1
+//             ftp://ftp.vim.org/pub/vim/pc/vim70src.zip.
+//////////////////////////////////////////////////////////////////////////////
 
 #include "SuRunExt.h"
 
@@ -142,70 +137,19 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
-	if (m_pDataObj)
-    m_pDataObj->Release();
-  m_pDataObj=NULL;
-  if (pDataObj) 
-  {
-    m_pDataObj = pDataObj;
-    pDataObj->AddRef();
-  }
+	m_bDeskTop=pDataObj!=0;
   return NOERROR;
 }
 
 STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
-	UINT idCmd = idCmdFirst;
-  TCHAR menucmd[_MAX_MENU];
-  
-  if(!(CMF_DEFAULTONLY & uFlags)) 
+  if(((CMF_DEFAULTONLY & uFlags)==0) && m_bDeskTop)
   {
+    //right click target is folder background
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-    if (m_pDataObj) 
-    {	//right click target is a file
-      FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-      STGMEDIUM medium;
-      if((SUCCEEDED(m_pDataObj->GetData(&fe, &medium)))&&(DragQueryFile((HDROP)medium.hGlobal, (UINT)-1, NULL, 0)==1)) 
-      {
-        TCHAR selectedfile[_MAX_PATH];
-        TCHAR drive[_MAX_DRIVE];
-        TCHAR dir[_MAX_DIR];
-        TCHAR filename[_MAX_FNAME];
-        TCHAR extension[_MAX_EXT];
-        DragQueryFile((HDROP)medium.hGlobal, 0, selectedfile, sizeof(selectedfile)/sizeof(TCHAR));
-        _wsplitpath_s(selectedfile, drive, _MAX_DRIVE, dir, _MAX_DIR, filename, _MAX_FNAME, extension, _MAX_EXT);
-        wcscpy_s(m_runcmd, _MAX_PATH, L"\"");
-        wcscat_s(m_runcmd, _MAX_PATH, selectedfile);
-        wcscat_s(m_runcmd, _MAX_PATH, L"\"");
-        wcscpy_s(menucmd, _MAX_MENU, SUDOMENU);
-        if (!_wcsicmp(extension,L".exe")||!_wcsicmp(extension,L".msc")||!_wcsicmp(extension,L".cpl")) 
-        {
-          wcscat_s(menucmd, _MAX_MENU, filename);
-          wcscat_s(menucmd, _MAX_MENU, extension);
-          InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmd++, menucmd);
-        }else if (!_wcsicmp(extension,L".msi")) 
-        {
-          wcscat_s(m_runcmd, _MAX_PATH, L" /i");
-          wcscat_s(menucmd, _MAX_MENU, INSTALLMSI);
-          wcscat_s(menucmd, _MAX_MENU, filename);
-          wcscat_s(menucmd, _MAX_MENU, extension);
-          InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmd++, menucmd);
-          wcscpy_s(menucmd, _MAX_MENU, SUDOMENU);
-          wcscat_s(menucmd, _MAX_MENU, REMOVEMSI);
-          wcscat_s(menucmd, _MAX_MENU, filename);
-          wcscat_s(menucmd, _MAX_MENU, extension);
-          InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmd++, menucmd);
-        }
-        ReleaseStgMedium(&medium);
-      }
-    }
-    else 
-    {	//right click target is folder background
-      wcscpy_s(m_runcmd, _MAX_PATH, L"control");
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmd++, SUDOCPL);
-    }
+    InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, SUDOCPL);
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-    return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmd-idCmdFirst));
+    return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst+1));
   }
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
 }
@@ -215,21 +159,13 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   HRESULT hr = E_INVALIDARG;
 	if (!HIWORD(lpcmi->lpVerb))
   {
-    UINT idCmd = LOWORD(lpcmi->lpVerb);
-    if (idCmd==1) 
-    {
-      m_runcmd[wcslen(m_runcmd)-2]=0;
-      wcscat_s(m_runcmd, _MAX_PATH, L"/x");
-    }
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    TCHAR sudocmd[_MAX_CMD];
+    TCHAR sudocmd[MAX_PATH];
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    GetWindowsDirectory(sudocmd, _MAX_PATH);
-    wcscat_s(sudocmd, _MAX_CMD, SEPARATOR);
-    wcscat_s(sudocmd, _MAX_CMD, SUDOEXE);
-    wcscat_s(sudocmd, _MAX_CMD, m_runcmd);
+    GetWindowsDirectory(sudocmd,MAX_PATH);
+    PathAppend(sudocmd, SURUNEXE);
     // Start the child process.
     if (CreateProcess(NULL,sudocmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
@@ -242,9 +178,9 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   return hr;
 }
 
-STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd, UINT uFlags, UINT FAR *reserved, LPSTR pszName, UINT cchMax)
+STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
 {
   if (uFlags == GCS_HELPTEXT && cchMax > 35)
-    wcscpy_s((LPWSTR)pszName, 35, L"Launch the selected file with Sudo");
+    wcscpy((LPWSTR)pszName,L"Launch the selected file with adminitrative rights");
   return NOERROR;
 }
