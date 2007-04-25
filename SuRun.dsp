@@ -58,7 +58,7 @@ LINK32=link.exe
 OutDir=.\DebugU
 SOURCE="$(InputPath)"
 PreLink_Desc=Check
-PreLink_Cmds=if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1>NUL 2>NUL
+PreLink_Cmds=if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1>NUL 2>NUL	if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1>NUL 2>NUL
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "SuRun - Win32 Unicode Release"
@@ -90,7 +90,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 OutDir=.\ReleaseU
 SOURCE="$(InputPath)"
-PreLink_Cmds=if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1>NUL 2>NUL
+PreLink_Cmds=if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1>NUL 2>NUL	if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1>NUL 2>NUL
 # End Special Build Tool
 
 !ENDIF 
