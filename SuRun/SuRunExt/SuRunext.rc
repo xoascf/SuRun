@@ -32,6 +32,12 @@ BEGIN
     IDS_ERR                 "SuRunExt.dll Fehler"
     IDS_TOOLTIP             "Systemsteuerung als Administrator starten"
     IDS_SURUN               "SuRun Systemsteuerung"
+    IDS_MENURESTART         "Neustart als Administrator"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUSTART           "Start als Administrator"
 END
 
 #endif    // German (Germany) resources
