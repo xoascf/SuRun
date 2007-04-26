@@ -6,12 +6,24 @@ template<const int _S> class CResourceString
 public:
   CResourceString()
   {
+    m_hInst=GetModuleHandle(0);
     memset(&m_str,0,sizeof(m_str));
   }
   CResourceString(int nID,...)
   {
+    m_hInst=GetModuleHandle(0);
     TCHAR S[_S];
-    LoadString(GetModuleHandle(0),nID,S,_S-1);
+    LoadString(m_hInst,nID,S,_S-1);
+    va_list va;
+    va_start(va,nID);
+    _vstprintf(m_str,S,va);
+    va_end(va);
+  }
+  CResourceString(HINSTANCE hInst,int nID,...)
+  {
+    m_hInst=hInst;
+    TCHAR S[_S];
+    LoadString(m_hInst,nID,S,_S-1);
     va_list va;
     va_start(va,nID);
     _vstprintf(m_str,S,va);
@@ -19,6 +31,7 @@ public:
   }
   CResourceString(LPCTSTR s,...)
   {
+    m_hInst=GetModuleHandle(0);
     va_list va;
     va_start(va,s);
     _vstprintf(m_str,s,va);
@@ -26,13 +39,21 @@ public:
   }
   CResourceString(int nID,va_list va)
   {
+    m_hInst=GetModuleHandle(0);
     TCHAR S[_S];
-    LoadString(GetModuleHandle(0),nID,S,_S-1);
+    LoadString(m_hInst,nID,S,_S-1);
+    _vstprintf(m_str,S,va);
+  }
+  CResourceString(HINSTANCE hInst,va_list va)
+  {
+    m_hInst=hInst;
+    TCHAR S[_S];
+    LoadString(hInst,nID,S,_S-1);
     _vstprintf(m_str,S,va);
   }
   const LPCTSTR operator =(int nID)
   {
-    LoadString(GetModuleHandle(0),nID,m_str,_S-1);
+    LoadString(m_hInst,nID,m_str,_S-1);
     return m_str;
   }
   const LPCTSTR operator =(LPCTSTR s)
@@ -48,6 +69,7 @@ public:
   operator LPCTSTR(){ return m_str; };
 protected:
   TCHAR m_str[_S];
+  HINSTANCE m_hInst;
 };
 
 typedef CResourceString<256> CResStr;
