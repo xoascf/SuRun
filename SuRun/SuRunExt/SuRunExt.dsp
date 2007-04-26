@@ -98,10 +98,6 @@ SOURCE=.\SuRunext.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\SuRunext.def
-# End Source File
-# Begin Source File
-
 SOURCE=.\SuRunext.rc
 # End Source File
 # End Group
