@@ -2,6 +2,10 @@
 // Microsoft Developer Studio generated include file.
 // Used by SuRunExt.rc
 //
+#define IDS_FILENOTFOUND                1
+#define IDS_ERR                         2
+#define IDS_TOOLTIP                     3
+#define IDS_SURUN                       4
 
 // Next default values for new objects
 // 
