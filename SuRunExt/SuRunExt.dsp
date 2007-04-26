@@ -94,7 +94,15 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\Helpers.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SuRunext.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SuRunExt.Def
 # End Source File
 # Begin Source File
 
@@ -104,6 +112,10 @@ SOURCE=.\SuRunext.rc
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\Helpers.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\resource.h
