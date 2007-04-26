@@ -242,6 +242,7 @@ BEGIN
     IDS_SURUNREPAIR         "Als Adiminstrator reparieren"
     IDS_UNISTREBOOT         "SuRun wurde erfolgreich entfernt.\r\n\r\nRestliche Dateien werden beim Nächsten Systemstart gelöscht."
     IDS_RUNFAILED           "Fehler!\r\n\r\n%s\r\n\r\nkonnte nich gestartet werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
+    IDS_INSTALLOK           "Der SuRun Dienst wurde erfolgreich installiert\r\n\r\nWollen Sie SuRun jetzt konfigurieren?"
 END
 
 #endif    // German (Germany) resources
@@ -478,6 +479,7 @@ BEGIN
     IDS_SURUNREPAIR         "Repair as administrator"
     IDS_UNISTREBOOT         "SuRun was successfully removed.\r\n\r\nRemaining files are deleted on reboot."
     IDS_RUNFAILED           "Error!\r\n\r\n%s\r\n\r\ncould not be started\r\nWindows reports the error as:\r\n\r\n%s"
+    IDS_INSTALLOK           "The SuRun service has been installed successfully.\r\n\r\nDo you want to start SuRuns Setup now?"
 END
 
 #endif    // English (U.S.) resources
