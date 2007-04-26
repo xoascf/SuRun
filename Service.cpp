@@ -644,7 +644,7 @@ BOOL InstallService()
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/InstallService"),SERVICE_RUNNING);
-  if (CheckServiceStatus()==SERVICE_RUNNING)
+  if (CheckServiceStatus())
     DeleteService(true);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
@@ -724,6 +724,7 @@ bool HandleServiceStuff()
   CCmdLine cmd;
   if (cmd.argc()==2)
   {
+    //Service
     if (_tcscmp(cmd.argv(1),_T("/ServiceRun"))==0)
     {
       if (!IsLocalSystem())
@@ -734,20 +735,24 @@ bool HandleServiceStuff()
       ExitProcess(0);
       return true;
     }
+    //System Menu Hook: This is AutoRun for every user
     if (_tcscmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
       InstallSysMenuHook();
       while (CheckServiceStatus()==SERVICE_RUNNING)
         WaitForSingleObject(GetCurrentThread(),2500);
+      UninstallSysMenuHook();
+      ExitProcess(0);
       return true;
     }
-    
+    //Install
     if (_tcscmp(cmd.argv(1),_T("/InstallService"))==0)
     {
       InstallService();
       ExitProcess(0);
       return true;
     }
+    //UnInstall
     if (_tcscmp(cmd.argv(1),_T("/DeleteService"))==0)
     {
       DeleteService();
