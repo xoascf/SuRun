@@ -48,7 +48,7 @@ static void dec_cRefThisDLL()
 	InterlockedDecrement((LPLONG)&g_cRefThisDll);
 }
 
-STDAPI DllCanUnloadNow()
+STDAPI DllCanUnloadNow(void)
 {
 	return (g_cRefThisDll == 0 ? S_OK : S_FALSE);
 }
@@ -66,19 +66,26 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 
 STDAPI DllRegisterServer()
 {
-  SetRegStr()
-[HKEY_CLASSES_ROOT\CLSID\{2C7B6088-5A77-4d48-BE43-30337DCA9A86}]
-   @="SuRun Shell Extension"
-[HKEY_CLASSES_ROOT\CLSID\{2C7B6088-5A77-4d48-BE43-30337DCA9A86}\InProcServer32]
-   @="SuRunExt.dll"
-   "ThreadingModel"="Apartment"
+  SetRegStr(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID,
+            L"",L"SuRun Shell Extension");
+  SetRegStr(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID L"\\InProcServer32",
+            L"",L"SuRunExt.dll");
+  SetRegStr(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID L"\\InProcServer32",
+            L"ThreadingModel",L"Apartment");
+  SetRegStr(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",
+            L"",sGUID);
+  SetRegStr(HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
+            sGUID,L"SuRun Shell Extension");
+  return S_OK;
+}
 
-[HKEY_CLASSES_ROOT\Directory\Background\shellex\ContextMenuHandlers\SuRun]
-   @="{2C7B6088-5A77-4d48-BE43-30337DCA9A86}"
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved]
-   "{2C7B6088-5A77-4d48-BE43-30337DCA9A86}"="SuRun Shell Extension"
-  
+STDAPI DllUnregisterServer()
+{
+  RegDelVal(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID,0);
+  RegDelVal(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",0);
+  RegDelVal(HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
+            sGUID);
+  return S_OK;
 }
 
 CShellExtClassFactory::CShellExtClassFactory()
