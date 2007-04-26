@@ -18,8 +18,9 @@ HINSTANCE   g_hInst     = NULL;
 UINT        WM_SYSMH0    = 0;
 UINT        WM_SYSMH1    = 0;
 
-const LPCTSTR sMenuRestart=CResStr(IDS_MENURESTART);
-const LPCTSTR sMenuStart=CResStr(IDS_MENUSTART);
+TCHAR sMenuRestart[MAX_PATH];
+TCHAR sMenuStart[MAX_PATH];
+TCHAR sFileNotFound[MAX_PATH];
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHARDATA,rws")
@@ -47,7 +48,6 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu((HMENU)wps->wParam) 
-        /*&& (GetWindowLong(wps->hwnd,GWL_STYLE)&WS_CHILD==0)*/
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1)
         && (!IsAdmin()))
       {
@@ -86,7 +86,7 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
       CloseHandle(pi.hProcess);
       CloseHandle(pi.hThread);
     }else
-      MessageBox(msg->hwnd,CResStr(IDS_FILENOTFOUND),0,MB_ICONSTOP);
+      MessageBox(msg->hwnd,sFileNotFound,0,MB_ICONSTOP);
   }
   #undef msg
   return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
@@ -124,6 +124,9 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     WM_SYSMH0=RegisterWindowMessage(_T("SYSMH_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     WM_SYSMH1=RegisterWindowMessage(_T("SYSMH_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     DisableThreadLibraryCalls(hInstDLL);
+    _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
+    _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
+    _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
   }
   return TRUE;
 }
