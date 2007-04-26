@@ -285,9 +285,12 @@ void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
       }
       LocalFree((HLOCAL)pNewDACL); 
 		  LocalFree((HLOCAL)pSD); 
-      CloseDesktop(hd);
+      if (!CloseDesktop(hd))
+        DBGTrace1("CloseDesktop failed: %s",GetLastErrorNameStatic());
 	  }
-    SetProcessWindowStation(hwss);
-    CloseWindowStation(hws);
+    if (!SetProcessWindowStation(hwss))
+      DBGTrace1("SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
+    if (!CloseWindowStation(hws))
+      DBGTrace1("CloseWindowStation failed: %s",GetLastErrorNameStatic());
 	}
 }
