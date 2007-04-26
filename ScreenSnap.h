@@ -20,10 +20,10 @@ inline void Blur(HBITMAP hbm,int w,int h)
   COLORREF* pSrc=(COLORREF*)malloc(g_bmi32.bmiHeader.biSizeImage); 
   if (pSrc==NULL)
     return;
-  HDC DC=::GetDC(0);
+  HDC DC=GetDC(0);
   if(!GetDIBits(DC,hbm,0,h,pSrc,&g_bmi32,DIB_RGB_COLORS))
   {
-    ::ReleaseDC(0,DC);
+    ReleaseDC(0,DC);
     free(pSrc);
     return;
   }
@@ -66,11 +66,11 @@ public:
     HDC dc=GetDC(0);
     HDC MemDC=CreateCompatibleDC(dc);
     m_bm=CreateCompatibleBitmap(dc,m_dx,m_dy);
-    HBITMAP hbm=(HBITMAP)SelectObject(MemDC,m_bm);
+    (HBITMAP)SelectObject(MemDC,m_bm);
     BitBlt(MemDC,0,0,m_dx,m_dy,dc,0,0,SRCCOPY);
-    SelectObject(MemDC,hbm);
     DeleteDC(MemDC);
     Blur(m_bm,m_dx,m_dy);
+    ReleaseDC(0,dc);
   }
   void Done()
   {
@@ -80,6 +80,7 @@ public:
     if (m_bm)
       DeleteObject(m_bm);
     m_bm=0;
+    UnregisterClass(_T("ScreenWndClass"),GetModuleHandle(0));
   }
   void Show()
   {
@@ -123,11 +124,10 @@ private:
         PAINTSTRUCT ps;
         HDC hdc= BeginPaint(m_hWnd, &ps);
         HDC MemDC=CreateCompatibleDC(hdc);
-        HBITMAP bm=(HBITMAP)SelectObject(MemDC,m_bm);
+        SelectObject(MemDC,m_bm);
         BitBlt(hdc,0,0,m_dx,m_dy,MemDC,0,0,SRCCOPY);
-        EndPaint(m_hWnd, &ps);
-        SelectObject(MemDC,bm);
         DeleteDC(MemDC);
+        EndPaint(m_hWnd, &ps);
         return 0;
       }
     case WM_SETCURSOR:
