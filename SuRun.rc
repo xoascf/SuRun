@@ -216,7 +216,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_USAGE               "Gebrauch:\r\n\tSuRun.exe Programm [Parameter]\r\noder\tSuRun.exe /SETUP"
-    IDS_ASKOK               "Der Befehl:\r\n%s\r\n\r\nsoll mit administratien Rechten ausgeführt werden."
+    IDS_ASKOK               "Der Befehl:\r\n%s\r\n\r\nsoll mit administravien Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
     IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
@@ -241,6 +241,7 @@ BEGIN
     IDS_SURUNUNINST         "Als Adiminstrator deinstallieren"
     IDS_SURUNREPAIR         "Als Adiminstrator reparieren"
     IDS_UNISTREBOOT         "SuRun wurde erfolgreich entfernt.\r\n\r\nRestliche Dateien werden beim Nächsten Systemstart gelöscht."
+    IDS_RUNFAILED           "Fehler!\r\n\r\n%s\r\n\r\nkonnte nich gestartet werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
 END
 
 #endif    // German (Germany) resources
@@ -476,6 +477,7 @@ BEGIN
     IDS_SURUNUNINST         "Remove as administrator"
     IDS_SURUNREPAIR         "Repair as administrator"
     IDS_UNISTREBOOT         "SuRun was successfully removed.\r\n\r\nRemaining files are deleted on reboot."
+    IDS_RUNFAILED           "Error!\r\n\r\n%s\r\n\r\ncould not be started\r\nWindows reports the error as:\r\n\r\n%s"
 END
 
 #endif    // English (U.S.) resources
