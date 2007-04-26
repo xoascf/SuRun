@@ -244,8 +244,9 @@ BEGIN
     IDS_RUNFAILED           "Fehler!\r\n\r\n%s\r\n\r\nkonnte nich gestartet werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_INSTALLOK           "SuRun wurde erfolgreich installiert\r\n\r\nWollen Sie SuRun jetzt konfigurieren?"
     IDS_STARTMENUDIR        "SuRun"
-    IDS_STARTMNUCFG         "SuRun Einstellungen"
+    IDS_STARTMNUCFG         "SuRun Einstellungen.lnk"
     IDS_ASKUNINST           "Soll SuRun deinstalliert werden?"
+    IDS_STARTMUNINST        "SuRun Entfernen.lnk"
 END
 
 #endif    // German (Germany) resources
@@ -360,7 +361,8 @@ BEGIN
     LTEXT           "Password",IDC_STATIC,57,155,32,8
     CONTROL         "",IDC_USER,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP,98,135,69,86
-    EDITTEXT        IDC_PASSWORD,98,152,69,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,98,152,69,14,ES_PASSWORD | ES_AUTOHSCROLL | 
+                    WS_DISABLED
     DEFPUSHBUTTON   "&Cancel",IDCANCEL,172,135,50,14
     PUSHBUTTON      "&OK",IDOK,172,152,50,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,65,230,1
@@ -484,8 +486,9 @@ BEGIN
     IDS_RUNFAILED           "Error!\r\n\r\n%s\r\n\r\ncould not be started\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_INSTALLOK           "SuRun been installed successfully.\r\n\r\nDo you want to configure SuRun now?"
     IDS_STARTMENUDIR        "SuRun"
-    IDS_STARTMNUCFG         "SuRun Settings"
+    IDS_STARTMNUCFG         "SuRun Settings.lnk"
     IDS_ASKUNINST           "Do you want to remove SuRun from this system?"
+    IDS_STARTMUNINST        "Remove SuRun.lnk"
 END
 
 #endif    // English (U.S.) resources
