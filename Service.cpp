@@ -17,11 +17,20 @@
 #include "Helpers.h"
 #include "DBGTrace.h"
 #include "Resource.h"
+#include "SuRunExt/SuRunExt.h"
+#include "SuRunExt/SysMenuHook.h"
 
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Rpcrt4.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"AdvApi32.lib")
+
+#ifndef _DEBUG
+#pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
+#else _DEBUG
+#pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
+#endif _DEBUG
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Settings
@@ -37,6 +46,7 @@ static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked a
 
 #define MainKey HKEY_LOCAL_MACHINE
 #define SvcKey _T("Software\\SuRun")
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Globals
@@ -252,6 +262,95 @@ int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_SERVICE_NOTIFICATION);
   return -1;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  InstallRegistry
+// 
+//////////////////////////////////////////////////////////////////////////////
+#define HKCR HKEY_CLASSES_ROOT
+#define HKLM HKEY_LOCAL_MACHINE
+
+#define UNINSTL L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SuRun"
+
+#define SHLRUN  L"\\Shell\\SuRun"
+#define EXERUN  L"exefile" SHLRUN
+#define CMDRUN  L"cmdfile" SHLRUN
+#define CPLRUN  L"cplfile" SHLRUN
+#define MSCRUN  L"mscfile" SHLRUN
+#define BATRUN  L"batfile" SHLRUN
+#define MSIPKG  L"Msi.Package" SHLRUN
+
+void InstallRegistry()
+{
+  TCHAR SuRunExe[4096];
+  GetWindowsDirectory(SuRunExe,4096);
+  PathAppend(SuRunExe,L"SuRun.exe");
+  CResStr MenuStr(IDS_MENUSTR);
+  CBigResStr DefCmd(L"%s \"%1\" %%*",SuRunExe);
+  //UnInstall
+  SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
+  SetRegStr(HKLM,UNINSTL,L"UninstallString",
+    CBigResStr(L"cmd.exe /c %s /DeleteService & del /f %s",SuRunExe,SuRunExe));
+  //AutoRun, System Menu Hook
+  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+    CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
+  //exefile
+  SetRegStr(HKCR,EXERUN,L"",MenuStr);
+  SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
+  //cmdfile
+  SetRegStr(HKCR,CMDRUN,L"",MenuStr);
+  SetRegStr(HKCR,CMDRUN L"\\command",L"",DefCmd);
+  //cplfile
+  SetRegStr(HKCR,CPLRUN,L"",MenuStr);
+  SetRegStr(HKCR,CPLRUN L"\\command",L"",DefCmd);
+  //MSCFile
+  SetRegStr(HKCR,MSCRUN,L"",MenuStr);
+  SetRegStr(HKCR,MSCRUN L"\\command",L"",DefCmd);
+  //batfile
+  SetRegStr(HKCR,BATRUN,L"",MenuStr);
+  SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
+  //MSI Install
+  SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
+  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s \"%1\" %%* /i",SuRunExe));
+  //MSI Repair
+  SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
+  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s \"%1\" %%* /f",SuRunExe));
+  //MSI Uninstall
+  SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
+  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%1\" %%* /x",SuRunExe));
+  InstallShellExt();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  RemoveRegistry
+// 
+//////////////////////////////////////////////////////////////////////////////
+void RemoveRegistry()
+{
+  RemoveShellExt();
+  //exefile
+  DelRegKey(HKCR,EXERUN);
+  //cmdfile
+  DelRegKey(HKCR,CMDRUN);
+  //cplfile
+  DelRegKey(HKCR,CPLRUN);
+  //MSCFile
+  DelRegKey(HKCR,MSCRUN);
+  //batfile
+  DelRegKey(HKCR,BATRUN);
+  //MSI Install
+  DelRegKey(HKCR,MSIPKG L" open");
+  //MSI Repair
+  DelRegKey(HKCR,MSIPKG L" repair");
+  //MSI Uninstall
+  DelRegKey(HKCR,MSIPKG L" Uninstall");
+  //AutoRun, System Menu Hook
+  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
+  //UnInstall
+  DelRegKey(HKLM,UNINSTL);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -516,6 +615,24 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat)
   WaitFor(CheckServiceStatus()==WaitStat);
 }
 
+void CopyToWinDir(LPCTSTR File)
+{
+  TCHAR DstFile[4096];
+  TCHAR SrcFile[4096];
+  GetModuleFileName(NULL,SrcFile,MAX_PATH);
+  NetworkPathToUNCPath(SrcFile);
+  PathRemoveFileSpec(SrcFile);
+  PathAppend(SrcFile,File);
+  GetWindowsDirectory(DstFile,4096);
+  PathAppend(DstFile,File);
+  if (PathFileExists(DstFile) && (!DeleteFile(DstFile)))
+  {
+    CBigResStr DelFile(_T("%s.tmp"),DstFile);
+    _trename(DstFile,DelFile);
+    MoveFileEx(DelFile,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
+  }
+  CopyFile(SrcFile,DstFile,FALSE);
+}
 
 BOOL InstallService()
 {
@@ -525,15 +642,16 @@ BOOL InstallService()
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
     return FALSE;
-  TCHAR ExeName[4096];
-  TCHAR ModName[MAX_PATH];
-  GetModuleFileName(NULL,ModName,MAX_PATH);
-  NetworkPathToUNCPath(ModName);
-  PathQuoteSpaces(ModName);
-  _stprintf(ExeName,_T("%s /ServiceRun"),ModName);
+  CopyToWinDir(_T("SuRun.exe"));
+  CopyToWinDir(_T("SuRunExt.dll"));
+  TCHAR SvcFile[4096];
+  GetWindowsDirectory(SvcFile,4096);
+  PathAppend(SvcFile,_T("SuRun.exe"));
+  PathQuoteSpaces(SvcFile);
+  _tcscat(SvcFile,_T(" /ServiceRun"));
   SC_HANDLE hdlServ = CreateService(hdlSCM,SvcName,SvcName,STANDARD_RIGHTS_REQUIRED,
                           SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,
-                          SERVICE_ERROR_NORMAL,ExeName,0,0,0,0,0);
+                          SERVICE_ERROR_NORMAL,SvcFile,0,0,0,0,0);
   if (!hdlServ) 
     return CloseServiceHandle(hdlSCM),FALSE;
   CloseServiceHandle(hdlServ);
@@ -546,7 +664,10 @@ BOOL InstallService()
     if (hdlServ)
       DeleteService(hdlServ);
   }else
+  {
+    InstallRegistry();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
+  }
   CloseServiceHandle(hdlServ);
   CloseServiceHandle(hdlSCM);
   return bRet;
@@ -556,6 +677,7 @@ BOOL DeleteService()
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/DeleteService"),0);
+  RemoveRegistry();
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
   {
@@ -569,6 +691,7 @@ BOOL DeleteService()
       return TRUE;
     }
   }
+  UninstallSysMenuHook();
   return FALSE;
 }
 
@@ -592,6 +715,13 @@ bool HandleServiceStuff()
       ExitProcess(0);
       return true;
     }
+    if (_tcscmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
+    {
+      InstallSysMenuHook();
+      WaitForSingleObject(GetCurrentThread(),INFINITE);
+      return true;
+    }
+    
     if (_tcscmp(cmd.argv(1),_T("/InstallService"))==0)
     {
       InstallService();
