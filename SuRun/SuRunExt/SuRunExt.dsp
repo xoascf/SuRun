@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=SuRunExt - Win32 Debug
+CFG=SuRunExt - Win32 Unicode Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,12 +13,12 @@ CFG=SuRunExt - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "SuRunExt.mak" CFG="SuRunExt - Win32 Debug"
+!MESSAGE NMAKE /f "SuRunExt.mak" CFG="SuRunExt - Win32 Unicode Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "SuRunExt - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "SuRunExt - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "SuRunExt - Win32 Unicode Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "SuRunExt - Win32 Unicode Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -29,17 +29,17 @@ CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "SuRunExt - Win32 Release"
+!IF  "$(CFG)" == "SuRunExt - Win32 Unicode Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "ReleaseU"
+# PROP BASE Intermediate_Dir "ReleaseU"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Output_Dir "ReleaseU"
+# PROP Intermediate_Dir "ReleaseU"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
@@ -53,20 +53,20 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 /nologo /dll /machine:I386 /out:"../SuRunExt.dll"
-# SUBTRACT LINK32 /nodefaultlib
+# ADD LINK32 /nologo /dll /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
+# SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "SuRunExt - Win32 Debug"
+!ELSEIF  "$(CFG)" == "SuRunExt - Win32 Unicode Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "DebugU"
+# PROP BASE Intermediate_Dir "DebugU"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
+# PROP Output_Dir "DebugU"
+# PROP Intermediate_Dir "DebugU"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /GZ /c
@@ -87,14 +87,30 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "SuRunExt - Win32 Release"
-# Name "SuRunExt - Win32 Debug"
+# Name "SuRunExt - Win32 Unicode Release"
+# Name "SuRunExt - Win32 Unicode Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\DBGTrace.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\Helpers.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\IsAdmin.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LogonDlg.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\sspi_auth.cpp
 # End Source File
 # Begin Source File
 
@@ -107,6 +123,14 @@ SOURCE=.\SuRunExt.Def
 # Begin Source File
 
 SOURCE=.\SuRunext.rc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SysMenuHook.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\UserGroups.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -123,6 +147,10 @@ SOURCE=.\resource.h
 # Begin Source File
 
 SOURCE=.\SuRunext.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SysMenuHook.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
