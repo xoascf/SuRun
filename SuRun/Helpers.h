@@ -4,6 +4,7 @@
 #define zero(x) memset(&x,0,sizeof(x))
 
 //  Registry Helper
+BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey);
 BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName);
 
 BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value);
