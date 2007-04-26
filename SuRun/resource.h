@@ -14,10 +14,15 @@
 #define IDS_NOADMIN                     10
 #define IDS_NOSUDOER                    11
 #define IDS_ASKSUDOER                   12
+#define IDS_MENUSTR                     13
 #define IDS_BUILTINADMIN                14
 #define IDS_SUDOER_OK                   15
 #define IDS_SUDOER_ERR                  16
 #define IDS_LOGOFFON                    17
+#define IDS_SYSMENUEXT                  18
+#define IDS_SURUNINST                   19
+#define IDS_SURUNUNINST                 20
+#define IDS_SURUNREPAIR                 21
 #define IDD_LOGONDLG                    101
 #define IDI_ICON1                       103
 #define IDI_MAINICON                    103
