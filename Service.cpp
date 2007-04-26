@@ -777,6 +777,8 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
+      for(int i=0;(i<30)&&(CheckServiceStatus()!=SERVICE_RUNNING);i++)
+        Sleep(1000);
       InstallSysMenuHook();
       do 
       {
