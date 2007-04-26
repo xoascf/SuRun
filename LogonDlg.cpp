@@ -258,11 +258,16 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }//WM_INITDIALOG
   case WM_DESTROY:
     {
-      DeleteObject((HGDIOBJ)SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_SETFONT,
-        (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0));
+      HGDIOBJ fs=GetStockObject(DEFAULT_GUI_FONT);
+      HGDIOBJ f=(HGDIOBJ)SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_GETFONT,0,0);
+      SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_SETFONT,(WPARAM)fs,0);
+      DeleteObject(f);
       if (GetDlgItem(hwnd,IDC_HINT))
-        DeleteObject((HGDIOBJ)SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,
-          (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0));
+      {
+        f=(HGDIOBJ)SendDlgItemMessage(hwnd,IDC_HINT,WM_GETFONT,0,0);
+        SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,(WPARAM)fs,0);
+        DeleteObject(f);
+      }
     }
   case WM_NCDESTROY:
     {
@@ -375,3 +380,18 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
   return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
     DialogProc,(LPARAM)&p);
 }
+
+//#ifdef _DEBUG
+//TCHAR User[MAX_PATH]=L"KAY";
+//TCHAR Password[MAX_PATH]={0};
+//BOOL l=LogonAdmin(User,Password,IDS_ASKINSTALL);
+//BOOL m=LogonAdmin(User,Password,IDS_ASKINSTALL);
+//BOOL n=LogonAdmin(User,Password,IDS_ASKINSTALL);
+//BOOL p=LogonAdmin(User,Password,IDS_ASKINSTALL);
+//BOOL Exit()
+//{
+//  ::ExitProcess(0);
+//  return TRUE;
+//}
+//BOOL x=Exit();
+//#endif _DEBUG
