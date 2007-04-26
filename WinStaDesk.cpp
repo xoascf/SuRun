@@ -134,6 +134,8 @@ void CRunOnNewDeskTop::CleanUp()
   {
     if (!SwitchDesktop(m_hDeskSwitch))
       DBGTrace1("CRunOnNewDeskTop: SwitchDesktop failed: %s",GetLastErrorNameStatic());
+    if (!CloseDesktop(m_hDeskSwitch))
+      DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
     m_hDeskSwitch=NULL;
   }
   //Set the previous Window Station
