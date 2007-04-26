@@ -592,7 +592,7 @@ DWORD CheckServiceStatus()
   return ss.dwCurrentState;
 }
 
-BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat)
+BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
 {
   TCHAR ModName[MAX_PATH];
   TCHAR cmdLine[4096];
@@ -613,7 +613,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat)
     }
   }
   _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
-  if (!RunAsAdmin(cmdLine,IDS_UNINSTALLADMIN))
+  if (!RunAsAdmin(cmdLine,nResId))
     return FALSE;
   WaitFor(CheckServiceStatus()==WaitStat);
 }
@@ -646,7 +646,7 @@ void CopyToWinDir(LPCTSTR File)
 BOOL InstallService()
 {
   if (!IsAdmin())
-    return RunThisAsAdmin(_T("/Install"),SERVICE_RUNNING);
+    return RunThisAsAdmin(_T("/Install"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   if (CheckServiceStatus())
     DeleteService(true);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
@@ -699,7 +699,7 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
     MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO)
     return false;
   if (!IsAdmin())
-    return RunThisAsAdmin(_T("/UNINSTALL"),0);
+    return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
   BOOL bRet=FALSE;
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
