@@ -30,3 +30,8 @@ bool GetSIDUserName(PSID sid,LPTSTR Name);
 bool GetTokenUserName(HANDLE hUser,LPTSTR Name);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR Name);
 
+//Link Creation
+BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname);
+
+// DeleteDirectory ... all files and SubDirs
+bool DeleteDirectory(LPCTSTR DIR);
