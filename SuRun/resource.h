@@ -29,6 +29,7 @@
 #define IDS_STARTMENUDIR                25
 #define IDS_STARTMNUCFG                 26
 #define IDS_ASKUNINST                   27
+#define IDS_STARTMUNINST                28
 #define IDD_LOGONDLG                    101
 #define IDI_ICON1                       103
 #define IDI_MAINICON                    103
