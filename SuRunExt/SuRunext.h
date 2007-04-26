@@ -1,4 +1,9 @@
 #pragma once
+#include <shlobj.h>
+
+
+extern "C" __declspec(dllexport) void RemoveShellExt();
+extern "C" __declspec(dllexport) void InstallShellExt();
 
 #pragma data_seg(".SHARDATA")
 
