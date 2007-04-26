@@ -377,9 +377,9 @@ void KillProcess(DWORD PID)
 DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR CommandLine) 
 {
   PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
-  {
+//  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+//  if(LoadUserProfile(hUser,&ProfInf))
+//  {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hUser,FALSE))
     {
@@ -404,9 +404,9 @@ DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR Co
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hUser,ProfInf.hProfile);
-  }else
-    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
+//    UnloadUserProfile(hUser,ProfInf.hProfile);
+//  }else
+//    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
   return pi.dwProcessId;
 }
 
