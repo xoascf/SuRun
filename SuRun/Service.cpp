@@ -663,13 +663,14 @@ BOOL InstallService()
     hdlServ=OpenService(hdlSCM,SvcName,SERVICE_STOP|DELETE);
     if (hdlServ)
       DeleteService(hdlServ);
-  }else
+  }
+  CloseServiceHandle(hdlServ);
+  CloseServiceHandle(hdlSCM);
+  if (!bRet)
   {
     InstallRegistry();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
-  CloseServiceHandle(hdlServ);
-  CloseServiceHandle(hdlSCM);
   return bRet;
 }
 
