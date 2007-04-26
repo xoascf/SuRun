@@ -17,6 +17,13 @@ public:
     _vstprintf(m_str,S,va);
     va_end(va);
   }
+  CResourceString(LPCTSTR s,...)
+  {
+    va_list va;
+    va_start(va,s);
+    _vstprintf(m_str,s,va);
+    va_end(va);
+  }
   CResourceString(int nID,va_list va)
   {
     TCHAR S[_S];
@@ -44,4 +51,4 @@ protected:
 };
 
 typedef CResourceString<256> CResStr;
-typedef CResourceString<256> CBigResStr;
+typedef CResourceString<4096> CBigResStr;
