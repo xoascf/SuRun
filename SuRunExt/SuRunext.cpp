@@ -1,17 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // based on: SuDowns sudoext.cpp http://sudown.sourceforge.net
-//           Tianmiao Hu's excellent GVimExt gvim extension v1.0.0.1
-//             ftp://ftp.vim.org/pub/vim/pc/vim70src.zip.
+//
 //////////////////////////////////////////////////////////////////////////////
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
 #include <tchar.h>
-#include <stdio.h>
 #include <shlobj.h>
 #include <initguid.h>
-#include <shlguid.h>
 #include <shlwapi.h>
 
 #pragma comment(lib,"User32.lib")
@@ -32,11 +29,6 @@ UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHARDATA,rws")
 
-
-extern "C" int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
-{
-  return 1;
-}
 
 static void inc_cRefThisDLL()
 {
@@ -64,28 +56,24 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
   return CLASS_E_CLASSNOTAVAILABLE;
 }
 
-STDAPI DllRegisterServer()
+#define HKCR HKEY_CLASSES_ROOT
+#define HKLM HKEY_LOCAL_MACHINE
+__declspec(dllexport) void InstallShellExt()
 {
-  SetRegStr(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID,
-            L"",L"SuRun Shell Extension");
-  SetRegStr(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID L"\\InProcServer32",
-            L"",L"SuRunExt.dll");
-  SetRegStr(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID L"\\InProcServer32",
-            L"ThreadingModel",L"Apartment");
-  SetRegStr(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",
-            L"",sGUID);
-  SetRegStr(HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
+  SetRegStr(HKCR,L"CLSID\\" sGUID,L"",L"SuRun Shell Extension");
+  SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"",L"SuRunExt.dll");
+  SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
+  SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUID,L"SuRun Shell Extension");
-  return S_OK;
 }
 
-STDAPI DllUnregisterServer()
+__declspec(dllexport) void RemoveShellExt()
 {
-  RegDelVal(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID,0);
-  RegDelVal(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",0);
+  DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
+  DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
   RegDelVal(HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUID);
-  return S_OK;
 }
 
 CShellExtClassFactory::CShellExtClassFactory()
