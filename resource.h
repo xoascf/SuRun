@@ -24,6 +24,7 @@
 #define IDS_SURUNUNINST                 20
 #define IDS_SURUNREPAIR                 21
 #define IDS_UNISTREBOOT                 22
+#define IDS_RUNFAILED                   23
 #define IDD_LOGONDLG                    101
 #define IDI_ICON1                       103
 #define IDI_MAINICON                    103
