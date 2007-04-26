@@ -1,4 +1,4 @@
-LIBRARY     ShellvRTF
+LIBRARY     SuRunExt
 
 EXPORTS
    DllCanUnloadNow   PRIVATE
