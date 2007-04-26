@@ -240,6 +240,7 @@ BEGIN
     IDS_SURUNINST           "Als Adiminstrator installieren"
     IDS_SURUNUNINST         "Als Adiminstrator deinstallieren"
     IDS_SURUNREPAIR         "Als Adiminstrator reparieren"
+    IDS_UNISTREBOOT         "SuRun wurde erfolgreich entfernt.\r\n\r\nRestliche Dateien werden beim Nächsten Systemstart gelöscht."
 END
 
 #endif    // German (Germany) resources
@@ -474,6 +475,7 @@ BEGIN
     IDS_SURUNINST           "Install as administrator"
     IDS_SURUNUNINST         "Remove as administrator"
     IDS_SURUNREPAIR         "Repair as administrator"
+    IDS_UNISTREBOOT         "SuRun was successfully removed.\r\n\r\nRemaining files are deleted on reboot."
 END
 
 #endif    // English (U.S.) resources
