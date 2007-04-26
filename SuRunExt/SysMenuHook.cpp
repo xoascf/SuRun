@@ -3,7 +3,9 @@
 #include <tchar.h>
 #include <shlwapi.h>
 #include "SysMenuHook.h"
+#include "../ResStr.h"
 #include "../IsAdmin.h"
+#include "Resource.h"
 
 #pragma comment(lib,"shlwapi")
 
@@ -15,6 +17,9 @@ HHOOK       g_hookMenu  = NULL;
 HINSTANCE   g_hInst     = NULL;
 UINT        WM_SYSMH0    = 0;
 UINT        WM_SYSMH1    = 0;
+
+const LPCTSTR sMenuRestart=CResStr(IDS_MENURESTART);
+const LPCTSTR sMenuStart=CResStr(IDS_MENUSTART);
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHARDATA,rws")
@@ -42,11 +47,12 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu((HMENU)wps->wParam) 
+        && (GetWindowLong(wps->hwnd,GWL_STYLE)&WS_CHILD==0)
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1)
         && (!IsAdmin()))
       {
-        AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,_T("Restart with SuRun"));
-        AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,_T("Start with SuRun"));
+        AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,sMenuRestart);
+        AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,sMenuStart);
       }
       break;
     }
@@ -65,17 +71,22 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
     PROCESS_INFORMATION pi;
     si.cb = sizeof(si);
     TCHAR cmd[4096];
+    TCHAR PID[10];
     GetWindowsDirectory(cmd, MAX_PATH);
     PathAppend(cmd, _T("surun.exe "));
-    _tcscat(cmd, GetCommandLine());
+    if (msg->wParam==WM_SYSMH0)
+    {
+      _tcscat(cmd,_T("/KILL "));
+      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
+      _tcscat(cmd,_T(" "));
+    }
+    _tcscat(cmd,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      if (msg->wParam==WM_SYSMH0)
-        ::ExitProcess(0);
       CloseHandle(pi.hProcess);
       CloseHandle(pi.hThread);
     }else
-      MessageBox(msg->hwnd,_T("File not found: surun.exe"),0,MB_ICONSTOP);
+      MessageBox(msg->hwnd,CResStr(IDS_FILENOTFOUND),0,MB_ICONSTOP);
   }
   #undef msg
   return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
@@ -110,8 +121,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   {
   case DLL_PROCESS_ATTACH:
     g_hInst=hInstDLL;
-    WM_SYSMH0=RegisterWindowMessage(_T("SYSMH229FE1EC5_F424_488b_A672_A21C189F4EDC"));
-    WM_SYSMH1=RegisterWindowMessage(_T("SYSMH329FE1EC5_F424_488b_A672_A21C189F4EDC"));
+    WM_SYSMH0=RegisterWindowMessage(_T("SYSMH_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+    WM_SYSMH1=RegisterWindowMessage(_T("SYSMH_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     DisableThreadLibraryCalls(hInstDLL);
   }
   return TRUE;
