@@ -678,16 +678,26 @@ BOOL InstallService()
   CloseServiceHandle(hdlSCM);
   if (bRet)
   {
+    //Registry
     InstallRegistry();
+    //Install Start menu Links
+    CoInitialize(0);
     TCHAR lnk[4096]={0};
     TCHAR file[4096]={0};
     GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
-      L"Common Programs",lnk,4096);
+      L"Common Programs",file,4096);
+    ExpandEnvironmentStrings(file,lnk,4096);
     PathAppend(lnk,CResStr(IDS_STARTMENUDIR));
+    CreateDirectory(lnk,0); 
     PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
     GetWindowsDirectory(file,4096);
     PathAppend(file,L"SuRun.exe /SETUP");
+    PathRemoveFileSpec(lnk);
+    PathAppend(lnk,CResStr(IDS_STARTMUNINST));
+    GetWindowsDirectory(file,4096);
+    PathAppend(file,L"SuRun.exe /UNINSTALL");
     CreateLink(file,lnk);
+    CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
   return bRet;
@@ -716,19 +726,25 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
   }
   if (bJustStop)
     return TRUE;
-  TCHAR File[4096];
+  //Registry
   RemoveRegistry();
+  //SysMenu Hook
   UninstallSysMenuHook();
+  //Delete Files and directories
+  TCHAR File[4096];
   GetWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRun.exe"));
   DelFile(File);
   GetWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRunExt.dll"));
   DelFile(File);
+  TCHAR file[4096];
   GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
-    L"Common Programs",File,4096);
+    L"Common Programs",file,4096);
+  ExpandEnvironmentStrings(file,File,4096);
   PathAppend(File,CResStr(IDS_STARTMENUDIR));
   DeleteDirectory(File);
+  //Ok!
   MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
   return bRet;
 }
@@ -806,11 +822,9 @@ DoInstall:
     ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
     if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
       MB_ICONQUESTION|MB_YESNO)==IDYES)
-    {
       ShellExecute(0,L"open",L"surun.exe",L"/SETUP",0,SW_SHOWNORMAL);
-      if (cmd.argc()==1)
-        ExitProcess(0);
-    }
+    if (cmd.argc()==1)
+      ExitProcess(0);
     ServiceStatus=CheckServiceStatus();
   }
   return false;
