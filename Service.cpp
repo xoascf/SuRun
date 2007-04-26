@@ -643,7 +643,8 @@ BOOL InstallService()
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/InstallService"),SERVICE_RUNNING);
-  DeleteService();
+  if (CheckServiceStatus()==SERVICE_RUNNING)
+    DeleteService(true);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
     return FALSE;
@@ -679,13 +680,11 @@ BOOL InstallService()
   return bRet;
 }
 
-BOOL DeleteService()
+BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/DeleteService"),0);
   BOOL bRet=FALSE;
-  RemoveRegistry();
-  UninstallSysMenuHook();
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
   {
@@ -699,13 +698,18 @@ BOOL DeleteService()
       bRet=TRUE;
     }
   }
+  if (bJustStop)
+    return TRUE;
   TCHAR File[4096];
+  RemoveRegistry();
+  UninstallSysMenuHook();
   GetWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRun.exe"));
   DelFile(File);
   GetWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRunExt.dll"));
   DelFile(File);
+  MessageBox(0,CBigResStr(IDS_UNISTREBOOT),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
   return bRet;
 }
 
@@ -732,7 +736,8 @@ bool HandleServiceStuff()
     if (_tcscmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
       InstallSysMenuHook();
-      WaitForSingleObject(GetCurrentThread(),INFINITE);
+      while (CheckServiceStatus()==SERVICE_RUNNING)
+        WaitForSingleObject(GetCurrentThread(),2500);
       return true;
     }
     
