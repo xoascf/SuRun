@@ -3,4 +3,4 @@
 #define ServicePipeName _T("\\\\.\\Pipe\\SuperUserRun")
 
 BOOL InstallService();
-BOOL DeleteService();
+BOOL DeleteService(BOOL bJustStop=FALSE);
