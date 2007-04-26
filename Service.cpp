@@ -288,7 +288,7 @@ void InstallRegistry()
   GetWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRun.exe");
   CResStr MenuStr(IDS_MENUSTR);
-  CBigResStr DefCmd(L"%s \"%1\" %%*",SuRunExe);
+  CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
   //UnInstall
   SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
   SetRegStr(HKLM,UNINSTL,L"UninstallString",
@@ -313,13 +313,13 @@ void InstallRegistry()
   SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
   //MSI Install
   SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
-  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s \"%1\" %%* /i",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s \"%%1\" %%* /i",SuRunExe));
   //MSI Repair
   SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
-  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s \"%1\" %%* /f",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s \"%%1\" %%* /f",SuRunExe));
   //MSI Uninstall
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
-  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%1\" %%* /x",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%%1\" %%* /x",SuRunExe));
   InstallShellExt();
 }
 
@@ -628,7 +628,8 @@ void CopyToWinDir(LPCTSTR File)
   if (PathFileExists(DstFile) && (!DeleteFile(DstFile)))
   {
     CBigResStr DelFile(_T("%s.tmp"),DstFile);
-    _trename(DstFile,DelFile);
+    while (_trename(DstFile,DelFile))
+      _tcscat(DelFile,L".tmp");
     MoveFileEx(DelFile,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
   }
   CopyFile(SrcFile,DstFile,FALSE);
