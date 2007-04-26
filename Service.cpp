@@ -561,7 +561,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 //////////////////////////////////////////////////////////////////////////////
 
 #define WaitFor(a) \
-    for (int i=0;i<10;i++)\
+    for (int i=0;i<30;i++)\
     {\
       Sleep(750);\
       if (a)\
@@ -739,8 +739,10 @@ bool HandleServiceStuff()
     if (_tcscmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
       InstallSysMenuHook();
-      while (CheckServiceStatus()==SERVICE_RUNNING)
-        WaitForSingleObject(GetCurrentThread(),2500);
+      do 
+      {
+      	WaitForSingleObject(GetCurrentThread(),5000);
+      } while (CheckServiceStatus()==SERVICE_RUNNING);
       UninstallSysMenuHook();
       ExitProcess(0);
       return true;
@@ -769,6 +771,17 @@ bool HandleServiceStuff()
       ExitProcess(0);
     if (!InstallService())
       ExitProcess(0);
+    TCHAR SuRunExe[4096];
+    GetWindowsDirectory(SuRunExe,4096);
+    PathAppend(SuRunExe,L"SuRun.exe");
+    ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
+    if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
+      MB_ICONQUESTION|MB_YESNO)==IDYES)
+    {
+      ShellExecute(0,L"open",L"surun.exe",L"/SETUP",0,SW_SHOWNORMAL);
+      if (cmd.argc()==1)
+        ExitProcess(0);
+    }
     ServiceStatus=CheckServiceStatus();
   }
   return false;
