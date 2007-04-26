@@ -136,6 +136,12 @@ BEGIN
     IDS_ERR                 "SuRunExt.dll error"
     IDS_TOOLTIP             "Launch control panel with adminitrative rights"
     IDS_SURUN               "SuRun control panel"
+    IDS_MENURESTART         "Restart as administrator"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUSTART           "Start as administrator"
 END
 
 #endif    // English (U.S.) resources
