@@ -291,7 +291,7 @@ void InstallRegistry()
   CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
   //UnInstall
   SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
-  SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /DeleteService",SuRunExe,SuRunExe));
+  SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /UNINSTALL",SuRunExe,SuRunExe));
   //AutoRun, System Menu Hook
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
     CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
@@ -446,6 +446,9 @@ VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
+#ifdef _DEBUG_ENU
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+#endif _DEBUG_ENU
   //service main
   argc;//unused
   argv;//unused
@@ -643,7 +646,7 @@ void CopyToWinDir(LPCTSTR File)
 BOOL InstallService()
 {
   if (!IsAdmin())
-    return RunThisAsAdmin(_T("/InstallService"),SERVICE_RUNNING);
+    return RunThisAsAdmin(_T("/Install"),SERVICE_RUNNING);
   if (CheckServiceStatus())
     DeleteService(true);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
@@ -676,6 +679,15 @@ BOOL InstallService()
   if (bRet)
   {
     InstallRegistry();
+    TCHAR lnk[4096]={0};
+    TCHAR file[4096]={0};
+    GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
+      L"Common Programs",lnk,4096);
+    PathAppend(lnk,CResStr(IDS_STARTMENUDIR));
+    PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
+    GetWindowsDirectory(file,4096);
+    PathAppend(file,L"SuRun.exe /SETUP");
+    CreateLink(file,lnk);
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
   return bRet;
@@ -683,8 +695,11 @@ BOOL InstallService()
 
 BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 {
+  if (MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
+    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO)
+    return false;
   if (!IsAdmin())
-    return RunThisAsAdmin(_T("/DeleteService"),0);
+    return RunThisAsAdmin(_T("/UNINSTALL"),0);
   BOOL bRet=FALSE;
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
@@ -710,7 +725,11 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
   GetWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRunExt.dll"));
   DelFile(File);
-  MessageBox(0,CBigResStr(IDS_UNISTREBOOT),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+  GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
+    L"Common Programs",File,4096);
+  PathAppend(File,CResStr(IDS_STARTMENUDIR));
+  DeleteDirectory(File);
+  MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
   return bRet;
 }
 
@@ -721,11 +740,15 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 //////////////////////////////////////////////////////////////////////////////
 bool HandleServiceStuff()
 {
+#ifdef _DEBUG_ENU
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+#endif _DEBUG_ENU
+  DWORD ServiceStatus=0;
   CCmdLine cmd;
   if (cmd.argc()==2)
   {
     //Service
-    if (_tcscmp(cmd.argv(1),_T("/ServiceRun"))==0)
+    if (_tcsicmp(cmd.argv(1),_T("/ServiceRun"))==0)
     {
       if (!IsLocalSystem())
         return false;
@@ -736,7 +759,7 @@ bool HandleServiceStuff()
       return true;
     }
     //System Menu Hook: This is AutoRun for every user
-    if (_tcscmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
+    if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
       InstallSysMenuHook();
       do 
@@ -748,24 +771,30 @@ bool HandleServiceStuff()
       return true;
     }
     //Install
-    if (_tcscmp(cmd.argv(1),_T("/InstallService"))==0)
+    if (_tcsicmp(cmd.argv(1),_T("/Install"))==0)
     {
       InstallService();
       ExitProcess(0);
       return true;
     }
     //UnInstall
-    if (_tcscmp(cmd.argv(1),_T("/DeleteService"))==0)
+    if (_tcsicmp(cmd.argv(1),_T("/UNINSTALL"))==0)
     {
       DeleteService();
       ExitProcess(0);
       return true;
     }
+    if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
+    {
+      //this is ugly:
+      goto DoInstall;
+    }
   }
   //The Service must be running!
-  DWORD ServiceStatus=CheckServiceStatus();
+  ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
+DoInstall:
     if (MessageBox(0,CBigResStr(IDS_ASKINSTALL),CResStr(IDS_APPNAME),
                    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
       ExitProcess(0);
