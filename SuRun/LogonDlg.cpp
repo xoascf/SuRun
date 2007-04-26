@@ -16,6 +16,7 @@
 
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Netapi32.lib")
+#pragma comment(lib,"Gdi32.lib")
 
 /////////////////////////////////////////////////////////////////////////////
 //
