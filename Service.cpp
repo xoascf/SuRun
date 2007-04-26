@@ -399,7 +399,8 @@ DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR Co
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
       }else
-        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+        MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
+          CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
