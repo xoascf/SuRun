@@ -291,8 +291,7 @@ void InstallRegistry()
   CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
   //UnInstall
   SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
-  SetRegStr(HKLM,UNINSTL,L"UninstallString",
-    CBigResStr(L"cmd.exe /c %s /DeleteService & del /f %s",SuRunExe,SuRunExe));
+  SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /DeleteService",SuRunExe,SuRunExe));
   //AutoRun, System Menu Hook
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
     CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
@@ -615,6 +614,17 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat)
   WaitFor(CheckServiceStatus()==WaitStat);
 }
 
+void DelFile(LPCTSTR File)
+{
+  if (PathFileExists(File) && (!DeleteFile(File)))
+  {
+    CBigResStr tmp(_T("%s.tmp"),File);
+    while (_trename(File,tmp))
+      _tcscat(tmp,L".tmp");
+    MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
+  }
+}
+
 void CopyToWinDir(LPCTSTR File)
 {
   TCHAR DstFile[4096];
@@ -625,13 +635,7 @@ void CopyToWinDir(LPCTSTR File)
   PathAppend(SrcFile,File);
   GetWindowsDirectory(DstFile,4096);
   PathAppend(DstFile,File);
-  if (PathFileExists(DstFile) && (!DeleteFile(DstFile)))
-  {
-    CBigResStr DelFile(_T("%s.tmp"),DstFile);
-    while (_trename(DstFile,DelFile))
-      _tcscat(DelFile,L".tmp");
-    MoveFileEx(DelFile,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
-  }
+  DelFile(DstFile);
   CopyFile(SrcFile,DstFile,FALSE);
 }
 
@@ -679,6 +683,7 @@ BOOL DeleteService()
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/DeleteService"),0);
+  BOOL bRet=FALSE;
   RemoveRegistry();
   UninstallSysMenuHook();
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
@@ -691,10 +696,17 @@ BOOL DeleteService()
       ControlService(hdlServ,SERVICE_CONTROL_STOP,&ss);
       DeleteService(hdlServ);
       CloseServiceHandle(hdlServ);
-      return TRUE;
+      bRet=TRUE;
     }
   }
-  return FALSE;
+  TCHAR File[4096];
+  GetWindowsDirectory(File,4096);
+  PathAppend(File,_T("SuRun.exe"));
+  DelFile(File);
+  GetWindowsDirectory(File,4096);
+  PathAppend(File,_T("SuRunExt.dll"));
+  DelFile(File);
+  return bRet;
 }
 
 //////////////////////////////////////////////////////////////////////////////
