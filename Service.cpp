@@ -666,7 +666,7 @@ BOOL InstallService()
   }
   CloseServiceHandle(hdlServ);
   CloseServiceHandle(hdlSCM);
-  if (!bRet)
+  if (bRet)
   {
     InstallRegistry();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
@@ -679,6 +679,7 @@ BOOL DeleteService()
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/DeleteService"),0);
   RemoveRegistry();
+  UninstallSysMenuHook();
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
   {
@@ -692,7 +693,6 @@ BOOL DeleteService()
       return TRUE;
     }
   }
-  UninstallSysMenuHook();
   return FALSE;
 }
 
