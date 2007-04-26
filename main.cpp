@@ -43,7 +43,8 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
   _tcscpy(file,app);
   PathStripPath(file);
   //Get Ext
-  LPTSTR ext=PathFindExtension(file);
+  TCHAR ext[MAX_PATH];
+  _tcscpy(ext,PathFindExtension(file));
   PathRemoveExtension(file);
   if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
   {
@@ -69,25 +70,36 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     zero(args);
   }else if (!_wcsicmp(ext, L".cpl")) 
   {
+    PathQuoteSpaces(app);
+    if (args[0] && app[0])
+      wcscat(app,L" ");
+    wcscat(app,args);
     wcscpy(args,app);
-    PathQuoteSpaces(args);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"control.exe");
   }else if (!_wcsicmp(ext, L".msi")) 
   {
+    PathQuoteSpaces(app);
+    if (args[0] && app[0])
+      wcscat(app,L" ");
+    wcscat(app,args);
     wcscpy(args,app);
-    PathQuoteSpaces(args);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"msiexec.exe");
   }else if (!_wcsicmp(ext, L".msc")) 
   {
     if (path[0]=='\0')
     {
-      GetSystemDirectory(args,4096);
-      PathAppend(args,app);
-    }else
-      wcscpy(args,app);
-    PathQuoteSpaces(args);
+      GetSystemDirectory(path,4096);
+      PathAppend(path,app);
+      wcscpy(app,path);
+      zero(path);
+    }
+    PathQuoteSpaces(app);
+    if (args[0] && app[0])
+      wcscat(app,L" ");
+    wcscat(app,args);
+    wcscpy(args,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"mmc.exe");
   }
