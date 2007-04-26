@@ -86,7 +86,7 @@ BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax)
 
 BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
 {
-  return SetRegAny(HK,SubKey,ValName,REG_SZ,(BYTE*)Value,_tcslen(Value));
+  return SetRegAny(HK,SubKey,ValName,REG_SZ,(BYTE*)Value,_tcslen(Value)*sizeof(TCHAR));
 }
 
 BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
@@ -99,6 +99,23 @@ BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
     return bRet;
   }
   return false;
+}
+
+BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
+{
+  HKEY hEnumKey;
+  if(RegOpenKeyEx(hKey,pszSubKey,0,KEY_ENUMERATE_SUB_KEYS,&hEnumKey)!=NOERROR)
+    return FALSE;
+  TCHAR szKey[MAX_PATH];
+  DWORD dwSize = MAX_PATH;
+  while (ERROR_SUCCESS==RegEnumKeyEx(hEnumKey,0,szKey,&dwSize,0,0,0,0))
+  {
+    DelRegKey(hEnumKey, szKey);
+    dwSize=MAX_PATH;
+  }
+  RegCloseKey(hEnumKey);
+  RegDeleteKey(hKey, pszSubKey);
+  return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
