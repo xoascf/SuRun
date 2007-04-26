@@ -5,10 +5,15 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include <SHLWAPI.H>
+#include <Shobjidl.h>
+#include <ShlGuid.h>
 
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"Mpr.lib")
+#pragma comment(lib,"Shell32.lib")
+#pragma comment(lib,"ole32.lib")
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Registry Helper
@@ -285,5 +290,93 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR Name)
     CloseHandle(hToken);
   }
   CloseHandle(hProc);
+  return bRet;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// CreateLink
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname)
+{
+  //Save parameters
+  TCHAR args[4096]={0};
+  _tcscpy(args,PathGetArgs(fname));
+  //Application
+  TCHAR app[4096]={0};
+  _tcscpy(app,fname);
+  PathRemoveArgs(app);
+  PathUnquoteSpaces(app);
+  NetworkPathToUNCPath(app);
+  //Get Path
+  TCHAR path[4096];
+  _tcscpy(path,app);
+  PathRemoveFileSpec(path);
+  if (!PathFileExists(app))
+    return false;
+  BOOL bRes=FALSE;
+  IShellLink *psl = NULL;
+  IPersistFile *pPf = NULL;
+  if(FAILED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl)))
+    goto cleanup;
+  if(FAILED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf)))
+    goto cleanup;
+  if(FAILED(psl->SetPath(app)))
+    goto cleanup;
+  if(FAILED(psl->SetWorkingDirectory(path)))
+    goto cleanup;
+  if (args[0])
+  {
+    if(FAILED(psl->SetArguments(args)))
+      goto cleanup;
+  }
+  if(FAILED(pPf->Save(lnk_fname, TRUE)))
+    goto cleanup;
+  bRes=TRUE;
+cleanup:
+  if(pPf)
+    pPf->Release();
+  if(psl)
+    psl->Release();
+  return bRes;
+} 
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// DeleteDirectory ... all files and SubDirs
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+bool DeleteDirectory(LPCTSTR DIR)
+{
+  bool bRet=true;
+  WIN32_FIND_DATA fd={0};
+  TCHAR s[MAX_PATH];
+  _tcscpy(s,DIR);
+  PathAppend(s,_T("*.*"));
+  HANDLE hFind=FindFirstFile(s,&fd);
+  if (hFind != INVALID_HANDLE_VALUE)
+  {
+    do
+    {
+      _tcscpy(s,DIR);
+      PathAppend(s,fd.cFileName);
+      if (PathIsDirectory(s)
+        && _tcscmp(fd.cFileName,_T("."))
+        && _tcscmp(fd.cFileName,_T("..")))
+      {
+        SetFileAttributes(s,FILE_ATTRIBUTE_DIRECTORY);
+        bRet=bRet && DeleteDirectory(s);
+      }else
+      {
+        SetFileAttributes(s,FILE_ATTRIBUTE_NORMAL);
+        bRet=bRet && DeleteFile(s);
+      }
+    }while (FindNextFile(hFind,&fd));
+  }
+  FindClose(hFind);
+  bRet=bRet && RemoveDirectory(DIR);
   return bRet;
 }
