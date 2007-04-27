@@ -376,48 +376,40 @@ void KillProcess(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR CommandLine) 
 {
-  ImpersonateLoggedOnUser(hUser);
   PROCESS_INFORMATION pi={0};
-  STARTUPINFO si={0};
-  si.cb=sizeof(si);
-  TCHAR WinStaDesk[2*MAX_PATH];
-  _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
-  si.lpDesktop=WinStaDesk;
-  CreateProcess(NULL,CommandLine,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi);
-  RevertToSelf();
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+  if(LoadUserProfile(hUser,&ProfInf))
+  {
+    void* Env=0;
+    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    {
+      TCHAR WinStaDesk[2*MAX_PATH];
+      _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
+      STARTUPINFO si={0};
+      si.cb=sizeof(si);
+      si.lpDesktop=WinStaDesk;
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
+      ImpersonateLoggedOnUser(hUser);
+      if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
+        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
+      {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+      }else
+        MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
+          CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      RevertToSelf();
+      DestroyEnvironmentBlock(Env);
+    }else
+      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
+    UnloadUserProfile(hUser,ProfInf.hProfile);
+  }else
+    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
   return pi.dwProcessId;
-
-//  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
-//  if(LoadUserProfile(hUser,&ProfInf))
-//  {
-//    void* Env=0;
-//    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-//    {
-//      TCHAR WinStaDesk[2*MAX_PATH];
-//      _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
-//      STARTUPINFO si={0};
-//      si.cb=sizeof(si);
-//      si.lpDesktop=WinStaDesk;
-//      //CreateProcessAsUser will only work from an NT System Account since the
-//      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-//      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-//      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-//      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
-//      if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
-//        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
-//      {
-//        CloseHandle(pi.hProcess);
-//        CloseHandle(pi.hThread);
-//      }else
-//        MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
-//          CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-//      DestroyEnvironmentBlock(Env);
-//    }else
-//      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-//    UnloadUserProfile(hUser,ProfInf.hProfile);
-//  }else
-//    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
-//  return pi.dwProcessId;
 }
 
 //////////////////////////////////////////////////////////////////////////////
