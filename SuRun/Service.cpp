@@ -485,6 +485,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       if (g_hPipe!=INVALID_HANDLE_VALUE)
       {
         DWORD SessionID=0;
+        HANDLE hCallingUser=0;
         TCHAR WinSta[MAX_PATH]={0};
         TCHAR Desk[MAX_PATH]={0};
         TCHAR UserName[CNLEN+DNLEN+2]={0};
@@ -494,6 +495,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         DWORD nRead=0;
         //Read Client Process ID and command line
         BOOL DoSuRun=ReadFile(g_hPipe,&SessionID,sizeof(SessionID),&nRead,0)
+                  && ReadFile(g_hPipe,&hCallingUser,sizeof(hCallingUser),&nRead,0)
                   && ReadFile(g_hPipe,WinSta,sizeof(WinSta)-sizeof(TCHAR),&nRead,0)
                   && ReadFile(g_hPipe,Desk,sizeof(Desk)-sizeof(TCHAR),&nRead,0)
                   && ReadFile(g_hPipe,UserName,sizeof(UserName)-sizeof(TCHAR),&nRead,0)
