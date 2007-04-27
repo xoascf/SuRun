@@ -710,8 +710,9 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
-  if (MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO)
+  if ((!bJustStop)
+    &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
+                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
     return false;
   BOOL bRet=FALSE;
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
