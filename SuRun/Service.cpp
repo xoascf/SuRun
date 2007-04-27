@@ -411,6 +411,129 @@ DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR Co
 }
 
 //////////////////////////////////////////////////////////////////////////////
+//
+//  GetProcessID
+//
+//  Get the Process ID for a file name. Filename is stripped to the bones e.g.
+//  "Explorer.exe" instead of "C:\Windows\Explorer.exe"
+//  If there are multiple "Explorer.exe"s running in your Logon session, the
+//  function will return the ID of the first Process it finds.
+//
+//  The purpose of this function ist primarily to get the Process ID of the
+//  Shell process.
+//////////////////////////////////////////////////////////////////////////////
+#include <Wtsapi32.h>
+#include <Tlhelp32.h>
+#pragma comment(lib,"Wtsapi32.lib")
+#pragma comment(lib,"Shell32.lib")
+
+DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1)
+{
+  if (SessID!=(DWORD)-1)
+  {
+    //Terminal Services:
+    DWORD nProcesses=0;
+    WTS_PROCESS_INFO* pwtspi=0;
+    WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&pwtspi,&nProcesses);
+    for (DWORD Process=0;Process<nProcesses;Process++) 
+    {
+      if (pwtspi[Process].SessionId!=SessID)
+        continue;
+      TCHAR PName[MAX_PATH]={0};
+      _tcscpy(PName,pwtspi[Process].pProcessName);
+      PathStripPath(PName);
+      if (_tcsicmp(ProcName,PName)==0)
+        return WTSFreeMemory(pwtspi), pwtspi[Process].ProcessId;
+    }
+    WTSFreeMemory(pwtspi);
+  }
+  //ToolHelp
+  HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
+  if (hSnap==INVALID_HANDLE_VALUE)
+    return 0; 
+  DWORD dwRet=0;
+  PROCESSENTRY32 pe={0};
+  pe.dwSize = sizeof(PROCESSENTRY32);
+  bool bFirst=true;
+  while((bFirst?Process32First(hSnap,&pe):Process32Next(hSnap,&pe)))
+  {
+    bFirst=false;
+    PathStripPath(pe.szExeFile);
+    if(_tcsicmp(ProcName,pe.szExeFile)!=0) 
+      continue;
+    if ((SessID!=(DWORD)-1))
+    {
+      ULONG s=-2;
+      if ((!ProcessIdToSessionId(pe.th32ProcessID,&s))||(s!=SessID))
+        continue;
+    }
+    dwRet=pe.th32ProcessID;
+    break;
+  }
+  CloseHandle(hSnap);
+  return dwRet;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//  GetSessionUserToken
+//
+//  This function tries to use WTSQueryUserToken to get the token of the 
+//  currently logged on user. If the WTSQueryUserToken method fails, we'll
+//  try to steal the user token of the logon sessions shell process.
+//////////////////////////////////////////////////////////////////////////////
+
+HANDLE GetSessionUserToken(DWORD SessID)
+{
+  //WTSQueryUserToken is present in WinXP++, load it dynamically
+  typedef BOOL (WINAPI* wtsqut)(ULONG,PHANDLE);
+  static wtsqut wtsqueryusertoken=NULL;
+  if (!wtsqueryusertoken)
+  {
+    HINSTANCE wtsapi32=LoadLibrary(_T("wtsapi32.dll"));
+    if (wtsapi32)
+      wtsqueryusertoken=(wtsqut)GetProcAddress(wtsapi32,"WTSQueryUserToken");
+  }
+  HANDLE hToken = NULL;
+  //SE_TCB_NAME is only present in a local System User Token
+  //WTSQueryUserToken requires SE_TCB_NAME!
+  if ((!wtsqueryusertoken)
+    ||(!EnablePrivilege(SE_TCB_NAME))
+    ||(!wtsqueryusertoken(SessID,&hToken))
+    ||(hToken==NULL))
+  {
+    //No WTSQueryUserToken: we're in Win2k
+    //Get the Shells Name
+    TCHAR Shell[MAX_PATH];
+    if (!GetRegStr(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Microsoft\\Windows NT\\")
+                   _T("CurrentVersion\\Winlogon"),_T("Shell"),Shell,MAX_PATH))
+      return 0;
+    PathRemoveArgs(Shell);
+    PathStripPath(Shell);
+    //Now get the Shells Process ID
+    DWORD ShellID=GetProcessID(Shell,SessID);
+    if (!ShellID)
+      return 0;
+    //We got the Shells Process ID, now get the user token
+    EnablePrivilege(SE_DEBUG_NAME);
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ShellID);
+    if (!hProc)
+      return 0;
+    // Open impersonation token for Shell process
+    OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+                          |TOKEN_ASSIGN_PRIMARY,&hToken);
+    CloseHandle(hProc);
+    if(!hToken)
+      return 0;
+  }
+  HANDLE hTokenDup=NULL;
+  DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+                          TokenPrimary,&hTokenDup); 
+  CloseHandle(hToken);
+  return hTokenDup;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // 
 //  The Service:
 // 
@@ -485,7 +608,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       if (g_hPipe!=INVALID_HANDLE_VALUE)
       {
         DWORD SessionID=0;
-        HANDLE hCallingUser=0;
         TCHAR WinSta[MAX_PATH]={0};
         TCHAR Desk[MAX_PATH]={0};
         TCHAR UserName[CNLEN+DNLEN+2]={0};
@@ -495,7 +617,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         DWORD nRead=0;
         //Read Client Process ID and command line
         BOOL DoSuRun=ReadFile(g_hPipe,&SessionID,sizeof(SessionID),&nRead,0)
-                  && ReadFile(g_hPipe,&hCallingUser,sizeof(hCallingUser),&nRead,0)
                   && ReadFile(g_hPipe,WinSta,sizeof(WinSta)-sizeof(TCHAR),&nRead,0)
                   && ReadFile(g_hPipe,Desk,sizeof(Desk)-sizeof(TCHAR),&nRead,0)
                   && ReadFile(g_hPipe,UserName,sizeof(UserName)-sizeof(TCHAR),&nRead,0)
@@ -532,9 +653,16 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                 SetTokenInformation(g_Users[nUser].UserToken,TokenSessionId,&SessionID,sizeof(DWORD));
               }
               zero(Password);
+              HANDLE hSess=GetSessionUserToken(SessionID);
+              if (hSess==0)
+                DBGTrace("GetSessionUserToken() failed");
+              if (!ImpersonateLoggedOnUser(hSess))
+                DBGTrace1("ImpersonateLoggedOnUser() failed: %s",GetLastErrorNameStatic());
               SetCurrentDirectory(CurDir);
               //Create Process
               RunAsUser(g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine);
+              if(!RevertToSelf())
+                DBGTrace1("RevertToSelf() failed: %s",GetLastErrorNameStatic());
               //Mark last start time
               GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
             }
