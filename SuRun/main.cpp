@@ -188,23 +188,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     //Session
     DWORD SessionId=0;
     ProcessIdToSessionId(GetCurrentProcessId(),&SessionId);
-    //User:
-    HANDLE hCallingUser=0;
-    EnablePrivilege(SE_DEBUG_NAME);
-    HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,TRUE,GetCurrentProcessId());
-    if (hProc)
-    {
-      HANDLE hToken=0;
-      OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-        |TOKEN_ASSIGN_PRIMARY,&hToken);
-      CloseHandle(hProc);
-      if(hToken)
-      {
-        DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
-          TokenPrimary,&hCallingUser); 
-        CloseHandle(hToken);
-      }
-    }
     //WindowStation
     TCHAR WinSta[MAX_PATH];
     GetWinStaName(WinSta,MAX_PATH);
@@ -222,7 +205,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     //Go!
     DWORD nWritten=0;
     WriteFile(hPipe,&SessionId,sizeof(SessionId),&nWritten,0);
-    WriteFile(hPipe,&hCallingUser,sizeof(hCallingUser),&nWritten,0);
     WriteFile(hPipe,WinSta,_tcslen(WinSta)*sizeof(TCHAR),&nWritten,0);
     WriteFile(hPipe,Desk,_tcslen(Desk)*sizeof(TCHAR),&nWritten,0);
     WriteFile(hPipe,UserName,_tcslen(UserName)*sizeof(TCHAR),&nWritten,0);
