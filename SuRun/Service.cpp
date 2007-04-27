@@ -526,7 +526,7 @@ void InstallRegistry()
   //MSI Uninstall
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
   SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%%1\" %%* /x",SuRunExe));
-  InstallShellExt();
+  //InstallShellExt();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -536,7 +536,7 @@ void InstallRegistry()
 //////////////////////////////////////////////////////////////////////////////
 void RemoveRegistry()
 {
-  RemoveShellExt();
+  //RemoveShellExt();
   //exefile
   DelRegKey(HKCR,EXERUN);
   //cmdfile
