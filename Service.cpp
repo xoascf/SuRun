@@ -58,6 +58,7 @@ typedef struct //User Token cache
   HANDLE UserToken;
   DWORD SessionID;
   TCHAR UserName[UNLEN+GNLEN+2];
+  TCHAR Password[PWLEN+1];
   __int64 LastAskTime;
 }USERDATA;
 
@@ -286,6 +287,34 @@ void KillProcess(DWORD PID)
 // 
 //  Start CommandLine as specific user of a logon session.
 //////////////////////////////////////////////////////////////////////////////
+DWORD RunAsUser(LPCTSTR UserName,LPCTSTR Password,LPCTSTR WinSta,LPCTSTR Desk,LPTSTR CommandLine) 
+{
+  PROCESS_INFORMATION pi={0};
+  TCHAR WinStaDesk[2*MAX_PATH];
+  _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
+  STARTUPINFO si={0};
+  si.cb=sizeof(si);
+  si.lpDesktop=WinStaDesk;
+  if(CreateProcessWithLogonW(UserName,NULL,Password,LOGON_WITH_PROFILE,
+      NULL,CommandLine,CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,NULL,0,
+      &si,&pi))
+  {
+    HANDLE hUser=0;
+    if (OpenProcessToken(pi.hProcess,TOKEN_QUERY,&hUser))
+    {
+      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
+      CloseHandle(hUser);
+    }else
+      DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic())
+    ResumeThread(pi.hThread);
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+  }else
+    MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
+      CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+  return pi.dwProcessId;
+}
+
 DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR CommandLine) 
 {
   PROCESS_INFORMATION pi={0};
@@ -432,21 +461,29 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             int nUser=PrepareSuRun(SessionID,UserName,Password,cmdLine);
             if (nUser!=-1)
             {
-              if (g_Users[nUser].UserToken==0)
-              {
-                EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
-                //Add user to admins group
-                AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
-                LogonUser(UserName,0,Password,LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
-                //Remove user from Administrators group
-                AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-                //Set Token Window Station and desktop:
-                SetTokenInformation(g_Users[nUser].UserToken,TokenSessionId,&SessionID,sizeof(DWORD));
-              }
+//              if (g_Users[nUser].UserToken==0)
+//              {
+//                EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
+//                //Add user to admins group
+//                AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
+//                LogonUser(UserName,0,Password,LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
+//                //Remove user from Administrators group
+//                AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+//                //Set Token Window Station and desktop:
+//                SetTokenInformation(g_Users[nUser].UserToken,TokenSessionId,&SessionID,sizeof(DWORD));
+//              }
+              if (g_Users[nUser].Password[0]==0)
+                _tcscpy(g_Users[nUser].Password,Password);
               zero(Password);
               SetCurrentDirectory(CurDir);
               //Create Process
-              RunAsUser(g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine);
+              //RunAsUser(g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine);
+
+              AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
+              RunAsUser(g_Users[nUser].UserName,g_Users[nUser].Password,WinSta,Desk,cmdLine);
+              AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+
+
               //Mark last start time
               GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
             }
