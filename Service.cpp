@@ -266,94 +266,6 @@ int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  InstallRegistry
-// 
-//////////////////////////////////////////////////////////////////////////////
-#define HKCR HKEY_CLASSES_ROOT
-#define HKLM HKEY_LOCAL_MACHINE
-
-#define UNINSTL L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SuRun"
-
-#define SHLRUN  L"\\Shell\\SuRun"
-#define EXERUN  L"exefile" SHLRUN
-#define CMDRUN  L"cmdfile" SHLRUN
-#define CPLRUN  L"cplfile" SHLRUN
-#define MSCRUN  L"mscfile" SHLRUN
-#define BATRUN  L"batfile" SHLRUN
-#define MSIPKG  L"Msi.Package" SHLRUN
-
-void InstallRegistry()
-{
-  TCHAR SuRunExe[4096];
-  GetWindowsDirectory(SuRunExe,4096);
-  PathAppend(SuRunExe,L"SuRun.exe");
-  CResStr MenuStr(IDS_MENUSTR);
-  CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
-  //UnInstall
-  SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
-  SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /UNINSTALL",SuRunExe,SuRunExe));
-  //AutoRun, System Menu Hook
-  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
-    CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
-  //exefile
-  SetRegStr(HKCR,EXERUN,L"",MenuStr);
-  SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
-  //cmdfile
-  SetRegStr(HKCR,CMDRUN,L"",MenuStr);
-  SetRegStr(HKCR,CMDRUN L"\\command",L"",DefCmd);
-  //cplfile
-  SetRegStr(HKCR,CPLRUN,L"",MenuStr);
-  SetRegStr(HKCR,CPLRUN L"\\command",L"",DefCmd);
-  //MSCFile
-  SetRegStr(HKCR,MSCRUN,L"",MenuStr);
-  SetRegStr(HKCR,MSCRUN L"\\command",L"",DefCmd);
-  //batfile
-  SetRegStr(HKCR,BATRUN,L"",MenuStr);
-  SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
-  //MSI Install
-  SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
-  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s \"%%1\" %%* /i",SuRunExe));
-  //MSI Repair
-  SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
-  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s \"%%1\" %%* /f",SuRunExe));
-  //MSI Uninstall
-  SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
-  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%%1\" %%* /x",SuRunExe));
-  InstallShellExt();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  RemoveRegistry
-// 
-//////////////////////////////////////////////////////////////////////////////
-void RemoveRegistry()
-{
-  RemoveShellExt();
-  //exefile
-  DelRegKey(HKCR,EXERUN);
-  //cmdfile
-  DelRegKey(HKCR,CMDRUN);
-  //cplfile
-  DelRegKey(HKCR,CPLRUN);
-  //MSCFile
-  DelRegKey(HKCR,MSCRUN);
-  //batfile
-  DelRegKey(HKCR,BATRUN);
-  //MSI Install
-  DelRegKey(HKCR,MSIPKG L" open");
-  //MSI Repair
-  DelRegKey(HKCR,MSIPKG L" repair");
-  //MSI Uninstall
-  DelRegKey(HKCR,MSIPKG L" Uninstall");
-  //AutoRun, System Menu Hook
-  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
-  //UnInstall
-  DelRegKey(HKLM,UNINSTL);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 //  KillProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -557,6 +469,94 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_ss.dwWin32ExitCode    = 0; 
   DBGTrace( "SuRun Service stopped");
   SetServiceStatus(g_hSS,&g_ss);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  InstallRegistry
+// 
+//////////////////////////////////////////////////////////////////////////////
+#define HKCR HKEY_CLASSES_ROOT
+#define HKLM HKEY_LOCAL_MACHINE
+
+#define UNINSTL L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SuRun"
+
+#define SHLRUN  L"\\Shell\\SuRun"
+#define EXERUN  L"exefile" SHLRUN
+#define CMDRUN  L"cmdfile" SHLRUN
+#define CPLRUN  L"cplfile" SHLRUN
+#define MSCRUN  L"mscfile" SHLRUN
+#define BATRUN  L"batfile" SHLRUN
+#define MSIPKG  L"Msi.Package" SHLRUN
+
+void InstallRegistry()
+{
+  TCHAR SuRunExe[4096];
+  GetWindowsDirectory(SuRunExe,4096);
+  PathAppend(SuRunExe,L"SuRun.exe");
+  CResStr MenuStr(IDS_MENUSTR);
+  CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
+  //UnInstall
+  SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
+  SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /UNINSTALL",SuRunExe,SuRunExe));
+  //AutoRun, System Menu Hook
+  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+    CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
+  //exefile
+  SetRegStr(HKCR,EXERUN,L"",MenuStr);
+  SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
+  //cmdfile
+  SetRegStr(HKCR,CMDRUN,L"",MenuStr);
+  SetRegStr(HKCR,CMDRUN L"\\command",L"",DefCmd);
+  //cplfile
+  SetRegStr(HKCR,CPLRUN,L"",MenuStr);
+  SetRegStr(HKCR,CPLRUN L"\\command",L"",DefCmd);
+  //MSCFile
+  SetRegStr(HKCR,MSCRUN,L"",MenuStr);
+  SetRegStr(HKCR,MSCRUN L"\\command",L"",DefCmd);
+  //batfile
+  SetRegStr(HKCR,BATRUN,L"",MenuStr);
+  SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
+  //MSI Install
+  SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
+  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s \"%%1\" %%* /i",SuRunExe));
+  //MSI Repair
+  SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
+  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s \"%%1\" %%* /f",SuRunExe));
+  //MSI Uninstall
+  SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
+  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%%1\" %%* /x",SuRunExe));
+  InstallShellExt();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  RemoveRegistry
+// 
+//////////////////////////////////////////////////////////////////////////////
+void RemoveRegistry()
+{
+  RemoveShellExt();
+  //exefile
+  DelRegKey(HKCR,EXERUN);
+  //cmdfile
+  DelRegKey(HKCR,CMDRUN);
+  //cplfile
+  DelRegKey(HKCR,CPLRUN);
+  //MSCFile
+  DelRegKey(HKCR,MSCRUN);
+  //batfile
+  DelRegKey(HKCR,BATRUN);
+  //MSI Install
+  DelRegKey(HKCR,MSIPKG L" open");
+  //MSI Repair
+  DelRegKey(HKCR,MSIPKG L" repair");
+  //MSI Uninstall
+  DelRegKey(HKCR,MSIPKG L" Uninstall");
+  //AutoRun, System Menu Hook
+  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
+  //UnInstall
+  DelRegKey(HKLM,UNINSTL);
 }
 
 //////////////////////////////////////////////////////////////////////////////
