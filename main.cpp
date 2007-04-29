@@ -129,7 +129,7 @@ void KillProcessNice(DWORD PID)
 {
   if (!PID)
     return;
-  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE,TRUE,PID);
   if(!hProcess)
     return;
   // TerminateAppEnum() posts WM_CLOSE to all windows whose PID
