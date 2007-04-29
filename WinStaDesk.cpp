@@ -186,14 +186,14 @@ bool CRunOnNewDeskTop::IsValid()
 #define DESKTOP_ALL_ACCESS 0x00001FF
 #endif
 
-void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
+void* GetTokenLogonSID(HANDLE htok)
 {
 	BYTE tgs[4096];
 	DWORD cbtgs = sizeof tgs;
 	if (!GetTokenInformation(htok,TokenGroups,tgs,cbtgs,&cbtgs))
   {
     DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
-    return;
+    return 0;
   }
 	const TOKEN_GROUPS* ptgs = (TOKEN_GROUPS*)(tgs);
 	const SID_AND_ATTRIBUTES* it = ptgs->Groups;
@@ -207,9 +207,14 @@ void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
 	if (end==it)
   {
     DBGTrace("UNEXPECTED: No Logon SID in TokenGroups");
-    return;
+    return 0;
   }
-	void* psidLogonSession = it->Sid;
+	return it->Sid;
+}
+
+void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
+{
+	void* psidLogonSession = GetTokenLogonSID(htok);
 	HWINSTA hws = OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED);
 	if (!hws)
   {
