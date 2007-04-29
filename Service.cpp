@@ -6,6 +6,7 @@
 #include <tchar.h>
 #include <Rpcdce.h>
 #include <lm.h>
+#include <ntsecapi.h>
 #include <USERENV.H>
 #include "Service.h"
 #include "IsAdmin.h"
@@ -44,8 +45,9 @@ static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked a
 #define Radio1chk (g_AskAlways!=0)
 #define Radio2chk ((g_AskAlways==0)&&(g_NoAskTimeOut!=0))
 
-#define MainKey HKEY_LOCAL_MACHINE
-#define SvcKey _T("Software\\SuRun")
+#define MAINKEY HKEY_LOCAL_MACHINE
+#define SVCKEY  _T("SECURITY\\SuRun")
+#define PWKEY   _T("SECURITY\\SuRun\\Cache")
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -56,7 +58,6 @@ static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked a
 typedef struct //User Token cache
 {
   HANDLE UserToken;
-  DWORD SessionID;
   TCHAR UserName[UNLEN+GNLEN+2];
   TCHAR Password[PWLEN+1];
   __int64 LastAskTime;
@@ -91,9 +92,9 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,16,16,0));
-      g_BlurDesktop=GetRegInt(MainKey,SvcKey,_T("BlurDesktop"),1)!=0;
-      g_AskAlways=GetRegInt(MainKey,SvcKey,_T("AskAlways"),1)!=0;
-      g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(MainKey,SvcKey,_T("AskTimeOut"),0)));
+      g_BlurDesktop=GetRegInt(MAINKEY,SVCKEY,_T("BlurDesktop"),1)!=0;
+      g_AskAlways=GetRegInt(MAINKEY,SVCKEY,_T("AskAlways"),1)!=0;
+      g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(MAINKEY,SVCKEY,_T("AskTimeOut"),0)));
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_RADIO2,(Radio2chk?BST_CHECKED:BST_UNCHECKED));
@@ -128,9 +129,9 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
           g_AskAlways=IsDlgButtonChecked(hwnd,IDC_RADIO1)==BST_CHECKED;
           g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
-          SetRegInt(MainKey,SvcKey,_T("BlurDesktop"),g_BlurDesktop);
-          SetRegInt(MainKey,SvcKey,_T("AskAlways"),g_AskAlways);
-          SetRegInt(MainKey,SvcKey,_T("AskTimeOut"),g_NoAskTimeOut);
+          SetRegInt(MAINKEY,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
+          SetRegInt(MAINKEY,SVCKEY,_T("AskAlways"),g_AskAlways);
+          SetRegInt(MAINKEY,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
           EndDialog(hwnd,1);
           return TRUE;
         }
@@ -156,30 +157,97 @@ BOOL Setup()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  KillProcess
+// 
+//////////////////////////////////////////////////////////////////////////////
+void KillProcess(DWORD PID)
+{
+  if (!PID)
+    return;
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
+  if(!hProcess)
+    return;
+  TerminateProcess(hProcess,0);
+  CloseHandle(hProcess);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  RunAsUser
+// 
+//  Start CommandLine as specific user of a logon session.
+//////////////////////////////////////////////////////////////////////////////
+DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
+                LPTSTR Desk,LPTSTR CommandLine,LPTSTR CurDir) 
+{
+  PROCESS_INFORMATION pi={0};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+  if(LoadUserProfile(hUser,&ProfInf))
+  {
+    void* Env=0;
+    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    {
+      TCHAR WinStaDesk[2*MAX_PATH];
+      _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
+      STARTUPINFO si={0};
+      si.cb=sizeof(si);
+      si.lpDesktop=WinStaDesk;
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      if (!SetTokenInformation(hUser,TokenSessionId,&SessionID,sizeof(DWORD)))
+        DBGTrace1("SetTokenInformation(TokenSessionId) failed: %s",GetLastErrorNameStatic());
+      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
+      //ImpersonateLoggedOnUser(hUser);
+      if (!SetCurrentDirectory(CurDir))
+        DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
+      if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
+        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
+      {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+      }else
+        MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
+          CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      //RevertToSelf();
+      DestroyEnvironmentBlock(Env);
+    }else
+      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
+    UnloadUserProfile(hUser,ProfInf.hProfile);
+  }else
+    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
+  return pi.dwProcessId;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
-int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
+int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
 {
   BOOL bDoAsk=g_AskAlways;
   //Do we have a token for this user?
   int nUser=-1;
-  for (int i=0;i<countof(g_Users);i++)
-    if ((g_Users[i].SessionID==SessionID)
-      &&(_tcsicmp(g_Users[i].UserName,UserName)==0))
+  for (int i=0;i<countof(g_Users);i++) if (_tcsicmp(g_Users[i].UserName,UserName)==0)
+  {
+    nUser=i;
+    if ((!bDoAsk) && g_NoAskTimeOut)
     {
-      nUser=i;
-      if ((!bDoAsk) && g_NoAskTimeOut)
-      {
-        __int64 ft;
-        GetSystemTimeAsFileTime((LPFILETIME)&ft);
-        if ((ft-g_Users[nUser].LastAskTime)>=(ft2min*(__int64)g_NoAskTimeOut))
-          bDoAsk=TRUE;
-      }
-      break;
+      __int64 ft;
+      GetSystemTimeAsFileTime((LPFILETIME)&ft);
+      if ((ft-g_Users[nUser].LastAskTime)>=(ft2min*(__int64)g_NoAskTimeOut))
+        bDoAsk=TRUE;
     }
+    break;
+  }
   if (nUser==-1)
     bDoAsk=TRUE;
+  else
+  {
+    if (g_Users[nUser].UserName...)
+  }
   //No Ask, just start cmdLine:
   if (!bDoAsk)
     return nUser;
@@ -235,6 +303,7 @@ int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
         MessageBox(0,CBigResStr(IDS_SUDOER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
       }
     }
+    TCHAR Password[MAX_PATH]={0};
     if(LogonCurrentUser(UserName,Password,IDS_ASKOK,cmdLine))
     {
       __int64 minTime=0;
@@ -256,8 +325,8 @@ int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
       if (nUser==-1)
         nUser=oldestUser;
       //Set user name cache
-      g_Users[nUser].SessionID=SessionID;
       _tcscpy(g_Users[nUser].UserName,UserName);
+      _tcscpy(g_Users[nUser].Password,Password);
       return nUser;
     }
   }else //FATAL: secure desktop could not be created!
@@ -265,92 +334,29 @@ int PrepareSuRun(DWORD SessionID,LPTSTR UserName,LPTSTR Password,LPTSTR cmdLine)
   return -1;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  KillProcess
-// 
-//////////////////////////////////////////////////////////////////////////////
-void KillProcess(DWORD PID)
+void SuDo(DWORD SessionID,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR cmdLine,LPTSTR CurDir)
 {
-  if (!PID)
-    return;
-  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
-  if(!hProcess)
-    return;
-  TerminateProcess(hProcess,0);
-  CloseHandle(hProcess);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  RunAsUser
-// 
-//  Start CommandLine as specific user of a logon session.
-//////////////////////////////////////////////////////////////////////////////
-DWORD RunAsUser(LPCTSTR UserName,LPCTSTR Password,LPCTSTR WinSta,LPCTSTR Desk,LPTSTR CommandLine) 
-{
-  PROCESS_INFORMATION pi={0};
-  TCHAR WinStaDesk[2*MAX_PATH];
-  _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
-  STARTUPINFO si={0};
-  si.cb=sizeof(si);
-  si.lpDesktop=WinStaDesk;
-  if(CreateProcessWithLogonW(UserName,NULL,Password,LOGON_WITH_PROFILE,
-      NULL,CommandLine,CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,NULL,0,
-      &si,&pi))
+  PathStripPath(UserName);//strip computer name!
+  //Start execution
+  int nUser=PrepareSuRun(UserName,cmdLine);
+  if (nUser!=-1)
   {
-    HANDLE hUser=0;
-    if (OpenProcessToken(pi.hProcess,TOKEN_QUERY,&hUser))
+    if (g_Users[nUser].UserToken==0)
     {
-      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
-      CloseHandle(hUser);
-    }else
-      DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic())
-    ResumeThread(pi.hThread);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-  }else
-    MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
-      CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-  return pi.dwProcessId;
-}
-
-DWORD RunAsUser(HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR CommandLine) 
-{
-  PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
-  {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-    {
-      TCHAR WinStaDesk[2*MAX_PATH];
-      _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
-      STARTUPINFO si={0};
-      si.cb=sizeof(si);
-      si.lpDesktop=WinStaDesk;
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
-      ImpersonateLoggedOnUser(hUser);
-      if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
-      {
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-      }else
-        MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
-          CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      RevertToSelf();
-      DestroyEnvironmentBlock(Env);
-    }else
-      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hUser,ProfInf.hProfile);
-  }else
-    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
-  return pi.dwProcessId;
+      EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
+      EnablePrivilege(SE_TCB_NAME);//Win2k
+      EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
+      //Add user to admins group
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
+      LogonUser(UserName,0,g_Users[nUser].Password,LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
+      //Remove user from Administrators group
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+    }
+    //Create Process
+    RunAsUser(SessionID,g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine,CurDir);
+    //Mark last start time
+    GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -417,9 +423,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     SetServiceStatus(g_hSS,&g_ss);
     DBGTrace( "SuRun Service running");
     //Setup
-    g_BlurDesktop=GetRegInt(MainKey,SvcKey,_T("BlurDesktop"),1)!=0;
-    g_AskAlways=GetRegInt(MainKey,SvcKey,_T("AskAlways"),1)!=0;
-    g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(MainKey,SvcKey,_T("AskTimeOut"),0)));
+    g_BlurDesktop=GetRegInt(MAINKEY,SVCKEY,_T("BlurDesktop"),1)!=0;
+    g_AskAlways=GetRegInt(MAINKEY,SVCKEY,_T("AskAlways"),1)!=0;
+    g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(MAINKEY,SVCKEY,_T("AskTimeOut"),0)));
     while (g_hPipe!=INVALID_HANDLE_VALUE)
     {
       //Wait for a connection
@@ -447,9 +453,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         DisconnectNamedPipe(g_hPipe);
         if(DoSuRun)
         {
-          TCHAR Password[PWLEN+1]={0};
-          //To execute apps without path spec e.g.:"test.exe":
-          PathStripPath(UserName);//strip computer name!
           //Setup?
           if (_tcsicmp(cmdLine,_T("/SETUP"))==0)
           {
@@ -457,36 +460,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }else
           {
             KillProcess(KillPID);
-            //Start execution
-            int nUser=PrepareSuRun(SessionID,UserName,Password,cmdLine);
-            if (nUser!=-1)
-            {
-//              if (g_Users[nUser].UserToken==0)
-//              {
-//                EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
-//                //Add user to admins group
-//                AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
-//                LogonUser(UserName,0,Password,LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
-//                //Remove user from Administrators group
-//                AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-//                //Set Token Window Station and desktop:
-//                SetTokenInformation(g_Users[nUser].UserToken,TokenSessionId,&SessionID,sizeof(DWORD));
-//              }
-              if (g_Users[nUser].Password[0]==0)
-                _tcscpy(g_Users[nUser].Password,Password);
-              zero(Password);
-              SetCurrentDirectory(CurDir);
-              //Create Process
-              //RunAsUser(g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine);
-
-              AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
-              RunAsUser(g_Users[nUser].UserName,g_Users[nUser].Password,WinSta,Desk,cmdLine);
-              AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-
-
-              //Mark last start time
-              GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
-            }
+            SuDo(SessionID,UserName,WinSta,Desk,cmdLine,CurDir);
           }
         }
         SessionID=0;
