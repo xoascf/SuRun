@@ -138,6 +138,10 @@ PreLink_Cmds=if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1>NUL 2>NUL
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\blowfish.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\DBGTrace.cpp
 # End Source File
 # Begin Source File
@@ -180,6 +184,10 @@ SOURCE=.\WinStaDesk.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\BLOWFISH.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\CmdLine.h
