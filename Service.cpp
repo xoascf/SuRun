@@ -16,6 +16,7 @@
 #include "LogonDlg.h"
 #include "UserGroups.h"
 #include "Helpers.h"
+#include "BlowFish.h"
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
@@ -41,13 +42,17 @@
 static bool g_BlurDesktop=TRUE; //blurred user desktop background on secure Desktop
 static bool g_AskAlways=TRUE;   //Ask "Is that ok?" every time
 static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
+static bool g_bSavePW=TRUE;
 
 #define Radio1chk (g_AskAlways!=0)
 #define Radio2chk ((g_AskAlways==0)&&(g_NoAskTimeOut!=0))
 
-#define MAINKEY HKEY_LOCAL_MACHINE
+#define HKLM    HKEY_LOCAL_MACHINE
 #define SVCKEY  _T("SECURITY\\SuRun")
 #define PWKEY   _T("SECURITY\\SuRun\\Cache")
+
+BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
+
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -58,8 +63,8 @@ static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked a
 typedef struct //User Token cache
 {
   HANDLE UserToken;
-  TCHAR UserName[UNLEN+GNLEN+2];
-  TCHAR Password[PWLEN+1];
+  TCHAR UserName[UNLEN+GNLEN];
+  TCHAR Password[PWLEN];
   __int64 LastAskTime;
 }USERDATA;
 
@@ -73,6 +78,100 @@ CResStr SvcName(IDS_SERVICE_NAME);
 
 //FILETIME(100ns) to minutes multiplier
 #define ft2min  (__int64)(10/*1µs*/*1000/*1ms*/*1000/*1s*/*60/*1min*/)
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  GetLogonToken
+// 
+//////////////////////////////////////////////////////////////////////////////
+void GetLogonToken(DWORD nUser)
+{
+  if (g_Users[nUser].UserToken)
+    return;
+  EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
+  EnablePrivilege(SE_TCB_NAME);//Win2k
+  EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
+  //Add user to admins group
+  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+  LogonUser(g_Users[nUser].UserName,0,g_Users[nUser].Password,
+    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
+  //Remove user from Administrators group
+  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  LoadSettings
+// 
+//////////////////////////////////////////////////////////////////////////////
+void LoadSettings()
+{
+  g_BlurDesktop=GetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),1)!=0;
+  g_AskAlways=GetRegInt(HKLM,SVCKEY,_T("AskAlways"),1)!=0;
+  g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),0)));
+  g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
+}
+
+void LoadPasswords()
+{
+  zero (g_Users);
+  if (!g_bSavePW)
+    return;
+  HKEY Key;
+  if (RegOpenKeyEx(HKLM,PWKEY,0,KEY_QUERY_VALUE,&Key)!=ERROR_SUCCESS)
+    return;
+  CBlowFish bf;
+  bf.Initialize(KEYPASS,sizeof(KEYPASS));
+  DWORD n=0;
+  for (int i=0;i<countof(g_Users);i++)
+  {
+    zero(g_Users[n]);
+    DWORD cbPwd=sizeof(g_Users[n].Password);
+    DWORD cbName=sizeof(g_Users[n].UserName);
+    DWORD Type=0;
+    if (ERROR_SUCCESS!=RegEnumValue(Key,i,g_Users[n].UserName,&cbName,0,&Type,
+                                    (BYTE*)g_Users[n].Password,&cbPwd))
+        break;
+    if (Type!=REG_BINARY)
+      continue;
+    bf.Decode((BYTE*)g_Users[n].Password,(BYTE*)g_Users[n].Password,cbPwd);
+    n++;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  SaveSettings
+// 
+//////////////////////////////////////////////////////////////////////////////
+void SaveSettings()
+{
+  SetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
+  SetRegInt(HKLM,SVCKEY,_T("AskAlways"),g_AskAlways);
+  SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
+  SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
+  if (!g_bSavePW)
+    DelRegKey(HKLM,PWKEY);
+}
+
+void SavePassword(int n)
+{
+  if ((!g_bSavePW)||(g_Users[n].Password[0]==0))
+    return;
+  CBlowFish bf;
+  TCHAR Password[PWLEN]={0};
+  bf.Initialize(KEYPASS,sizeof(KEYPASS));
+  SetRegAny(HKLM,PWKEY,g_Users[n].UserName,REG_BINARY,(BYTE*)g_Users[n].Password,
+    bf.Encode((BYTE*)g_Users[n].Password,(BYTE*)Password,
+              _tcslen(g_Users[n].Password)*sizeof(TCHAR)));
+}
+
+void SavePasswords()
+{
+  DelRegKey(HKLM,PWKEY);
+  for (int i=0;i<countof(g_Users);i++) 
+    SavePassword(i);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -92,14 +191,13 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,16,16,0));
-      g_BlurDesktop=GetRegInt(MAINKEY,SVCKEY,_T("BlurDesktop"),1)!=0;
-      g_AskAlways=GetRegInt(MAINKEY,SVCKEY,_T("AskAlways"),1)!=0;
-      g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(MAINKEY,SVCKEY,_T("AskTimeOut"),0)));
-      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
+      LoadSettings();
       CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_RADIO2,(Radio2chk?BST_CHECKED:BST_UNCHECKED));
       SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
       SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
+      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
       return TRUE;
     }//WM_INITDIALOG
   case WM_NCDESTROY:
@@ -129,9 +227,8 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
           g_AskAlways=IsDlgButtonChecked(hwnd,IDC_RADIO1)==BST_CHECKED;
           g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
-          SetRegInt(MAINKEY,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
-          SetRegInt(MAINKEY,SVCKEY,_T("AskAlways"),g_AskAlways);
-          SetRegInt(MAINKEY,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
+          g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
+          SaveSettings();
           EndDialog(hwnd,1);
           return TRUE;
         }
@@ -244,9 +341,14 @@ int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
   }
   if (nUser==-1)
     bDoAsk=TRUE;
-  else
+  else if (g_Users[nUser].UserToken==0)
   {
-    if (g_Users[nUser].UserName...)
+    GetLogonToken(nUser);
+    if (g_Users[nUser].UserToken==0)
+    {
+      nUser=-1;
+      bDoAsk=TRUE;
+    }
   }
   //No Ask, just start cmdLine:
   if (!bDoAsk)
@@ -291,7 +393,7 @@ int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
         MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
       }else
       {
-        TCHAR U[UNLEN+GNLEN+2]={0};
+        TCHAR U[UNLEN+GNLEN]={0};
         TCHAR P[PWLEN]={0};
         if (!LogonAdmin(U,P,IDS_NOSUDOER))
           return -1;
@@ -311,7 +413,8 @@ int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
       //find free or oldest USER
       for (int i=0;i<countof(g_Users);i++) 
       {
-        if (g_Users[i].UserName[0]=='\0')
+        if ((g_Users[i].UserName[0]=='\0')
+          ||(_tcsicmp(g_Users[i].UserName,UserName)==0))
         {
           nUser=i;
           break;
@@ -327,6 +430,8 @@ int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
       //Set user name cache
       _tcscpy(g_Users[nUser].UserName,UserName);
       _tcscpy(g_Users[nUser].Password,Password);
+      GetLogonToken(nUser);
+      SavePasswords();
       return nUser;
     }
   }else //FATAL: secure desktop could not be created!
@@ -339,19 +444,8 @@ void SuDo(DWORD SessionID,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR cmdLi
   PathStripPath(UserName);//strip computer name!
   //Start execution
   int nUser=PrepareSuRun(UserName,cmdLine);
-  if (nUser!=-1)
+  if ((nUser!=-1)&&(g_Users[nUser].UserToken!=0))
   {
-    if (g_Users[nUser].UserToken==0)
-    {
-      EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
-      EnablePrivilege(SE_TCB_NAME);//Win2k
-      EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
-      //Add user to admins group
-      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
-      LogonUser(UserName,0,g_Users[nUser].Password,LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
-      //Remove user from Administrators group
-      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-    }
     //Create Process
     RunAsUser(SessionID,g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine,CurDir);
     //Mark last start time
@@ -423,9 +517,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     SetServiceStatus(g_hSS,&g_ss);
     DBGTrace( "SuRun Service running");
     //Setup
-    g_BlurDesktop=GetRegInt(MAINKEY,SVCKEY,_T("BlurDesktop"),1)!=0;
-    g_AskAlways=GetRegInt(MAINKEY,SVCKEY,_T("AskAlways"),1)!=0;
-    g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(MAINKEY,SVCKEY,_T("AskTimeOut"),0)));
+    LoadSettings();
+    LoadPasswords();
     while (g_hPipe!=INVALID_HANDLE_VALUE)
     {
       //Wait for a connection
