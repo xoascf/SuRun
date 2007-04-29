@@ -44,22 +44,6 @@ static bool g_AskAlways=TRUE;   //Ask "Is that ok?" every time
 static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
 static bool g_bSavePW=TRUE;
 
-#define Radio1chk (g_AskAlways!=0)
-#define Radio2chk ((g_AskAlways==0)&&(g_NoAskTimeOut!=0))
-
-#define HKLM    HKEY_LOCAL_MACHINE
-#define SVCKEY  _T("SECURITY\\SuRun")
-#define PWKEY   _T("SECURITY\\SuRun\\Cache")
-
-BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
-
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  Globals
-// 
-//////////////////////////////////////////////////////////////////////////////
-
 typedef struct //User Token cache
 {
   HANDLE UserToken;
@@ -69,6 +53,21 @@ typedef struct //User Token cache
 }USERDATA;
 
 static USERDATA g_Users[16]={0};    //Tokens for the last 16 Users are cached
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Globals
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+#define Radio1chk (g_AskAlways!=0)
+#define Radio2chk ((g_AskAlways==0)&&(g_NoAskTimeOut!=0))
+
+#define HKLM    HKEY_LOCAL_MACHINE
+#define SVCKEY  _T("SECURITY\\SuRun")
+#define PWKEY   _T("SECURITY\\SuRun\\Cache")
+
+BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
 
 static SERVICE_STATUS_HANDLE g_hSS=0;
 static SERVICE_STATUS g_ss= {0};
@@ -161,7 +160,7 @@ void SavePassword(int n)
   CBlowFish bf;
   TCHAR Password[PWLEN]={0};
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,PWKEY,g_Users[n].UserName,REG_BINARY,(BYTE*)g_Users[n].Password,
+  SetRegAny(HKLM,PWKEY,g_Users[n].UserName,REG_BINARY,(BYTE*)Password,
     bf.Encode((BYTE*)g_Users[n].Password,(BYTE*)Password,
               _tcslen(g_Users[n].Password)*sizeof(TCHAR)));
 }
@@ -296,6 +295,7 @@ DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
       if (!SetTokenInformation(hUser,TokenSessionId,&SessionID,sizeof(DWORD)))
         DBGTrace1("SetTokenInformation(TokenSessionId) failed: %s",GetLastErrorNameStatic());
       GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
+      WTSQ
       //ImpersonateLoggedOnUser(hUser);
       if (!SetCurrentDirectory(CurDir))
         DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
