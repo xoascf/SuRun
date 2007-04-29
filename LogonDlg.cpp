@@ -139,6 +139,7 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
 {
   HANDLE hToken=NULL;
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
+  EnablePrivilege(SE_TCB_NAME);//Win2k
   if (!LogonUser(User,0,Password,LOGON32_LOGON_NETWORK,0,&hToken))
     if (GetLastError()==ERROR_PRIVILEGE_NOT_HELD)
       hToken=SSPLogonUser(0,User,Password);
