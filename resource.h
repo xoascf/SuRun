@@ -50,6 +50,7 @@
 #define IDC_RADIO3                      1009
 #define IDC_ASKTIMEOUT                  1010
 #define IDC_BLURDESKTOP                 1011
+#define IDC_SAVEPW                      1012
 #define IDC_HINT                        1017
 #define IDC_HINTBK                      1018
 #define IDC_SECICON1                    1019
