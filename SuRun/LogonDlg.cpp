@@ -147,6 +147,14 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
   return hToken;
 }
 
+BOOL PasswordOK(LPCTSTR User,LPCTSTR Password)
+{
+  HANDLE hToken=GetUserToken(User,Password);
+  BOOL bRet=hToken!=0;
+  CloseHandle(hToken);
+  return bRet;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Logon Dialog
