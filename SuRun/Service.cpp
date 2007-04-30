@@ -47,7 +47,6 @@ static bool g_bSavePW=TRUE;
 
 typedef struct //User Token cache
 {
-  HANDLE UserToken;
   TCHAR UserName[UNLEN+GNLEN];
   TCHAR Password[PWLEN];
   __int64 LastAskTime;
@@ -250,15 +249,29 @@ void KillProcess(DWORD PID)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  GetLogonToken
+// 
+//////////////////////////////////////////////////////////////////////////////
+HANDLE GetLogonToken(DWORD SessionID,DWORD nUser)
+{
+  EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
+  EnablePrivilege(SE_TCB_NAME);//Win2k
+  EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
+  return AdminLogon(0,g_Users[nUser].UserName,0,g_Users[nUser].Password);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  RunAsUser
 // 
 //  Start CommandLine as specific user of a logon session.
 //////////////////////////////////////////////////////////////////////////////
-DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
-                LPTSTR Desk,LPTSTR CommandLine,LPTSTR CurDir) 
+DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
+                LPTSTR CommandLine,LPTSTR CurDir) 
 {
   PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_Users[nUser].UserName};
+  HANDLE hUser=GetLogonToken(SessionID,nUser);
   if(LoadUserProfile(hUser,&ProfInf))
   {
     void* Env=0;
@@ -273,12 +286,6 @@ DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      //Assign User Token to Logon Session:
-      if (!SetTokenInformation(hUser,TokenSessionId,&SessionID,sizeof(DWORD)))
-        DBGTrace1("SetTokenInformation(TokenSessionId) failed: %s",GetLastErrorNameStatic());
-      //
-      GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
-      //ImpersonateLoggedOnUser(hUser);
       if (!SetCurrentDirectory(CurDir))
         DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
       if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
@@ -289,35 +296,15 @@ DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
       }else
         MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
           CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      //RevertToSelf();
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
     UnloadUserProfile(hUser,ProfInf.hProfile);
   }else
     DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
+  if (hUser)
+    CloseHandle(hUser);
   return pi.dwProcessId;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  GetLogonToken
-// 
-//////////////////////////////////////////////////////////////////////////////
-void GetLogonToken(DWORD nUser)
-{
-  if (g_Users[nUser].UserToken)
-    return;
-  EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
-  EnablePrivilege(SE_TCB_NAME);//Win2k
-  EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
-//  //Add user to admins group
-//  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-//  LogonUser(g_Users[nUser].UserName,0,g_Users[nUser].Password,
-//    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
-//  //Remove user from Administrators group
-//  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
-  g_Users[nUser].UserToken=LSALogon(0,g_Users[nUser].UserName,L"",g_Users[nUser].Password);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -344,14 +331,10 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
   }
   if (nUser==-1)
     bDoAsk=TRUE;
-  else if (g_Users[nUser].UserToken==0)
+  else if (!PasswordOK(g_Users[nUser].UserName,g_Users[nUser].Password))
   {
-    GetLogonToken(nUser);
-    if (g_Users[nUser].UserToken==0)
-    {
-      nUser=-1;
-      bDoAsk=TRUE;
-    }
+    nUser=-1;
+    bDoAsk=TRUE;
   }
   //No Ask, just start cmdLine:
   if (!bDoAsk)
@@ -433,7 +416,6 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
       //Set user name cache
       _tcscpy(g_Users[nUser].UserName,UserName);
       _tcscpy(g_Users[nUser].Password,Password);
-      GetLogonToken(nUser);
       SavePasswords();
       return nUser;
     }
@@ -447,10 +429,10 @@ void SuDo(DWORD SessionID,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR cmdLi
   PathStripPath(UserName);//strip computer name!
   //Start execution
   int nUser=PrepareSuRun(WinSta,UserName,cmdLine);
-  if ((nUser!=-1)&&(g_Users[nUser].UserToken!=0))
+  if (nUser!=-1)
   {
     //Create Process
-    RunAsUser(SessionID,g_Users[nUser].UserToken,UserName,WinSta,Desk,cmdLine,CurDir);
+    RunAsUser(SessionID,nUser,WinSta,Desk,cmdLine,CurDir);
     //Mark last start time
     GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
   }
