@@ -11,7 +11,7 @@ BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName);
 class CRunOnNewDeskTop
 {
 public:
-  CRunOnNewDeskTop(LPCTSTR DeskName,BOOL bCreateBkWnd);
+  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCreateBkWnd);
   ~CRunOnNewDeskTop();
   bool IsValid();
 private:
