@@ -317,7 +317,7 @@ void GetLogonToken(DWORD nUser)
 //    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
 //  //Remove user from Administrators group
 //  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
-  g_Users[nUser].UserToken=LSALogon(0,g_Users[nUser].UserName,NULL,g_Users[nUser].Password);
+  g_Users[nUser].UserToken=LSALogon(0,g_Users[nUser].UserName,L"",g_Users[nUser].Password);
 }
 
 //////////////////////////////////////////////////////////////////////////////
