@@ -16,6 +16,7 @@
 #include "LogonDlg.h"
 #include "UserGroups.h"
 #include "Helpers.h"
+#include "LSALogon.h"
 #include "BlowFish.h"
 #include "DBGTrace.h"
 #include "Resource.h"
@@ -310,12 +311,13 @@ void GetLogonToken(DWORD nUser)
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
   EnablePrivilege(SE_TCB_NAME);//Win2k
   EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
-  //Add user to admins group
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-  LogonUser(g_Users[nUser].UserName,0,g_Users[nUser].Password,
-    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
-  //Remove user from Administrators group
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+//  //Add user to admins group
+//  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+//  LogonUser(g_Users[nUser].UserName,0,g_Users[nUser].Password,
+//    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
+//  //Remove user from Administrators group
+//  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+  g_Users[nUser].UserToken=LSALogon(0,g_Users[nUser].UserName,NULL,g_Users[nUser].Password);
 }
 
 //////////////////////////////////////////////////////////////////////////////
