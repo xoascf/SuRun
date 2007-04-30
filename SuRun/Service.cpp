@@ -257,13 +257,13 @@ DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
                 LPTSTR CommandLine,LPTSTR CurDir) 
 {
   PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_Users[nUser].UserName};
   HANDLE hUser=AdminLogon(SessionID,g_Users[nUser].UserName,0,g_Users[nUser].Password);
-  if(LoadUserProfile(hUser,&ProfInf))
-  {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-    {
+//  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_Users[nUser].UserName};
+//  if(LoadUserProfile(hUser,&ProfInf))
+//  {
+//    void* Env=0;
+//    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+//    {
       TCHAR WinStaDesk[2*MAX_PATH];
       _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
       STARTUPINFO si={0};
@@ -276,19 +276,19 @@ DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
+        CREATE_UNICODE_ENVIRONMENT,0/*Env*/,NULL,&si,&pi))
       {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
       }else
         MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
           CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      DestroyEnvironmentBlock(Env);
-    }else
-      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hUser,ProfInf.hProfile);
-  }else
-    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
+//      DestroyEnvironmentBlock(Env);
+//    }else
+//      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
+//    UnloadUserProfile(hUser,ProfInf.hProfile);
+//  }else
+//    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
   if (hUser)
     CloseHandle(hUser);
   return pi.dwProcessId;
