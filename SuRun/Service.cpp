@@ -249,19 +249,6 @@ void KillProcess(DWORD PID)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  GetLogonToken
-// 
-//////////////////////////////////////////////////////////////////////////////
-HANDLE GetLogonToken(DWORD SessionID,DWORD nUser)
-{
-  EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
-  EnablePrivilege(SE_TCB_NAME);//Win2k
-  EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
-  return AdminLogon(0,g_Users[nUser].UserName,0,g_Users[nUser].Password);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 //  RunAsUser
 // 
 //  Start CommandLine as specific user of a logon session.
@@ -271,7 +258,7 @@ DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
 {
   PROCESS_INFORMATION pi={0};
   PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_Users[nUser].UserName};
-  HANDLE hUser=GetLogonToken(SessionID,nUser);
+  HANDLE hUser=AdminLogon(SessionID,g_Users[nUser].UserName,0,g_Users[nUser].Password);
   if(LoadUserProfile(hUser,&ProfInf))
   {
     void* Env=0;
@@ -282,12 +269,12 @@ DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
       STARTUPINFO si={0};
       si.cb=sizeof(si);
       si.lpDesktop=WinStaDesk;
+      if (!SetCurrentDirectory(CurDir))
+        DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      if (!SetCurrentDirectory(CurDir))
-        DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
       if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
         CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
       {
