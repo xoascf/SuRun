@@ -80,26 +80,6 @@ CResStr SvcName(IDS_SERVICE_NAME);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  GetLogonToken
-// 
-//////////////////////////////////////////////////////////////////////////////
-void GetLogonToken(DWORD nUser)
-{
-  if (g_Users[nUser].UserToken)
-    return;
-  EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
-  EnablePrivilege(SE_TCB_NAME);//Win2k
-  EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
-  //Add user to admins group
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-  LogonUser(g_Users[nUser].UserName,0,g_Users[nUser].Password,
-    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
-  //Remove user from Administrators group
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 //  LoadSettings
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -238,7 +218,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
-BOOL Setup()
+BOOL Setup(LPCTSTR WinStaName)
 {
   //Every "secure" Desktop has its own UUID as name:
   UUID uid;
@@ -246,7 +226,7 @@ BOOL Setup()
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
-  CRunOnNewDeskTop crond(DeskName,g_BlurDesktop);
+  CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   RpcStringFree(&DeskName);
   return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc);
 }
@@ -292,10 +272,11 @@ DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      //Assign User Token to Logon Session:
       if (!SetTokenInformation(hUser,TokenSessionId,&SessionID,sizeof(DWORD)))
         DBGTrace1("SetTokenInformation(TokenSessionId) failed: %s",GetLastErrorNameStatic());
+      //
       GrantAccessToWinstationAndDesktop(hUser,WinSta,Desk);
-      WTSQ
       //ImpersonateLoggedOnUser(hUser);
       if (!SetCurrentDirectory(CurDir))
         DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
@@ -319,10 +300,30 @@ DWORD RunAsUser(DWORD SessionID,HANDLE hUser,LPTSTR UserName,LPTSTR WinSta,
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  GetLogonToken
+// 
+//////////////////////////////////////////////////////////////////////////////
+void GetLogonToken(DWORD nUser)
+{
+  if (g_Users[nUser].UserToken)
+    return;
+  EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
+  EnablePrivilege(SE_TCB_NAME);//Win2k
+  EnablePrivilege(SE_INTERACTIVE_LOGON_NAME);
+  //Add user to admins group
+  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+  LogonUser(g_Users[nUser].UserName,0,g_Users[nUser].Password,
+    LOGON32_LOGON_INTERACTIVE,0,&g_Users[nUser].UserToken);
+  //Remove user from Administrators group
+  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
-int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
+int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
 {
   BOOL bDoAsk=g_AskAlways;
   //Do we have a token for this user?
@@ -359,7 +360,7 @@ int PrepareSuRun(LPTSTR UserName,LPTSTR cmdLine)
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
-  CRunOnNewDeskTop crond(DeskName,g_BlurDesktop);
+  CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   RpcStringFree(&DeskName);
   if (crond.IsValid())
   {
@@ -443,7 +444,7 @@ void SuDo(DWORD SessionID,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR cmdLi
 {
   PathStripPath(UserName);//strip computer name!
   //Start execution
-  int nUser=PrepareSuRun(UserName,cmdLine);
+  int nUser=PrepareSuRun(WinSta,UserName,cmdLine);
   if ((nUser!=-1)&&(g_Users[nUser].UserToken!=0))
   {
     //Create Process
@@ -549,7 +550,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           //Setup?
           if (_tcsicmp(cmdLine,_T("/SETUP"))==0)
           {
-            Setup();
+            Setup(WinSta);
           }else
           {
             KillProcess(KillPID);
