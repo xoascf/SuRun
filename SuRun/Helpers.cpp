@@ -578,3 +578,17 @@ PTOKEN_GROUPS	GetSessionTokenGroups(DWORD SessionID)
   CloseHandle(hToken);
   return ptg;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//  GetSessionLogonSID
+//
+//////////////////////////////////////////////////////////////////////////////
+
+PSID GetSessionLogonSID(DWORD SessionID)
+{
+  HANDLE hToken=GetSessionUserToken(SessionID);
+  if (!hToken)
+    return 0;
+  return GetLogonSid(hToken);
+}
