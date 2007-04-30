@@ -56,3 +56,6 @@ HANDLE GetSessionUserToken(DWORD SessID);
 
 //GetSessionTokenGroups
 PTOKEN_GROUPS	GetSessionTokenGroups(DWORD SessionID);
+
+//GetSessionLogonSID
+PSID GetSessionLogonSID(DWORD SessionID);
