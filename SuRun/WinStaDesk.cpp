@@ -5,6 +5,7 @@
 #include <aclapi.h>
 #include <userenv.h>
 #include "WinStaDesk.h"
+#include "Helpers.h"
 #include "DBGTrace.h"
 
 #pragma comment(lib,"Userenv.lib")
@@ -39,7 +40,7 @@ BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR DeskName,BOOL bCreateBkWnd)
+CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCreateBkWnd)
 {
   m_hDeskSwitch=NULL;
   m_hwinstaUser=NULL;
@@ -55,15 +56,15 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR DeskName,BOOL bCreateBkWnd)
   DWORD LenD=MAX_PATH;
   GetUserObjectInformation(m_hwinstaSave,UOI_NAME,wsn,LenW,&LenW);
   GetUserObjectInformation(m_hdeskSave,UOI_NAME,dtn,LenD,&LenD);
-  //Set new WindowStation (WinSta0)  
-  if ((wsn[0]=='\0') || _tcsicmp(wsn,_T("WinSta0")))
+  //Set new WindowStation (WinStaName)  
+  if ((wsn[0]=='\0') || _tcsicmp(wsn,WinStaName))
   {
-    m_hwinstaUser = OpenWindowStation(_T("WinSta0"), FALSE, MAXIMUM_ALLOWED);
+    m_hwinstaUser = OpenWindowStation(WinStaName,FALSE,MAXIMUM_ALLOWED);
     if (m_hwinstaUser == NULL)
     {
       DBGTrace1("CRunOnNewDeskTop::OpenWindowStation failed: %s",GetLastErrorNameStatic());
       SECURITY_ATTRIBUTES saWinSta= { sizeof(saWinSta), NULL, TRUE };
-      m_hwinstaUser = CreateWindowStation(_T("WinSta0"),0,WINSTA_ACCESSCLIPBOARD
+      m_hwinstaUser = CreateWindowStation(WinStaName,0,WINSTA_ACCESSCLIPBOARD
         |WINSTA_ACCESSGLOBALATOMS|WINSTA_CREATEDESKTOP|WINSTA_ENUMDESKTOPS 
         |WINSTA_ENUMERATE|WINSTA_EXITWINDOWS|WINSTA_READATTRIBUTES 
         |WINSTA_READSCREEN|WINSTA_WRITEATTRIBUTES,&saWinSta);
@@ -186,35 +187,14 @@ bool CRunOnNewDeskTop::IsValid()
 #define DESKTOP_ALL_ACCESS 0x00001FF
 #endif
 
-void* GetTokenLogonSID(HANDLE htok)
-{
-	BYTE tgs[4096];
-	DWORD cbtgs = sizeof tgs;
-	if (!GetTokenInformation(htok,TokenGroups,tgs,cbtgs,&cbtgs))
-  {
-    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
-    return 0;
-  }
-	const TOKEN_GROUPS* ptgs = (TOKEN_GROUPS*)(tgs);
-	const SID_AND_ATTRIBUTES* it = ptgs->Groups;
-	const SID_AND_ATTRIBUTES* end = it + ptgs->GroupCount;
-	while (end!=it)
-	{
-		if ((it->Attributes & SE_GROUP_LOGON_ID)==SE_GROUP_LOGON_ID)
-			break;
-		++it;
-	}
-	if (end==it)
-  {
-    DBGTrace("UNEXPECTED: No Logon SID in TokenGroups");
-    return 0;
-  }
-	return it->Sid;
-}
-
 void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
 {
-	void* psidLogonSession = GetTokenLogonSID(htok);
+	void* pLogonSID=GetLogonSid(htok);
+  if (!pLogonSID)
+  {
+    DBGTrace("GetLogonSid failed!");
+    return;
+  }
 	HWINSTA hws = OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED);
 	if (!hws)
   {
@@ -233,7 +213,7 @@ void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
     ea[1].grfInheritance= NO_INHERITANCE;
     ea[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
     ea[1].Trustee.TrusteeType = TRUSTEE_IS_USER;
-    ea[1].Trustee.ptstrName  = (LPTSTR)psidLogonSession;
+    ea[1].Trustee.ptstrName  = (LPTSTR)pLogonSID;
     // grant the logon session all access to any new desktops created in winsta0
 		// by adding an inherit-only ace
     ea[0].grfAccessPermissions = DESKTOP_ALL_ACCESS|STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE;
@@ -241,7 +221,7 @@ void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
     ea[0].grfInheritance= SUB_CONTAINERS_AND_OBJECTS_INHERIT|INHERIT_ONLY;
     ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
     ea[0].Trustee.TrusteeType = TRUSTEE_IS_USER;
-    ea[0].Trustee.ptstrName  = (LPTSTR)psidLogonSession;
+    ea[0].Trustee.ptstrName  = (LPTSTR)pLogonSID;
     // Create a new ACL that merges the new ACE into the existing DACL.
     DWORD err=SetEntriesInAcl(2,ea,pOldDACL,&pNewDACL);
     if (err!=ERROR_SUCCESS)
@@ -277,7 +257,7 @@ void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
       ea.grfInheritance= NO_INHERITANCE;
       ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
       ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
-      ea.Trustee.ptstrName  = (LPTSTR)psidLogonSession;
+      ea.Trustee.ptstrName  = (LPTSTR)pLogonSID;
       // Create a new ACL that merges the new ACE into the existing DACL.
       DWORD err=SetEntriesInAcl(1,&ea,pOldDACL,&pNewDACL);
       if (err!=ERROR_SUCCESS)
@@ -300,4 +280,5 @@ void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk)
     if (!CloseWindowStation(hws))
       DBGTrace1("CloseWindowStation failed: %s",GetLastErrorNameStatic());
 	}
+  free(pLogonSID);
 }
