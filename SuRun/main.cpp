@@ -148,7 +148,6 @@ void KillProcessNice(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-  zero(g_RunPwd);
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //Session
@@ -201,12 +200,16 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   if (hPipe!=INVALID_HANDLE_VALUE)
   {
     //Go!
+    zero(g_RunPwd);
+    g_RunPwd[0]=0xFF;
     DWORD nWritten=0;
     WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
     CloseHandle(hPipe);
     int n=0;
-    while ((g_RunPwd[0]==0)&&(n<1000))
+    while ((g_RunPwd[0]==0xFF)&&(n<1000))
       Sleep(55);
+    if (g_RunPwd[0]==0xFF)
+      return 0;
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb = sizeof(STARTUPINFO);
