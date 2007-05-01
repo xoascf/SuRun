@@ -15,6 +15,8 @@ const DWORD UserGroups[]=
   DOMAIN_ALIAS_RID_GUESTS
 };
 
+void CreateSuDoersGroup();
+
 BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName);
 
 DWORD AlterGroupMember(LPCWSTR Group,LPCWSTR DomainAndName, BOOL bAdd);
