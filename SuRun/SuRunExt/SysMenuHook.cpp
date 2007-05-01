@@ -117,6 +117,11 @@ __declspec(dllexport) BOOL UninstallSysMenuHook()
   return bRet;
 }
 
+__declspec(dllexport) BOOL SysMenuHookInstalled()
+{
+  return (g_hookShell!=0)||(g_hookMenu!=0);
+}
+
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   switch(dwReason)
