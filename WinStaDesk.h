@@ -24,5 +24,3 @@ private:
   HDESK   m_hDeskSwitch;
   CBlurredScreen m_Screen;
 };
-
-void GrantAccessToWinstationAndDesktop(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk);
