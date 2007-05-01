@@ -237,22 +237,6 @@ BOOL Setup(LPCTSTR WinStaName)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  KillProcess
-// 
-//////////////////////////////////////////////////////////////////////////////
-void KillProcess(DWORD PID)
-{
-  if (!PID)
-    return;
-  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
-  if(!hProcess)
-    return;
-  TerminateProcess(hProcess,0);
-  CloseHandle(hProcess);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 // CheckCliProcess:
 // 
 // checks if rd.CliProcessId is this exe and if rd is g_RunData of the calling
@@ -312,6 +296,150 @@ DWORD CheckCliProcess(RUNDATA& rd)
   return CloseHandle(hProcess),2;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  The Service:
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
+{
+  //service control handler
+  if(dwControl==SERVICE_CONTROL_STOP)
+  {
+    g_ss.dwCurrentState   = SERVICE_STOP_PENDING; 
+    g_ss.dwCheckPoint     = 0; 
+    g_ss.dwWaitHint       = 0; 
+    g_ss.dwWin32ExitCode  = 0; 
+    SetServiceStatus(g_hSS,&g_ss);
+    //Close Named Pipe
+    HANDLE hPipe=g_hPipe;
+    g_hPipe=INVALID_HANDLE_VALUE;
+    //Connect to Pipe
+    HANDLE sw=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+    if (sw==INVALID_HANDLE_VALUE)
+    {
+      DisconnectNamedPipe(hPipe);
+      sw=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+    }
+    //As g_hPipe is now INVALID_HANDLE_VALUE, the Service will exit
+    CloseHandle(hPipe);
+    return;
+  } 
+  if (g_hSS!=(SERVICE_STATUS_HANDLE)0) 
+    SetServiceStatus(g_hSS,&g_ss);
+}
+
+VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
+{
+#ifdef _DEBUG_ENU
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+#endif _DEBUG_ENU
+  zero(g_RunPwd);
+  //service main
+  argc;//unused
+  argv;//unused
+  DBGTrace( "SuRun Service starting");
+  g_ss.dwServiceType      = SERVICE_WIN32_OWN_PROCESS; 
+  g_ss.dwControlsAccepted = SERVICE_ACCEPT_STOP; 
+  g_ss.dwCurrentState     = SERVICE_START_PENDING; 
+  g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
+  if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
+    return; 
+  //Create Pipe:
+  g_hPipe=CreateNamedPipe(ServicePipeName,
+    PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
+    PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE|PIPE_WAIT,
+    1,0,0,NMPWAIT_USE_DEFAULT_WAIT,NULL);
+  if (g_hPipe!=INVALID_HANDLE_VALUE)
+  {
+    AllowAccess(g_hPipe);
+    //Set Service Status to "running"
+    g_ss.dwCurrentState     = SERVICE_RUNNING; 
+    g_ss.dwCheckPoint       = 0;
+    g_ss.dwWaitHint         = 0;
+    SetServiceStatus(g_hSS,&g_ss);
+    DBGTrace( "SuRun Service running");
+    //Setup
+    LoadSettings();
+    while (g_hPipe!=INVALID_HANDLE_VALUE)
+    {
+      //Wait for a connection
+      ConnectNamedPipe(g_hPipe,0);
+      //Exit if g_hPipe==INVALID_HANDLE_VALUE
+      if (g_hPipe==INVALID_HANDLE_VALUE)
+        break;
+      DWORD nRead=0;
+      RUNDATA rd={0};
+      //Read Client Process ID and command line
+      ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
+      //Disconnect client
+      DisconnectNamedPipe(g_hPipe);
+      if(CheckCliProcess(rd)==2)
+      {
+        //Process Check succeded, now start this exe in the calling processes
+        //Terminal server session to get SwitchDesktop working:
+        HANDLE hProc=0;
+        if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
+        {
+          HANDLE hRun=0;
+          if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
+            SecurityIdentification,TokenPrimary,&hRun))
+          {
+            DWORD SessionID=0;
+            ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
+            if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
+            {
+              PROCESS_INFORMATION pi={0};
+              STARTUPINFO si={0};
+              si.cb=sizeof(si);
+              TCHAR cmd[4096]={0};
+              GetWindowsDirectory(cmd,4096);
+              PathAppend(cmd,L"SuRun.exe /AskPID ");
+              TCHAR PID[10];
+              _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
+              EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+              EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+              if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
+                          CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+              {
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+              }
+            }
+            CloseHandle(hRun);
+          }
+          CloseHandle(hProc);
+        }
+      }
+      zero(rd);
+    }
+  }else
+    DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
+  //Stop Service
+  g_ss.dwCurrentState     = SERVICE_STOPPED; 
+  g_ss.dwCheckPoint       = 0;
+  g_ss.dwWaitHint         = 0;
+  g_ss.dwWin32ExitCode    = 0; 
+  DBGTrace( "SuRun Service stopped");
+  SetServiceStatus(g_hSS,&g_ss);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  KillProcess
+// 
+//////////////////////////////////////////////////////////////////////////////
+void KillProcess(DWORD PID)
+{
+  if (!PID)
+    return;
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
+  if(!hProcess)
+    return;
+  TerminateProcess(hProcess,0);
+  CloseHandle(hProcess);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -460,6 +588,11 @@ int PrepareSuRun()
   return -1;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  SuRun
+// 
+//////////////////////////////////////////////////////////////////////////////
 void SuDoRun(DWORD ProcessID)
 {
   //This is called from a separate process created by the service
@@ -498,135 +631,6 @@ void SuDoRun(DWORD ProcessID)
     return;
   }
   GivePassword();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  The Service:
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
-{
-  //service control handler
-  if(dwControl==SERVICE_CONTROL_STOP)
-  {
-    g_ss.dwCurrentState   = SERVICE_STOP_PENDING; 
-    g_ss.dwCheckPoint     = 0; 
-    g_ss.dwWaitHint       = 0; 
-    g_ss.dwWin32ExitCode  = 0; 
-    SetServiceStatus(g_hSS,&g_ss);
-    //Close Named Pipe
-    HANDLE hPipe=g_hPipe;
-    g_hPipe=INVALID_HANDLE_VALUE;
-    //Connect to Pipe
-    HANDLE sw=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
-    if (sw==INVALID_HANDLE_VALUE)
-    {
-      DisconnectNamedPipe(hPipe);
-      sw=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
-    }
-    //As g_hPipe is now INVALID_HANDLE_VALUE, the Service will exit
-    CloseHandle(hPipe);
-    return;
-  } 
-  if (g_hSS!=(SERVICE_STATUS_HANDLE)0) 
-    SetServiceStatus(g_hSS,&g_ss);
-}
-
-VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
-{
-#ifdef _DEBUG_ENU
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-#endif _DEBUG_ENU
-  zero(g_RunPwd);
-  //service main
-  argc;//unused
-  argv;//unused
-  DBGTrace( "SuRun Service starting");
-  g_ss.dwServiceType      = SERVICE_WIN32_OWN_PROCESS; 
-  g_ss.dwControlsAccepted = SERVICE_ACCEPT_STOP; 
-  g_ss.dwCurrentState     = SERVICE_START_PENDING; 
-  g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
-  if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
-    return; 
-  //Create Pipe:
-  g_hPipe=CreateNamedPipe(ServicePipeName,
-    PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
-    PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE|PIPE_WAIT,
-    1,0,0,NMPWAIT_USE_DEFAULT_WAIT,NULL);
-  if (g_hPipe!=INVALID_HANDLE_VALUE)
-  {
-    AllowAccess(g_hPipe);
-    //Set Service Status to "running"
-    g_ss.dwCurrentState     = SERVICE_RUNNING; 
-    g_ss.dwCheckPoint       = 0;
-    g_ss.dwWaitHint         = 0;
-    SetServiceStatus(g_hSS,&g_ss);
-    DBGTrace( "SuRun Service running");
-    //Setup
-    LoadSettings();
-    while (g_hPipe!=INVALID_HANDLE_VALUE)
-    {
-      //Wait for a connection
-      ConnectNamedPipe(g_hPipe,0);
-      //Exit if g_hPipe==INVALID_HANDLE_VALUE
-      if (g_hPipe==INVALID_HANDLE_VALUE)
-        break;
-      DWORD nRead=0;
-      RUNDATA rd={0};
-      //Read Client Process ID and command line
-      ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
-      //Disconnect client
-      DisconnectNamedPipe(g_hPipe);
-      if(CheckCliProcess(rd)==2)
-      {
-        //Process Check succeded, now start this exe in the calling processes
-        //Terminal server session to get SwitchDesktop working:
-        HANDLE hProc=0;
-        if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
-        {
-          HANDLE hRun=0;
-          if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
-            SecurityIdentification,TokenPrimary,&hRun))
-          {
-            DWORD SessionID=0;
-            ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
-            if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
-            {
-              PROCESS_INFORMATION pi={0};
-              STARTUPINFO si={0};
-              si.cb=sizeof(si);
-              TCHAR cmd[4096]={0};
-              GetWindowsDirectory(cmd,4096);
-              PathAppend(cmd,L"SuRun.exe /AskPID ");
-              TCHAR PID[10];
-              _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
-              EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-              EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-              if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
-                          CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
-              {
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
-              }
-            }
-            CloseHandle(hRun);
-          }
-          CloseHandle(hProc);
-        }
-      }
-      zero(rd);
-    }
-  }else
-    DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
-  //Stop Service
-  g_ss.dwCurrentState     = SERVICE_STOPPED; 
-  g_ss.dwCheckPoint       = 0;
-  g_ss.dwWaitHint         = 0;
-  g_ss.dwWin32ExitCode    = 0; 
-  DBGTrace( "SuRun Service stopped");
-  SetServiceStatus(g_hSS,&g_ss);
 }
 
 //////////////////////////////////////////////////////////////////////////////
