@@ -208,6 +208,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     int n=0;
     while ((g_RunPwd[0]==0xFF)&&(n<1000))
       Sleep(55);
+    if(bRunSetup)
+      return 0;
     if (g_RunPwd[0]==0xFF)
       return 0;
     PROCESS_INFORMATION pi={0};
