@@ -11,7 +11,7 @@ typedef struct
   TCHAR UserName[CNLEN+DNLEN];
   TCHAR cmdLine[4096];
   TCHAR CurDir[MAX_PATH];
-//  DWORD KillPID;
+  DWORD KillPID;
 }RUNDATA;
 
 extern RUNDATA g_RunData;
