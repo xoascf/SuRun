@@ -811,8 +811,6 @@ BOOL InstallService()
   if (CheckServiceStatus())
     if (!DeleteService(true))
       return FALSE;
-  for (int n=0;(CheckServiceStatus())&&(n<100);n++)
-    Sleep(100);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
     return FALSE;
@@ -894,14 +892,14 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
       bRet=TRUE;
     }
   }
+  for (int n=0;(CheckServiceStatus()||SysMenuHookInstalled())&&(n<100);n++)
+    Sleep(100);
   if (bJustStop)
     return TRUE;
   //Shell Extension
   //RemoveShellExt();
   //Registry
   RemoveRegistry();
-  //SysMenu Hook
-  UninstallSysMenuHook();
   //Delete Files and directories
   TCHAR File[4096];
   GetWindowsDirectory(File,4096);
