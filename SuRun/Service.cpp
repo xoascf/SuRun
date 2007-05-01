@@ -240,16 +240,16 @@ BOOL Setup(LPCTSTR WinStaName)
 //  KillProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-//void KillProcess(DWORD PID)
-//{
-//  if (!PID)
-//    return;
-//  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
-//  if(!hProcess)
-//    return;
-//  TerminateProcess(hProcess,0);
-//  CloseHandle(hProcess);
-//}
+void KillProcess(DWORD PID)
+{
+  if (!PID)
+    return;
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
+  if(!hProcess)
+    return;
+  TerminateProcess(hProcess,0);
+  CloseHandle(hProcess);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -481,7 +481,7 @@ void SuDoRun(DWORD ProcessID)
     Setup(g_RunData.WinSta);
     return;
   }
-//  KillProcess(g_RunData.KillPID);
+  KillProcess(g_RunData.KillPID);
   //Start execution
   int nUser=PrepareSuRun();
   if (nUser!=-1)
