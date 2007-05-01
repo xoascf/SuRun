@@ -250,6 +250,7 @@ BEGIN
     IDS_STARTMNUCFG         "SuRun Einstellungen.lnk"
     IDS_ASKUNINST           "Soll SuRun deinstalliert werden?"
     IDS_STARTMUNINST        "SuRun Entfernen.lnk"
+    IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
 END
 
 #endif    // German (Germany) resources
@@ -495,6 +496,7 @@ BEGIN
     IDS_STARTMNUCFG         "SuRun Settings.lnk"
     IDS_ASKUNINST           "Do you want to remove SuRun from this system?"
     IDS_STARTMUNINST        "Remove SuRun.lnk"
+    IDS_GRPDESC             "Members of this group can use SuRun."
 END
 
 #endif    // English (U.S.) resources
