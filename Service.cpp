@@ -467,7 +467,7 @@ void SuDoRun(DWORD ProcessID)
     return;
   zero(g_RunData);
   zero(g_RunPwd);
-  g_RunPwd[1]=1;
+  g_RunPwd[0]=1;
   LoadSettings();
   LoadPasswords();
   RUNDATA RD={0};
@@ -479,25 +479,25 @@ void SuDoRun(DWORD ProcessID)
   {
     GivePassword();
     Setup(g_RunData.WinSta);
-  }else
-  {
-    KillProcess(g_RunData.KillPID);
-    //Start execution
-    int nUser=PrepareSuRun();
-    if (nUser!=-1)
-    {
-      _tcscpy(g_RunPwd,g_Users[nUser].Password);
-      //Add user to admins group
-      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-      //Give Password to the calling process
-      GivePassword();
-      //Remove user from Administrators group
-      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
-      //Mark last start time
-      GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
-    }else
-      GivePassword();
+    return;
   }
+  KillProcess(g_RunData.KillPID);
+  //Start execution
+  int nUser=PrepareSuRun();
+  if (nUser!=-1)
+  {
+    _tcscpy(g_RunPwd,g_Users[nUser].Password);
+    //Add user to admins group
+    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+    //Give Password to the calling process
+    GivePassword();
+    //Remove user from Administrators group
+    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+    //Mark last start time
+    GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
+    return;
+  }
+  GivePassword();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -615,7 +615,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           CloseHandle(hProc);
         }
       }
-      zero(g_RunPwd);
       zero(rd);
     }
   }else
@@ -926,6 +925,9 @@ bool HandleServiceStuff()
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
     SuDoRun(wcstol(cmd.argv(2),0,10));
+    //clean sensitive Data
+    zero(g_Users);
+    zero(g_RunPwd);
     ExitProcess(0);
   }else
   if (cmd.argc()==2)
