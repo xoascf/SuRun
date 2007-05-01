@@ -685,6 +685,7 @@ void InstallRegistry()
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
   SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s /x \"%%1\" %%*",SuRunExe));
   //InstallShellExt();
+  CreateSuDoersGroup();
 }
 
 //////////////////////////////////////////////////////////////////////////////
