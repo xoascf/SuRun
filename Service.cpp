@@ -467,6 +467,7 @@ void SuDoRun(DWORD ProcessID)
     return;
   zero(g_RunData);
   zero(g_RunPwd);
+  g_RunPwd[1]=1;
   LoadSettings();
   LoadPasswords();
   RUNDATA RD={0};
