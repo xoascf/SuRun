@@ -806,6 +806,8 @@ void CopyToWinDir(LPCTSTR File)
 
 BOOL InstallService()
 {
+  if (!IsAdmin())
+    return RunThisAsAdmin(_T("/INSTALL"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   if (CheckServiceStatus())
   {
     if (!DeleteService(true))
@@ -813,8 +815,6 @@ BOOL InstallService()
     //Wait until "SuRun /SYSMENUHOOK" has exited:
     Sleep(2000);
   }
-  if (!IsAdmin())
-    return RunThisAsAdmin(_T("/INSTALL"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
     return FALSE;
@@ -877,7 +877,7 @@ BOOL InstallService()
 BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 {
   if (!IsAdmin())
-    return RunThisAsAdmin(bJustStop?_T("/QUNINST"):_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
+    return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
   if ((!bJustStop)
     &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
                   MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO))
@@ -926,6 +926,8 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 
 BOOL UserInstall(int IDSMsg)
 {
+  if (!IsAdmin())
+    return RunThisAsAdmin(_T("/USERINST"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   if (MessageBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)!=IDYES)
     return FALSE;
@@ -997,13 +999,6 @@ bool HandleServiceStuff()
     if (_tcsicmp(cmd.argv(1),_T("/UNINSTALL"))==0)
     {
       DeleteService();
-      ExitProcess(0);
-      return true;
-    }
-    //QUNINST
-    if (_tcsicmp(cmd.argv(1),_T("/QUNINST"))==0)
-    {
-      DeleteService(true);
       ExitProcess(0);
       return true;
     }
