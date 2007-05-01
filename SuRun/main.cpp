@@ -9,6 +9,7 @@
 #include "Helpers.h"
 #include "ResStr.h"
 #include "Service.h"
+#include "DBGTrace.h"
 #include "Resource.h"
 
 #pragma comment(lib,"shlwapi.lib")
@@ -158,6 +159,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+  PathStripPath(g_RunData.UserName);//strip computer name!
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
@@ -203,10 +205,21 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
     CloseHandle(hPipe);
     int n=0;
-    while ((g_RunPwd[0]==0)&&(n<100))
+    while ((g_RunPwd[0]==0)&&(n<1000))
       Sleep(55);
-    LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
-    MessageBox(0,g_RunPwd,0,0);
+    PROCESS_INFORMATION pi={0};
+    STARTUPINFO si={0};
+    si.cb = sizeof(STARTUPINFO);
+    if(!CreateProcessWithLogonW(g_RunData.UserName,NULL,g_RunPwd,
+      LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
+      NULL,g_RunData.CurDir,&si,&pi))
+    {
+      DBGTrace4("CreateProcessWithLogonW(%s,%s,%s) failed: %s",g_RunData.UserName,
+        g_RunPwd,g_RunData.cmdLine,GetLastErrorNameStatic());
+      MessageBox(0,
+        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetLastErrorNameStatic()),
+        CResStr(IDS_APPNAME),MB_ICONSTOP);
+    }
   }
   return 0;
 }
