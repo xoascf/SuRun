@@ -809,7 +809,10 @@ BOOL InstallService()
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/INSTALL"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   if (CheckServiceStatus())
-    DeleteService(true);
+    if (!DeleteService(true))
+      return FALSE;
+  for (int n=0;(CheckServiceStatus())&&(n<100);n++)
+    Sleep(100);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
     return FALSE;
@@ -920,6 +923,28 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+// UserInstall ...interactive
+// 
+//////////////////////////////////////////////////////////////////////////////
+BOOL UserInstall()
+{
+  if (MessageBox(0,CBigResStr(IDS_ASKINSTALL),CResStr(IDS_APPNAME),
+    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
+    return FALSE;
+  if (!InstallService())
+    return FALSE;
+  TCHAR SuRunExe[4096];
+  GetWindowsDirectory(SuRunExe,4096);
+  PathAppend(SuRunExe,L"SuRun.exe");
+  ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
+  if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
+    MB_ICONQUESTION|MB_YESNO)==IDYES)
+    ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
+  return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 // HandleServiceStuff: called on App Entry before WinMain()
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -982,26 +1007,17 @@ bool HandleServiceStuff()
     //UserInst:
     if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
     {
-      goto ForceInstall;
+      UserInstall();
+      ExitProcess(0);
+      return true;
     }
   }
   //The Service must be running!
   ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
-ForceInstall:
-    if (MessageBox(0,CBigResStr(IDS_ASKINSTALL),CResStr(IDS_APPNAME),
-                   MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
+    if (!UserInstall())
       ExitProcess(0);
-    if (!InstallService())
-      ExitProcess(0);
-    TCHAR SuRunExe[4096];
-    GetWindowsDirectory(SuRunExe,4096);
-    PathAppend(SuRunExe,L"SuRun.exe");
-    ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
-    if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
-      MB_ICONQUESTION|MB_YESNO)==IDYES)
-      ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
     if (cmd.argc()==1)
       ExitProcess(0);
     ServiceStatus=CheckServiceStatus();
