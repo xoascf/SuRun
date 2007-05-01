@@ -971,17 +971,11 @@ bool HandleServiceStuff()
       ExitProcess(0);
       return true;
     }
-    if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
-    {
-      //this is ugly:
-      goto DoInstall;
-    }
   }
   //The Service must be running!
   ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
-DoInstall:
     if (MessageBox(0,CBigResStr(IDS_ASKINSTALL),CResStr(IDS_APPNAME),
                    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
       ExitProcess(0);
