@@ -239,7 +239,6 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       HWND UserList=GetDlgItem(hwnd,IDC_USER);
       SendMessage(UserList,CB_SETEXTENDEDUI,1,0);
       BOOL bFoundUser=FALSE;
-      PathStripPath(p->User);//strip computer name!
       for (int i=0;i<p->Users.nUsers;i++)
       {
         COMBOBOXEXITEM cei={0};
