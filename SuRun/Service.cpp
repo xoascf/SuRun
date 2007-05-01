@@ -17,7 +17,6 @@
 #include "LogonDlg.h"
 #include "UserGroups.h"
 #include "Helpers.h"
-#include "LSALogon.h"
 #include "BlowFish.h"
 #include "DBGTrace.h"
 #include "Resource.h"
@@ -258,47 +257,6 @@ void KillProcess(DWORD PID)
 // 
 //  Start CommandLine as specific user of a logon session.
 //////////////////////////////////////////////////////////////////////////////
-DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
-                LPTSTR CommandLine,LPTSTR CurDir) 
-{
-  PROCESS_INFORMATION pi={0};
-  HANDLE hUser=AdminLogon(SessionID,g_Users[nUser].UserName,0,g_Users[nUser].Password);
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_Users[nUser].UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
-  {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-    {
-      TCHAR WinStaDesk[2*MAX_PATH];
-      _stprintf(WinStaDesk,_T("%s\\%s"),WinSta,Desk);
-      STARTUPINFO si={0};
-      si.cb=sizeof(si);
-      si.lpDesktop=WinStaDesk;
-      if (!SetCurrentDirectory(CurDir))
-        DBGTrace2("SetCurrentDirectory(%s) failed: %s",CurDir,GetLastErrorNameStatic());
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      if (CreateProcessAsUser(hUser,NULL,(LPTSTR)CommandLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
-      {
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-      }else
-        MessageBox(0,CResStr(IDS_RUNFAILED,CommandLine,GetLastErrorNameStatic()),
-          CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      DestroyEnvironmentBlock(Env);
-    }else
-      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hUser,ProfInf.hProfile);
-  }else
-    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
-  if (hUser)
-    CloseHandle(hUser);
-  return pi.dwProcessId;
-}
-
 BOOL RunAsUser(RUNDATA& rd,LPCTSTR Password) 
 {
   if (rd.CliProcessId==GetCurrentProcessId())
@@ -325,7 +283,7 @@ BOOL RunAsUser(RUNDATA& rd,LPCTSTR Password)
       DBGTrace1("EnumProcessModules failed: %s",GetLastErrorNameStatic());
       return CloseHandle(hProcess),FALSE;
     }
-    if(GetModuleFileNameEx(hProcess,hMod,f1,MAX_PATH)==0)
+    if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
     {
       DBGTrace1("GetModuleFileNameEx failed: %s",GetLastErrorNameStatic());
       return CloseHandle(hProcess),FALSE;
@@ -347,7 +305,6 @@ BOOL RunAsUser(RUNDATA& rd,LPCTSTR Password)
     DBGTrace2("ReadProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
     return CloseHandle(hProcess),FALSE;
   }
-  PathStripPath(g_RunData.UserName);//strip computer name!
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
   {
     DBGTrace("RunData is different!");
@@ -486,7 +443,6 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
 
 void SuDo(RUNDATA& rd)
 {
-  PathStripPath(rd.UserName);//strip computer name!
   //Start execution
   int nUser=PrepareSuRun(rd.WinSta,rd.UserName,rd.cmdLine);
   if (nUser!=-1)
