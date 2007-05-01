@@ -880,7 +880,7 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
     return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
   if ((!bJustStop)
     &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
-                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
+                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO))
     return false;
   BOOL bRet=FALSE;
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
@@ -898,8 +898,6 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
   }
   for (int n=0;CheckServiceStatus() && (n<100);n++)
     Sleep(100);
-  if (bJustStop)
-    return TRUE;
   //Shell Extension
   //RemoveShellExt();
   //Registry
@@ -918,20 +916,18 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
   ExpandEnvironmentStrings(file,File,4096);
   PathAppend(File,CResStr(IDS_STARTMENUDIR));
   DeleteDirectory(File);
+  if (bJustStop)
+    return TRUE;
   //Ok!
-  MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+  MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
+    MB_ICONINFORMATION|MB_SETFOREGROUND);
   return bRet;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// 
-// UserInstall ...interactive
-// 
-//////////////////////////////////////////////////////////////////////////////
 BOOL UserInstall(int IDSMsg)
 {
   if (MessageBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
+    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)!=IDYES)
     return FALSE;
   if (!InstallService())
     return FALSE;
@@ -940,7 +936,7 @@ BOOL UserInstall(int IDSMsg)
   PathAppend(SuRunExe,L"SuRun.exe");
   ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
   if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO)==IDYES)
+    MB_ICONQUESTION|MB_YESNO|MB_SETFOREGROUND)==IDYES)
     ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
   return TRUE;
 }
@@ -985,7 +981,7 @@ bool HandleServiceStuff()
         Sleep(1000);
       InstallSysMenuHook();
       while (CheckServiceStatus()==SERVICE_RUNNING)
-      	WaitForSingleObject(GetCurrentThread(),1000);
+      	Sleep(1000);
       UninstallSysMenuHook();
       ExitProcess(0);
       return true;
