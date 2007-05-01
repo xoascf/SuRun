@@ -71,20 +71,22 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
     PROCESS_INFORMATION pi;
     si.cb = sizeof(si);
     TCHAR cmd[4096];
-    TCHAR PID[10];
     GetWindowsDirectory(cmd, MAX_PATH);
     PathAppend(cmd, _T("surun.exe "));
-    if (msg->wParam==WM_SYSMH0)
-    {
-      _tcscat(cmd,_T("/KILL "));
-      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
-      _tcscat(cmd,_T(" "));
-    }
+//    TCHAR PID[10];
+//    if (msg->wParam==WM_SYSMH0)
+//    {
+//      _tcscat(cmd,_T("/KILL "));
+//      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
+//      _tcscat(cmd,_T(" "));
+//    }
     _tcscat(cmd,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
       CloseHandle(pi.hProcess);
       CloseHandle(pi.hThread);
+      if (msg->wParam==WM_SYSMH0)
+        ::ExitProcess(0);
     }else
       MessageBox(msg->hwnd,sFileNotFound,0,MB_ICONSTOP);
   }
