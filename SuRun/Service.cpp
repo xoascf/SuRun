@@ -581,7 +581,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if(CheckCliProcess(rd)==2)
       {
-        //ToDo: GetProcessToken, Set SessionID, CreateProcessAsUser
+        //Process Check succeded, now start this exe in the calling processes
+        //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
         if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
         {
