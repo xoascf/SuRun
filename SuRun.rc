@@ -156,7 +156,7 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,151,105
     CONTROL         "",-1,"Static",SS_ETCHEDHORZ,0,105,151,1
-    ICON            IDI_SHIELD,IDC_SECICON,7,15,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "Frage um Erlaubnis",-1,46,7,82,49
     CONTROL         "&immer",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP,52,18,34,10
@@ -169,7 +169,7 @@ BEGIN
     CONTROL         "Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,52,63,93,20
-    CONTROL         "Passwörter sicher und verschlüsselt speichern",
+    CONTROL         "Passworte speichern. (sicher und verschlüsselt)",
                     IDC_SAVEPW,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,52,84,93,20
     DEFPUSHBUTTON   "&Speichern",IDOK,7,116,50,14
