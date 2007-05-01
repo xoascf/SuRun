@@ -25,7 +25,7 @@ BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName)
   BOOL bSuccess = FALSE;
   if(AllocateAndInitializeSid(&sia,2,SECURITY_BUILTIN_DOMAIN_RID,Rid,0,0,0,0,0,0,&pSid)) 
   {
-    WCHAR DomainName[DNLEN+1];
+    WCHAR DomainName[DNLEN];
     DWORD DnLen = DNLEN;
     SID_NAME_USE snu;
     bSuccess = LookupAccountSidW(0,pSid,Name,cchName,DomainName,&DnLen,&snu);
