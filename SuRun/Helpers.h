@@ -38,24 +38,3 @@ bool DeleteDirectory(LPCTSTR DIR);
 bool GetSIDUserName(PSID sid,LPTSTR Name);
 bool GetTokenUserName(HANDLE hUser,LPTSTR Name);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR Name);
-
-// GetTokenGroups
-PTOKEN_GROUPS	GetTokenGroups(HANDLE hToken);
-
-// FindLogonSID
-PSID FindLogonSID(PTOKEN_GROUPS	ptg);
-
-// GetLogonSid
-PSID GetLogonSid(HANDLE hToken);
-
-//  GetProcessID
-DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1);
-
-//GetSessionTokenGroups
-HANDLE GetSessionUserToken(DWORD SessID);
-
-//GetSessionTokenGroups
-PTOKEN_GROUPS	GetSessionTokenGroups(DWORD SessionID);
-
-//GetSessionLogonSID
-PSID GetSessionLogonSID(DWORD SessionID);
