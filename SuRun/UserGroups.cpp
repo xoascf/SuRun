@@ -9,9 +9,22 @@
 #include <windows.h>
 #include <TCHAR.h>
 #include <lm.h>
+#include "ResStr.h"
 #include "UserGroups.h"
+#include "Resource.h"
 
 #pragma comment(lib,"Netapi32.lib")
+/////////////////////////////////////////////////////////////////////////////
+//
+// CreateSuDoersGroup
+//
+/////////////////////////////////////////////////////////////////////////////
+void CreateSuDoersGroup()
+{
+  LOCALGROUP_INFO_1	lgri1={SUDOERSGROUP,CResStr(IDS_GRPDESC)};
+  DWORD error;
+  NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
