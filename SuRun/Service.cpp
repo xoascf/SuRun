@@ -809,8 +809,12 @@ BOOL InstallService()
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/INSTALL"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   if (CheckServiceStatus())
+  {
     if (!DeleteService(true))
       return FALSE;
+    //Wait until "SuRun /SYSMENUHOOK" has exited:
+    Sleep(2000);
+  }
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
     return FALSE;
@@ -892,7 +896,7 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
       bRet=TRUE;
     }
   }
-  for (int n=0;(CheckServiceStatus()||SysMenuHookInstalled())&&(n<100);n++)
+  for (int n=0;CheckServiceStatus() && (n<100);n++)
     Sleep(100);
   if (bJustStop)
     return TRUE;
@@ -924,9 +928,9 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 // UserInstall ...interactive
 // 
 //////////////////////////////////////////////////////////////////////////////
-BOOL UserInstall()
+BOOL UserInstall(int IDSMsg)
 {
-  if (MessageBox(0,CBigResStr(IDS_ASKINSTALL),CResStr(IDS_APPNAME),
+  if (MessageBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
     return FALSE;
   if (!InstallService())
@@ -980,10 +984,8 @@ bool HandleServiceStuff()
       for(int i=0;(i<30)&&(CheckServiceStatus()!=SERVICE_RUNNING);i++)
         Sleep(1000);
       InstallSysMenuHook();
-      do 
-      {
-      	WaitForSingleObject(GetCurrentThread(),5000);
-      } while (CheckServiceStatus()==SERVICE_RUNNING);
+      while (CheckServiceStatus()==SERVICE_RUNNING)
+      	WaitForSingleObject(GetCurrentThread(),1000);
       UninstallSysMenuHook();
       ExitProcess(0);
       return true;
@@ -1005,7 +1007,7 @@ bool HandleServiceStuff()
     //UserInst:
     if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
     {
-      UserInstall();
+      UserInstall(IDS_ASKUSRINSTALL);
       ExitProcess(0);
       return true;
     }
@@ -1014,7 +1016,7 @@ bool HandleServiceStuff()
   ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
-    if (!UserInstall())
+    if (!UserInstall(IDS_ASKINSTALL))
       ExitProcess(0);
     if (cmd.argc()==1)
       ExitProcess(0);
