@@ -878,10 +878,18 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
+  CBlurredScreen cbs;
+  if(!bJustStop)
+  {
+    cbs.Init();
+    cbs.Show();
+  }
   if ((!bJustStop)
     &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
                   MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO))
     return false;
+  if(!bJustStop)
+    cbs.MsgLoop();
   BOOL bRet=FALSE;
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
@@ -928,9 +936,13 @@ BOOL UserInstall(int IDSMsg)
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/USERINST"),SERVICE_RUNNING,IDS_INSTALLADMIN);
+  CBlurredScreen cbs;
+  cbs.Init();
+  cbs.Show();
   if (MessageBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)!=IDYES)
     return FALSE;
+  cbs.MsgLoop();
   if (!InstallService())
     return FALSE;
   TCHAR SuRunExe[4096];
