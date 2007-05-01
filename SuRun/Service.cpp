@@ -460,6 +460,44 @@ int PrepareSuRun()
   return -1;
 }
 
+void SuDoRun(DWORD ProcessID)
+{
+  if (!IsLocalSystem())
+    return;
+  zero(g_RunData);
+  zero(g_RunPwd);
+  LoadSettings();
+  LoadPasswords();
+  RUNDATA RD={0};
+  RD.CliProcessId=ProcessID;
+  if(CheckCliProcess(RD)!=1)
+    return;
+  //Setup?
+  if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
+  {
+    GivePassword();
+    Setup(g_RunData.WinSta);
+  }else
+  {
+    KillProcess(g_RunData.KillPID);
+    //Start execution
+    int nUser=PrepareSuRun();
+    if (nUser!=-1)
+    {
+      _tcscpy(g_RunPwd,g_Users[nUser].Password);
+      //Add user to admins group
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+      //Give Password to the calling process
+      GivePassword();
+      //Remove user from Administrators group
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+      //Mark last start time
+      GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
+    }else
+      GivePassword();
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  The Service:
@@ -526,7 +564,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace( "SuRun Service running");
     //Setup
     LoadSettings();
-    LoadPasswords();
     while (g_hPipe!=INVALID_HANDLE_VALUE)
     {
       //Wait for a connection
@@ -564,7 +601,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
               EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
               EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-              if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+              if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
                           CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
               {
                 CloseHandle(pi.hProcess);
@@ -574,31 +611,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             CloseHandle(hRun);
           }
           CloseHandle(hProc);
-        }
-        ...
-        //Setup?
-        if (_tcsicmp(rd.cmdLine,_T("/SETUP"))==0)
-        {
-          GivePassword();
-          Setup(rd.WinSta);
-        }else
-        {
-          KillProcess(rd.KillPID);
-          //Start execution
-          int nUser=PrepareSuRun();
-          if (nUser!=-1)
-          {
-            _tcscpy(g_RunPwd,g_Users[nUser].Password);
-            //Add user to admins group
-            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-            //Give Password to the calling process
-            GivePassword();
-            //Remove user from Administrators group
-            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
-            //Mark last start time
-            GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
-          }else
-            GivePassword();
         }
       }
       zero(g_RunPwd);
@@ -909,6 +921,11 @@ bool HandleServiceStuff()
 #endif _DEBUG_ENU
   DWORD ServiceStatus=0;
   CCmdLine cmd;
+  if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
+  {
+    SuDoRun(wcstol(cmd.argv(2),0,10));
+    ExitProcess(0);
+  }else
   if (cmd.argc()==2)
   {
     //Service
