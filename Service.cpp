@@ -338,7 +338,7 @@ BOOL GivePassword()
     DBGTrace2("WriteProcessMemory invalid size %d != %d ",PWLEN,n);
     return CloseHandle(hProcess),FALSE;
   }
-  WaitForSingleObject(hProcess,INFINITE);
+  WaitForSingleObject(hProcess,15000);
   return CloseHandle(hProcess),TRUE;
 }
 
