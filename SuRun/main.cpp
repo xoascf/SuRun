@@ -117,26 +117,12 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
 // 
 //////////////////////////////////////////////////////////////////////////////
 // callback function for window enumeration
-static BOOL CALLBACK TerminateAppEnum(HWND hwnd,LPARAM lParam )
+static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
 {
   DWORD dwID ;
   GetWindowThreadProcessId(hwnd, &dwID) ;
   if(dwID==(DWORD)lParam)
-  {
-    //Get the highest Parent...
-    HWND hWnd=GetParent(hwnd);
-    GetWindowThreadProcessId(hWnd,&dwID) ;
-    while(IsWindow(hWnd)&&(dwID==(DWORD)lParam))
-    {
-      hwnd=hWnd;
-      hWnd=GetParent(hwnd);
-      GetWindowThreadProcessId(hWnd,&dwID);
-    }
-    //...close it
     PostMessage(hwnd,WM_CLOSE,0,0) ;
-    //stop EnumWindows
-    return FALSE;
-  }
   return TRUE ;
 }
 
@@ -148,7 +134,7 @@ void KillProcessNice(DWORD PID)
   if(!hProcess)
     return;
   //Post WM_CLOSE to all Windows of PID
-  EnumWindows(TerminateAppEnum,(LPARAM)PID);
+  EnumWindows(CloseAppEnum,(LPARAM)PID);
   //Give the Process time to close
   WaitForSingleObject(hProcess, 15000);
   CloseHandle(hProcess);
@@ -162,6 +148,7 @@ void KillProcessNice(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  zero(g_RunData);
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //Session
