@@ -219,8 +219,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
       NULL,g_RunData.CurDir,&si,&pi))
     {
-      DBGTrace4("CreateProcessWithLogonW(%s,%s,%s) failed: %s",g_RunData.UserName,
-        g_RunPwd,g_RunData.cmdLine,GetLastErrorNameStatic());
+      if (g_RunPwd[0]==0)
+        return 0;
       MessageBox(0,
         CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetLastErrorNameStatic()),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
