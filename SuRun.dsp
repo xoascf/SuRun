@@ -158,10 +158,6 @@ SOURCE=.\LogonDlg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\LSALogon.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
@@ -211,10 +207,6 @@ SOURCE=.\IsAdmin.h
 # Begin Source File
 
 SOURCE=.\LogonDlg.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\LSALogon.h
 # End Source File
 # Begin Source File
 
