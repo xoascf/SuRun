@@ -208,9 +208,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     int n=0;
     while ((g_RunPwd[0]==0xFF)&&(n<1000))
       Sleep(55);
-    if(bRunSetup)
-      return 0;
-    if (g_RunPwd[0]==0xFF)
+    if ((g_RunPwd[0]==0xFF)
+      ||(g_RunPwd[0]==1)
+      || bRunSetup)
       return 0;
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
@@ -219,8 +219,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
       NULL,g_RunData.CurDir,&si,&pi))
     {
-      if (g_RunPwd[0]==0)
-        return 0;
       MessageBox(0,
         CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetLastErrorNameStatic()),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
