@@ -462,6 +462,7 @@ int PrepareSuRun()
 
 void SuDoRun(DWORD ProcessID)
 {
+  //This is called from a separate process created by the service
   if (!IsLocalSystem())
     return;
   zero(g_RunData);
