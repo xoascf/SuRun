@@ -122,10 +122,7 @@ static BOOL CALLBACK TerminateAppEnum( HWND hwnd, LPARAM lParam )
   DWORD dwID ;
   GetWindowThreadProcessId(hwnd, &dwID) ;
   if(dwID == (DWORD)lParam)
-  {
-    PostMessage(hwnd,WM_CLOSE,0,0) ;
-    return FALSE;
-  }
+    PostMessage(hwnd,WM_SYSCOMMAND,SC_CLOSE,0) ;
   return TRUE ;
 }
 
