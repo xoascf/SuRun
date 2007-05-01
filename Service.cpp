@@ -676,13 +676,13 @@ void InstallRegistry()
   SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
   //MSI Install
   SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
-  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s \"%%1\" %%* /i",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s /i \"%%1\" %%*",SuRunExe));
   //MSI Repair
   SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
-  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s \"%%1\" %%* /f",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s /f \"%%1\" %%*",SuRunExe));
   //MSI Uninstall
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
-  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s \"%%1\" %%* /x",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s /x \"%%1\" %%*",SuRunExe));
   //InstallShellExt();
 }
 
