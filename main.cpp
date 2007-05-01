@@ -147,9 +147,22 @@ void KillProcessNice(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-  TCHAR cmd[4096]={0};
+  zero(g_RunPwd);
+  //ProcessId
+  g_RunData.CliProcessId=GetCurrentProcessId();
+  //Session
+  ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
+  //WindowStation
+  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+  //Desktop
+  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
+  //UserName
+  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+  //Current Directory
+  GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
+  NetworkPathToUNCPath(g_RunData.CurDir);
+  //cmdLine
   BOOL bRunSetup=FALSE;
-  DWORD KillPID=0;
   LPTSTR Args=PathGetArgs(GetCommandLine());
   //Parse direct commands:
   while (Args[0]=='/')
@@ -161,21 +174,21 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!_wcsicmp(c,L"/SETUP"))
     {
       bRunSetup=TRUE;
-      wcscpy(cmd,L"/SETUP");
+      wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
     }else
     if (!_wcsicmp(c,L"/KILL"))
     {
-      KillPID=wcstol(Args,0,10);
+      g_RunData.KillPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
-      KillProcessNice(KillPID);
+      KillProcessNice(g_RunData.KillPID);
     }
   }
   //Convert Command Line
   if (!bRunSetup)
-    ArgsToCommand(Args,cmd);
+    ArgsToCommand(Args,g_RunData.cmdLine);
   //Usage
-  if (!cmd[0])
+  if (!g_RunData.cmdLine[0])
   {
     LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
     MessageBox(0,CBigResStr(IDS_USAGE),0,MB_ICONSTOP);
@@ -185,33 +198,15 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if (hPipe!=INVALID_HANDLE_VALUE)
   {
-    //Session
-    DWORD SessionId=0;
-    ProcessIdToSessionId(GetCurrentProcessId(),&SessionId);
-    //WindowStation
-    TCHAR WinSta[MAX_PATH];
-    GetWinStaName(WinSta,MAX_PATH);
-    //Desktop
-    TCHAR Desk[MAX_PATH];
-    GetDesktopName(Desk,MAX_PATH);
-    //UserName
-    TCHAR UserName[DNLEN+UNLEN+2];
-    DWORD len=DNLEN+UNLEN+1;
-    GetProcessUserName(GetCurrentProcessId(),UserName);
-    //Current Directory
-    TCHAR Dir[MAX_PATH]={0};
-    GetCurrentDirectory(MAX_PATH,Dir);
-    NetworkPathToUNCPath(Dir);
     //Go!
     DWORD nWritten=0;
-    WriteFile(hPipe,&SessionId,sizeof(SessionId),&nWritten,0);
-    WriteFile(hPipe,WinSta,_tcslen(WinSta)*sizeof(TCHAR),&nWritten,0);
-    WriteFile(hPipe,Desk,_tcslen(Desk)*sizeof(TCHAR),&nWritten,0);
-    WriteFile(hPipe,UserName,_tcslen(UserName)*sizeof(TCHAR),&nWritten,0);
-    WriteFile(hPipe,cmd,_tcslen(cmd)*sizeof(TCHAR),&nWritten,0);
-    WriteFile(hPipe,Dir,_tcslen(Dir)*sizeof(TCHAR),&nWritten,0);
-    WriteFile(hPipe,&KillPID,sizeof(KillPID),&nWritten,0);
+    WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
     CloseHandle(hPipe);
+    int n=0;
+    while ((g_RunPwd[0]==0)&&(n<100))
+      Sleep(55);
+    LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
+    MessageBox(0,g_RunPwd,0,0);
   }
   return 0;
 }
