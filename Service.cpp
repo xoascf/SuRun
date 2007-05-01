@@ -939,7 +939,7 @@ DoInstall:
     ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
     if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
       MB_ICONQUESTION|MB_YESNO)==IDYES)
-      ShellExecute(0,L"open",L"surun.exe",L"/SETUP",0,SW_SHOWNORMAL);
+      ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
     if (cmd.argc()==1)
       ExitProcess(0);
     ServiceStatus=CheckServiceStatus();
