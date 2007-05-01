@@ -122,7 +122,10 @@ static BOOL CALLBACK TerminateAppEnum( HWND hwnd, LPARAM lParam )
   DWORD dwID ;
   GetWindowThreadProcessId(hwnd, &dwID) ;
   if(dwID == (DWORD)lParam)
-    PostMessage(hwnd, WM_CLOSE, 0, 0) ;
+  {
+    PostMessage(hwnd,WM_CLOSE,0,0) ;
+    return FALSE;
+  }
   return TRUE ;
 }
 
@@ -135,7 +138,7 @@ void KillProcessNice(DWORD PID)
     return;
   // TerminateAppEnum() posts WM_CLOSE to all windows whose PID
   // matches your process's.
-  ::EnumWindows(TerminateAppEnum,(LPARAM)PID);
+  EnumWindows(TerminateAppEnum,(LPARAM)PID);
   // Wait on the handle. If it signals, great. 
   WaitForSingleObject(hProcess, 5000);
   CloseHandle(hProcess);
