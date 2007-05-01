@@ -251,6 +251,7 @@ BEGIN
     IDS_ASKUNINST           "Soll SuRun deinstalliert werden?"
     IDS_STARTMUNINST        "SuRun Entfernen.lnk"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
+    IDS_ASKUSRINSTALL       "Wollen Sie SuRun jetzt installieren bzw. ersetzen?\r\n\r\nWenn Sie auf Ja klicken, werden die SuRun-Dateien in das Windows\r\nVerzeichnis kopiert und der SuRun Dienst installiert und gestartet."
 END
 
 #endif    // German (Germany) resources
@@ -497,6 +498,7 @@ BEGIN
     IDS_ASKUNINST           "Do you want to remove SuRun from this system?"
     IDS_STARTMUNINST        "Remove SuRun.lnk"
     IDS_GRPDESC             "Members of this group can use SuRun."
+    IDS_ASKUSRINSTALL       "Do you want to install or update SuRun now?\r\n\r\nIf you press Yes, SuRun files will be copied to your Windows\r\ndirectory and the SuRun service is installed and run."
 END
 
 #endif    // English (U.S.) resources
