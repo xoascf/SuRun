@@ -684,8 +684,6 @@ void InstallRegistry()
   //MSI Uninstall
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
   SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s /x \"%%1\" %%*",SuRunExe));
-  //InstallShellExt();
-  CreateSuDoersGroup();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -695,7 +693,6 @@ void InstallRegistry()
 //////////////////////////////////////////////////////////////////////////////
 void RemoveRegistry()
 {
-  //RemoveShellExt();
   //exefile
   DelRegKey(HKCR,EXERUN);
   //cmdfile
@@ -762,7 +759,10 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   PathQuoteSpaces(ModName);
   if (CheckServiceStatus()==SERVICE_RUNNING)
   {
-    _stprintf(cmdLine,_T("%s %s %s"),ModName,ModName,cmd);
+    TCHAR SvcFile[4096];
+    GetWindowsDirectory(SvcFile,4096);
+    PathAppend(SvcFile,_T("SuRun.exe"));
+    _stprintf(cmdLine,_T("%s %s %s"),SvcFile,ModName,cmd);
     STARTUPINFO si={0};
     PROCESS_INFORMATION pi;
     si.cb = sizeof(si);
@@ -807,7 +807,7 @@ void CopyToWinDir(LPCTSTR File)
 BOOL InstallService()
 {
   if (!IsAdmin())
-    return RunThisAsAdmin(_T("/Install"),SERVICE_RUNNING,IDS_INSTALLADMIN);
+    return RunThisAsAdmin(_T("/INSTALL"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   if (CheckServiceStatus())
     DeleteService(true);
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
@@ -841,6 +841,10 @@ BOOL InstallService()
   {
     //Registry
     InstallRegistry();
+    //Shell Extension
+    //InstallShellExt();
+    //"SuDuers" Group
+    CreateSuDoersGroup();
     //Install Start menu Links
     CoInitialize(0);
     TCHAR lnk[4096]={0};
@@ -889,6 +893,8 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
   }
   if (bJustStop)
     return TRUE;
+  //Shell Extension
+  //RemoveShellExt();
   //Registry
   RemoveRegistry();
   //SysMenu Hook
@@ -935,7 +941,7 @@ bool HandleServiceStuff()
   if (cmd.argc()==2)
   {
     //Service
-    if (_tcsicmp(cmd.argv(1),_T("/ServiceRun"))==0)
+    if (_tcsicmp(cmd.argv(1),_T("/SERVICERUN"))==0)
     {
       if (!IsLocalSystem())
         return false;
@@ -960,7 +966,7 @@ bool HandleServiceStuff()
       return true;
     }
     //Install
-    if (_tcsicmp(cmd.argv(1),_T("/Install"))==0)
+    if (_tcsicmp(cmd.argv(1),_T("/INSTALL"))==0)
     {
       InstallService();
       ExitProcess(0);
@@ -973,11 +979,17 @@ bool HandleServiceStuff()
       ExitProcess(0);
       return true;
     }
+    //UserInst:
+    if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
+    {
+      goto ForceInstall;
+    }
   }
   //The Service must be running!
   ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
+ForceInstall:
     if (MessageBox(0,CBigResStr(IDS_ASKINSTALL),CResStr(IDS_APPNAME),
                    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)!=IDYES)
       ExitProcess(0);
