@@ -48,7 +48,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
 
 typedef struct  
 {
-  WCHAR UserName[UNLEN+DNLEN+2];
+  WCHAR UserName[UNLEN+DNLEN];
   HBITMAP UserBitmap;
 }USERDATA;
 
