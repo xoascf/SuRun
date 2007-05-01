@@ -8,6 +8,7 @@
 #include <lm.h>
 #include <ntsecapi.h>
 #include <USERENV.H>
+#include <Psapi.h>
 #include "Service.h"
 #include "IsAdmin.h"
 #include "CmdLine.h"
@@ -27,6 +28,7 @@
 #pragma comment(lib,"Rpcrt4.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"AdvApi32.lib")
+#pragma comment(lib,"PSAPI.lib")
 
 #ifndef _DEBUG
 #pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
@@ -74,6 +76,9 @@ static SERVICE_STATUS g_ss= {0};
 static HANDLE g_hPipe=INVALID_HANDLE_VALUE;
 
 CResStr SvcName(IDS_SERVICE_NAME);
+
+RUNDATA g_RunData={0};
+TCHAR g_RunPwd[PWLEN];
 
 //FILETIME(100ns) to minutes multiplier
 #define ft2min  (__int64)(10/*1µs*/*1000/*1ms*/*1000/*1s*/*60/*1min*/)
@@ -294,6 +299,74 @@ DWORD RunAsUser(DWORD SessionID,int nUser,LPTSTR WinSta,LPTSTR Desk,
   return pi.dwProcessId;
 }
 
+BOOL RunAsUser(RUNDATA& rd,LPCTSTR Password) 
+{
+  if (rd.CliProcessId==GetCurrentProcessId())
+    return FALSE;
+  HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,rd.CliProcessId);
+  if (!hProcess)
+  {
+    DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
+    return FALSE;
+  }
+  DWORD n;
+  //Check if the calling process is this Executable:
+  {
+    HMODULE hMod;
+    TCHAR f1[MAX_PATH];
+    TCHAR f2[MAX_PATH];
+    if (!GetModuleFileName(0,f1,MAX_PATH))
+    {
+      DBGTrace1("GetModuleFileName failed: %s",GetLastErrorNameStatic());
+      return CloseHandle(hProcess),FALSE;
+    }
+    if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&n))
+    {
+      DBGTrace1("EnumProcessModules failed: %s",GetLastErrorNameStatic());
+      return CloseHandle(hProcess),FALSE;
+    }
+    if(GetModuleFileNameEx(hProcess,hMod,f1,MAX_PATH)==0)
+    {
+      DBGTrace1("GetModuleFileNameEx failed: %s",GetLastErrorNameStatic());
+      return CloseHandle(hProcess),FALSE;
+    }
+    if(_tcsicmp(f1,f2)!=0)
+    {
+      DBGTrace2("Invalid Process! %s != %s !",f1,f2);
+      return CloseHandle(hProcess),FALSE;
+    }
+  }
+  //Since it's the same process, g_RunData has the same address!
+  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
+  {
+    DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
+    return CloseHandle(hProcess),FALSE;
+  }
+  if (sizeof(RUNDATA)!=n)
+  {
+    DBGTrace2("ReadProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
+    return CloseHandle(hProcess),FALSE;
+  }
+  PathStripPath(g_RunData.UserName);//strip computer name!
+  if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
+  {
+    DBGTrace("RunData is different!");
+    return CloseHandle(hProcess),FALSE;
+  }
+  if (!WriteProcessMemory(hProcess,&g_RunPwd,Password,PWLEN,&n))
+  {
+    DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
+    return CloseHandle(hProcess),FALSE;
+  }
+  if (PWLEN!=n)
+  {
+    DBGTrace2("WriteProcessMemory invalid size %d != %d ",PWLEN,n);
+    return CloseHandle(hProcess),FALSE;
+  }
+  WaitForSingleObject(hProcess,INFINITE);
+  return CloseHandle(hProcess),TRUE;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
@@ -411,15 +484,22 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
   return -1;
 }
 
-void SuDo(DWORD SessionID,LPTSTR UserName,LPTSTR WinSta,LPTSTR Desk,LPTSTR cmdLine,LPTSTR CurDir)
+void SuDo(RUNDATA& rd)
 {
-  PathStripPath(UserName);//strip computer name!
+  PathStripPath(rd.UserName);//strip computer name!
   //Start execution
-  int nUser=PrepareSuRun(WinSta,UserName,cmdLine);
+  int nUser=PrepareSuRun(rd.WinSta,rd.UserName,rd.cmdLine);
   if (nUser!=-1)
   {
     //Create Process
-    RunAsUser(SessionID,nUser,WinSta,Desk,cmdLine,CurDir);
+    //RunAsUser(rd.SessionID,nUser,rd.WinSta,rd.Desk,rd.cmdLine,rd.CurDir);
+    
+    //Add user to admins group
+    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+    RunAsUser(rd,g_Users[nUser].Password);
+    //Remove user from Administrators group
+    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+    
     //Mark last start time
     GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
   }
@@ -498,42 +578,26 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       //Exit if g_hPipe==INVALID_HANDLE_VALUE
       if (g_hPipe!=INVALID_HANDLE_VALUE)
       {
-        DWORD SessionID=0;
-        TCHAR WinSta[MAX_PATH]={0};
-        TCHAR Desk[MAX_PATH]={0};
-        TCHAR UserName[CNLEN+DNLEN+2]={0};
-        TCHAR cmdLine[4096]={0};
-        TCHAR CurDir[MAX_PATH]={0};
-        DWORD KillPID=0;
         DWORD nRead=0;
+        RUNDATA rd={0};
         //Read Client Process ID and command line
-        BOOL DoSuRun=ReadFile(g_hPipe,&SessionID,sizeof(SessionID),&nRead,0)
-                  && ReadFile(g_hPipe,WinSta,sizeof(WinSta)-sizeof(TCHAR),&nRead,0)
-                  && ReadFile(g_hPipe,Desk,sizeof(Desk)-sizeof(TCHAR),&nRead,0)
-                  && ReadFile(g_hPipe,UserName,sizeof(UserName)-sizeof(TCHAR),&nRead,0)
-                  && ReadFile(g_hPipe,cmdLine,sizeof(cmdLine)-sizeof(TCHAR),&nRead,0)
-                  && ReadFile(g_hPipe,CurDir,sizeof(CurDir)-sizeof(TCHAR),&nRead,0)
-                  && ReadFile(g_hPipe,&KillPID,sizeof(KillPID),&nRead,0);
+        BOOL DoSuRun=ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0) 
+                    && (nRead==sizeof(rd));
         //Disconnect client
         DisconnectNamedPipe(g_hPipe);
         if(DoSuRun)
         {
           //Setup?
-          if (_tcsicmp(cmdLine,_T("/SETUP"))==0)
+          if (_tcsicmp(rd.cmdLine,_T("/SETUP"))==0)
           {
-            Setup(WinSta);
+            Setup(rd.WinSta);
           }else
           {
-            KillProcess(KillPID);
-            SuDo(SessionID,UserName,WinSta,Desk,cmdLine,CurDir);
+            KillProcess(rd.KillPID);
+            SuDo(rd);
           }
         }
-        SessionID=0;
-        zero(WinSta);
-        zero(Desk);
-        zero(UserName);
-        zero(cmdLine);
-        zero(CurDir);
+        zero(rd);
       }
     }
   }else
