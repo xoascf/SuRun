@@ -258,15 +258,15 @@ void KillProcess(DWORD PID)
 // checks if rd.CliProcessId is this exe and if rd is g_RunData of the calling
 // process equals rd, copies the clients g_RunData to our g_RunData
 //////////////////////////////////////////////////////////////////////////////
-BOOL CheckCliProcess(RUNDATA& rd)
+DWORD CheckCliProcess(RUNDATA& rd)
 {
   if (rd.CliProcessId==GetCurrentProcessId())
-    return FALSE;
+    return 0;
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,rd.CliProcessId);
   if (!hProcess)
   {
     DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
-    return FALSE;
+    return 0;
   }
   DWORD n;
   //Check if the calling process is this Executable:
@@ -276,40 +276,40 @@ BOOL CheckCliProcess(RUNDATA& rd)
   if (!GetModuleFileName(0,f1,MAX_PATH))
   {
     DBGTrace1("GetModuleFileName failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),0;
   }
   if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&n))
   {
     DBGTrace1("EnumProcessModules failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),0;
   }
   if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
   {
     DBGTrace1("GetModuleFileNameEx failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),0;
   }
   if(_tcsicmp(f1,f2)!=0)
   {
     DBGTrace2("Invalid Process! %s != %s !",f1,f2);
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),0;
   }
   //Since it's the same process, g_RunData has the same address!
   if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),0;
   }
   if (sizeof(RUNDATA)!=n)
   {
     DBGTrace2("ReadProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),0;
   }
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
   {
     DBGTrace("RunData is different!");
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandle(hProcess),1;
   }
-  return CloseHandle(hProcess),TRUE;
+  return CloseHandle(hProcess),2;
 }
 
 
@@ -347,23 +347,24 @@ BOOL GivePassword()
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
-int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
+int PrepareSuRun()
 {
   BOOL bDoAsk=g_AskAlways;
   //Do we have a token for this user?
   int nUser=-1;
-  for (int i=0;i<countof(g_Users);i++) if (_tcsicmp(g_Users[i].UserName,UserName)==0)
-  {
-    nUser=i;
-    if ((!bDoAsk) && g_NoAskTimeOut)
+  for (int i=0;i<countof(g_Users);i++) 
+    if (_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0)
     {
-      __int64 ft;
-      GetSystemTimeAsFileTime((LPFILETIME)&ft);
-      if ((ft-g_Users[nUser].LastAskTime)>=(ft2min*(__int64)g_NoAskTimeOut))
-        bDoAsk=TRUE;
+      nUser=i;
+      if ((!bDoAsk) && g_NoAskTimeOut)
+      {
+        __int64 ft;
+        GetSystemTimeAsFileTime((LPFILETIME)&ft);
+        if ((ft-g_Users[nUser].LastAskTime)>=(ft2min*(__int64)g_NoAskTimeOut))
+          bDoAsk=TRUE;
+      }
+      break;
     }
-    break;
-  }
   if (nUser==-1)
     bDoAsk=TRUE;
   else if (!PasswordOK(g_Users[nUser].UserName,g_Users[nUser].Password))
@@ -380,7 +381,7 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
-  CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
+  CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,g_BlurDesktop);
   RpcStringFree(&DeskName);
   if (crond.IsValid())
   {
@@ -388,25 +389,25 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
     if(nUser!=-1)
     {
       
-      if(!AskCurrentUserOk(UserName,IDS_ASKOK,cmdLine))
+      if(!AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine))
         return -1;
       return nUser;
     }
-    if (IsBuiltInAdmin(UserName))
+    if (IsBuiltInAdmin(g_RunData.UserName))
     {
       MessageBox(0,CBigResStr(IDS_BUILTINADMIN),CResStr(IDS_APPNAME),MB_ICONSTOP);
       return -1;
     }
     //Is User member of SuDoers?
-    if (!IsInSudoers(UserName))
+    if (!IsInSudoers(g_RunData.UserName))
     {
-      if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+      if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
       {
         if(MessageBox(0,CBigResStr(IDS_ASKSUDOER),CResStr(IDS_APPNAME),
           MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
           return -1;
-        if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0)!=0)
-          ||(AlterGroupMember(SUDOERSGROUP,UserName,1)!=0))
+        if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0)!=0)
+          ||(AlterGroupMember(SUDOERSGROUP,g_RunData.UserName,1)!=0))
         {
           MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
           return -1;
@@ -418,7 +419,7 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
         TCHAR P[PWLEN]={0};
         if (!LogonAdmin(U,P,IDS_NOSUDOER))
           return -1;
-        if (AlterGroupMember(SUDOERSGROUP,UserName,1)!=0)
+        if (AlterGroupMember(SUDOERSGROUP,g_RunData.UserName,1)!=0)
         {
           MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
           return -1;
@@ -427,7 +428,7 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
       }
     }
     TCHAR Password[MAX_PATH]={0};
-    if(LogonCurrentUser(UserName,Password,IDS_ASKOK,cmdLine))
+    if(LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine))
     {
       __int64 minTime=0;
       int oldestUser=0;
@@ -435,7 +436,7 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
       for (int i=0;i<countof(g_Users);i++) 
       {
         if ((g_Users[i].UserName[0]=='\0')
-          ||(_tcsicmp(g_Users[i].UserName,UserName)==0))
+          ||(_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0))
         {
           nUser=i;
           break;
@@ -449,7 +450,7 @@ int PrepareSuRun(LPCTSTR WinStaName,LPTSTR UserName,LPTSTR cmdLine)
       if (nUser==-1)
         nUser=oldestUser;
       //Set user name cache
-      _tcscpy(g_Users[nUser].UserName,UserName);
+      _tcscpy(g_Users[nUser].UserName,g_RunData.UserName);
       _tcscpy(g_Users[nUser].Password,Password);
       SavePasswords();
       return nUser;
@@ -531,45 +532,77 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       //Wait for a connection
       ConnectNamedPipe(g_hPipe,0);
       //Exit if g_hPipe==INVALID_HANDLE_VALUE
-      if (g_hPipe!=INVALID_HANDLE_VALUE)
+      if (g_hPipe==INVALID_HANDLE_VALUE)
+        break;
+      DWORD nRead=0;
+      RUNDATA rd={0};
+      //Read Client Process ID and command line
+      ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
+      //Disconnect client
+      DisconnectNamedPipe(g_hPipe);
+      if(CheckCliProcess(rd)==2)
       {
-        DWORD nRead=0;
-        RUNDATA rd={0};
-        //Read Client Process ID and command line
-        ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
-        //Disconnect client
-        DisconnectNamedPipe(g_hPipe);
-        if(CheckCliProcess(rd))
+        //ToDo: GetProcessToken, Set SessionID, CreateProcessAsUser
+        HANDLE hProc=0;
+        if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
         {
-          //ToDo: GetProcessToken, Set SessionID, CreateProcessAsUser
-          BOOL bDoAdmin=FALSE;
-          int nUser=-1;
-          //Setup?
-          if (_tcsicmp(rd.cmdLine,_T("/SETUP"))==0)
-            Setup(rd.WinSta);
-          else
+          HANDLE hRun=0;
+          if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
+            SecurityIdentification,TokenPrimary,&hRun))
           {
-            KillProcess(rd.KillPID);
-            //Start execution
-            nUser=PrepareSuRun(rd.WinSta,rd.UserName,rd.cmdLine);
-            if (nUser!=-1)
+            DWORD SessionID=0;
+            ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
+            if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
             {
-              _tcscpy(g_RunPwd,g_Users[nUser].Password);
-              bDoAdmin=TRUE;
-              //Mark last start time
-              GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
+              PROCESS_INFORMATION pi={0};
+              STARTUPINFO si={0};
+              si.cb=sizeof(si);
+              TCHAR cmd[4096]={0};
+              GetWindowsDirectory(cmd,4096);
+              PathAppend(cmd,L"SuRun.exe /AskPID ");
+              TCHAR PID[10];
+              _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
+              EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+              EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+              if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+                          CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+              {
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+              }
             }
+            CloseHandle(hRun);
           }
-          if(bDoAdmin) //Add user to admins group
-            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-          //Give Password to the calling process
-          GivePassword();
-          if(bDoAdmin) //Remove user from Administrators group
-            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+          CloseHandle(hProc);
         }
-        zero(g_RunPwd);
-        zero(rd);
+        ...
+        //Setup?
+        if (_tcsicmp(rd.cmdLine,_T("/SETUP"))==0)
+        {
+          GivePassword();
+          Setup(rd.WinSta);
+        }else
+        {
+          KillProcess(rd.KillPID);
+          //Start execution
+          int nUser=PrepareSuRun();
+          if (nUser!=-1)
+          {
+            _tcscpy(g_RunPwd,g_Users[nUser].Password);
+            //Add user to admins group
+            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
+            //Give Password to the calling process
+            GivePassword();
+            //Remove user from Administrators group
+            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
+            //Mark last start time
+            GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
+          }else
+            GivePassword();
+        }
       }
+      zero(g_RunPwd);
+      zero(rd);
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
