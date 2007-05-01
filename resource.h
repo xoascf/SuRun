@@ -31,6 +31,7 @@
 #define IDS_ASKUNINST                   27
 #define IDS_STARTMUNINST                28
 #define IDS_GRPDESC                     29
+#define IDS_ASKUSRINSTALL               30
 #define IDD_LOGONDLG                    101
 #define IDI_ICON1                       103
 #define IDI_MAINICON                    103
