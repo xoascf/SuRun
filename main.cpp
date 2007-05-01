@@ -117,29 +117,29 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
 // 
 //////////////////////////////////////////////////////////////////////////////
 // callback function for window enumeration
-//static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
-//{
-//  DWORD dwID ;
-//  GetWindowThreadProcessId(hwnd, &dwID) ;
-//  if(dwID==(DWORD)lParam)
-//    PostMessage(hwnd,WM_CLOSE,0,0) ;
-//  return TRUE ;
-//}
-//
-//void KillProcessNice(DWORD PID)
-//{
-//  if (!PID)
-//    return;
-//  HANDLE hProcess=OpenProcess(SYNCHRONIZE,TRUE,PID);
-//  if(!hProcess)
-//    return;
-//  //Post WM_CLOSE to all Windows of PID
-//  EnumWindows(CloseAppEnum,(LPARAM)PID);
-//  //Give the Process time to close
-//  WaitForSingleObject(hProcess, 15000);
-//  CloseHandle(hProcess);
-//  //The service will call TerminateProcess()...
-//}
+static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
+{
+  DWORD dwID ;
+  GetWindowThreadProcessId(hwnd, &dwID) ;
+  if(dwID==(DWORD)lParam)
+    PostMessage(hwnd,WM_CLOSE,0,0) ;
+  return TRUE ;
+}
+
+void KillProcessNice(DWORD PID)
+{
+  if (!PID)
+    return;
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE,TRUE,PID);
+  if(!hProcess)
+    return;
+  //Post WM_CLOSE to all Windows of PID
+  EnumWindows(CloseAppEnum,(LPARAM)PID);
+  //Give the Process time to close
+  WaitForSingleObject(hProcess, 2500);
+  CloseHandle(hProcess);
+  //The service will call TerminateProcess()...
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -179,13 +179,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
     }
-//    else
-//    if (!_wcsicmp(c,L"/KILL"))
-//    {
-//      g_RunData.KillPID=wcstol(Args,0,10);
-//      Args=PathGetArgs(Args);
-//      KillProcessNice(g_RunData.KillPID);
-//    }
+    else
+    if (!_wcsicmp(c,L"/KILL"))
+    {
+      g_RunData.KillPID=wcstol(Args,0,10);
+      Args=PathGetArgs(Args);
+      KillProcessNice(g_RunData.KillPID);
+    }
   }
   //Convert Command Line
   if (!bRunSetup)
