@@ -148,6 +148,7 @@ void KillProcessNice(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   zero(g_RunData);
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
@@ -192,7 +193,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Usage
   if (!g_RunData.cmdLine[0])
   {
-    LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
     MessageBox(0,CBigResStr(IDS_USAGE),0,MB_ICONSTOP);
     return -1;
   }
@@ -220,10 +220,16 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
       NULL,g_RunData.CurDir,&si,&pi))
     {
+      //Clear sensitive Data
+      zero(g_RunPwd);
+      zero(g_RunData);
       MessageBox(0,
         CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetLastErrorNameStatic()),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
     }
+    //Clear sensitive Data
+    zero(g_RunPwd);
+    zero(g_RunData);
   }
   return 0;
 }
