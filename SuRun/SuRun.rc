@@ -65,6 +65,9 @@ IDI_MAINICON            ICON    DISCARDABLE     "main.ico"
 IDI_SHIELD              ICON    DISCARDABLE     "ico10605.ico"
 IDI_SHIELD2             ICON    DISCARDABLE     "ico10606.ico"
 IDI_SHIELD1             ICON    DISCARDABLE     "ico10607.ico"
+IDI_INSTALL             ICON    DISCARDABLE     "Software.ico"
+IDI_HELP                ICON    DISCARDABLE     "Notes.ico"
+IDI_SETUP               ICON    DISCARDABLE     "Settings.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
