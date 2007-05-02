@@ -16,12 +16,12 @@
 #pragma comment(lib,"Netapi32.lib")
 /////////////////////////////////////////////////////////////////////////////
 //
-// CreateSuDoersGroup
+// CreateSuRunnersGroup
 //
 /////////////////////////////////////////////////////////////////////////////
-void CreateSuDoersGroup()
+void CreateSuRunnersGroup()
 {
-  LOCALGROUP_INFO_1	lgri1={SUDOERSGROUP,CResStr(IDS_GRPDESC)};
+  LOCALGROUP_INFO_1	lgri1={SURUNNERSGROUP,CResStr(IDS_GRPDESC)};
   DWORD error;
   NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
 }
@@ -96,13 +96,13 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName)
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// IsInSudoers
+// IsInSuRunners
 //
-//  Checks if "DOMAIN\User" is a member of the sudoers localgroup
+//  Checks if "DOMAIN\User" is a member of the SuRunners localgroup
 /////////////////////////////////////////////////////////////////////////////
-BOOL IsInSudoers(LPCWSTR DomainAndName)
+BOOL IsInSuRunners(LPCWSTR DomainAndName)
 {
-  return IsInGroup(SUDOERSGROUP,DomainAndName);
+  return IsInGroup(SURUNNERSGROUP,DomainAndName);
 }
 
 /////////////////////////////////////////////////////////////////////////////
