@@ -172,7 +172,7 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
-  m_pDeskClicked=pDataObj!=0;
+  m_pDeskClicked=pDataObj==0;
   return NOERROR;
 }
 
