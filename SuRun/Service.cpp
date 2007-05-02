@@ -169,10 +169,10 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
-        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,0,0,0));
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
-        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,16,16,0));
       LoadSettings();
       CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
