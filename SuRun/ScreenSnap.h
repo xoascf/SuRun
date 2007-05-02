@@ -1,3 +1,26 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// Home of CBlurredScreen
+//
+// This class captures the Windows Desktop (containing all windows) 
+// into a bitmap, blurres and darkens that bitmap and displays a fullscreen 
+// window with that bitmap as client area
+//
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 #include <WINDOWS.h>
 #include <TCHAR.h>
@@ -42,9 +65,6 @@ inline void Blur(HBITMAP hbm,int w,int h)
   free(pSrc);
 }
 
-//This class captures the Windows Desktop (containing all windows) 
-//into a bitmap, blurres and darkens that bitmap and displays a fullscreen 
-//window with that bitmap as client area
 class CBlurredScreen
 {
 public:
