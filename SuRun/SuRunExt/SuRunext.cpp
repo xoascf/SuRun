@@ -185,13 +185,13 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    TCHAR sudocmd[MAX_PATH];
+    TCHAR cmd[MAX_PATH];
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    GetWindowsDirectory(sudocmd,MAX_PATH);
-    PathAppend(sudocmd, _T("SuRun.exe"));
+    GetWindowsDirectory(cmd,MAX_PATH);
+    PathAppend(cmd, _T("SuRun.exe"));
     // Start the child process.
-    if (CreateProcess(NULL,sudocmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+    if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
       CloseHandle( pi.hProcess );
       CloseHandle( pi.hThread );
