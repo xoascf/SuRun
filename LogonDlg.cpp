@@ -17,6 +17,7 @@
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Netapi32.lib")
 #pragma comment(lib,"Gdi32.lib")
+#pragma comment(lib,"comctl32.lib")
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -216,12 +217,12 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
+      LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
       SetWindowLong(hwnd,GWL_USERDATA,lParam);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
         g_HintBrush=CreateSolidBrush(RGB(192,128,0));
       else
         g_HintBrush=CreateSolidBrush(RGB(128,192,0));
-      LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,0,0,0));
@@ -276,6 +277,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,(WPARAM)fs,0);
         DeleteObject(f);
       }
+      return TRUE;
     }
   case WM_NCDESTROY:
     {
@@ -300,6 +302,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       }
       if (CtlId==IDC_HINTBK)
         return (BOOL)g_HintBrush;
+      break;
     }
   case WM_COMMAND:
     {
@@ -307,10 +310,10 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
       case MAKELPARAM(IDC_USER,CBN_EDITCHANGE):
         SetUserBitmap(hwnd);
-        break;
+        return TRUE;
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,0);
-        break;
+        return TRUE;
       case MAKELPARAM(IDOK,BN_CLICKED):
         {
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
@@ -339,7 +342,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       }//switch (wParam)
       break;
     }//WM_COMMAND
-  }
+  }//switch(msg)
   return FALSE;
 }
 
@@ -390,16 +393,27 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
 }
 
 //#ifdef _DEBUG
-//TCHAR User[MAX_PATH]=L"KAY";
-//TCHAR Password[MAX_PATH]={0};
-//BOOL l=LogonAdmin(User,Password,IDS_ASKINSTALL);
-//BOOL m=LogonAdmin(User,Password,IDS_ASKINSTALL);
-//BOOL n=LogonAdmin(User,Password,IDS_ASKINSTALL);
-//BOOL p=LogonAdmin(User,Password,IDS_ASKINSTALL);
-//BOOL Exit()
+//BOOL TestLogonDlg()
 //{
+//  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
+//  InitCommonControlsEx(&icce);
+//  TCHAR User[MAX_PATH]=L"KAY";
+//  TCHAR Password[MAX_PATH]={0};
+//  BOOL l=Logon(User,Password,IDS_ASKINSTALL);
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  BOOL m=LogonAdmin(User,Password,IDS_ASKINSTALL);
+//  if (m==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",m,GetLastErrorNameStatic());
+//  BOOL n=LogonCurrentUser(User,Password,IDS_ASKINSTALL);
+//  if (n==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",n,GetLastErrorNameStatic());
+//  BOOL p=AskCurrentUserOk(User,IDS_ASKINSTALL);
+//  if (p==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",p,GetLastErrorNameStatic());
 //  ::ExitProcess(0);
 //  return TRUE;
 //}
-//BOOL x=Exit();
+//
+//BOOL x=TestLogonDlg();
 //#endif _DEBUG
