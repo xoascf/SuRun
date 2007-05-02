@@ -512,8 +512,6 @@ BOOL Setup(LPCTSTR WinStaName)
   //Create the new desktop
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   RpcStringFree(&DeskName);
-  if (!CheckGroupMembership(g_RunData.UserName))
-    return 0;
   return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;
 }
 
