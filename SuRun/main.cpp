@@ -159,6 +159,20 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 {
   LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   zero(g_RunData);
+  //User must not be a domain member
+  {
+    WCHAR* dom=0;
+    NETSETUP_JOIN_STATUS js;
+    if((NetGetJoinInformation(0,&dom,&js)==NERR_Success)
+      &&(js==NetSetupDomainName))
+    {
+      MessageBox(0,CBigResStr(IDS_NODOMAIN,dom),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      NetApiBufferFree(dom);
+      return -1;
+    }
+    if(dom)
+      NetApiBufferFree(dom);
+  }
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //Session
@@ -168,11 +182,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Desktop
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
-  TCHAR Domain[DNLEN+UNLEN]={0};
+  WCHAR Domain[DNLEN]={0};
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName,Domain);
-  //strip Domain name!
-  PathStripPath(g_RunData.UserName);
-
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
@@ -205,7 +216,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Usage
   if (!g_RunData.cmdLine[0])
   {
-    MessageBox(0,CBigResStr(IDS_USAGE),0,MB_ICONSTOP);
+    MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return -1;
   }
   //Lets go:
@@ -227,7 +238,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb = sizeof(STARTUPINFO);
-    if(!CreateProcessWithLogonW(g_RunData.UserName,Domain,g_RunPwd,
+    if(!CreateProcessWithLogonW(g_RunData.UserName,0,g_RunPwd,
       LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
       NULL,g_RunData.CurDir,&si,&pi))
     {
