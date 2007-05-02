@@ -158,86 +158,6 @@ void SavePasswords()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  Service setup
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-  switch(msg)
-  {
-  case WM_INITDIALOG:
-    {
-      SendMessage(hwnd,WM_SETICON,ICON_BIG,
-        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
-        IMAGE_ICON,0,0,0));
-      SendMessage(hwnd,WM_SETICON,ICON_SMALL,
-        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
-        IMAGE_ICON,16,16,0));
-      LoadSettings();
-      CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
-      CheckDlgButton(hwnd,IDC_RADIO2,(Radio2chk?BST_CHECKED:BST_UNCHECKED));
-      SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
-      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
-      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
-      CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
-      return TRUE;
-    }//WM_INITDIALOG
-  case WM_NCDESTROY:
-    {
-      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
-      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
-      return TRUE;
-    }//WM_NCDESTROY
-  case WM_CTLCOLORSTATIC:
-    {
-      int CtlId=GetDlgCtrlID((HWND)lParam);
-      if ((CtlId!=IDC_WHTBK))
-      {
-        SetBkMode((HDC)wParam,TRANSPARENT);
-        return (BOOL)GetStockObject(WHITE_BRUSH);
-      }
-      break;
-    }
-  case WM_COMMAND:
-    {
-      switch (wParam)
-      {
-      case MAKELPARAM(IDCANCEL,BN_CLICKED):
-        EndDialog(hwnd,0);
-        return TRUE;
-      case MAKELPARAM(IDOK,BN_CLICKED):
-        {
-          g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
-          g_AskAlways=IsDlgButtonChecked(hwnd,IDC_RADIO1)==BST_CHECKED;
-          g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
-          g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
-          SaveSettings();
-          EndDialog(hwnd,1);
-          return TRUE;
-        }
-      }//switch (wParam)
-      break;
-    }//WM_COMMAND
-  }
-  return FALSE;
-}
-
-BOOL Setup(LPCTSTR WinStaName)
-{
-  //Every "secure" Desktop has its own UUID as name:
-  UUID uid;
-  UuidCreate(&uid);
-  LPTSTR DeskName=0;
-  UuidToString(&uid,&DeskName);
-  //Create the new desktop
-  CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
-  RpcStringFree(&DeskName);
-  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 // CheckCliProcess:
 // 
 // checks if rd.CliProcessId is this exe and if rd is g_RunData of the calling
@@ -473,6 +393,132 @@ BOOL GivePassword()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  CheckGroupMembership: check, if User is member of SuDuers, 
+//      if not, try to join him
+//////////////////////////////////////////////////////////////////////////////
+BOOL CheckGroupMembership(LPCTSTR UserName)
+{
+  if (IsBuiltInAdmin(UserName))
+  {
+    MessageBox(0,CBigResStr(IDS_BUILTINADMIN),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return FALSE;
+  }
+  //Is User member of SuDoers?
+  if (!IsInSudoers(UserName))
+  {
+    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+    {
+      if(MessageBox(0,CBigResStr(IDS_ASKSUDOER),CResStr(IDS_APPNAME),
+        MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
+        return FALSE;
+      if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0)!=0)
+        ||(AlterGroupMember(SUDOERSGROUP,UserName,1)!=0))
+      {
+        MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        return FALSE;
+      }
+      MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+    }else
+    {
+      TCHAR U[UNLEN+GNLEN]={0};
+      TCHAR P[PWLEN]={0};
+      if (!LogonAdmin(U,P,IDS_NOSUDOER))
+        return FALSE;
+      if (AlterGroupMember(SUDOERSGROUP,UserName,1)!=0)
+      {
+        MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        return FALSE;
+      }
+      MessageBox(0,CBigResStr(IDS_SUDOER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+    }
+  }
+  return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Service setup
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      SendMessage(hwnd,WM_SETICON,ICON_BIG,
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
+        IMAGE_ICON,0,0,0));
+      SendMessage(hwnd,WM_SETICON,ICON_SMALL,
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
+        IMAGE_ICON,16,16,0));
+      LoadSettings();
+      CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_RADIO2,(Radio2chk?BST_CHECKED:BST_UNCHECKED));
+      SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
+      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
+      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
+      return TRUE;
+    }//WM_INITDIALOG
+  case WM_NCDESTROY:
+    {
+      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
+      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
+      return TRUE;
+    }//WM_NCDESTROY
+  case WM_CTLCOLORSTATIC:
+    {
+      int CtlId=GetDlgCtrlID((HWND)lParam);
+      if ((CtlId!=IDC_WHTBK))
+      {
+        SetBkMode((HDC)wParam,TRANSPARENT);
+        return (BOOL)GetStockObject(WHITE_BRUSH);
+      }
+      break;
+    }
+  case WM_COMMAND:
+    {
+      switch (wParam)
+      {
+      case MAKELPARAM(IDCANCEL,BN_CLICKED):
+        EndDialog(hwnd,0);
+        return TRUE;
+      case MAKELPARAM(IDOK,BN_CLICKED):
+        {
+          g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
+          g_AskAlways=IsDlgButtonChecked(hwnd,IDC_RADIO1)==BST_CHECKED;
+          g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
+          g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
+          SaveSettings();
+          EndDialog(hwnd,1);
+          return TRUE;
+        }
+      }//switch (wParam)
+      break;
+    }//WM_COMMAND
+  }
+  return FALSE;
+}
+
+BOOL Setup(LPCTSTR WinStaName)
+{
+  //Every "secure" Desktop has its own UUID as name:
+  UUID uid;
+  UuidCreate(&uid);
+  LPTSTR DeskName=0;
+  UuidToString(&uid,&DeskName);
+  //Create the new desktop
+  CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
+  RpcStringFree(&DeskName);
+  if (!CheckGroupMembership(g_RunData.UserName))
+    return 0;
+  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -517,45 +563,12 @@ int PrepareSuRun()
     //secure desktop created...
     if(nUser!=-1)
     {
-      
       if(!AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine))
         return -1;
       return nUser;
     }
-    if (IsBuiltInAdmin(g_RunData.UserName))
-    {
-      MessageBox(0,CBigResStr(IDS_BUILTINADMIN),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    if (!CheckGroupMembership(g_RunData.UserName))
       return -1;
-    }
-    //Is User member of SuDoers?
-    if (!IsInSudoers(g_RunData.UserName))
-    {
-      if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
-      {
-        if(MessageBox(0,CBigResStr(IDS_ASKSUDOER),CResStr(IDS_APPNAME),
-          MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
-          return -1;
-        if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0)!=0)
-          ||(AlterGroupMember(SUDOERSGROUP,g_RunData.UserName,1)!=0))
-        {
-          MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
-          return -1;
-        }
-        MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
-      }else
-      {
-        TCHAR U[UNLEN+GNLEN]={0};
-        TCHAR P[PWLEN]={0};
-        if (!LogonAdmin(U,P,IDS_NOSUDOER))
-          return -1;
-        if (AlterGroupMember(SUDOERSGROUP,g_RunData.UserName,1)!=0)
-        {
-          MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
-          return -1;
-        }
-        MessageBox(0,CBigResStr(IDS_SUDOER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
-      }
-    }
     TCHAR Password[MAX_PATH]={0};
     BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine);
     if(bLogon)
@@ -955,7 +968,8 @@ BOOL UserInstall(int IDSMsg)
   TCHAR SuRunExe[4096];
   GetWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRun.exe");
-  ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
+  //This mostly does not work...
+  //ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
   if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_YESNO|MB_SETFOREGROUND)==IDYES)
     ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
