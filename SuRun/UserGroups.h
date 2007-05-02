@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#define SUDOERSGROUP  _T("sudoers")
+#define SURUNNERSGROUP  _T("SuRunners")
 
 const DWORD UserGroups[]=
 {
@@ -15,7 +15,7 @@ const DWORD UserGroups[]=
   DOMAIN_ALIAS_RID_GUESTS
 };
 
-void CreateSuDoersGroup();
+void CreateSuRunnersGroup();
 
 BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName);
 
@@ -24,6 +24,6 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd);
 
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName);
 BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName);
-BOOL IsInSudoers(LPCWSTR DomainAndName);
+BOOL IsInSuRunners(LPCWSTR DomainAndName);
 
 BOOL IsBuiltInAdmin(LPCWSTR DomainAndName);
