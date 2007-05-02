@@ -33,16 +33,10 @@
 #define IDS_GRPDESC                     29
 #define IDS_ASKUSRINSTALL               30
 #define IDD_LOGONDLG                    101
-#define IDI_ICON1                       103
-#define IDI_MAINICON                    103
 #define IDD_DIALOG1                     104
-#define IDI_SECURITY                    106
 #define IDD_SETUP                       107
 #define IDD_CURUSRLOGON                 108
 #define IDD_CURUSRACK                   109
-#define IDI_INSTALL                     109
-#define IDI_HELP                        110
-#define IDI_SETUP                       111
 #define IDC_USER                        1000
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002
@@ -59,9 +53,13 @@
 #define IDC_HINT                        1017
 #define IDC_HINTBK                      1018
 #define IDC_SECICON1                    1019
-#define IDI_SHIELD                      10605
-#define IDI_SHIELD2                     10606
-#define IDI_SHIELD1                     10607
+#define IDI_MAINICON                    100
+#define IDI_INSTALL                     101
+#define IDI_SETUP                       102
+#define IDI_HELP                        103
+#define IDI_SHIELD                      104
+#define IDI_SHIELD2                     105
+#define IDI_SHIELD1                     106
 
 // Next default values for new objects
 // 
