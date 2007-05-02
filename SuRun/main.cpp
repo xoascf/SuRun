@@ -178,13 +178,18 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       bRunSetup=TRUE;
       wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
-    }
-    else
+    }else
     if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
       KillProcessNice(g_RunData.KillPID);
+    }else
+    {
+      Args=c;
+      if (*(Args-1)==0)
+        *(Args-1)=' ';
+      break;
     }
   }
   //Convert Command Line
