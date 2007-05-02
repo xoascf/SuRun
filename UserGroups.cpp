@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Most of this is heavily based on SuDown (http://sudown.sourceforge.net)
@@ -51,7 +65,7 @@ BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName)
 //
 // AlterGroupMembership
 //
-//  Adds or removes "DOMAIN\User" from the "Group" localgroup
+//  Adds or removes "DOMAIN\User" from the local group "Group"
 /////////////////////////////////////////////////////////////////////////////
 DWORD AlterGroupMember(LPCWSTR Group,LPCWSTR DomainAndName, BOOL bAdd)
 {
