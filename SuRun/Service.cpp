@@ -197,6 +197,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetBkMode((HDC)wParam,TRANSPARENT);
         return (BOOL)GetStockObject(WHITE_BRUSH);
       }
+      break;
     }
   case WM_COMMAND:
     {
@@ -204,7 +205,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,0);
-        break;
+        return TRUE;
       case MAKELPARAM(IDOK,BN_CLICKED):
         {
           g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
@@ -556,8 +557,10 @@ int PrepareSuRun()
       }
     }
     TCHAR Password[MAX_PATH]={0};
-    if(LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine))
+    BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine);
+    if(bLogon)
     {
+      DBGTrace2("DialogBoxParam returned %d: %s",bLogon,GetLastErrorNameStatic());
       __int64 minTime=0;
       int oldestUser=0;
       //find free or oldest USER
@@ -966,6 +969,8 @@ BOOL UserInstall(int IDSMsg)
 //////////////////////////////////////////////////////////////////////////////
 bool HandleServiceStuff()
 {
+  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
+  InitCommonControlsEx(&icce);
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
