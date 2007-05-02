@@ -540,7 +540,9 @@ int PrepareSuRun()
     }
   if (nUser==-1)
     bDoAsk=TRUE;
-  else if (!PasswordOK(g_Users[nUser].UserName,g_Users[nUser].Password))
+  else 
+    if ((!PasswordOK(g_Users[nUser].UserName,g_Users[nUser].Password))
+      ||(!IsInSuRunners(g_RunData.UserName)))
   {
     nUser=-1;
     bDoAsk=TRUE;
