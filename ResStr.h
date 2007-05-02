@@ -19,8 +19,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#pragma warning(disable: 4996)
-
 template<const int _S> class CResourceString
 {
 public:
