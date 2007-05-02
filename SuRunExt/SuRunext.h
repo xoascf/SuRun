@@ -32,7 +32,7 @@ public:
 typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
 
 // this is the actual OLE Shell context menu handler
-class CShellExt : public IContextMenu
+class CShellExt : public IContextMenu, IShellExtInit
 {
 protected:
   ULONG	 m_cRef;
@@ -47,6 +47,8 @@ public:
   STDMETHODIMP QueryContextMenu(HMENU, UINT, UINT, UINT, UINT);
   STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO);
   STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT FAR *, LPSTR, UINT);
+  //IShellExtInit methods
+  STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
 };
 
 typedef CShellExt *LPCSHELLEXT;
