@@ -36,6 +36,7 @@ class CShellExt : public IContextMenu, IShellExtInit
 {
 protected:
   ULONG	 m_cRef;
+  bool m_pDeskClicked;
 public:
   CShellExt();
   ~CShellExt();
