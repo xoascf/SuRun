@@ -869,12 +869,12 @@ BOOL InstallService()
     PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
     GetWindowsDirectory(file,4096);
     PathAppend(file,L"SuRun.exe /SETUP");
-    CreateLink(file,lnk);
+    CreateLink(file,lnk,2);
     PathRemoveFileSpec(lnk);
     PathAppend(lnk,CResStr(IDS_STARTMUNINST));
     GetWindowsDirectory(file,4096);
     PathAppend(file,L"SuRun.exe /UNINSTALL");
-    CreateLink(file,lnk);
+    CreateLink(file,lnk,1);
     CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
