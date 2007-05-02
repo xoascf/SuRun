@@ -393,7 +393,7 @@ BOOL GivePassword()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  CheckGroupMembership: check, if User is member of SuDuers, 
+//  CheckGroupMembership: check, if User is member of SuRunners, 
 //      if not, try to join him
 //////////////////////////////////////////////////////////////////////////////
 BOOL CheckGroupMembership(LPCTSTR UserName)
@@ -403,18 +403,18 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     MessageBox(0,CBigResStr(IDS_BUILTINADMIN),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return FALSE;
   }
-  //Is User member of SuDoers?
-  if (!IsInSudoers(UserName))
+  //Is User member of SuRunners?
+  if (!IsInSuRunners(UserName))
   {
     if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
     {
-      if(MessageBox(0,CBigResStr(IDS_ASKSUDOER),CResStr(IDS_APPNAME),
+      if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),CResStr(IDS_APPNAME),
         MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
         return FALSE;
       if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0)!=0)
-        ||(AlterGroupMember(SUDOERSGROUP,UserName,1)!=0))
+        ||(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0))
       {
-        MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        MessageBox(0,CBigResStr(IDS_SURUNNER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
         return FALSE;
       }
       MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
@@ -422,14 +422,14 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     {
       TCHAR U[UNLEN+GNLEN]={0};
       TCHAR P[PWLEN]={0};
-      if (!LogonAdmin(U,P,IDS_NOSUDOER))
+      if (!LogonAdmin(U,P,IDS_NOSURUNNER))
         return FALSE;
-      if (AlterGroupMember(SUDOERSGROUP,UserName,1)!=0)
+      if (AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0)
       {
-        MessageBox(0,CBigResStr(IDS_SUDOER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        MessageBox(0,CBigResStr(IDS_SURUNNER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
         return FALSE;
       }
-      MessageBox(0,CBigResStr(IDS_SUDOER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+      MessageBox(0,CBigResStr(IDS_SURUNNER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
     }
   }
   return TRUE;
@@ -609,7 +609,7 @@ int PrepareSuRun()
 //  SuRun
 // 
 //////////////////////////////////////////////////////////////////////////////
-void SuDoRun(DWORD ProcessID)
+void SuRun(DWORD ProcessID)
 {
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
@@ -869,7 +869,7 @@ BOOL InstallService()
     //Shell Extension
     //InstallShellExt();
     //"SuDuers" Group
-    CreateSuDoersGroup();
+    CreateSuRunnersGroup();
     //Install Start menu Links
     CoInitialize(0);
     TCHAR lnk[4096]={0};
@@ -992,7 +992,7 @@ bool HandleServiceStuff()
   CCmdLine cmd;
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
-    SuDoRun(wcstol(cmd.argv(2),0,10));
+    SuRun(wcstol(cmd.argv(2),0,10));
     //clean sensitive Data
     zero(g_Users);
     zero(g_RunPwd);
