@@ -49,6 +49,6 @@ BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname,int iIcon);
 bool DeleteDirectory(LPCTSTR DIR);
 
 //UserName:
-bool GetSIDUserName(PSID sid,LPTSTR Name);
-bool GetTokenUserName(HANDLE hUser,LPTSTR Name);
-bool GetProcessUserName(DWORD ProcessID,LPTSTR Name);
+bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain=0);
+bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain=0);
+bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
