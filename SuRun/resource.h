@@ -40,6 +40,9 @@
 #define IDD_SETUP                       107
 #define IDD_CURUSRLOGON                 108
 #define IDD_CURUSRACK                   109
+#define IDI_INSTALL                     109
+#define IDI_HELP                        110
+#define IDI_SETUP                       111
 #define IDC_USER                        1000
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002
@@ -64,7 +67,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        109
+#define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           102
