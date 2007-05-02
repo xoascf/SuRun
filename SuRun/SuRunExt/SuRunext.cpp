@@ -133,6 +133,7 @@ STDMETHODIMP CShellExtClassFactory::LockServer(BOOL fLock)
 CShellExt::CShellExt()
 {
 	m_cRef = 0L;
+  m_pDeskClicked=false;
   inc_cRefThisDLL();
 }
 
@@ -171,12 +172,13 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
+  m_pDeskClicked=pDataObj!=0;
   return NOERROR;
 }
 
 STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
-  if((CMF_DEFAULTONLY & uFlags)==0)
+  if((!(CMF_DEFAULTONLY & uFlags))&& m_pDeskClicked) 
   {
     //right click target is folder background
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
