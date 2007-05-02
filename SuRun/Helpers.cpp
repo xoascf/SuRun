@@ -234,7 +234,7 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname)
+BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname,int iIcon)
 {
   //Save parameters
   TCHAR args[4096]={0};
@@ -261,6 +261,8 @@ BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname)
   if(FAILED(psl->SetPath(app)))
     goto cleanup;
   if(FAILED(psl->SetWorkingDirectory(path)))
+    goto cleanup;
+  if(FAILED(psl->SetIconLocation(app,iIcon)))
     goto cleanup;
   if (args[0])
   {
