@@ -141,8 +141,10 @@ CShellExt::~CShellExt()
 
 STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
-	*ppv = NULL;
-  if (IsEqualIID(riid, IID_IContextMenu))
+  *ppv = NULL;
+  if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown)) 
+    *ppv = (LPSHELLEXTINIT)this;
+  else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
   if (*ppv) 
   {
@@ -163,6 +165,11 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
     return m_cRef;
   delete this;
   return 0L;
+}
+
+STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
+{
+  return NOERROR;
 }
 
 STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
