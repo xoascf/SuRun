@@ -184,12 +184,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       g_RunData.KillPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
       KillProcessNice(g_RunData.KillPID);
-    }else
-    {
-      if (*(Args-1)==0)
-        *(Args-1)=' ';
-      Args=c;
-      break;
     }
   }
   //Convert Command Line
