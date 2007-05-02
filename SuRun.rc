@@ -255,6 +255,7 @@ BEGIN
     IDS_STARTMUNINST        "SuRun Entfernen.lnk"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
     IDS_ASKUSRINSTALL       "Wollen Sie SuRun jetzt installieren bzw. ersetzen?\r\n\r\nWenn Sie auf Ja klicken, werden die SuRun-Dateien in das Windows\r\nVerzeichnis kopiert und der SuRun Dienst installiert und gestartet."
+    IDS_NODOMAIN            "Sie sind Mitglied der Domäne %s\r\n\r\nSuRun funktioniert nur mit lokalen Benutzerkonten."
 END
 
 #endif    // German (Germany) resources
@@ -502,6 +503,7 @@ BEGIN
     IDS_STARTMUNINST        "Remove SuRun.lnk"
     IDS_GRPDESC             "Members of this group can use SuRun."
     IDS_ASKUSRINSTALL       "Do you want to install or update SuRun now?\r\n\r\nIf you press Yes, SuRun files will be copied to your Windows\r\ndirectory and the SuRun service is installed and run."
+    IDS_NODOMAIN            "You are member of domain %s\r\n\r\nSuRun works only on local user accounts."
 END
 
 #endif    // English (U.S.) resources
