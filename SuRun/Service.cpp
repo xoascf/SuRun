@@ -693,15 +693,18 @@ void InstallRegistry()
   //batfile
   SetRegStr(HKCR,BATRUN,L"",MenuStr);
   SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
+  TCHAR MSIExe[4096];
+  GetSystemDirectory(MSIExe,4096);
+  PathAppend(MSIExe,L"msiexec.exe");
   //MSI Install
   SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
-  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s /i \"%%1\" %%*",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s %s /i \"%%1\" %%*",SuRunExe,MSIExe));
   //MSI Repair
   SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
-  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s /f \"%%1\" %%*",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s %s /f \"%%1\" %%*",SuRunExe,MSIExe));
   //MSI Uninstall
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
-  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s /x \"%%1\" %%*",SuRunExe));
+  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s %s /x \"%%1\" %%*",SuRunExe,MSIExe));
 }
 
 //////////////////////////////////////////////////////////////////////////////
