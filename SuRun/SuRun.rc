@@ -232,15 +232,15 @@ BEGIN
     IDS_LOGONFAILED         "Anmeldung fehlgeschlagen!\r\n\r\nDer Benutzername und/oder das Passwort sind falsch.\r\n\r\nAchten Sie auf Groß- und Kleinschreibung."
     IDS_NOADMIN             "Fehler!\r\n\r\nBenutzer %s ist kein Administrator."
     IDS_NOSURUNNER          "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nIdentifizieren Sie sich als Administrator, um Mitglied von ""SuRunners"" zu werden.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
-    IDS_ASKSURUNNER         "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nWollen Sie Mitglied der ""SuRunners"" Gruppe und aus der Administratoren Gruppe ausgetragen werden?\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
+    IDS_ASKSURUNNER         "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nWollen Sie Mitglied der ""SuRunners"" Gruppe und aus der Administratoren Gruppe ausgetragen werden?\r\n\r\nWenn Sie Ja wählen, werden Sie KEIN ADMINISTRATOR, sondern SuRunner.\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
     IDS_MENUSTR             "Starte als Administrator"
     IDS_BUILTINADMIN        "Sie sind ein vordefinierter Administrator!\r\n\r\nSie können SuRun nicht benutzen, weil Sie nicht zum normalen Benutzer degradiert werden können."
-    IDS_SURUNNER_OK           "Sie sind erfolgreich als Mitglied in die Gruppe ""SuRunners"" aufgenommen worden."
+    IDS_SURUNNER_OK         "Sie sind erfolgreich als Mitglied in die Gruppe ""SuRunners"" aufgenommen worden."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR          "Fehler!\r\n\r\nSie konnten nicht in die ""SuRunners"" Gruppe aufgenommen werden!"
+    IDS_SURUNNER_ERR        "Fehler!\r\n\r\nSie konnten nicht in die ""SuRunners"" Gruppe aufgenommen werden!"
     IDS_LOGOFFON            "Sie sind erfolgreich in die Gruppe ""SuRunners"" aufgenommen und aus\r\nder Administratoren-Gruppe ausgetragen worden.\r\n\r\nSie müssen sich jetzt ab und wieder anmelden, \r\num mit eingeschränkten Rechten zu arbeiten."
     IDS_SYSMENUEXT          "SuRun Systemmenü-Erweiterung"
     IDS_SURUNINST           "Als Adiminstrator installieren"
@@ -478,16 +478,16 @@ BEGIN
     IDS_INSTALLADMIN        "You need to have administrative rights to install SuRun.\r\n\r\nPlease enter the credentials of an Administrator for this system:"
     IDS_LOGONFAILED         "Logon failed!\r\n\r\nCheck the users name and password and try again!\r\n\r\nNote that the user name and password are case sensitive."
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
-    IDS_NOSURUNNER            "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click ""Cancel""."
-    IDS_ASKSURUNNER           "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you're not sure what you're doing, click ""No""."
+    IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click ""Cancel""."
+    IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_MENUSTR             "Start as administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot youse SuRun because you cannot act as normal user!"
-    IDS_SURUNNER_OK           "You have successfully been added to the ""SuRunners"" user group."
+    IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR          "Error!\r\n\r\nPutting your account into the ""SuRunners"" user group failed."
+    IDS_SURUNNER_ERR        "Error!\r\n\r\nPutting your account into the ""SuRunners"" user group failed."
     IDS_LOGOFFON            "You have successfully been added to the ""SuRunners"" and removed from the Administrators user groups.\r\n\r\nTo continue using you computer with limited access rights you need to log off and log on."
     IDS_SYSMENUEXT          "SuRun System Menu Extension"
     IDS_SURUNINST           "Install as administrator"
