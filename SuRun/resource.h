@@ -13,10 +13,10 @@
 #define IDS_LOGONFAILED                 9
 #define IDS_NOADMIN                     10
 #define IDS_NOSURUNNER                  11
-#define IDS_ASKSURUNNER                   12
+#define IDS_ASKSURUNNER                 12
 #define IDS_MENUSTR                     13
 #define IDS_BUILTINADMIN                14
-#define IDS_SURUNNER_OK                   15
+#define IDS_SURUNNER_OK                 15
 #define IDS_SURUNNER_ERR                16
 #define IDS_LOGOFFON                    17
 #define IDS_SYSMENUEXT                  18
@@ -32,8 +32,16 @@
 #define IDS_STARTMUNINST                28
 #define IDS_GRPDESC                     29
 #define IDS_ASKUSRINSTALL               30
+#define IDS_NODOMAIN                    31
+#define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
+#define IDI_INSTALL                     101
+#define IDI_SETUP                       102
+#define IDI_HELP                        103
 #define IDD_DIALOG1                     104
+#define IDI_SHIELD                      104
+#define IDI_SHIELD2                     105
+#define IDI_SHIELD1                     106
 #define IDD_SETUP                       107
 #define IDD_CURUSRLOGON                 108
 #define IDD_CURUSRACK                   109
@@ -53,13 +61,6 @@
 #define IDC_HINT                        1017
 #define IDC_HINTBK                      1018
 #define IDC_SECICON1                    1019
-#define IDI_MAINICON                    100
-#define IDI_INSTALL                     101
-#define IDI_SETUP                       102
-#define IDI_HELP                        103
-#define IDI_SHIELD                      104
-#define IDI_SHIELD2                     105
-#define IDI_SHIELD1                     106
 
 // Next default values for new objects
 // 
