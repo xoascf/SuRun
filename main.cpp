@@ -186,9 +186,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       KillProcessNice(g_RunData.KillPID);
     }else
     {
-      Args=c;
       if (*(Args-1)==0)
         *(Args-1)=' ';
+      Args=c;
       break;
     }
   }
