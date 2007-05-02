@@ -26,6 +26,7 @@
 #include "Resource.h"
 
 #pragma comment(lib,"shlwapi.lib")
+#pragma comment(lib,"netapi32.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -167,8 +168,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Desktop
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
-  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-  PathStripPath(g_RunData.UserName);//strip computer name!
+  TCHAR Domain[DNLEN+UNLEN]={0};
+  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName,Domain);
+  //strip Domain name!
+  PathStripPath(g_RunData.UserName);
+
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
@@ -223,13 +227,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb = sizeof(STARTUPINFO);
-    if(!CreateProcessWithLogonW(g_RunData.UserName,NULL,g_RunPwd,
+    if(!CreateProcessWithLogonW(g_RunData.UserName,Domain,g_RunPwd,
       LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
       NULL,g_RunData.CurDir,&si,&pi))
     {
       //Clear sensitive Data
       zero(g_RunPwd);
-      zero(g_RunData);
       MessageBox(0,
         CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetLastErrorNameStatic()),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
