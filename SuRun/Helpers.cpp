@@ -19,6 +19,7 @@
 #include <SHLWAPI.H>
 #include <Shobjidl.h>
 #include <ShlGuid.h>
+#include <lm.h>
 #include "DBGTRace.h"
 
 #pragma comment(lib,"ShlWapi.lib")
@@ -340,21 +341,28 @@ bool DeleteDirectory(LPCTSTR DIR)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-bool GetSIDUserName(PSID sid,LPTSTR Name)
+bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain/*=0*/)
 {
   SID_NAME_USE snu;
-  TCHAR uName[64],dName[64];
-  DWORD uLen=64, dLen=64;
+  TCHAR uName[UNLEN],dName[DNLEN];
+  DWORD uLen=UNLEN, dLen=DNLEN;
   if(!LookupAccountSid(NULL,sid,uName,&uLen,dName,&dLen,&snu))
     return FALSE;
-  _tcscpy(Name, dName);
-  if(_tcslen(Name))
-    _tcscat(Name, TEXT("\\"));
-  _tcscat(Name,uName);
+  if(Domain==0)
+  {
+    _tcscpy(User, dName);
+    if(_tcslen(User))
+      _tcscat(User, TEXT("\\"));
+    _tcscat(User,uName);
+  }else
+  {
+    _tcscpy(User, uName);
+    _tcscpy(Domain, dName);
+  }
   return TRUE;
 }
 
-bool GetTokenUserName(HANDLE hUser,LPTSTR Name)
+bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain/*=0*/)
 {
   DWORD dwLen=0;
   if ((!GetTokenInformation(hUser, TokenUser,NULL,0,&dwLen))
@@ -364,7 +372,7 @@ bool GetTokenUserName(HANDLE hUser,LPTSTR Name)
   if(!ptu)
     return false;
   if(GetTokenInformation(hUser,TokenUser,(PVOID)ptu,dwLen,&dwLen))
-    GetSIDUserName(ptu->User.Sid,Name);
+    GetSIDUserName(ptu->User.Sid,User,Domain);
   free(ptu);
   return true;
 }
@@ -375,7 +383,7 @@ bool GetTokenUserName(HANDLE hUser,LPTSTR Name)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-bool GetProcessUserName(DWORD ProcessID,LPTSTR Name)
+bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
 {
   EnablePrivilege(SE_DEBUG_NAME);
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcessID);
@@ -386,7 +394,7 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR Name)
   // Open impersonation token for Shell process
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
-    bRet=GetTokenUserName(hToken,Name);
+    bRet=GetTokenUserName(hToken,User,Domain);
     CloseHandle(hToken);
   }
   CloseHandle(hProc);
