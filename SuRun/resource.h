@@ -12,12 +12,12 @@
 #define IDS_INSTALLADMIN                8
 #define IDS_LOGONFAILED                 9
 #define IDS_NOADMIN                     10
-#define IDS_NOSUDOER                    11
-#define IDS_ASKSUDOER                   12
+#define IDS_NOSURUNNER                  11
+#define IDS_ASKSURUNNER                   12
 #define IDS_MENUSTR                     13
 #define IDS_BUILTINADMIN                14
-#define IDS_SUDOER_OK                   15
-#define IDS_SUDOER_ERR                  16
+#define IDS_SURUNNER_OK                   15
+#define IDS_SURUNNER_ERR                16
 #define IDS_LOGOFFON                    17
 #define IDS_SYSMENUEXT                  18
 #define IDS_SURUNINST                   19
