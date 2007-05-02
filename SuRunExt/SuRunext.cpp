@@ -21,6 +21,8 @@
 #include "../Helpers.h"
 #include "Resource.h"
 
+extern HINSTANCE g_hInst;
+
 // global data within shared data segment to allow sharing across instances
 #pragma data_seg(".SHARDATA")
 
@@ -178,7 +180,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   {
     //right click target is folder background
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-    InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, CResStr(IDS_SURUN));
+    InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, CResStr(g_hInst,IDS_SURUN));
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
     return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst+1));
   }
@@ -197,6 +199,8 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     si.cb = sizeof(si);
     GetWindowsDirectory(cmd,MAX_PATH);
     PathAppend(cmd, _T("SuRun.exe"));
+    PathQuoteSpaces(cmd);
+    _tcscat(cmd,L" control");
     // Start the child process.
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
@@ -204,7 +208,8 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
       CloseHandle( pi.hThread );
       hr = NOERROR;
     }else
-      MessageBoxW(lpcmi->hwnd,CResStr(IDS_FILENOTFOUND),CResStr(IDS_ERR),MB_ICONSTOP);
+      MessageBoxW(lpcmi->hwnd,CResStr(g_hInst,IDS_FILENOTFOUND),
+        CResStr(g_hInst,IDS_ERR),MB_ICONSTOP);
   }
   return hr;
 }
@@ -212,6 +217,6 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
 {
   if (uFlags == GCS_HELPTEXT && cchMax > 35)
-    wcscpy((LPWSTR)pszName,CResStr(IDS_TOOLTIP));
+    wcscpy((LPWSTR)pszName,CResStr(g_hInst,IDS_TOOLTIP));
   return NOERROR;
 }
