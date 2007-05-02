@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <shlwapi.h>
 #include "SysMenuHook.h"
+#include "../DBGTrace.H"
 #include "../ResStr.h"
 #include "../IsAdmin.h"
 #include "Resource.h"
@@ -34,6 +35,7 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
     switch(wps->message)
     {
     case WM_MENUSELECT:
+      DBGTrace("WM_MENUSELECT");
       if((wps->lParam==NULL)&&(HIWORD(wps->wParam)==0xFFFF))
       {
         RemoveMenu(GetSystemMenu(wps->hwnd,FALSE),WM_SYSMH0,MF_BYCOMMAND);
@@ -43,9 +45,11 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
     case WM_CONTEXTMENU:
       //Load the System menu for the Window, if we don't, we'll get a default 
       //system menu on the first click.
+      DBGTrace("WM_CONTEXTMENU");
       GetSystemMenu((HWND)wps->wParam,FALSE);
       break;
     case WM_INITMENUPOPUP:
+      DBGTrace("WM_INITMENUPOPUP");
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu((HMENU)wps->wParam) 
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1)
@@ -96,12 +100,21 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
 
 __declspec(dllexport) BOOL InstallSysMenuHook()
 {
-  if((g_hookShell!=NULL)&&(g_hookMenu!=NULL))
-    return TRUE;
+  DBGTrace2("InstallSysMenuHook init (%x,%x)",g_hookShell,g_hookMenu);
   if((g_hookShell!=NULL)||(g_hookMenu!=NULL))
+    UninstallSysMenuHook();
+  if((g_hookShell!=NULL)||(g_hookMenu!=NULL))
+  {
+    DBGTrace2("InstallSysMenuHook failed: Still Hooked (%x,%x)",g_hookShell,g_hookMenu);
     return FALSE;
+  }
   g_hookShell=SetWindowsHookEx(WH_CALLWNDPROC,(HOOKPROC)ShellProc,g_hInst,0);
+  if (g_hookShell==NULL)
+    DBGTrace1("SetWindowsHookEx(Shell) failed: %s",GetLastErrorNameStatic());
   g_hookMenu =SetWindowsHookEx(WH_GETMESSAGE ,(HOOKPROC)MenuProc ,g_hInst,0);
+  if (g_hookMenu==NULL)
+    DBGTrace1("SetWindowsHookEx(Menu) failed: %s",GetLastErrorNameStatic());
+  DBGTrace2("InstallSysMenuHook exit (%x,%x)",g_hookShell,g_hookMenu);
   return (g_hookShell!= NULL) && (g_hookMenu != NULL);
 }
 
