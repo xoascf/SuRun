@@ -1,3 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
@@ -391,29 +404,3 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
   return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
     DialogProc,(LPARAM)&p);
 }
-
-//#ifdef _DEBUG
-//BOOL TestLogonDlg()
-//{
-//  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
-//  InitCommonControlsEx(&icce);
-//  TCHAR User[MAX_PATH]=L"KAY";
-//  TCHAR Password[MAX_PATH]={0};
-//  BOOL l=Logon(User,Password,IDS_ASKINSTALL);
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  BOOL m=LogonAdmin(User,Password,IDS_ASKINSTALL);
-//  if (m==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",m,GetLastErrorNameStatic());
-//  BOOL n=LogonCurrentUser(User,Password,IDS_ASKINSTALL);
-//  if (n==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",n,GetLastErrorNameStatic());
-//  BOOL p=AskCurrentUserOk(User,IDS_ASKINSTALL);
-//  if (p==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",p,GetLastErrorNameStatic());
-//  ::ExitProcess(0);
-//  return TRUE;
-//}
-//
-//BOOL x=TestLogonDlg();
-//#endif _DEBUG
