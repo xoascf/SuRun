@@ -316,7 +316,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               si.cb=sizeof(si);
               TCHAR cmd[4096]={0};
               GetWindowsDirectory(cmd,4096);
-              PathAppend(cmd,L"SuRun.exe /AskPID ");
+              PathAppend(cmd,L"SuRun.exe");
+              PathQuoteSpaces(cmd);
+              _tcscat(cmd,L" /AskPID ");
               TCHAR PID[10];
               _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
               EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
@@ -670,6 +672,7 @@ void InstallRegistry()
   TCHAR SuRunExe[4096];
   GetWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRun.exe");
+  PathQuoteSpaces(SuRunExe);
   CResStr MenuStr(IDS_MENUSTR);
   CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
   //UnInstall
@@ -696,6 +699,7 @@ void InstallRegistry()
   TCHAR MSIExe[4096];
   GetSystemDirectory(MSIExe,4096);
   PathAppend(MSIExe,L"msiexec.exe");
+  PathQuoteSpaces(MSIExe);
   //MSI Install
   SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
   SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s %s /i \"%%1\" %%*",SuRunExe,MSIExe));
@@ -783,6 +787,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
     TCHAR SvcFile[4096];
     GetWindowsDirectory(SvcFile,4096);
     PathAppend(SvcFile,_T("SuRun.exe"));
+    PathQuoteSpaces(SvcFile);
     _stprintf(cmdLine,_T("%s %s %s"),SvcFile,ModName,cmd);
     STARTUPINFO si={0};
     PROCESS_INFORMATION pi;
@@ -868,7 +873,7 @@ BOOL InstallService()
     //Registry
     InstallRegistry();
     //Shell Extension
-    //InstallShellExt();
+    InstallShellExt();
     //"SuDuers" Group
     CreateSuRunnersGroup();
     //Install Start menu Links
@@ -887,7 +892,9 @@ BOOL InstallService()
     PathRemoveFileSpec(lnk);
     PathAppend(lnk,CResStr(IDS_STARTMUNINST));
     GetWindowsDirectory(file,4096);
-    PathAppend(file,L"SuRun.exe /UNINSTALL");
+    PathAppend(file,L"SuRun.exe");
+    PathQuoteSpaces(file);
+    _tcscat(file,L" /UNINSTALL");
     CreateLink(file,lnk,1);
     CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
@@ -928,7 +935,7 @@ BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
   for (int n=0;CheckServiceStatus() && (n<100);n++)
     Sleep(100);
   //Shell Extension
-  //RemoveShellExt();
+  RemoveShellExt();
   //Registry
   RemoveRegistry();
   //Delete Files and directories
