@@ -1,3 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
@@ -13,11 +26,6 @@
 #include "Resource.h"
 
 #pragma comment(lib,"shlwapi.lib")
-
-//////////////////////////////////////////////////////////////////////////////
-//the App Icon is by Foood, "iCandy Junior", http://www.iconaholic.com
-//the Shield Icons are taken from Windows XP Service Pack 2 (xpsp2res.dll)
-//////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -200,7 +208,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if (hPipe!=INVALID_HANDLE_VALUE)
   {
-    //Go!
     zero(g_RunPwd);
     g_RunPwd[0]=0xFF;
     DWORD nWritten=0;
