@@ -265,7 +265,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SendMessage(UserList,CBEM_INSERTITEM,0,(LPARAM)&cei);
       }
       HWND Edit=(HWND)SendMessage(UserList,CBEM_GETEDITCONTROL,0,0);
-      if (bFoundUser)
+      if (bFoundUser || p->UserReadonly)
         SetWindowText(Edit,p->User);
       else
         SetWindowText(Edit,p->Users.User[0].UserName);
