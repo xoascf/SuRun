@@ -260,6 +260,18 @@ SOURCE=.\ico10607.ico
 
 SOURCE=.\main.ico
 # End Source File
+# Begin Source File
+
+SOURCE=.\Notes.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\Settings.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\Software.ico
+# End Source File
 # End Group
 # End Target
 # End Project
