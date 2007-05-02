@@ -1,3 +1,27 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
+
+// This is the main file for the SuRun service. This file handles:
+// -SuRun Installation
+// -SuRun Uninstallation
+// -SuRun Setup
+// -the Windows Service
+// -putting the user to the SuRunners group
+// -Terminating a Process for "Restart as admin..."
+// -requesting permission/password in the logon session of the user
+// -putting the users password to the user process via WriteProcessMemory
+
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
@@ -830,6 +854,64 @@ void CopyToWinDir(LPCTSTR File)
   CopyFile(SrcFile,DstFile,FALSE);
 }
 
+BOOL DeleteService(BOOL bJustStop=FALSE)
+{
+  if (!IsAdmin())
+    return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
+  CBlurredScreen cbs;
+  if(!bJustStop)
+  {
+    cbs.Init();
+    cbs.Show();
+  }
+  if ((!bJustStop)
+    &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
+                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO))
+    return false;
+  if(!bJustStop)
+    cbs.MsgLoop();
+  BOOL bRet=FALSE;
+  SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
+  if (hdlSCM) 
+  {
+    SC_HANDLE hdlServ=OpenService(hdlSCM,SvcName,SERVICE_STOP|DELETE);
+    if (hdlServ)
+    {
+      SERVICE_STATUS ss;
+      ControlService(hdlServ,SERVICE_CONTROL_STOP,&ss);
+      DeleteService(hdlServ);
+      CloseServiceHandle(hdlServ);
+      bRet=TRUE;
+    }
+  }
+  for (int n=0;CheckServiceStatus() && (n<100);n++)
+    Sleep(100);
+  //Shell Extension
+  RemoveShellExt();
+  //Registry
+  RemoveRegistry();
+  //Delete Files and directories
+  TCHAR File[4096];
+  GetWindowsDirectory(File,4096);
+  PathAppend(File,_T("SuRun.exe"));
+  DelFile(File);
+  GetWindowsDirectory(File,4096);
+  PathAppend(File,_T("SuRunExt.dll"));
+  DelFile(File);
+  TCHAR file[4096];
+  GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
+    L"Common Programs",file,4096);
+  ExpandEnvironmentStrings(file,File,4096);
+  PathAppend(File,CResStr(IDS_STARTMENUDIR));
+  DeleteDirectory(File);
+  if (bJustStop)
+    return TRUE;
+  //Ok!
+  MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
+    MB_ICONINFORMATION|MB_SETFOREGROUND);
+  return bRet;
+}
+
 BOOL InstallService()
 {
   if (!IsAdmin())
@@ -899,64 +981,6 @@ BOOL InstallService()
     CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
-  return bRet;
-}
-
-BOOL DeleteService(BOOL bJustStop/*=FALSE*/)
-{
-  if (!IsAdmin())
-    return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
-  CBlurredScreen cbs;
-  if(!bJustStop)
-  {
-    cbs.Init();
-    cbs.Show();
-  }
-  if ((!bJustStop)
-    &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
-                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO))
-    return false;
-  if(!bJustStop)
-    cbs.MsgLoop();
-  BOOL bRet=FALSE;
-  SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
-  if (hdlSCM) 
-  {
-    SC_HANDLE hdlServ=OpenService(hdlSCM,SvcName,SERVICE_STOP|DELETE);
-    if (hdlServ)
-    {
-      SERVICE_STATUS ss;
-      ControlService(hdlServ,SERVICE_CONTROL_STOP,&ss);
-      DeleteService(hdlServ);
-      CloseServiceHandle(hdlServ);
-      bRet=TRUE;
-    }
-  }
-  for (int n=0;CheckServiceStatus() && (n<100);n++)
-    Sleep(100);
-  //Shell Extension
-  RemoveShellExt();
-  //Registry
-  RemoveRegistry();
-  //Delete Files and directories
-  TCHAR File[4096];
-  GetWindowsDirectory(File,4096);
-  PathAppend(File,_T("SuRun.exe"));
-  DelFile(File);
-  GetWindowsDirectory(File,4096);
-  PathAppend(File,_T("SuRunExt.dll"));
-  DelFile(File);
-  TCHAR file[4096];
-  GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
-    L"Common Programs",file,4096);
-  ExpandEnvironmentStrings(file,File,4096);
-  PathAppend(File,CResStr(IDS_STARTMENUDIR));
-  DeleteDirectory(File);
-  if (bJustStop)
-    return TRUE;
-  //Ok!
-  MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
-    MB_ICONINFORMATION|MB_SETFOREGROUND);
   return bRet;
 }
 
