@@ -73,7 +73,9 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
     si.cb = sizeof(si);
     TCHAR cmd[4096];
     GetWindowsDirectory(cmd, MAX_PATH);
-    PathAppend(cmd, _T("surun.exe "));
+    PathAppend(cmd, _T("SuRun.exe"));
+    PathQuoteSpaces(cmd);
+    _tcscat(cmd,_T(" "));
     TCHAR PID[10];
     if (msg->wParam==WM_SYSMH0)
     {
