@@ -1041,7 +1041,6 @@ bool HandleServiceStuff()
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
-  DWORD ServiceStatus=0;
   CCmdLine cmd;
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
@@ -1098,8 +1097,25 @@ bool HandleServiceStuff()
       return true;
     }
   }
+  //Are we run from the Windows directory?, if Not, ask for Install/update
+  {
+    TCHAR fn[4096];
+    TCHAR wd[4096];
+    GetModuleFileName(NULL,fn,MAX_PATH);
+    NetworkPathToUNCPath(fn);
+    PathRemoveFileSpec(fn);
+    PathRemoveBackslash(fn);
+    GetWindowsDirectory(wd,4096);
+    PathRemoveBackslash(wd);
+    if(_tcsicmp(fn,wd))
+    {
+      UserInstall(IDS_ASKUSRINSTALL);
+      ExitProcess(0);
+      return true;
+    }
+  }
   //The Service must be running!
-  ServiceStatus=CheckServiceStatus();
+  DWORD ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
     if (!UserInstall(IDS_ASKINSTALL))
