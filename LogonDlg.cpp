@@ -46,12 +46,13 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
     _T("Common AppData"),PicDir,MAX_PATH);
   PathUnquoteSpaces(PicDir);
   PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
-  TCHAR Pic[MAX_PATH];
-  _tcscpy(Pic,PicDir);
-  PathAppend(Pic,UserName);
-  PathAddExtension(Pic,_T(".bmp"));
+  TCHAR Pic[UNLEN];
+  _tcscpy(Pic,UserName);
+  PathStripPath(Pic);
+  PathAppend(PicDir,Pic);
+  PathAddExtension(PicDir,_T(".bmp"));
   //DBGTrace1("LoadUserBitmap: %s",Pic);
-  return (HBITMAP)LoadImage(0,Pic,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+  return (HBITMAP)LoadImage(0,PicDir,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
