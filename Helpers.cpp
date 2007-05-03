@@ -344,8 +344,8 @@ bool DeleteDirectory(LPCTSTR DIR)
 bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain/*=0*/)
 {
   SID_NAME_USE snu;
-  TCHAR uName[UNLEN],dName[DNLEN];
-  DWORD uLen=UNLEN, dLen=DNLEN;
+  TCHAR uName[UNLEN],dName[UNLEN];
+  DWORD uLen=UNLEN, dLen=UNLEN;
   if(!LookupAccountSid(NULL,sid,uName,&uLen,dName,&dLen,&snu))
     return FALSE;
   if(Domain==0)
