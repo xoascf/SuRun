@@ -152,13 +152,19 @@ private:
 
 HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
 {
+  TCHAR un[2*UNLEN]={0};
+  TCHAR dn[2*UNLEN]={0};
+  _tcscpy(un,User);
+  PathStripPath(un);
+  _tcscpy(dn,User);
+  PathRemoveFileSpec(dn);
   HANDLE hToken=NULL;
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
   EnablePrivilege(SE_TCB_NAME);//Win2k
-  if (!LogonUser(User,0,Password,LOGON32_LOGON_NETWORK,0,&hToken))
+  if (!LogonUser(un,dn,Password,LOGON32_LOGON_NETWORK,0,&hToken))
     if (GetLastError()==ERROR_PRIVILEGE_NOT_HELD)
-      hToken=SSPLogonUser(0,User,Password);
-  DBGTrace3("GetUserToken(%s,%s):%s",User,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
+      hToken=SSPLogonUser(dn,un,Password);
+  DBGTrace4("GetUserToken(%s,%s,%s):%s",un,dn,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
   return hToken;
 }
 
