@@ -28,7 +28,7 @@ typedef struct
   DWORD SessionID;
   TCHAR WinSta[MAX_PATH];
   TCHAR Desk[MAX_PATH];
-  TCHAR UserName[CNLEN+DNLEN];
+  TCHAR UserName[UNLEN];
   TCHAR cmdLine[4096];
   TCHAR CurDir[MAX_PATH];
   DWORD KillPID;
