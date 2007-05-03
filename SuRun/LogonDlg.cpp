@@ -40,18 +40,19 @@
 
 HBITMAP LoadUserBitmap(LPCTSTR UserName)
 {
-  TCHAR PicDir[MAX_PATH];
+  TCHAR BMP[MAX_PATH];
   GetRegStr(HKEY_LOCAL_MACHINE,
     _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"),
-    _T("Common AppData"),PicDir,MAX_PATH);
-  PathUnquoteSpaces(PicDir);
-  PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
-  TCHAR Pic[MAX_PATH];
-  _tcscpy(Pic,PicDir);
-  PathAppend(Pic,UserName);
-  PathAddExtension(Pic,_T(".bmp"));
+    _T("Common AppData"),BMP,MAX_PATH);
+  PathUnquoteSpaces(BMP);
+  PathAppend(BMP,_T("Microsoft\\User Account Pictures"));
+  TCHAR usr[UNLEN];
+  _tcscpy(usr,UserName);
+  PathStripPath(usr);
+  PathAppend(BMP,usr);
+  PathAddExtension(BMP,_T(".bmp"));
   //DBGTrace1("LoadUserBitmap: %s",Pic);
-  return (HBITMAP)LoadImage(0,Pic,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+  return (HBITMAP)LoadImage(0,BMP,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -62,7 +63,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
 
 typedef struct  
 {
-  WCHAR UserName[UNLEN+DNLEN];
+  WCHAR UserName[UNLEN+UNLEN];
   HBITMAP UserBitmap;
 }USERDATA;
 
