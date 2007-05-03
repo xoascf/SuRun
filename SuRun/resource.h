@@ -32,7 +32,6 @@
 #define IDS_STARTMUNINST                28
 #define IDS_GRPDESC                     29
 #define IDS_ASKUSRINSTALL               30
-#define IDS_NODOMAIN                    31
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
