@@ -464,6 +464,22 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
 //  Service setup
 // 
 //////////////////////////////////////////////////////////////////////////////
+void UpdateAskUser(HWND hwnd)
+{
+  if(IsDlgButtonChecked(hwnd,IDC_SAVEPW)!=BST_CHECKED)
+  {
+    CheckDlgButton(hwnd,IDC_RADIO1,(BST_CHECKED));
+    CheckDlgButton(hwnd,IDC_RADIO2,(BST_UNCHECKED));
+    EnableWindow(GetDlgItem(hwnd,IDC_RADIO1),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_RADIO2),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),false);
+  }else
+  {
+    EnableWindow(GetDlgItem(hwnd,IDC_RADIO1),true);
+    EnableWindow(GetDlgItem(hwnd,IDC_RADIO2),true);
+    EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),true);
+  }
+}
 
 INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -506,6 +522,11 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       switch (wParam)
       {
+      case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
+        {
+          UpdateAskUser(hwnd);
+          return TRUE;
+        }
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,0);
         return TRUE;
@@ -1089,6 +1110,17 @@ bool HandleServiceStuff()
   }
   return false;
 }
+
+#ifdef _DEBUG
+BOOL TestSetup()
+{
+  Setup(L"WinSta0");
+  ::ExitProcess(0);
+  return TRUE;
+}
+
+BOOL x=TestSetup();
+#endif _DEBUG
 
 //////////////////////////////////////////////////////////////////////////////
 // 
