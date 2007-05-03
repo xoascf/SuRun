@@ -57,17 +57,21 @@
 #define IDC_ASKTIMEOUT                  1010
 #define IDC_BLURDESKTOP                 1011
 #define IDC_SAVEPW                      1012
-#define IDC_HINT                        1017
+#define IDC_HINT                        1016
+#define IDC_HINT2                       1017
 #define IDC_HINTBK                      1018
 #define IDC_SECICON1                    1019
-
+#define IDC_FRAME1                      1020
+#define IDC_FRAME2                      1021
+#define IDC_USRST                       1022
+#define IDC_PWDST                       1023
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        112
+#define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_CONTROL_VALUE         1024
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
