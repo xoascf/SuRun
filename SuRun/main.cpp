@@ -223,9 +223,14 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb = sizeof(STARTUPINFO);
-    if(!CreateProcessWithLogonW(g_RunData.UserName,0,g_RunPwd,
-      LOGON_WITH_PROFILE,NULL,g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,
-      NULL,g_RunData.CurDir,&si,&pi))
+    TCHAR un[2*UNLEN]={0};
+    TCHAR dn[2*UNLEN]={0};
+    _tcscpy(un,g_RunData.UserName);
+    PathStripPath(un);
+    _tcscpy(dn,g_RunData.UserName);
+    PathRemoveFileSpec(dn);
+    if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
+      g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT,NULL,g_RunData.CurDir,&si,&pi))
     {
       //Clear sensitive Data
       zero(g_RunPwd);
