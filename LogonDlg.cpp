@@ -118,22 +118,28 @@ private:
       LPBYTE pBuff=0;
       DWORD dwRec=0;
       DWORD dwTot=0;
-      res = NetLocalGroupGetMembers(NULL,GroupName,1,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+      res = NetLocalGroupGetMembers(NULL,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
       if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
       {
         DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
         break;
       }
-      for(LOCALGROUP_MEMBERS_INFO_1* p=(LOCALGROUP_MEMBERS_INFO_1*)pBuff;dwRec>0;dwRec--,p++)
+      for(LOCALGROUP_MEMBERS_INFO_2* p=(LOCALGROUP_MEMBERS_INFO_2*)pBuff;dwRec>0;dwRec--,p++)
       {
-        if (p->lgrmi1_sidusage==SidTypeUser)
+        if (p->lgrmi2_sidusage==SidTypeUser)
         {
+          TCHAR un[2*UNLEN]={0};
+          TCHAR dn[2*UNLEN]={0};
+          _tcscpy(un,p->lgrmi2_domainandname);
+          PathStripPath(un);
+          _tcscpy(dn,p->lgrmi2_domainandname);
+          PathRemoveFileSpec(dn);
           USER_INFO_2* b=0;
-          NetUserGetInfo(0,p->lgrmi1_name,2,(LPBYTE*)&b);
+          NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
           if (b)
           {
             if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
-              Add(p->lgrmi1_name);
+              Add(p->lgrmi2_domainandname);
             NetApiBufferFree(b);
           }else
             DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
@@ -200,22 +206,30 @@ typedef struct _LOGONDLGPARAMS
   }
 }LOGONDLGPARAMS;
 
+//User Bitmaps:
 void SetUserBitmap(HWND hwnd)
 {
   LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
   if (p==0)
     return;
-  HWND UserList=GetDlgItem(hwnd,IDC_USER);
-  HWND Edit=(HWND)SendMessage(UserList,CBEM_GETEDITCONTROL,0,0);
   TCHAR User[UNLEN+GNLEN+2]={0};
-  GetWindowText(Edit,User,UNLEN+GNLEN+1);
+  GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
+  int n=SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  if (n!=CB_ERR)
+    SendDlgItemMessage(hwnd,IDC_USER,CB_GETLBTEXT,n,(LPARAM)&User);
   HBITMAP bm=0;
+  PathStripPath(User);
   for (int i=0;i<p->Users.nUsers;i++) 
-    if (_tcsicmp(p->Users.User[i].UserName,User)==0)
+  {
+    TCHAR un[2*UNLEN]={0};
+    _tcscpy(un,p->Users.User[i].UserName);
+    PathStripPath(un);
+    if (_tcsicmp(un,User)==0)
     {
       bm=p->Users.User[i].UserBitmap;
       break;
     }
+  }
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
   DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
   if(bm)
@@ -230,6 +244,104 @@ void SetUserBitmap(HWND hwnd)
   }
 }
 
+//Dialog Resizing:
+SIZE RectSize(RECT r)
+{
+  SIZE s={r.right-r.left,r.bottom-r.top};
+  return s;
+}
+
+SIZE CliSize(HWND w)
+{
+  RECT r={0};
+  GetClientRect(w,&r);
+  return RectSize(r);
+}
+
+//These controls are not changed on X-Resize
+int NX_Ctrls[]={IDC_SECICON,IDC_SECICON1,IDC_USERBITMAP,IDC_USRST,IDC_PWDST};
+//These controls are stretched on X-Resize
+int SX_Ctrls[]={IDC_WHTBK,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,IDC_DLGQUESTION,
+                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2};
+//These controls are moved on X-Resize
+int MX_Ctrls[]={IDCANCEL,IDOK};
+//These controls are not changed on Y-Resize
+int NY_Ctrls[]={IDC_SECICON};
+//These controls are stretched on Y-Resize
+int SY_Ctrls[]={IDC_WHTBK,IDC_DLGQUESTION};
+//These controls are moved on Y-Resize
+int MY_Ctrls[]={IDC_SECICON1,IDC_USERBITMAP,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,
+                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2,IDCANCEL,IDOK,
+                IDC_USRST,IDC_PWDST};
+
+void MoveDlgCtrl(HWND hDlg,int nId,int x,int y,int dx,int dy)
+{
+  HWND w=GetDlgItem(hDlg,nId);
+  if(w)
+  {
+    RECT r;
+    GetWindowRect(w,&r);
+    ScreenToClient(hDlg,(LPPOINT)&r.left);
+    ScreenToClient(hDlg,(LPPOINT)&r.right);
+    MoveWindow(w,r.left+x,r.top+y,r.right-r.left+dx,r.bottom-r.top+dy,TRUE);
+  }
+}
+    
+void MoveWnd(HWND hwnd,int x,int y,int dx,int dy)
+{
+  RECT r;
+  GetWindowRect(hwnd,&r);
+  MoveWindow(hwnd,r.left+x,r.top+y,r.right-r.left+dx,r.bottom-r.top+dy,TRUE);
+}
+    
+SIZE GetDrawSize(HWND w)
+{
+  TCHAR s[4096];
+  GetWindowText(w,s,4096);
+  HDC dc=GetDC(0);
+  HDC MemDC=CreateCompatibleDC(dc);
+  ReleaseDC(0,dc);
+  SelectObject(MemDC,(HGDIOBJ)SendMessage(w,WM_GETFONT,0,0));
+  RECT r={0};
+  DrawText(MemDC,s,-1,&r,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
+  DeleteDC(MemDC);
+  //the size needed is sometimes too small
+  //Tests have shown that 8 pixels added to cx would be enough
+  //I'll add 10 pixels to cx and pixels 4 to cx until I know a better way:
+  SIZE S={r.right-r.left+10,r.bottom-r.top+4};
+  return S;
+}
+
+void SetWindowSizes(HWND hDlg)
+{
+  RECT dlgr={0};
+  GetWindowRect(hDlg,&dlgr);
+  HWND ew=GetDlgItem(hDlg,IDC_DLGQUESTION);
+  SIZE ds=GetDrawSize(ew);
+  SIZE es=CliSize(ew);
+  //Resize X
+  int dx=ds.cx-es.cx;
+  if (dx) 
+  {
+    MoveWnd(hDlg,-dx/2,0,dx,0);
+    for (int i=0;i<countof(SX_Ctrls);i++)
+      MoveDlgCtrl(hDlg,SX_Ctrls[i],0,0,dx,0);
+    for (i=0;i<countof(MX_Ctrls);i++)
+      MoveDlgCtrl(hDlg,MX_Ctrls[i],dx,0,0,0);
+  }
+  //Resize Y
+  int dy=ds.cy-es.cy;
+  if (dy)
+  {
+    MoveWnd(hDlg,0,-dy/2,0,dy);
+    for (int i=0;i<countof(SY_Ctrls);i++)
+      MoveDlgCtrl(hDlg,SY_Ctrls[i],0,0,0,dy);
+    for (i=0;i<countof(MY_Ctrls);i++)
+      MoveDlgCtrl(hDlg,MY_Ctrls[i],0,dy,0,0);
+  }
+}
+
+//DialogProc
 HBRUSH g_HintBrush=0;
 INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -250,39 +362,38 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,16,16,0));
       SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_SETFONT,
-        (WPARAM)CreateFont(-12,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("Arial")),1);
+        (WPARAM)CreateFont(-14,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("Arial")),1);
       if (GetDlgItem(hwnd,IDC_HINT))
         SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,
-          (WPARAM)CreateFont(-12,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("Arial")),1);
+          (WPARAM)CreateFont(-14,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("Arial")),1);
       SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
       SetDlgItemText(hwnd,IDC_PASSWORD,p->Password);
       SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETPASSWORDCHAR,'*',0);
-      HWND UserList=GetDlgItem(hwnd,IDC_USER);
-      SendMessage(UserList,CB_SETEXTENDEDUI,1,0);
       BOOL bFoundUser=FALSE;
       for (int i=0;i<p->Users.nUsers;i++)
       {
-        COMBOBOXEXITEM cei={0};
-        cei.mask=CBEIF_TEXT|CBEIF_LPARAM;
-        cei.iItem=i;
-        cei.lParam=(LPARAM)p->Users.User[i].UserBitmap;
-        cei.pszText=p->Users.User[i].UserName;
         if (_tcsicmp(p->Users.User[i].UserName,p->User)==0)
           bFoundUser=TRUE;
-        SendMessage(UserList,CBEM_INSERTITEM,0,(LPARAM)&cei);
+        SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
+          (LPARAM)&p->Users.User[i].UserName);
+        SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
       }
-      HWND Edit=(HWND)SendMessage(UserList,CBEM_GETEDITCONTROL,0,0);
-      if (bFoundUser || p->UserReadonly)
-        SetWindowText(Edit,p->User);
-      else
-        SetWindowText(Edit,p->Users.User[0].UserName);
-      SetUserBitmap(hwnd);
-      if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
-        SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
-      else
-        SetFocus(GetDlgItem(hwnd,IDCANCEL));
       if (p->UserReadonly)
-        EnableWindow(UserList,false);
+        EnableWindow(GetDlgItem(hwnd,IDC_USER),false);
+      if (IsWindowEnabled(GetDlgItem(hwnd,IDC_USER)))
+        SetFocus(GetDlgItem(hwnd,IDC_USER));
+      else if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
+      {
+        SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETSEL,0,-1);
+        SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
+      }else
+        SetFocus(GetDlgItem(hwnd,IDCANCEL));
+      if ((!p->ForceAdminLogon)|| bFoundUser)
+        SetDlgItemText(hwnd,IDC_USER,p->User);
+      else
+        SetDlgItemText(hwnd,IDC_USER,p->Users.User[0].UserName);
+      SetUserBitmap(hwnd);
+      SetWindowSizes(hwnd);
       return FALSE;
     }//WM_INITDIALOG
   case WM_DESTROY:
@@ -324,22 +435,34 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return (BOOL)g_HintBrush;
       break;
     }
+  case WM_TIMER:
+    {
+      SetUserBitmap(hwnd);
+      return TRUE;
+    }
   case WM_COMMAND:
     {
       switch (wParam)
       {
-      case MAKELPARAM(IDC_USER,CBN_EDITCHANGE):
+      case MAKEWPARAM(IDC_USER,CBN_DROPDOWN):
+        SetTimer(hwnd,1,250,0);
+        return TRUE;
+      case MAKEWPARAM(IDC_USER,CBN_CLOSEUP):
+        KillTimer(hwnd,1);
+        return TRUE;
+      case MAKEWPARAM(IDC_USER,CBN_SELCHANGE):
+      case MAKEWPARAM(IDC_USER,CBN_EDITCHANGE):
         SetUserBitmap(hwnd);
         return TRUE;
-      case MAKELPARAM(IDCANCEL,BN_CLICKED):
+      case MAKEWPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,0);
         return TRUE;
-      case MAKELPARAM(IDOK,BN_CLICKED):
+      case MAKEWPARAM(IDOK,BN_CLICKED):
         {
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
             LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
-            GetWindowText((HWND)SendMessage(GetDlgItem(hwnd,IDC_USER),CBEM_GETEDITCONTROL,0,0),p->User,UNLEN+GNLEN+1);
+            GetDlgItemText(hwnd,IDC_USER,p->User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),p->Password,PWLEN);
             HANDLE hUser=GetUserToken(p->User,p->Password);
             if (hUser)
@@ -354,7 +477,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                 EndDialog(hwnd,1);
               }
             }else
+            {
               MessageBox(hwnd,CResStr(IDS_LOGONFAILED),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+              SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETSEL,0,-1);
+              SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
+            }
           }else
             EndDialog(hwnd,1);
           return TRUE;
@@ -411,3 +538,49 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
   return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
     DialogProc,(LPARAM)&p);
 }
+
+//#ifdef _DEBUG
+//BOOL TestLogonDlg()
+//{
+//  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
+//  InitCommonControlsEx(&icce);
+//  TCHAR User[MAX_PATH]=L"Bruns\\KAY";
+//  TCHAR Password[MAX_PATH]={0};
+//  BOOL l=Logon(User,Password,IDS_ASKINSTALL);
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  l=LogonCurrentUser(User,Password,IDS_ASKOK,
+//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  l=AskCurrentUserOk(User,IDS_ASKOK,
+//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//
+//  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+//
+//  l=Logon(User,Password,IDS_ASKINSTALL);
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  l=LogonCurrentUser(User,Password,IDS_ASKOK,
+//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//  l=AskCurrentUserOk(User,IDS_ASKOK,
+//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
+//  if (l==-1)
+//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//
+//  ::ExitProcess(0);
+//  return TRUE;
+//}
+//
+//BOOL x=TestLogonDlg();
+//#endif _DEBUG
