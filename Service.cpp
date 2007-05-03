@@ -1111,16 +1111,16 @@ bool HandleServiceStuff()
   return false;
 }
 
-#ifdef _DEBUG
-BOOL TestSetup()
-{
-  Setup(L"WinSta0");
-  ::ExitProcess(0);
-  return TRUE;
-}
-
-BOOL x=TestSetup();
-#endif _DEBUG
+//#ifdef _DEBUG
+//BOOL TestSetup()
+//{
+//  Setup(L"WinSta0");
+//  ::ExitProcess(0);
+//  return TRUE;
+//}
+//
+//BOOL x=TestSetup();
+//#endif _DEBUG
 
 //////////////////////////////////////////////////////////////////////////////
 // 
