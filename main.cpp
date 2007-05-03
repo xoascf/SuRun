@@ -159,20 +159,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 {
   LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   zero(g_RunData);
-  //User must not be a domain member
-  {
-    WCHAR* dom=0;
-    NETSETUP_JOIN_STATUS js;
-    if((NetGetJoinInformation(0,&dom,&js)==NERR_Success)
-      &&(js==NetSetupDomainName))
-    {
-      MessageBox(0,CBigResStr(IDS_NODOMAIN,dom),CResStr(IDS_APPNAME),MB_ICONSTOP);
-      NetApiBufferFree(dom);
-      return -1;
-    }
-    if(dom)
-      NetApiBufferFree(dom);
-  }
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //Session
@@ -182,8 +168,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Desktop
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
-  WCHAR Domain[DNLEN]={0};
-  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName,Domain);
+  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
