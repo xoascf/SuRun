@@ -372,11 +372,13 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       BOOL bFoundUser=FALSE;
       for (int i=0;i<p->Users.nUsers;i++)
       {
-        if (_tcsicmp(p->Users.User[i].UserName,p->User)==0)
-          bFoundUser=TRUE;
         SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
           (LPARAM)&p->Users.User[i].UserName);
-        SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
+        if (_tcsicmp(p->Users.User[i].UserName,p->User)==0)
+        {
+          SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
+          bFoundUser=TRUE;
+        }
       }
       if (p->UserReadonly)
         EnableWindow(GetDlgItem(hwnd,IDC_USER),false);
