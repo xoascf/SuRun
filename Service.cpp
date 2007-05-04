@@ -437,6 +437,7 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),CResStr(IDS_APPNAME),
       MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
       return FALSE;
+    AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
     if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0)!=0)
       ||(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0))
     {
