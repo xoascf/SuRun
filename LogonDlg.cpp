@@ -309,6 +309,12 @@ SIZE GetDrawSize(HWND w)
   //Tests have shown that 8 pixels added to cx would be enough
   //I'll add 10 pixels to cx and pixels 4 to cx until I know a better way:
   SIZE S={r.right-r.left+10,r.bottom-r.top+4};
+  //Limit the width to 90% of the screen width
+  if (S.cx>GetSystemMetrics(SM_CXFULLSCREEN)*9/10)
+  {
+    S.cx=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
+    SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_HSCROLL|WS_VSCROLL);
+  }
   return S;
 }
 
