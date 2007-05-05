@@ -313,7 +313,7 @@ SIZE GetDrawSize(HWND w)
   if (S.cx>GetSystemMetrics(SM_CXFULLSCREEN)*9/10)
   {
     S.cx=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
-    SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_HSCROLL|WS_VSCROLL);
+    SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL);
   }
   return S;
 }
