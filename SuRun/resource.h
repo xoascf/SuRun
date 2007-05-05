@@ -32,6 +32,8 @@
 #define IDS_STARTMUNINST                28
 #define IDS_GRPDESC                     29
 #define IDS_ASKUSRINSTALL               30
+#define IDS_DOMAINGROUPS                31
+#define IDS_DOMAINGROUPS2               32
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
@@ -65,6 +67,7 @@
 #define IDC_FRAME2                      1021
 #define IDC_USRST                       1022
 #define IDC_PWDST                       1023
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
