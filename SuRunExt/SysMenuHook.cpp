@@ -22,6 +22,9 @@ UINT        WM_SYSMH1    = 0;
 TCHAR sMenuRestart[MAX_PATH];
 TCHAR sMenuStart[MAX_PATH];
 TCHAR sFileNotFound[MAX_PATH];
+TCHAR sSuRun[MAX_PATH];
+TCHAR sErr[MAX_PATH];
+TCHAR sTip[MAX_PATH];
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHARDATA,rws")
@@ -149,6 +152,9 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
     _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
     _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
+    _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
+    _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
+    _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
   }
   return TRUE;
 }
