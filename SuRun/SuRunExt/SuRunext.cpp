@@ -21,7 +21,11 @@
 #include "../Helpers.h"
 #include "Resource.h"
 
-extern HINSTANCE g_hInst;
+extern TCHAR sFileNotFound[MAX_PATH];
+extern TCHAR sSuRun[MAX_PATH];
+extern TCHAR sErr[MAX_PATH];
+extern TCHAR sTip[MAX_PATH];
+
 
 // global data within shared data segment to allow sharing across instances
 #pragma data_seg(".SHARDATA")
@@ -182,7 +186,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   {
     //right click target is folder background
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-    InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, CResStr(g_hInst,IDS_SURUN));
+    InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, sSuRun);
     InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
     return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst+1));
   }
@@ -210,8 +214,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
       CloseHandle( pi.hThread );
       hr = NOERROR;
     }else
-      MessageBoxW(lpcmi->hwnd,CResStr(g_hInst,IDS_FILENOTFOUND),
-        CResStr(g_hInst,IDS_ERR),MB_ICONSTOP);
+      MessageBoxW(lpcmi->hwnd,sFileNotFound,sErr,MB_ICONSTOP);
   }
   return hr;
 }
@@ -219,6 +222,6 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
 {
   if (uFlags == GCS_HELPTEXT && cchMax > 35)
-    wcscpy((LPWSTR)pszName,CResStr(g_hInst,IDS_TOOLTIP));
+    wcscpy((LPWSTR)pszName,sTip);
   return NOERROR;
 }
