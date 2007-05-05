@@ -432,6 +432,19 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
   //Is User member of SuRunners?
   if (IsInSuRunners(UserName))
     return TRUE;
+  //Domain user?
+  LPWSTR lpdn=0;
+  NETSETUP_JOIN_STATUS js;
+  if(NetGetJoinInformation(0,&lpdn,&js))
+  {
+    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS2,lpdn),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+    else
+      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS,lpdn),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+    NetApiBufferFree(lpdn);
+    return FALSE;
+  }
+  //Local User:
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
   {
     if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),CResStr(IDS_APPNAME),
