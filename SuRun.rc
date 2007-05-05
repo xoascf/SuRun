@@ -111,7 +111,7 @@ BEGIN
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn das Programm mit administrativen Rechten ausgeführt werden soll, gebenn Sie Ihr persönliches Passwort ein.\r\n\r\nAnsonsten drücken Sie Abbruch!",
+    LTEXT           "Wenn das Programm mit administrativen Rechten ausgeführt werden soll, geben Sie Ihr persönliches Passwort ein.\r\n\r\nAnsonsten drücken Sie Abbruch!",
                     IDC_HINT,48,68,234,49,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,127,47,46
