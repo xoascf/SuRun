@@ -304,17 +304,27 @@ SIZE GetDrawSize(HWND w)
   SelectObject(MemDC,(HGDIOBJ)SendMessage(w,WM_GETFONT,0,0));
   RECT r={0};
   DrawText(MemDC,s,-1,&r,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
-  DeleteDC(MemDC);
   //the size needed is sometimes too small
   //Tests have shown that 8 pixels added to cx would be enough
   //I'll add 10 pixels to cx and pixels 4 to cx until I know a better way:
   SIZE S={r.right-r.left+10,r.bottom-r.top+4};
   //Limit the width to 90% of the screen width
-  if (S.cx>GetSystemMetrics(SM_CXFULLSCREEN)*9/10)
+  int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
+  if (S.cx>maxDX)
   {
-    S.cx=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
-    SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL);
+    TEXTMETRIC tm;
+    GetTextMetrics(MemDC,&tm);
+    S.cy+=tm.tmHeight*(S.cx/maxDX+1);
+    S.cx=maxDX;
+    //Limit the height to 60% of the screen height
+    int maxDY=GetSystemMetrics(SM_CXFULLSCREEN)*6/10;
+    if (S.cy>maxDY)
+    {
+      S.cy=maxDY;
+      SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
+    }
   }
+  DeleteDC(MemDC);
   return S;
 }
 
