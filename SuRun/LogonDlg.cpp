@@ -314,7 +314,7 @@ SIZE GetDrawSize(HWND w)
   {
     TEXTMETRIC tm;
     GetTextMetrics(MemDC,&tm);
-    S.cy+=tm.tmHeight*(S.cx/maxDX+1);
+    S.cy+=tm.tmHeight*(S.cx/maxDX);
     S.cx=maxDX;
     //Limit the height to 60% of the screen height
     int maxDY=GetSystemMetrics(SM_CXFULLSCREEN)*6/10;
