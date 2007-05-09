@@ -82,8 +82,20 @@ ToDo:
 ------------------------------------------------------------------------------
 - Store User SIDs instead of Domain\UserName 
   ...SIDs are variable length structures, so SuRun stores the names instead
-- "Yes from now on" Button
+- Whitelist
   List of Programs that are allowed to always be SuRun without questioning
+
+------------------------------------------------------------------------------
+Changes:
+------------------------------------------------------------------------------
+SuRun 1.0.0.1 - 2007-05-09:
+---------------------------
+* Fixed possible CreateRemoteThread() attack. Access for current user to 
+  processes started by SuRun is now denied.
+
+SuRun 1.0.0.0 - 2007-05-08:
+---------------------------
+* first public release
 
 ==============================================================================
                                     by Kay Bruns (c) 2007, http://kay-bruns.de
