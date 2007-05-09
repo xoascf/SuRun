@@ -152,58 +152,6 @@ void KillProcessNice(DWORD PID)
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// SetAdminAccess
-//
-//////////////////////////////////////////////////////////////////////////////
-#include <Accctrl.h>
-#include <Aclapi.h>
-
-void SetAdminAccess(HANDLE hObject)
-{
-  DWORD dwRes;
-  PACL pOldDACL=NULL, pNewDACL=NULL;
-  PSECURITY_DESCRIPTOR pSD = NULL;
-  EXPLICIT_ACCESS ea={0};
-  SID_IDENTIFIER_AUTHORITY SIDAuthWorld = SECURITY_WORLD_SID_AUTHORITY;
-  PSID AdminSID = NULL;
-  if (NULL == hObject) 
-    return;
-  // Get a pointer to the existing DACL.
-  dwRes = GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
-  if (ERROR_SUCCESS != dwRes) 
-    return;
-
-  // Initialize Admin SID
-  SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
-  if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
-    DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
-    goto Cleanup; 
-  // Initialize an EXPLICIT_ACCESS structure for an ACE.
-  // The ACE will allow Everyone read access to the key.
-  ea.grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL;
-  ea.grfAccessMode = GRANT_ACCESS;
-  ea.grfInheritance= NO_INHERITANCE;
-  ea.Trustee.ptstrName  = (LPTSTR)AdminSID;
-  // Create a new ACL that merges the new ACE
-  // into the existing DACL.
-  dwRes = SetEntriesInAcl(1,&ea,pOldDACL,&pNewDACL);
-  if (ERROR_SUCCESS != dwRes)  
-    goto Cleanup; 
-  // Attach the new ACL as the object's DACL.
-  dwRes = SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
-  if (ERROR_SUCCESS != dwRes)  
-    goto Cleanup; 
-Cleanup:
-  if(pSD != NULL) 
-    LocalFree((HLOCAL) pSD); 
-  if(pNewDACL != NULL) 
-    LocalFree((HLOCAL) pNewDACL); 
-  if (AdminSID)
-    FreeSid(AdminSID);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
 // WinMain
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -281,6 +229,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     PathStripPath(un);
     _tcscpy(dn,g_RunData.UserName);
     PathRemoveFileSpec(dn);
+    //Create the process suspended to revoke access for the current user 
+    //before it starts runnung
     if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
       g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT|CREATE_SUSPENDED,NULL,
       g_RunData.CurDir,&si,&pi))
@@ -292,9 +242,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         CResStr(IDS_APPNAME),MB_ICONSTOP);
     }else
     {
-      SetAdminAccess(pi.hThread);
-      SetAdminAccess(pi.hProcess);
+      //Allow access to the Process and Thread to the Administrators and deny 
+      //access for the current user
+      SetAdminDenyUserAccess(pi.hThread);
+      SetAdminDenyUserAccess(pi.hProcess);
+      //Start the main thread
       ResumeThread(pi.hThread);
+      //Ok, we're done with the handles:
       CloseHandle(pi.hThread);
       CloseHandle(pi.hProcess);
     }
