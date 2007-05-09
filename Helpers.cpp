@@ -20,6 +20,7 @@
 #include <Shobjidl.h>
 #include <ShlGuid.h>
 #include <lm.h>
+#include "Helpers.h"
 #include "DBGTRace.h"
 
 #pragma comment(lib,"ShlWapi.lib")
@@ -215,6 +216,59 @@ Cleanup:
 
 //////////////////////////////////////////////////////////////////////////////
 //
+// SetAdminDenyUserAccess
+//
+//////////////////////////////////////////////////////////////////////////////
+
+void SetAdminDenyUserAccess(HANDLE hObject)
+{
+  DWORD dwRes;
+  PACL pOldDACL=NULL, pNewDACL=NULL;
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  EXPLICIT_ACCESS ea[2]={0};
+  SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
+  PSID AdminSID = NULL;
+  PSID UserSID  = GetProcessUserSID(GetCurrentProcessId());
+  if (NULL == hObject) 
+    goto Cleanup; 
+  // Get a pointer to the existing DACL.
+  dwRes = GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
+  if (ERROR_SUCCESS != dwRes) 
+    goto Cleanup; 
+
+  // Initialize Admin SID
+  if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
+    DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+    goto Cleanup; 
+  // Initialize EXPLICIT_ACCESS structures
+  // The ACE will allow Administrators full access to the object.
+  ea[0].grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL;
+  ea[0].grfAccessMode = GRANT_ACCESS;
+  ea[0].Trustee.ptstrName  = (LPTSTR)AdminSID;
+  // The ACE will deny the current User access to the object.
+  ea[1].grfAccessMode = REVOKE_ACCESS;
+  ea[1].Trustee.ptstrName  = (LPTSTR)UserSID;
+  // Create a new ACL that merges the new ACE
+  // into the existing DACL.
+  dwRes = SetEntriesInAcl(2,&ea[0],pOldDACL,&pNewDACL);
+  if (ERROR_SUCCESS != dwRes)  
+    goto Cleanup; 
+  // Attach the new ACL as the object's DACL.
+  dwRes = SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
+  if (ERROR_SUCCESS != dwRes)  
+    goto Cleanup; 
+Cleanup:
+  if(pSD != NULL) 
+    LocalFree((HLOCAL) pSD); 
+  if(pNewDACL != NULL) 
+    LocalFree((HLOCAL) pNewDACL); 
+  if (AdminSID)
+    FreeSid(AdminSID);
+  free(UserSID);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
 //  NetworkPathToUNCPath
 //
 //  This will convert a path on a mapped network share to a UNC path
@@ -377,6 +431,45 @@ bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain/*=0*/)
     GetSIDUserName(ptu->User.Sid,User,Domain);
   free(ptu);
   return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// GetProcessUserSID
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+PSID GetProcessUserSID(DWORD ProcessID)
+{
+  EnablePrivilege(SE_DEBUG_NAME);
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcessID);
+  if (!hProc)
+    return 0;
+  HANDLE hToken;
+  PSID sid=0;
+  // Open impersonation token for Shell process
+  if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
+  {
+    DWORD dwLen=0;
+    if ((GetTokenInformation(hToken, TokenUser,NULL,0,&dwLen))
+      ||(GetLastError()==ERROR_INSUFFICIENT_BUFFER))
+    {
+      TOKEN_USER* ptu=(TOKEN_USER*)malloc(dwLen);
+      if(ptu)
+      {
+        if(GetTokenInformation(hToken,TokenUser,(PVOID)ptu,dwLen,&dwLen))
+        {
+          dwLen=GetLengthSid(ptu->User.Sid);
+          sid=(PSID)malloc(dwLen);
+          CopySid(dwLen,sid,ptu->User.Sid);
+        }
+        free(ptu);
+      }
+    }
+    CloseHandle(hToken);
+  }
+  CloseHandle(hProc);
+  return sid;
 }
 
 //////////////////////////////////////////////////////////////////////////////
