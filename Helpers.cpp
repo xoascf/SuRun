@@ -209,6 +209,8 @@ Cleanup:
     LocalFree((HLOCAL) pSD); 
   if(pNewDACL != NULL) 
     LocalFree((HLOCAL) pNewDACL); 
+  if(pEveryoneSID)
+    FreeSid(pEveryoneSID);
 }
 
 //////////////////////////////////////////////////////////////////////////////
