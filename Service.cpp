@@ -182,6 +182,26 @@ void SavePasswords()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+// WhiteList handling
+// 
+//////////////////////////////////////////////////////////////////////////////
+BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine)
+{
+  return GetRegInt(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,User),CmdLine,0)==1;
+}
+
+BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
+{
+  return RegDelVal(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,User),CmdLine);
+}
+
+void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine)
+{
+  SetRegInt(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,User),CmdLine,1);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 // CheckCliProcess:
 // 
 // checks if rd.CliProcessId is this exe and if rd is g_RunData of the calling
@@ -605,7 +625,9 @@ int PrepareSuRun()
   {
     nUser=-1;
     bDoAsk=TRUE;
-  }
+  }else
+    if (IsInWhiteList(g_Users[nUser].UserName,g_RunData.cmdLine))
+      return nUser;
   //No Ask, just start cmdLine:
   if (!bDoAsk)
     return nUser;
@@ -622,8 +644,11 @@ int PrepareSuRun()
     //secure desktop created...
     if(nUser!=-1)
     {
-      if(!AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine))
+      BOOL bLogon=AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine);
+      if(!bLogon)
         return -1;
+      if (bLogon==2)
+        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
       return nUser;
     }
     if (!CheckGroupMembership(g_RunData.UserName))
@@ -656,6 +681,8 @@ int PrepareSuRun()
       _tcscpy(g_Users[nUser].UserName,g_RunData.UserName);
       _tcscpy(g_Users[nUser].Password,Password);
       SavePasswords();
+      if (bLogon==2)
+        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
       return nUser;
     }
   }else //FATAL: secure desktop could not be created!
