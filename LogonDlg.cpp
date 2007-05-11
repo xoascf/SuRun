@@ -337,7 +337,7 @@ void SetWindowSizes(HWND hDlg)
   SIZE es=CliSize(ew);
   //Resize X
   int dx=ds.cx-es.cx;
-  if (dx) 
+  if (dx>0) 
   {
     MoveWnd(hDlg,-dx/2,0,dx,0);
     for (int i=0;i<countof(SX_Ctrls);i++)
@@ -347,7 +347,7 @@ void SetWindowSizes(HWND hDlg)
   }
   //Resize Y
   int dy=ds.cy-es.cy;
-  if (dy)
+  if (dy>0)
   {
     MoveWnd(hDlg,0,-dy/2,0,dy);
     for (int i=0;i<countof(SY_Ctrls);i++)
