@@ -1015,6 +1015,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   DeleteDirectory(File);
   if (bJustStop)
     return TRUE;
+  DelRegKey(HKLM,SVCKEY);
   //Ok!
   MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
     MB_ICONINFORMATION|MB_SETFOREGROUND);
