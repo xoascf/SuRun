@@ -68,6 +68,8 @@
 #define IDC_USRST                       1022
 #define IDC_PWDST                       1023
 #define IDC_ALWAYSOK                    1025
+#define IDC_WHITELIST                   1026
+#define IDC_DELETE                      1027
 
 // Next default values for new objects
 // 
@@ -75,7 +77,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1026
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
