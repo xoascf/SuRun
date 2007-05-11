@@ -176,7 +176,7 @@ BEGIN
     CONTROL         "Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,52,63,93,20
-    CONTROL         "Passworte speichern. (sicher und verschlüsselt)",
+    CONTROL         "&Passworte speichern. (sicher und verschlüsselt)",
                     IDC_SAVEPW,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,52,84,93,20
     GROUPBOX        "Starte immer ohne zu fragen:",IDC_STATIC,159,0,230,105
@@ -280,14 +280,14 @@ BEGIN
                     IDC_HINT2,0,123,263,12,SS_CENTERIMAGE
 END
 
-IDD_SETUP DIALOG DISCARDABLE  0, 0, 152, 137
+IDD_SETUP DIALOG DISCARDABLE  0, 0, 394, 137
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun Settings"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,151,105
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,1,105,151,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,112
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,112,394,1
     ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "Ask for permission",IDC_STATIC,46,7,82,49
     CONTROL         "&always",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
@@ -301,11 +301,16 @@ BEGIN
     CONTROL         "Show user &desktop as background (slow)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,52,63,93,20
-    CONTROL         "Store Passwords (protected, encrypted)",IDC_SAVEPW,
+    CONTROL         "Store &Passwords (protected, encrypted)",IDC_SAVEPW,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,52,
                     84,93,20
-    DEFPUSHBUTTON   "&Save",IDOK,7,116,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,95,116,50,14
+    GROUPBOX        "Always run without asking:",IDC_STATIC,159,0,230,105
+    LISTBOX         IDC_WHITELIST,163,9,220,75,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Remove",IDC_DELETE,333,88,50,14
+    DEFPUSHBUTTON   "&Save",IDOK,99,116,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,245,116,50,14
 END
 
 IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 194
@@ -373,8 +378,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,1,0
+ PRODUCTVERSION 1,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -392,14 +397,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "FileVersion", "1, 0, 1, 0\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "ProductVersion", "1, 0, 1, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
