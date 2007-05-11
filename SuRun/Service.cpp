@@ -373,9 +373,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                           CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                           0,NULL,&si,&pi))
               {
-                Sleep(500);
+                //Wait until the desktop is created
+                Sleep(250);
                 WaitForInputIdle(pi.hProcess,15000);
-                if(WaitForSingleObject(pi.hProcess,60000)==WAIT_TIMEOUT)
+                //Wait 45s for the child process to terminate:
+                if(WaitForSingleObject(pi.hProcess,45000)==WAIT_TIMEOUT)
                   TerminateProcess(pi.hProcess,-1);
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
