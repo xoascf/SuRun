@@ -206,7 +206,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   //Lets go:
   HANDLE hPipe=INVALID_HANDLE_VALUE;
-  //retry if the pipe is buisy: (max 60s)
+  //retry if the pipe is busy: (max 60s)
   for(int i=0;i<240;i++)
   {
     hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
@@ -222,8 +222,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
     CloseHandle(hPipe);
     int n=0;
+    //Wait for 60s to get a Password...
     while ((g_RunPwd[0]==0xFF)&&(n<1000))
-      Sleep(55);
+      Sleep(60);
     if ((g_RunPwd[0]==0xFF)
       ||(g_RunPwd[0]==1)
       || bRunSetup)
