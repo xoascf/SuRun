@@ -145,7 +145,7 @@ void KillProcessNice(DWORD PID)
   //Post WM_CLOSE to all Windows of PID
   EnumWindows(CloseAppEnum,(LPARAM)PID);
   //Give the Process time to close
-  WaitForSingleObject(hProcess, 2500);
+  WaitForSingleObject(hProcess,2500);
   CloseHandle(hProcess);
   //The service will call TerminateProcess()...
 }
@@ -222,7 +222,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
     CloseHandle(hPipe);
     int n=0;
-    //Wait for 60s to get a Password...
+    //Wait for max 60s for the Password...
     while ((g_RunPwd[0]==0xFF)&&(n<1000))
       Sleep(60);
     if ((g_RunPwd[0]==0xFF)
