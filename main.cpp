@@ -206,13 +206,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   //Lets go:
   HANDLE hPipe=INVALID_HANDLE_VALUE;
-  //retry if the pipe is buisy:
-  for(int i=0;i<10;i++)
+  //retry if the pipe is buisy: (max 60s)
+  for(int i=0;i<240;i++)
   {
     hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
     if(hPipe!=INVALID_HANDLE_VALUE)
       break;
-    Sleep(500);
+    Sleep(250);
   }
   if (hPipe!=INVALID_HANDLE_VALUE)
   {
