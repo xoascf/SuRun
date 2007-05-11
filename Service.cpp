@@ -377,7 +377,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                 Sleep(250);
                 WaitForInputIdle(pi.hProcess,15000);
                 //Wait 45s for the child process to terminate:
-                if(WaitForSingleObject(pi.hProcess,45000)==WAIT_TIMEOUT)
+                if(WaitForSingleObject(pi.hProcess,15000)==WAIT_TIMEOUT)
                   TerminateProcess(pi.hProcess,-1);
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
