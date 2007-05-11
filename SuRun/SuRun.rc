@@ -155,14 +155,14 @@ BEGIN
                     271,10
 END
 
-IDD_SETUP DIALOG DISCARDABLE  0, 0, 152, 137
+IDD_SETUP DIALOG DISCARDABLE  0, 0, 394, 137
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun Einstellungen"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,151,105
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,105,151,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,112
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,112,394,1
     ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "Frage um Erlaubnis",IDC_STATIC,46,7,82,49
     CONTROL         "&immer",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
@@ -179,8 +179,13 @@ BEGIN
     CONTROL         "Passworte speichern. (sicher und verschlüsselt)",
                     IDC_SAVEPW,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,52,84,93,20
-    DEFPUSHBUTTON   "&Speichern",IDOK,7,116,50,14
-    PUSHBUTTON      "&Abbruch",IDCANCEL,95,116,50,14
+    GROUPBOX        "Starte immer ohne zu fragen:",IDC_STATIC,159,0,230,105
+    LISTBOX         IDC_WHITELIST,163,9,220,75,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Löschen",IDC_DELETE,333,88,50,14
+    DEFPUSHBUTTON   "&Speichern",IDOK,99,116,50,14
+    PUSHBUTTON      "&Abbruch",IDCANCEL,245,116,50,14
 END
 
 
@@ -283,7 +288,7 @@ FONT 8, "MS Sans Serif"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,151,105
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,1,105,151,1
-    ICON            IDI_SHIELD,IDC_SECICON,7,15,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "Ask for permission",IDC_STATIC,46,7,82,49
     CONTROL         "&always",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP,52,18,37,10
