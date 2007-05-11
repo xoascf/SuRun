@@ -236,6 +236,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_DOMAINGROUPS2       "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nSie sind Mitglied der Domäne %s.\r\nLassen Sie sich von einem Domänen-Administrator in die ""SuRunners"" Gruppe ein-\r\nund aus der Administratoren-Gruppe austragen."
+    IDS_CANCEL              "&Abbruch (%d)"
 END
 
 #endif    // German (Germany) resources
@@ -480,6 +481,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_DOMAINGROUPS2       "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nYou are currently member of domain %s.\r\nA domain administrator must remove your account from the\r\nadministrators group and put it into into the ""SuRunners"" group."
+    IDS_CANCEL              "&Cancel (%d)"
 END
 
 #endif    // English (U.S.) resources
