@@ -263,6 +263,18 @@ DWORD CheckCliProcess(RUNDATA& rd)
   return CloseHandle(hProcess),2;
 }
 
+void WaitForProcess(DWORD ProcID)
+{
+  HANDLE hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
+  while (hProc)
+  {
+    WaitForSingleObject(hProc,INFINITE);
+    Sleep(100);
+    CloseHandle(hProc);
+    hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  The Service:
@@ -373,14 +385,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                           CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                           0,NULL,&si,&pi))
               {
-                //Wait until the desktop is created
-                Sleep(250);
-                WaitForInputIdle(pi.hProcess,15000);
-                //Wait 45s for the child process to terminate:
-                if(WaitForSingleObject(pi.hProcess,15000)==WAIT_TIMEOUT)
-                  TerminateProcess(pi.hProcess,-1);
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
+                WaitForProcess(pi.dwProcessId);
               }
             }
             CloseHandle(hRun);
