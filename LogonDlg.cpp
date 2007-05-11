@@ -196,6 +196,7 @@ typedef struct _LOGONDLGPARAMS
   BOOL UserReadonly;
   BOOL ForceAdminLogon;
   USERLIST Users;
+  int TimeOut;
   _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm):Users(Adm)
   {
     Msg=M;
@@ -203,6 +204,7 @@ typedef struct _LOGONDLGPARAMS
     Password=Pwd;
     UserReadonly=RO;
     ForceAdminLogon=Adm;
+    TimeOut=40;//s
   }
 }LOGONDLGPARAMS;
 
@@ -412,6 +414,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetDlgItemText(hwnd,IDC_USER,p->Users.User[0].UserName);
       SetUserBitmap(hwnd);
       SetWindowSizes(hwnd);
+      SetTimer(hwnd,2,1000,0);
       return FALSE;
     }//WM_INITDIALOG
   case WM_DESTROY:
@@ -455,7 +458,17 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }
   case WM_TIMER:
     {
-      SetUserBitmap(hwnd);
+      if (wParam==1)
+        SetUserBitmap(hwnd);
+      if (wParam==2)
+      {
+        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+        p->TimeOut--;
+        if (p->TimeOut<0)
+          EndDialog(hwnd,0);
+        else if (p->TimeOut<10)
+          SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CANCEL,p->TimeOut));
+      }
       return TRUE;
     }
   case WM_COMMAND:
