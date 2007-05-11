@@ -90,13 +90,12 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.1.0 - 2007-05-11:
 ---------------------------
-* Added Support for programs that are always run without asking for permission
+* Added Whitelist for programs that are always run without asking
 * When finally uninstalling SuRun the registry is cleaned
 * Logon dialogs are resized only if the command line is too long
-* Dialogs have a 40s Timeout to "cancel" now
-* SuRun retries to open the pipe for 60 seconds on failure. This is useful, 
-  when a user starts multiple applications in short time. (E.G. with Windows' 
-  AutoStart menu)
+* Dialogs have a 40s Timeout to automatic "cancel"
+* SuRun retries to open the service pipe for 3 minutes. This is useful, when a 
+  user starts multiple apps in short intervalls. (e.g. from the StartUp menu)
 
 SuRun 1.0.0.1 - 2007-05-09:
 ---------------------------
