@@ -88,6 +88,15 @@ ToDo:
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.1.0 - 2007-05-11:
+---------------------------
+* Added Support for programs that are always run without asking for permission
+* When finally uninstalling SuRun the registry is cleaned
+* Logon dialogs are resized only if the command line is too long
+* SuRun retries to open the pipe ten times on failure. This is useful, when a 
+  users start multiple applications in short time. (E.G. with Windows' AutoRun 
+  Start menu)
+
 SuRun 1.0.0.1 - 2007-05-09:
 ---------------------------
 * Fixed possible CreateRemoteThread() attack. Access for current user to 
