@@ -98,7 +98,7 @@ BEGIN
                     IDC_HINT2,0,123,263,12,SS_CENTERIMAGE
 END
 
-IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 182
+IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 194
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Passwort erforderlich"
@@ -121,9 +121,12 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,98,152,129,14,ES_AUTOHSCROLL
     PUSHBUTTON      "&Abbruch",IDCANCEL,233,135,50,14
     DEFPUSHBUTTON   "&OK",IDOK,233,152,50,14
+    CONTROL         "Das Programm ohne Nachfrage immer mit administrativen Rechten starten",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
+                    271,10
 END
 
-IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 289, 182
+IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 289, 195
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Bestätigung erforderlich"
@@ -147,6 +150,9 @@ BEGIN
                     WS_DISABLED
     DEFPUSHBUTTON   "&Abbruch",IDCANCEL,233,135,50,14
     PUSHBUTTON      "&OK",IDOK,233,152,50,14
+    CONTROL         "Das Programm ohne Nachfrage immer mit administrativen Rechten starten",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
+                    271,10
 END
 
 IDD_SETUP DIALOG DISCARDABLE  0, 0, 152, 137
@@ -297,7 +303,7 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,95,116,50,14
 END
 
-IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 182
+IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 194
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Passwort required"
@@ -307,7 +313,7 @@ BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     LTEXT           "If the application should be started with administrative rights, enter you password.\r\n\r\nIf not, press Cancel!",
@@ -320,9 +326,12 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,98,152,129,14,ES_AUTOHSCROLL
     PUSHBUTTON      "&Cancel",IDCANCEL,233,135,50,14
     DEFPUSHBUTTON   "&OK",IDOK,233,152,50,14
+    CONTROL         "Always start this program with administrative privileges without confirmation",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
+                    271,10
 END
 
-IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 289, 182
+IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 289, 194
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Authorisation required"
@@ -346,6 +355,9 @@ BEGIN
                     WS_DISABLED
     DEFPUSHBUTTON   "&Cancel",IDCANCEL,233,135,50,14
     PUSHBUTTON      "&OK",IDOK,233,152,50,14
+    CONTROL         "Always start this program with administrative privileges without confirmation",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
+                    271,10
 END
 
 
@@ -393,6 +405,22 @@ BEGIN
 END
 
 #endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_CURUSRACK, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 182
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
