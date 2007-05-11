@@ -88,9 +88,10 @@ static USERDATA g_Users[16]={0};    //Tokens for the last 16 Users are cached
 #define Radio1chk (g_AskAlways!=0)
 #define Radio2chk ((g_AskAlways==0)&&(g_NoAskTimeOut!=0))
 
-#define HKLM    HKEY_LOCAL_MACHINE
-#define SVCKEY  _T("SECURITY\\SuRun")
-#define PWKEY   _T("SECURITY\\SuRun\\Cache")
+#define HKLM      HKEY_LOCAL_MACHINE
+#define SVCKEY    _T("SECURITY\\SuRun")
+#define PWKEY     _T("SECURITY\\SuRun\\Cache")
+#define WLKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
 
 BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
 
@@ -185,19 +186,20 @@ void SavePasswords()
 // WhiteList handling
 // 
 //////////////////////////////////////////////////////////////////////////////
+
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine)
 {
-  return GetRegInt(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,User),CmdLine,0)==1;
+  return GetRegInt(HKLM,WLKEY(User),CmdLine,0)==1;
 }
 
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
 {
-  return RegDelVal(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,User),CmdLine);
+  return RegDelVal(HKLM,WLKEY(User),CmdLine);
 }
 
 void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine)
 {
-  SetRegInt(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,User),CmdLine,1);
+  SetRegInt(HKLM,WLKEY(User),CmdLine,1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -515,6 +517,22 @@ void UpdateAskUser(HWND hwnd)
   }
 }
 
+void LBSetScrollbar(HWND hwnd)
+{
+  HDC hdc=GetDC(hwnd);
+  TCHAR s[4096];
+  int nItems=SendMessage(hwnd,LB_GETCOUNT,0,0);
+  int wMax=0;
+  for (int i=0;i<nItems;i++)
+  {
+    SIZE sz={0};
+    GetTextExtentPoint32(hdc,s,SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
+    wMax=max(sz.cx,wMax);
+  }
+  SendMessage(hwnd,LB_SETHORIZONTALEXTENT,wMax,0);
+  ReleaseDC(hwnd,hdc);
+}
+
 INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
@@ -534,6 +552,14 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
+      
+      CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_RunData.UserName);
+      TCHAR cmd[4096];
+      for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
+        SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_ADDSTRING,0,(LPARAM)&cmd);
+      EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+        SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
+      LBSetScrollbar(GetDlgItem(hwnd,IDC_WHITELIST));
       return TRUE;
     }//WM_INITDIALOG
   case WM_NCDESTROY:
@@ -572,6 +598,27 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
           SaveSettings();
           EndDialog(hwnd,1);
+          return TRUE;
+        }
+      case MAKELPARAM(IDC_DELETE,BN_CLICKED):
+        {
+          int CurSel=SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0);
+          if (CurSel>=0)
+          {
+            TCHAR cmd[4096];
+            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETTEXT,CurSel,(LPARAM)&cmd);
+            RemoveFromWhiteList(g_RunData.UserName,cmd);
+            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_DELETESTRING,CurSel,0);
+          }
+          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
+          LBSetScrollbar(GetDlgItem(hwnd,IDC_WHITELIST));
+          return TRUE;
+        }
+      case MAKELPARAM(IDC_WHITELIST,LBN_SELCHANGE):
+        {
+          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
           return TRUE;
         }
       }//switch (wParam)
