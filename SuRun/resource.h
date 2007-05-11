@@ -34,6 +34,7 @@
 #define IDS_ASKUSRINSTALL               30
 #define IDS_DOMAINGROUPS                31
 #define IDS_DOMAINGROUPS2               32
+#define IDS_CANCEL                      33
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
