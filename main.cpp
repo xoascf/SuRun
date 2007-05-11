@@ -205,7 +205,15 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return -1;
   }
   //Lets go:
-  HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+  HANDLE hPipe=INVALID_HANDLE_VALUE;
+  //retry if the pipe is buisy:
+  for(int i=0;i<10;i++)
+  {
+    hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+    if(hPipe!=INVALID_HANDLE_VALUE)
+      break;
+    Sleep(500);
+  }
   if (hPipe!=INVALID_HANDLE_VALUE)
   {
     zero(g_RunPwd);
