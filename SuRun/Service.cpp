@@ -370,8 +370,13 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
               EnablePrivilege(SE_INCREASE_QUOTA_NAME);
               if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
-                          CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+                          CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
+                          0,NULL,&si,&pi))
               {
+                Sleep(500);
+                WaitForInputIdle(pi.hProcess,15000);
+                if(WaitForSingleObject(pi.hProcess,60000)==WAIT_TIMEOUT)
+                  TerminateProcess(pi.hProcess,-1);
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
               }
