@@ -78,14 +78,6 @@ Why use SuRun?
  increase the chance that the system could be infected by malware.
 
 ------------------------------------------------------------------------------
-ToDo:
-------------------------------------------------------------------------------
-- Store User SIDs instead of Domain\UserName 
-  ...SIDs are variable length structures, so SuRun stores the names instead
-- Whitelist
-  List of Programs that are allowed to always be SuRun without questioning
-
-------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.1.0 - 2007-05-11:
