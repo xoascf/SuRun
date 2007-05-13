@@ -22,6 +22,10 @@
 // -requesting permission/password in the logon session of the user
 // -putting the users password to the user process via WriteProcessMemory
 
+#ifdef _DEBUG
+//#define _DEBUGSETUP
+#endif _DEBUG
+
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
@@ -1230,16 +1234,16 @@ bool HandleServiceStuff()
   return false;
 }
 
-//#ifdef _DEBUG
-//BOOL TestSetup()
-//{
-//  Setup(L"WinSta0");
-//  ::ExitProcess(0);
-//  return TRUE;
-//}
-//
-//BOOL x=TestSetup();
-//#endif _DEBUG
+#ifdef _DEBUGSETUP
+BOOL TestSetup()
+{
+  Setup(L"WinSta0");
+  ::ExitProcess(0);
+  return TRUE;
+}
+
+BOOL x=TestSetup();
+#endif _DEBUGSETUP
 
 //////////////////////////////////////////////////////////////////////////////
 // 
