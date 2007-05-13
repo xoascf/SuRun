@@ -32,6 +32,10 @@
 #pragma comment(lib,"Gdi32.lib")
 #pragma comment(lib,"comctl32.lib")
 
+#ifdef _DEBUG
+//#define _DLGDEBUG
+#endif _DEBUG
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // LoadUserBitmap
@@ -380,10 +384,10 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,16,16,0));
       SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_SETFONT,
-        (WPARAM)CreateFont(-14,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("Arial")),1);
+        (WPARAM)CreateFont(-14,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
       if (GetDlgItem(hwnd,IDC_HINT))
         SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,
-          (WPARAM)CreateFont(-14,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("Arial")),1);
+          (WPARAM)CreateFont(-14,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
       SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
       SetDlgItemText(hwnd,IDC_PASSWORD,p->Password);
       SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETPASSWORDCHAR,'*',0);
@@ -570,48 +574,44 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
     DialogProc,(LPARAM)&p);
 }
 
-//#ifdef _DEBUG
-//BOOL TestLogonDlg()
-//{
-//  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
-//  InitCommonControlsEx(&icce);
-//  TCHAR User[MAX_PATH]=L"Bruns\\KAY";
-//  TCHAR Password[MAX_PATH]={0};
-//  BOOL l=Logon(User,Password,IDS_ASKINSTALL);
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  l=LogonCurrentUser(User,Password,IDS_ASKOK,
-//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  l=AskCurrentUserOk(User,IDS_ASKOK,
-//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//
-//  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-//
-//  l=Logon(User,Password,IDS_ASKINSTALL);
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  l=LogonCurrentUser(User,Password,IDS_ASKOK,
-//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//  l=AskCurrentUserOk(User,IDS_ASKOK,
-//      L"C:\\wincmd\\TOTALCMD.EXE /i=C:\\WINCMD\\wincmd.ini /F=C:\\WinCMD\\wcx_ftp.ini");
-//  if (l==-1)
-//    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//
-//  ::ExitProcess(0);
-//  return TRUE;
-//}
-//
-//BOOL x=TestLogonDlg();
-//#endif _DEBUG
+#ifdef _DLGDEBUG
+BOOL TestLogonDlg()
+{
+  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
+  InitCommonControlsEx(&icce);
+  TCHAR User[MAX_PATH]=L"Bruns\\KAY";
+  TCHAR Password[MAX_PATH]={0};
+  BOOL l=Logon(User,Password,IDS_ASKINSTALL);
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonCurrentUser(User,Password,IDS_ASKOK,L"cmd");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=AskCurrentUserOk(User,IDS_ASKOK,L"cmd");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+
+  l=Logon(User,Password,IDS_ASKINSTALL);
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonCurrentUser(User,Password,IDS_ASKOK,L"cmd");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=AskCurrentUserOk(User,IDS_ASKOK,L"cmd");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+
+  ::ExitProcess(0);
+  return TRUE;
+}
+
+BOOL x=TestLogonDlg();
+#endif _DLGDEBUG
