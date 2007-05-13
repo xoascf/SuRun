@@ -26,7 +26,7 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 // 24
 //
 
-1                       24      MOVEABLE PURE   "app.manifest"
+1                       24      MOVEABLE PURE   "res\\app.manifest"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -61,76 +61,78 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_MAINICON            ICON    DISCARDABLE     "main.ico"
-IDI_SHIELD              ICON    DISCARDABLE     "ico10605.ico"
-IDI_SHIELD2             ICON    DISCARDABLE     "ico10606.ico"
-IDI_SHIELD1             ICON    DISCARDABLE     "ico10607.ico"
-IDI_INSTALL             ICON    DISCARDABLE     "Software.ico"
-IDI_HELP                ICON    DISCARDABLE     "Notes.ico"
-IDI_SETUP               ICON    DISCARDABLE     "Settings.ico"
+IDI_MAINICON            ICON    DISCARDABLE     "res\\main.ico"
+IDI_SHIELD              ICON    DISCARDABLE     "res\\ico10605.ico"
+IDI_SHIELD2             ICON    DISCARDABLE     "res\\ico10606.ico"
+IDI_SHIELD1             ICON    DISCARDABLE     "res\\ico10607.ico"
+IDI_INSTALL             ICON    DISCARDABLE     "res\\Software.ico"
+IDI_HELP                ICON    DISCARDABLE     "res\\Notes.ico"
+IDI_SETUP               ICON    DISCARDABLE     "res\\Settings.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_LOGONDLG DIALOG DISCARDABLE  0, 0, 263, 134
+IDD_LOGONDLG DIALOGEX 0, 0, 263, 137
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Benutzerdaten Erforderlich"
-FONT 8, "MS Sans Serif"
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Benutzerdaten erforderlich"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
     ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
     LTEXT           "Bitte identifizieren Sie sich als berechtigte Person:",
-                    IDC_DLGQUESTION,52,7,206,51,SS_NOPREFIX
+                    IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,46
-    LTEXT           "Benutzer",IDC_USRST,65,83,29,8
-    LTEXT           "Passwort",IDC_PWDST,65,101,30,8
-    COMBOBOX        IDC_USER,98,82,103,30,CBS_DROPDOWN | CBS_SORT | 
+    LTEXT           "Bitte wählen Sie Abbrechen, wenn Sie sich unsicher sind!",
+                    IDC_HINT2,62,70,194,8
+    LTEXT           "&Benutzer:",IDC_USRST,62,85,33,8
+    LTEXT           "&Kennwort:",IDC_PWDST,62,99,33,8
+    COMBOBOX        IDC_USER,98,82,158,30,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PASSWORD,98,98,103,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "&Abbruch",IDCANCEL,205,81,50,14
-    DEFPUSHBUTTON   "&OK",IDOK,205,98,50,14
-    CTEXT           "Falls Sie unsicher sind, was das hier ist, dücken Sie Abbruch!",
-                    IDC_HINT2,0,123,263,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD,98,97,158,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,150,116,52,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,204,116,52,14
 END
 
-IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 194
+IDD_CURUSRLOGON DIALOGEX 0, 0, 289, 200
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Passwort erforderlich"
-FONT 8, "MS Sans Serif"
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Kennwort erforderlich"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn das Programm mit administrativen Rechten ausgeführt werden soll, geben Sie Ihr persönliches Passwort ein.\r\n\r\nAnsonsten drücken Sie Abbruch!",
-                    IDC_HINT,48,68,234,49,SS_NOPREFIX
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Bitte geben Sie ihr persönliches Kennwort ein, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie 'Abbrechen'!",
+                    IDC_HINT,48,74,234,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,127,47,46
-    LTEXT           "Benutzer",IDC_USRST,65,137,29,8
-    LTEXT           "Passwort",IDC_PWDST,65,155,30,8
-    EDITTEXT        IDC_USER,98,136,129,14,WS_DISABLED
-    EDITTEXT        IDC_PASSWORD,98,152,129,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "&Abbruch",IDCANCEL,233,135,50,14
-    DEFPUSHBUTTON   "&OK",IDOK,233,152,50,14
-    CONTROL         "Das Programm ohne Nachfrage immer mit administrativen Rechten starten",
-                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
-                    271,10
+                    SS_REALSIZEIMAGE,6,127,47,46
+    LTEXT           "&Benutzer:",IDC_USRST,64,137,33,8
+    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
+    LTEXT           "&Kennwort:",IDC_PWDST,64,151,35,8
+    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_AUTOHSCROLL
+    CONTROL         "Das Programm ohne zu Fragen immer starten",IDC_ALWAYSOK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,163,182,10
+    DEFPUSHBUTTON   "OK",IDOK,179,179,50,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,232,179,50,14
 END
 
-IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 289, 195
+IDD_CURUSRACK DIALOGEX 0, 0, 289, 200
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Bestätigung erforderlich"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -139,27 +141,26 @@ BEGIN
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn das Programm mit administrativen Rechten ausgeführt werden soll, drücken Sie OK.\r\n\r\nAnsonsten drücken Sie Abbruch!",
-                    IDC_HINT,48,68,234,49,SS_NOPREFIX
+    LTEXT           "Wählen Sie OK, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie Abbrechen!",
+                    IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,127,47,46
-    LTEXT           "Benutzer",IDC_USRST,65,137,29,8
-    LTEXT           "Passwort",IDC_PWDST,65,155,30,8
-    EDITTEXT        IDC_USER,98,136,129,14,WS_DISABLED
-    EDITTEXT        IDC_PASSWORD,98,152,129,14,ES_PASSWORD | ES_AUTOHSCROLL | 
-                    WS_DISABLED
-    DEFPUSHBUTTON   "&Abbruch",IDCANCEL,233,135,50,14
-    PUSHBUTTON      "&OK",IDOK,233,152,50,14
-    CONTROL         "Das Programm ohne Nachfrage immer mit administrativen Rechten starten",
-                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
-                    271,10
+                    SS_REALSIZEIMAGE,6,127,47,46
+    LTEXT           "&Benutzer:",IDC_USRST,64,137,33,8
+    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
+    LTEXT           "&Kennwort:",IDC_PWDST,64,151,35,8
+    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
+    CONTROL         "Das Programm ohne zu Fragen immer starten",IDC_ALWAYSOK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,163,182,10
+    DEFPUSHBUTTON   "OK",IDOK,179,179,50,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,232,179,50,14
 END
 
-IDD_SETUP DIALOG DISCARDABLE  0, 0, 394, 137
+IDD_SETUP DIALOGEX 0, 0, 394, 137
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "SuRun Einstellungen"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,112
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,112,394,1
@@ -197,7 +198,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_USAGE               "Gebrauch:\r\n\tSuRun.exe Programm [Parameter]\r\noder\tSuRun.exe /SETUP"
-    IDS_ASKOK               "Der Befehl:\r\n\r\n%s\r\n\r\nsoll mit administravien Rechten ausgeführt werden."
+    IDS_ASKOK               "Der Befehl:\r\n\r\n%s\r\n\r\nsoll mit erhöhten Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
     IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
@@ -236,7 +237,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_DOMAINGROUPS2       "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nSie sind Mitglied der Domäne %s.\r\nLassen Sie sich von einem Domänen-Administrator in die ""SuRunners"" Gruppe ein-\r\nund aus der Administratoren-Gruppe austragen."
-    IDS_CANCEL              "&Abbruch (%d)"
+    IDS_CANCEL              "Abbrechen (%d)"
 END
 
 #endif    // German (Germany) resources
@@ -257,35 +258,95 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_LOGONDLG DIALOG DISCARDABLE  0, 0, 263, 134
+IDD_LOGONDLG DIALOGEX 0, 0, 263, 135
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Authorisation required"
-FONT 8, "MS Sans Serif"
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Authorization required"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
     ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Identify yourself as authorized person",IDC_DLGQUESTION,
-                    52,7,205,51,SS_NOPREFIX
+    LTEXT           "Identify yourself as authorized person.",
+                    IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,46
-    LTEXT           "User Name",IDC_USRST,58,83,36,8
-    LTEXT           "Password",IDC_PWDST,58,101,32,8
-    COMBOBOX        IDC_USER,98,82,103,30,CBS_DROPDOWN | CBS_SORT | 
+    LTEXT           "If you are not sure what this here is about, press 'Cancel'!",
+                    IDC_HINT2,58,70,198,8
+    RTEXT           "&User name:",IDC_USRST,58,84,37,8
+    RTEXT           "&Password:",IDC_PWDST,58,98,37,8
+    COMBOBOX        IDC_USER,98,82,158,30,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PASSWORD,98,98,103,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "&Cancel",IDCANCEL,205,81,50,14
-    DEFPUSHBUTTON   "&OK",IDOK,205,98,50,14
-    CTEXT           "If you are not sure what this here is about, press Cancel!",
-                    IDC_HINT2,0,123,263,12,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD,98,97,158,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,153,115,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,206,115,50,14
 END
 
-IDD_SETUP DIALOG DISCARDABLE  0, 0, 394, 137
+IDD_CURUSRLOGON DIALOGEX 0, 0, 289, 200
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Password required"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
+    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
+    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    LTEXT           "If the application should be started with administrative rights, enter you password.\r\n\r\nIf not, press 'Cancel'!",
+                    IDC_HINT,48,74,234,43,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,6,127,47,46
+    RTEXT           "&User name:",IDC_USRST,64,137,33,8
+    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
+    RTEXT           "&Password:",IDC_PWDST,64,151,35,8
+    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_AUTOHSCROLL
+    CONTROL         "Always start this program without confirmation",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
+                    163,182,10
+    DEFPUSHBUTTON   "OK",IDOK,179,179,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,232,179,50,14
+END
+
+IDD_CURUSRACK DIALOGEX 0, 0, 289, 200
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Authorization required"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
+    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
+                    NOT WS_BORDER
+    LTEXT           "If the application should be started with administrative rights, press 'OK'.\r\n\r\nIf not, press 'Cancel'!",
+                    IDC_HINT,48,73,234,44,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,6,127,47,46
+    RTEXT           "&User name:",IDC_USRST,64,137,33,8
+    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
+    RTEXT           "&Password:",IDC_PWDST,64,151,35,8
+    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
+    CONTROL         "Always start this program without confirmation",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
+                    163,182,10
+    DEFPUSHBUTTON   "OK",IDOK,179,179,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,232,179,50,14
+END
+
+IDD_SETUP DIALOGEX 0, 0, 394, 137
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "SuRun Settings"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,112
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,112,394,1
@@ -314,63 +375,6 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,245,116,50,14
 END
 
-IDD_CURUSRLOGON DIALOG DISCARDABLE  0, 0, 289, 194
-STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Passwort required"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
-    LTEXT           "If the application should be started with administrative rights, enter you password.\r\n\r\nIf not, press Cancel!",
-                    IDC_HINT,48,68,234,49,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,127,47,46
-    LTEXT           "User Name",IDC_USRST,58,137,36,8
-    LTEXT           "Password",IDC_PWDST,57,155,32,8
-    EDITTEXT        IDC_USER,98,136,129,14,WS_DISABLED
-    EDITTEXT        IDC_PASSWORD,98,152,129,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "&Cancel",IDCANCEL,233,135,50,14
-    DEFPUSHBUTTON   "&OK",IDOK,233,152,50,14
-    CONTROL         "Always start this program with administrative privileges without confirmation",
-                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
-                    271,10
-END
-
-IDD_CURUSRACK DIALOG DISCARDABLE  0, 0, 289, 194
-STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Authorisation required"
-FONT 8, "MS Sans Serif"
-BEGIN
-    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
-    LTEXT           "If the application should be started with administrative rights, press OK.\r\n\r\nIf not, press Cancel!",
-                    IDC_HINT,48,68,234,49,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,127,47,46
-    LTEXT           "User Name",IDC_USRST,58,137,36,8
-    LTEXT           "Password",IDC_PWDST,57,155,32,8
-    EDITTEXT        IDC_USER,98,136,129,14,WS_DISABLED
-    EDITTEXT        IDC_PASSWORD,98,152,129,14,ES_PASSWORD | ES_AUTOHSCROLL | 
-                    WS_DISABLED
-    DEFPUSHBUTTON   "&Cancel",IDCANCEL,233,135,50,14
-    PUSHBUTTON      "&OK",IDOK,233,152,50,14
-    CONTROL         "Always start this program with administrative privileges without confirmation",
-                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,177,
-                    271,10
-END
-
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -379,8 +383,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,0
- PRODUCTVERSION 1,0,1,0
+ FILEVERSION 1,0,1,1
+ PRODUCTVERSION 1,0,1,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -398,14 +402,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 1, 0\0"
+            VALUE "FileVersion", "1, 0, 1, 1\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 1, 0\0"
+            VALUE "ProductVersion", "1, 0, 1, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -420,29 +424,13 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_CURUSRACK, DIALOG
-    BEGIN
-        BOTTOMMARGIN, 182
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_USAGE               "Usage:\r\n\tSuRun.exe program [parameters]\r\nor\tSuRun.exe /Setup"
-    IDS_ASKOK               "The command:\r\n\r\n%s\r\n\r\nis about to be started with administrative privileges."
+    IDS_ASKOK               "The command:\r\n\r\n%s\r\n\r\nis about to be executed with administrative privileges."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
     IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
@@ -451,7 +439,7 @@ BEGIN
     IDS_INSTALLADMIN        "You need to have administrative rights to install SuRun.\r\n\r\nPlease enter the credentials of an Administrator for this system:"
     IDS_LOGONFAILED         "Logon failed!\r\n\r\nCheck the users name and password and try again!\r\n\r\nNote that the user name and password are case sensitive."
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
-    IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click ""Cancel""."
+    IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_MENUSTR             "Start as administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot youse SuRun because you cannot act as normal user!"
@@ -481,7 +469,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_DOMAINGROUPS2       "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nYou are currently member of domain %s.\r\nA domain administrator must remove your account from the\r\nadministrators group and put it into into the ""SuRunners"" group."
-    IDS_CANCEL              "&Cancel (%d)"
+    IDS_CANCEL              "Cancel (%d)"
 END
 
 #endif    // English (U.S.) resources
