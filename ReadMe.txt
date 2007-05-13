@@ -80,6 +80,11 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.1.1 - 2007-05-13:
+---------------------------
+* Sven (http://speedproject.de) fixed some typos and beautified the logon 
+  dialogs, Thanks!
+
 SuRun 1.0.1.0 - 2007-05-11:
 ---------------------------
 * Added Whitelist for programs that are always run without asking
