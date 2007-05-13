@@ -250,7 +250,15 @@ SOURCE=.\ico10605.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\ico10605.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\ico10606.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\ico10606.ico
 # End Source File
 # Begin Source File
 
@@ -258,7 +266,15 @@ SOURCE=.\ico10607.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\ico10607.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\main.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\main.ico
 # End Source File
 # Begin Source File
 
@@ -266,13 +282,29 @@ SOURCE=.\Notes.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\Notes.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\Settings.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\Settings.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\Software.ico
 # End Source File
 # Begin Source File
 
 SOURCE=.\Software.ico
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=.\res\app.manifest
+# End Source File
 # Begin Source File
 
 SOURCE=.\ReadMe.txt
