@@ -33,7 +33,7 @@
 #pragma comment(lib,"comctl32.lib")
 
 #ifdef _DEBUG
-//#define _DLGDEBUG
+//#define _DEBUGLOGON
 #endif _DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
@@ -574,7 +574,7 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
     DialogProc,(LPARAM)&p);
 }
 
-#ifdef _DLGDEBUG
+#ifdef _DEBUGLOGON
 BOOL TestLogonDlg()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
@@ -614,4 +614,4 @@ BOOL TestLogonDlg()
 }
 
 BOOL x=TestLogonDlg();
-#endif _DLGDEBUG
+#endif _DEBUGLOGON
