@@ -219,11 +219,11 @@ BEGIN
     IDS_SURUNNER_ERR        "Fehler!\r\n\r\nSie konnten nicht in die ""SuRunners"" Gruppe aufgenommen werden!"
     IDS_LOGOFFON            "Sie sind erfolgreich in die Gruppe ""SuRunners"" aufgenommen und aus\r\nder Administratoren-Gruppe ausgetragen worden.\r\n\r\nSie müssen sich jetzt ab und wieder anmelden, \r\num mit eingeschränkten Rechten zu arbeiten."
     IDS_SYSMENUEXT          "SuRun Systemmenü-Erweiterung"
-    IDS_SURUNINST           "Als Adiminstrator installieren"
-    IDS_SURUNUNINST         "Als Adiminstrator deinstallieren"
-    IDS_SURUNREPAIR         "Als Adiminstrator reparieren"
+    IDS_SURUNINST           "Als Administrator installieren"
+    IDS_SURUNUNINST         "Als Administrator deinstallieren"
+    IDS_SURUNREPAIR         "Als Administrator reparieren"
     IDS_UNINSTREBOOT        "SuRun wurde erfolgreich entfernt.\r\n\r\nRestliche Dateien werden beim nächsten Systemstart gelöscht."
-    IDS_RUNFAILED           "Fehler!\r\n\r\n%s\r\n\r\nkonnte nich gestartet werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
+    IDS_RUNFAILED           "Fehler!\r\n\r\n%s\r\n\r\nkonnte nicht gestartet werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_INSTALLOK           "SuRun wurde erfolgreich installiert\r\n\r\nBitte melden Sie sich ab und wieder an, bevor Sie SuRun benutzen.\r\n\r\nWollen Sie SuRun jetzt konfigurieren?"
     IDS_STARTMENUDIR        "SuRun"
     IDS_STARTMNUCFG         "SuRun Einstellungen.lnk"
@@ -442,7 +442,7 @@ BEGIN
     IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_MENUSTR             "Start as administrator"
-    IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot youse SuRun because you cannot act as normal user!"
+    IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot use SuRun because you cannot act as normal user!"
     IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
 END
 
@@ -468,7 +468,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DOMAINGROUPS2       "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nYou are currently member of domain %s.\r\nA domain administrator must remove your account from the\r\nadministrators group and put it into into the ""SuRunners"" group."
+    IDS_DOMAINGROUPS2       "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nYou are currently member of domain %s.\r\nA domain administrator must remove your account from the\r\nadministrators group and put it into the ""SuRunners"" group."
     IDS_CANCEL              "Cancel (%d)"
 END
 
