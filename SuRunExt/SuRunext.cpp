@@ -203,7 +203,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     TCHAR cmd[MAX_PATH];
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    GetWindowsDirectory(cmd,MAX_PATH);
+    GetSystemWindowsDirectory(cmd,MAX_PATH);
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
     _tcscat(cmd,L" control");
