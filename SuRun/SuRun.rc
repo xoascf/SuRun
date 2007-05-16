@@ -176,10 +176,10 @@ BEGIN
     LTEXT           "0 min = Frage einmal",IDC_STATIC,50,44,73,8
     CONTROL         "Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,52,63,93,20
+                    WS_TABSTOP,52,63,101,20
     CONTROL         "&Passworte speichern. (sicher und verschlüsselt)",
                     IDC_SAVEPW,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,52,84,93,20
+                    WS_TABSTOP,52,84,102,20
     GROUPBOX        "Starte immer ohne zu fragen:",IDC_STATIC,159,0,230,105
     LISTBOX         IDC_WHITELIST,163,9,220,75,LBS_SORT | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
