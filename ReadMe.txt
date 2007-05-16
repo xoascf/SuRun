@@ -13,12 +13,12 @@ The idea is simple and was taken from SuDown (http://SuDown.sourceforge.net).
 The user usually works with the pc as standard user. 
 If a program needs administrative rights, the user starts "SuRun <app>". 
 SuRun then asks the user in a secure desktop if <app> should really be 
-run with administrative rights. If the user acknowleges, SuRun will start 
+run with administrative rights. If the user acknowledges, SuRun will start 
 <app> AS THE CURRENT USER but WITH ADMINISTRATIVE RIGHTS.
 SuRun uses the trick from SuDown: 
  * Put the user in the local Administrators user group
  * Start <app>
- * remove the user from the local Administrators user group
+ * Remove the user from the local Administrators user group
 
 SuRun also installs a hook that appends "Run as admin..." and "Restart as 
 admin..." to the system menu of every application that does not run as 
@@ -73,7 +73,7 @@ Why use SuRun?
  the password. The desktop is not accessible by user applications. Keyboard 
  and mouse hooks will also not work on that desktop.
 *SuRun does not leave the user in the administrators group.
- After creating the administrative process, surun removes the user from the 
+ After creating the administrative process, SuRun removes the user from the 
  administrators group immediately. So spying even out the password would not 
  increase the chance that the system could be infected by malware.
 
