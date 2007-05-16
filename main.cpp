@@ -56,37 +56,39 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
   TCHAR ext[MAX_PATH];
   _tcscpy(ext,PathFindExtension(file));
   PathRemoveExtension(file);
-  if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
+   if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
   {
-    wcscat(app, L" /n,/root,");
+    wcscpy(app,L"/n,/root,");
     if (args[0]==0) 
       wcscat(app, L"C:");
     else 
-    {
       wcscat(app,args);
-      zero(args);
-    }
-  }else if ((path[0]=='\0')&&(!_wcsicmp(file, L"msconfig")))
+    wcscpy(args,app);
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app, L"explorer.exe");
+  }else if ((path[0]==0)&&(!_wcsicmp(file,L"msconfig")))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
     if (!PathFileExists(app))
       wcscpy(app,L"msconfig");
     zero(args);
-  }else if ((path[0]=='\0')&&(!_wcsicmp(file, L"control"))) 
+  }else if (((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
+            && (args[0]==0))
   {
-    GetSystemDirectory(app,4096);
-    PathAppend(app,L"control.exe");
-    zero(args);
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app,L"explorer.exe");
+    wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
   }else if (!_wcsicmp(ext, L".cpl")) 
   {
     PathQuoteSpaces(app);
     if (args[0] && app[0])
-      wcscat(app,L" ");
+      wcscat(app,L",");
     wcscat(app,args);
-    wcscpy(args,app);
+    wcscpy(args,L"shell32.dll,Control_RunDLLAsUser ");
+    wcscat(args,app);
     GetSystemDirectory(app,4096);
-    PathAppend(app,L"control.exe");
+    PathAppend(app,L"rundll32.exe");
   }else if (!_wcsicmp(ext, L".msi")) 
   {
     PathQuoteSpaces(app);
@@ -98,7 +100,7 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     PathAppend(app,L"msiexec.exe");
   }else if (!_wcsicmp(ext, L".msc")) 
   {
-    if (path[0]=='\0')
+    if (path[0]==0)
     {
       GetSystemDirectory(path,4096);
       PathAppend(path,app);
@@ -181,7 +183,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     LPTSTR c=Args;
     Args=PathGetArgs(Args);
     if (*(Args-1)==' ')
-      *(Args-1)='\0';
+      *(Args-1)=0;
     if (!_wcsicmp(c,L"/SETUP"))
     {
       bRunSetup=TRUE;
@@ -238,6 +240,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     PathStripPath(un);
     _tcscpy(dn,g_RunData.UserName);
     PathRemoveFileSpec(dn);
+    //To start control Panel and other Explorer children we need to tell 
+    //Explorer to start a new Process:
+    SetRegInt(HKEY_CURRENT_USER,
+      L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+      L"SeparateProcess",1);
     //Create the process suspended to revoke access for the current user 
     //before it starts runnung
     if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
