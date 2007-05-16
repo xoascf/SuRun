@@ -68,7 +68,7 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     }
   }else if ((path[0]=='\0')&&(!_wcsicmp(file, L"msconfig")))
   {
-    GetWindowsDirectory(app,4096);
+    GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
     if (!PathFileExists(app))
       wcscpy(app,L"msconfig");
