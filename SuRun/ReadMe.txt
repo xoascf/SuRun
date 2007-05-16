@@ -83,7 +83,7 @@ Changes:
 SuRun 1.0.1.2 - 2007-05-16:
 ---------------------------
 * Sven (http://speedproject.de) found a bug in the context menu extension for 
-  the Desktop. The Entries für the sub menu "new" were not displayed when 
+  the Desktop. The Entries for the sub menu "new" were not displayed when 
   SuRun was active.
 * All calls GetWindowsDirectory were replaced with GetSystemWindowsDirectory 
   to make SuRun work with Windows 2003 Terminal Server Edition
