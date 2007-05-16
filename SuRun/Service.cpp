@@ -377,7 +377,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               STARTUPINFO si={0};
               si.cb=sizeof(si);
               TCHAR cmd[4096]={0};
-              GetWindowsDirectory(cmd,4096);
+              GetSystemWindowsDirectory(cmd,4096);
               PathAppend(cmd,L"SuRun.exe");
               PathQuoteSpaces(cmd);
               _tcscat(cmd,L" /AskPID ");
@@ -821,7 +821,7 @@ void SuRun(DWORD ProcessID)
 void InstallRegistry()
 {
   TCHAR SuRunExe[4096];
-  GetWindowsDirectory(SuRunExe,4096);
+  GetSystemWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRun.exe");
   PathQuoteSpaces(SuRunExe);
   CResStr MenuStr(IDS_MENUSTR);
@@ -936,7 +936,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   if (CheckServiceStatus()==SERVICE_RUNNING)
   {
     TCHAR SvcFile[4096];
-    GetWindowsDirectory(SvcFile,4096);
+    GetSystemWindowsDirectory(SvcFile,4096);
     PathAppend(SvcFile,_T("SuRun.exe"));
     PathQuoteSpaces(SvcFile);
     _stprintf(cmdLine,_T("%s %s %s"),SvcFile,ModName,cmd);
@@ -975,7 +975,7 @@ void CopyToWinDir(LPCTSTR File)
   NetworkPathToUNCPath(SrcFile);
   PathRemoveFileSpec(SrcFile);
   PathAppend(SrcFile,File);
-  GetWindowsDirectory(DstFile,4096);
+  GetSystemWindowsDirectory(DstFile,4096);
   PathAppend(DstFile,File);
   DelFile(DstFile);
   CopyFile(SrcFile,DstFile,FALSE);
@@ -1019,10 +1019,10 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   RemoveRegistry();
   //Delete Files and directories
   TCHAR File[4096];
-  GetWindowsDirectory(File,4096);
+  GetSystemWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRun.exe"));
   DelFile(File);
-  GetWindowsDirectory(File,4096);
+  GetSystemWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRunExt.dll"));
   DelFile(File);
   TCHAR file[4096];
@@ -1057,7 +1057,7 @@ BOOL InstallService()
   CopyToWinDir(_T("SuRun.exe"));
   CopyToWinDir(_T("SuRunExt.dll"));
   TCHAR SvcFile[4096];
-  GetWindowsDirectory(SvcFile,4096);
+  GetSystemWindowsDirectory(SvcFile,4096);
   PathAppend(SvcFile,_T("SuRun.exe"));
   PathQuoteSpaces(SvcFile);
   _tcscat(SvcFile,_T(" /ServiceRun"));
@@ -1096,12 +1096,12 @@ BOOL InstallService()
     PathAppend(lnk,CResStr(IDS_STARTMENUDIR));
     CreateDirectory(lnk,0); 
     PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
-    GetWindowsDirectory(file,4096);
+    GetSystemWindowsDirectory(file,4096);
     PathAppend(file,L"SuRun.exe /SETUP");
     CreateLink(file,lnk,2);
     PathRemoveFileSpec(lnk);
     PathAppend(lnk,CResStr(IDS_STARTMUNINST));
-    GetWindowsDirectory(file,4096);
+    GetSystemWindowsDirectory(file,4096);
     PathAppend(file,L"SuRun.exe");
     PathQuoteSpaces(file);
     _tcscat(file,L" /UNINSTALL");
@@ -1126,7 +1126,7 @@ BOOL UserInstall(int IDSMsg)
   if (!InstallService())
     return FALSE;
   TCHAR SuRunExe[4096];
-  GetWindowsDirectory(SuRunExe,4096);
+  GetSystemWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRun.exe");
   //This mostly does not work...
   //ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
@@ -1212,10 +1212,11 @@ bool HandleServiceStuff()
     NetworkPathToUNCPath(fn);
     PathRemoveFileSpec(fn);
     PathRemoveBackslash(fn);
-    GetWindowsDirectory(wd,4096);
+    GetSystemWindowsDirectory(wd,4096);
     PathRemoveBackslash(wd);
     if(_tcsicmp(fn,wd))
     {
+      DBGTrace2("Running from \"%s\" and NOT from WinDir(\"%s\")",fn,wd);
       UserInstall(IDS_ASKUSRINSTALL);
       ExitProcess(0);
       return true;
