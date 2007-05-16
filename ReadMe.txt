@@ -87,6 +87,12 @@ SuRun 1.0.1.2 - 2007-05-16:
   SuRun was active.
 * All calls GetWindowsDirectory were replaced with GetSystemWindowsDirectory 
   to make SuRun work with Windows 2003 Terminal Server Edition
+* Control Panel and Control Panel Applets were not shown in Win2k, Win2k3.
+  SuRun now sets the DWORD value "SeparateProcess" in the registry path
+  "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" to 1 to
+  let Explorer start a separate Process for the control panel. The main control 
+  panel is now started with Explorer using the "Workspace\Control Panel" GUIDs.
+  Control Panel Applets are now started with RunDLL32 instead of control.exe.
 
 SuRun 1.0.1.1 - 2007-05-13:
 ---------------------------
