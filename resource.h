@@ -71,6 +71,12 @@
 #define IDC_ALWAYSOK                    1025
 #define IDC_WHITELIST                   1026
 #define IDC_DELETE                      1027
+#define IDC_ALLOWTIME                   1028
+#define IDC_OWNERGROUP                  1029
+#define IDC_SETENERGY                   1030
+#define IDC_WINUPD4ALL                  1031
+#define IDC_EXTOPT                      1032
+#define IDC_WINUPDBOOT                  1033
 
 // Next default values for new objects
 // 
@@ -78,7 +84,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        113
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_CONTROL_VALUE         1033
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
