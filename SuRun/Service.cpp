@@ -558,7 +558,7 @@ void LBSetScrollbar(HWND hwnd)
 
 #define SetOwnerAdminGrp(b) SetRegInt(HKLM,\
                               _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
-                              _T("nodefaultadminowner"),b==0)
+                              _T("nodefaultadminowner"),(b)==0)
 
 #define IsWinUpd4All      GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
