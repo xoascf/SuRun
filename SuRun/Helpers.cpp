@@ -226,6 +226,76 @@ Cleanup:
     FreeSid(pEveryoneSID);
 }
 
+void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow)
+{
+  DWORD dwRes;
+  PACL pOldDACL = NULL, pNewDACL = NULL;
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  EXPLICIT_ACCESS ea={0};
+  if (NULL == KeyName) 
+    return;
+  // Get a pointer to the existing DACL.
+  dwRes = GetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION,  
+    NULL, NULL, &pOldDACL, NULL, &pSD);
+  if (ERROR_SUCCESS != dwRes) 
+  { 
+    DBGTrace1( "GetNamedSecurityInfo failed %s\n", GetErrorNameStatic(dwRes));
+    goto Cleanup; 
+  }  
+  // Initialize an EXPLICIT_ACCESS structure for an ACE.
+  BuildExplicitAccessWithName(&ea,Account,KEY_ALL_ACCESS,
+    bAllow?SET_ACCESS:REVOKE_ACCESS,SUB_CONTAINERS_AND_OBJECTS_INHERIT);
+  // Create a new ACL that merges the new ACE into the existing DACL.
+  dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
+  if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1( "SetEntriesInAcl failed %s\n", GetErrorNameStatic(dwRes));
+    goto Cleanup; 
+  }  
+  // Attach the new ACL as the object's DACL.
+  dwRes = SetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION,  
+    NULL, NULL, pNewDACL, NULL);
+  if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1( "SetNamedSecurityInfo failed %s\n", GetErrorNameStatic(dwRes));
+    goto Cleanup; 
+  }  
+Cleanup:
+  if(pSD != NULL) 
+    LocalFree((HLOCAL) pSD); 
+  if(pNewDACL != NULL) 
+    LocalFree((HLOCAL) pNewDACL); 
+}
+
+BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account)
+{
+  DWORD dwRes;
+  PACL pDACL = NULL;
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  TRUSTEE tr={0};
+  ACCESS_MASK am=0;
+  if (NULL == KeyName) 
+    return 0;
+  // Get a pointer to the existing DACL.
+  dwRes = GetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION,  
+    NULL, NULL, &pDACL, NULL, &pSD);
+  if (ERROR_SUCCESS != dwRes) 
+  { 
+    DBGTrace1( "GetNamedSecurityInfo failed %s\n", GetErrorNameStatic(dwRes));
+    goto Cleanup; 
+  }  
+  // Initialize an EXPLICIT_ACCESS structure for an ACE.
+  BuildTrusteeWithName(&tr,Account);
+  if (GetEffectiveRightsFromAcl(pDACL,&tr,&am)!=ERROR_SUCCESS)
+    DBGTrace1( "GetEffectiveRightsFromAcl failed %s\n", GetErrorNameStatic(dwRes));
+Cleanup:
+  if(pSD != NULL) 
+    LocalFree((HLOCAL) pSD); 
+  if(pDACL != NULL) 
+    LocalFree((HLOCAL) pDACL); 
+  return (am&KEY_WRITE)==KEY_WRITE;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // SetAdminDenyUserAccess
