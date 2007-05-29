@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 typedef enum {
@@ -11,3 +25,6 @@ BOOL AccountPrivilege(LPTSTR Account,LPTSTR Privilege,PrivOp op);
 #define AddAcctPrivilege(a,p) AccountPrivilege(a,p,AddPrivilege)
 #define DelAcctPrivilege(a,p) AccountPrivilege(a,p,DelPrivilege)
 #define HasAcctPrivilege(a,p) AccountPrivilege(a,p,HasPrivilege)
+
+#define CanSetTime(a)     HasAcctPrivilege(a,SE_SYSTEMTIME_NAME)
+#define AllowSetTime(a,b) AccountPrivilege(a,SE_SYSTEMTIME_NAME,b?AddPrivilege:DelPrivilege)
