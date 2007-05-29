@@ -155,15 +155,15 @@ BEGIN
     DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,179,50,14
 END
 
-IDD_SETUP DIALOGEX 0, 0, 394, 137
+IDD_SETUP DIALOGEX 0, 0, 394, 263
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "SuRun Einstellungen"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,112
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,112,394,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,240
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,240,394,1
     ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "Frage um Erlaubnis",IDC_STATIC,46,7,82,49
     CONTROL         "&immer",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
@@ -176,17 +176,35 @@ BEGIN
     LTEXT           "0 min = Frage einmal",IDC_STATIC,50,44,73,8
     CONTROL         "Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,52,63,101,20
+                    WS_TABSTOP,16,63,138,20
     CONTROL         "&Passworte speichern. (sicher und verschlüsselt)",
                     IDC_SAVEPW,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,52,84,102,20
-    GROUPBOX        "Starte immer ohne zu fragen:",IDC_STATIC,159,0,230,105
+                    WS_TABSTOP,16,84,138,20
+    GROUPBOX        "Starte immer, ohne zu fragen:",IDC_STATIC,159,0,230,105
     LISTBOX         IDC_WHITELIST,163,9,220,75,LBS_SORT | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
                     WS_TABSTOP
     PUSHBUTTON      "&Löschen",IDC_DELETE,333,88,50,14
-    DEFPUSHBUTTON   "&Speichern",IDOK,99,116,50,14
-    PUSHBUTTON      "&Abbruch",IDCANCEL,245,116,50,14
+    GROUPBOX        "Erleichterte Bedienung",IDC_EXTOPT,8,112,380,123
+    CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
+                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,127,349,13
+    CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
+                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,144,349,13
+    CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
+                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,161,349,13
+    CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
+                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,178,349,13
+    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,195,349,27
+    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden erst bei der nächsten Windows-Anmeldung aktiv",
+                    IDC_STATIC,11,224,373,8
+    DEFPUSHBUTTON   "&Speichern",IDOK,279,245,50,14
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,338,245,50,14
 END
 
 
@@ -257,6 +275,58 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 // Dialog
 //
+
+IDD_SETUP DIALOGEX 0, 0, 394, 263
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "SuRun Settings"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,240
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,240,394,1
+    ICON            IDI_SHIELD,IDC_SECICON,7,15,21,20,SS_REALSIZEIMAGE
+    GROUPBOX        "Ask for permission",IDC_STATIC,46,7,82,49
+    CONTROL         "&always",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,52,18,37,10
+    CONTROL         "&every:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,52,31,
+                    31,10
+    EDITTEXT        IDC_ASKTIMEOUT,87,29,18,14,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min",IDC_STATIC,110,31,12,8
+    LTEXT           "0 min = Ask only once",IDC_STATIC,50,44,73,8
+    CONTROL         "Show user &desktop as background (slow)",
+                    IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,16,63,138,20
+    CONTROL         "Store &Passwords (protected, encrypted)",IDC_SAVEPW,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,16,
+                    84,138,20
+    GROUPBOX        "Always run without asking:",IDC_STATIC,159,0,230,105
+    LISTBOX         IDC_WHITELIST,163,9,220,75,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    PUSHBUTTON      "&Remove",IDC_DELETE,333,88,50,14
+    GROUPBOX        "Convenience settings",IDC_EXTOPT,8,112,380,123
+    CONTROL         "Allow 'SuRunners' to set (and show) the system time.",
+                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,127,349,13
+    CONTROL         "Allow 'SuRunners' to change 'Power Options' and select power schemes.",
+                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,144,349,13
+    CONTROL         "Show Windows update notifications to all users (if automatic updates are activated).",
+                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,161,349,13
+    CONTROL         "No auto-restart for scheduled Automatic Windows Update installations",
+                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,178,349,13
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,16,195,349,27
+    LTEXT           "NOTE: Changes in these settings become effective after the next logon.",
+                    IDC_STATIC,11,224,373,8
+    DEFPUSHBUTTON   "&Save",IDOK,279,245,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,338,245,50,14
+END
 
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 135
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
@@ -341,40 +411,6 @@ BEGIN
     DEFPUSHBUTTON   "Cancel",IDCANCEL,232,179,50,14
 END
 
-IDD_SETUP DIALOGEX 0, 0, 394, 137
-STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "SuRun Settings"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,112
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,112,394,1
-    ICON            IDI_SHIELD,IDC_SECICON,7,15,20,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Ask for permission",IDC_STATIC,46,7,82,49
-    CONTROL         "&always",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,52,18,37,10
-    CONTROL         "&every:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,52,31,
-                    31,10
-    EDITTEXT        IDC_ASKTIMEOUT,87,29,18,14,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "min",IDC_STATIC,110,31,12,8
-    LTEXT           "0 min = Ask only once",IDC_STATIC,50,44,73,8
-    CONTROL         "Show user &desktop as background (slow)",
-                    IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,52,63,93,20
-    CONTROL         "Store &Passwords (protected, encrypted)",IDC_SAVEPW,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,52,
-                    84,93,20
-    GROUPBOX        "Always run without asking:",IDC_STATIC,159,0,230,105
-    LISTBOX         IDC_WHITELIST,163,9,220,75,LBS_SORT | 
-                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
-                    WS_TABSTOP
-    PUSHBUTTON      "&Remove",IDC_DELETE,333,88,50,14
-    DEFPUSHBUTTON   "&Save",IDOK,99,116,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,245,116,50,14
-END
-
 
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
@@ -383,8 +419,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,2
- PRODUCTVERSION 1,0,1,2
+ FILEVERSION 1,0,2,0
+ PRODUCTVERSION 1,0,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -402,14 +438,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 1, 2\0"
+            VALUE "FileVersion", "1, 0, 2, 0\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 1, 2\0"
+            VALUE "ProductVersion", "1, 0, 2, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
