@@ -23,7 +23,7 @@
 // -putting the users password to the user process via WriteProcessMemory
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -46,6 +46,7 @@
 #include "UserGroups.h"
 #include "Helpers.h"
 #include "BlowFish.h"
+#include "lsa_laar.h"
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
@@ -551,8 +552,39 @@ void LBSetScrollbar(HWND hwnd)
   ReleaseDC(hwnd,hdc);
 }
 
+#define IsOwnerAdminGrp     GetRegInt(HKLM,\
+                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
+                              _T("nodefaultadminowner"),0)
+
+#define SetOwnerAdminGrp(b) SetRegInt(HKLM,\
+                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
+                              _T("nodefaultadminowner"),b)
+
+#define IsWinUpd4All      GetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
+                            _T("ElevateNonAdmins"),0)
+
+#define SetWinUpd4All(b)  SetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
+                            _T("ElevateNonAdmins"),b)
+
+#define IsWinUpdBoot      GetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
+                            _T("NoAutoRebootWithLoggedOnUsers"),0)
+
+#define SetWinUpdBoot(b)  SetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
+                            _T("NoAutoRebootWithLoggedOnUsers"),b)
+
+#define CanSetEnergy  HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
+                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP)
+
+#define SetEnergy(b)  SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
+                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b)
+
 INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+  DBGTrace4("SetupDlgProc(%x,%x,%x,%x)",hwnd,msg,wParam,lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -570,7 +602,11 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
-      
+      CheckDlgButton(hwnd,IDC_ALLOWTIME,CanSetTime(SURUNNERSGROUP)?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_OWNERGROUP,IsOwnerAdminGrp?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_WINUPD4ALL,IsWinUpd4All?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_WINUPDBOOT,IsWinUpdBoot?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_SETENERGY,CanSetEnergy?BST_CHECKED:BST_UNCHECKED);
       CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_RunData.UserName);
       TCHAR cmd[4096];
       for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
@@ -601,10 +637,8 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       switch (wParam)
       {
       case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
-        {
-          UpdateAskUser(hwnd);
-          return TRUE;
-        }
+        UpdateAskUser(hwnd);
+        return TRUE;
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,0);
         return TRUE;
@@ -615,6 +649,13 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
           g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
           SaveSettings();
+          if ((CanSetTime(SURUNNERSGROUP)!=0)!=(IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)==BST_CHECKED))
+            AllowSetTime(SURUNNERSGROUP,IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)==BST_CHECKED);
+          SetOwnerAdminGrp((IsDlgButtonChecked(hwnd,IDC_OWNERGROUP)==BST_CHECKED)?1:0);
+          SetWinUpd4All((IsDlgButtonChecked(hwnd,IDC_WINUPD4ALL)==BST_CHECKED)?1:0);
+          SetWinUpdBoot((IsDlgButtonChecked(hwnd,IDC_WINUPDBOOT)==BST_CHECKED)?1:0);
+          if (CanSetEnergy!=(IsDlgButtonChecked(hwnd,IDC_SETENERGY)==BST_CHECKED))
+            SetEnergy(IsDlgButtonChecked(hwnd,IDC_SETENERGY)==BST_CHECKED);
           EndDialog(hwnd,1);
           return TRUE;
         }
@@ -648,6 +689,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL Setup(LPCTSTR WinStaName)
 {
+#ifndef _DEBUGSETUP
   //Every "secure" Desktop has its own UUID as name:
   UUID uid;
   UuidCreate(&uid);
@@ -656,8 +698,26 @@ BOOL Setup(LPCTSTR WinStaName)
   //Create the new desktop
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   RpcStringFree(&DeskName);
+#endif _DEBUGSETUP
   return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;
 }
+
+#ifdef _DEBUGSETUP
+BOOL TestSetup()
+{
+  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
+  InitCommonControlsEx(&icce);
+  if (!Setup(L"WinSta0"))
+    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+  if (!Setup(L"WinSta0"))
+    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  ::ExitProcess(0);
+  return TRUE;
+}
+
+BOOL x=TestSetup();
+#endif _DEBUGSETUP
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -1234,17 +1294,6 @@ bool HandleServiceStuff()
   }
   return false;
 }
-
-#ifdef _DEBUGSETUP
-BOOL TestSetup()
-{
-  Setup(L"WinSta0");
-  ::ExitProcess(0);
-  return TRUE;
-}
-
-BOOL x=TestSetup();
-#endif _DEBUGSETUP
 
 //////////////////////////////////////////////////////////////////////////////
 // 
