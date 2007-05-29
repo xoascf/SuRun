@@ -23,7 +23,7 @@
 // -putting the users password to the user process via WriteProcessMemory
 
 #ifdef _DEBUG
-#define _DEBUGSETUP
+//#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
