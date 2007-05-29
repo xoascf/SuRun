@@ -25,8 +25,6 @@
 #include <TCHAR.h>
 #include "lsa_laar.h"
 
-#pragma warning(disable: 4996)
-
 class LsaUnicodeString: public _LSA_UNICODE_STRING
 {
 public:
@@ -62,7 +60,7 @@ public:
   }
   void Set( char *s )
   {
-    int l=(int)strlen( s ) * (int)sizeof(wchar_t);
+    int l=strlen( s ) * sizeof(wchar_t);
     if ( l >= MaximumLength )
       init( l );
     MultiByteToWideChar( CP_ACP, 0, s, l/sizeof(wchar_t), Buffer, l );
@@ -70,7 +68,7 @@ public:
   }
   void Set( wchar_t *s )
   {
-    int l=(int)wcslen( s ) * (int)sizeof(wchar_t);
+    int l=wcslen( s ) * sizeof(wchar_t);
 	  if ( l >= MaximumLength )
 		  init( l );
 	  memmove(Buffer,s,l);
@@ -155,8 +153,7 @@ BOOL AccountPrivilege(LPTSTR Account,LPTSTR Privilege,PrivOp op)
         sid = malloc( sidlen ); // max SID length (we hope)
         InitializeSid( sid, GetSidIdentifierAuthority( s ),
           (BYTE) 1 + ssac );
-        DWORD d = 0;
-        for (; d < (DWORD)ssac; ++ d )
+        for (DWORD d = 0; d < (DWORD)ssac; ++ d )
           *GetSidSubAuthority( sid, d ) = *GetSidSubAuthority( s, d );
         *GetSidSubAuthority( sid, d ) = sidList->RelativeId;
         switch (op)
