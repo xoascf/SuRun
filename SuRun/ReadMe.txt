@@ -80,6 +80,17 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.0 - 2007-05-29:
+---------------------------
+* SuRun Setup now contains new options:
+   -Allow 'SuRunners' to set (and show) the system time
+   -Allow 'SuRunners' to change 'Power Options' and select power schemes
+   -Show Windows update notifications to all users
+   -No auto-restart for scheduled Automatic Windows Update installations
+   -Set 'Administrators' instead of 'Object creator' as default owner for 
+    ojects created by administrators
+  The last option is pretty important!
+
 SuRun 1.0.1.2 - 2007-05-16:
 ---------------------------
 * Sven (http://speedproject.de) found a bug in the context menu extension for 
