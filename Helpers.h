@@ -39,6 +39,8 @@ BOOL EnablePrivilege(LPCTSTR name);
 
 //  AllowAccess
 void AllowAccess(HANDLE hObject);
+void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow);
+BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account);
 
 // SetAdminDenyUserAccess
 void SetAdminDenyUserAccess(HANDLE hObject);
