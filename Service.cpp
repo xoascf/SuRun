@@ -472,7 +472,24 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
   }
   //Is User member of SuRunners?
   if (IsInSuRunners(UserName))
+  {
+    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+    {
+      DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
+      if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+      {
+        MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        return FALSE;
+      }
+      dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+      if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+      {
+        MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        return FALSE;
+      }
+    }
     return TRUE;
+  }
   //Domain user?
   LPWSTR lpdn=0;
   NETSETUP_JOIN_STATUS js;
@@ -491,11 +508,22 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),CResStr(IDS_APPNAME),
       MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
       return FALSE;
-    AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
-    if ((AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0)!=0)
-      ||(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0))
+    DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
+    if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
-      MessageBox(0,CBigResStr(IDS_SURUNNER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      return FALSE;
+    }
+    dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+    if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+    {
+      MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      return FALSE;
+    }
+    dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
+    if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+    {
+      MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
       return FALSE;
     }
     MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
@@ -699,7 +727,12 @@ BOOL Setup(LPCTSTR WinStaName)
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   RpcStringFree(&DeskName);
 #endif _DEBUGSETUP
-  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;
+  //only Admins and SuRunners may setup SuRun
+  if ((IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
+    ||(IsInSuRunners(g_RunData.UserName))
+    ||(CheckGroupMembership(g_RunData.UserName)))
+    return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;  
+  return false;
 }
 
 #ifdef _DEBUGSETUP
