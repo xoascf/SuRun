@@ -35,6 +35,8 @@
 #define IDS_DOMAINGROUPS                31
 #define IDS_DOMAINGROUPS2               32
 #define IDS_CANCEL                      33
+#define IDS_NOADD2USERS                 34
+#define IDS_NOREMADMINS                 35
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
