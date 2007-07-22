@@ -851,6 +851,36 @@ int PrepareSuRun()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  CheckServiceStatus
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+DWORD CheckServiceStatus(LPCTSTR ServiceName)
+{
+  SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT|SC_MANAGER_ENUMERATE_SERVICE);
+  if (hdlSCM==0) 
+    return FALSE;
+  SC_HANDLE hdlServ = OpenService(hdlSCM,ServiceName,SERVICE_QUERY_STATUS);
+  if (!hdlServ) 
+    return CloseServiceHandle(hdlSCM),FALSE;
+  SERVICE_STATUS ss={0};
+  if (!QueryServiceStatus(hdlServ,&ss))
+  {
+    CloseServiceHandle(hdlServ);
+    return CloseServiceHandle(hdlSCM),FALSE;
+  }
+  CloseServiceHandle(hdlServ);
+  CloseServiceHandle(hdlSCM);
+  return ss.dwCurrentState;
+}
+
+DWORD CheckServiceStatus()
+{
+  return CheckServiceStatus(SvcName);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  SuRun
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -880,6 +910,26 @@ void SuRun(DWORD ProcessID)
   int nUser=PrepareSuRun();
   if (nUser!=-1)
   {
+    if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
+    {
+      //Start/Resume secondary logon
+      SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT);
+      if (hdlSCM!=0) 
+      {
+        SC_HANDLE hdlServ = OpenService(hdlSCM,_T("seclogon"),SERVICE_START|SERVICE_PAUSE_CONTINUE);
+        if(hdlServ)
+        {
+          if (!StartService(hdlServ,0,0))
+          {
+            SERVICE_STATUS ss;
+            ControlService(hdlServ,SERVICE_CONTROL_CONTINUE,&ss);
+          }
+          CloseServiceHandle(hdlServ);
+        }
+        CloseServiceHandle(hdlSCM);
+      }
+    }
+    //copy the password to the client
     _tcscpy(g_RunPwd,g_Users[nUser].Password);
     //Add user to admins group
     AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
@@ -1000,25 +1050,6 @@ void RemoveRegistry()
     } \
     return a;
 
-
-DWORD CheckServiceStatus()
-{
-  SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT|SC_MANAGER_ENUMERATE_SERVICE);
-  if (hdlSCM==0) 
-    return FALSE;
-  SC_HANDLE hdlServ = OpenService(hdlSCM,SvcName,SERVICE_QUERY_STATUS);
-  if (!hdlServ) 
-    return CloseServiceHandle(hdlSCM),FALSE;
-  SERVICE_STATUS ss={0};
-  if (!QueryServiceStatus(hdlServ,&ss))
-  {
-    CloseServiceHandle(hdlServ);
-    return CloseServiceHandle(hdlSCM),FALSE;
-  }
-  CloseServiceHandle(hdlServ);
-  CloseServiceHandle(hdlSCM);
-  return ss.dwCurrentState;
-}
 
 BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
 {
