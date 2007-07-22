@@ -533,9 +533,10 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
   TCHAR P[PWLEN]={0};
   if (!LogonAdmin(U,P,IDS_NOSURUNNER))
     return FALSE;
-  if (AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0)
+  DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
+  if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
   {
-    MessageBox(0,CBigResStr(IDS_SURUNNER_ERR),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return FALSE;
   }
   MessageBox(0,CBigResStr(IDS_SURUNNER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
