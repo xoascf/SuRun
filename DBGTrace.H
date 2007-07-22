@@ -18,7 +18,6 @@
 #include <mmsystem.h>
 #pragma comment(lib,"winmm")
 
-#pragma warning(disable: 4996)
 
 //#define DoDBGTrace
 
