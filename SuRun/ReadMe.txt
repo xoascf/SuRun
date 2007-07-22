@@ -80,10 +80,14 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.1 - 2007-05-29:
+SuRun 1.0.2.1 - 2007-07-22:
 ---------------------------
 * "surun ncpa.cpl" did not work
-* 
+* SuRun now reports detailed, why a user could not be added or removed to/from 
+  a user group
+* SuRun now assures that a "SuRunner" is NOT member of "Administrators"
+* SuRun now checks that a user is member of "Administrators" or "SuRunners" 
+  before launching setup
 
 SuRun 1.0.2.0 - 2007-05-29:
 ---------------------------
