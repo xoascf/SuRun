@@ -91,13 +91,42 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 //
 //  Checks if "DOMAIN\User" is a member of the group
 /////////////////////////////////////////////////////////////////////////////
+/**/BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
+//Checks if "DOMAIN\User" is a member of the sudoers localgroup
+{	
+	DWORD result = 0;
+	NET_API_STATUS status;
+	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
+	DWORD num = 0;
+	DWORD total = 0;
+	DWORD resume = 0;
+	DWORD i;
+	do
+	{
+		status = NetLocalGroupGetMembers(NULL,Group,3,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
+		if (((status==NERR_Success)||(status==ERROR_MORE_DATA))&&(result==0))
+		{
+			if (Members)
+				for(i = 0; (i<total); i++)
+					if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
+          {
+            NetApiBufferFree(Members);
+            return TRUE;
+          }
+		}
+	}while (status==ERROR_MORE_DATA);
+	NetApiBufferFree(Members);
+	return FALSE;
+}/**/
+
+/**
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {
 	if (AlterGroupMember(Group,DomainAndName,TRUE)==ERROR_MEMBER_IN_ALIAS)
 		return TRUE;
 	AlterGroupMember(Group,DomainAndName,FALSE);
 	return FALSE;
-}
+}/**/
 
 BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName)
 {
