@@ -91,8 +91,8 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 //
 //  Checks if "DOMAIN\User" is a member of the group
 /////////////////////////////////////////////////////////////////////////////
-/**/BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
-//Checks if "DOMAIN\User" is a member of the sudoers localgroup
+/**/
+BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
 	DWORD result = 0;
 	NET_API_STATUS status;
@@ -117,7 +117,8 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 	}while (status==ERROR_MORE_DATA);
 	NetApiBufferFree(Members);
 	return FALSE;
-}/**/
+}
+/**/
 
 /**
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
@@ -126,7 +127,8 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 		return TRUE;
 	AlterGroupMember(Group,DomainAndName,FALSE);
 	return FALSE;
-}/**/
+}
+/**/
 
 BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName)
 {
