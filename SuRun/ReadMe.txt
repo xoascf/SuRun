@@ -82,6 +82,7 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.2.1 - 2007-07-24:
 ---------------------------
+* The way that SuRun checks a users group membership was changed
 * "surun ncpa.cpl" did not work
 * SuRun now reports detailed, why a user could not be added or removed to/from 
   a user group
