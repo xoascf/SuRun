@@ -80,7 +80,7 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.1 - 2007-07-23:
+SuRun 1.0.2.1 - 2007-07-24:
 ---------------------------
 * "surun ncpa.cpl" did not work
 * SuRun now reports detailed, why a user could not be added or removed to/from 
@@ -89,6 +89,7 @@ SuRun 1.0.2.1 - 2007-07-23:
 * SuRun now checks that a user is member of "Administrators" or "SuRunners" 
   before launching setup
 * SuRun now starts/resumes the "Secondary Logon" service automatically
+* SuRun now complains if the windows shell is running as Administrator
 
 SuRun 1.0.2.0 - 2007-05-29:
 ---------------------------
