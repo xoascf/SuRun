@@ -280,12 +280,28 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     zero(g_RunData);
     //Complain if the shell is runnig with administrative privileges:
     DWORD ShellID=0;
-    GetWindowThreadProcessId(GetDesktopWindow(),&ShellID);
+    GetWindowThreadProcessId(GetShellWindow(),&ShellID);
     if (ShellID)
     {
       HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
-      if (IsAdmin(hShell))
-        MessageBox(0,CBigResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SERVICE_NOTIFICATION);
+      if (hShell)
+      {
+        HANDLE hTok=0;
+        if(OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
+        {
+          if(IsAdmin(hTok))
+          {
+            TCHAR s[MAX_PATH]={0};
+            GetRegStr(HKEY_LOCAL_MACHINE,
+              L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+              L"Shell",s,MAX_PATH);
+            MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+              MB_ICONEXCLAMATION);
+          }
+          CloseHandle(hTok);
+        }
+        CloseHandle(hShell);
+      }
     }
   }
   return 0;
