@@ -296,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
               L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
               L"Shell",s,MAX_PATH);
             MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-              MB_ICONEXCLAMATION);
+              MB_ICONEXCLAMATION|MB_SETFOREGROUND);
           }
           CloseHandle(hTok);
         }
