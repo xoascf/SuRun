@@ -258,7 +258,7 @@ BEGIN
     IDS_CANCEL              "Abbrechen (%d)"
     IDS_NOADD2USERS         "Fehler!\r\n\r\nSie konnten nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_NOREMADMINS         "Fehler!\r\n\r\nSie konnten nicht aus der Gruppe der Administratoren ausgetragen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
-    IDS_ADMINSHELL          "WARNUNG:\r\n\r\nIhre Windows Shell %s läuft mit Administrator-Rechten!\r\n\r\nSuRun wird erst wirksam, nachdem Sie sich ab- und wieder anmelden."
+    IDS_ADMINSHELL          "WARNUNG:\r\n\r\nDie Windows Shell '%s' läuft mit Administrator-Rechten!\r\n\r\nSuRun wird erst wirksam, nachdem Sie sich ab- und wieder anmelden."
     IDS_NOSECLOGON          "FATAL:\r\n\r\nSuRun benötigt den Windows Dienst 'Sekundäre Anmeldung'.\r\n\r\nDieser Dienst ist nicht gestartet."
 END
 
@@ -512,7 +512,7 @@ BEGIN
     IDS_CANCEL              "Cancel (%d)"
     IDS_NOADD2USERS         "Error!\r\n\r\nPutting your account into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
-    IDS_ADMINSHELL          "WARNING:\r\n\r\nThe Windows Shell %s is currently running with administrative rights!\r\n\r\nYou need to log off and on before SuRun has any effect."
+    IDS_ADMINSHELL          "WARNING:\r\n\r\nThe Windows Shell '%s' is currently running with administrative rights!\r\n\r\nYou need to log off and on before SuRun has any effect."
     IDS_NOSECLOGON          "FATAL:\r\n\r\nSuRun depends on the 'secondary logon' service but this service is not running."
 END
 
