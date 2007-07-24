@@ -19,6 +19,7 @@
 #include <tchar.h>
 #include <lm.h>
 #include "WinStaDesk.h"
+#include "IsAdmin.h"
 #include "Helpers.h"
 #include "ResStr.h"
 #include "Service.h"
@@ -277,6 +278,15 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     //Clear sensitive Data
     zero(g_RunPwd);
     zero(g_RunData);
+    //Complain if the shell is runnig with administrative privileges:
+    DWORD ShellID=0;
+    GetWindowThreadProcessId(GetDesktopWindow(),&ShellID);
+    if (ShellID)
+    {
+      HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
+      if (IsAdmin(hShell))
+        MessageBox(0,CBigResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SERVICE_NOTIFICATION);
+    }
   }
   return 0;
 }
