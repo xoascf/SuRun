@@ -845,7 +845,7 @@ int PrepareSuRun()
       return nUser;
     }
   }else //FATAL: secure desktop could not be created!
-    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_SERVICE_NOTIFICATION);
+    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return -1;
 }
 
@@ -910,6 +910,7 @@ void SuRun(DWORD ProcessID)
   int nUser=PrepareSuRun();
   if (nUser!=-1)
   {
+    //Secondary Logon service is required by CreateProcessWithLogonW
     if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
     {
       //Start/Resume secondary logon
@@ -927,6 +928,12 @@ void SuRun(DWORD ProcessID)
           CloseServiceHandle(hdlServ);
         }
         CloseServiceHandle(hdlSCM);
+      }
+      if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
+      {
+        GivePassword();
+        MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+        return;
       }
     }
     //copy the password to the client
