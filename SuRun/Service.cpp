@@ -625,6 +625,12 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,16,16,0));
       LoadSettings();
+      {
+        TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
+        GetWindowText(hwnd,WndText,MAX_PATH);
+        _stprintf(newText,WndText,GetVersionString());
+        SetWindowText(hwnd,newText);
+      }
       CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_RADIO2,(Radio2chk?BST_CHECKED:BST_UNCHECKED));
       SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
