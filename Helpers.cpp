@@ -101,7 +101,7 @@ BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax)
 
 BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
 {
-  return SetRegAny(HK,SubKey,ValName,REG_SZ,(BYTE*)Value,(DWORD)_tcslen(Value)*(DWORD)sizeof(TCHAR));
+  return SetRegAny(HK,SubKey,ValName,REG_SZ,(BYTE*)Value,_tcslen(Value)*sizeof(TCHAR));
 }
 
 BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
