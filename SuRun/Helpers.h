@@ -59,3 +59,6 @@ bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain=0);
 PSID GetProcessUserSID(DWORD ProcessID);
 bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain=0);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
+
+// GetVersionString
+LPCTSTR GetVersionString();
