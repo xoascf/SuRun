@@ -80,6 +80,10 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.2 - 2007-07-30:
+---------------------------
+* Added SuRun Version display to setup dialog caption
+
 SuRun 1.0.2.1 - 2007-07-24:
 ---------------------------
 * The way that SuRun checks a users group membership was changed
