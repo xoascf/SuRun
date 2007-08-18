@@ -169,7 +169,7 @@ void SaveSettings()
 
 void SavePassword(int n)
 {
-  if ((!g_bSavePW)||(g_Users[n].Password[0]==0))
+  if (!g_bSavePW)
     return;
   CBlowFish bf;
   TCHAR Password[PWLEN]={0};
@@ -759,6 +759,34 @@ BOOL TestSetup()
 BOOL x=TestSetup();
 #endif _DEBUGSETUP
 
+void CacheUserPassword(LPTSTR Password)
+{
+  __int64 minTime=0;
+  int nUser=-1;
+  int oldestUser=0;
+  //find free or oldest USER
+  for (int i=0;i<countof(g_Users);i++) 
+  {
+    if ((g_Users[i].UserName[0]=='\0')
+      ||(_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0))
+    {
+      nUser=i;
+      break;
+    }
+    if (g_Users[i].LastAskTime<minTime)
+    {
+      minTime=g_Users[i].LastAskTime;
+      oldestUser=i;
+    }
+  }
+  if (nUser==-1)
+    nUser=oldestUser;
+  //Set user name cache
+  _tcscpy(g_Users[nUser].UserName,g_RunData.UserName);
+  _tcscpy(g_Users[nUser].Password,Password);
+  SavePasswords();
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
@@ -783,7 +811,16 @@ int PrepareSuRun()
       break;
     }
   if (nUser==-1)
-    bDoAsk=TRUE;
+  {
+    //Test if password is empty:
+    if ((PasswordOK(g_RunData.UserName,_T("")))
+      &&(IsInSuRunners(g_RunData.UserName)))
+    {
+      //Password is empty, cache it ;)
+      CacheUserPassword(_T(""));
+    }else
+      bDoAsk=TRUE;
+  }
   else 
     if ((!PasswordOK(g_Users[nUser].UserName,g_Users[nUser].Password))
       ||(!IsInSuRunners(g_RunData.UserName)))
@@ -822,30 +859,8 @@ int PrepareSuRun()
     BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine);
     if(bLogon)
     {
-      DBGTrace2("DialogBoxParam returned %d: %s",bLogon,GetLastErrorNameStatic());
-      __int64 minTime=0;
-      int oldestUser=0;
-      //find free or oldest USER
-      for (int i=0;i<countof(g_Users);i++) 
-      {
-        if ((g_Users[i].UserName[0]=='\0')
-          ||(_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0))
-        {
-          nUser=i;
-          break;
-        }
-        if (g_Users[i].LastAskTime<minTime)
-        {
-          minTime=g_Users[i].LastAskTime;
-          oldestUser=i;
-        }
-      }
-      if (nUser==-1)
-        nUser=oldestUser;
-      //Set user name cache
-      _tcscpy(g_Users[nUser].UserName,g_RunData.UserName);
-      _tcscpy(g_Users[nUser].Password,Password);
-      SavePasswords();
+      CacheUserPassword(Password);
+      zero(Password);
       if (bLogon==2)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
       return nUser;
