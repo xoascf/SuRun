@@ -80,6 +80,10 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.3 - 2007-08-18:
+---------------------------
+* SuRun now works with users that have an empty password
+
 SuRun 1.0.2.2 - 2007-07-30:
 ---------------------------
 * Added SuRun Version display to setup dialog caption
