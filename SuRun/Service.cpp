@@ -759,7 +759,7 @@ BOOL TestSetup()
 BOOL x=TestSetup();
 #endif _DEBUGSETUP
 
-void CacheUserPassword(LPTSTR Password)
+int CacheUserPassword(LPTSTR Password)
 {
   __int64 minTime=0;
   int nUser=-1;
@@ -785,6 +785,7 @@ void CacheUserPassword(LPTSTR Password)
   _tcscpy(g_Users[nUser].UserName,g_RunData.UserName);
   _tcscpy(g_Users[nUser].Password,Password);
   SavePasswords();
+  return nUser;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -817,7 +818,7 @@ int PrepareSuRun()
       &&(IsInSuRunners(g_RunData.UserName)))
     {
       //Password is empty, cache it ;)
-      CacheUserPassword(_T(""));
+      nUser=CacheUserPassword(_T(""));
     }else
       bDoAsk=TRUE;
   }
@@ -844,6 +845,14 @@ int PrepareSuRun()
   if (crond.IsValid())
   {
     //secure desktop created...
+    if (!CheckGroupMembership(g_RunData.UserName))
+      return -1;
+    //Test if password is empty:
+    if (PasswordOK(g_RunData.UserName,_T("")))
+    {
+      //Password is empty, cache it ;)
+      nUser=CacheUserPassword(_T(""));
+    }
     if(nUser!=-1)
     {
       BOOL bLogon=AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine);
@@ -853,8 +862,6 @@ int PrepareSuRun()
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
       return nUser;
     }
-    if (!CheckGroupMembership(g_RunData.UserName))
-      return -1;
     TCHAR Password[MAX_PATH]={0};
     BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine);
     if(bLogon)
