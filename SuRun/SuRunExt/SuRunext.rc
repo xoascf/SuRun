@@ -32,7 +32,7 @@ BEGIN
     IDS_ERR                 "B³¹d SuRunExt.dll"
     IDS_TOOLTIP             "Uruchom 'Panel sterowania' z prawami administratora"
     IDS_SURUN               "Panel sterowania jako administrator"
-    IDS_MENURESTART         "Restart jako administrator"
+    IDS_MENURESTART         "Uruchom ponownie jako administrator"
 END
 
 STRINGTABLE DISCARDABLE 
