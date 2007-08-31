@@ -80,6 +80,11 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.4 - 2007-08-31:
+---------------------------
+* SuRun has been translated to polish by sarmat, Thanks! :-)
+* Microsoft Installer Patch Files (*.msp) can be started with elevated rights
+
 SuRun 1.0.2.3 - 2007-08-18:
 ---------------------------
 * SuRun now works with users that have an empty password
