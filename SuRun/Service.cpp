@@ -995,6 +995,7 @@ void SuRun(DWORD ProcessID)
 #define CPLRUN  L"cplfile" SHLRUN
 #define MSCRUN  L"mscfile" SHLRUN
 #define BATRUN  L"batfile" SHLRUN
+#define MSIPTCH L"Msi.Patch" SHLRUN
 #define MSIPKG  L"Msi.Package" SHLRUN
 
 void InstallRegistry()
@@ -1039,6 +1040,9 @@ void InstallRegistry()
   //MSI Uninstall
   SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
   SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s %s /x \"%%1\" %%*",SuRunExe,MSIExe));
+  //MSP Apply
+  SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
+  SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
 }
 
 //////////////////////////////////////////////////////////////////////////////
