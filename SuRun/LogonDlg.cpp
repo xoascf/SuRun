@@ -171,7 +171,7 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
   HANDLE hToken=NULL;
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
   EnablePrivilege(SE_TCB_NAME);//Win2k
-  if (!LogonUser(un,dn,Password,LOGON32_LOGON_NETWORK,0,&hToken))
+  if (!LogonUser(un,dn,Password,LOGON32_LOGON_INTERACTIVE,0,&hToken))
     if (GetLastError()==ERROR_PRIVILEGE_NOT_HELD)
       hToken=SSPLogonUser(dn,un,Password);
   DBGTrace4("GetUserToken(%s,%s,%s):%s",un,dn,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
