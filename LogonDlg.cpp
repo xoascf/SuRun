@@ -171,10 +171,10 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
   HANDLE hToken=NULL;
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
   EnablePrivilege(SE_TCB_NAME);//Win2k
+  //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
   if ((Password==NULL) || (*Password==NULL))
   {
-    //Enable use of empty passwords for network logon
     bEmptyPWAllowed=EmptyPWAllowed;
     AllowEmptyPW(TRUE);
   }
