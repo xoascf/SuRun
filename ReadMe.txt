@@ -80,6 +80,14 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.5 - 2007-09-05:
+---------------------------
+* Empty user passwords did not work in an out of the box Windows. Users 
+  were forced to use the policy editor to set "Accounts: Limit local 
+  account use of blank passwords to console logon only" to "Disabled".
+  Now SuRun temporarily sets this policy automatically to "Disabled" and 
+  after starting the administrative process SuRun restores the policy.
+
 SuRun 1.0.2.4 - 2007-08-31:
 ---------------------------
 * SuRun has been translated to polish by sarmat, Thanks! :-)
