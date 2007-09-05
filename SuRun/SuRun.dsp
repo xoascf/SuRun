@@ -281,6 +281,10 @@ SOURCE=.\res\app.manifest
 # End Source File
 # Begin Source File
 
+SOURCE=.\gpedit.txt
+# End Source File
+# Begin Source File
+
 SOURCE=.\ReadMe.txt
 # End Source File
 # End Target
