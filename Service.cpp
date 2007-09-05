@@ -964,19 +964,20 @@ void SuRun(DWORD ProcessID)
         return;
       }
     }
+    //copy the password to the client
+    _tcscpy(g_RunPwd,g_Users[nUser].Password);
+    //Enable use of empty passwords for network logon
     BOOL bEmptyPWAllowed=FALSE;
     if (g_RunPwd[0]==0)
     {
-      //Enable use of empty passwords for network logon
       bEmptyPWAllowed=EmptyPWAllowed;
       AllowEmptyPW(TRUE);
     }
-    //copy the password to the client
-    _tcscpy(g_RunPwd,g_Users[nUser].Password);
     //Add user to admins group
     AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
     //Give Password to the calling process
     GivePassword();
+    //Reset status of "use of empty passwords for network logon"
     if (g_RunPwd[0]==0)
       AllowEmptyPW(bEmptyPWAllowed);
     //Remove user from Administrators group
