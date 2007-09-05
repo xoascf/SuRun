@@ -171,10 +171,20 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
   HANDLE hToken=NULL;
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
   EnablePrivilege(SE_TCB_NAME);//Win2k
+  BOOL bEmptyPWAllowed=FALSE;
+  if ((Password==NULL) || (*Password==NULL))
+  {
+    //Enable use of empty passwords for network logon
+    bEmptyPWAllowed=EmptyPWAllowed;
+    AllowEmptyPW(TRUE);
+  }
   if (!LogonUser(un,dn,Password,LOGON32_LOGON_NETWORK,0,&hToken))
     if (GetLastError()==ERROR_PRIVILEGE_NOT_HELD)
       hToken=SSPLogonUser(dn,un,Password);
   DBGTrace4("GetUserToken(%s,%s,%s):%s",un,dn,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
+  //Reset status of "use of empty passwords for network logon"
+  if ((Password==NULL) || (*Password==NULL))
+    AllowEmptyPW(bEmptyPWAllowed);
   return hToken;
 }
 
