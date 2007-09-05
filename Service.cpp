@@ -964,12 +964,21 @@ void SuRun(DWORD ProcessID)
         return;
       }
     }
+    BOOL bEmptyPWAllowed=FALSE;
+    if (g_RunPwd[0]==0)
+    {
+      //Enable use of empty passwords for network logon
+      bEmptyPWAllowed=EmptyPWAllowed;
+      AllowEmptyPW(TRUE);
+    }
     //copy the password to the client
     _tcscpy(g_RunPwd,g_Users[nUser].Password);
     //Add user to admins group
     AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
     //Give Password to the calling process
     GivePassword();
+    if (g_RunPwd[0]==0)
+      AllowEmptyPW(bEmptyPWAllowed);
     //Remove user from Administrators group
     AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
     //Mark last start time
@@ -984,9 +993,6 @@ void SuRun(DWORD ProcessID)
 //  InstallRegistry
 // 
 //////////////////////////////////////////////////////////////////////////////
-#define HKCR HKEY_CLASSES_ROOT
-#define HKLM HKEY_LOCAL_MACHINE
-
 #define UNINSTL L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SuRun"
 
 #define SHLRUN  L"\\Shell\\SuRun"
