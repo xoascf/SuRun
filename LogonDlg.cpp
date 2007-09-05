@@ -93,8 +93,7 @@ public:
   {
     if(nUsers>511)
       return;
-    int j=0;
-    for(;j<nUsers;j++)
+    for(int j=0;j<nUsers;j++)
     {
       int cr=_tcsicmp(User[j].UserName,UserName);
       if (cr==0)
@@ -114,7 +113,7 @@ public:
 private:
   void AddGroupUsers(DWORD WellKnownGroup)
   {
-    DWORD_PTR i=0;
+    DWORD i=0;
     DWORD GNLen=GNLEN;
     WCHAR GroupName[GNLEN+1];
     DWORD res=ERROR_MORE_DATA;
@@ -226,12 +225,12 @@ typedef struct _LOGONDLGPARAMS
 //User Bitmaps:
 void SetUserBitmap(HWND hwnd)
 {
-  LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+  LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
   if (p==0)
     return;
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
-  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  int n=SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
   if (n!=CB_ERR)
     SendDlgItemMessage(hwnd,IDC_USER,CB_GETLBTEXT,n,(LPARAM)&User);
   HBITMAP bm=0;
@@ -251,11 +250,11 @@ void SetUserBitmap(HWND hwnd)
   DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
   if(bm)
   {
-    SetWindowLongPtr(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
   }else
   {
-    SetWindowLongPtr(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,
       SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
   }
@@ -338,7 +337,7 @@ SIZE GetDrawSize(HWND w)
     if (S.cy>maxDY)
     {
       S.cy=maxDY;
-      SetWindowLongPtr(w,GWL_STYLE,GetWindowLongPtr(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
+      SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
     }
   }
   DeleteDC(MemDC);
@@ -357,8 +356,7 @@ void SetWindowSizes(HWND hDlg)
   if (dx>0) 
   {
     MoveWnd(hDlg,-dx/2,0,dx,0);
-    int i=0;
-    for (;i<countof(SX_Ctrls);i++)
+    for (int i=0;i<countof(SX_Ctrls);i++)
       MoveDlgCtrl(hDlg,SX_Ctrls[i],0,0,dx,0);
     for (i=0;i<countof(MX_Ctrls);i++)
       MoveDlgCtrl(hDlg,MX_Ctrls[i],dx,0,0,0);
@@ -368,8 +366,7 @@ void SetWindowSizes(HWND hDlg)
   if (dy>0)
   {
     MoveWnd(hDlg,0,-dy/2,0,dy);
-    int i=0;
-    for (;i<countof(SY_Ctrls);i++)
+    for (int i=0;i<countof(SY_Ctrls);i++)
       MoveDlgCtrl(hDlg,SY_Ctrls[i],0,0,0,dy);
     for (i=0;i<countof(MY_Ctrls);i++)
       MoveDlgCtrl(hDlg,MY_Ctrls[i],0,dy,0,0);
@@ -385,7 +382,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
-      SetWindowLongPtr(hwnd,GWLP_USERDATA,lParam);
+      SetWindowLong(hwnd,GWL_USERDATA,lParam);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
         g_HintBrush=CreateSolidBrush(RGB(192,128,0));
       else
@@ -479,7 +476,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetUserBitmap(hwnd);
       if (wParam==2)
       {
-        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
         p->TimeOut--;
         if (p->TimeOut<0)
           EndDialog(hwnd,0);
@@ -509,7 +506,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
-            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
             GetDlgItemText(hwnd,IDC_USER,p->User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),p->Password,PWLEN);
             HANDLE hUser=GetUserToken(p->User,p->Password);
@@ -553,7 +550,7 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
+  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
     DialogProc,(LPARAM)&p);
 }
 
@@ -563,7 +560,7 @@ BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,true);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
+  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
     DialogProc,(LPARAM)&p);
 }
 
@@ -573,7 +570,7 @@ BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,true,false);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),0,
+  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),0,
     DialogProc,(LPARAM)&p);
 }
 
@@ -583,7 +580,7 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,_T("******"),true,false);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
+  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
     DialogProc,(LPARAM)&p);
 }
 
