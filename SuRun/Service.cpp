@@ -82,7 +82,7 @@ typedef struct //User Token cache
   __int64 LastAskTime;
 }USERDATA;
 
-static USERDATA g_Users[16]={0};    //Tokens for the last 16 Users are cached
+static USERDATA g_Users[32]={0};    //Tokens for the last 32 Users are cached
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -866,7 +866,7 @@ int PrepareSuRun()
     BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine);
     if(bLogon)
     {
-      CacheUserPassword(Password);
+      nUser=CacheUserPassword(Password);
       zero(Password);
       if (bLogon==2)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
