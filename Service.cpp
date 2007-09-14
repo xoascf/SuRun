@@ -59,11 +59,7 @@
 #pragma comment(lib,"PSAPI.lib")
 
 #ifndef _DEBUG
-#ifdef _WIN64
-#pragma comment(lib,"SuRunExt/Release64U/SuRunExt.lib")
-#else _WIN64
 #pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
-#endif _WIN64
 #else _DEBUG
 #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
 #endif _DEBUG
@@ -180,7 +176,7 @@ void SavePassword(int n)
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
   SetRegAny(HKLM,PWKEY,g_Users[n].UserName,REG_BINARY,(BYTE*)Password,
     bf.Encode((BYTE*)g_Users[n].Password,(BYTE*)Password,
-              (int)_tcslen(g_Users[n].Password)*sizeof(TCHAR)));
+              _tcslen(g_Users[n].Password)*sizeof(TCHAR)));
 }
 
 void SavePasswords()
@@ -254,7 +250,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     return CloseHandle(hProcess),0;
   }
   //Since it's the same process, g_RunData has the same address!
-  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),(SIZE_T*)&n))
+  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
@@ -448,7 +444,7 @@ BOOL GivePassword()
   }
   DWORD n;
   //Since it's the same process, g_RunPwd has the same address!
-  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,(SIZE_T*)&n))
+  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
   {
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
@@ -573,12 +569,12 @@ void LBSetScrollbar(HWND hwnd)
 {
   HDC hdc=GetDC(hwnd);
   TCHAR s[4096];
-  int nItems=(int)SendMessage(hwnd,LB_GETCOUNT,0,0);
+  int nItems=SendMessage(hwnd,LB_GETCOUNT,0,0);
   int wMax=0;
   for (int i=0;i<nItems;i++)
   {
     SIZE sz={0};
-    GetTextExtentPoint32(hdc,s,(int)SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
+    GetTextExtentPoint32(hdc,s,SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
     wMax=max(sz.cx,wMax);
   }
   SendMessage(hwnd,LB_SETHORIZONTALEXTENT,wMax,0);
@@ -700,7 +696,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         }
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
-          int CurSel=(int)SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0);
+          int CurSel=SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0);
           if (CurSel>=0)
           {
             TCHAR cmd[4096];
@@ -733,10 +729,10 @@ BOOL Setup(LPCTSTR WinStaName)
   UUID uid;
   UuidCreate(&uid);
   LPTSTR DeskName=0;
-  UuidToString(&uid,(WORD**)&DeskName);
+  UuidToString(&uid,&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
-  RpcStringFree((WORD**)&DeskName);
+  RpcStringFree(&DeskName);
 #endif _DEBUGSETUP
   //only Admins and SuRunners may setup SuRun
   if ((IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
@@ -842,10 +838,10 @@ int PrepareSuRun()
   UUID uid;
   UuidCreate(&uid);
   LPTSTR DeskName=0;
-  UuidToString(&uid,(WORD**)&DeskName);
+  UuidToString(&uid,&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,g_BlurDesktop);
-  RpcStringFree((WORD**)&DeskName);
+  RpcStringFree(&DeskName);
   if (crond.IsValid())
   {
     //secure desktop created...
