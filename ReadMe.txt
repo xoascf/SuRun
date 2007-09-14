@@ -80,6 +80,11 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.6 - 2007-09-14:
+---------------------------
+* With the Option "Store &Passwords (protected, encrypted)" disabled SurRun 
+  did not start any Process...Thanks to A.H.Klein for reporting.
+
 SuRun 1.0.2.5 - 2007-09-05:
 ---------------------------
 * Empty user passwords did not work in an out of the box Windows. Users 
