@@ -176,7 +176,7 @@ void SavePassword(int n)
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
   SetRegAny(HKLM,PWKEY,g_Users[n].UserName,REG_BINARY,(BYTE*)Password,
     bf.Encode((BYTE*)g_Users[n].Password,(BYTE*)Password,
-              _tcslen(g_Users[n].Password)*sizeof(TCHAR)));
+              (int)_tcslen(g_Users[n].Password)*sizeof(TCHAR)));
 }
 
 void SavePasswords()
@@ -250,7 +250,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     return CloseHandle(hProcess),0;
   }
   //Since it's the same process, g_RunData has the same address!
-  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
+  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),(size_t*)&n))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
@@ -444,7 +444,7 @@ BOOL GivePassword()
   }
   DWORD n;
   //Since it's the same process, g_RunPwd has the same address!
-  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
+  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,(size_t*)&n))
   {
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
@@ -569,12 +569,12 @@ void LBSetScrollbar(HWND hwnd)
 {
   HDC hdc=GetDC(hwnd);
   TCHAR s[4096];
-  int nItems=SendMessage(hwnd,LB_GETCOUNT,0,0);
+  int nItems=(int)SendMessage(hwnd,LB_GETCOUNT,0,0);
   int wMax=0;
   for (int i=0;i<nItems;i++)
   {
     SIZE sz={0};
-    GetTextExtentPoint32(hdc,s,SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
+    GetTextExtentPoint32(hdc,s,(int)SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
     wMax=max(sz.cx,wMax);
   }
   SendMessage(hwnd,LB_SETHORIZONTALEXTENT,wMax,0);
@@ -696,7 +696,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         }
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
-          int CurSel=SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0);
+          int CurSel=(int)SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0);
           if (CurSel>=0)
           {
             TCHAR cmd[4096];
