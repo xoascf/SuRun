@@ -59,7 +59,11 @@
 #pragma comment(lib,"PSAPI.lib")
 
 #ifndef _DEBUG
+#ifdef _WIN64
+#pragma comment(lib,"SuRunExt/Release64U/SuRunExt.lib")
+#else _WIN64
 #pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
+#endif _WIN64
 #else _DEBUG
 #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
 #endif _DEBUG
