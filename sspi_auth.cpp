@@ -228,11 +228,11 @@ HANDLE SSPLogonUser(LPCTSTR szDomain,LPCTSTR szUser,LPCTSTR szPassword)
     // Initialize auth identity structure
     ZeroMemory(&ai,sizeof(ai));
 #if defined(UNICODE) || defined(_UNICODE)
-    ai.Domain = (LPTSTR)szDomain;
+    ai.Domain = (WORD*)szDomain;
     ai.DomainLength = lstrlen(szDomain);
-    ai.User = (LPTSTR)szUser;
+    ai.User = (WORD*)szUser;
     ai.UserLength = lstrlen(szUser);
-    ai.Password = (LPTSTR)szPassword;
+    ai.Password = (WORD*)szPassword;
     ai.PasswordLength = lstrlen(szPassword);
     ai.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
 #else      
