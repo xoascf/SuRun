@@ -60,7 +60,7 @@ public:
   }
   void Set( char *s )
   {
-    int l=strlen( s ) * sizeof(wchar_t);
+    int l=(int)strlen( s ) * sizeof(wchar_t);
     if ( l >= MaximumLength )
       init( l );
     MultiByteToWideChar( CP_ACP, 0, s, l/sizeof(wchar_t), Buffer, l );
@@ -68,7 +68,7 @@ public:
   }
   void Set( wchar_t *s )
   {
-    int l=wcslen( s ) * sizeof(wchar_t);
+    int l=(int)wcslen( s ) * sizeof(wchar_t);
 	  if ( l >= MaximumLength )
 		  init( l );
 	  memmove(Buffer,s,l);
