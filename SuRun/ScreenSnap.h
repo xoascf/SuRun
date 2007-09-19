@@ -111,7 +111,7 @@ public:
     RegisterClass(&wc);
     m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW,wc.lpszClassName,_T("ScreenWnd"),
       WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
-    SetWindowLong(m_hWnd,GWL_USERDATA,(LONG)this);
+    SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
     InvalidateRect(m_hWnd,0,1);
     UpdateWindow(m_hWnd);
     MsgLoop();
@@ -130,9 +130,9 @@ public:
 private:
   static LRESULT CALLBACK WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
-    CBlurredScreen* sw=(CBlurredScreen*)GetWindowLong(hWnd,GWL_USERDATA);
+    CBlurredScreen* sw=(CBlurredScreen*)GetWindowLongPtr(hWnd,GWLP_USERDATA);
     if (sw)
-      return ((CBlurredScreen*)GetWindowLong(hWnd,GWL_USERDATA))->WindowProc(msg,wParam,lParam);
+      return ((CBlurredScreen*)GetWindowLongPtr(hWnd,GWLP_USERDATA))->WindowProc(msg,wParam,lParam);
     return DefWindowProc(hWnd,msg,wParam,lParam);
   }
   LRESULT CALLBACK WindowProc(UINT msg,WPARAM wParam,LPARAM lParam)
