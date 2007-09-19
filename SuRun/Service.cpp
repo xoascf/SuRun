@@ -729,10 +729,10 @@ BOOL Setup(LPCTSTR WinStaName)
   UUID uid;
   UuidCreate(&uid);
   LPTSTR DeskName=0;
-  UuidToString(&uid,&DeskName);
+  UuidToString(&uid,(WORD**)&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
-  RpcStringFree(&DeskName);
+  RpcStringFree((WORD**)&DeskName);
 #endif _DEBUGSETUP
   //only Admins and SuRunners may setup SuRun
   if ((IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
@@ -838,10 +838,10 @@ int PrepareSuRun()
   UUID uid;
   UuidCreate(&uid);
   LPTSTR DeskName=0;
-  UuidToString(&uid,&DeskName);
+  UuidToString(&uid,(WORD**)&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,g_BlurDesktop);
-  RpcStringFree(&DeskName);
+  RpcStringFree((WORD**)&DeskName);
   if (crond.IsValid())
   {
     //secure desktop created...
