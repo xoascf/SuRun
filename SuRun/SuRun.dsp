@@ -216,27 +216,11 @@ SOURCE=.\WinStaDesk.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=.\app.manifest
-# End Source File
-# Begin Source File
-
-SOURCE=.\ico10605.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\ico10605.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\ico10606.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\ico10606.ico
-# End Source File
-# Begin Source File
-
-SOURCE=.\ico10607.ico
 # End Source File
 # Begin Source File
 
@@ -264,15 +248,7 @@ SOURCE=.\res\Settings.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\Settings.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\Software.ico
-# End Source File
-# Begin Source File
-
-SOURCE=.\Software.ico
 # End Source File
 # End Group
 # Begin Source File
