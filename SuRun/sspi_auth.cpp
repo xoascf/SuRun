@@ -11,6 +11,8 @@
 //  Copyright (C) 2001.  Microsoft Corporation.  All rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 #define SECURITY_WIN32
+#define _WIN32_WINNT 0x0500
+#define WINVER       0x0500
 #include <windows.h>
 #include <tchar.h>
 #include <sspi.h>
