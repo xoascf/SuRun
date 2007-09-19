@@ -113,7 +113,7 @@ public:
 private:
   void AddGroupUsers(DWORD WellKnownGroup)
   {
-    DWORD i=0;
+    DWORD_PTR i=0;
     DWORD GNLen=GNLEN;
     WCHAR GroupName[GNLEN+1];
     DWORD res=ERROR_MORE_DATA;
@@ -225,12 +225,12 @@ typedef struct _LOGONDLGPARAMS
 //User Bitmaps:
 void SetUserBitmap(HWND hwnd)
 {
-  LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+  LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
   if (p==0)
     return;
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
-  int n=SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
   if (n!=CB_ERR)
     SendDlgItemMessage(hwnd,IDC_USER,CB_GETLBTEXT,n,(LPARAM)&User);
   HBITMAP bm=0;
@@ -382,7 +382,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
-      SetWindowLong(hwnd,GWL_USERDATA,lParam);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,lParam);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
         g_HintBrush=CreateSolidBrush(RGB(192,128,0));
       else
@@ -476,7 +476,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetUserBitmap(hwnd);
       if (wParam==2)
       {
-        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
         p->TimeOut--;
         if (p->TimeOut<0)
           EndDialog(hwnd,0);
@@ -506,7 +506,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
-            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
             GetDlgItemText(hwnd,IDC_USER,p->User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),p->Password,PWLEN);
             HANDLE hUser=GetUserToken(p->User,p->Password);
