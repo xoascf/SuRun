@@ -250,7 +250,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     return CloseHandle(hProcess),0;
   }
   //Since it's the same process, g_RunData has the same address!
-  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),(size_t*)&n))
+  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),(SIZE_T*)&n))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
@@ -444,7 +444,7 @@ BOOL GivePassword()
   }
   DWORD n;
   //Since it's the same process, g_RunPwd has the same address!
-  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,(size_t*)&n))
+  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,(SIZE_T*)&n))
   {
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
