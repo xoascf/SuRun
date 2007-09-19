@@ -226,7 +226,7 @@ typedef struct _LOGONDLGPARAMS
 //User Bitmaps:
 void SetUserBitmap(HWND hwnd)
 {
-  LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+  LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
   if (p==0)
     return;
   TCHAR User[UNLEN+GNLEN+2]={0};
@@ -248,14 +248,14 @@ void SetUserBitmap(HWND hwnd)
     }
   }
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
-  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  DWORD dwStyle=GetWindowLongPtr(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
   if(bm)
   {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SetWindowLongPtr(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
   }else
   {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SetWindowLongPtr(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,
       SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
   }
@@ -338,7 +338,7 @@ SIZE GetDrawSize(HWND w)
     if (S.cy>maxDY)
     {
       S.cy=maxDY;
-      SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
+      SetWindowLongPtr(w,GWL_STYLE,GetWindowLongPtr(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
     }
   }
   DeleteDC(MemDC);
@@ -385,7 +385,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
-      SetWindowLong(hwnd,GWL_USERDATA,lParam);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,lParam);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
         g_HintBrush=CreateSolidBrush(RGB(192,128,0));
       else
@@ -479,7 +479,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetUserBitmap(hwnd);
       if (wParam==2)
       {
-        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+        LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
         p->TimeOut--;
         if (p->TimeOut<0)
           EndDialog(hwnd,0);
@@ -509,7 +509,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
-            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLong(hwnd,GWL_USERDATA);
+            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
             GetDlgItemText(hwnd,IDC_USER,p->User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),p->Password,PWLEN);
             HANDLE hUser=GetUserToken(p->User,p->Password);
