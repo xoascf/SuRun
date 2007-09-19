@@ -114,7 +114,7 @@ public:
 private:
   void AddGroupUsers(DWORD WellKnownGroup)
   {
-    DWORD i=0;
+    DWORD_PTR i=0;
     DWORD GNLen=GNLEN;
     WCHAR GroupName[GNLEN+1];
     DWORD res=ERROR_MORE_DATA;
@@ -231,7 +231,7 @@ void SetUserBitmap(HWND hwnd)
     return;
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
-  int n=SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
   if (n!=CB_ERR)
     SendDlgItemMessage(hwnd,IDC_USER,CB_GETLBTEXT,n,(LPARAM)&User);
   HBITMAP bm=0;
@@ -248,7 +248,7 @@ void SetUserBitmap(HWND hwnd)
     }
   }
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
-  DWORD dwStyle=GetWindowLongPtr(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
   if(bm)
   {
     SetWindowLongPtr(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
@@ -553,7 +553,7 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false);
-  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
     DialogProc,(LPARAM)&p);
 }
 
@@ -563,7 +563,7 @@ BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,true);
-  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,
     DialogProc,(LPARAM)&p);
 }
 
@@ -573,7 +573,7 @@ BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,true,false);
-  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),0,
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),0,
     DialogProc,(LPARAM)&p);
 }
 
@@ -583,7 +583,7 @@ BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,_T("******"),true,false);
-  return DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,
     DialogProc,(LPARAM)&p);
 }
 
