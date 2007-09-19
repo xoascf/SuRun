@@ -99,7 +99,7 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
 	DWORD num = 0;
 	DWORD total = 0;
-	DWORD resume = 0;
+	DWORD_PTR resume = 0;
 	DWORD i;
 	do
 	{
