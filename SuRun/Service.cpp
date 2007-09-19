@@ -232,7 +232,8 @@ DWORD CheckCliProcess(RUNDATA& rd)
     DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
     return 0;
   }
-  DWORD n;
+  SIZE_T s;
+  DWORD d;
   //Check if the calling process is this Executable:
   HMODULE hMod;
   TCHAR f1[MAX_PATH];
@@ -242,7 +243,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     DBGTrace1("GetModuleFileName failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
   }
-  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&n))
+  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
   {
     DBGTrace1("EnumProcessModules failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
@@ -258,14 +259,14 @@ DWORD CheckCliProcess(RUNDATA& rd)
     return CloseHandle(hProcess),0;
   }
   //Since it's the same process, g_RunData has the same address!
-  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
+  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&s))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
   }
-  if (sizeof(RUNDATA)!=n)
+  if (sizeof(RUNDATA)!=s)
   {
-    DBGTrace2("ReadProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
+    DBGTrace2("ReadProcessMemory invalid size %d != %d ",sizeof(RUNDATA),s);
     return CloseHandle(hProcess),0;
   }
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
@@ -450,7 +451,7 @@ BOOL GivePassword()
     DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
     return FALSE;
   }
-  DWORD n;
+  SIZE_T n;
   //Since it's the same process, g_RunPwd has the same address!
   if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
   {
