@@ -3,6 +3,7 @@
 // by Bruce Schneier
 // Revised code--3/20/94
 // Converted to C++ class 5/96, Jim Conger
+#pragma once
 
 #define MAXKEYBYTES 	56		// 448 bits max
 #define NPASS         16		// SBox passes
