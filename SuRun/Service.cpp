@@ -62,7 +62,11 @@
   #ifdef _WIN64
     #pragma comment(lib,"SuRunExt/ReleaseUx64/SuRunExt.lib")
   #else  _WIN64
-    #pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
+    #ifdef _SR32
+      #pragma comment(lib,"SuRunExt/ReleaseUsr32/SuRunExt32.lib")
+    #else _SR32
+      #pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
+    #endif _SR32
   #endif _WIN64
 #else _DEBUG
   #ifdef _WIN64
