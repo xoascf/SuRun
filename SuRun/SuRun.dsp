@@ -20,6 +20,7 @@ CFG=SuRun - Win32 Unicode Release
 !MESSAGE "SuRun - Win32 Unicode Debug" (based on "Win32 (x86) Application")
 !MESSAGE "SuRun - Win32 Unicode Release" (based on "Win32 (x86) Application")
 !MESSAGE "SuRun - Win32 x64 Unicode Release" (based on "Win32 (x86) Application")
+!MESSAGE "SuRun - Win32 SuRun32 Unicode Release" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -128,6 +129,39 @@ SOURCE="$(InputPath)"
 PreLink_Cmds=if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1>NUL 2>NUL	if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1>NUL 2>NUL
 # End Special Build Tool
 
+!ELSEIF  "$(CFG)" == "SuRun - Win32 SuRun32 Unicode Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "SuRun___Win32_SuRun32_Unicode_Release"
+# PROP BASE Intermediate_Dir "SuRun___Win32_SuRun32_Unicode_Release"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "ReleaseUsr32"
+# PROP Intermediate_Dir "ReleaseUsr32"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_SR32" /YX /FD /c
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x407 /d "NDEBUG"
+# ADD RSC /l 0x407 /fo"ReleaseUsr32/SuRun32.res" /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo /o"ReleaseUsr32/SuRun32.bsc"
+LINK32=link.exe
+# ADD BASE LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
+# SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
+# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /out:"ReleaseUsr32/SuRun32.exe" /IGNORE:4089
+# SUBTRACT LINK32 /pdb:none /nodefaultlib
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Cmds=copy ReleaseUsr32\SuRun32.exe ReleaseUx64\SuRun32.dat
+# End Special Build Tool
+
 !ENDIF 
 
 # Begin Target
@@ -135,6 +169,7 @@ PreLink_Cmds=if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1>NUL 2>NUL
 # Name "SuRun - Win32 Unicode Debug"
 # Name "SuRun - Win32 Unicode Release"
 # Name "SuRun - Win32 x64 Unicode Release"
+# Name "SuRun - Win32 SuRun32 Unicode Release"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
