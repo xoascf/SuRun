@@ -1151,14 +1151,14 @@ void DelFile(LPCTSTR File)
   }
 }
 
-void CopyToWinDir(LPCTSTR File,LPCTSTR Src=0)
+void CopyToWinDir(LPCTSTR File)
 {
   TCHAR DstFile[4096];
   TCHAR SrcFile[4096];
   GetModuleFileName(NULL,SrcFile,MAX_PATH);
   NetworkPathToUNCPath(SrcFile);
   PathRemoveFileSpec(SrcFile);
-  PathAppend(SrcFile,Src?Src:File);
+  PathAppend(SrcFile,File);
   GetSystemWindowsDirectory(DstFile,4096);
   PathAppend(DstFile,File);
   DelFile(DstFile);
@@ -1211,7 +1211,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   DelFile(File);
 #ifdef _WIN64
   GetSystemWindowsDirectory(File,4096);
-  PathAppend(File,_T("SuRun32.exe"));
+  PathAppend(File,_T("SuRun32.bin"));
   DelFile(File);
   GetSystemWindowsDirectory(File,4096);
   PathAppend(File,_T("SuRunExt32.dll"));
@@ -1249,8 +1249,8 @@ BOOL InstallService()
   CopyToWinDir(_T("SuRun.exe"));
   CopyToWinDir(_T("SuRunExt.dll"));
 #ifdef _WIN64
-  CopyToWinDir(_T("SuRun32.exe"),_T("SuRun32.dat"));
-  CopyToWinDir(_T("SuRunExt32.dat"));
+  CopyToWinDir(_T("SuRun32.bin"));
+  CopyToWinDir(_T("SuRunExt32.dll"));
 #endif _WIN64
   TCHAR SvcFile[4096];
   GetSystemWindowsDirectory(SvcFile,4096);
@@ -1376,7 +1376,7 @@ bool HandleServiceStuff()
       {
         TCHAR SuRun32Exe[4096];
         GetSystemWindowsDirectory(SuRun32Exe,4096);
-        PathAppend(SuRun32Exe,L"SuRun32.exe");
+        PathAppend(SuRun32Exe,L"SuRun32.bin");
         ShellExecute(0,L"open",SuRun32Exe,L"/SYSMENUHOOK",0,SW_HIDE);
       }
 #endif _WIN64
