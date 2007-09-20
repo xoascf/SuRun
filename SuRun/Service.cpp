@@ -1376,8 +1376,15 @@ bool HandleServiceStuff()
       {
         TCHAR SuRun32Exe[4096];
         GetSystemWindowsDirectory(SuRun32Exe,4096);
-        PathAppend(SuRun32Exe,L"SuRun32.bin");
-        ShellExecute(0,L"open",SuRun32Exe,L"/SYSMENUHOOK",0,SW_HIDE);
+        PathAppend(SuRun32Exe,L"SuRun32.bin /SYSMENUHOOK");
+        STARTUPINFO si={0};
+        PROCESS_INFORMATION pi;
+        si.cb = sizeof(si);
+        if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+        {
+          CloseHandle(pi.hProcess);
+          CloseHandle(pi.hThread);
+        }
       }
 #endif _WIN64
       while (CheckServiceStatus()==SERVICE_RUNNING)
