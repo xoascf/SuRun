@@ -140,12 +140,8 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386 /out:"ReleaseUsr32/SuRunExt32.dll" /IGNORE:4089
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 /nologo /dll /machine:I386 /out:"ReleaseUsr32/SuRunExt32.dll" /IGNORE:4089
+# ADD LINK32 /nologo /dll /machine:I386 /out:"../ReleaseUx64/SuRunExt32.dll" /IGNORE:4089
 # SUBTRACT LINK32 /pdb:none
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=copy ReleaseUsr32\SuRunExt32.dll ..\ReleaseUx64\SuRunExt32.dll
-# End Special Build Tool
 
 !ENDIF 
 
@@ -196,12 +192,33 @@ SOURCE=.\SuRunExt.Def
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
 
+# PROP Exclude_From_Build 1
+
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=.\SuRunext.rc
+# End Source File
+# Begin Source File
+
+SOURCE=.\SuRunExt32.Def
+
+!IF  "$(CFG)" == "SuRunExt - Win32 Unicode Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "SuRunExt - Win32 Unicode Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "SuRunExt - Win32 x64 Unicode Release"
+
+!ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
