@@ -20,6 +20,7 @@ CFG=SURUNEXT - WIN32 UNICODE RELEASE
 !MESSAGE "SuRunExt - Win32 Unicode Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "SuRunExt - Win32 Unicode Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "SuRunExt - Win32 x64 Unicode Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "SuRunExt - Win32 SuRun32 Unicode Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -113,6 +114,39 @@ LINK32=link.exe
 # ADD LINK32 bufferoverflowu.lib /nologo /dll /machine:IX86 /def:".\SuRunExt.Def" /out:"../ReleaseUx64/SuRunExt.dll" /IGNORE:4089 /machine:AMD64
 # SUBTRACT LINK32 /pdb:none
 
+!ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "SuRunExt___Win32_SuRun32_Unicode_Release"
+# PROP BASE Intermediate_Dir "SuRunExt___Win32_SuRun32_Unicode_Release"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "ReleaseUsr32"
+# PROP Intermediate_Dir "ReleaseUsr32"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /D "_SR32" /YX /FD /c
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x407 /d "NDEBUG"
+# ADD RSC /l 0x407 /fo"ReleaseUsr32/SuRunext32.res" /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo /o"ReleaseUsr32/SuRunExt32.bsc"
+LINK32=link.exe
+# ADD BASE LINK32 /nologo /dll /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 /nologo /dll /machine:I386 /out:"ReleaseUsr32/SuRunExt32.dll" /IGNORE:4089
+# SUBTRACT LINK32 /pdb:none
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Cmds=copy ReleaseUsr32\SuRunExt32.dll ..\ReleaseUx64\SuRunExt32.dat
+# End Special Build Tool
+
 !ENDIF 
 
 # Begin Target
@@ -120,6 +154,7 @@ LINK32=link.exe
 # Name "SuRunExt - Win32 Unicode Release"
 # Name "SuRunExt - Win32 Unicode Debug"
 # Name "SuRunExt - Win32 x64 Unicode Release"
+# Name "SuRunExt - Win32 SuRun32 Unicode Release"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -158,6 +193,8 @@ SOURCE=.\SuRunExt.Def
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 x64 Unicode Release"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
 
 !ENDIF 
 
