@@ -78,8 +78,48 @@ Why use SuRun?
  increase the chance that the system could be infected by malware.
 
 ------------------------------------------------------------------------------
+How to build the sources?
+------------------------------------------------------------------------------
+
+To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
+
+* To build the 32Bit version of SuRun you can use the last official Platform 
+  SDK for VC6, version 02/2003.
+  Use SuRun.dsw to build "Win32 Unicode Release". 
+  SuRun.exe and SuRunExt.dll will be compiled to the directory ReleaseU.
+
+* Compiling the 64 Bit version is a bit more tricky.
+  In Win64, Windows has two subsystems in parallel, Win64 and Win32. To get the 
+  System Menu hook for 32Bit and 64Bit Applications, you must install one Hook 
+  for each subsystem. So SuRun64 consists of four files. "SuRun.exe", the Win64
+  executable; "SuRunExt.dll" for the Win64 Hooks; "SuRun32.bin", the 32Bit
+  executable and "SuRunExt32.dll" for the 32Bit system menu hook.
+  -First you need to install Microsoft's Platform SDK 04/2005 ("Windows Server 
+   2003 SP1")
+  -Then "Open Build Environment Window"->"Windows XP 64-bit Build Environment"
+   ->"Set Windows XP x64 Build Environment (Retail)"
+  -In the command prompt type "MSDEV.EXE /useenv"
+  I use the following batch file for that:
+    --------------------------------------------------------------------------
+    set VC6Dir=E:\VStudio
+    Set MSSDK=E:\MSTOOLS
+    call %VC6Dir%\VC98\Bin\VCVARS32.BAT
+    call %MSSDK%\SetEnv.Cmd /X64
+    start %VC6Dir%\Common\MSDev98\Bin\MSDEV.EXE /useenv
+    --------------------------------------------------------------------------
+  In MSDEV with the AMD64 build environment compile the "Win32 x64 Unicode 
+  Release" to get SuRun.exe and SuRunExt.dll.
+  Then start MSDEV just as usual with the 32Bit build environment and make 
+  "Win32 SuRun32 Unicode Release" to get SuRun32.bin and SuRunExt32.dll.
+
+------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.6 - 2007-09-20:
+---------------------------
+* SuRun - x64 Version added, the version number is the same because SuRun 
+  has no new functions or bugfixes
+
 SuRun 1.0.2.6 - 2007-09-14:
 ---------------------------
 * With the Option "Store &Passwords (protected, encrypted)" disabled SurRun 
