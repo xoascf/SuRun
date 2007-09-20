@@ -111,7 +111,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /nologo /dll /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 bufferoverflowu.lib /nologo /dll /machine:IX86 /def:".\SuRunExt.Def" /out:"../ReleaseUx64/SuRunExt.dll" /IGNORE:4089 /machine:AMD64
+# ADD LINK32 bufferoverflowu.lib /nologo /dll /machine:IX86 /out:"../ReleaseUx64/SuRunExt.dll" /IGNORE:4089 /machine:AMD64
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
@@ -188,8 +188,6 @@ SOURCE=.\SuRunExt.Def
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 x64 Unicode Release"
 
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
 
 # PROP Exclude_From_Build 1
@@ -214,6 +212,8 @@ SOURCE=.\SuRunExt32.Def
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 x64 Unicode Release"
+
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
 
