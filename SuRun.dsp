@@ -159,7 +159,7 @@ LINK32=link.exe
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy ReleaseUsr32\SuRun32.exe ReleaseUx64\SuRun32.dat
+PostBuild_Cmds=copy ReleaseUsr32\SuRun32.exe ReleaseUx64\SuRun32.bin
 # End Special Build Tool
 
 !ENDIF 
