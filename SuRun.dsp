@@ -155,12 +155,8 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
 # SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
-# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /out:"ReleaseUsr32/SuRun32.exe" /IGNORE:4089
+# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /out:"../ReleaseUx64/SuRun32.bin" /IGNORE:4089
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=copy ReleaseUsr32\SuRun32.exe ReleaseUx64\SuRun32.bin
-# End Special Build Tool
 
 !ENDIF 
 
