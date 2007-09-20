@@ -1380,7 +1380,7 @@ bool HandleServiceStuff()
         STARTUPINFO si={0};
         PROCESS_INFORMATION pi;
         si.cb = sizeof(si);
-        if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+        if (CreateProcess(NULL,SuRun32Exe,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
         {
           CloseHandle(pi.hProcess);
           CloseHandle(pi.hThread);
