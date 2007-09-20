@@ -89,8 +89,8 @@ LINK32=link.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "SuRunExt___Win32_x64_Unicode_Release"
-# PROP BASE Intermediate_Dir "SuRunExt___Win32_x64_Unicode_Release"
+# PROP BASE Output_Dir "ReleaseUx64"
+# PROP BASE Intermediate_Dir "ReleaseUx64"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -118,8 +118,8 @@ LINK32=link.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "SuRunExt___Win32_SuRun32_Unicode_Release"
-# PROP BASE Intermediate_Dir "SuRunExt___Win32_SuRun32_Unicode_Release"
+# PROP BASE Output_Dir "ReleaseUsr32"
+# PROP BASE Intermediate_Dir "ReleaseUsr32"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -138,13 +138,13 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo /o"ReleaseUsr32/SuRunExt32.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /dll /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
+# ADD BASE LINK32 /nologo /dll /machine:I386 /out:"ReleaseUsr32/SuRunExt32.dll" /IGNORE:4089
 # SUBTRACT BASE LINK32 /pdb:none
 # ADD LINK32 /nologo /dll /machine:I386 /out:"ReleaseUsr32/SuRunExt32.dll" /IGNORE:4089
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy ReleaseUsr32\SuRunExt32.dll ..\ReleaseUx64\SuRunExt32.dat
+PostBuild_Cmds=copy ReleaseUsr32\SuRunExt32.dll ..\ReleaseUx64\SuRunExt32.dll
 # End Special Build Tool
 
 !ENDIF 
