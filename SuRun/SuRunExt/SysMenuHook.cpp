@@ -68,7 +68,7 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
 extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   #define msg ((MSG*)lParam)
-  if ((nCode>=0)&&(msg->message==WM_SYSCOMMAND)
+  if ((nCode>=0)&&(msg->message==WM_SYSCOMMAND)&&(wParam==PM_REMOVE)
     &&((msg->wParam==WM_SYSMH0)||(msg->wParam==WM_SYSMH1)))
   {
     STARTUPINFO si={0};
