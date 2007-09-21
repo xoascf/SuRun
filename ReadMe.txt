@@ -115,6 +115,11 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.7 - 2007-09-21:
+---------------------------
+* Fixed a Bug in the Sysmenuhook that caused "start as administrator" to
+  fire multiple times.
+
 SuRun 1.0.2.6 - 2007-09-20:
 ---------------------------
 * SuRun - x64 Version added, the version number is the same because SuRun 
