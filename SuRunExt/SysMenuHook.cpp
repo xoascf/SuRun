@@ -95,6 +95,8 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
         ::ExitProcess(0);
     }else
       MessageBox(msg->hwnd,sFileNotFound,0,MB_ICONSTOP);
+    //We processed the Message: Stop calling other hooks!
+    return 0;
   }
   #undef msg
   return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
