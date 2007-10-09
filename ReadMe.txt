@@ -115,6 +115,12 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.8 - 2007-10-09:
+---------------------------
+* Added code to recover SuRuns Desktop when user processes call SwitchDesktop()
+  "shedhlp.exe", part of Acronis True Image Home 11 calls SwitchDesktop() 
+  periodically and so switches from SuRuns Desktop back to the users Desktop.
+
 SuRun 1.0.2.7 - 2007-09-21:
 ---------------------------
 * Fixed a Bug in the Sysmenuhook that caused "start as administrator" to
