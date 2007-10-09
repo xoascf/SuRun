@@ -70,7 +70,8 @@ void GrantUserAccessToDesktop(HDESK hDesk)
   DWORD SidLen=0;
   GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
   UserSID=LocalAlloc(LPTR,SidLen);
-  GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
+  if (!GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen))
+    DBGTrace1("GetUserObjectInformation failed:%s",GetLastErrorNameStatic());
 
   PSECURITY_DESCRIPTOR pSD = NULL;
 	PACL pOldDACL=NULL, pNewDACL=NULL;
@@ -79,7 +80,7 @@ void GrantUserAccessToDesktop(HDESK hDesk)
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
   EXPLICIT_ACCESS ea={0};
   // grant the logon session all access to the default desktop
-  ea.grfAccessPermissions = DESKTOP_ALL_ACCESS|STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE;
+  ea.grfAccessPermissions = DESKTOP_ALL_ACCESS;
   ea.grfAccessMode = SET_ACCESS;
   ea.grfInheritance= NO_INHERITANCE;
   ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
@@ -108,7 +109,8 @@ void DenyUserAccessToDesktop(HDESK hDesk)
   DWORD SidLen=0;
   GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
   UserSID=LocalAlloc(LPTR,SidLen);
-  GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
+  if (!GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen))
+    DBGTrace1("GetUserObjectInformation failed:%s",GetLastErrorNameStatic());
 
   PSECURITY_DESCRIPTOR pSD = NULL;
 	PACL pOldDACL=NULL, pNewDACL=NULL;
@@ -117,8 +119,8 @@ void DenyUserAccessToDesktop(HDESK hDesk)
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
   EXPLICIT_ACCESS ea={0};
   // grant the logon session all access to the default desktop
-  ea.grfAccessPermissions = DESKTOP_ALL_ACCESS|STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE;
-  ea.grfAccessMode = REVOKE_ACCESS;
+  ea.grfAccessPermissions = DESKTOP_ALL_ACCESS;
+  ea.grfAccessMode = DENY_ACCESS;
   ea.grfInheritance= NO_INHERITANCE;
   ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
   ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
@@ -185,7 +187,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
       DBGTrace1("CRunOnNewDeskTop::SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
   }
   //Get interactive Desktop
-  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
+  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL);
   if (!m_hDeskSwitch)
   {
     DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
