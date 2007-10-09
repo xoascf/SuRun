@@ -224,7 +224,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
       return;
     }
   }
-  DenyUserAccessToDesktop(m_hDeskSwitch);
+  //DenyUserAccessToDesktop(m_hDeskSwitch);
   //Switch to the new Desktop
   if (!SwitchDesktop(m_hdeskUser))
   {
@@ -246,7 +246,7 @@ void CRunOnNewDeskTop::CleanUp()
   //Switch back to the interactive Desktop
   if(m_hDeskSwitch)
   {
-    GrantUserAccessToDesktop(m_hDeskSwitch);
+    //GrantUserAccessToDesktop(m_hDeskSwitch);
     if (!SwitchDesktop(m_hDeskSwitch))
       DBGTrace1("CRunOnNewDeskTop: SwitchDesktop failed: %s",GetLastErrorNameStatic());
     if (!CloseDesktop(m_hDeskSwitch))
