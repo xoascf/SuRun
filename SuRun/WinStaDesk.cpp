@@ -109,20 +109,23 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
   GetUserObjectInformation(m_hdeskSave,UOI_NAME,dtn,LenD,&LenD);
   if ((dtn[0]==TCHAR('\0')) || _tcsicmp(dtn,DeskName))
   {
-    SECURITY_ATTRIBUTES saDesktop = { sizeof(saDesktop), NULL, TRUE };
+    //saDesktop.lpSecurityDescriptor allows access to m_hdeskUser only for the current user
+    SECURITY_ATTRIBUTES saDesktop = { sizeof(saDesktop), GetUserAccessSD(), TRUE };
     m_hdeskUser = CreateDesktop(DeskName,0,0,0,DESKTOP_CREATEMENU|DESKTOP_CREATEWINDOW
       |DESKTOP_ENUMERATE|DESKTOP_HOOKCONTROL|DESKTOP_READOBJECTS
       |DESKTOP_SWITCHDESKTOP|DESKTOP_WRITEOBJECTS,&saDesktop);
     if (m_hdeskUser == NULL)
     {
-      CleanUp();
       DBGTrace1("CRunOnNewDeskTop::CreateDesktop failed: %s",GetLastErrorNameStatic());
+      LocalFree(saDesktop.lpSecurityDescriptor);
+      CleanUp();
       return;
     }
+    LocalFree(saDesktop.lpSecurityDescriptor);
     if (!SetThreadDesktop(m_hdeskUser))
     {
-      CleanUp();
       DBGTrace("CRunOnNewDeskTop::SetThreadDesktop failed!");
+      CleanUp();
       return;
     }
   }
