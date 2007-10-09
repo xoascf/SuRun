@@ -48,6 +48,99 @@ BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+//
+// The following has evolved taken from Keith Browns cmdasuser
+//
+// http://www.develop.com/kbrown
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// for some reason, winuser.h doesn't define these useful aliases
+#ifndef WINSTA_ALL_ACCESS
+#define WINSTA_ALL_ACCESS 0x0000037F
+#endif
+
+#ifndef DESKTOP_ALL_ACCESS
+#define DESKTOP_ALL_ACCESS 0x00001FF
+#endif
+
+void GrantUserAccessToDesktop(HDESK hDesk)
+{
+  PSID UserSID=0;
+  DWORD SidLen=0;
+  GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
+  UserSID=LocalAlloc(LPTR,SidLen);
+  GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
+
+  PSECURITY_DESCRIPTOR pSD = NULL;
+	PACL pOldDACL=NULL, pNewDACL=NULL;
+	// get the existing DACL, with enough extra space for adding a couple more aces
+  GetSecurityInfo(hDesk,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
+  // Initialize an EXPLICIT_ACCESS structure for an ACE.
+  EXPLICIT_ACCESS ea={0};
+  // grant the logon session all access to the default desktop
+  ea.grfAccessPermissions = DESKTOP_ALL_ACCESS|STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE;
+  ea.grfAccessMode = SET_ACCESS;
+  ea.grfInheritance= NO_INHERITANCE;
+  ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
+  ea.Trustee.ptstrName  = (LPTSTR)UserSID;
+  // Create a new ACL that merges the new ACE into the existing DACL.
+  DWORD err=SetEntriesInAcl(1,&ea,pOldDACL,&pNewDACL);
+  if (err!=ERROR_SUCCESS)
+  {
+    DBGTrace1("SetEntriesInAcl failed:%s",GetErrorNameStatic(err));
+  }else
+  {
+    // apply changes
+    err=SetSecurityInfo(hDesk,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,0,0,pNewDACL,0);
+    if ( err )
+      DBGTrace1("SetSecurityInfo failed %s",GetErrorNameStatic(err));
+  }
+  LocalFree(UserSID);
+  LocalFree((HLOCAL)pNewDACL); 
+	LocalFree((HLOCAL)pSD); 
+}
+
+void DenyUserAccessToDesktop(HDESK hDesk)
+{
+  PSID UserSID=0;
+  DWORD SidLen=0;
+  GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
+  UserSID=LocalAlloc(LPTR,SidLen);
+  GetUserObjectInformation(hDesk,UOI_USER_SID,UserSID,SidLen,&SidLen);
+
+  PSECURITY_DESCRIPTOR pSD = NULL;
+	PACL pOldDACL=NULL, pNewDACL=NULL;
+	// get the existing DACL, with enough extra space for adding a couple more aces
+  GetSecurityInfo(hDesk,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
+  // Initialize an EXPLICIT_ACCESS structure for an ACE.
+  EXPLICIT_ACCESS ea={0};
+  // grant the logon session all access to the default desktop
+  ea.grfAccessPermissions = DESKTOP_ALL_ACCESS|STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE;
+  ea.grfAccessMode = REVOKE_ACCESS;
+  ea.grfInheritance= NO_INHERITANCE;
+  ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
+  ea.Trustee.ptstrName  = (LPTSTR)UserSID;
+  // Create a new ACL that merges the new ACE into the existing DACL.
+  DWORD err=SetEntriesInAcl(1,&ea,pOldDACL,&pNewDACL);
+  if (err!=ERROR_SUCCESS)
+  {
+    DBGTrace1("SetEntriesInAcl failed:%s",GetErrorNameStatic(err));
+  }else
+  {
+    // apply changes
+    err=SetSecurityInfo(hDesk,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,0,0,pNewDACL,0);
+    if ( err )
+      DBGTrace1("SetSecurityInfo failed %s",GetErrorNameStatic(err));
+  }
+  LocalFree(UserSID);
+  LocalFree((HLOCAL)pNewDACL); 
+	LocalFree((HLOCAL)pSD); 
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // 
 // CRunOnNewDeskTop:
 //   create and Switch to Desktop, switch back when Object is deleted
@@ -129,6 +222,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
       return;
     }
   }
+  DenyUserAccessToDesktop(m_hDeskSwitch);
   //Switch to the new Desktop
   if (!SwitchDesktop(m_hdeskUser))
   {
@@ -150,6 +244,7 @@ void CRunOnNewDeskTop::CleanUp()
   //Switch back to the interactive Desktop
   if(m_hDeskSwitch)
   {
+    GrantUserAccessToDesktop(m_hDeskSwitch);
     if (!SwitchDesktop(m_hDeskSwitch))
       DBGTrace1("CRunOnNewDeskTop: SwitchDesktop failed: %s",GetLastErrorNameStatic());
     if (!CloseDesktop(m_hDeskSwitch))
