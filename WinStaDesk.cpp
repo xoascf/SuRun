@@ -187,7 +187,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
       DBGTrace1("CRunOnNewDeskTop::SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
   }
   //Get interactive Desktop
-  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL);
+  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP/*DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL*/);
   if (!m_hDeskSwitch)
   {
     DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
