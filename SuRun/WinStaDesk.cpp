@@ -120,7 +120,7 @@ void DenyUserAccessToDesktop(HDESK hDesk)
   EXPLICIT_ACCESS ea={0};
   // grant the logon session all access to the default desktop
   ea.grfAccessPermissions = DESKTOP_ALL_ACCESS;
-  ea.grfAccessMode = DENY_ACCESS;
+  ea.grfAccessMode = REVOKE_ACCESS;
   ea.grfInheritance= NO_INHERITANCE;
   ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
   ea.Trustee.TrusteeType = TRUSTEE_IS_USER;
