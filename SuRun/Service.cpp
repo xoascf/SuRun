@@ -745,6 +745,7 @@ BOOL Setup(LPCTSTR WinStaName)
   UuidToString(&uid,&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
+  CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
 #endif _DEBUGSETUP
   //only Admins and SuRunners may setup SuRun
@@ -854,6 +855,7 @@ int PrepareSuRun()
   UuidToString(&uid,&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,g_BlurDesktop);
+  CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
   if (crond.IsValid())
   {
