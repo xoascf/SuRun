@@ -351,6 +351,56 @@ Cleanup:
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// 
+// GetUserAccessSD:
+//   create a self relative "full access" Security Descriptor for the current user
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+PSECURITY_DESCRIPTOR GetUserAccessSD()
+{
+  PSID pUserSID = GetProcessUserSID(GetCurrentProcessId());
+  PACL pACL = NULL;
+  PSECURITY_DESCRIPTOR pSD = 0;
+  PSECURITY_DESCRIPTOR pSDret =0;
+  EXPLICIT_ACCESS ea={0};
+  DWORD SDlen=0;
+  ea.grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL|GENERIC_READ|GENERIC_WRITE;
+  ea.grfAccessMode = SET_ACCESS;
+  ea.grfInheritance= NO_INHERITANCE;
+  ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea.Trustee.TrusteeType = TRUSTEE_IS_GROUP;
+  ea.Trustee.ptstrName  = (LPTSTR) pUserSID;
+  if (ERROR_SUCCESS != SetEntriesInAcl(1,&ea,NULL,&pACL)) 
+    goto Cleanup;
+  pSD = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR,SECURITY_DESCRIPTOR_MIN_LENGTH); 
+  if (pSD == NULL) 
+    goto Cleanup; 
+  if (!InitializeSecurityDescriptor(pSD,SECURITY_DESCRIPTOR_REVISION)) 
+    goto Cleanup; 
+  if (!SetSecurityDescriptorDacl(pSD,TRUE,pACL,FALSE))
+    goto Cleanup; 
+  MakeSelfRelativeSD(pSD,pSDret,&SDlen);
+  pSDret=(PSECURITY_DESCRIPTOR)LocalAlloc(LPTR,SDlen);
+  if(!MakeSelfRelativeSD(pSD,pSDret,&SDlen))
+    goto Cleanup;
+  LocalFree(pUserSID);
+  LocalFree(pACL);
+  LocalFree(pSD);
+  return pSDret;
+Cleanup:
+  if (pUserSID) 
+    LocalFree(pUserSID);
+  if (pACL) 
+    LocalFree(pACL);
+  if (pSD) 
+    LocalFree(pSD);
+  if (pSDret) 
+    LocalFree(pSDret);
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 //
 //  NetworkPathToUNCPath
 //
