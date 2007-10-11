@@ -20,6 +20,8 @@
 #include <Shobjidl.h>
 #include <ShlGuid.h>
 #include <lm.h>
+#include <MMSYSTEM.H>
+
 #include "Helpers.h"
 #include "DBGTRace.h"
 
@@ -29,6 +31,7 @@
 #pragma comment(lib,"Shell32.lib")
 #pragma comment(lib,"ole32.lib")
 #pragma comment(lib,"Version.lib")
+#pragma comment(lib,"WINMM.LIB")
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -663,4 +666,41 @@ LPCTSTR GetVersionString()
     free(VerInfo);
   }
   return _T("");
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// CTimeOut
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+CTimeOut::CTimeOut()
+{
+  Set(0);
+}
+
+CTimeOut::CTimeOut(DWORD TimeOut)
+{
+  Set(TimeOut);
+}
+
+void CTimeOut::Set(DWORD TimeOut)
+{
+  m_EndTime=timeGetTime()+TimeOut;
+}
+
+DWORD CTimeOut::Rest()
+{
+  int to=(int)m_EndTime-(int)timeGetTime();
+  if (to<=0)
+  {
+    SetLastError(ERROR_TIMEOUT);
+    return 0;
+  }
+  return (DWORD)to;
+}
+
+bool CTimeOut::TimedOut()
+{
+  return Rest()==0;
 }
