@@ -74,7 +74,8 @@ public:
     LPTSTR s=m_DeskName;
     m_DeskName=0;
     free(s);
-    WaitForSingleObject(m_Thread,INFINITE);
+    if(m_Thread)
+      WaitForSingleObject(m_Thread,INFINITE);
   }
   static DWORD WINAPI ThreadProc(void* p)
   {
@@ -83,7 +84,7 @@ public:
     LPTSTR DeskName=_tcsdup(t->m_DeskName);
     while (t->m_DeskName)
     {
-      HDESK d=OpenDesktop(t->m_DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
+      HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
       if (d!=0)
       {
         HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
