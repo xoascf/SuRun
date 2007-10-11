@@ -286,7 +286,7 @@ void WaitForProcess(DWORD ProcID)
   HANDLE hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
   while (hProc)
   {
-    WaitForSingleObject(hProc,INFINITE);
+    WaitForSingleObject(hProc,50000);
     Sleep(100);
     CloseHandle(hProc);
     hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
@@ -406,10 +406,13 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
                 WaitForProcess(pi.dwProcessId);
-              }
-            }
+              }else
+                DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
+            }else
+              DBGTrace2("SetTokenInformation(TokenSessionId(%d)) failed %s",SessionID,GetLastErrorNameStatic());
             CloseHandle(hRun);
-          }
+          }else
+            DBGTrace1("DuplicateTokenEx() failed %s",GetLastErrorNameStatic());
           CloseHandle(hProc);
         }
       }
