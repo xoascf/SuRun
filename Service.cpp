@@ -284,9 +284,25 @@ DWORD CheckCliProcess(RUNDATA& rd)
 void WaitForProcess(DWORD ProcID)
 {
   HANDLE hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
+  //First:
+  // WaitforSingleObject() for a just started Process will return 
+  // immediately with WAIT_OBJECT_0, so SuRun keeps trying until 
+  // OpenProcess returns 0
+  //
+  //Second:
+  // This is a bit tricky and because of the RootKit Detector of "ANTIVIR" 
+  // avipbb.sys. With avipbb.sys loaded and AntiVir active, OpenProcess
+  // will succeed even after the process has terminated
+  // So SuRun uses an additional two stage detection,
+  // * a total timeout of 50seconds
+  // * at maximum 25 runs (WaitForSingleObject, Sleep)
+  CTimeOut t(50000);
+  int i=0;
   while (hProc)
   {
-    WaitForSingleObject(hProc,50000);
+    if (t.TimedOut() 
+      || (WaitForSingleObject(hProc,t.Rest())!=WAIT_OBJECT_0)
+      || (i>25) )
     Sleep(100);
     CloseHandle(hProc);
     hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
