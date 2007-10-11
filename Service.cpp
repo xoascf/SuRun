@@ -405,7 +405,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               {
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
-                //WaitForProcess(pi.dwProcessId);
+                WaitForProcess(pi.dwProcessId);
               }else
                 DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
             }else
