@@ -304,6 +304,7 @@ void WaitForProcess(DWORD ProcID)
       || (WaitForSingleObject(hProc,t.Rest())!=WAIT_OBJECT_0)
       || (i>25) )
       break;
+    i++;
     Sleep(100);
     CloseHandle(hProc);
     hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
