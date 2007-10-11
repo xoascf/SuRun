@@ -303,6 +303,7 @@ void WaitForProcess(DWORD ProcID)
     if (t.TimedOut() 
       || (WaitForSingleObject(hProc,t.Rest())!=WAIT_OBJECT_0)
       || (i>25) )
+      break;
     Sleep(100);
     CloseHandle(hProc);
     hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
