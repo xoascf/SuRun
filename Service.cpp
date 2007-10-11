@@ -309,6 +309,7 @@ void WaitForProcess(DWORD ProcID)
     CloseHandle(hProc);
     hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
   }
+  DBGTrace1("WaitForProcess(%d) exit",ProcID);
 }
 
 //////////////////////////////////////////////////////////////////////////////
