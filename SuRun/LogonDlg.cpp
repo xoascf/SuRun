@@ -100,7 +100,7 @@ public:
         return;
       if (cr>0)
       {
-        if (j<nUsers)
+        if (j<nUsers-1)
           memmove(&User[j+1],&User[j],(nUsers-j)*sizeof(User[0]));
         break;
       }
