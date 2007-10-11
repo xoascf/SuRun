@@ -98,6 +98,7 @@ public:
         }
         CloseDesktop(d);
       }
+      Sleep(10);
     }
     free(DeskName);
     t->m_Thread=0;
