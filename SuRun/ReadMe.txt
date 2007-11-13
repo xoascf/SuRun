@@ -117,6 +117,10 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.2.8 - 2007-10-11:
 ---------------------------
+* SuRun now set's an ExitCode
+
+SuRun 1.0.2.8 - 2007-10-11:
+---------------------------
 * Added code to avoid Deadlock with AntiVir's RootKit detector "avipbb.sys" 
   that breaks OpenProcess()
 * Added code to recover SuRuns Desktop when user processes call SwitchDesktop()
