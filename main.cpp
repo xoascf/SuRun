@@ -211,7 +211,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   if (!g_RunData.cmdLine[0])
   {
     MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return -1;
+    return ERROR_INVALID_PARAMETER;
   }
   //Lets go:
   HANDLE hPipe=INVALID_HANDLE_VALUE;
@@ -237,7 +237,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if ((g_RunPwd[0]==0xFF)
       ||(g_RunPwd[0]==1)
       || bRunSetup)
-      return 0;
+      return ERROR_ACCESS_DENIED;
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb = sizeof(STARTUPINFO);
@@ -260,9 +260,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     {
       //Clear sensitive Data
       zero(g_RunPwd);
+      DWORD dwErr=GetLastError();
       MessageBox(0,
-        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetLastErrorNameStatic()),
+        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
+      return dwErr;
     }else
     {
       //Clear sensitive Data
