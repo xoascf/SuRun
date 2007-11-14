@@ -564,10 +564,14 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
     return TRUE;
   }
-  TCHAR U[UNLEN+GNLEN]={0};
-  TCHAR P[PWLEN]={0};
-  if (!LogonAdmin(U,P,IDS_NOSURUNNER))
-    return FALSE;
+  {
+    TCHAR U[UNLEN+GNLEN]={0};
+    TCHAR P[PWLEN]={0};
+    if (!LogonAdmin(U,P,IDS_NOSURUNNER))
+      return FALSE;
+    zero(U);
+    zero(P);
+  }
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
   {
