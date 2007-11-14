@@ -251,6 +251,9 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
   TCHAR User[UNLEN+GNLEN+2]={0};
   TCHAR Password[PWLEN+1]={0};
   GetProcessUserName(GetCurrentProcessId(),User);
-  return LogonAdmin(User,Password,IDmsg) 
-      && RunAs(cmdline,User,Password);
+  BOOL bRet=LogonAdmin(User,Password,IDmsg) 
+    && RunAs(cmdline,User,Password);
+  zero(User);      //Clean sensitive Data
+  zero(Password);  //Clean sensitive Data
+  return bRet;
 }
