@@ -393,6 +393,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if(CheckCliProcess(rd)==2)
       {
+        GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+        MessageBox(0,g_RunData.UserName,L"Name jetzt ok?",MB_SERVICE_NOTIFICATION);
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
