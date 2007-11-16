@@ -178,7 +178,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-  MessageBox(0,g_RunData.UserName,L"Name ok?",0);
+  
+  //MessageBox(0,g_RunData.UserName,L"Name ok?",0);
+
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
