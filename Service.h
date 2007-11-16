@@ -22,6 +22,8 @@
 
 // This structure is passed from SuRun.exe to the service
 // RUNDATA is bigger than required, but I'll leave it this way
+#pragma pack(push)
+#pragma pack(1)
 typedef struct
 {
   DWORD CliProcessId;
@@ -41,3 +43,5 @@ extern RUNDATA g_RunData;
 //The service copies the users password via WriteProcessMemory to g_RunPwd of 
 //SuRun.exe that was started by the user
 extern TCHAR g_RunPwd[PWLEN];
+
+#pragma pack(pop)
