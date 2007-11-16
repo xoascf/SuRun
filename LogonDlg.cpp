@@ -50,7 +50,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
     _T("Common AppData"),PicDir,MAX_PATH);
   PathUnquoteSpaces(PicDir);
   PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
-  TCHAR Pic[UNLEN];
+  TCHAR Pic[UNLEN+1];
   _tcscpy(Pic,UserName);
   PathStripPath(Pic);
   PathAppend(PicDir,Pic);
@@ -67,7 +67,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
 
 typedef struct  
 {
-  WCHAR UserName[UNLEN+DNLEN];
+  WCHAR UserName[UNLEN+UNLEN+2];
   HBITMAP UserBitmap;
 }USERDATA;
 
@@ -132,8 +132,8 @@ private:
       {
         if (p->lgrmi2_sidusage==SidTypeUser)
         {
-          TCHAR un[2*UNLEN]={0};
-          TCHAR dn[2*UNLEN]={0};
+          TCHAR un[2*UNLEN+2]={0};
+          TCHAR dn[2*UNLEN+2]={0};
           _tcscpy(un,p->lgrmi2_domainandname);
           PathStripPath(un);
           _tcscpy(dn,p->lgrmi2_domainandname);
@@ -162,8 +162,8 @@ private:
 
 HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
 {
-  TCHAR un[2*UNLEN]={0};
-  TCHAR dn[2*UNLEN]={0};
+  TCHAR un[2*UNLEN+2]={0};
+  TCHAR dn[2*UNLEN+2]={0};
   _tcscpy(un,User);
   PathStripPath(un);
   _tcscpy(dn,User);
@@ -237,7 +237,7 @@ void SetUserBitmap(HWND hwnd)
   PathStripPath(User);
   for (int i=0;i<p->Users.nUsers;i++) 
   {
-    TCHAR un[2*UNLEN]={0};
+    TCHAR un[2*UNLEN+2]={0};
     _tcscpy(un,p->Users.User[i].UserName);
     PathStripPath(un);
     if (_tcsicmp(un,User)==0)
