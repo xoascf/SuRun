@@ -536,10 +536,13 @@ bool DeleteDirectory(LPCTSTR DIR)
 bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain/*=0*/)
 {
   SID_NAME_USE snu;
-  TCHAR uName[UNLEN],dName[DNLEN];
-  DWORD uLen=UNLEN, dLen=DNLEN;
+  TCHAR uName[UNLEN+1],dName[UNLEN+1];
+  DWORD uLen=UNLEN, dLen=UNLEN;
   if(!LookupAccountSid(NULL,sid,uName,&uLen,dName,&dLen,&snu))
+  {
+    DBGTrace1( "LookupAccountSid failed %s\n", GetLastErrorNameStatic());
     return FALSE;
+  }
   if(Domain==0)
   {
     _tcscpy(User, dName);
@@ -563,8 +566,11 @@ bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain/*=0*/)
   TOKEN_USER* ptu=(TOKEN_USER*)malloc(dwLen);
   if(!ptu)
     return false;
-  if(GetTokenInformation(hUser,TokenUser,(PVOID)ptu,dwLen,&dwLen))
-    GetSIDUserName(ptu->User.Sid,User,Domain);
+  if((!GetTokenInformation(hUser,TokenUser,(PVOID)ptu,dwLen,&dwLen))
+    ||(!GetSIDUserName(ptu->User.Sid,User,Domain)))
+  {
+    return false;
+  }
   free(ptu);
   return true;
 }
