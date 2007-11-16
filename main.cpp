@@ -178,9 +178,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-  
-  //MessageBox(0,g_RunData.UserName,L"Name ok?",0);
-
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
@@ -244,8 +241,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb = sizeof(STARTUPINFO);
-    TCHAR un[2*UNLEN]={0};
-    TCHAR dn[2*UNLEN]={0};
+    TCHAR un[2*UNLEN+2]={0};
+    TCHAR dn[2*UNLEN+2]={0};
     _tcscpy(un,g_RunData.UserName);
     PathStripPath(un);
     _tcscpy(dn,g_RunData.UserName);
