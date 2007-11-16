@@ -33,7 +33,7 @@
 #pragma comment(lib,"comctl32.lib")
 
 #ifdef _DEBUG
-#define _DEBUGLOGON
+//#define _DEBUGLOGON
 #endif _DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
@@ -75,10 +75,11 @@ class USERLIST
 {
 public:
   int nUsers;
-  USERDATA User[1024];
+  USERDATA User[512];
   USERLIST(BOOL bAdminsOnly)
   {
     nUsers=0;
+    zero(User);
     if (bAdminsOnly)
       AddGroupUsers(DOMAIN_ALIAS_RID_ADMINS);
     else for (int g=0;g<countof(UserGroups);g++)
@@ -91,7 +92,7 @@ public:
   }
   void Add(LPWSTR UserName)
   {
-    if(nUsers>511)
+    if(nUsers>=countof(User))
       return;
     for(int j=0;j<nUsers;j++)
     {
@@ -100,7 +101,7 @@ public:
         return;
       if (cr>0)
       {
-        if (j<nUsers-1)
+        if (j<nUsers)
           memmove(&User[j+1],&User[j],(nUsers-j)*sizeof(User[0]));
         break;
       }
