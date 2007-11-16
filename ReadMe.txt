@@ -115,9 +115,12 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.8 - 2007-10-11:
+SuRun 1.0.2.9 - 2007-16-11:
 ---------------------------
 * SuRun now set's an ExitCode
+* FIX: In Windows XP a domain name can have more than DNLEN(=15) characters.
+    This caused GetProcessUsername() to fail and NetLocalGroupAddMembers() 
+    to return "1: Invalid Function".
 
 SuRun 1.0.2.8 - 2007-10-11:
 ---------------------------
