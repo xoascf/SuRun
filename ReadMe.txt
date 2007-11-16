@@ -121,6 +121,7 @@ SuRun 1.0.2.9 - 2007-16-11:
 * FIX: In Windows XP a domain name can have more than DNLEN(=15) characters.
     This caused GetProcessUsername() to fail and NetLocalGroupAddMembers() 
     to return "1: Invalid Function".
+* Fixed a Bug in the LogonDialog that could cause an exception.
 
 SuRun 1.0.2.8 - 2007-10-11:
 ---------------------------
