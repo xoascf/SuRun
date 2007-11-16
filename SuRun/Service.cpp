@@ -89,7 +89,7 @@ static bool g_bSavePW=TRUE;
 
 typedef struct //User Token cache
 {
-  TCHAR UserName[UNLEN+GNLEN];
+  TCHAR UserName[UNLEN+GNLEN+2];
   TCHAR Password[PWLEN];
   __int64 LastAskTime;
 }USERDATA;
@@ -393,9 +393,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if(CheckCliProcess(rd)==2)
       {
-//        GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-//        MessageBox(0,g_RunData.UserName,L"Name jetzt ok?",MB_SERVICE_NOTIFICATION);
-
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
@@ -568,7 +565,7 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     return TRUE;
   }
   {
-    TCHAR U[UNLEN+GNLEN]={0};
+    TCHAR U[UNLEN+GNLEN+2]={0};
     TCHAR P[PWLEN]={0};
     if (!LogonAdmin(U,P,IDS_NOSURUNNER))
       return FALSE;
