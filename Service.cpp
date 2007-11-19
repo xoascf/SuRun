@@ -1397,7 +1397,7 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
-      //in the first three Minutes after Sytstem start:
+      //In the first three Minutes after Sytstem start:
       //Wait for the service to start
       DWORD ss=CheckServiceStatus();
       if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
@@ -1465,7 +1465,7 @@ bool HandleServiceStuff()
       return true;
     }
   }
-  //in the first three Minutes after Sytstem start:
+  //In the first three Minutes after Sytstem start:
   //Wait for the service to start
   DWORD ss=CheckServiceStatus();
   if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
