@@ -223,88 +223,88 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       break;
     Sleep(250);
   }
-  if (hPipe!=INVALID_HANDLE_VALUE)
+  //No Pipe handle: fail!
+  if (hPipe==INVALID_HANDLE_VALUE)
+    return -2;
+  zero(g_RunPwd);
+  g_RunPwd[0]=0xFF;
+  DWORD nWritten=0;
+  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
+  CloseHandle(hPipe);
+  int n=0;
+  //Wait for max 60s for the Password...
+  while ((g_RunPwd[0]==0xFF)&&(n<1000))
+    Sleep(60);
+  if ((g_RunPwd[0]==0xFF)
+    ||(g_RunPwd[0]==1)
+    || bRunSetup)
+    return ERROR_ACCESS_DENIED;
+  PROCESS_INFORMATION pi={0};
+  STARTUPINFO si={0};
+  si.cb = sizeof(STARTUPINFO);
+  TCHAR un[2*UNLEN+2]={0};
+  TCHAR dn[2*UNLEN+2]={0};
+  _tcscpy(un,g_RunData.UserName);
+  PathStripPath(un);
+  _tcscpy(dn,g_RunData.UserName);
+  PathRemoveFileSpec(dn);
+  //To start control Panel and other Explorer children we need to tell 
+  //Explorer to start a new Process:
+  SetRegInt(HKEY_CURRENT_USER,
+    L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+    L"SeparateProcess",1);
+  //Create the process suspended to revoke access for the current user 
+  //before it starts runnung
+  if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
+    g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT|CREATE_SUSPENDED,NULL,
+    g_RunData.CurDir,&si,&pi))
   {
+    //Clear sensitive Data
     zero(g_RunPwd);
-    g_RunPwd[0]=0xFF;
-    DWORD nWritten=0;
-    WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
-    CloseHandle(hPipe);
-    int n=0;
-    //Wait for max 60s for the Password...
-    while ((g_RunPwd[0]==0xFF)&&(n<1000))
-      Sleep(60);
-    if ((g_RunPwd[0]==0xFF)
-      ||(g_RunPwd[0]==1)
-      || bRunSetup)
-      return ERROR_ACCESS_DENIED;
-    PROCESS_INFORMATION pi={0};
-    STARTUPINFO si={0};
-    si.cb = sizeof(STARTUPINFO);
-    TCHAR un[2*UNLEN+2]={0};
-    TCHAR dn[2*UNLEN+2]={0};
-    _tcscpy(un,g_RunData.UserName);
-    PathStripPath(un);
-    _tcscpy(dn,g_RunData.UserName);
-    PathRemoveFileSpec(dn);
-    //To start control Panel and other Explorer children we need to tell 
-    //Explorer to start a new Process:
-    SetRegInt(HKEY_CURRENT_USER,
-      L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-      L"SeparateProcess",1);
-    //Create the process suspended to revoke access for the current user 
-    //before it starts runnung
-    if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
-      g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT|CREATE_SUSPENDED,NULL,
-      g_RunData.CurDir,&si,&pi))
+    DWORD dwErr=GetLastError();
+    MessageBox(0,
+      CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
+      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return dwErr;
+  }else
+  {
+    //Clear sensitive Data
+    zero(g_RunPwd);
+    zero(g_RunData);
+    //Allow access to the Process and Thread to the Administrators and deny 
+    //access for the current user
+    SetAdminDenyUserAccess(pi.hThread);
+    SetAdminDenyUserAccess(pi.hProcess);
+    //Complain if the shell is runnig with administrative privileges:
+    DWORD ShellID=0;
+    GetWindowThreadProcessId(GetShellWindow(),&ShellID);
+    if (ShellID)
     {
-      //Clear sensitive Data
-      zero(g_RunPwd);
-      DWORD dwErr=GetLastError();
-      MessageBox(0,
-        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
-        CResStr(IDS_APPNAME),MB_ICONSTOP);
-      return dwErr;
-    }else
-    {
-      //Clear sensitive Data
-      zero(g_RunPwd);
-      zero(g_RunData);
-      //Allow access to the Process and Thread to the Administrators and deny 
-      //access for the current user
-      SetAdminDenyUserAccess(pi.hThread);
-      SetAdminDenyUserAccess(pi.hProcess);
-      //Complain if the shell is runnig with administrative privileges:
-      DWORD ShellID=0;
-      GetWindowThreadProcessId(GetShellWindow(),&ShellID);
-      if (ShellID)
+      HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
+      if (hShell)
       {
-        HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
-        if (hShell)
+        HANDLE hTok=0;
+        if(OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
         {
-          HANDLE hTok=0;
-          if(OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
+          if(IsAdmin(hTok))
           {
-            if(IsAdmin(hTok))
-            {
-              TCHAR s[MAX_PATH]={0};
-              GetRegStr(HKEY_LOCAL_MACHINE,
-                L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-                L"Shell",s,MAX_PATH);
-              MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-                MB_ICONEXCLAMATION|MB_SETFOREGROUND);
-            }
-            CloseHandle(hTok);
+            TCHAR s[MAX_PATH]={0};
+            GetRegStr(HKEY_LOCAL_MACHINE,
+              L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+              L"Shell",s,MAX_PATH);
+            MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+              MB_ICONEXCLAMATION|MB_SETFOREGROUND);
           }
-          CloseHandle(hShell);
+          CloseHandle(hTok);
         }
+        CloseHandle(hShell);
       }
-      //Start the main thread
-      ResumeThread(pi.hThread);
-      //Ok, we're done with the handles:
-      CloseHandle(pi.hThread);
-      CloseHandle(pi.hProcess);
     }
+    //Start the main thread
+    ResumeThread(pi.hThread);
+    //Ok, we're done with the handles:
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
   }
   return 0;
 }
