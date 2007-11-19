@@ -1462,6 +1462,13 @@ bool HandleServiceStuff()
     }
   }
   //The Service must be running!
+  HANDLE hScC=OpenEvent(SYNCHRONIZE,0,_TEXT("\\BaseNamedObjects\\SC_AutoStartComplete"));
+  if (hScC)
+  {
+    WaitForSingleObject(hScC,INFINITE);
+    CloseHandle(hScC);
+  }else
+    MessageBox(0,GetLastErrorNameStatic(),L"SC_AutoStartComplete",0);
   DWORD ServiceStatus=CheckServiceStatus();
   while(ServiceStatus!=SERVICE_RUNNING)
   {
