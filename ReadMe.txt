@@ -115,6 +115,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.9 - 2007-11-19:
+---------------------------
+* SuRun waits for max 3 minutes after the Windows start for the Service.
+
 SuRun 1.0.2.9 - 2007-11-17:
 ---------------------------
 * SuRun now set's an ExitCode
