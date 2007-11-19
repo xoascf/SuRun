@@ -1397,8 +1397,12 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
-      for(int i=0;(i<30)&&(CheckServiceStatus()!=SERVICE_RUNNING);i++)
-        Sleep(1000);
+      //in the first three Minutes after Sytstem start:
+      //Wait for the service to start
+      DWORD ss=CheckServiceStatus();
+      if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
+        while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
+            Sleep(1000);
       InstallSysMenuHook();
 #ifdef _WIN64
       {
@@ -1461,22 +1465,21 @@ bool HandleServiceStuff()
       return true;
     }
   }
+  //in the first three Minutes after Sytstem start:
+  //Wait for the service to start
+  DWORD ss=CheckServiceStatus();
+  if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
+    while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
+        Sleep(1000);
   //The Service must be running!
-  HANDLE hScC=OpenEvent(SYNCHRONIZE,0,_TEXT("\\BaseNamedObjects\\SC_AutoStartComplete"));
-  if (hScC)
-  {
-    WaitForSingleObject(hScC,INFINITE);
-    CloseHandle(hScC);
-  }else
-    MessageBox(0,GetLastErrorNameStatic(),L"SC_AutoStartComplete",0);
-  DWORD ServiceStatus=CheckServiceStatus();
-  while(ServiceStatus!=SERVICE_RUNNING)
+  ss=CheckServiceStatus();
+  while(ss!=SERVICE_RUNNING)
   {
     if (!UserInstall(IDS_ASKINSTALL))
       ExitProcess(0);
     if (cmd.argc()==1)
       ExitProcess(0);
-    ServiceStatus=CheckServiceStatus();
+    ss=CheckServiceStatus();
   }
   return false;
 }
