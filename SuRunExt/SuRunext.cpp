@@ -55,21 +55,17 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
-  DBGTrace("SuRunExt:DllGetClassObject");
 	*ppvOut = NULL;
   if (IsEqualIID(rclsid, CLSID_ShellExtension)) 
   {
     CShellExtClassFactory *pcf = new CShellExtClassFactory;
-    DBGTrace("SuRunExt:DllGetClassObject CShellExtClassFactory ");
     return pcf->QueryInterface(riid, ppvOut);
   }
   if (IsEqualIID(rclsid, IID_IShellExecHook)) 
   {
     CShellExecHook *seh = new CShellExecHook;
-    DBGTrace("SuRunExt:DllGetClassObject CShellExecHook");
     return seh->QueryInterface(riid, ppvOut);
   }
-  DBGTrace("SuRunExt:DllGetClassObject CLASS_E_CLASSNOTAVAILABLE");
   return CLASS_E_CLASSNOTAVAILABLE;
 }
 
@@ -177,8 +173,6 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
     *ppv = (LPSHELLEXTINIT)this;
   else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
-  else if (IsEqualIID(riid, IID_IShellExecHook))
-    *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
   {
     AddRef();
@@ -266,27 +260,42 @@ CShellExecHook::~CShellExecHook()
 
 STDMETHODIMP CShellExecHook::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
+  DBGTrace("CShellExecHook::QueryInterface");
   *ppv = NULL;
   if (IsEqualIID(riid, IID_IUnknown))
+  {
+    DBGTrace("CShellExecHook::QueryInterface IUnknonw");
     *ppv = (IUnknown*)this;
+  }
   if (IsEqualIID(riid, IID_IShellExecuteHook))
+  {
+    DBGTrace("CShellExecHook::QueryInterface IShellExecuteHook");
     *ppv = (IShellExecuteHook*)this;
+  }
+  if (IsEqualIID(riid, IID_IShellExecHook))
+  {
+    DBGTrace("CShellExecHook::QueryInterface IShellExecHook");
+    *ppv = (IShellExecuteHook*)this;
+  }
   if (*ppv) 
   {
     AddRef();
     return NOERROR;
   }
+  DBGTrace("CShellExecHook::QueryInterface E_NOINTERFACE");
   return E_NOINTERFACE;
 }
 
 
 STDMETHODIMP_(ULONG) CShellExecHook::AddRef()
 {
+  DBGTrace1("CShellExecHook::AddRef %d",m_cRef);
 	return InterlockedIncrement((LPLONG)&m_cRef);
 }
 
 STDMETHODIMP_(ULONG) CShellExecHook::Release()
 {
+  DBGTrace1("CShellExecHook::Release %d",m_cRef);
 	if (InterlockedDecrement((LPLONG)&m_cRef))
     return m_cRef;
   delete this;
