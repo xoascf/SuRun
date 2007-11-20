@@ -21,6 +21,8 @@
 #include "../Helpers.h"
 #include "Resource.h"
 
+#include "../DBGTrace.h"
+
 extern TCHAR sFileNotFound[MAX_PATH];
 extern TCHAR sSuRun[MAX_PATH];
 extern TCHAR sErr[MAX_PATH];
@@ -58,6 +60,11 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
   {
     CShellExtClassFactory *pcf = new CShellExtClassFactory;
     return pcf->QueryInterface(riid, ppvOut);
+  }
+  if (IsEqualIID(rclsid, IID_IShellExecHook)) 
+  {
+    CShellExecHook *seh = new CShellExecHook;
+    return seh->QueryInterface(riid, ppvOut);
   }
   return CLASS_E_CLASSNOTAVAILABLE;
 }
@@ -153,6 +160,8 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
     *ppv = (LPSHELLEXTINIT)this;
   else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
+  else if (IsEqualIID(riid, IID_IShellExecHook))
+    *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
   {
     AddRef();
@@ -224,4 +233,49 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
   if (uFlags == GCS_HELPTEXT && cchMax > 35)
     wcscpy((LPWSTR)pszName,sTip);
   return NOERROR;
+}
+
+
+CShellExecHook::CShellExecHook()
+{
+	m_cRef = 0L;
+  inc_cRefThisDLL();
+}
+
+CShellExecHook::~CShellExecHook()
+{
+  dec_cRefThisDLL();
+}
+
+STDMETHODIMP CShellExecHook::QueryInterface(REFIID riid, LPVOID FAR *ppv)
+{
+  *ppv = NULL;
+  if (IsEqualIID(riid, IID_IShellExecuteHook))
+    *ppv = (IShellExecuteHook*)this;
+  if (*ppv) 
+  {
+    AddRef();
+    return NOERROR;
+  }
+  return E_NOINTERFACE;
+}
+
+
+STDMETHODIMP_(ULONG) CShellExecHook::AddRef()
+{
+	return InterlockedIncrement((LPLONG)&m_cRef);
+}
+
+STDMETHODIMP_(ULONG) CShellExecHook::Release()
+{
+	if (InterlockedDecrement((LPLONG)&m_cRef))
+    return m_cRef;
+  delete this;
+  return 0L;
+}
+
+STDMETHODIMP CShellExecHook::Execute(LPSHELLEXECUTEINFO pei)
+{
+  DBGTrace1("ShellExecute: %s",pei->lpFile);
+  return S_FALSE;
 }
