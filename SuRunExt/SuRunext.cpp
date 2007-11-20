@@ -79,14 +79,27 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUID,L"SuRun Shell Extension");
+
+  SetRegStr(HKCR,L"CLSID\\" sGUIDhk,L"",L"SuRun ShellExecHook");
+  SetRegStr(HKCR,L"CLSID\\" sGUIDhk L"\\InProcServer32",L"",L"SuRunExt.dll");
+  SetRegStr(HKCR,L"CLSID\\" sGUIDhk L"\\InProcServer32",L"ThreadingModel",L"Apartment");
+  
+  SetRegStr(HKCR,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
+            L"SuRun ShellExecHook",sGUID);
+  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
+            sGUID,L"SuRun ShellExecHook");
 }
 
 __declspec(dllexport) void RemoveShellExt()
 {
   DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
-  RegDelVal(HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
-            sGUID);
+
+  DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUIDhk);
+  RegDelVal(HKEY_CLASSES_ROOT,
+    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUIDhk);
+  RegDelVal(HKEY_LOCAL_MACHINE,
+    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUIDhk);
 }
 
 CShellExtClassFactory::CShellExtClassFactory()
