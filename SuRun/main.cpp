@@ -57,7 +57,7 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
   TCHAR ext[MAX_PATH];
   _tcscpy(ext,PathFindExtension(file));
   PathRemoveExtension(file);
-   if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
+  if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
   {
     wcscpy(app,L"/n,/root,");
     if (args[0]==0) 
