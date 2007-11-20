@@ -55,17 +55,21 @@ STDAPI DllCanUnloadNow(void)
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
+  DBGTrace("SuRunExt:DllGetClassObject");
 	*ppvOut = NULL;
   if (IsEqualIID(rclsid, CLSID_ShellExtension)) 
   {
     CShellExtClassFactory *pcf = new CShellExtClassFactory;
+    DBGTrace("SuRunExt:DllGetClassObject CShellExtClassFactory ");
     return pcf->QueryInterface(riid, ppvOut);
   }
   if (IsEqualIID(rclsid, IID_IShellExecHook)) 
   {
     CShellExecHook *seh = new CShellExecHook;
+    DBGTrace("SuRunExt:DllGetClassObject CShellExecHook");
     return seh->QueryInterface(riid, ppvOut);
   }
+  DBGTrace("SuRunExt:DllGetClassObject CLASS_E_CLASSNOTAVAILABLE");
   return CLASS_E_CLASSNOTAVAILABLE;
 }
 
@@ -85,7 +89,7 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"CLSID\\" sGUIDhk L"\\InProcServer32",L"ThreadingModel",L"Apartment");
   
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
-            L"SuRun ShellExecHook",sGUIDhk);
+            sGUIDhk,L"");
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUIDhk,L"SuRun ShellExecHook");
 }
@@ -263,6 +267,8 @@ CShellExecHook::~CShellExecHook()
 STDMETHODIMP CShellExecHook::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
   *ppv = NULL;
+  if (IsEqualIID(riid, IID_IUnknown))
+    *ppv = (IUnknown*)this;
   if (IsEqualIID(riid, IID_IShellExecuteHook))
     *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
