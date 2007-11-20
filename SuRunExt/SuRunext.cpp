@@ -61,11 +61,6 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     CShellExtClassFactory *pcf = new CShellExtClassFactory;
     return pcf->QueryInterface(riid, ppvOut);
   }
-  if (IsEqualIID(rclsid, IID_IShellExecHook)) 
-  {
-    CShellExecHook *seh = new CShellExecHook;
-    return seh->QueryInterface(riid, ppvOut);
-  }
   return CLASS_E_CLASSNOTAVAILABLE;
 }
 
@@ -80,26 +75,18 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUID,L"SuRun Shell Extension");
 
-  SetRegStr(HKCR,L"CLSID\\" sGUIDhk,L"",L"SuRun ShellExecHook");
-  SetRegStr(HKCR,L"CLSID\\" sGUIDhk L"\\InProcServer32",L"",L"SuRunExt.dll");
-  SetRegStr(HKCR,L"CLSID\\" sGUIDhk L"\\InProcServer32",L"ThreadingModel",L"Apartment");
-  
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
-            sGUIDhk,L"");
-  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
-            sGUIDhk,L"SuRun ShellExecHook");
+            sGUID,L"");
 }
 
 __declspec(dllexport) void RemoveShellExt()
 {
   DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
-
-  DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUIDhk);
   RegDelVal(HKEY_CLASSES_ROOT,
-    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUIDhk);
+    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
   RegDelVal(HKEY_LOCAL_MACHINE,
-    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUIDhk);
+    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
 CShellExtClassFactory::CShellExtClassFactory()
@@ -173,6 +160,8 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
     *ppv = (LPSHELLEXTINIT)this;
   else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
+  if (IsEqualIID(riid, IID_IShellExecuteHook))
+    *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
   {
     AddRef();
@@ -247,62 +236,7 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
 }
 
 
-CShellExecHook::CShellExecHook()
-{
-	m_cRef = 0L;
-  inc_cRefThisDLL();
-}
-
-CShellExecHook::~CShellExecHook()
-{
-  dec_cRefThisDLL();
-}
-
-STDMETHODIMP CShellExecHook::QueryInterface(REFIID riid, LPVOID FAR *ppv)
-{
-  DBGTrace("CShellExecHook::QueryInterface");
-  *ppv = NULL;
-  if (IsEqualIID(riid, IID_IUnknown))
-  {
-    DBGTrace("CShellExecHook::QueryInterface IUnknonw");
-    *ppv = (IUnknown*)this;
-  }
-  if (IsEqualIID(riid, IID_IShellExecuteHook))
-  {
-    DBGTrace("CShellExecHook::QueryInterface IShellExecuteHook");
-    *ppv = (IShellExecuteHook*)this;
-  }
-  if (IsEqualIID(riid, IID_IShellExecHook))
-  {
-    DBGTrace("CShellExecHook::QueryInterface IShellExecHook");
-    *ppv = (IShellExecuteHook*)this;
-  }
-  if (*ppv) 
-  {
-    AddRef();
-    return NOERROR;
-  }
-  DBGTrace("CShellExecHook::QueryInterface E_NOINTERFACE");
-  return E_NOINTERFACE;
-}
-
-
-STDMETHODIMP_(ULONG) CShellExecHook::AddRef()
-{
-  DBGTrace1("CShellExecHook::AddRef %d",m_cRef);
-	return InterlockedIncrement((LPLONG)&m_cRef);
-}
-
-STDMETHODIMP_(ULONG) CShellExecHook::Release()
-{
-  DBGTrace1("CShellExecHook::Release %d",m_cRef);
-	if (InterlockedDecrement((LPLONG)&m_cRef))
-    return m_cRef;
-  delete this;
-  return 0L;
-}
-
-STDMETHODIMP CShellExecHook::Execute(LPSHELLEXECUTEINFO pei)
+STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
   DBGTrace1("ShellExecute: %s",pei->lpFile);
   return S_FALSE;
