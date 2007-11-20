@@ -85,9 +85,9 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"CLSID\\" sGUIDhk L"\\InProcServer32",L"ThreadingModel",L"Apartment");
   
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
-            L"SuRun ShellExecHook",sGUID);
+            L"SuRun ShellExecHook",sGUIDhk);
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
-            sGUID,L"SuRun ShellExecHook");
+            sGUIDhk,L"SuRun ShellExecHook");
 }
 
 __declspec(dllexport) void RemoveShellExt()
