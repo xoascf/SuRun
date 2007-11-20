@@ -238,6 +238,7 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
 
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
+  //ToDo:
   DBGTrace1("ShellExecute: %s",pei->lpFile);
   return S_FALSE;
 }
