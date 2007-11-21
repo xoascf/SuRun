@@ -184,6 +184,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //cmdLine
   BOOL bRunSetup=FALSE;
   LPTSTR Args=PathGetArgs(GetCommandLine());
+  DBGTrace1("SuRun: ARGS %s",Args)
   //Parse direct commands:
   while (Args[0]=='/')
   {
@@ -200,8 +201,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!_wcsicmp(c,L"/TESTAUTOADMIN"))
     {
       g_RunData.bShlExHook=TRUE;
-      Args=PathGetArgs(Args);
-      break;
     }else
     if (!_wcsicmp(c,L"/KILL"))
     {
@@ -210,15 +209,21 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       KillProcessNice(g_RunData.KillPID);
     }
   }
+  DBGTrace1("SuRun: ARGS2 %s",Args)
   //Convert Command Line
   if (!bRunSetup)
     ArgsToCommand(Args,g_RunData.cmdLine);
+  DBGTrace1("SuRun: ARGS3 %s",Args)
   //Usage
   if (!g_RunData.cmdLine[0])
   {
     MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return ERROR_INVALID_PARAMETER;
   }
+  if (g_RunData.bShlExHook)
+    DBGTrace1("SuRun: testing %s",g_RunData.cmdLine)
+  else
+    DBGTrace1("SuRun: starting %s",g_RunData.cmdLine);
   //Lets go:
   HANDLE hPipe=INVALID_HANDLE_VALUE;
   //retry if the pipe is busy: (max 240s)
