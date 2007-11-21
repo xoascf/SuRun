@@ -529,7 +529,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
             }
           }else
-            EndDialog(hwnd,1+IsDlgButtonChecked(hwnd,IDC_ALWAYSOK));
+            EndDialog(hwnd,1|(IsDlgButtonChecked(hwnd,IDC_ALWAYSOK)<<1)
+                            |(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2));
           return TRUE;
         }//MAKELPARAM(IDOK,BN_CLICKED)
       }//switch (wParam)
