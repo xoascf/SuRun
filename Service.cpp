@@ -87,14 +87,15 @@ static bool g_AskAlways=TRUE;   //Ask "Is that ok?" every time
 static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
 static bool g_bSavePW=TRUE;
 
-typedef struct //User Token cache
+//ToDo: get rid of USERDATA:
+typedef struct //User Password cache
 {
   TCHAR UserName[UNLEN+GNLEN+2];
   TCHAR Password[PWLEN];
   __int64 LastAskTime;
 }USERDATA;
 
-static USERDATA g_Users[32]={0};    //Tokens for the last 32 Users are cached
+static USERDATA g_Users[32]={0};    //Passwords for the last 32 Users are cached
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -291,37 +292,6 @@ DWORD CheckCliProcess(RUNDATA& rd)
   return CloseHandle(hProcess),2;
 }
 
-void WaitForProcess(DWORD ProcID)
-{
-  HANDLE hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
-  //First:
-  // WaitforSingleObject() for a just started Process will return 
-  // immediately with WAIT_OBJECT_0, so SuRun keeps trying until 
-  // OpenProcess returns 0
-  //
-  //Second:
-  // This is a bit tricky and because of the RootKit Detector of "ANTIVIR" 
-  // avipbb.sys. With avipbb.sys loaded and AntiVir active, OpenProcess
-  // will succeed even after the process has terminated
-  // So SuRun uses an additional two stage detection,
-  // * a total timeout of 50seconds
-  // * at maximum 25 runs (WaitForSingleObject, Sleep)
-  CTimeOut t(50000);
-  int i=0;
-  while (hProc)
-  {
-    if (t.TimedOut() 
-      || (WaitForSingleObject(hProc,t.Rest())!=WAIT_OBJECT_0)
-      || (i>25) )
-      break;
-    i++;
-    Sleep(100);
-    CloseHandle(hProc);
-    hProc=OpenProcess(SYNCHRONIZE,0,ProcID);
-  }
-  DBGTrace1("WaitForProcess(%d) exit",ProcID);
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  GivePassword
@@ -474,9 +444,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                           CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                           0,NULL,&si,&pi))
               {
-                CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
-                WaitForProcess(pi.dwProcessId);
+                WaitForSingleObject(pi.hProcess,60000);
+                CloseHandle(pi.hProcess);
               }else
                 DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
             }else
@@ -859,7 +829,7 @@ int CacheUserPassword(LPTSTR Password)
 int PrepareSuRun()
 {
   BOOL bDoAsk=g_AskAlways;
-  //Do we have a token for this user?
+  //Do we have a Password for this user?
   int nUser=-1;
   for (int i=0;i<countof(g_Users);i++) 
     if (_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0)
@@ -918,33 +888,25 @@ int PrepareSuRun()
       nUser=CacheUserPassword(_T(""));
     }
     BOOL bSeOk=IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-    if(nUser!=-1)
+    BOOL bLogon=0;
+    if (nUser==-1)
     {
-      BOOL bLogon=AskCurrentUserOk(g_RunData.UserName,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
-      if(!bLogon)
-        return -1;
-      if ((bLogon&2)==2)
-        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
-      if ((bLogon&4)==4)
-        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-      else
-        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-      return nUser;
-    }
-    TCHAR Password[MAX_PATH]={0};
-    BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
-    if(bLogon)
-    {
-      nUser=CacheUserPassword(Password);
+      TCHAR Password[MAX_PATH]={0};
+      bLogon=LogonCurrentUser(g_RunData.UserName,Password,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
+      if(bLogon)
+        nUser=CacheUserPassword(Password);
       zero(Password);
-      if ((bLogon&2)==2)
-        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
-      if ((bLogon&4)==4)
-        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-      else
-        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-      return nUser;
-    }
+    }else
+      bLogon=AskCurrentUserOk(g_RunData.UserName,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
+    if(!bLogon)
+      return -1;
+    if (bLogon&2)
+      SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
+    if (bLogon&4)
+      SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
+    else
+      RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
+    return nUser;
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return -1;
