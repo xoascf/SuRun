@@ -203,20 +203,30 @@ void SavePasswords()
 // WhiteList handling
 // 
 //////////////////////////////////////////////////////////////////////////////
+#define FLAG_DONTASK   1
+#define FLAG_SHELLEXEC 2
 
-BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine)
+BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  return GetRegInt(HKLM,WLKEY(User),CmdLine,0)==1;
+  return (GetRegInt(HKLM,WLKEY(User),CmdLine,0)&Flag)==Flag;
 }
 
-BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
+BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
+  DWORD dwwl=GetRegInt(HKLM,WLKEY(User),CmdLine,0)&(~Flag);
+  if(dwwl)
+  {
+    DBGTrace3("WhiteList Remove Flag(%X): %s: %s",Flag,g_RunData.UserName,g_RunData.cmdLine);
+    return SetRegInt(HKLM,WLKEY(User),CmdLine,dwwl);
+  }
+  DBGTrace3("WhiteList Remove(%X): %s: %s",Flag,g_RunData.UserName,g_RunData.cmdLine);
   return RegDelVal(HKLM,WLKEY(User),CmdLine);
 }
 
-void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine)
+void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  SetRegInt(HKLM,WLKEY(User),CmdLine,1);
+  DBGTrace3("WhiteList SaveFlag(%X): %s: %s",Flag,g_RunData.UserName,g_RunData.cmdLine);
+  SetRegInt(HKLM,WLKEY(User),CmdLine,GetRegInt(HKLM,WLKEY(User),CmdLine,0)|Flag);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -314,6 +324,35 @@ void WaitForProcess(DWORD ProcID)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  GivePassword
+// 
+//////////////////////////////////////////////////////////////////////////////
+BOOL GivePassword() 
+{
+  HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.CliProcessId);
+  if (!hProcess)
+  {
+    DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
+    return FALSE;
+  }
+  SIZE_T n;
+  //Since it's the same process, g_RunPwd has the same address!
+  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
+  {
+    DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
+    return CloseHandle(hProcess),FALSE;
+  }
+  if (PWLEN!=n)
+  {
+    DBGTrace2("WriteProcessMemory invalid size %d != %d ",PWLEN,n);
+    return CloseHandle(hProcess),FALSE;
+  }
+  WaitForSingleObject(hProcess,15000);
+  return CloseHandle(hProcess),TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  The Service:
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -393,6 +432,19 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if(CheckCliProcess(rd)==2)
       {
+        //check if the requested App is in the ShellExecHook-Runlist
+        if (g_RunData.bShlExHook)
+        {
+          if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC))
+          {
+            zero(g_RunPwd);
+            g_RunPwd[0]=2;
+            GivePassword();
+            DBGTrace2("WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            continue;
+          }
+          DBGTrace2("WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+        }
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
@@ -462,35 +514,6 @@ void KillProcess(DWORD PID)
     return;
   TerminateProcess(hProcess,0);
   CloseHandle(hProcess);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  GivePassword
-// 
-//////////////////////////////////////////////////////////////////////////////
-BOOL GivePassword() 
-{
-  HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.CliProcessId);
-  if (!hProcess)
-  {
-    DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
-    return FALSE;
-  }
-  SIZE_T n;
-  //Since it's the same process, g_RunPwd has the same address!
-  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
-  {
-    DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),FALSE;
-  }
-  if (PWLEN!=n)
-  {
-    DBGTrace2("WriteProcessMemory invalid size %d != %d ",PWLEN,n);
-    return CloseHandle(hProcess),FALSE;
-  }
-  WaitForSingleObject(hProcess,15000);
-  return CloseHandle(hProcess),TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -740,7 +763,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           {
             TCHAR cmd[4096];
             SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETTEXT,CurSel,(LPARAM)&cmd);
-            RemoveFromWhiteList(g_RunData.UserName,cmd);
+            RemoveFromWhiteList(g_RunData.UserName,cmd,FLAG_DONTASK);
             SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_DELETESTRING,CurSel,0);
           }
           EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
@@ -869,7 +892,7 @@ int PrepareSuRun()
     nUser=-1;
     bDoAsk=TRUE;
   }else
-    if (IsInWhiteList(g_Users[nUser].UserName,g_RunData.cmdLine))
+    if (IsInWhiteList(g_Users[nUser].UserName,g_RunData.cmdLine,FLAG_DONTASK))
       return nUser;
   //No Ask, just start cmdLine:
   if (!bDoAsk)
@@ -900,7 +923,7 @@ int PrepareSuRun()
       if(!bLogon)
         return -1;
       if (bLogon==2)
-        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
+        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
       return nUser;
     }
     TCHAR Password[MAX_PATH]={0};
@@ -909,8 +932,14 @@ int PrepareSuRun()
     {
       nUser=CacheUserPassword(Password);
       zero(Password);
-      if (bLogon==2)
-        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine);
+      if ((bLogon&2)==2)
+        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
+      else
+        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
+      if ((bLogon&4)==4)
+        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
+      else
+        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
       return nUser;
     }
   }else //FATAL: secure desktop could not be created!
