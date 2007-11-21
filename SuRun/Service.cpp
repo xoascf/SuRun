@@ -23,7 +23,7 @@
 // -putting the users password to the user process via WriteProcessMemory
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -83,7 +83,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 static bool g_BlurDesktop=TRUE; //blurred user desktop background on secure Desktop
-static bool g_AskAlways=TRUE;   //Ask "Is that ok?" every time
 static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
 static bool g_bSavePW=TRUE;
 
@@ -93,8 +92,8 @@ static bool g_bSavePW=TRUE;
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-#define Radio1chk (g_AskAlways!=0)
-#define Radio2chk ((g_AskAlways==0)&&(g_NoAskTimeOut!=0))
+#define Radio1chk (g_bSavePW==0)
+#define Radio2chk (g_bSavePW!=0)
 
 #define HKLM      HKEY_LOCAL_MACHINE
 #define SVCKEY    _T("SECURITY\\SuRun")
@@ -124,11 +123,29 @@ TCHAR g_RunPwd[PWLEN];
 void LoadSettings()
 {
   g_BlurDesktop=GetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),1)!=0;
-  g_AskAlways=GetRegInt(HKLM,SVCKEY,_T("AskAlways"),1)!=0;
   g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),0)));
   g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  SaveSettings
+// 
+//////////////////////////////////////////////////////////////////////////////
+void SaveSettings()
+{
+  SetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
+  SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
+  SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
+  if (!g_bSavePW)
+    DelRegKey(HKLM,PWKEY);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Password cache
+// 
+//////////////////////////////////////////////////////////////////////////////
 void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
   if (!g_bSavePW)
@@ -145,29 +162,15 @@ void DeletePassword(LPTSTR UserName)
   RegDelVal(HKLM,TMKEY,UserName);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  SaveSettings
-// 
-//////////////////////////////////////////////////////////////////////////////
-void SaveSettings()
-{
-  SetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
-  SetRegInt(HKLM,SVCKEY,_T("AskAlways"),g_AskAlways);
-  SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
-  SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
-  if (!g_bSavePW)
-    DelRegKey(HKLM,PWKEY);
-}
-
 void SavePassword(LPTSTR UserName,LPTSTR Password)
 {
   if (!g_bSavePW)
     return;
   CBlowFish bf;
+  TCHAR pw[PWLEN];
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,PWKEY,UserName,REG_BINARY,(BYTE*)Password,
-    bf.Encode((BYTE*)Password,(BYTE*)Password,(int)_tcslen(Password)*sizeof(TCHAR)));
+  SetRegAny(HKLM,PWKEY,UserName,REG_BINARY,(BYTE*)pw,
+    bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -356,8 +359,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     g_ss.dwWaitHint         = 0;
     SetServiceStatus(g_hSS,&g_ss);
     DBGTrace( "SuRun Service running");
-    //Setup
-    LoadSettings();
     while (g_hPipe!=INVALID_HANDLE_VALUE)
     {
       //Wait for a connection
@@ -562,8 +563,10 @@ void UpdateAskUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),false);
   }else
   {
-    EnableWindow(GetDlgItem(hwnd,IDC_RADIO1),true);
-    EnableWindow(GetDlgItem(hwnd,IDC_RADIO2),true);
+    CheckDlgButton(hwnd,IDC_RADIO1,(BST_UNCHECKED));
+    CheckDlgButton(hwnd,IDC_RADIO2,(BST_CHECKED));
+    EnableWindow(GetDlgItem(hwnd,IDC_RADIO1),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_RADIO2),false);
     EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),true);
   }
 }
@@ -616,7 +619,7 @@ void LBSetScrollbar(HWND hwnd)
 
 INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
-  DBGTrace4("SetupDlgProc(%x,%x,%x,%x)",hwnd,msg,wParam,lParam);
+//  DBGTrace4("SetupDlgProc(%x,%x,%x,%x)",hwnd,msg,wParam,lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -652,6 +655,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
         SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
       LBSetScrollbar(GetDlgItem(hwnd,IDC_WHITELIST));
+      UpdateAskUser(hwnd);
       return TRUE;
     }//WM_INITDIALOG
   case WM_NCDESTROY:
@@ -683,7 +687,6 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDOK,BN_CLICKED):
         {
           g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
-          g_AskAlways=IsDlgButtonChecked(hwnd,IDC_RADIO1)==BST_CHECKED;
           g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
           g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
           SaveSettings();
@@ -737,11 +740,11 @@ BOOL Setup(LPCTSTR WinStaName)
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
-#endif _DEBUGSETUP
   //only Admins and SuRunners may setup SuRun
   if ((IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
     ||(IsInSuRunners(g_RunData.UserName))
     ||(CheckGroupMembership(g_RunData.UserName)))
+#endif _DEBUGSETUP
     return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;  
   return false;
 }
@@ -751,11 +754,19 @@ BOOL TestSetup()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
+  
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!Setup(L"WinSta0"))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
   if (!Setup(L"WinSta0"))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
+  if (!Setup(L"WinSta0"))
+    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  
   ::ExitProcess(0);
   return TRUE;
 }
@@ -774,19 +785,20 @@ BOOL PrepareSuRun()
   GetSystemTimeAsFileTime((LPFILETIME)&ft);
   zero(g_RunPwd);
   //Do we have a Password for this user?
-  if(!g_AskAlways)
-    LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
-  else if (g_NoAskTimeOut)
+  if (g_bSavePW)
   {
-    __int64 AskTime=GetRegInt64(HKLM,TMKEY,g_RunData.UserName,0);
-    if ((ft-AskTime)<(ft2min*(__int64)g_NoAskTimeOut))
+    if (g_NoAskTimeOut)
+    {
+      __int64 AskTime=GetRegInt64(HKLM,TMKEY,g_RunData.UserName,0);
+      if ((ft-AskTime)<(ft2min*(__int64)g_NoAskTimeOut))
+        LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
+      else //Time is up: Delete Password!
+        DeletePassword(g_RunData.UserName);
+    }else
       LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
-    else //Time is up: Delete Password!
-      DeletePassword(g_RunData.UserName);
   }
   BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd);
-  if ((!PwOk)
-    ||(!IsInSuRunners(g_RunData.UserName)))
+  if ((!PwOk)||(!IsInSuRunners(g_RunData.UserName)))
   //Password is NOT ok:
   {
     zero(g_RunPwd);
