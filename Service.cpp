@@ -917,15 +917,14 @@ int PrepareSuRun()
       //Password is empty, cache it ;)
       nUser=CacheUserPassword(_T(""));
     }
+    BOOL bSeOk=IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
     if(nUser!=-1)
     {
-      BOOL bLogon=AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine);
+      BOOL bLogon=AskCurrentUserOk(g_RunData.UserName,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
       if(!bLogon)
         return -1;
       if ((bLogon&2)==2)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
-      else
-        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
       if ((bLogon&4)==4)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
       else
@@ -933,15 +932,13 @@ int PrepareSuRun()
       return nUser;
     }
     TCHAR Password[MAX_PATH]={0};
-    BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,IDS_ASKOK,g_RunData.cmdLine);
+    BOOL bLogon=LogonCurrentUser(g_RunData.UserName,Password,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
     if(bLogon)
     {
       nUser=CacheUserPassword(Password);
       zero(Password);
       if ((bLogon&2)==2)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
-      else
-        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
       if ((bLogon&4)==4)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
       else
