@@ -922,8 +922,14 @@ int PrepareSuRun()
       BOOL bLogon=AskCurrentUserOk(g_RunData.UserName,IDS_ASKOK,g_RunData.cmdLine);
       if(!bLogon)
         return -1;
-      if (bLogon==2)
+      if ((bLogon&2)==2)
         SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
+      else
+        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
+      if ((bLogon&4)==4)
+        SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
+      else
+        RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
       return nUser;
     }
     TCHAR Password[MAX_PATH]={0};
