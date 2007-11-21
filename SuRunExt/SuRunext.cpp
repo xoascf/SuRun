@@ -241,6 +241,37 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   //Struct Size Check
   if (pei->cbSize<sizeof(SHELLEXECUTEINFO))
     return S_FALSE;
+  //
+  if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"runas")==0))
+  {
+    //check if this Programm has an Auto-SuRun-Entry in the List
+    TCHAR cmd[MAX_PATH];
+    TCHAR tmp[MAX_PATH];
+    GetSystemWindowsDirectory(cmd,MAX_PATH);
+    PathAppend(cmd, _T("SuRun.exe"));
+    PathQuoteSpaces(cmd);
+    _tcscpy(tmp,pei->lpFile);
+    PathQuoteSpaces(tmp);
+    _tcscat(cmd,tmp);
+    if (pei->lpParameters && _tcslen(pei->lpParameters))
+    {
+      _tcscat(cmd,L" ");
+      _tcscat(cmd,pei->lpParameters);
+    }
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    // Start the child process.
+    if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+    {
+      CloseHandle(pi.hThread );
+      CloseHandle(pi.hProcess);
+      pei->hInstApp=(HINSTANCE)33;
+      return S_OK;
+    }
+    return S_FALSE;
+  }
   //Verb must be "open" or empty
   if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"open")!=0))
     return S_FALSE;
