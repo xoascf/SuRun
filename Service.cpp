@@ -87,16 +87,6 @@ static bool g_AskAlways=TRUE;   //Ask "Is that ok?" every time
 static BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
 static bool g_bSavePW=TRUE;
 
-//ToDo: get rid of USERDATA:
-typedef struct //User Password cache
-{
-  TCHAR UserName[UNLEN+GNLEN+2];
-  TCHAR Password[PWLEN];
-  __int64 LastAskTime;
-}USERDATA;
-
-static USERDATA g_Users[32]={0};    //Passwords for the last 32 Users are cached
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Globals
@@ -109,6 +99,7 @@ static USERDATA g_Users[32]={0};    //Passwords for the last 32 Users are cached
 #define HKLM      HKEY_LOCAL_MACHINE
 #define SVCKEY    _T("SECURITY\\SuRun")
 #define PWKEY     _T("SECURITY\\SuRun\\Cache")
+#define TMKEY     _T("SECURITY\\SuRun\\Times")
 #define WLKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
 
 BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
@@ -138,31 +129,20 @@ void LoadSettings()
   g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
 }
 
-void LoadPasswords()
+void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
-  zero (g_Users);
   if (!g_bSavePW)
-    return;
-  HKEY Key;
-  if (RegOpenKeyEx(HKLM,PWKEY,0,KEY_QUERY_VALUE,&Key)!=ERROR_SUCCESS)
     return;
   CBlowFish bf;
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  DWORD n=0;
-  for (int i=0;i<countof(g_Users);i++)
-  {
-    zero(g_Users[n]);
-    DWORD cbPwd=sizeof(g_Users[n].Password);
-    DWORD cbName=sizeof(g_Users[n].UserName);
-    DWORD Type=0;
-    if (ERROR_SUCCESS!=RegEnumValue(Key,i,g_Users[n].UserName,&cbName,0,&Type,
-                                    (BYTE*)g_Users[n].Password,&cbPwd))
-        break;
-    if (Type!=REG_BINARY)
-      continue;
-    bf.Decode((BYTE*)g_Users[n].Password,(BYTE*)g_Users[n].Password,cbPwd);
-    n++;
-  }
+  if(GetRegAny(HKLM,PWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
+    bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
+}
+
+void DeletePassword(LPTSTR UserName)
+{
+  RegDelVal(HKLM,PWKEY,UserName);
+  RegDelVal(HKLM,TMKEY,UserName);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -180,23 +160,14 @@ void SaveSettings()
     DelRegKey(HKLM,PWKEY);
 }
 
-void SavePassword(int n)
+void SavePassword(LPTSTR UserName,LPTSTR Password)
 {
   if (!g_bSavePW)
     return;
   CBlowFish bf;
-  TCHAR Password[PWLEN]={0};
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,PWKEY,g_Users[n].UserName,REG_BINARY,(BYTE*)Password,
-    bf.Encode((BYTE*)g_Users[n].Password,(BYTE*)Password,
-              (int)_tcslen(g_Users[n].Password)*sizeof(TCHAR)));
-}
-
-void SavePasswords()
-{
-  DelRegKey(HKLM,PWKEY);
-  for (int i=0;i<countof(g_Users);i++) 
-    SavePassword(i);
+  SetRegAny(HKLM,PWKEY,UserName,REG_BINARY,(BYTE*)Password,
+    bf.Encode((BYTE*)Password,(BYTE*)Password,(int)_tcslen(Password)*sizeof(TCHAR)));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -792,81 +763,42 @@ BOOL TestSetup()
 BOOL x=TestSetup();
 #endif _DEBUGSETUP
 
-int CacheUserPassword(LPTSTR Password)
-{
-  __int64 minTime=0;
-  int nUser=-1;
-  int oldestUser=0;
-  //find free or oldest USER
-  for (int i=0;i<countof(g_Users);i++) 
-  {
-    if ((g_Users[i].UserName[0]=='\0')
-      ||(_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0))
-    {
-      nUser=i;
-      break;
-    }
-    if (g_Users[i].LastAskTime<minTime)
-    {
-      minTime=g_Users[i].LastAskTime;
-      oldestUser=i;
-    }
-  }
-  if (nUser==-1)
-    nUser=oldestUser;
-  //Set user name cache
-  _tcscpy(g_Users[nUser].UserName,g_RunData.UserName);
-  _tcscpy(g_Users[nUser].Password,Password);
-  SavePasswords();
-  return nUser;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
-int PrepareSuRun()
+BOOL PrepareSuRun()
 {
-  BOOL bDoAsk=g_AskAlways;
+  __int64 ft;
+  GetSystemTimeAsFileTime((LPFILETIME)&ft);
+  zero(g_RunPwd);
   //Do we have a Password for this user?
-  int nUser=-1;
-  for (int i=0;i<countof(g_Users);i++) 
-    if (_tcsicmp(g_Users[i].UserName,g_RunData.UserName)==0)
-    {
-      nUser=i;
-      if ((!bDoAsk) && g_NoAskTimeOut)
-      {
-        __int64 ft;
-        GetSystemTimeAsFileTime((LPFILETIME)&ft);
-        if ((ft-g_Users[nUser].LastAskTime)>=(ft2min*(__int64)g_NoAskTimeOut))
-          bDoAsk=TRUE;
-      }
-      break;
-    }
-  if (nUser==-1)
+  if(!g_AskAlways)
+    LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
+  else if (g_NoAskTimeOut)
   {
-    //Test if password is empty:
-    if ((PasswordOK(g_RunData.UserName,_T("")))
-      &&(IsInSuRunners(g_RunData.UserName)))
-    {
-      //Password is empty, cache it ;)
-      nUser=CacheUserPassword(_T(""));
-    }else
-      bDoAsk=TRUE;
+    __int64 AskTime=GetRegInt64(HKLM,TMKEY,g_RunData.UserName,0);
+    if ((ft-AskTime)<(ft2min*(__int64)g_NoAskTimeOut))
+      LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
+    else //Time is up: Delete Password!
+      DeletePassword(g_RunData.UserName);
   }
-  else 
-    if ((!PasswordOK(g_Users[nUser].UserName,g_Users[nUser].Password))
-      ||(!IsInSuRunners(g_RunData.UserName)))
+  BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd);
+  if ((!PwOk)
+    ||(!IsInSuRunners(g_RunData.UserName)))
+  //Password is NOT ok:
   {
-    nUser=-1;
-    bDoAsk=TRUE;
+    zero(g_RunPwd);
+    DeletePassword(g_RunData.UserName);
+    PwOk=FALSE;
   }else
-    if (IsInWhiteList(g_Users[nUser].UserName,g_RunData.cmdLine,FLAG_DONTASK))
-      return nUser;
-  //No Ask, just start cmdLine:
-  if (!bDoAsk)
-    return nUser;
+  //Password is ok:
+  if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
+  {
+    SetRegInt64(HKLM,TMKEY,g_RunData.UserName,ft);
+    return TRUE;
+  }
   //Every "secure" Desktop has its own UUID as name:
   UUID uid;
   UuidCreate(&uid);
@@ -880,36 +812,30 @@ int PrepareSuRun()
   {
     //secure desktop created...
     if (!CheckGroupMembership(g_RunData.UserName))
-      return -1;
-    //Test if password is empty:
-    if (PasswordOK(g_RunData.UserName,_T("")))
-    {
-      //Password is empty, cache it ;)
-      nUser=CacheUserPassword(_T(""));
-    }
+      return FALSE;
     BOOL bSeOk=IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
     BOOL bLogon=0;
-    if (nUser==-1)
+    if (!PwOk)
     {
-      TCHAR Password[MAX_PATH]={0};
-      bLogon=LogonCurrentUser(g_RunData.UserName,Password,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
-      if(bLogon)
-        nUser=CacheUserPassword(Password);
-      zero(Password);
+      bLogon=LogonCurrentUser(g_RunData.UserName,g_RunPwd,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
+      if (g_bSavePW && (bLogon&1))
+        SavePassword(g_RunData.UserName,g_RunPwd);
     }else
       bLogon=AskCurrentUserOk(g_RunData.UserName,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
     if(!bLogon)
-      return -1;
+      return FALSE;
     if (bLogon&2)
       SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
     if (bLogon&4)
       SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
     else
       RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-    return nUser;
+    GetSystemTimeAsFileTime((LPFILETIME)&ft);
+    SetRegInt64(HKLM,TMKEY,g_RunData.UserName,ft);
+    return TRUE;
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-  return -1;
+  return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -918,7 +844,7 @@ int PrepareSuRun()
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD CheckServiceStatus(LPCTSTR ServiceName)
+DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 {
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT|SC_MANAGER_ENUMERATE_SERVICE);
   if (hdlSCM==0) 
@@ -937,11 +863,6 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName)
   return ss.dwCurrentState;
 }
 
-DWORD CheckServiceStatus()
-{
-  return CheckServiceStatus(SvcName);
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  SuRun
@@ -956,7 +877,6 @@ void SuRun(DWORD ProcessID)
   zero(g_RunPwd);
   g_RunPwd[0]=1;
   LoadSettings();
-  LoadPasswords();
   RUNDATA RD={0};
   RD.CliProcessId=ProcessID;
   if(CheckCliProcess(RD)!=1)
@@ -970,58 +890,56 @@ void SuRun(DWORD ProcessID)
   }
   KillProcess(g_RunData.KillPID);
   //Start execution
-  int nUser=PrepareSuRun();
-  if (nUser!=-1)
+  if (!PrepareSuRun())
   {
-    //Secondary Logon service is required by CreateProcessWithLogonW
-    if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
-    {
-      //Start/Resume secondary logon
-      SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT);
-      if (hdlSCM!=0) 
-      {
-        SC_HANDLE hdlServ = OpenService(hdlSCM,_T("seclogon"),SERVICE_START|SERVICE_PAUSE_CONTINUE);
-        if(hdlServ)
-        {
-          if (!StartService(hdlServ,0,0))
-          {
-            SERVICE_STATUS ss;
-            ControlService(hdlServ,SERVICE_CONTROL_CONTINUE,&ss);
-          }
-          CloseServiceHandle(hdlServ);
-        }
-        CloseServiceHandle(hdlSCM);
-      }
-      if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
-      {
-        GivePassword();
-        MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-        return;
-      }
-    }
-    //copy the password to the client
-    _tcscpy(g_RunPwd,g_Users[nUser].Password);
-    //Enable use of empty passwords for network logon
-    BOOL bEmptyPWAllowed=FALSE;
-    if (g_RunPwd[0]==0)
-    {
-      bEmptyPWAllowed=EmptyPWAllowed;
-      AllowEmptyPW(TRUE);
-    }
-    //Add user to admins group
-    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,1);
-    //Give Password to the calling process
+    g_RunPwd[0]=1;
     GivePassword();
-    //Reset status of "use of empty passwords for network logon"
-    if (g_RunPwd[0]==0)
-      AllowEmptyPW(bEmptyPWAllowed);
-    //Remove user from Administrators group
-    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_Users[nUser].UserName,0);
-    //Mark last start time
-    GetSystemTimeAsFileTime((LPFILETIME)&g_Users[nUser].LastAskTime);
     return;
   }
+  //Secondary Logon service is required by CreateProcessWithLogonW
+  if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
+  {
+    //Start/Resume secondary logon
+    SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT);
+    if (hdlSCM!=0) 
+    {
+      SC_HANDLE hdlServ = OpenService(hdlSCM,_T("seclogon"),SERVICE_START|SERVICE_PAUSE_CONTINUE);
+      if(hdlServ)
+      {
+        if (!StartService(hdlServ,0,0))
+        {
+          SERVICE_STATUS ss;
+          ControlService(hdlServ,SERVICE_CONTROL_CONTINUE,&ss);
+        }
+        CloseServiceHandle(hdlServ);
+      }
+      CloseServiceHandle(hdlSCM);
+    }
+    if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
+    {
+      GivePassword();
+      MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      return;
+    }
+  }
+  //copy the password to the client
+  //Enable use of empty passwords for network logon
+  BOOL bEmptyPWAllowed=FALSE;
+  if (g_RunPwd[0]==0)
+  {
+    bEmptyPWAllowed=EmptyPWAllowed;
+    AllowEmptyPW(TRUE);
+  }
+  //Add user to admins group
+  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
+  //Give Password to the calling process
   GivePassword();
+  //Reset status of "use of empty passwords for network logon"
+  if (g_RunPwd[0]==0)
+    AllowEmptyPW(bEmptyPWAllowed);
+  //Remove user from Administrators group
+  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
+  zero(g_RunPwd);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1370,9 +1288,6 @@ bool HandleServiceStuff()
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
     SuRun(wcstol(cmd.argv(2),0,10));
-    //clean sensitive Data
-    zero(g_Users);
-    zero(g_RunPwd);
     ExitProcess(0);
   }else
   if (cmd.argc()==2)
