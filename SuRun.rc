@@ -313,11 +313,11 @@ BEGIN
     CONTROL         "Immer OK. (Diesen Dialog nicht mehr anzeigen.)",
                     IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
                     163,182,10
-    PUSHBUTTON      "OK",IDOK,179,189,50,14
-    DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
     CONTROL         "Programm automatisch mit erhöhten Rechten ausführen",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
+    PUSHBUTTON      "OK",IDOK,179,189,50,14
+    DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
 END
 
 IDD_SETUP DIALOGEX 0, 0, 394, 263
@@ -624,11 +624,11 @@ BEGIN
     CONTROL         "Always 'OK'. (Don't show this message again.)",
                     IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
                     163,182,10
-    PUSHBUTTON      "OK",IDOK,179,189,50,14
-    DEFPUSHBUTTON   "Cancel",IDCANCEL,232,189,50,14
     CONTROL         "Always run this application with elevated rights.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
+    PUSHBUTTON      "OK",IDOK,179,189,50,14
+    DEFPUSHBUTTON   "Cancel",IDCANCEL,232,189,50,14
 END
 
 
