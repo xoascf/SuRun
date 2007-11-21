@@ -212,13 +212,15 @@ typedef struct _LOGONDLGPARAMS
   BOOL ForceAdminLogon;
   USERLIST Users;
   int TimeOut;
-  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm):Users(Adm)
+  BOOL bShellExecOk;
+  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,BOOL bSeOk):Users(Adm)
   {
     Msg=M;
     User=Usr;
     Password=Pwd;
     UserReadonly=RO;
     ForceAdminLogon=Adm;
+    bShellExecOk=bSeOk;
     TimeOut=40;//s
   }
 }LOGONDLGPARAMS;
@@ -427,6 +429,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetDlgItemText(hwnd,IDC_USER,p->User);
       else
         SetDlgItemText(hwnd,IDC_USER,p->Users.User[0].UserName);
+      CheckDlgButton(hwnd,IDC_SHELLEXECOK,(p->bShellExecOk)?1:0);
       SetUserBitmap(hwnd);
       SetWindowSizes(hwnd);
       SetTimer(hwnd,2,1000,0);
@@ -552,7 +555,7 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,false,false);
+  LOGONDLGPARAMS p(S,User,Password,false,false,false);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -562,27 +565,27 @@ BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,false,true);
+  LOGONDLGPARAMS p(S,User,Password,false,true,false);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,int IDmsg,...)
+BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,BOOL bShellExecOk,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,true,false);
+  LOGONDLGPARAMS p(S,User,Password,true,false,bShellExecOk);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL AskCurrentUserOk(LPTSTR User,int IDmsg,...)
+BOOL AskCurrentUserOk(LPTSTR User,BOOL bShellExecOk,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,_T("******"),true,false);
+  LOGONDLGPARAMS p(S,User,_T("******"),true,false,bShellExecOk);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
                   0,DialogProc,(LPARAM)&p);
 }
