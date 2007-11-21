@@ -288,12 +288,12 @@ BEGIN
     PUSHBUTTON      "Abbrechen",IDCANCEL,232,179,50,14
 END
 
-IDD_CURUSRACK DIALOGEX 0, 0, 289, 200
+IDD_CURUSRACK DIALOGEX 0, 0, 289, 209
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Bestätigung erforderlich"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -301,7 +301,7 @@ BEGIN
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "Wählen Sie OK, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie Abbrechen!",
                     IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -310,10 +310,14 @@ BEGIN
     EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
     LTEXT           "&Kennwort:",IDC_PWDST,64,151,35,8
     EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
-    CONTROL         "Das Programm ohne zu Fragen immer starten",IDC_ALWAYSOK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,163,182,10
-    PUSHBUTTON      "OK",IDOK,179,179,50,14
-    DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,179,50,14
+    CONTROL         "Immer OK. (Diesen Dialog nicht mehr anzeigen.)",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
+                    163,182,10
+    PUSHBUTTON      "OK",IDOK,179,189,50,14
+    DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
+    CONTROL         "Programm automatisch mit erhöhten Rechten ausführen",
+                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    100,174,182,10
 END
 
 IDD_SETUP DIALOGEX 0, 0, 394, 263
@@ -595,18 +599,18 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,232,179,50,14
 END
 
-IDD_CURUSRACK DIALOGEX 0, 0, 289, 200
+IDD_CURUSRACK DIALOGEX 0, 0, 289, 209
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Authorization required"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     LTEXT           "If the application should be started with administrative rights, press 'OK'.\r\n\r\nIf not, press 'Cancel'!",
@@ -617,11 +621,14 @@ BEGIN
     EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
     RTEXT           "&Password:",IDC_PWDST,64,151,35,8
     EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
-    CONTROL         "Always start this program without confirmation",
+    CONTROL         "Always 'OK'. (Don't show this message again.)",
                     IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
                     163,182,10
-    PUSHBUTTON      "OK",IDOK,179,179,50,14
-    DEFPUSHBUTTON   "Cancel",IDCANCEL,232,179,50,14
+    PUSHBUTTON      "OK",IDOK,179,189,50,14
+    DEFPUSHBUTTON   "Cancel",IDCANCEL,232,189,50,14
+    CONTROL         "Always run this application with elevated rights.",
+                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    100,174,182,10
 END
 
 
