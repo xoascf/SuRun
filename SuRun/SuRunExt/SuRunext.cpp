@@ -267,7 +267,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  DBGTrace1("SuRun ShellExtHook: testing %s",cmd);
   if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     CloseHandle(pi.hThread );
@@ -276,10 +275,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
       if (ExitCode==0)
-      {
-        DBGTrace1("SuRun ShellExtHook: executed %s",cmd);
         pei->hInstApp=(HINSTANCE)33;
-      }else 
+      else 
       {
         DBGTrace2("SuRun ShellExtHook: failed to execute %s; %s",cmd,GetErrorNameStatic(ExitCode));
         if(ExitCode==ERROR_ACCESS_DENIED)
