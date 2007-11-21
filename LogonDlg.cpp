@@ -505,6 +505,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKEWPARAM(IDOK,BN_CLICKED):
         {
+          INT_PTR ExitCode=1+(IsDlgButtonChecked(hwnd,IDC_ALWAYSOK)<<1)
+                            +(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2);
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
             LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -520,7 +522,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               }else
               {
                 CloseHandle(hUser);
-                EndDialog(hwnd,1+IsDlgButtonChecked(hwnd,IDC_ALWAYSOK));
+                EndDialog(hwnd,ExitCode);
               }
             }else
             {
@@ -529,8 +531,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
             }
           }else
-            EndDialog(hwnd,1|(IsDlgButtonChecked(hwnd,IDC_ALWAYSOK)<<1)
-                            |(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2));
+            EndDialog(hwnd,ExitCode);
           return TRUE;
         }//MAKELPARAM(IDOK,BN_CLICKED)
       }//switch (wParam)
