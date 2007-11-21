@@ -242,7 +242,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (pei->cbSize<sizeof(SHELLEXECUTEINFO))
     return S_FALSE;
   //Verb must be "open" or empty
-  if ((_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"open")!=0))
+  if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"open")!=0))
     return S_FALSE;
   //Check Directory
   if (!SetCurrentDirectory(pei->lpDirectory))
