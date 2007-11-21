@@ -197,6 +197,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
     }else
+    if (!_wcsicmp(c,L"/TESTAUTOADMIN"))
+    {
+      g_RunData.bShlExHook=TRUE;
+      Args=PathGetArgs(Args);
+      break;
+    }else
     if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
@@ -235,9 +241,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Wait for max 60s for the Password...
   while ((g_RunPwd[0]==0xFF)&&(n<1000))
     Sleep(60);
-  if ((g_RunPwd[0]==0xFF)
-    ||(g_RunPwd[0]==1)
-    || bRunSetup)
+  if (g_RunPwd[0]==0xFF)
+    return ERROR_ACCESS_DENIED;
+  if (bRunSetup)
+    return 0;
+  if (g_RunPwd[0]==2) //ShellExec->NOT in List
+    return -2;
+  if (g_RunPwd[0]==1)
     return ERROR_ACCESS_DENIED;
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
