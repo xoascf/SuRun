@@ -200,6 +200,10 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Setup.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Service.cpp
 # End Source File
 # Begin Source File
@@ -261,6 +265,10 @@ SOURCE=.\ResStr.h
 # Begin Source File
 
 SOURCE=.\ScreenSnap.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Setup.h
 # End Source File
 # Begin Source File
 
