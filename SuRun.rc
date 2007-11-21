@@ -31,7 +31,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "SuRun %s - Ustawienia"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,393,240
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,240,394,1
@@ -132,8 +132,8 @@ BEGIN
     CONTROL         "Always run this application with elevated rights.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "OK",IDOK,179,189,50,14
-    DEFPUSHBUTTON   "Anuluj",IDCANCEL,232,189,50,14
+    DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
+    PUSHBUTTON      "Anuluj",IDCANCEL,232,189,50,14
 END
 
 IDD_CURUSRACK DIALOGEX 0, 0, 289, 209
@@ -294,8 +294,8 @@ BEGIN
     CONTROL         "Programm automatisch mit erhöhten Rechten ausführen",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "OK",IDOK,179,189,50,14
-    DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
+    DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,232,189,50,14
 END
 
 IDD_CURUSRACK DIALOGEX 0, 0, 289, 209
@@ -303,13 +303,13 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Bestätigung erforderlich"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     LTEXT           "Wählen Sie OK, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie Abbrechen!",
@@ -608,8 +608,8 @@ BEGIN
     CONTROL         "Always run this application with elevated rights.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "OK",IDOK,179,189,50,14
-    DEFPUSHBUTTON   "Cancel",IDCANCEL,232,189,50,14
+    DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,232,189,50,14
 END
 
 IDD_CURUSRACK DIALOGEX 0, 0, 289, 209
