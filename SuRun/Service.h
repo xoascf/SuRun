@@ -34,6 +34,7 @@ typedef struct
   TCHAR cmdLine[4096];
   TCHAR CurDir[MAX_PATH];
   DWORD KillPID;
+  BOOL  bShlExHook;
 }RUNDATA;
 
 //This is used to verify that SuRun.exe started by the user is the same as 
