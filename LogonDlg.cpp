@@ -597,6 +597,9 @@ BOOL TestLogonDlg()
   InitCommonControlsEx(&icce);
   TCHAR User[MAX_PATH]=L"Bruns\\KAY";
   TCHAR Password[MAX_PATH]={0};
+
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
+
   BOOL l=Logon(User,Password,IDS_ASKINSTALL);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
@@ -612,6 +615,21 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 
+  l=Logon(User,Password,IDS_ASKINSTALL);
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  l=AskCurrentUserOk(User,IDS_ASKOK,0,L"cmd");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
+  
   l=Logon(User,Password,IDS_ASKINSTALL);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
