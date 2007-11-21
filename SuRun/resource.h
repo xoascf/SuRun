@@ -74,6 +74,7 @@
 #define IDC_PWDST                       1023
 #define IDC_ALWAYSOK                    1025
 #define IDC_WHITELIST                   1026
+#define IDC_SHELLEXECOK                 1026
 #define IDC_DELETE                      1027
 #define IDC_ALLOWTIME                   1028
 #define IDC_OWNERGROUP                  1029
