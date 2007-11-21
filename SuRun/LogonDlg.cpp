@@ -603,10 +603,10 @@ BOOL TestLogonDlg()
   l=LogonAdmin(User,Password,IDS_NOSURUNNER);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonCurrentUser(User,Password,IDS_ASKOK,L"cmd");
+  l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(User,IDS_ASKOK,L"cmd");
+  l=AskCurrentUserOk(User,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
 
@@ -618,10 +618,10 @@ BOOL TestLogonDlg()
   l=LogonAdmin(User,Password,IDS_NOSURUNNER);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonCurrentUser(User,Password,IDS_ASKOK,L"cmd");
+  l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(User,IDS_ASKOK,L"cmd");
+  l=AskCurrentUserOk(User,IDS_ASKOK,0,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
 
