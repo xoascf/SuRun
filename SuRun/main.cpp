@@ -59,7 +59,7 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
   PathRemoveExtension(file);
   if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
   {
-    wcscpy(app,L"/n,/root,");
+    wcscpy(app,L"/e,/select,");
     if (args[0]==0) 
       wcscat(app, L"C:");
     else 
