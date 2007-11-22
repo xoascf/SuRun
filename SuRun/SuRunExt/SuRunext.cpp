@@ -68,23 +68,31 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 #define HKLM HKEY_LOCAL_MACHINE
 __declspec(dllexport) void InstallShellExt()
 {
+  //COM-Object
   SetRegStr(HKCR,L"CLSID\\" sGUID,L"",L"SuRun Shell Extension");
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"",L"SuRunExt.dll");
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
+  //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  //ShellExecuteHook
+  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
+            sGUID,L"");
+  //self Approval
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUID,L"SuRun Shell Extension");
 
-  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
-            sGUID,L"");
 }
 
 __declspec(dllexport) void RemoveShellExt()
 {
+  //COM-Object
   DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
+  //Desktop-Background-Hook
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
+  //ShellExecuteHook
   RegDelVal(HKEY_CLASSES_ROOT,
     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
+  //self Approval
   RegDelVal(HKEY_LOCAL_MACHINE,
     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
@@ -183,8 +191,80 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
   return 0L;
 }
 
+void PrintFileNames(LPDATAOBJECT pDataObj)
+{
+	IEnumFORMATETC *pefEtc = 0;
+	if(  SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc))
+    && SUCCEEDED(pefEtc->Reset()))
+  while(TRUE)
+	{
+		FORMATETC fEtc;
+		ULONG ulFetched = 0L;
+		if(FAILED(pefEtc->Next(1,&fEtc,&ulFetched)) || (ulFetched <= 0))
+			break;
+		STGMEDIUM stgM;
+		if(SUCCEEDED(pDataObj->GetData(&fEtc, &stgM)))
+		{
+      switch (stgM.tymed)
+      {
+      case TYMED_HGLOBAL:
+        DBGTrace("CShellExt::Initialize TYMED_HGLOBAL");
+			  {
+				  UINT nFileCount = DragQueryFile((HDROP)stgM.hGlobal, (UINT)INVALID_HANDLE_VALUE, NULL, 0);
+				  if(nFileCount >= 1)
+				  {
+            TCHAR f[MAX_PATH];
+					  for(UINT x = 0; x < nFileCount; x++)
+					  {
+						  DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH);
+              DBGTrace1("-->File:",f);
+					  }
+				  }
+			  }
+        break;
+      case TYMED_FILE:
+        DBGTrace("CShellExt::Initialize TYMED_FILE");
+        break;
+      case TYMED_ISTREAM:
+        DBGTrace("CShellExt::Initialize TYMED_ISTREAM");
+        break;
+      case TYMED_ISTORAGE:
+        DBGTrace("CShellExt::Initialize TYMED_ISTORAGE");
+        break;
+      case TYMED_GDI:
+        DBGTrace("CShellExt::Initialize TYMED_GDI");
+        break;
+      case TYMED_MFPICT:
+        DBGTrace("CShellExt::Initialize TYMED_MFPICT");
+        break;
+      case TYMED_ENHMF:
+        DBGTrace("CShellExt::Initialize TYMED_ENHMF");
+        break;
+      case TYMED_NULL:
+        DBGTrace("CShellExt::Initialize TYMED_NULL");
+        break;
+      default:
+        DBGTrace1("CShellExt::Initialize unknown tymed: %d",stgM.tymed);
+      }
+		}
+	}
+	if(pefEtc)
+		pefEtc->Release();
+}
+
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
+#ifdef _DEBUG
+  TCHAR Path[MAX_PATH]={0};
+  if (pIDFolder)
+    SHGetPathFromIDList(pIDFolder,Path);
+  TCHAR FileClass[MAX_PATH]={0};
+  if(hRegKey)
+    GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
+  DBGTrace3("CShellExt::Initialize(%s,0x%08X,%s)",Path,pDataObj,FileClass);
+  if(pDataObj)
+    PrintFileNames(pDataObj);
+#endif _DEBUG
   m_pDeskClicked=pDataObj==0;
   return NOERROR;
 }
@@ -193,13 +273,23 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
 {
   if((!(CMF_DEFAULTONLY & uFlags))&& m_pDeskClicked) 
   {
-    //right click target is folder background
-    InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-    InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, sSuRun);
-    InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-    return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(1));
+    if(GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0)
+    {
+      //right click target is folder background
+      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, sSuRun);
+      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(1));
+    }
   }
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
+}
+
+STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
+{
+  if ((uFlags == GCS_HELPTEXT) && (cchMax > wcslen(sTip)))
+    wcscpy((LPWSTR)pszName,sTip);
+  return NOERROR;
 }
 
 STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
@@ -227,14 +317,6 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   }
   return hr;
 }
-
-STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
-{
-  if (uFlags == GCS_HELPTEXT && cchMax > 35)
-    wcscpy((LPWSTR)pszName,sTip);
-  return NOERROR;
-}
-
 
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
