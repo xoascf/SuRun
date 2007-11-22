@@ -27,6 +27,7 @@
 extern TCHAR sFileNotFound[MAX_PATH];
 extern TCHAR sSuRun[MAX_PATH];
 extern TCHAR sSuRunCmd[MAX_PATH];
+extern TCHAR sSuRunExp[MAX_PATH];
 extern TCHAR sErr[MAX_PATH];
 extern TCHAR sTip[MAX_PATH];
 
@@ -213,25 +214,26 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
 {
   if((CMF_DEFAULTONLY & uFlags)==0) 
   {
+    m_MenuId=idCmdFirst;
     if(m_pDeskClicked && GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0)
     {
-      UINT id=idCmdFirst;
       //right click target is folder background
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, sSuRun);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst++, sSuRun);
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst-m_MenuId));
     }
     if(m_ClickFolderName[0] && GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0)
     {
-      UINT id=idCmdFirst;
       //right click target is folder background
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       TCHAR s[MAX_PATH];
       _stprintf(s,sSuRunCmd,m_ClickFolderName);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst++, s);
+      _stprintf(s,sSuRunExp,m_ClickFolderName);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst++, s);
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst-m_MenuId));
     }
   }
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
@@ -257,7 +259,20 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     GetSystemWindowsDirectory(cmd,MAX_PATH);
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
-    _tcscat(cmd,L" control");
+    if (m_pDeskClicked)
+      _tcscat(cmd,L" control");
+    else
+    {
+      if (m_MenuId==LOWORD(lpcmi->lpVerb))
+        _tcscat(cmd,L" cmd /D /T:4E /K cd /D ");
+      else
+      {
+        _tcscat(cmd,L" explorer ");
+        PathAddBackslash(m_ClickFolderName);
+      }
+      PathQuoteSpaces(m_ClickFolderName);
+      _tcscat(cmd,m_ClickFolderName);
+    }
     // Start the child process.
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
