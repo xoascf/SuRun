@@ -7,6 +7,7 @@
 #define IDS_TOOLTIP                     3
 #define IDS_SURUN                       4
 #define IDS_SURUNCMD                    5
+#define IDS_SURUNEXP                    6
 #define IDS_MENURESTART                 13
 #define IDS_MENUSTART                   18
 
