@@ -212,16 +212,13 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
       case TYMED_HGLOBAL:
         DBGTrace("CShellExt::Initialize TYMED_HGLOBAL");
 			  {
-				  UINT nFileCount = DragQueryFile((HDROP)stgM.hGlobal, (UINT)INVALID_HANDLE_VALUE, NULL, 0);
-				  if(nFileCount >= 1)
-				  {
-            TCHAR f[MAX_PATH];
-					  for(UINT x = 0; x < nFileCount; x++)
-					  {
-						  DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH);
-              DBGTrace1("-->File:",f);
-					  }
-				  }
+				  UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
+				  if(n>=1) for(UINT x = 0; x < n; x++)
+					{
+            TCHAR f[MAX_PATH]={0};
+						DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
+            DBGTrace1("-->File: %s",f);
+					}
 			  }
         break;
       case TYMED_FILE:
