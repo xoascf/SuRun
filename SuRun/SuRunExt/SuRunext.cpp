@@ -1,5 +1,19 @@
 //////////////////////////////////////////////////////////////////////////////
 //
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                   (c) Kay Bruns (http://kay-bruns.de), 2007
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+//
 // based on: SuDowns sudoext.cpp http://sudown.sourceforge.net
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -24,15 +38,11 @@
 
 #include "../DBGTrace.h"
 
-extern TCHAR sFileNotFound[MAX_PATH];
-extern TCHAR sSuRun[MAX_PATH];
-extern TCHAR sSuRunCmd[MAX_PATH];
-extern TCHAR sSuRunExp[MAX_PATH];
-extern TCHAR sErr[MAX_PATH];
-extern TCHAR sTip[MAX_PATH];
-
-
+//////////////////////////////////////////////////////////////////////////////
+//
 // global data within shared data segment to allow sharing across instances
+//
+//////////////////////////////////////////////////////////////////////////////
 #pragma data_seg(".SHARDATA")
 
 UINT g_cRefThisDll = 0;    // Reference count of this DLL.
@@ -40,6 +50,75 @@ UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHARDATA,rws")
 
+//////////////////////////////////////////////////////////////////////////////
+//
+// Strings: these are defined in SysMenuHook.cpp and placed in ".SHARDATA"
+//
+//////////////////////////////////////////////////////////////////////////////
+extern TCHAR sFileNotFound[MAX_PATH];
+extern TCHAR sSuRun[MAX_PATH];
+extern TCHAR sSuRunCmd[MAX_PATH];
+extern TCHAR sSuRunExp[MAX_PATH];
+extern TCHAR sErr[MAX_PATH];
+extern TCHAR sTip[MAX_PATH];
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// this class factory object creates context menu handlers for windows 32 shell
+//
+//////////////////////////////////////////////////////////////////////////////
+class CShellExtClassFactory : public IClassFactory
+{
+protected:
+  ULONG	m_cRef;
+public:
+  CShellExtClassFactory();
+  ~CShellExtClassFactory();
+  //IUnknown members
+  STDMETHODIMP			QueryInterface(REFIID, LPVOID FAR *);
+  STDMETHODIMP_(ULONG)	AddRef();
+  STDMETHODIMP_(ULONG)	Release();
+  //IClassFactory members
+  STDMETHODIMP		CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR *);
+  STDMETHODIMP		LockServer(BOOL);
+};
+typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// this is the actual OLE Shell context menu handler
+//
+//////////////////////////////////////////////////////////////////////////////
+class CShellExt : public IContextMenu, IShellExtInit, IShellExecuteHook
+{
+protected:
+  ULONG m_cRef;
+  bool m_pDeskClicked;
+  TCHAR m_ClickFolderName[MAX_PATH];
+public:
+  CShellExt();
+  ~CShellExt();
+  //IUnknown members
+  STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *);
+  STDMETHODIMP_(ULONG) AddRef();
+  STDMETHODIMP_(ULONG) Release();
+  //IContextMenu members
+  STDMETHODIMP QueryContextMenu(HMENU, UINT, UINT, UINT, UINT);
+  STDMETHODIMP InvokeCommand(LPCMINVOKECOMMANDINFO);
+  STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT FAR *, LPSTR, UINT);
+  //IShellExtInit methods
+  STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
+  //IShellExecuteHook methods
+  STDMETHODIMP Execute(LPSHELLEXECUTEINFO pei);
+};
+
+typedef CShellExt *LPCSHELLEXT;
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// DLL Handling Stuff
+//
+//////////////////////////////////////////////////////////////////////////////
 
 static void inc_cRefThisDLL()
 {
@@ -67,8 +146,12 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
   return CLASS_E_CLASSNOTAVAILABLE;
 }
 
-#define HKCR HKEY_CLASSES_ROOT
-#define HKLM HKEY_LOCAL_MACHINE
+//////////////////////////////////////////////////////////////////////////////
+//
+// Install/Uninstall
+//
+//////////////////////////////////////////////////////////////////////////////
+
 __declspec(dllexport) void InstallShellExt()
 {
   //COM-Object
@@ -101,6 +184,12 @@ __declspec(dllexport) void RemoveShellExt()
   RegDelVal(HKEY_LOCAL_MACHINE,
     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// CShellExtClassFactory
+//
+//////////////////////////////////////////////////////////////////////////////
 
 CShellExtClassFactory::CShellExtClassFactory()
 {
@@ -153,6 +242,12 @@ STDMETHODIMP CShellExtClassFactory::LockServer(BOOL fLock)
 {
 	return NOERROR;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// CShellExt
+//
+//////////////////////////////////////////////////////////////////////////////
 
 CShellExt::CShellExt()
 {
