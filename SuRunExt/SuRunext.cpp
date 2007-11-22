@@ -214,14 +214,14 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
 {
   if((CMF_DEFAULTONLY & uFlags)==0) 
   {
-    m_MenuId=idCmdFirst;
+    UINT id=idCmdFirst;
     if(m_pDeskClicked && GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0)
     {
       //right click target is folder background
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst++, sSuRun);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, sSuRun);
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst-m_MenuId));
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
     }
     if(m_ClickFolderName[0] && GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0)
     {
@@ -229,11 +229,11 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       TCHAR s[MAX_PATH];
       _stprintf(s,sSuRunCmd,m_ClickFolderName);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst++, s);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
       _stprintf(s,sSuRunExp,m_ClickFolderName);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst++, s);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(idCmdFirst-m_MenuId));
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
     }
   }
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
@@ -241,7 +241,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
 
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
 {
-  if ((uFlags == GCS_HELPTEXT) && (cchMax > wcslen(sTip)))
+  if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(sTip)))
     wcscpy((LPWSTR)pszName,sTip);
   return NOERROR;
 }
@@ -263,7 +263,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
       _tcscat(cmd,L" control");
     else
     {
-      if (m_MenuId==LOWORD(lpcmi->lpVerb))
+      if (LOWORD(lpcmi->lpVerb)==0)
         _tcscat(cmd,L" cmd /D /T:4E /K cd /D ");
       else
       {
