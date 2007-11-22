@@ -11,6 +11,7 @@ DEFINE_GUID(CLSID_ShellExtension,0x2c7b6088,0x5a77,0x4d48,0xbe,0x43,0x30,0x33,0x
 
 #define ControlAsAdmin  L"ControlAsAdmin"  //"Control Panel As Admin" on Desktop Menu
 #define CmdHereAsAdmin  L"CmdHereAsAdmin"  //"Cmd here As Admin" on Folder Menu
+#define ExpHereAsAdmin  L"ExpHereAsAdmin"  //"Explorer here As Admin" on Folder Menu
 #define RestartAsAdmin  L"RestartAsAdmin"  //"Restart As Admin" in System-Menu
 #define StartAsAdmin    L"StartAsAdmin"    //"Start As Admin" in System-Menu
 
