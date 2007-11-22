@@ -211,6 +211,7 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
       {
       case TYMED_HGLOBAL:
         DBGTrace("CShellExt::Initialize TYMED_HGLOBAL");
+        if (fEtc.cfFormat==CF_HDROP)
 			  {
 				  UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
 				  if(n>=1) for(UINT x = 0; x < n; x++)
