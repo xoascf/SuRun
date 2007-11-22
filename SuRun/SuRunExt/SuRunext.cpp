@@ -203,13 +203,16 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   if(hRegKey)
     GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
   TCHAR File[MAX_PATH]={0};
-  FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-  STGMEDIUM stm;
-  if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+  if(pDataObj)
   {
-    if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-      DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
-    ReleaseStgMedium(&stm);
+    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    STGMEDIUM stm;
+    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+    {
+      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+        DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
+      ReleaseStgMedium(&stm);
+    }
   }
   DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
 #endif _DEBUG
