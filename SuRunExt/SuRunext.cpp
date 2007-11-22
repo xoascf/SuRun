@@ -74,6 +74,7 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
   //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   //ShellExecuteHook
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
             sGUID,L"");
@@ -89,6 +90,7 @@ __declspec(dllexport) void RemoveShellExt()
   DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
   //Desktop-Background-Hook
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
+  DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
   //ShellExecuteHook
   RegDelVal(HKEY_CLASSES_ROOT,
     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
