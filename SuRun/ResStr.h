@@ -27,6 +27,11 @@ public:
     m_hInst=GetModuleHandle(0);
     memset(&m_str,0,sizeof(m_str));
   }
+  CResourceString(HINSTANCE hInst)
+  {
+    m_hInst=hInst;
+    memset(&m_str,0,sizeof(m_str));
+  }
   CResourceString(int nID,...)
   {
     m_hInst=GetModuleHandle(0);
