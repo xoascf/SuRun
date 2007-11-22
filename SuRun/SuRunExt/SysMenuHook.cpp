@@ -26,6 +26,7 @@ TCHAR sMenuStart[MAX_PATH];
 TCHAR sFileNotFound[MAX_PATH];
 TCHAR sSuRun[MAX_PATH];
 TCHAR sSuRunCmd[MAX_PATH];
+TCHAR sSuRunExp[MAX_PATH];
 TCHAR sErr[MAX_PATH];
 TCHAR sTip[MAX_PATH];
 
@@ -162,6 +163,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
     CResStr rs=IDS_SURUNCMD;//Do not expand %s!
     _tcscpy(sSuRunCmd,rs);
+    rs=IDS_SURUNEXP;//Do not expand %s!
+    _tcscpy(sSuRunExp,rs);
     _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
     _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
   }
