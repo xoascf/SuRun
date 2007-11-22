@@ -14,6 +14,7 @@
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
 #pragma comment(lib,"Shell32.lib")
+#pragma comment(lib,"ShFolder.Lib")
 #pragma comment(lib,"Shlwapi.lib")
 
 #include "SuRunExt.h"
@@ -25,6 +26,7 @@
 
 extern TCHAR sFileNotFound[MAX_PATH];
 extern TCHAR sSuRun[MAX_PATH];
+extern TCHAR sSuRunCmd[MAX_PATH];
 extern TCHAR sErr[MAX_PATH];
 extern TCHAR sTip[MAX_PATH];
 
@@ -74,7 +76,7 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
   //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   //ShellExecuteHook
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
             sGUID,L"");
@@ -90,7 +92,7 @@ __declspec(dllexport) void RemoveShellExt()
   DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
   //Desktop-Background-Hook
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
-  DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
+  //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
   //ShellExecuteHook
   RegDelVal(HKEY_CLASSES_ROOT,
     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
@@ -195,42 +197,41 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
-#ifdef _DEBUG
-  TCHAR Path[MAX_PATH]={0};
-  if (pIDFolder)
-    SHGetPathFromIDList(pIDFolder,Path);
-  TCHAR FileClass[MAX_PATH]={0};
-  if(hRegKey)
-    GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
-  TCHAR File[MAX_PATH]={0};
-  if(pDataObj)
+  zero(m_ClickFolderName);
+  m_pDeskClicked=FALSE;
+  if (pDataObj==0)
   {
-    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-    STGMEDIUM stm;
-    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-    {
-      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-        DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
-      ReleaseStgMedium(&stm);
-    }
+    SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
+    TCHAR s[MAX_PATH]={0};
+    SHGetFolderPath(0,CSIDL_DESKTOP,0,SHGFP_TYPE_CURRENT,s);
+    m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
   }
-  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-#endif _DEBUG
-  m_pDeskClicked=pDataObj==0;
   return NOERROR;
 }
 
 STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
-  if((!(CMF_DEFAULTONLY & uFlags))&& m_pDeskClicked) 
+  if((CMF_DEFAULTONLY & uFlags)==0) 
   {
-    if(GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0)
+    if(m_pDeskClicked && GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0)
     {
+      UINT id=idCmdFirst;
       //right click target is folder background
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, idCmdFirst, sSuRun);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, sSuRun);
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(1));
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
+    }
+    if(m_ClickFolderName[0] && GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0)
+    {
+      UINT id=idCmdFirst;
+      //right click target is folder background
+      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      TCHAR s[MAX_PATH];
+      _stprintf(s,sSuRunCmd,m_ClickFolderName);
+      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
+      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
     }
   }
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
