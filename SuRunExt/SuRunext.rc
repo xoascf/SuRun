@@ -33,6 +33,7 @@ BEGIN
     IDS_TOOLTIP             "Uruchom 'Panel sterowania' z prawami administratora"
     IDS_SURUN               "Panel sterowania jako administrator"
     IDS_SURUNCMD            "'cmd %s' jako administrator"
+    IDS_SURUNEXP            "'Explorer %s' jako administrator"
     IDS_MENURESTART         "Uruchom ponownie jako administrator"
 END
 
@@ -66,6 +67,7 @@ BEGIN
     IDS_TOOLTIP             "Systemsteuerung als Administrator starten"
     IDS_SURUN               "Systemsteuerung als Administrator"
     IDS_SURUNCMD            "'cmd %s' als Administrator"
+    IDS_SURUNEXP            "'Explorer %s' als Administrator"
     IDS_MENURESTART         "Neustart als Administrator"
 END
 
@@ -171,6 +173,7 @@ BEGIN
     IDS_TOOLTIP             "Launch control panel with administrative rights"
     IDS_SURUN               "Control panel as administrator"
     IDS_SURUNCMD            "'cmd %s' as administrator"
+    IDS_SURUNEXP            "'Explorer %s' as administrator"
     IDS_MENURESTART         "Restart as administrator"
 END
 
