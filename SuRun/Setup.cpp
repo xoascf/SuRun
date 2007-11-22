@@ -36,19 +36,13 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  Settings
+//  Globals
 // 
 //////////////////////////////////////////////////////////////////////////////
 
 bool g_BlurDesktop=TRUE; //blurred user desktop background on secure Desktop
 BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
-bool g_bSavePW=TRUE;
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  Globals
-// 
-//////////////////////////////////////////////////////////////////////////////
+bool g_bSavePW=TRUE;     //Save Passwords in Registry
 
 #define Radio1chk (g_bSavePW==0)
 #define Radio2chk (g_bSavePW!=0)
@@ -82,7 +76,10 @@ void SaveSettings()
   SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
   SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
   if (!g_bSavePW)
+  {
     DelRegKey(HKLM,PWKEY);
+    DelRegKey(HKLM,TMKEY);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
