@@ -193,65 +193,6 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
   return 0L;
 }
 
-void PrintFileNames(LPDATAOBJECT pDataObj)
-{
-	IEnumFORMATETC *pefEtc = 0;
-	if(  SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc))
-    && SUCCEEDED(pefEtc->Reset()))
-  while(TRUE)
-	{
-		FORMATETC fEtc;
-		ULONG ulFetched = 0L;
-		if(FAILED(pefEtc->Next(1,&fEtc,&ulFetched)) || (ulFetched <= 0))
-			break;
-		STGMEDIUM stgM;
-		if(SUCCEEDED(pDataObj->GetData(&fEtc, &stgM)))
-		{
-      switch (stgM.tymed)
-      {
-      case TYMED_HGLOBAL:
-        DBGTrace1("CShellExt::Initialize TYMED_HGLOBAL, CF_: %d",fEtc.cfFormat);
-        if (fEtc.cfFormat==CF_HDROP)
-			  {
-				  UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
-				  if(n>=1) for(UINT x = 0; x < n; x++)
-					{
-            TCHAR f[MAX_PATH]={0};
-						DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
-            DBGTrace1("-->File: %s",f);
-					}
-			  }
-        break;
-      case TYMED_FILE:
-        DBGTrace("CShellExt::Initialize TYMED_FILE");
-        break;
-      case TYMED_ISTREAM:
-        DBGTrace("CShellExt::Initialize TYMED_ISTREAM");
-        break;
-      case TYMED_ISTORAGE:
-        DBGTrace("CShellExt::Initialize TYMED_ISTORAGE");
-        break;
-      case TYMED_GDI:
-        DBGTrace("CShellExt::Initialize TYMED_GDI");
-        break;
-      case TYMED_MFPICT:
-        DBGTrace("CShellExt::Initialize TYMED_MFPICT");
-        break;
-      case TYMED_ENHMF:
-        DBGTrace("CShellExt::Initialize TYMED_ENHMF");
-        break;
-      case TYMED_NULL:
-        DBGTrace("CShellExt::Initialize TYMED_NULL");
-        break;
-      default:
-        DBGTrace1("CShellExt::Initialize unknown tymed: %d",stgM.tymed);
-      }
-		}
-	}
-	if(pefEtc)
-		pefEtc->Release();
-}
-
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef _DEBUG
@@ -261,9 +202,16 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   TCHAR FileClass[MAX_PATH]={0};
   if(hRegKey)
     GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
-  DBGTrace3("CShellExt::Initialize(%s,0x%08X,%s)",Path,pDataObj,FileClass);
-  if(pDataObj)
-    PrintFileNames(pDataObj);
+  TCHAR File[MAX_PATH]={0};
+  FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+  STGMEDIUM stm;
+  if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+  {
+    if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+      DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
+    ReleaseStgMedium(&stm);
+  }
+  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
 #endif _DEBUG
   m_pDeskClicked=pDataObj==0;
   return NOERROR;
