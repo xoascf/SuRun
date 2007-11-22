@@ -15,7 +15,6 @@
 // This is the main file for the SuRun service. This file handles:
 // -SuRun Installation
 // -SuRun Uninstallation
-// -SuRun Setup
 // -the Windows Service
 // -putting the user to the SuRunners group
 // -Terminating a Process for "Restart as admin..."
