@@ -267,7 +267,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         _tcscat(cmd,L" cmd /D /T:4E /K cd /D ");
       else
       {
-        _tcscat(cmd,L" explorer ");
+        _tcscat(cmd,L" explorer /e,/root,");
         PathAddBackslash(m_ClickFolderName);
       }
       PathQuoteSpaces(m_ClickFolderName);
