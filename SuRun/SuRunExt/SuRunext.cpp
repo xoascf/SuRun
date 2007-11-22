@@ -210,7 +210,7 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
       switch (stgM.tymed)
       {
       case TYMED_HGLOBAL:
-        DBGTrace("CShellExt::Initialize TYMED_HGLOBAL");
+        DBGTrace1("CShellExt::Initialize TYMED_HGLOBAL, CF_: %d",fEtc.cfFormat);
         if (fEtc.cfFormat==CF_HDROP)
 			  {
 				  UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
