@@ -38,7 +38,6 @@ class CShellExt : public IContextMenu, IShellExtInit, IShellExecuteHook
 {
 protected:
   ULONG m_cRef;
-  UINT m_MenuId;
   bool m_pDeskClicked;
   TCHAR m_ClickFolderName[MAX_PATH];
 public:
