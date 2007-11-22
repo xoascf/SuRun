@@ -223,16 +223,28 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
     }
-    if(m_ClickFolderName[0] && GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0)
+    if(m_ClickFolderName[0])
     {
-      //right click target is folder background
-      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       TCHAR s[MAX_PATH];
-      _stprintf(s,sSuRunCmd,m_ClickFolderName);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
-      _stprintf(s,sSuRunExp,m_ClickFolderName);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
-      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      BOOL bCmd=GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0;
+      BOOL bExp=GetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)!=0;
+      if (bExp || bCmd)
+        InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      //right click target is folder background
+      if (bCmd)
+      {
+        _stprintf(s,sSuRunCmd,m_ClickFolderName);
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, s);
+      }
+      id++;
+      if (bExp)
+      {
+        _stprintf(s,sSuRunExp,m_ClickFolderName);
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, s);
+      }
+      id++;
+      if (bExp || bCmd)
+        InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
     }
   }
