@@ -268,6 +268,18 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
           DBGTrace2("WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
         }
+        if(!g_bRestricApps && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
+        {
+          if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_NORESTRICT))
+          {
+            zero(g_RunPwd);
+            g_RunPwd[0]=2;
+            GivePassword();
+            DBGTrace2("WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            continue;
+          }
+          DBGTrace2("WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+        }
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
@@ -346,9 +358,13 @@ void KillProcess(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 BOOL CheckGroupMembership(LPCTSTR UserName)
 {
+  CResStr sCaption(IDS_APPNAME);
+  _tcscat(sCaption,L" (");
+  _tcscat(sCaption,UserName);
+  _tcscat(sCaption,L")");
   if (IsBuiltInAdmin(UserName))
   {
-    MessageBox(0,CBigResStr(IDS_BUILTINADMIN),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    MessageBox(0,CBigResStr(IDS_BUILTINADMIN),sCaption,MB_ICONSTOP);
     return FALSE;
   }
   //Is User member of SuRunners?
@@ -359,13 +375,13 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
       DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
       if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
       {
-        MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
         return FALSE;
       }
       dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
       if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
       {
-        MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
         return FALSE;
       }
     }
@@ -377,37 +393,37 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
   if(NetGetJoinInformation(0,&lpdn,&js))
   {
     if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
-      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS2,lpdn),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS2,lpdn),sCaption,MB_ICONINFORMATION);
     else
-      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS,lpdn),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS,lpdn),sCaption,MB_ICONINFORMATION);
     NetApiBufferFree(lpdn);
     return FALSE;
   }
   //Local User:
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
   {
-    if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),CResStr(IDS_APPNAME),
+    if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),sCaption,
       MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
       return FALSE;
     DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
     if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
-      MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
     dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
     if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
     {
-      MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
     dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
     if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
-      MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
-    MessageBox(0,CBigResStr(IDS_LOGOFFON),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+    MessageBox(0,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
   {
@@ -421,10 +437,10 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
   {
-    MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
     return FALSE;
   }
-  MessageBox(0,CBigResStr(IDS_SURUNNER_OK),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+  MessageBox(0,CBigResStr(IDS_SURUNNER_OK),sCaption,MB_ICONINFORMATION);
   return TRUE;
 }
 
@@ -542,11 +558,22 @@ BOOL Setup(LPCTSTR WinStaName)
   CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
   CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
+  if (!crond.IsValid())    
+  {
+    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    return FALSE;
+  }
+  LoadSettings(g_RunData.UserName);
   //only Admins and SuRunners may setup SuRun
-  if ((IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
-    ||(IsInSuRunners(g_RunData.UserName))
-    ||(CheckGroupMembership(g_RunData.UserName)))
+  if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
     return RunSetup();
+  if (!g_bAdminOnlySetup)
+  {
+    if (IsInSuRunners(g_RunData.UserName) 
+      ||CheckGroupMembership(g_RunData.UserName))
+      return RunSetup();
+  }else
+    MessageBox(0,CBigResStr(IDS_NOADMIN2,g_RunData.UserName),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
   return false;
 }
 
@@ -563,7 +590,7 @@ void SuRun(DWORD ProcessID)
   zero(g_RunData);
   zero(g_RunPwd);
   g_RunPwd[0]=1;
-  LoadSettings();
+  LoadSettings(g_RunData.UserName);
   RUNDATA RD={0};
   RD.CliProcessId=ProcessID;
   if(CheckCliProcess(RD)!=1)
