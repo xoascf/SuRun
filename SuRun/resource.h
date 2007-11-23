@@ -39,6 +39,7 @@
 #define IDS_NOREMADMINS                 35
 #define IDS_ADMINSHELL                  36
 #define IDS_NOSECLOGON                  37
+#define IDS_NOADMIN2                    38
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
