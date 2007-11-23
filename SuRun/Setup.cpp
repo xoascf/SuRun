@@ -31,6 +31,7 @@
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "Service.h"
+#include "SuRunExt/SuRunExt.h"
 
 #pragma comment(lib,"comctl32.lib")
 
@@ -40,29 +41,44 @@
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-bool g_BlurDesktop=TRUE; //blurred user desktop background on secure Desktop
-BYTE g_NoAskTimeOut=0;   //Minutes to wait until "Is that OK?" is asked again
-bool g_bSavePW=TRUE;     //Save Passwords in Registry
+//Settings for all users; saved to "HKLM\SECURITY\SuRun":
+bool g_BlurDesktop=TRUE;      //blurred user desktop background on secure Desktop
+BYTE g_NoAskTimeOut=0;        //Minutes to wait until "Is that OK?" is asked again
+bool g_bSavePW=TRUE;          //Save Passwords in Registry
+
+//Settings for every user; saved to "HKLM\SECURITY\SuRun\<ComputerName>\<UserName>":
+bool g_bAdminOnlySetup=FALSE; //Only real Admins may run Setup
+bool g_bRestricApps=FALSE;    //SuRunner may only run predefined Applications
+
+//Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
+//G/SetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)  //"Control Panel As Admin" on Desktop Menu
+//G/SetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)  //"Cmd here As Admin" on Folder Menu
+//G/SetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)  //"Explorer here As Admin" on Folder Menu
+//G/SetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,1)  //"Restart As Admin" in System-Menu
+//G/SetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,1)    //"Start As Admin" in System-Menu
+
+#define PASSWKEY      SVCKEY _T("\\Cache")
+#define TIMESKEY      SVCKEY _T("\\Times")
+#define WHTLSTKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
+#define USERKEY(u)    CBigResStr(_T("%s\\%s\\Settings"),SVCKEY,u)
+
+BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
 
 #define Radio1chk (g_bSavePW==0)
 #define Radio2chk (g_bSavePW!=0)
-
-#define PWKEY     SVCKEY _T("\\Cache")
-#define TMKEY     SVCKEY _T("\\Times")
-#define WLKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
-
-BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
 
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  LoadSettings
 // 
 //////////////////////////////////////////////////////////////////////////////
-void LoadSettings()
+void LoadSettings(LPTSTR UserName)
 {
   g_BlurDesktop=GetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),1)!=0;
   g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),0)));
   g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
+  g_bAdminOnlySetup=GetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),1)!=0;
+  g_bRestricApps=GetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),1)!=0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -70,15 +86,17 @@ void LoadSettings()
 //  SaveSettings
 // 
 //////////////////////////////////////////////////////////////////////////////
-void SaveSettings()
+void SaveSettings(LPTSTR UserName)
 {
   SetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
   SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
   SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
+  SetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),g_bAdminOnlySetup);
+  SetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),g_bRestricApps);
   if (!g_bSavePW)
   {
-    DelRegKey(HKLM,PWKEY);
-    DelRegKey(HKLM,TMKEY);
+    DelRegKey(HKLM,PASSWKEY);
+    DelRegKey(HKLM,TIMESKEY);
   }
 }
 
@@ -93,14 +111,14 @@ void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
     return;
   CBlowFish bf;
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  if(GetRegAny(HKLM,PWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
+  if(GetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
     bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
 }
 
 void DeletePassword(LPTSTR UserName)
 {
-  RegDelVal(HKLM,PWKEY,UserName);
-  RegDelVal(HKLM,TMKEY,UserName);
+  RegDelVal(HKLM,PASSWKEY,UserName);
+  RegDelVal(HKLM,TIMESKEY,UserName);
 }
 
 void SavePassword(LPTSTR UserName,LPTSTR Password)
@@ -110,7 +128,7 @@ void SavePassword(LPTSTR UserName,LPTSTR Password)
   CBlowFish bf;
   TCHAR pw[PWLEN];
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,PWKEY,UserName,REG_BINARY,(BYTE*)pw,
+  SetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)pw,
     bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
 }
 
@@ -122,14 +140,14 @@ void SavePassword(LPTSTR UserName,LPTSTR Password)
 
 __int64 GetLastRunTime(LPTSTR UserName)
 {
-  return GetRegInt64(HKLM,TMKEY,UserName,0);
+  return GetRegInt64(HKLM,TIMESKEY,UserName,0);
 }
 
 void UpdLastRunTime(LPTSTR UserName)
 {
   __int64 ft;
   GetSystemTimeAsFileTime((LPFILETIME)&ft);
-  SetRegInt64(HKLM,TMKEY,UserName,ft);
+  SetRegInt64(HKLM,TIMESKEY,UserName,ft);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -142,20 +160,21 @@ void UpdLastRunTime(LPTSTR UserName)
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  return (GetRegInt(HKLM,WLKEY(User),CmdLine,0)&Flag)==Flag;
+  return (GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&Flag)==Flag;
 }
 
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  DWORD dwwl=GetRegInt(HKLM,WLKEY(User),CmdLine,0)&(~Flag);
+  DWORD dwwl=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&(~Flag);
   if(dwwl)
-    return SetRegInt(HKLM,WLKEY(User),CmdLine,dwwl);
-  return RegDelVal(HKLM,WLKEY(User),CmdLine);
+    return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,dwwl);
+  return RegDelVal(HKLM,WHTLSTKEY(User),CmdLine);
 }
 
 void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  SetRegInt(HKLM,WLKEY(User),CmdLine,GetRegInt(HKLM,WLKEY(User),CmdLine,0)|Flag);
+  SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,
+    GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)|Flag);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -241,7 +260,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,16,16,0));
-      LoadSettings();
+      LoadSettings(g_RunData.UserName);
       {
         TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
         GetWindowText(hwnd,WndText,MAX_PATH);
@@ -300,7 +319,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
           g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
           g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
-          SaveSettings();
+          SaveSettings(g_RunData.UserName);
           if ((CanSetTime(SURUNNERSGROUP)!=0)!=(IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)==BST_CHECKED))
             AllowSetTime(SURUNNERSGROUP,IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)==BST_CHECKED);
           SetOwnerAdminGrp((IsDlgButtonChecked(hwnd,IDC_OWNERGROUP)==BST_CHECKED)?1:0);
