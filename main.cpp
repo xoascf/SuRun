@@ -34,7 +34,7 @@
 // ArgumentsToCommand: Based on SuDown (http://SuDown.sourceforge.net)
 //
 //////////////////////////////////////////////////////////////////////////////
-VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
+VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
 {
   //Save parameters
   TCHAR args[4096]={0};
@@ -49,29 +49,33 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
   TCHAR path[4096];
   _tcscpy(path,app);
   PathRemoveFileSpec(path);
-  //Get File
+  //Get File, Ext
   TCHAR file[MAX_PATH];
+  TCHAR ext[MAX_PATH];
   _tcscpy(file,app);
   PathStripPath(file);
-  //Get Ext
-  TCHAR ext[MAX_PATH];
   _tcscpy(ext,PathFindExtension(file));
   PathRemoveExtension(file);
-  if ((path[0]=='\0')&&(!_wcsicmp(file,L"explorer")) )
+  //Explorer(.exe)
+  if ((!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
   {
     if (args[0]==0) 
       wcscpy(args,L"/e,C:");
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"explorer.exe");
-  }else if ((path[0]==0)&&(!_wcsicmp(file,L"msconfig")))
+  }else 
+  //Msconfig(.exe) is not in path but found by windows
+  if ((!_wcsicmp(app,L"msconfig"))||(!_wcsicmp(app,L"msconfig.exe")))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
     if (!PathFileExists(app))
       wcscpy(app,L"msconfig");
     zero(args);
-  }else if (((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
-            && (args[0]==0))
+  }else
+  //Control Panel special folder files:
+  if (((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
+      && (args[0]==0))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
@@ -82,7 +86,9 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
     wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
-  }else if (!_wcsicmp(ext, L".cpl")) 
+  }else 
+  //Control Panel files  
+  if (!_wcsicmp(ext, L".cpl")) 
   {
     PathQuoteSpaces(app);
     if (args[0] && app[0])
@@ -92,7 +98,9 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     wcscat(args,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"rundll32.exe");
-  }else if (!_wcsicmp(ext, L".msi")) 
+  }else 
+  //Windows Installer files  
+  if (!_wcsicmp(ext, L".msi")) 
   {
     PathQuoteSpaces(app);
     if (args[0] && app[0])
@@ -101,7 +109,9 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     wcscpy(args,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"msiexec.exe");
-  }else if (!_wcsicmp(ext, L".msc")) 
+  }else 
+  //Windows Installer patch files  
+  if (!_wcsicmp(ext, L".msc")) 
   {
     if (path[0]==0)
     {
@@ -117,6 +127,20 @@ VOID ArgsToCommand(LPWSTR Args, LPTSTR cmd)
     wcscpy(args,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"mmc.exe");
+  }else
+  //Try to find the executable:
+  {
+    if (path[0]==0)
+    {
+      // file.ext ->search in current dir, search %path%
+      // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
+
+    }
+    
+    // d:file.ext ->search in current dir of "d"
+    // d:\path\file.ext ->PathFileExists
+    // \\uncpath\file.ext ->PathFileExists
+    ...
   }
   wcscpy(cmd,app);
   PathQuoteSpaces(cmd);
