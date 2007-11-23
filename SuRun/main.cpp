@@ -45,6 +45,7 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   PathRemoveArgs(app);
   PathUnquoteSpaces(app);
   NetworkPathToUNCPath(app);
+  BOOL fExist=PathFileExists(app);
   //Get Path
   TCHAR path[4096];
   _tcscpy(path,app);
@@ -57,7 +58,7 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   _tcscpy(ext,PathFindExtension(file));
   PathRemoveExtension(file);
   //Explorer(.exe)
-  if ((!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
+  if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
   {
     if (args[0]==0) 
       wcscpy(args,L"/e,C:");
@@ -65,7 +66,7 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
     PathAppend(app, L"explorer.exe");
   }else 
   //Msconfig(.exe) is not in path but found by windows
-  if ((!_wcsicmp(app,L"msconfig"))||(!_wcsicmp(app,L"msconfig.exe")))
+  if ((!fExist)&&(!_wcsicmp(app,L"msconfig"))||(!_wcsicmp(app,L"msconfig.exe")))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
@@ -74,14 +75,15 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
     zero(args);
   }else
   //Control Panel special folder files:
-  if (((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
-      && (args[0]==0))
+  if ((!fExist)
+    &&((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
+    && (args[0]==0))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
     wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
   }else if ((!_wcsicmp(app,L"ncpa.cpl")) 
-            && (args[0]==0))
+         && (args[0]==0))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
@@ -110,7 +112,7 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
     GetSystemDirectory(app,4096);
     PathAppend(app,L"msiexec.exe");
   }else 
-  //Windows Installer patch files  
+  //Windows Management Console Sanp-In
   if (!_wcsicmp(ext, L".msc")) 
   {
     if (path[0]==0)
@@ -130,19 +132,34 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   }else
   //Try to find the executable:
   {
+    if ((path[0]=='\\'))
+    {
+      if(path[1]=='\\')
+      //UNC path: must be fully qualified!
+        ;
+      else
+      {
+        //Root of current drive
+      }
+    }else
     if (path[0]==0)
     {
       // file.ext ->search in current dir, search %path%
       // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
-
+    }else
+    if (path[1]==':')
+    {
+      //if path=="d:" -> "cd d:"
+      SetCurrentDirectory(path);
+      //if path=="d:" -> "cd d:" -> "d:\documents"
+      GetCurrentDirectory(4096,path);
+      // d:\path\file.ext ->PathFileExists
+      // \\uncpath\file.ext ->PathFileExists
     }
-    
-    // d:file.ext ->search in current dir of "d"
-    // d:\path\file.ext ->PathFileExists
-    // \\uncpath\file.ext ->PathFileExists
     ...
   }
   wcscpy(cmd,app);
+  fExist=PathFileExists(app);
   PathQuoteSpaces(cmd);
   if (args[0] && app[0])
     wcscat(cmd,L" ");
