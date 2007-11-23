@@ -202,6 +202,9 @@ CShellExtClassFactory::~CShellExtClassFactory()
 	dec_cRefThisDLL();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// IUnknown
+//////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExtClassFactory::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
   *ppv = NULL;
@@ -227,6 +230,9 @@ STDMETHODIMP_(ULONG) CShellExtClassFactory::Release()
   return 0L;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// IClassFactory
+//////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExtClassFactory::CreateInstance(LPUNKNOWN pUnkOuter, REFIID riid, LPVOID *ppvObj)
 {
 	*ppvObj = NULL;
@@ -261,6 +267,9 @@ CShellExt::~CShellExt()
   dec_cRefThisDLL();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// IUnknown
+//////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
   *ppv = NULL;
@@ -291,6 +300,9 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
   return 0L;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// IShellExtInit
+//////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
   zero(m_ClickFolderName);
@@ -305,6 +317,9 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   return NOERROR;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// IContextMenu
+//////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
   if((CMF_DEFAULTONLY & uFlags)==0) 
@@ -389,6 +404,9 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   return hr;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// IShellExecuteHook
+//////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
   //Struct Size Check
@@ -427,8 +445,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
+      //ExitCode==-2 means that the program is not in the WhiteList
       if (ExitCode==0)
+      {
         pei->hInstApp=(HINSTANCE)33;
+        //ToDo: Show ToolTip "<Program> is running elevated"...
+      }
       else 
       {
         DBGTrace2("SuRun ShellExtHook: failed to execute %s; %s",cmd,GetErrorNameStatic(ExitCode));
