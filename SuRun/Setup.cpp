@@ -13,7 +13,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -23,6 +23,7 @@
 #include <tchar.h>
 #include <lm.h>
 #include <commctrl.h>
+#include "Setup.h"
 #include "Helpers.h"
 #include "BlowFish.h"
 #include "ResStr.h"
@@ -51,11 +52,11 @@ bool g_bAdminOnlySetup=FALSE; //Only real Admins may run Setup
 bool g_bRestricApps=FALSE;    //SuRunner may only run predefined Applications
 
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)  //"Control Panel As Admin" on Desktop Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)  //"Cmd here As Admin" on Folder Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)  //"Explorer here As Admin" on Folder Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,1)  //"Restart As Admin" in System-Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,1)    //"Start As Admin" in System-Menu
+bool g_bControlAsAdmin=TRUE;  //"Control Panel As Admin" on Desktop Menu
+bool g_bCmdHereAsAdmin=TRUE;  //"Cmd here As Admin" on Folder Menu
+bool g_bExpHereAsAdmin=TRUE;  //"Explorer here As Admin" on Folder Menu
+bool g_bRestartAsAdmin=TRUE;  //"Restart As Admin" in System-Menu
+bool g_bStartAsAdmin=TRUE;    //"Start As Admin" in System-Menu
 
 #define PASSWKEY      SVCKEY _T("\\Cache")
 #define TIMESKEY      SVCKEY _T("\\Times")
@@ -64,21 +65,63 @@ bool g_bRestricApps=FALSE;    //SuRunner may only run predefined Applications
 
 BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
 
-#define Radio1chk (g_bSavePW==0)
-#define Radio2chk (g_bSavePW!=0)
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Windows Policy Stuff
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+#define IsOwnerAdminGrp     (GetRegInt(HKLM,\
+                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
+                              _T("nodefaultadminowner"),1)==0)
+
+#define SetOwnerAdminGrp(b) SetRegInt(HKLM,\
+                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
+                              _T("nodefaultadminowner"),(b)==0)
+
+#define IsWinUpd4All      GetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
+                            _T("ElevateNonAdmins"),0)
+
+#define SetWinUpd4All(b)  SetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
+                            _T("ElevateNonAdmins"),b)
+
+#define IsWinUpdBoot      GetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
+                            _T("NoAutoRebootWithLoggedOnUsers"),0)
+
+#define SetWinUpdBoot(b)  SetRegInt(HKLM,\
+                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
+                            _T("NoAutoRebootWithLoggedOnUsers"),b)
+
+#define CanSetEnergy  HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
+                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP)
+
+#define SetEnergy(b)  SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
+                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  LoadSettings
 // 
 //////////////////////////////////////////////////////////////////////////////
+
 void LoadSettings(LPTSTR UserName)
 {
+  //General settings
   g_BlurDesktop=GetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),1)!=0;
   g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),0)));
   g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
+  //User restrictions
   g_bAdminOnlySetup=GetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),0)!=0;
   g_bRestricApps=GetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),0)!=0;
+  //Shell integration
+  g_bControlAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0;
+  g_bCmdHereAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0;
+  g_bExpHereAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)!=0;
+  g_bRestartAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,1)!=0;
+  g_bStartAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,1)!=0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,11 +129,14 @@ void LoadSettings(LPTSTR UserName)
 //  SaveSettings
 // 
 //////////////////////////////////////////////////////////////////////////////
+
 void SaveSettings(LPTSTR UserName)
 {
+  //General settings
   SetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
   SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
   SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
+  //User restrictions
   SetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),g_bAdminOnlySetup);
   SetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),g_bRestricApps);
   if (!g_bSavePW)
@@ -98,6 +144,12 @@ void SaveSettings(LPTSTR UserName)
     DelRegKey(HKLM,PASSWKEY);
     DelRegKey(HKLM,TIMESKEY);
   }
+  //Shell integration
+  SetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,g_bControlAsAdmin);
+  SetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,g_bCmdHereAsAdmin);
+  SetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,g_bExpHereAsAdmin);
+  SetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,g_bRestartAsAdmin);
+  SetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,g_bStartAsAdmin);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -105,6 +157,7 @@ void SaveSettings(LPTSTR UserName)
 //  Password cache
 // 
 //////////////////////////////////////////////////////////////////////////////
+
 void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
   if (!g_bSavePW)
@@ -155,8 +208,6 @@ void UpdLastRunTime(LPTSTR UserName)
 // WhiteList handling
 // 
 //////////////////////////////////////////////////////////////////////////////
-#define FLAG_DONTASK   1
-#define FLAG_SHELLEXEC 2
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
@@ -182,6 +233,23 @@ void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 //  Service setup
 // 
 //////////////////////////////////////////////////////////////////////////////
+
+void LBSetScrollbar(HWND hwnd)
+{
+  HDC hdc=GetDC(hwnd);
+  TCHAR s[4096];
+  int nItems=(int)SendMessage(hwnd,LB_GETCOUNT,0,0);
+  int wMax=0;
+  for (int i=0;i<nItems;i++)
+  {
+    SIZE sz={0};
+    GetTextExtentPoint32(hdc,s,(int)SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
+    wMax=max(sz.cx,wMax);
+  }
+  SendMessage(hwnd,LB_SETHORIZONTALEXTENT,wMax,0);
+  ReleaseDC(hwnd,hdc);
+}
+
 void UpdateAskUser(HWND hwnd)
 {
   if(IsDlgButtonChecked(hwnd,IDC_SAVEPW)!=BST_CHECKED)
@@ -201,52 +269,6 @@ void UpdateAskUser(HWND hwnd)
   }
 }
 
-void LBSetScrollbar(HWND hwnd)
-{
-  HDC hdc=GetDC(hwnd);
-  TCHAR s[4096];
-  int nItems=(int)SendMessage(hwnd,LB_GETCOUNT,0,0);
-  int wMax=0;
-  for (int i=0;i<nItems;i++)
-  {
-    SIZE sz={0};
-    GetTextExtentPoint32(hdc,s,(int)SendMessage(hwnd,LB_GETTEXT,i,(LPARAM)&s),&sz);
-    wMax=max(sz.cx,wMax);
-  }
-  SendMessage(hwnd,LB_SETHORIZONTALEXTENT,wMax,0);
-  ReleaseDC(hwnd,hdc);
-}
-
-#define IsOwnerAdminGrp     (GetRegInt(HKLM,\
-                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
-                              _T("nodefaultadminowner"),1)==0)
-
-#define SetOwnerAdminGrp(b) SetRegInt(HKLM,\
-                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
-                              _T("nodefaultadminowner"),(b)==0)
-
-#define IsWinUpd4All      GetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
-                            _T("ElevateNonAdmins"),0)
-
-#define SetWinUpd4All(b)  SetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
-                            _T("ElevateNonAdmins"),b)
-
-#define IsWinUpdBoot      GetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
-                            _T("NoAutoRebootWithLoggedOnUsers"),0)
-
-#define SetWinUpdBoot(b)  SetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
-                            _T("NoAutoRebootWithLoggedOnUsers"),b)
-
-#define CanSetEnergy  HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
-                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP)
-
-#define SetEnergy(b)  SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
-                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b)
-
 INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 //  DBGTrace4("SetupDlgProc(%x,%x,%x,%x)",hwnd,msg,wParam,lParam);
@@ -256,7 +278,7 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
-        IMAGE_ICON,0,0,0));
+        IMAGE_ICON,32,32,0));
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,16,16,0));
@@ -267,8 +289,8 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         _stprintf(newText,WndText,GetVersionString());
         SetWindowText(hwnd,newText);
       }
-      CheckDlgButton(hwnd,IDC_RADIO1,(Radio1chk?BST_CHECKED:BST_UNCHECKED));
-      CheckDlgButton(hwnd,IDC_RADIO2,(Radio2chk?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_RADIO1,((g_bSavePW==0)?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_RADIO2,((g_bSavePW!=0)?BST_CHECKED:BST_UNCHECKED));
       SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
       SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
@@ -358,28 +380,126 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+//  DBGTrace4("SetupDlgProc(%x,%x,%x,%x)",hwnd,msg,wParam,lParam);
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
+      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
+      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
+      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),g_bSavePW);
+      CheckDlgButton(hwnd,IDC_ALLOWTIME,CanSetTime(SURUNNERSGROUP)?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_OWNERGROUP,IsOwnerAdminGrp?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_WINUPD4ALL,IsWinUpd4All?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_WINUPDBOOT,IsWinUpdBoot?BST_CHECKED:BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_SETENERGY,CanSetEnergy?BST_CHECKED:BST_UNCHECKED);
+      return TRUE;
+    }//WM_INITDIALOG
+  case WM_COMMAND:
+    {
+      switch (wParam)
+      {
+      case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED);
+        return TRUE;
+      }//switch (wParam)
+      break;
+    }//WM_COMMAND
+  }
+  return FALSE;
+}
+
+INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      SendMessage(hwnd,WM_SETICON,ICON_BIG,
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
+        IMAGE_ICON,32,32,0));
+      SendMessage(hwnd,WM_SETICON,ICON_SMALL,
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
+        IMAGE_ICON,16,16,0));
+      LoadSettings(g_RunData.UserName);
+      {
+        TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
+        GetWindowText(hwnd,WndText,MAX_PATH);
+        _stprintf(newText,WndText,GetVersionString());
+        SetWindowText(hwnd,newText);
+      }
+      //...
+      return TRUE;
+    }//WM_INITDIALOG
+  case WM_NCDESTROY:
+    {
+      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
+      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
+      return TRUE;
+    }//WM_NCDESTROY
+  case WM_COMMAND:
+    {
+      switch (wParam)
+      {
+      case MAKELPARAM(IDCANCEL,BN_CLICKED):
+        EndDialog(hwnd,0);
+        return TRUE;
+      case MAKELPARAM(IDOK,BN_CLICKED):
+        {
+          EndDialog(hwnd,1);
+          return TRUE;
+        }
+      }//switch (wParam)
+      break;
+    }//WM_COMMAND
+  }
+  return FALSE;
+}
+
 BOOL RunSetup()
 {
   return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;  
 }
 
 #ifdef _DEBUGSETUP
+typedef struct _SETUPDATA 
+{
+  USERLIST Users;
+  _SETUPDATA ():Users(SURUNNERSGROUP)
+  {
+  }
+}SETUPDATA;
+
+BOOL RunMainSetup()
+{
+  SETUPDATA sd;
+  BOOL bRet=DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
+                           0,MainSetupDlgProc,(LPARAM)&sd)>=0;  
+  return bRet;
+}
+
 BOOL TestSetup()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
+
+  RunMainSetup();
   
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-  if (!RunSetup())
-    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-  if (!RunSetup())
-    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-  
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
-  if (!RunSetup())
-    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+//  if (!RunSetup())
+//    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+//
+//  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+//  if (!RunSetup())
+//    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+//  
+//  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
+//  if (!RunSetup())
+//    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   
   ::ExitProcess(0);
   return TRUE;
