@@ -24,11 +24,11 @@ extern bool g_bAdminOnlySetup;  //Only real Admins may run Setup
 extern bool g_bRestricApps;     //SuRunner may only run predefined Applications
 
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)  //"Control Panel As Admin" on Desktop Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)  //"Cmd here As Admin" on Folder Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)  //"Explorer here As Admin" on Folder Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,1)  //"Restart As Admin" in System-Menu
-//G/SetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,1)    //"Start As Admin" in System-Menu
+extern bool g_bControlAsAdmin;  //"Control Panel As Admin" on Desktop Menu
+extern bool g_bCmdHereAsAdmin;  //"Cmd here As Admin" on Folder Menu
+extern bool g_bExpHereAsAdmin;  //"Explorer here As Admin" on Folder Menu
+extern bool g_bRestartAsAdmin;  //"Restart As Admin" in System-Menu
+extern bool g_bStartAsAdmin;    //"Start As Admin" in System-Menu
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -65,9 +65,9 @@ void UpdLastRunTime(LPTSTR UserName);
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-#define FLAG_DONTASK    1
-#define FLAG_SHELLEXEC  2
-#define FLAG_NORESTRICT 4
+#define FLAG_DONTASK   1  //SuRun will not ask if App can be executed
+#define FLAG_SHELLEXEC 2  //ShellExecute hook will execute App elevated
+#define FLAG_NORESTRICT 4 //Restricted SuRunner may execute App elevated
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
