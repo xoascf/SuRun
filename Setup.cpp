@@ -77,8 +77,8 @@ void LoadSettings(LPTSTR UserName)
   g_BlurDesktop=GetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),1)!=0;
   g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),0)));
   g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
-  g_bAdminOnlySetup=GetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),1)!=0;
-  g_bRestricApps=GetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),1)!=0;
+  g_bAdminOnlySetup=GetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),0)!=0;
+  g_bRestricApps=GetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),0)!=0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
