@@ -53,3 +53,31 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName);
 
 // is User "DomainAndName" the built in administrator? (can't be degraded)
 BOOL IsBuiltInAdmin(LPCWSTR DomainAndName);
+
+// User list
+//
+/////////////////////////////////////////////////////////////////////////////
+
+typedef struct  
+{
+  WCHAR UserName[UNLEN+UNLEN+2];
+  HBITMAP UserBitmap;
+}USERDATA;
+
+class USERLIST
+{
+public:
+  int nUsers;
+  USERDATA* User;
+  //List of Users of WellKnownGroups
+  USERLIST(BOOL bAdminsOnly);
+  //List of Users of "GroupName"
+  USERLIST(LPWSTR GroupName);
+  ~USERLIST();
+  HBITMAP GetUserBitmap(LPTSTR UserName);
+private:
+  void Add(LPWSTR UserName);
+  void AddGroupUsers(LPWSTR GroupName);
+  void AddGroupUsers(DWORD WellKnownGroup);
+};
+
