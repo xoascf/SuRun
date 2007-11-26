@@ -268,12 +268,13 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
           DBGTrace2("WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
         }
-        if(!g_bRestricApps && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
+        LoadSettings(g_RunData.UserName);
+        if(g_bRestricApps && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
         {
           if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_NORESTRICT))
           {
             zero(g_RunPwd);
-            g_RunPwd[0]=2;
+            g_RunPwd[0]=3;
             GivePassword();
             DBGTrace2("WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
@@ -1116,7 +1117,5 @@ bool HandleServiceStuff()
 //////////////////////////////////////////////////////////////////////////////
 
 //To make DialogBoxParam and MessageBox work with Themes:
-#ifndef _DEBUG
 HANDLE g_hShell32=LoadLibrary(_T("Shell32.dll"));
 static bool g_IsServiceStuff=HandleServiceStuff();
-#endif _DEBUG
