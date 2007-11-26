@@ -364,6 +364,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return 0;
   if (g_RunPwd[0]==2) //ShellExec->NOT in List
     return -2;
+  if (g_RunPwd[0]==2) //Restricted User, may not run App!
+  {
+    MessageBox(0,
+      CResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return -3;
+  }
   if (g_RunPwd[0]==1)
     return ERROR_ACCESS_DENIED;
   PROCESS_INFORMATION pi={0};
