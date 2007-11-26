@@ -168,27 +168,24 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   switch(dwReason)
   {
   case DLL_PROCESS_ATTACH:
-    //if (!g_hInst)
-    {
 #ifdef _DEBUG_ENU
-      SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
-      g_hInst=hInstDLL;
-      WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-      WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-      DisableThreadLibraryCalls(hInstDLL);
-      _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
-      _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
-      _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
-      _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
-      CResStr rs(g_hInst);
-      rs=IDS_SURUNCMD;//Do not expand %s!
-      _tcscpy(sSuRunCmd,rs);
-      rs=IDS_SURUNEXP;//Do not expand %s!
-      _tcscpy(sSuRunExp,rs);
-      _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
-      _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
-    }
+    g_hInst=hInstDLL;
+    WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+    WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+    DisableThreadLibraryCalls(hInstDLL);
+    _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
+    _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
+    _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
+    _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
+    CResStr rs(g_hInst);
+    rs=IDS_SURUNCMD;//Do not expand %s!
+    _tcscpy(sSuRunCmd,rs);
+    rs=IDS_SURUNEXP;//Do not expand %s!
+    _tcscpy(sSuRunExp,rs);
+    _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
+    _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
   }
   return TRUE;
 }
