@@ -34,61 +34,101 @@
 // QualifyPath
 //
 //////////////////////////////////////////////////////////////////////////////
+
+//Combine path parts
+void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
+{
+  _tcscpy(Dst,path);
+  PathAppend(Dst,file);
+  PathAddExtension(Dst,ext);
+}
+
+//Split path parts
+void Split(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
+{
+  //Get Path
+  _tcscpy(path,app);
+  PathRemoveFileSpec(path);
+  //Get File, Ext
+  _tcscpy(file,app);
+  PathStripPath(file);
+  _tcscpy(ext,PathFindExtension(file));
+  PathRemoveExtension(file);
+}
+
 BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
-  static LPCTSTR ExeExts[]={L"exe",L"lnk",L"cmd",L"bat",L"com",L"pif"};
-  //relative path:
+  static LPTSTR ExeExts[]={L".exe",L".lnk",L".cmd",L".bat",L".com",L".pif"};
   if (path[0]=='.')
   {
-    PathCanonicalize()
+    //relative path: make it absolute
+    _tcscpy(app,g_RunData.CurDir);
+    PathAppend(app,path);
+    PathCanonicalize(path,app);
+    Combine(app,path,file,ext);
   }
   if ((path[0]=='\\'))
   {
     if(path[1]=='\\')
       //UNC path: must be fully qualified!
-      return PathFileExists(app);
-        && (!PathIsDirectory(app))
+      return PathFileExists(app)
+        && (!PathIsDirectory(app));
     //Root of current drive
     _tcscpy(path,g_RunData.CurDir);
     PathStripToRoot(path);
-    _stprintf(app,"%s%s%s",path,file,ext);
+    Combine(app,path,file,ext);
   }
   if (path[0]==0)
   {
     _tcscpy(path,app);
-    LPCTSTR d=&g_RunData.CurDir;
+    LPCTSTR d[2]={(LPCTSTR)&g_RunData.CurDir,0};
     // file.ext ->search in current dir and %path%
-    if ((PathFindOnPath(path,&d))&&(!PathIsDirectory(path)))
+    if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
     {
       //Done!
       _tcscpy(app,path);
       PathRemoveFileSpec(path);
       return TRUE;
     }
-    if (ext[0]==0) for (int i=0;i<countof(ExeExts),i++)
+    if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
     //Not found! Try all Extensions for Executables
     // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
     {
-      _stprintf(path,"%s.%s",file,ExeExts[i]);
-      if ((PathFindOnPath(path,&d))&&(!PathIsDirectory(path)))
+      _stprintf(path,L"%s%s",file,ExeExts[i]);
+      if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
       {
         //Done!
         _tcscpy(app,path);
+        _tcscpy(ext,ExeExts[i]);
         PathRemoveFileSpec(path);
         return TRUE;
       }
     }
     return FALSE;
   }
-  PathCanonicalize()
   if (path[1]==':')
   {
     //if path=="d:" -> "cd d:"
-    SetCurrentDirectory(path);
+    if (!SetCurrentDirectory(path))
+      return false;
     //if path=="d:" -> "cd d:" -> "d:\documents"
     GetCurrentDirectory(4096,path);
-    // d:\path\file.ext ->PathFileExists
-    // \\uncpath\file.ext ->PathFileExists
+    Combine(app,path,file,ext);
+  }
+  // d:\path\file.ext ->PathFileExists
+  if (PathFileExists(app) && (!PathIsDirectory(app)))
+    return TRUE;
+  if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
+  //Not found! Try all Extensions for Executables
+  // file ->search (exe,bat,cmd,com,pif,lnk) in path
+  {
+    Combine(app,path,file,ExeExts[i]);
+    if ((PathFileExists(app))&&(!PathIsDirectory(app)))
+    {
+      //Done!
+      _tcscpy(ext,ExeExts[i]);
+      return TRUE;
+    }
   }
   return FALSE;
 }
@@ -98,7 +138,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
 // ArgumentsToCommand: Based on SuDown (http://SuDown.sourceforge.net)
 //
 //////////////////////////////////////////////////////////////////////////////
-VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
+BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
 {
   //Save parameters
   TCHAR args[4096]={0};
@@ -110,17 +150,11 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   PathUnquoteSpaces(app);
   NetworkPathToUNCPath(app);
   BOOL fExist=PathFileExists(app);
-  //Get Path
+  //Split path parts
   TCHAR path[4096];
-  _tcscpy(path,app);
-  PathRemoveFileSpec(path);
-  //Get File, Ext
   TCHAR file[MAX_PATH];
   TCHAR ext[MAX_PATH];
-  _tcscpy(file,app);
-  PathStripPath(file);
-  _tcscpy(ext,PathFindExtension(file));
-  PathRemoveExtension(file);
+  Split(app,path,file,ext);
   //Explorer(.exe)
   if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
   {
@@ -196,7 +230,14 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   }else
   //Try to fully qualify the executable:
   {
-    QualifyPath(app,path,file,ext);
+    if (!QualifyPath(app,path,file,ext))
+    {
+      _tcscpy(app,Args);
+      PathRemoveArgs(app);
+      PathUnquoteSpaces(app);
+      NetworkPathToUNCPath(app);
+      Split(app,path,file,ext);
+    }
   }
   wcscpy(cmd,app);
   fExist=PathFileExists(app);
@@ -204,6 +245,7 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   if (args[0] && app[0])
     wcscat(cmd,L" ");
   wcscat(cmd,args);
+  return fExist;
 }
 
 //////////////////////////////////////////////////////////////////////////////
