@@ -31,6 +31,70 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //
+// QualifyPath
+//
+//////////////////////////////////////////////////////////////////////////////
+BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
+{
+  static LPCTSTR ExeExts[]={L"exe",L"lnk",L"cmd",L"bat",L"com",L"pif"};
+  //relative path:
+  if (path[0]=='.')
+  {
+    PathCanonicalize()
+  }
+  if ((path[0]=='\\'))
+  {
+    if(path[1]=='\\')
+      //UNC path: must be fully qualified!
+      return PathFileExists(app);
+        && (!PathIsDirectory(app))
+    //Root of current drive
+    _tcscpy(path,g_RunData.CurDir);
+    PathStripToRoot(path);
+    _stprintf(app,"%s%s%s",path,file,ext);
+  }
+  if (path[0]==0)
+  {
+    _tcscpy(path,app);
+    LPCTSTR d=&g_RunData.CurDir;
+    // file.ext ->search in current dir and %path%
+    if ((PathFindOnPath(path,&d))&&(!PathIsDirectory(path)))
+    {
+      //Done!
+      _tcscpy(app,path);
+      PathRemoveFileSpec(path);
+      return TRUE;
+    }
+    if (ext[0]==0) for (int i=0;i<countof(ExeExts),i++)
+    //Not found! Try all Extensions for Executables
+    // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
+    {
+      _stprintf(path,"%s.%s",file,ExeExts[i]);
+      if ((PathFindOnPath(path,&d))&&(!PathIsDirectory(path)))
+      {
+        //Done!
+        _tcscpy(app,path);
+        PathRemoveFileSpec(path);
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+  PathCanonicalize()
+  if (path[1]==':')
+  {
+    //if path=="d:" -> "cd d:"
+    SetCurrentDirectory(path);
+    //if path=="d:" -> "cd d:" -> "d:\documents"
+    GetCurrentDirectory(4096,path);
+    // d:\path\file.ext ->PathFileExists
+    // \\uncpath\file.ext ->PathFileExists
+  }
+  return FALSE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
 // ArgumentsToCommand: Based on SuDown (http://SuDown.sourceforge.net)
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -130,33 +194,9 @@ VOID ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
     GetSystemDirectory(app,4096);
     PathAppend(app,L"mmc.exe");
   }else
-  //Try to find the executable:
+  //Try to fully qualify the executable:
   {
-    if ((path[0]=='\\'))
-    {
-      if(path[1]=='\\')
-      //UNC path: must be fully qualified!
-        ;
-      else
-      {
-        //Root of current drive
-      }
-    }else
-    if (path[0]==0)
-    {
-      // file.ext ->search in current dir, search %path%
-      // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
-    }else
-    if (path[1]==':')
-    {
-      //if path=="d:" -> "cd d:"
-      SetCurrentDirectory(path);
-      //if path=="d:" -> "cd d:" -> "d:\documents"
-      GetCurrentDirectory(4096,path);
-      // d:\path\file.ext ->PathFileExists
-      // \\uncpath\file.ext ->PathFileExists
-    }
-    ...
+    QualifyPath(app,path,file,ext);
   }
   wcscpy(cmd,app);
   fExist=PathFileExists(app);
