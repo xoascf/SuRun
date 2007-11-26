@@ -263,10 +263,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             zero(g_RunPwd);
             g_RunPwd[0]=2;
             GivePassword();
-            DBGTrace2("WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
           }
-          DBGTrace2("WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+          DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
         }
         LoadSettings(g_RunData.UserName);
         if(g_bRestricApps && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
@@ -276,10 +276,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             zero(g_RunPwd);
             g_RunPwd[0]=3;
             GivePassword();
-            DBGTrace2("WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
           }
-          DBGTrace2("WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+          DBGTrace2("Restriction WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
         }
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
@@ -427,14 +427,8 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     MessageBox(0,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
-  {
-    TCHAR U[UNLEN+GNLEN+2]={0};
-    TCHAR P[PWLEN]={0};
-    if (!LogonAdmin(U,P,IDS_NOSURUNNER))
-      return FALSE;
-    zero(U);
-    zero(P);
-  }
+  if (!LogonAdmin(IDS_NOSURUNNER))
+    return FALSE;
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
   {
@@ -568,13 +562,16 @@ BOOL Setup(LPCTSTR WinStaName)
   //only Admins and SuRunners may setup SuRun
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
     return RunSetup();
-  if (!g_bAdminOnlySetup)
+  if (g_bAdminOnlySetup)
   {
-    if (IsInSuRunners(g_RunData.UserName) 
-      ||CheckGroupMembership(g_RunData.UserName))
+    if(!LogonAdmin(IDS_NOADMIN2))
+      return FALSE;
+    else
       return RunSetup();
-  }else
-    MessageBox(0,CBigResStr(IDS_NOADMIN2,g_RunData.UserName),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+  }
+  if (IsInSuRunners(g_RunData.UserName) 
+    ||CheckGroupMembership(g_RunData.UserName))
+    return RunSetup();
   return false;
 }
 
