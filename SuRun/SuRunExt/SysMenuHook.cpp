@@ -168,7 +168,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   switch(dwReason)
   {
   case DLL_PROCESS_ATTACH:
-    if (!g_hInst)
+    //if (!g_hInst)
     {
 #ifdef _DEBUG_ENU
       SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
