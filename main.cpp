@@ -229,15 +229,13 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
     PathAppend(app,L"mmc.exe");
   }else
   //Try to fully qualify the executable:
+  if (!QualifyPath(app,path,file,ext))
   {
-    if (!QualifyPath(app,path,file,ext))
-    {
-      _tcscpy(app,Args);
-      PathRemoveArgs(app);
-      PathUnquoteSpaces(app);
-      NetworkPathToUNCPath(app);
-      Split(app,path,file,ext);
-    }
+    _tcscpy(app,Args);
+    PathRemoveArgs(app);
+    PathUnquoteSpaces(app);
+    NetworkPathToUNCPath(app);
+    Split(app,path,file,ext);
   }
   wcscpy(cmd,app);
   fExist=PathFileExists(app);
@@ -364,7 +362,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return 0;
   if (g_RunPwd[0]==2) //ShellExec->NOT in List
     return -2;
-  if (g_RunPwd[0]==2) //Restricted User, may not run App!
+  if (g_RunPwd[0]==3) //Restricted User, may not run App!
   {
     MessageBox(0,
       CResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
