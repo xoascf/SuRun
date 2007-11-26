@@ -22,12 +22,17 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <TCHAR.h>
+#include <shlwapi.h>
 #include <lm.h>
+#include "Helpers.h"
 #include "ResStr.h"
 #include "UserGroups.h"
 #include "Resource.h"
+#include "DBGTrace.h"
 
+#pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Netapi32.lib")
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // CreateSuRunnersGroup
@@ -166,3 +171,122 @@ BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
 	return FALSE;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// User list
+//
+/////////////////////////////////////////////////////////////////////////////
+
+//List of Users of WellKnownGroups
+USERLIST::USERLIST(BOOL bAdminsOnly)
+{
+  nUsers=0;
+  User=0;
+  if (bAdminsOnly)
+    AddGroupUsers(DOMAIN_ALIAS_RID_ADMINS);
+  else for (int g=0;g<countof(UserGroups);g++)
+    AddGroupUsers(UserGroups[g]);
+}
+
+//List of Users of "GroupName"
+USERLIST::USERLIST(LPWSTR GroupName)
+{
+  nUsers=0;
+  User=0;
+  AddGroupUsers(GroupName);
+}
+
+USERLIST::~USERLIST()
+{
+  for (int i=0;i<nUsers;i++)
+    DeleteObject(User[i].UserBitmap);
+  free(User);
+}
+HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
+{
+  TCHAR un[2*UNLEN+2];
+  _tcscpy(un,UserName);
+  PathStripPath(un);
+  for (int i=0;nUsers;i++) 
+  {
+    TCHAR UN[2*UNLEN+2]={0};
+    _tcscpy(UN,User[i].UserName);
+    PathStripPath(UN);
+    if (_tcsicmp(un,UN)==0)
+      return User[i].UserBitmap;
+  }
+  return 0;
+}
+
+void USERLIST::Add(LPWSTR UserName)
+{
+  for(int j=0;j<nUsers;j++)
+  {
+    int cr=_tcsicmp(User[j].UserName,UserName);
+    if (cr==0)
+      return;
+    if (cr>0)
+    {
+      if (j<nUsers)
+      {
+        User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
+        memmove(&User[j+1],&User[j],(nUsers-j)*sizeof(User[0]));
+      }
+      break;
+    }
+  }
+  if (j>=nUsers)
+    User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
+  wcscpy(User[j].UserName,UserName);
+  User[j].UserBitmap=LoadUserBitmap(UserName);
+  nUsers++;
+  return;
+}
+
+void USERLIST::AddGroupUsers(LPWSTR GroupName)
+{
+  DWORD_PTR i=0;
+  DWORD res=ERROR_MORE_DATA;
+  for(;res==ERROR_MORE_DATA;)
+  { 
+    LPBYTE pBuff=0;
+    DWORD dwRec=0;
+    DWORD dwTot=0;
+    res = NetLocalGroupGetMembers(NULL,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+    if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
+    {
+      DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
+      break;
+    }
+    for(LOCALGROUP_MEMBERS_INFO_2* p=(LOCALGROUP_MEMBERS_INFO_2*)pBuff;dwRec>0;dwRec--,p++)
+    {
+      if (p->lgrmi2_sidusage==SidTypeUser)
+      {
+        TCHAR un[2*UNLEN+2]={0};
+        TCHAR dn[2*UNLEN+2]={0};
+        _tcscpy(un,p->lgrmi2_domainandname);
+        PathStripPath(un);
+        _tcscpy(dn,p->lgrmi2_domainandname);
+        PathRemoveFileSpec(dn);
+        USER_INFO_2* b=0;
+        NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
+        if (b)
+        {
+          if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+            Add(p->lgrmi2_domainandname);
+          NetApiBufferFree(b);
+        }else
+          DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
+      }
+    }
+    NetApiBufferFree(pBuff);
+  }
+}
+
+void USERLIST::AddGroupUsers(DWORD WellKnownGroup)
+{
+  DWORD GNLen=GNLEN;
+  WCHAR GroupName[GNLEN+1];
+  if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
+    AddGroupUsers(GroupName);
+}
