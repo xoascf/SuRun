@@ -683,6 +683,29 @@ LPCTSTR GetVersionString()
 }
 
 /////////////////////////////////////////////////////////////////////////////
+//
+// LoadUserBitmap
+//
+/////////////////////////////////////////////////////////////////////////////
+
+HBITMAP LoadUserBitmap(LPCTSTR UserName)
+{
+  TCHAR PicDir[MAX_PATH];
+  GetRegStr(HKEY_LOCAL_MACHINE,
+    _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"),
+    _T("Common AppData"),PicDir,MAX_PATH);
+  PathUnquoteSpaces(PicDir);
+  PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
+  TCHAR Pic[UNLEN+1];
+  _tcscpy(Pic,UserName);
+  PathStripPath(Pic);
+  PathAppend(PicDir,Pic);
+  PathAddExtension(PicDir,_T(".bmp"));
+  //DBGTrace1("LoadUserBitmap: %s",Pic);
+  return (HBITMAP)LoadImage(0,PicDir,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // 
 // CTimeOut
 // 
