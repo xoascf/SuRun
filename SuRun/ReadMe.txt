@@ -115,9 +115,27 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.3.0 - 2007-11-19:
+SuRun 1.0.3.0 - 2007-11-30:
 ---------------------------
+* New Commands. If the User right-clicks on a folder background, two new Items,
+  "'cmd <folder>' as administrator" and "'Explorer <folder>' as administrator"
+  are shown.
 * SuRun waits for max 3 minutes after the Windows start for the Service.
+* SuRun tries to locate the Application to be started. So "surun cmd" will
+  make ask SuRun wether "C:\Windows\System32\cmd.exe" is allowed to run.
+* Users can always run specific Applications with privileged rights. To make 
+  this work, SuRun hooks ShellExecute. If the Shell tries to execute a program 
+  that is marked as "Always run this application with elevated rights.", then
+  SuRun starts that application as Administrator. E.g. If you start "cmd" found 
+  as "C:\Windows\System32\cmd.exe" and "C:\Windows\System32\cmd.exe" is in the 
+  list, SuRun will launch cmd automatically elevated.
+* SuRun can be restricted on a per User basis:
+  - Users can be denied to use "SuRun setup".
+  - Users can be restricted to specific applications that are allowed to run 
+    with elevated rights
+  This enables to use SuRun in Parent/Children scenarios or in Companies where 
+  real Administrators want to work with lowered rights.
+* SuRuns Shell integration can be customized.
 
 SuRun 1.0.2.9 - 2007-11-17:
 ---------------------------
