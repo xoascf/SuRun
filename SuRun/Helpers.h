@@ -80,6 +80,9 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
 // GetVersionString
 LPCTSTR GetVersionString();
 
+// LoadUserBitmap
+HBITMAP LoadUserBitmap(LPCTSTR UserName);
+
 // CTimeOut
 class CTimeOut
 {
