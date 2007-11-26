@@ -570,6 +570,21 @@ BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
+BOOL LogonAdmin(int IDmsg,...)
+{
+  va_list va;
+  va_start(va,IDmsg);
+  CBigResStr S(IDmsg,va);
+  TCHAR U[UNLEN+GNLEN+2]={0};
+  TCHAR P[PWLEN]={0};
+  LOGONDLGPARAMS p(S,U,P,false,true,false);
+  BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),
+                    MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
+  zero(U);
+  zero(P);
+  return bRet;
+}
+
 BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,BOOL bShellExecOk,int IDmsg,...)
 {
   va_list va;
