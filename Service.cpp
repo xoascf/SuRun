@@ -268,8 +268,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
           DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
         }
-        LoadSettings(g_RunData.UserName);
-        if(g_bRestricApps && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
+        if  (GetRestrictApps(g_RunData.UserName) 
+         && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
         {
           if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_NORESTRICT))
           {
@@ -446,22 +446,11 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
 //////////////////////////////////////////////////////////////////////////////
 BOOL PrepareSuRun()
 {
-  __int64 ft;
-  GetSystemTimeAsFileTime((LPFILETIME)&ft);
   zero(g_RunPwd);
   //Do we have a Password for this user?
-  if (g_bSavePW)
-  {
-    if (g_NoAskTimeOut)
-    {
-      __int64 AskTime=GetLastRunTime(g_RunData.UserName);
-      if ((ft-AskTime)<(ft2min*(__int64)g_NoAskTimeOut))
-        LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
-      else //Time is up: Delete Password!
-        DeletePassword(g_RunData.UserName);
-    }else
+  if (GetSavePW
+    &&(!PasswordExpired(g_RunData.UserName)))
       LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
-  }
   BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd);
   if ((!PwOk)||(!IsInSuRunners(g_RunData.UserName)))
   //Password is NOT ok:
@@ -479,7 +468,7 @@ BOOL PrepareSuRun()
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
-  CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,g_BlurDesktop);
+  CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,GetBlurDesk);
   CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
   if (crond.IsValid())
@@ -492,7 +481,7 @@ BOOL PrepareSuRun()
     if (!PwOk)
     {
       bLogon=LogonCurrentUser(g_RunData.UserName,g_RunPwd,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
-      if (g_bSavePW && (bLogon&1))
+      if (GetSavePW && (bLogon&1))
         SavePassword(g_RunData.UserName,g_RunPwd);
     }else
       bLogon=AskCurrentUserOk(g_RunData.UserName,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
@@ -504,7 +493,6 @@ BOOL PrepareSuRun()
       SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
     else
       RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-    GetSystemTimeAsFileTime((LPFILETIME)&ft);
     return UpdLastRunTime(g_RunData.UserName),TRUE;
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
@@ -550,7 +538,7 @@ BOOL Setup(LPCTSTR WinStaName)
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
-  CRunOnNewDeskTop crond(WinStaName,DeskName,g_BlurDesktop);
+  CRunOnNewDeskTop crond(WinStaName,DeskName,GetBlurDesk);
   CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
   if (!crond.IsValid())    
@@ -558,11 +546,10 @@ BOOL Setup(LPCTSTR WinStaName)
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     return FALSE;
   }
-  LoadSettings(g_RunData.UserName);
   //only Admins and SuRunners may setup SuRun
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
     return RunSetup();
-  if (g_bAdminOnlySetup)
+  if (GetNoRunSetup(g_RunData.UserName))
   {
     if(!LogonAdmin(IDS_NOADMIN2))
       return FALSE;
@@ -588,7 +575,6 @@ void SuRun(DWORD ProcessID)
   zero(g_RunData);
   zero(g_RunPwd);
   g_RunPwd[0]=1;
-  LoadSettings(g_RunData.UserName);
   RUNDATA RD={0};
   RD.CliProcessId=ProcessID;
   if(CheckCliProcess(RD)!=1)
