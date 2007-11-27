@@ -107,7 +107,7 @@ typedef struct _LOGONDLGPARAMS
 }LOGONDLGPARAMS;
 
 //User Bitmaps:
-void SetUserBitmap(HWND hwnd)
+static void SetUserBitmap(HWND hwnd)
 {
   LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
   if (p==0)
