@@ -21,6 +21,7 @@
 #include "../ResStr.h"
 #include "../IsAdmin.h"
 #include "../Helpers.h"
+#include "../Setup.h"
 #include "SuRunExt.h"
 #include "Resource.h"
 
@@ -77,9 +78,9 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1)
         && (!IsAdmin()))
       {
-        if(GetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,1)!=0)
+        if(GetRestartAsAdmin)
           AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,sMenuRestart);
-        if(GetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,1)!=0)
+        if(GetStartAsAdmin)
           AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,sMenuStart);
       }
       break;
