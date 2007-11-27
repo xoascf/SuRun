@@ -34,6 +34,7 @@
 #include "SuRunExt.h"
 #include "../ResStr.h"
 #include "../Helpers.h"
+#include "../Setup.h"
 #include "Resource.h"
 
 #include "../DBGTrace.h"
@@ -325,7 +326,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   if((CMF_DEFAULTONLY & uFlags)==0) 
   {
     UINT id=idCmdFirst;
-    if(m_pDeskClicked && GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0)
+    if(m_pDeskClicked && GetCtrlAsAdmin)
     {
       //right click target is folder background
       InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
@@ -336,8 +337,8 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
     if(m_ClickFolderName[0])
     {
       TCHAR s[MAX_PATH];
-      BOOL bCmd=GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0;
-      BOOL bExp=GetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)!=0;
+      BOOL bCmd=GetCmdAsAdmin;
+      BOOL bExp=GetExpAsAdmin;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       //right click target is folder background
