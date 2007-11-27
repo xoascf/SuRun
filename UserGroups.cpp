@@ -202,6 +202,14 @@ USERLIST::~USERLIST()
     DeleteObject(User[i].UserBitmap);
   free(User);
 }
+
+HBITMAP USERLIST::GetUserBitmap(int nUser)
+{
+  if ((nUser<0)||(nUser>=nUsers))
+    return 0;
+  return User[nUser].UserBitmap;
+}
+
 HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
 {
   TCHAR un[2*UNLEN+2];
