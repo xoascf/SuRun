@@ -273,6 +273,20 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+typedef struct _SETUPDATA 
+{
+  USERLIST Users;
+  HICON UserIcon;
+  _SETUPDATA ():Users(SURUNNERSGROUP)
+  {
+    UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
+        IMAGE_ICON,48,48,0);
+  }
+}SETUPDATA;
+
+//There can be only one Setup per Application. It's data is stored in g_SD
+static SETUPDATA *g_SD=NULL;
+
 INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 //  DBGTrace4("SetupDlgProc(%x,%x,%x,%x)",hwnd,msg,wParam,lParam);
@@ -306,6 +320,26 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+//User Bitmaps:
+static void SetUserBitmap(HWND hwnd)
+{
+  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  HBITMAP bm=0;
+  if (n!=CB_ERR)
+    bm=g_SD->Users.GetUserBitmap(n);
+  HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
+  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  if(bm)
+  {
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
+  }else
+  {
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,(LPARAM)g_SD->UserIcon);
+  }
+}
+
 INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
@@ -324,6 +358,24 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
         _stprintf(newText,WndText,GetVersionString());
         SetWindowText(hwnd,newText);
       }
+      //UserList
+      BOOL bFoundUser=FALSE;
+      for (int i=0;i<g_SD->Users.nUsers;i++)
+      {
+        SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
+          (LPARAM)&g_SD->Users.User[i].UserName);
+        if (_tcsicmp(g_SD->Users.User[i].UserName,g_RunData.UserName)==0)
+        {
+          SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
+          bFoundUser=TRUE;
+        }
+      }
+      if (!bFoundUser)
+      {
+        SetDlgItemText(hwnd,IDC_USER,g_SD->Users.User[0].UserName);
+        SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,0,0);
+      }
+      SetUserBitmap(hwnd);
       //...
       return TRUE;
     }//WM_INITDIALOG
@@ -333,10 +385,26 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
       return TRUE;
     }//WM_NCDESTROY
+  case WM_TIMER:
+    {
+      if (wParam==1)
+        SetUserBitmap(hwnd);
+      return TRUE;
+    }//WM_TIMER
   case WM_COMMAND:
     {
       switch (wParam)
       {
+      case MAKEWPARAM(IDC_USER,CBN_DROPDOWN):
+        SetTimer(hwnd,1,250,0);
+        return TRUE;
+      case MAKEWPARAM(IDC_USER,CBN_CLOSEUP):
+        KillTimer(hwnd,1);
+        return TRUE;
+      case MAKEWPARAM(IDC_USER,CBN_SELCHANGE):
+      case MAKEWPARAM(IDC_USER,CBN_EDITCHANGE):
+        SetUserBitmap(hwnd);
+        return TRUE;
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,0);
         return TRUE;
@@ -358,19 +426,13 @@ BOOL RunSetup()
 }
 
 #ifdef _DEBUGSETUP
-typedef struct _SETUPDATA 
-{
-  USERLIST Users;
-  _SETUPDATA ():Users(SURUNNERSGROUP)
-  {
-  }
-}SETUPDATA;
-
 BOOL RunMainSetup()
 {
   SETUPDATA sd;
+  g_SD=&sd;
   BOOL bRet=DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
                            0,MainSetupDlgProc,(LPARAM)&sd)>=0;  
+  g_SD=0;
   return bRet;
 }
 
