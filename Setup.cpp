@@ -32,125 +32,8 @@
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "Service.h"
-#include "SuRunExt/SuRunExt.h"
 
 #pragma comment(lib,"comctl32.lib")
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  Globals
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-//Settings for all users; saved to "HKLM\SECURITY\SuRun":
-bool g_BlurDesktop=TRUE;      //blurred user desktop background on secure Desktop
-BYTE g_NoAskTimeOut=0;        //Minutes to wait until "Is that OK?" is asked again
-bool g_bSavePW=TRUE;          //Save Passwords in Registry
-
-//Settings for every user; saved to "HKLM\SECURITY\SuRun\<ComputerName>\<UserName>":
-bool g_bAdminOnlySetup=FALSE; //Only real Admins may run Setup
-bool g_bRestricApps=FALSE;    //SuRunner may only run predefined Applications
-
-//Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
-bool g_bControlAsAdmin=TRUE;  //"Control Panel As Admin" on Desktop Menu
-bool g_bCmdHereAsAdmin=TRUE;  //"Cmd here As Admin" on Folder Menu
-bool g_bExpHereAsAdmin=TRUE;  //"Explorer here As Admin" on Folder Menu
-bool g_bRestartAsAdmin=TRUE;  //"Restart As Admin" in System-Menu
-bool g_bStartAsAdmin=TRUE;    //"Start As Admin" in System-Menu
-
-#define PASSWKEY      SVCKEY _T("\\Cache")
-#define TIMESKEY      SVCKEY _T("\\Times")
-#define WHTLSTKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
-#define USERKEY(u)    CBigResStr(_T("%s\\%s\\Settings"),SVCKEY,u)
-
-BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  Windows Policy Stuff
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-#define IsOwnerAdminGrp     (GetRegInt(HKLM,\
-                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
-                              _T("nodefaultadminowner"),1)==0)
-
-#define SetOwnerAdminGrp(b) SetRegInt(HKLM,\
-                              _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
-                              _T("nodefaultadminowner"),(b)==0)
-
-#define IsWinUpd4All      GetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
-                            _T("ElevateNonAdmins"),0)
-
-#define SetWinUpd4All(b)  SetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
-                            _T("ElevateNonAdmins"),b)
-
-#define IsWinUpdBoot      GetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
-                            _T("NoAutoRebootWithLoggedOnUsers"),0)
-
-#define SetWinUpdBoot(b)  SetRegInt(HKLM,\
-                            _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
-                            _T("NoAutoRebootWithLoggedOnUsers"),b)
-
-#define CanSetEnergy  HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
-                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP)
-
-#define SetEnergy(b)  SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
-                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b)
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  LoadSettings
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-void LoadSettings(LPTSTR UserName)
-{
-  //General settings
-  g_BlurDesktop=GetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),1)!=0;
-  g_NoAskTimeOut=(BYTE)min(60,max(0,(int)GetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),0)));
-  g_bSavePW=GetRegInt(HKLM,SVCKEY,_T("SavePasswords"),1)!=0;
-  //User restrictions
-  g_bAdminOnlySetup=GetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),0)!=0;
-  g_bRestricApps=GetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),0)!=0;
-  //Shell integration
-  g_bControlAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,1)!=0;
-  g_bCmdHereAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,1)!=0;
-  g_bExpHereAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,1)!=0;
-  g_bRestartAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,1)!=0;
-  g_bStartAsAdmin=GetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,1)!=0;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  SaveSettings
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-void SaveSettings(LPTSTR UserName)
-{
-  //General settings
-  SetRegInt(HKLM,SVCKEY,_T("BlurDesktop"),g_BlurDesktop);
-  SetRegInt(HKLM,SVCKEY,_T("AskTimeOut"),g_NoAskTimeOut);
-  SetRegInt(HKLM,SVCKEY,_T("SavePasswords"),g_bSavePW);
-  //User restrictions
-  SetRegInt(HKLM,USERKEY(UserName),_T("AdminOnlySetup"),g_bAdminOnlySetup);
-  SetRegInt(HKLM,USERKEY(UserName),_T("RestricApps"),g_bRestricApps);
-  if (!g_bSavePW)
-  {
-    DelRegKey(HKLM,PASSWKEY);
-    DelRegKey(HKLM,TIMESKEY);
-  }
-  //Shell integration
-  SetRegInt(HKCR,L"CLSID\\" sGUID,ControlAsAdmin,g_bControlAsAdmin);
-  SetRegInt(HKCR,L"CLSID\\" sGUID,CmdHereAsAdmin,g_bCmdHereAsAdmin);
-  SetRegInt(HKCR,L"CLSID\\" sGUID,ExpHereAsAdmin,g_bExpHereAsAdmin);
-  SetRegInt(HKCR,L"CLSID\\" sGUID,RestartAsAdmin,g_bRestartAsAdmin);
-  SetRegInt(HKCR,L"CLSID\\" sGUID,StartAsAdmin,g_bStartAsAdmin);
-}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -158,9 +41,11 @@ void SaveSettings(LPTSTR UserName)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
+static BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
+
 void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
-  if (!g_bSavePW)
+  if (!GetSavePW)
     return;
   CBlowFish bf;
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
@@ -176,7 +61,7 @@ void DeletePassword(LPTSTR UserName)
 
 void SavePassword(LPTSTR UserName,LPTSTR Password)
 {
-  if (!g_bSavePW)
+  if (!GetSavePW)
     return;
   CBlowFish bf;
   TCHAR pw[PWLEN];
@@ -191,9 +76,19 @@ void SavePassword(LPTSTR UserName,LPTSTR Password)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-__int64 GetLastRunTime(LPTSTR UserName)
+//FILETIME(100ns) to minutes multiplier
+#define ft2min  (__int64)(10/*1µs*/*1000/*1ms*/*1000/*1s*/*60/*1min*/)
+
+BOOL PasswordExpired(LPTSTR UserName)
 {
-  return GetRegInt64(HKLM,TIMESKEY,UserName,0);
+  __int64 ft;
+  GetSystemTimeAsFileTime((LPFILETIME)&ft);
+  __int64 AskTime=GetRegInt64(HKLM,TIMESKEY,UserName,0);
+  if ((AskTime==0) 
+    || ((ft-GetPwTimeOut)<(ft2min*(__int64)AskTime)))
+    return FALSE;
+  DeletePassword(UserName);
+  return TRUE;
 }
 
 void UpdLastRunTime(LPTSTR UserName)
@@ -282,19 +177,18 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,16,16,0));
-      LoadSettings(g_RunData.UserName);
       {
         TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
         GetWindowText(hwnd,WndText,MAX_PATH);
         _stprintf(newText,WndText,GetVersionString());
         SetWindowText(hwnd,newText);
       }
-      CheckDlgButton(hwnd,IDC_RADIO1,((g_bSavePW==0)?BST_CHECKED:BST_UNCHECKED));
-      CheckDlgButton(hwnd,IDC_RADIO2,((g_bSavePW!=0)?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_RADIO1,((GetSavePW==0)?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_RADIO2,((GetSavePW!=0)?BST_CHECKED:BST_UNCHECKED));
       SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
-      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
-      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
-      CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
+      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,GetPwTimeOut,0);
+      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(GetBlurDesk?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_SAVEPW,(GetSavePW?BST_CHECKED:BST_UNCHECKED));
       CheckDlgButton(hwnd,IDC_ALLOWTIME,CanSetTime(SURUNNERSGROUP)?BST_CHECKED:BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,IsOwnerAdminGrp?BST_CHECKED:BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_WINUPD4ALL,IsWinUpd4All?BST_CHECKED:BST_UNCHECKED);
@@ -338,10 +232,9 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(IDOK,BN_CLICKED):
         {
-          g_NoAskTimeOut=max(0,min(60,GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1)));
-          g_BlurDesktop=IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED;
-          g_bSavePW=IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED;
-          SaveSettings(g_RunData.UserName);
+          SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
+          SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP)==BST_CHECKED);
+          SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW)==BST_CHECKED);
           if ((CanSetTime(SURUNNERSGROUP)!=0)!=(IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)==BST_CHECKED))
             AllowSetTime(SURUNNERSGROUP,IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)==BST_CHECKED);
           SetOwnerAdminGrp((IsDlgButtonChecked(hwnd,IDC_OWNERGROUP)==BST_CHECKED)?1:0);
@@ -388,10 +281,10 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
-      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,g_NoAskTimeOut,0);
-      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(g_BlurDesktop?BST_CHECKED:BST_UNCHECKED));
-      CheckDlgButton(hwnd,IDC_SAVEPW,(g_bSavePW?BST_CHECKED:BST_UNCHECKED));
-      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),g_bSavePW);
+      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,GetPwTimeOut,0);
+      CheckDlgButton(hwnd,IDC_BLURDESKTOP,(GetBlurDesk?BST_CHECKED:BST_UNCHECKED));
+      CheckDlgButton(hwnd,IDC_SAVEPW,(GetSavePW?BST_CHECKED:BST_UNCHECKED));
+      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
       CheckDlgButton(hwnd,IDC_ALLOWTIME,CanSetTime(SURUNNERSGROUP)?BST_CHECKED:BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,IsOwnerAdminGrp?BST_CHECKED:BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_WINUPD4ALL,IsWinUpd4All?BST_CHECKED:BST_UNCHECKED);
@@ -425,7 +318,6 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       SendMessage(hwnd,WM_SETICON,ICON_SMALL,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SETUP),
         IMAGE_ICON,16,16,0));
-      LoadSettings(g_RunData.UserName);
       {
         TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
         GetWindowText(hwnd,WndText,MAX_PATH);
