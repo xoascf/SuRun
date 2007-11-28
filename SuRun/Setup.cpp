@@ -13,7 +13,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-#define _DEBUGSETUP
+//#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -83,10 +83,10 @@ BOOL PasswordExpired(LPTSTR UserName)
 {
   __int64 ft;
   GetSystemTimeAsFileTime((LPFILETIME)&ft);
-  __int64 AskTime=GetRegInt64(HKLM,TIMESKEY,UserName,0);
-  if ((AskTime==0) 
-    || ((ft-GetPwTimeOut)<(ft2min*(__int64)AskTime)))
+  __int64 pwto=ft2min*GetPwTimeOut;
+  if ((pwto==0) || ((ft-GetRegInt64(HKLM,TIMESKEY,UserName,0))<pwto))
     return FALSE;
+  DBGTrace1("Password for %s Expired!",UserName);
   DeletePassword(UserName);
   return TRUE;
 }
