@@ -448,10 +448,13 @@ BOOL PrepareSuRun()
 {
   zero(g_RunPwd);
   //Do we have a Password for this user?
-  if (GetSavePW
-    &&(!PasswordExpired(g_RunData.UserName)))
+  if (GetSavePW &&(!PasswordExpired(g_RunData.UserName)))
       LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
   BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd);
+#ifdef _DEBUG
+  if (!PwOk)
+    DBGTrace2("Password (%s) for %s is NOT ok!",g_RunPwd,g_RunData.UserName);
+#endif _DEBUG
   if ((!PwOk)||(!IsInSuRunners(g_RunData.UserName)))
   //Password is NOT ok:
   {
