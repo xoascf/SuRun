@@ -116,11 +116,13 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 					if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
           {
             NetApiBufferFree(Members);
+            DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
             return TRUE;
           }
 		}
 	}while (status==ERROR_MORE_DATA);
 	NetApiBufferFree(Members);
+  DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
 	return FALSE;
 }
 /**/
