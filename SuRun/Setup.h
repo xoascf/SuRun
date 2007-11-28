@@ -45,7 +45,7 @@
 #define GetPwTimeOut      min(60,max(0,(int)GetOption(_T("AskTimeOut"),0)))
 #define SetPwTimeOut(t)   min(60,max(0,(int)SetOption(_T("AskTimeOut"),t)))
 
-#define GetSavePW         (GetOption(_T("SavePasswords"),0)!=0)
+#define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
 #define SetSavePW(b)      SetOption(_T("SavePasswords"),b); \
                           if (!b) \
                           { \
