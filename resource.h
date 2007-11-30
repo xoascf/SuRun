@@ -41,6 +41,9 @@
 #define IDS_NOSECLOGON                  37
 #define IDS_NOADMIN2                    38
 #define IDS_RUNRESTRICTED               39
+#define IDS_SETUP1                      40
+#define IDS_SETUP2                      41
+#define IDS_SETUP3                      42
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
@@ -53,9 +56,11 @@
 #define IDD_SETUP                       107
 #define IDD_CURUSRLOGON                 108
 #define IDD_CURUSRACK                   109
-#define IDD_SETUP1                      110
-#define IDD_SETUP2                      111
-#define IDD_SETUP_MAIN                  112
+#define IDD_SETUP_MAIN                  110
+#define IDD_SETUP1                      111
+#define IDD_SETUP2                      112
+#define IDD_SETUP3                      113
+#define IDD_SETUP4                      114
 #define IDC_USER                        1000
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002
@@ -90,14 +95,21 @@
 #define IDC_SETUP_TAB                   1033
 #define IDC_EXTOPT2                     1034
 #define IDC_BUTTON1                     1034
+#define IDC_CTRLASADMIN                 1036
+#define IDC_CMDASADMIN                  1037
+#define IDC_EXPASADMIN                  1038
+#define IDC_RESTARTADMIN                1039
+#define IDC_STARTADMIN                  1040
+#define IDC_RUNSETUP                    1041
+#define IDC_RESTRICTED                  1042
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        113
+#define _APS_NEXT_RESOURCE_VALUE        114
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1036
+#define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
