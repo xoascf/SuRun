@@ -13,12 +13,13 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
+#include <windowsx.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <lm.h>
@@ -273,10 +274,13 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+
+#define nTabs 3
 typedef struct _SETUPDATA 
 {
   USERLIST Users;
   HICON UserIcon;
+  HWND hTabCtrl[nTabs];
   _SETUPDATA ():Users(SURUNNERSGROUP)
   {
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
@@ -320,13 +324,42 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  return FALSE;
+}
+
+INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  return FALSE;
+}
+
 //User Bitmaps:
 static void SetUserBitmap(HWND hwnd)
 {
   int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
   HBITMAP bm=0;
+  HWND hWL=GetDlgItem(g_SD->hTabCtrl[2],IDC_WHITELIST);
   if (n!=CB_ERR)
+  {
     bm=g_SD->Users.GetUserBitmap(n);
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
+    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
+    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
+    EnableWindow(hWL,true);
+    ListBox_ResetContent(hWL);
+    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_RunData.UserName);
+    TCHAR cmd[4096];
+    for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
+      SendMessage(hWL,LB_ADDSTRING,0,(LPARAM)&cmd);
+  }else
+  {
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
+    ListBox_ResetContent(hWL);
+    EnableWindow(hWL,false);
+  }
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
   DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
   if(bm)
@@ -360,11 +393,11 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       }
       //UserList
       BOOL bFoundUser=FALSE;
-      for (int i=0;i<g_SD->Users.nUsers;i++)
+      for (int i=0;i<g_SD->Users.GetCount();i++)
       {
         SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
-          (LPARAM)&g_SD->Users.User[i].UserName);
-        if (_tcsicmp(g_SD->Users.User[i].UserName,g_RunData.UserName)==0)
+          (LPARAM)g_SD->Users.GetUserName(i));
+        if (_tcsicmp(g_SD->Users.GetUserName(i),g_RunData.UserName)==0)
         {
           SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
           bFoundUser=TRUE;
@@ -372,15 +405,37 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       }
       if (!bFoundUser)
       {
-        SetDlgItemText(hwnd,IDC_USER,g_SD->Users.User[0].UserName);
+        SetDlgItemText(hwnd,IDC_USER,g_SD->Users.GetUserName(0));
         SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,0,0);
       }
-      SetUserBitmap(hwnd);
+      //Tab Control
+      HWND hTab=GetDlgItem(hwnd,IDC_SETUP_TAB);
+      int TabNames[nTabs]= {IDS_SETUP1, IDS_SETUP2, IDS_SETUP3};
+      int TabIDs[nTabs]= { IDD_SETUP1,IDD_SETUP2,IDD_SETUP3};
+      DLGPROC TabProcs[nTabs]= { SetupDlg1Proc,SetupDlg3Proc,SetupDlg3Proc};
+      for (i=0;i<nTabs;i++)
+      {
+        TCITEM tie={TCIF_TEXT,0,0,CResStr(TabNames[i]),0,0,0};
+		    TabCtrl_InsertItem(hTab,i,&tie);
+		    g_SD->hTabCtrl[i]=CreateDialog(GetModuleHandle(0),
+                          MAKEINTRESOURCE(TabIDs[i]),hwnd,TabProcs[i]);
+        RECT r;
+        GetWindowRect(hTab,&r);
+        ScreenToClient(hwnd,(POINT*)&r.left);
+        ScreenToClient(hwnd,(POINT*)&r.right);
+        TabCtrl_AdjustRect(hTab,FALSE,&r);
+	      SetWindowPos(g_SD->hTabCtrl[i],HWND_TOP,r.left,r.top,
+          r.right-r.left,r.bottom-r.top,0);
+      }
+      ShowWindow(g_SD->hTabCtrl[0],TRUE);
       //...
+      SetUserBitmap(hwnd);
       return TRUE;
     }//WM_INITDIALOG
   case WM_NCDESTROY:
     {
+      for (int i=0;i<nTabs;i++)
+        DestroyWindow(g_SD->hTabCtrl[i]);
       DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
       DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
       return TRUE;
@@ -391,6 +446,23 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
         SetUserBitmap(hwnd);
       return TRUE;
     }//WM_TIMER
+  case WM_NOTIFY:
+    {
+      if (wParam==IDC_SETUP_TAB)
+      {
+        int nSel=TabCtrl_GetCurSel(GetDlgItem(hwnd,IDC_SETUP_TAB));
+        switch (((LPNMHDR)lParam)->code)
+        {
+          case TCN_SELCHANGING:
+            ShowWindow(g_SD->hTabCtrl[nSel],FALSE);
+            return TRUE;
+		      case TCN_SELCHANGE:
+            ShowWindow(g_SD->hTabCtrl[nSel],TRUE);
+            return TRUE;
+        }
+      }
+      break;
+    }//WM_NOTIFY
   case WM_COMMAND:
     {
       switch (wParam)
