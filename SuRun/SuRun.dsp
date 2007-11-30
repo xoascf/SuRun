@@ -200,11 +200,11 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Setup.cpp
+SOURCE=.\Service.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Service.cpp
+SOURCE=.\Setup.cpp
 # End Source File
 # Begin Source File
 
@@ -213,6 +213,10 @@ SOURCE=.\sspi_auth.cpp
 # Begin Source File
 
 SOURCE=.\SuRun.rc
+# End Source File
+# Begin Source File
+
+SOURCE=.\TabCtrl.cpp
 # End Source File
 # Begin Source File
 
@@ -268,15 +272,19 @@ SOURCE=.\ScreenSnap.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\Setup.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\Service.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\Setup.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\sspi_auth.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\TabCtrl.h
 # End Source File
 # Begin Source File
 
