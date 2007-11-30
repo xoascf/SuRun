@@ -205,6 +205,13 @@ USERLIST::~USERLIST()
   free(User);
 }
 
+LPTSTR USERLIST::GetUserName(int nUser)
+{
+  if ((nUser<0)||(nUser>=nUsers))
+    return 0;
+  return User[nUser].UserName;
+}
+
 HBITMAP USERLIST::GetUserBitmap(int nUser)
 {
   if ((nUser<0)||(nUser>=nUsers))
