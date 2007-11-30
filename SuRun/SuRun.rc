@@ -384,44 +384,44 @@ BEGIN
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,245,50,14
 END
 
-IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 394, 196
+IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 186
 STYLE DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
+    GROUPBOX        "Allgemein (alle Benutzer)",IDC_EXTOPT2,3,2,370,55,
+                    WS_GROUP
     CONTROL         "Zeige abgedunkelten Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,16,14,349,13
+                    WS_TABSTOP,11,15,349,13
     CONTROL         "&Passworte speichern",IDC_SAVEPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,16,35,87,13
-    LTEXT           "...und nach",-1,113,37,42,8,NOT WS_GROUP
-    EDITTEXT        IDC_ASKTIMEOUT,157,34,18,14,ES_CENTER | ES_AUTOHSCROLL | 
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,29,87,13
+    LTEXT           "gespeicherte Passworte nach",-1,22,43,98,8,NOT WS_GROUP
+    EDITTEXT        IDC_ASKTIMEOUT,122,38,18,14,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min löschen (0 = nie löschen)",-1,180,37,92,8,NOT 
+    LTEXT           "min löschen (0 = nie löschen)",-1,146,43,92,8,NOT 
                     WS_GROUP
-    GROUPBOX        "Erleichterte Bedienung  (alle Benutzer)",IDC_EXTOPT,8,
-                    64,370,123,WS_GROUP
+    GROUPBOX        "Erleichterte Bedienung  (alle Benutzer)",IDC_EXTOPT,3,
+                    65,370,117,WS_GROUP
     CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
                     IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,16,79,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,80,349,13
     CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
                     IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,16,96,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,95,349,13
     CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
                     IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,16,113,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,110,349,13
     CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,16,130,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,125,349,13
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,16,147,349,27
-    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden erst bei der nächsten Windows-Anmeldung aktiv",
-                    -1,11,176,365,8
-    GROUPBOX        "Allgemein (alle Benutzer)",IDC_EXTOPT2,8,1,370,55,
-                    WS_GROUP
+                    BS_MULTILINE | WS_TABSTOP,11,140,349,27
+    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
+                    -1,6,170,365,8
 END
 
-IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 191
+IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 390, 191
 STYLE DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
@@ -432,24 +432,49 @@ BEGIN
     PUSHBUTTON      "&Löschen",IDC_DELETE,319,169,50,14
 END
 
-IDD_SETUP_MAIN DIALOGEX 0, 0, 394, 263
+IDD_SETUP_MAIN DIALOGEX 0, 0, 395, 274
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "SuRun %s Einstellungen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "&SuRunner:",IDC_USRST,67,12,33,8
-    COMBOBOX        IDC_USER,103,9,158,217,CBS_DROPDOWNLIST | CBS_SORT | 
+    CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
+                    WS_TABSTOP,0,40,395,212
+    LTEXT           "&SuRunner:",IDC_USRST,50,6,33,8
+    COMBOBOX        IDC_USER,86,3,158,217,CBS_DROPDOWNLIST | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Erweitert...",IDC_BUTTON1,265,8,43,14
-    CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",0x0,65,30,327,207
+    PUSHBUTTON      "Erweitert...",IDC_BUTTON1,248,2,43,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,6,9,47,46
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,240,394,1
-    ICON            IDI_SHIELD,IDC_SECICON,17,67,20,20,SS_REALSIZEIMAGE
-    DEFPUSHBUTTON   "&Speichern",IDOK,279,245,50,14
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,338,245,50,14
+                    SS_REALSIZEIMAGE,4,2,40,37
+    DEFPUSHBUTTON   "&Speichern",IDOK,279,256,50,14
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
+    CONTROL         "Benutzer darf SuRun Einstellungen verändern",
+                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,17,
+                    216,10
+    CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
+                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
+                    28,216,10
+END
+
+IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 394, 196
+STYLE DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Zeige im Contextmenü (alle Benutzer)",IDC_STATIC,3,4,
+                    145,55,WS_GROUP
+    CONTROL         "Systemsteuerung als Administrator",IDC_CTRLASADMIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,17,123,10
+    CONTROL         "'cmd <hier>' als Administrator",IDC_CMDASADMIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,31,106,10
+    CONTROL         "'Explorer <hier>' als Administrator",IDC_EXPASADMIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,45,118,10
+    GROUPBOX        "Zeige im Systemmenü (alle Benutzer)",IDC_STATIC,3,68,
+                    144,46,WS_GROUP
+    CONTROL         "Neustart als Administrator",IDC_RESTARTADMIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,81,95,10
+    CONTROL         "Start als Administrator",IDC_STARTADMIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,11,95,83,10
 END
 
 
@@ -500,6 +525,22 @@ IDI_SHIELD1             ICON    DISCARDABLE     "res\\ico10607.ico"
 IDI_INSTALL             ICON    DISCARDABLE     "res\\Software.ico"
 IDI_HELP                ICON    DISCARDABLE     "res\\Notes.ico"
 IDI_SETUP               ICON    DISCARDABLE     "res\\Settings.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_SETUP_MAIN, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 263
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -555,6 +596,9 @@ BEGIN
     IDS_NOSECLOGON          "FATAL:\r\n\r\nSuRun benötigt den Windows Dienst 'Sekundäre Anmeldung'.\r\n\r\nDieser Dienst ist nicht gestartet."
     IDS_NOADMIN2            "Sie (%s) sind nicht berechtigt, 'SuRun Einstellungen' zu verändern.\r\n\r\nIdentifizieren Sie sich als Administrator, um SuRuns Optionen zu verändern.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
     IDS_RUNRESTRICTED       "SuRun ist für Sie (%s) so konfiguriert, dass Sie damit nur bestimmte Programme starten dürfen.\r\nSie sind nicht berechtigt, '%s' mit SuRun zu starten."
+    IDS_SETUP1              "Allgemein"
+    IDS_SETUP2              "Shell Integration"
+    IDS_SETUP3              "Programmeinstellungen"
 END
 
 #endif    // German (Germany) resources
