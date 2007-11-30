@@ -283,7 +283,7 @@ typedef struct _SETUPDATA
   HICON UserIcon;
   HWND hTabCtrl[nTabs];
   int DlgExitCode;
-  _SETUPDATA ():Users(SURUNNERSGROUP)
+  _SETUPDATA():Users(GetAllowAll?_T("*"):SURUNNERSGROUP)
   {
     DlgExitCode=IDCANCEL;
     zero(hTabCtrl);
@@ -305,10 +305,13 @@ static void UpdateUser(HWND hwnd)
   if (g_SD->CurUser==n)
     return;
   //Save Settings:
-  SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
-    IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
-  SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
-    IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
+  if (g_SD->CurUser>=0)
+  {
+    SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
+      IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
+    SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
+      IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
+  }
   g_SD->CurUser=n;
   if (n!=CB_ERR)
   {
@@ -323,6 +326,7 @@ static void UpdateUser(HWND hwnd)
     TCHAR cmd[4096];
     for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
       SendMessage(hWL,LB_ADDSTRING,0,(LPARAM)&cmd);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELETE),SendMessage(hWL,LB_GETCURSEL,0,0)!=-1);
   }else
   {
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
@@ -355,6 +359,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_SAVEPW,GetSavePW);
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
+      CheckDlgButton(hwnd,IDC_ALLOWALL,GetAllowAll);
 
       CheckDlgButton(hwnd,IDC_CTRLASADMIN,GetCtrlAsAdmin);
       CheckDlgButton(hwnd,IDC_CMDASADMIN,GetCmdAsAdmin);
@@ -389,6 +394,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW));
       SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
+      SetAllowAll(IsDlgButtonChecked(hwnd,IDC_ALLOWALL));
       
       SetCtrlAsAdmin(IsDlgButtonChecked(hwnd,IDC_CTRLASADMIN));
       SetCmdAsAdmin(IsDlgButtonChecked(hwnd,IDC_CMDASADMIN));
@@ -404,6 +410,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetWinUpd4All(IsDlgButtonChecked(hwnd,IDC_WINUPD4ALL));
       SetWinUpdBoot(IsDlgButtonChecked(hwnd,IDC_WINUPDBOOT));
       SetOwnerAdminGrp(IsDlgButtonChecked(hwnd,IDC_OWNERGROUP));
+      return TRUE;
     }//WM_DESTROY
   }
   return FALSE;
@@ -474,9 +481,24 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           LBSetScrollbar(GetDlgItem(hwnd,IDC_WHITELIST));
           return TRUE;
         }
+      case MAKELPARAM(IDC_WHITELIST,LBN_SELCHANGE):
+        {
+          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
+          return TRUE;
+        }
       }//switch (wParam)
       break;
     }//WM_COMMAND
+  case WM_DESTROY:
+    if (/*(g_SD->DlgExitCode==IDOK) && */(g_SD->CurUser>=0))
+    {
+      SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
+        IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
+      SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
+        IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
+      return TRUE;
+    }//WM_DESTROY
   }
   return FALSE;
 }
