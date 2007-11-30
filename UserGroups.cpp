@@ -195,7 +195,10 @@ USERLIST::USERLIST(LPWSTR GroupName)
 {
   nUsers=0;
   User=0;
-  AddGroupUsers(GroupName);
+  if (_tcscmp(GroupName,_T("*"))==0)
+    AddAllUsers();
+  else
+    AddGroupUsers(GroupName);
 }
 
 USERLIST::~USERLIST()
@@ -260,7 +263,7 @@ void USERLIST::Add(LPWSTR UserName)
   return;
 }
 
-void USERLIST::AddGroupUsers(LPWSTR GroupName)
+void USERLIST::AddGroupUsers(LPWSTR GroupName,bool bNoAdmin/*=FALSE*/)
 {
   DWORD_PTR i=0;
   DWORD res=ERROR_MORE_DATA;
@@ -289,7 +292,8 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName)
         NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
         if (b)
         {
-          if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+          if (((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+            &&((bNoAdmin==0) || ((b->usri2_priv &USER_PRIV_ADMIN)==0)))
             Add(p->lgrmi2_domainandname);
           NetApiBufferFree(b);
         }else
@@ -306,4 +310,25 @@ void USERLIST::AddGroupUsers(DWORD WellKnownGroup)
   WCHAR GroupName[GNLEN+1];
   if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
     AddGroupUsers(GroupName);
+}
+
+void USERLIST::AddAllUsers()
+{
+  DWORD_PTR i=0;
+  DWORD res=ERROR_MORE_DATA;
+  for(;res==ERROR_MORE_DATA;)
+  { 
+    LPBYTE pBuff=0;
+    DWORD dwRec=0;
+    DWORD dwTot=0;
+    res = NetLocalGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+    if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
+    {
+      DBGTrace1("NetLocalGroupEnum failed: %s",GetErrorNameStatic(res));
+      return;
+    }
+    for(LOCALGROUP_INFO_0* p=(LOCALGROUP_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
+      AddGroupUsers(p->lgrpi0_name,TRUE);
+    NetApiBufferFree(pBuff);
+  }
 }
