@@ -384,52 +384,78 @@ BEGIN
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,245,50,14
 END
 
-IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 186
-STYLE DS_FIXEDSYS | WS_CHILD
+IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Allgemein (alle Benutzer)",IDC_EXTOPT2,3,2,370,55,
-                    WS_GROUP
+    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    GROUPBOX        "SuRun Optionen",IDC_EXTOPT2,75,2,297,55,WS_GROUP
     CONTROL         "Zeige abgedunkelten Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,11,15,349,13
+                    WS_TABSTOP,83,15,242,13
     CONTROL         "&Passworte speichern",IDC_SAVEPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,29,87,13
-    LTEXT           "gespeicherte Passworte nach",-1,22,43,98,8,NOT WS_GROUP
-    EDITTEXT        IDC_ASKTIMEOUT,122,38,18,14,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "min löschen (0 = nie löschen)",-1,146,43,92,8,NOT 
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,29,87,13
+    LTEXT           "gespeicherte Passworte nach",IDC_STATIC,94,43,98,8,NOT 
                     WS_GROUP
-    GROUPBOX        "Erleichterte Bedienung  (alle Benutzer)",IDC_EXTOPT,3,
-                    65,370,117,WS_GROUP
+    EDITTEXT        IDC_ASKTIMEOUT,194,40,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min löschen (0 = nie löschen)",IDC_STATIC,218,43,92,8,
+                    NOT WS_GROUP
+    GROUPBOX        "Zeige im Kontext-Menü:",IDC_STATIC,75,59,145,55,
+                    WS_GROUP
+    CONTROL         "Systemsteuerung als Administrator",IDC_CTRLASADMIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,72,123,10
+    CONTROL         "'cmd <hier>' als Administrator",IDC_CMDASADMIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,83,86,106,10
+    CONTROL         "'Explorer <hier>' als Administrator",IDC_EXPASADMIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,100,118,10
+    GROUPBOX        "Zeige im System-Menü",IDC_STATIC,227,59,145,55,WS_GROUP
+    CONTROL         "Neustart als Administrator",IDC_RESTARTADMIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,235,73,95,10
+    CONTROL         "Start als Administrator",IDC_STARTADMIN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,235,87,83,10
+    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,3,115,370,
+                    117,WS_GROUP
     CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
                     IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,80,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,130,349,13
     CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
                     IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,95,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,145,349,13
     CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
                     IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,110,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,160,349,13
     CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,125,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,175,349,13
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,140,349,27
+                    BS_MULTILINE | WS_TABSTOP,11,190,349,27
     CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
-                    -1,6,170,365,8
+                    IDC_STATIC,6,220,365,8
 END
 
-IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 390, 191
-STYLE DS_FIXEDSYS | WS_CHILD
+IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Starte immer, ohne zu fragen:",-1,6,5,378,183
-    LISTBOX         IDC_WHITELIST,10,14,368,152,LBS_SORT | 
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,4,2,40,37
+    LTEXT           "&SuRunner:",IDC_USRST,50,6,33,8
+    COMBOBOX        IDC_USER,86,3,158,217,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Erweitert...",IDC_BUTTON1,248,2,43,14
+    CONTROL         "Benutzer darf SuRun Einstellungen verändern",
+                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,17,
+                    216,10
+    CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
+                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
+                    28,216,10
+    GROUPBOX        "Starte immer, ohne zu fragen:",-1,6,46,378,187
+    LISTBOX         IDC_WHITELIST,10,56,368,159,LBS_SORT | 
                     LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
                     WS_TABSTOP
-    PUSHBUTTON      "&Löschen",IDC_DELETE,319,169,50,14
+    PUSHBUTTON      "&Löschen",IDC_DELETE,319,216,50,14
 END
 
 IDD_SETUP_MAIN DIALOGEX 0, 0, 395, 274
@@ -440,41 +466,9 @@ CAPTION "SuRun %s Einstellungen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
-                    WS_TABSTOP,0,40,395,212
-    LTEXT           "&SuRunner:",IDC_USRST,50,6,33,8
-    COMBOBOX        IDC_USER,86,3,158,217,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Erweitert...",IDC_BUTTON1,248,2,43,14
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,4,2,40,37
+                    WS_TABSTOP,0,0,395,252
     DEFPUSHBUTTON   "&Speichern",IDOK,279,256,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
-    CONTROL         "Benutzer darf SuRun Einstellungen verändern",
-                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,17,
-                    216,10
-    CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
-                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
-                    28,216,10
-END
-
-IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 394, 196
-STYLE DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg"
-BEGIN
-    GROUPBOX        "Zeige im Contextmenü (alle Benutzer)",IDC_STATIC,3,4,
-                    145,55,WS_GROUP
-    CONTROL         "Systemsteuerung als Administrator",IDC_CTRLASADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,17,123,10
-    CONTROL         "'cmd <hier>' als Administrator",IDC_CMDASADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,31,106,10
-    CONTROL         "'Explorer <hier>' als Administrator",IDC_EXPASADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,45,118,10
-    GROUPBOX        "Zeige im Systemmenü (alle Benutzer)",IDC_STATIC,3,68,
-                    144,46,WS_GROUP
-    CONTROL         "Neustart als Administrator",IDC_RESTARTADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,81,95,10
-    CONTROL         "Start als Administrator",IDC_STARTADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,95,83,10
 END
 
 
@@ -534,6 +528,16 @@ IDI_SETUP               ICON    DISCARDABLE     "res\\Settings.ico"
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
+    IDD_SETUP1, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 148
+    END
+
+    IDD_SETUP2, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 191
+    END
+
     IDD_SETUP_MAIN, DIALOG
     BEGIN
         BOTTOMMARGIN, 263
@@ -597,8 +601,7 @@ BEGIN
     IDS_NOADMIN2            "Sie (%s) sind nicht berechtigt, 'SuRun Einstellungen' zu verändern.\r\n\r\nIdentifizieren Sie sich als Administrator, um SuRuns Optionen zu verändern.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
     IDS_RUNRESTRICTED       "SuRun ist für Sie (%s) so konfiguriert, dass Sie damit nur bestimmte Programme starten dürfen.\r\nSie sind nicht berechtigt, '%s' mit SuRun zu starten."
     IDS_SETUP1              "Allgemein"
-    IDS_SETUP2              "Shell Integration"
-    IDS_SETUP3              "Programmeinstellungen"
+    IDS_SETUP2              "Benutzer-Einstellungen"
 END
 
 #endif    // German (Germany) resources
