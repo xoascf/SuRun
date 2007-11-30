@@ -323,17 +323,19 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT uFlags)
 {
+  UINT id=idCmdFirst;
   if((CMF_DEFAULTONLY & uFlags)==0) 
   {
-    UINT id=idCmdFirst;
-    if(m_pDeskClicked && GetCtrlAsAdmin)
+    if(m_pDeskClicked)
     {
-      //right click target is folder background
-      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, sSuRun);
-      InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
-    }
+      if (GetCtrlAsAdmin)
+      {
+        //right click target is folder background
+        InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, sSuRun);
+        InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      }
+    }else
     if(m_ClickFolderName[0])
     {
       TCHAR s[MAX_PATH];
@@ -356,10 +358,9 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       id++;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
     }
   }
-  return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(0));
+  return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
 }
 
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
