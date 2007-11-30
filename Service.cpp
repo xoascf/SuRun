@@ -359,6 +359,8 @@ void KillProcess(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 BOOL CheckGroupMembership(LPCTSTR UserName)
 {
+  if (GetAllowAll)
+    return TRUE;
   CResStr sCaption(IDS_APPNAME);
   _tcscat(sCaption,L" (");
   _tcscat(sCaption,UserName);
