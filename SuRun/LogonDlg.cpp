@@ -274,11 +274,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetDlgItemText(hwnd,IDC_PASSWORD,p->Password);
       SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETPASSWORDCHAR,'*',0);
       BOOL bFoundUser=FALSE;
-      for (int i=0;i<p->Users.nUsers;i++)
+      for (int i=0;i<p->Users.GetCount();i++)
       {
         SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
-          (LPARAM)&p->Users.User[i].UserName);
-        if (_tcsicmp(p->Users.User[i].UserName,p->User)==0)
+          (LPARAM)p->Users.GetUserName(i));
+        if (_tcsicmp(p->Users.GetUserName(i),p->User)==0)
         {
           SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
           bFoundUser=TRUE;
@@ -298,7 +298,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetDlgItemText(hwnd,IDC_USER,p->User);
       else
       {
-        SetDlgItemText(hwnd,IDC_USER,p->Users.User[0].UserName);
+        SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
         SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,0,0);
       }
       CheckDlgButton(hwnd,IDC_SHELLEXECOK,(p->bShellExecOk)?1:0);
