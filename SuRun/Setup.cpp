@@ -283,6 +283,8 @@ typedef struct _SETUPDATA
   HICON UserIcon;
   HWND hTabCtrl[nTabs];
   int DlgExitCode;
+  HIMAGELIST ImgList;
+  int ImgIconIdx[6];
   _SETUPDATA():Users(GetAllowAll?_T("*"):SURUNNERSGROUP)
   {
     DlgExitCode=IDCANCEL;
@@ -290,6 +292,19 @@ typedef struct _SETUPDATA
     CurUser=-1;
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
+    ImgList=ImageList_Create(16,16,ILC_MASK,6,1);
+    for (int i=0;i<6;i++)
+    {
+      HICON icon=(HICON)LoadImage(GetModuleHandle(0),
+        MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,16,16,0);
+      ImgIconIdx[i]=ImageList_AddIcon(ImgList,icon);
+      DestroyIcon(icon);
+    }
+    ~_SETUPDATA()
+    {
+      DestroyIcon(UserIcon);
+      ImageList_Destroy(ImgList);
+    }
   }
 }SETUPDATA;
 
@@ -325,7 +340,12 @@ static void UpdateUser(HWND hwnd)
     CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
     TCHAR cmd[4096];
     for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
+    {
+      ListView_InsertItem()
+
+      int Flags=GetRegInt(HKLM,wlkey,cmd,0);
       SendMessage(hWL,LB_ADDSTRING,0,(LPARAM)&cmd);
+    }
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),SendMessage(hWL,LB_GETCURSEL,0,0)!=-1);
   }else
   {
@@ -422,6 +442,10 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
+      //Program list icons:
+      HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+      SendMessage(hWL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
+      ListView_SetImageList 
       //UserList
       BOOL bFoundUser=FALSE;
       for (int i=0;i<g_SD->Users.GetCount();i++)
