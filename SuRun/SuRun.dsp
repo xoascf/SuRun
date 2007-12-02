@@ -324,6 +324,14 @@ SOURCE=.\res\main.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\NoQuestion.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\NoRestrict.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\Notes.ico
 # End Source File
 # Begin Source File
@@ -332,11 +340,27 @@ SOURCE=.\res\Notes.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\NoWindows.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\Question.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\Restrict.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\Settings.ico
 # End Source File
 # Begin Source File
 
 SOURCE=.\res\Software.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\Windows.ico
 # End Source File
 # End Group
 # Begin Source File
