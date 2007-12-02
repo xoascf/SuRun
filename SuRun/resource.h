@@ -61,6 +61,12 @@
 #define IDD_SETUP2                      112
 #define IDD_SETUP3                      113
 #define IDD_SETUP4                      114
+#define IDI_LISTICON                    114
+#define IDI_LISTICON3                   115
+#define IDI_LISTICON5                   116
+#define IDI_LISTICON1                   117
+#define IDI_LISTICON2                   118
+#define IDI_LISTICON4                   119
 #define IDC_USER                        1000
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002
@@ -108,7 +114,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        114
+#define _APS_NEXT_RESOURCE_VALUE        120
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1045
 #define _APS_NEXT_SYMED_VALUE           102
