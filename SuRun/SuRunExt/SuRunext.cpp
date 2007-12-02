@@ -412,13 +412,13 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
   //Struct Size Check
-  if (pei->cbSize<sizeof(SHELLEXECUTEINFO))
+  if ((!pei)||(pei->cbSize<sizeof(SHELLEXECUTEINFO))||(!pei->lpFile))
     return S_FALSE;
   //Verb must be "open" or empty
   if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"open")!=0))
     return S_FALSE;
   //Check Directory
-  if (!SetCurrentDirectory(pei->lpDirectory))
+  if (pei->lpDirectory && (!SetCurrentDirectory(pei->lpDirectory)))
     return S_FALSE;
   //check if this Programm has an Auto-SuRun-Entry in the List
   TCHAR cmd[MAX_PATH];
