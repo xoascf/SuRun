@@ -1,3 +1,11 @@
+ToDo:
+*Domain-Mitglied ermitteln
+
+*ShellExt-Registry bei Update nicht löschen
+*"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
+
+*Bei Installation "SuRunners Gruppe nicht benutzen" anbieten.
+
 ==============================================================================
 SuRun...  Super User Run
                                                         by Kay Bruns (c) 2007
