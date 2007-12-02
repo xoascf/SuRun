@@ -520,6 +520,12 @@ IDI_SHIELD1             ICON    DISCARDABLE     "res\\ico10607.ico"
 IDI_INSTALL             ICON    DISCARDABLE     "res\\Software.ico"
 IDI_HELP                ICON    DISCARDABLE     "res\\Notes.ico"
 IDI_SETUP               ICON    DISCARDABLE     "res\\Settings.ico"
+IDI_LISTICON            ICON    DISCARDABLE     "res\\Windows.ico"
+IDI_LISTICON3           ICON    DISCARDABLE     "res\\NoQuestion.ico"
+IDI_LISTICON5           ICON    DISCARDABLE     "res\\NoRestrict.ico"
+IDI_LISTICON1           ICON    DISCARDABLE     "res\\NoWindows.ico"
+IDI_LISTICON2           ICON    DISCARDABLE     "res\\Question.ico"
+IDI_LISTICON4           ICON    DISCARDABLE     "res\\Restrict.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
