@@ -1105,7 +1105,7 @@ bool HandleServiceStuff()
 //////////////////////////////////////////////////////////////////////////////
 
 //To make DialogBoxParam and MessageBox work with Themes:
-#ifndef _DEBUG
+#ifndef _DEBUGSETUP
 HANDLE g_hShell32=LoadLibrary(_T("Shell32.dll"));
 static bool g_IsServiceStuff=HandleServiceStuff();
-#endif _DEBUG
+#endif _DEBUGSETUP
