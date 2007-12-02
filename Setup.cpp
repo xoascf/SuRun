@@ -274,6 +274,12 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+BOOL RunSetup()
+{
+  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;  
+}
+
+#ifdef _DEBUGSETUP
 
 #define nTabs 2
 typedef struct _SETUPDATA 
@@ -300,11 +306,11 @@ typedef struct _SETUPDATA
       ImgIconIdx[i]=ImageList_AddIcon(ImgList,icon);
       DestroyIcon(icon);
     }
-    ~_SETUPDATA()
-    {
-      DestroyIcon(UserIcon);
-      ImageList_Destroy(ImgList);
-    }
+  }
+  ~_SETUPDATA()
+  {
+    DestroyIcon(UserIcon);
+    ImageList_Destroy(ImgList);
   }
 }SETUPDATA;
 
@@ -617,12 +623,6 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   return FALSE;
 }
 
-BOOL RunSetup()
-{
-  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP),0,SetupDlgProc)>=0;  
-}
-
-#ifdef _DEBUGSETUP
 BOOL RunMainSetup()
 {
   SETUPDATA sd;
