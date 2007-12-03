@@ -760,7 +760,9 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   GetModuleFileName(NULL,ModName,MAX_PATH);
   NetworkPathToUNCPath(ModName);
   PathQuoteSpaces(ModName);
-  if (CheckServiceStatus()==SERVICE_RUNNING)
+  TCHAR User[UNLEN+GNLEN+2]={0};
+  GetProcessUserName(GetCurrentProcessId(),User);
+  if (IsInGroup(SURUNNERSGROUP,User) && (CheckServiceStatus()==SERVICE_RUNNING))
   {
     TCHAR SvcFile[4096];
     GetSystemWindowsDirectory(SvcFile,4096);
@@ -1105,7 +1107,7 @@ bool HandleServiceStuff()
 //////////////////////////////////////////////////////////////////////////////
 
 //To make DialogBoxParam and MessageBox work with Themes:
-#ifndef _DEBUGSETUP
+#ifndef _DEBUG
 HANDLE g_hShell32=LoadLibrary(_T("Shell32.dll"));
 static bool g_IsServiceStuff=HandleServiceStuff();
-#endif _DEBUGSETUP
+#endif _DEBUG
