@@ -298,11 +298,11 @@ typedef struct _SETUPDATA
     CurUser=-1;
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
-    ImgList=ImageList_Create(16,16,ILC_MASK,6,1);
+    ImgList=ImageList_Create(16,16,ILC_COLOR32,6,1);
     for (int i=0;i<6;i++)
     {
       HICON icon=(HICON)LoadImage(GetModuleHandle(0),
-        MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,16,16,0);
+        MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
       ImgIconIdx[i]=ImageList_AddIcon(ImgList,icon);
       DestroyIcon(icon);
     }
@@ -316,63 +316,6 @@ typedef struct _SETUPDATA
 
 //There can be only one Setup per Application. It's data is stored in g_SD
 static SETUPDATA *g_SD=NULL;
-
-//User Bitmaps:
-static void UpdateUser(HWND hwnd)
-{
-  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
-  HBITMAP bm=0;
-  HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
-  if (g_SD->CurUser==n)
-    return;
-  //Save Settings:
-  if (g_SD->CurUser>=0)
-  {
-    SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
-      IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
-    SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
-      IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
-  }
-  g_SD->CurUser=n;
-  if (n!=CB_ERR)
-  {
-    bm=g_SD->Users.GetUserBitmap(n);
-    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
-    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
-    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
-    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
-    EnableWindow(hWL,true);
-    ListBox_ResetContent(hWL);
-    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
-    TCHAR cmd[4096];
-    for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
-    {
-      ListView_InsertItem()
-
-      int Flags=GetRegInt(HKLM,wlkey,cmd,0);
-      SendMessage(hWL,LB_ADDSTRING,0,(LPARAM)&cmd);
-    }
-    EnableWindow(GetDlgItem(hwnd,IDC_DELETE),SendMessage(hWL,LB_GETCURSEL,0,0)!=-1);
-  }else
-  {
-    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
-    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
-    ListBox_ResetContent(hWL);
-    EnableWindow(hWL,false);
-  }
-  LBSetScrollbar(hWL);
-  HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
-  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
-  if(bm)
-  {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
-    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
-  }else
-  {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
-    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,(LPARAM)g_SD->UserIcon);
-  }
-}
 
 INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -442,6 +385,72 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
+//User Bitmaps:
+static void UpdateUser(HWND hwnd)
+{
+  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  HBITMAP bm=0;
+  HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+  if (g_SD->CurUser==n)
+    return;
+  //Save Settings:
+  if (g_SD->CurUser>=0)
+  {
+    SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
+      IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
+    SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
+      IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
+  }
+  g_SD->CurUser=n;
+  if (n!=CB_ERR)
+  {
+    bm=g_SD->Users.GetUserBitmap(n);
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
+    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
+    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
+    EnableWindow(hWL,true);
+    ListView_DeleteAllItems(hWL);
+    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
+    TCHAR cmd[4096];
+    for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
+    {
+      int Flags=GetRegInt(HKLM,wlkey,cmd,0);
+      LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)],0,0};
+      int idx=ListView_InsertItem(hWL,&item);
+      item.iItem=idx;
+      ListView_SetItem(hWL,&item);
+      item.iSubItem=1;
+      item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)];
+      ListView_SetItem(hWL,&item);
+      item.iSubItem=2;
+      item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
+      ListView_SetItem(hWL,&item);
+      ListView_SetItemText(hWL,idx,3,cmd);
+    }
+    ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELETE),SendMessage(hWL,LB_GETCURSEL,0,0)!=-1);
+  }else
+  {
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
+    ListView_DeleteAllItems(hWL);
+    EnableWindow(hWL,false);
+  }
+  LBSetScrollbar(hWL);
+  HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
+  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  if(bm)
+  {
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
+  }else
+  {
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,(LPARAM)g_SD->UserIcon);
+  }
+}
+
 INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
@@ -451,10 +460,15 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       //Program list icons:
       HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
       SendMessage(hWL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
-      ListView_SetImageList 
+      ListView_SetImageList(hWL,g_SD->ImgList,LVSIL_SMALL);
+      for (int i=0;i<4;i++)
+      {
+        LVCOLUMN col={LVCF_WIDTH,0,(i==0)?26:22,0,0,0,0,0};
+        ListView_InsertColumn(hWL,i,&col);
+      }
       //UserList
       BOOL bFoundUser=FALSE;
-      for (int i=0;i<g_SD->Users.GetCount();i++)
+      for (i=0;i<g_SD->Users.GetCount();i++)
       {
         SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
           (LPARAM)g_SD->Users.GetUserName(i));
