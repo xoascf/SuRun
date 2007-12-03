@@ -99,7 +99,6 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 /**/
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
-	DWORD result = 0;
 	NET_API_STATUS status;
 	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
 	DWORD num = 0;
@@ -109,7 +108,7 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 	do
 	{
 		status = NetLocalGroupGetMembers(NULL,Group,3,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
-		if (((status==NERR_Success)||(status==ERROR_MORE_DATA))&&(result==0))
+		if (((status==NERR_Success)||(status==ERROR_MORE_DATA)))
 		{
 			if (Members)
 				for(i = 0; (i<total); i++)
