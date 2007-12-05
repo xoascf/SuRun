@@ -300,6 +300,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   NetworkPathToUNCPath(g_RunData.CurDir);
   //cmdLine
   BOOL bRunSetup=FALSE;
+  bool beQuiet=FALSE;
   LPTSTR Args=PathGetArgs(GetCommandLine());
   //Parse direct commands:
   while (Args[0]=='/')
@@ -308,6 +309,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     Args=PathGetArgs(Args);
     if (*(Args-1)==' ')
       *(Args-1)=0;
+    if (!_wcsicmp(c,L"/QUIET"))
+    {
+      beQuiet=TRUE;
+    }else
     if (!_wcsicmp(c,L"/SETUP"))
     {
       bRunSetup=TRUE;
@@ -331,7 +336,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Usage
   if (!g_RunData.cmdLine[0])
   {
-    MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    if (!beQuiet)
+      MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return ERROR_INVALID_PARAMETER;
   }
   //Lets go:
@@ -364,9 +370,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return -2;
   if (g_RunPwd[0]==3) //Restricted User, may not run App!
   {
-    MessageBox(0,
-      CResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
-      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    if (!beQuiet)
+      MessageBox(0,
+        CResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+        CResStr(IDS_APPNAME),MB_ICONSTOP);
     return -3;
   }
   if (g_RunPwd[0]==1)
@@ -394,9 +401,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     //Clear sensitive Data
     zero(g_RunPwd);
     DWORD dwErr=GetLastError();
-    MessageBox(0,
-      CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
-      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    if (!beQuiet)
+      MessageBox(0,
+        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
+        CResStr(IDS_APPNAME),MB_ICONSTOP);
     return dwErr;
   }else
   {
@@ -424,8 +432,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
             GetRegStr(HKEY_LOCAL_MACHINE,
               L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
               L"Shell",s,MAX_PATH);
-            MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-              MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+            if (!beQuiet)
+              MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+                MB_ICONEXCLAMATION|MB_SETFOREGROUND);
           }
           CloseHandle(hTok);
         }
