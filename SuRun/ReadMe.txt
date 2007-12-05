@@ -1,7 +1,6 @@
 ToDo:
 *Domain-Mitglied ermitteln
 
-*ShellExt-Registry bei Update nicht löschen
 *"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
 
 *Bei Installation "SuRunners Gruppe nicht benutzen" anbieten.
@@ -128,6 +127,7 @@ SuRun 1.0.3.0 - 2007-11-30:
 * New Commands. If the User right-clicks on a folder background, two new Items,
   "'cmd <folder>' as administrator" and "'Explorer <folder>' as administrator"
   are shown.
+* New command line Option: /QUIET
 * SuRun waits for max 3 minutes after the Windows start for the Service.
 * SuRun tries to locate the Application to be started. So "surun cmd" will
   make ask SuRun wether "C:\Windows\System32\cmd.exe" is allowed to run.
