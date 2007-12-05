@@ -237,6 +237,19 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
   return 0;
 }
 
+void USERLIST::SetGroupUsers(LPWSTR GroupName)
+{
+  for (int i=0;i<nUsers;i++)
+    DeleteObject(User[i].UserBitmap);
+  free(User);
+  User=0;
+  nUsers=0;
+  if (_tcscmp(GroupName,_T("*"))==0)
+    AddAllUsers();
+  else
+    AddGroupUsers(GroupName);
+}
+
 void USERLIST::Add(LPWSTR UserName)
 {
   for(int j=0;j<nUsers;j++)
