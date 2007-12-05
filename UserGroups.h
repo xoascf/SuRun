@@ -73,6 +73,7 @@ public:
   USERLIST(LPWSTR GroupName);
   ~USERLIST();
 public:
+  void SetGroupUsers(LPWSTR GroupName);
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
