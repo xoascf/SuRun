@@ -110,6 +110,22 @@ BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
   return (GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&Flag)==Flag;
 }
 
+BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable)
+{
+  DWORD dwwl=(GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&(~Flag))|(Enable?Flag:0);
+  return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,dwwl);
+}
+
+BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
+{
+  DWORD dwwl=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
+  if(dwwl&Flag)
+    dwwl&=~Flag;
+  else
+    dwwl|=Flag;
+  return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,dwwl);
+}
+
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
   DWORD dwwl=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&(~Flag);
@@ -317,6 +333,114 @@ typedef struct _SETUPDATA
 //There can be only one Setup per Application. It's data is stored in g_SD
 static SETUPDATA *g_SD=NULL;
 
+//User Bitmaps and Program list handling
+static int CALLBACK ListSortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+  TCHAR s1[4096];
+  TCHAR s2[4096];
+  ListView_GetItemText((HWND)lParamSort,lParam1,3,s1,4095);
+  ListView_GetItemText((HWND)lParamSort,lParam2,3,s2,4095);
+  return _tcscmp(s1,s2);
+}
+
+static void UpdateWhiteListFlags(HWND hWL)
+{
+  CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(g_SD->CurUser));
+  TCHAR cmd[4096];
+  for (int i=0;i<ListView_GetItemCount(hWL);i++)
+  {
+    ListView_GetItemText(hWL,i,3,cmd,4095);
+    int Flags=GetRegInt(HKLM,wlkey,cmd,0);
+    LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)],0,0};
+    ListView_SetItem(hWL,&item);
+    item.iSubItem=1;
+    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)];
+    ListView_SetItem(hWL,&item);
+    item.iSubItem=2;
+    item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
+    ListView_SetItem(hWL,&item);
+  }
+  ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
+}
+
+static void SaveUserFlags()
+{
+  if (g_SD->CurUser>=0)
+  {
+    SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
+      IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
+    SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
+      IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
+  }
+}
+
+static void UpdateUser(HWND hwnd)
+{
+  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+  HBITMAP bm=0;
+  HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+  if (g_SD->CurUser==n)
+    return;
+  //Save Settings:
+  SaveUserFlags();
+  g_SD->CurUser=n;
+  ListView_DeleteAllItems(hWL);
+  if (n!=CB_ERR)
+  {
+    bm=g_SD->Users.GetUserBitmap(n);
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
+    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
+    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
+    EnableWindow(hWL,true);
+    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
+    TCHAR cmd[4096];
+    for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
+    {
+      int Flags=GetRegInt(HKLM,wlkey,cmd,0);
+      LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
+      ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
+    }
+    ListView_SortItemsEx(hWL,ListSortProc,hWL);
+    UpdateWhiteListFlags(hWL);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hWL)!=-1);
+  }else
+  {
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
+    EnableWindow(hWL,false);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELETE),false);
+  }
+  HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
+  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  if(bm)
+  {
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
+  }else
+  {
+    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,(LPARAM)g_SD->UserIcon);
+  }
+}
+
+static void UpdateUserList(HWND hwnd)
+{
+  SendDlgItemMessage(hwnd,IDC_USER,CB_RESETCONTENT,0,0);
+  SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,-1,0);
+  g_SD->CurUser=0;
+  for (int i=0;i<g_SD->Users.GetCount();i++)
+  {
+    LPTSTR u=g_SD->Users.GetUserName(i);
+    SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,(LPARAM)u);
+    if (_tcsicmp(u,g_RunData.UserName)==0)
+      g_SD->CurUser=i;
+  }
+  SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,g_SD->CurUser,0);
+  g_SD->CurUser=-1;
+  UpdateUser(hwnd);
+}
+
 INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
@@ -354,6 +478,13 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW));
         return TRUE;
+      case MAKELPARAM(IDC_ALLOWALL,BN_CLICKED):
+        {
+          SaveUserFlags();
+          g_SD->Users.SetGroupUsers(IsDlgButtonChecked(hwnd,IDC_ALLOWALL)?_T("*"):SURUNNERSGROUP);
+          UpdateUserList(g_SD->hTabCtrl[1]);
+        }
+        return TRUE;
       }//switch (wParam)
       break;
     }//WM_COMMAND
@@ -385,72 +516,6 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
-//User Bitmaps:
-static void UpdateUser(HWND hwnd)
-{
-  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
-  HBITMAP bm=0;
-  HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
-  if (g_SD->CurUser==n)
-    return;
-  //Save Settings:
-  if (g_SD->CurUser>=0)
-  {
-    SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
-      IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
-    SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
-      IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
-  }
-  g_SD->CurUser=n;
-  if (n!=CB_ERR)
-  {
-    bm=g_SD->Users.GetUserBitmap(n);
-    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
-    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
-    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
-    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
-    EnableWindow(hWL,true);
-    ListView_DeleteAllItems(hWL);
-    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
-    TCHAR cmd[4096];
-    for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
-    {
-      int Flags=GetRegInt(HKLM,wlkey,cmd,0);
-      LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)],0,0};
-      int idx=ListView_InsertItem(hWL,&item);
-      item.iItem=idx;
-      ListView_SetItem(hWL,&item);
-      item.iSubItem=1;
-      item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)];
-      ListView_SetItem(hWL,&item);
-      item.iSubItem=2;
-      item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
-      ListView_SetItem(hWL,&item);
-      ListView_SetItemText(hWL,idx,3,cmd);
-    }
-    ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
-    EnableWindow(GetDlgItem(hwnd,IDC_DELETE),SendMessage(hWL,LB_GETCURSEL,0,0)!=-1);
-  }else
-  {
-    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
-    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
-    ListView_DeleteAllItems(hWL);
-    EnableWindow(hWL,false);
-  }
-  LBSetScrollbar(hWL);
-  HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
-  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
-  if(bm)
-  {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
-    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
-  }else
-  {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
-    SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,(LPARAM)g_SD->UserIcon);
-  }
-}
-
 INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
@@ -467,24 +532,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         ListView_InsertColumn(hWL,i,&col);
       }
       //UserList
-      BOOL bFoundUser=FALSE;
-      for (i=0;i<g_SD->Users.GetCount();i++)
-      {
-        SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
-          (LPARAM)g_SD->Users.GetUserName(i));
-        if (_tcsicmp(g_SD->Users.GetUserName(i),g_RunData.UserName)==0)
-        {
-          SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
-          bFoundUser=TRUE;
-          g_SD->CurUser=i;
-        }
-      }
-      if (!bFoundUser)
-      {
-        SetDlgItemText(hwnd,IDC_USER,g_SD->Users.GetUserName(0));
-        SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,0,0);
-      }
-      UpdateUser(hwnd);
+      UpdateUserList(hwnd);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORDLG:
@@ -512,35 +560,71 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
-          int CurSel=(int)SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0);
+          HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+          int CurSel=(int)ListView_GetSelectionMark(hWL);
           if (CurSel>=0)
           {
             TCHAR cmd[4096];
-            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETTEXT,CurSel,(LPARAM)&cmd);
-            RemoveFromWhiteList(g_RunData.UserName,cmd,FLAG_DONTASK);
-            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_DELETESTRING,CurSel,0);
+            ListView_GetItemText(hWL,CurSel,3,cmd,4095);
+            if(RemoveFromWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd,FLAG_DONTASK))
+            {
+              ListView_DeleteItem(hWL,CurSel);
+              CurSel=ListView_GetSelectionMark(hWL);
+              if (CurSel>=0)
+                ListView_SetItemState(hWL,CurSel,LVIS_SELECTED,0x0F);
+            }
+            else
+              MessageBeep(MB_ICONERROR);
           }
           EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
-            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
-          LBSetScrollbar(GetDlgItem(hwnd,IDC_WHITELIST));
-          return TRUE;
-        }
-      case MAKELPARAM(IDC_WHITELIST,LBN_SELCHANGE):
-        {
-          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
-            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
+            ListView_GetSelectionMark(hWL)!=-1);
           return TRUE;
         }
       }//switch (wParam)
       break;
     }//WM_COMMAND
-  case WM_DESTROY:
-    if (/*(g_SD->DlgExitCode==IDOK) && */(g_SD->CurUser>=0))
+  case WM_NOTIFY:
     {
-      SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
-        IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
-      SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
-        IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
+      switch (wParam)
+      {
+      case IDC_WHITELIST:
+        if (lParam) switch(((LPNMHDR)lParam)->code)
+        {
+        case LVN_ITEMCHANGED:
+          {
+            EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+              ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_WHITELIST))!=-1);
+            return TRUE;
+          }
+          break;
+        case NM_CLICK:
+          {
+            LPNMITEMACTIVATE p=(LPNMITEMACTIVATE)lParam;
+            int Flag=0;
+            switch(p->iSubItem)
+            {
+            case 0:Flag=FLAG_DONTASK;     break;
+            case 1:Flag=FLAG_SHELLEXEC;   break;
+            case 2:Flag=FLAG_NORESTRICT;  break;
+            }
+            if (Flag)
+            {
+              TCHAR cmd[4096];
+              HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+              ListView_GetItemText(hWL,p->iItem,3,cmd,4095);
+              ToggleWhiteListFlag(g_SD->Users.GetUserName(g_SD->CurUser),cmd,Flag);
+              UpdateWhiteListFlags(hWL);
+            }
+          }
+          break;
+        }//switch (switch(((LPNMHDR)lParam)->code)
+      }//switch (wParam)
+      break;
+    }//WM_NOTIFY
+  case WM_DESTROY:
+    //if (g_SD->DlgExitCode==IDOK)
+    {
+      SaveUserFlags();
       return TRUE;
     }//WM_DESTROY
   }
