@@ -710,7 +710,7 @@ BEGIN
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    LTEXT           "If the application should be started with administrative rights, enter you password.\r\n\r\nIf not, press 'Cancel'!",
+    LTEXT           "If the application should be started with administrative rights, enter your password.\r\n\r\nIf not, press 'Cancel'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,6,127,47,46
