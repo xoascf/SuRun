@@ -481,23 +481,19 @@ BOOL PrepareSuRun()
     //secure desktop created...
     if (!CheckGroupMembership(g_RunData.UserName))
       return FALSE;
-    BOOL bSeOk=IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-    BOOL bLogon=0;
+    DWORD f=GetRegInt(HKLM,WHTLSTKEY(g_RunData.UserName),g_RunData.cmdLine,0);
+    DWORD l=0;
     if (!PwOk)
     {
-      bLogon=LogonCurrentUser(g_RunData.UserName,g_RunPwd,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
-      if (GetSavePW && (bLogon&1))
+      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,IDS_ASKOK,g_RunData.cmdLine);
+      if (GetSavePW && (l&1))
         SavePassword(g_RunData.UserName,g_RunPwd);
     }else
-      bLogon=AskCurrentUserOk(g_RunData.UserName,bSeOk,IDS_ASKOK,g_RunData.cmdLine);
-    if(!bLogon)
+      l=AskCurrentUserOk(g_RunData.UserName,f,IDS_ASKOK,g_RunData.cmdLine);
+    if((l&1)==0)
       return FALSE;
-    if (bLogon&2)
-      SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK);
-    if (bLogon&4)
-      SaveToWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
-    else
-      RemoveFromWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC);
+    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
+    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     return UpdLastRunTime(g_RunData.UserName),TRUE;
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
@@ -556,7 +552,7 @@ BOOL Setup(LPCTSTR WinStaName)
     return RunSetup();
   if (GetNoRunSetup(g_RunData.UserName))
   {
-    if(!LogonAdmin(IDS_NOADMIN2))
+    if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
     else
       return RunSetup();
@@ -744,13 +740,15 @@ void RemoveRegistry()
 //////////////////////////////////////////////////////////////////////////////
 
 #define WaitFor(a) \
+  {\
     for (int i=0;i<30;i++)\
     {\
       Sleep(750);\
       if (a)\
         return TRUE; \
     } \
-    return a;
+    return a;\
+  }
 
 
 BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
@@ -762,21 +760,27 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   PathQuoteSpaces(ModName);
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetProcessUserName(GetCurrentProcessId(),User);
-  if (IsInGroup(SURUNNERSGROUP,User) && (CheckServiceStatus()==SERVICE_RUNNING))
+  if (CheckServiceStatus()==SERVICE_RUNNING)
   {
     TCHAR SvcFile[4096];
     GetSystemWindowsDirectory(SvcFile,4096);
     PathAppend(SvcFile,_T("SuRun.exe"));
     PathQuoteSpaces(SvcFile);
-    _stprintf(cmdLine,_T("%s %s %s"),SvcFile,ModName,cmd);
+    _stprintf(cmdLine,_T("%s /QUIET %s %s"),SvcFile,ModName,cmd);
     STARTUPINFO si={0};
     PROCESS_INFORMATION pi;
     si.cb = sizeof(si);
     if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      CloseHandle(pi.hProcess);
       CloseHandle(pi.hThread);
-      WaitFor(CheckServiceStatus()==WaitStat);
+      DWORD ExitCode=-1;
+      if (WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+        GetExitCodeProcess(pi.hProcess,&ExitCode);
+      CloseHandle(pi.hProcess);
+      if (ExitCode==ERROR_ACCESS_DENIED)
+        return FALSE;
+      if (ExitCode==0)
+        WaitFor(CheckServiceStatus()==WaitStat);
     }
   }
   _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
@@ -819,13 +823,11 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   {
     cbs.Init();
     cbs.Show();
-  }
-  if ((!bJustStop)
-    &&(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
-                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO))
+    if(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
+                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO)
     return false;
-  if(!bJustStop)
     cbs.MsgLoop();
+  }
   BOOL bRet=FALSE;
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
@@ -842,10 +844,6 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   }
   for (int n=0;CheckServiceStatus() && (n<100);n++)
     Sleep(100);
-  //Shell Extension
-  RemoveShellExt();
-  //Registry
-  RemoveRegistry();
   //Delete Files and directories
   TCHAR File[4096];
   GetSystemWindowsDirectory(File,4096);
@@ -862,15 +860,22 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   PathAppend(File,_T("SuRunExt32.dll"));
   DelFile(File);
 #endif _WIN64
+  //Start Menu
   TCHAR file[4096];
   GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
     L"Common Programs",file,4096);
   ExpandEnvironmentStrings(file,File,4096);
   PathAppend(File,CResStr(IDS_STARTMENUDIR));
   DeleteDirectory(File);
+  //Registry
+  RemoveRegistry();
   if (bJustStop)
     return TRUE;
+  //Shell Extension
+  RemoveShellExt();
+  //HKLM\Security\SuRun
   DelRegKey(HKLM,SVCKEY);
+  //ToDo: SuRunners->Administratoren
   //Ok!
   MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
     MB_ICONINFORMATION|MB_SETFOREGROUND);
