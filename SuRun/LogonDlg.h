@@ -29,6 +29,6 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...);
 BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...);
 BOOL LogonAdmin(int IDmsg,...);
 
-BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,BOOL bShellExecOk,int IDmsg,...);
+DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...);
 
-BOOL AskCurrentUserOk(LPTSTR User,BOOL bShellExecOk,int IDmsg,...);
+DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...);
