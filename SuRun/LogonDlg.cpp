@@ -25,6 +25,7 @@
 #include "UserGroups.h"
 #include "sspi_auth.h"
 #include "Helpers.h"
+#include "Setup.h"
 #include "Resource.h"
 
 #pragma comment(lib,"shlwapi.lib")
@@ -93,15 +94,15 @@ typedef struct _LOGONDLGPARAMS
   BOOL ForceAdminLogon;
   USERLIST Users;
   int TimeOut;
-  BOOL bShellExecOk;
-  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,BOOL bSeOk):Users(Adm)
+  DWORD UsrFlags;
+  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags):Users(Adm)
   {
     Msg=M;
     User=Usr;
     Password=Pwd;
     UserReadonly=RO;
     ForceAdminLogon=Adm;
-    bShellExecOk=bSeOk;
+    UsrFlags=UFlags;
     TimeOut=40;//s
   }
 }LOGONDLGPARAMS;
@@ -301,7 +302,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
         SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,0,0);
       }
-      CheckDlgButton(hwnd,IDC_SHELLEXECOK,(p->bShellExecOk)?1:0);
+      CheckDlgButton(hwnd,IDC_SHELLEXECOK,(p->UsrFlags&FLAG_SHELLEXEC)?1:0);
+      CheckDlgButton(hwnd,IDC_ALWAYSOK,(p->UsrFlags&FLAG_DONTASK)?1:0);
       SetUserBitmap(hwnd);
       SetWindowSizes(hwnd);
       SetTimer(hwnd,2,1000,0);
@@ -457,23 +459,23 @@ BOOL LogonAdmin(int IDmsg,...)
   return bRet;
 }
 
-BOOL LogonCurrentUser(LPTSTR User,LPTSTR Password,BOOL bShellExecOk,int IDmsg,...)
+DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,true,false,bShellExecOk);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
+  LOGONDLGPARAMS p(S,User,Password,true,false,UsrFlags);
+  return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL AskCurrentUserOk(LPTSTR User,BOOL bShellExecOk,int IDmsg,...)
+DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,_T("******"),true,false,bShellExecOk);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
+  LOGONDLGPARAMS p(S,User,_T("******"),true,false,UsrFlags);
+  return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
                   0,DialogProc,(LPARAM)&p);
 }
 
