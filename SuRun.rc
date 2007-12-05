@@ -388,7 +388,7 @@ IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "SuRun Optionen",IDC_EXTOPT2,75,2,297,55,WS_GROUP
     CONTROL         "Zeige abgedunkelten Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
@@ -399,6 +399,9 @@ BEGIN
                     ES_NUMBER
     LTEXT           "min löschen (0 = nie löschen)",IDC_STATIC,226,31,92,8,
                     NOT WS_GROUP
+    CONTROL         "Alle Benutzer dürfen SuRun benutzen (Gruppe 'SuRunners' nicht verwenden)",
+                    IDC_ALLOWALL,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,83,43,285,13
     GROUPBOX        "Zeige im Kontext-Menü:",IDC_STATIC,75,59,145,55,
                     WS_GROUP
     CONTROL         "Systemsteuerung als Administrator",IDC_CTRLASADMIN,
@@ -431,9 +434,6 @@ BEGIN
                     BS_MULTILINE | WS_TABSTOP,11,190,349,27
     CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
                     IDC_STATIC,6,220,365,8
-    CONTROL         "Alle Benutzer dürfen SuRun benutzen (Gruppe 'SuRunners' nicht verwenden)",
-                    IDC_ALLOWALL,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,83,43,285,13
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -443,20 +443,21 @@ BEGIN
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,4,2,40,37
     LTEXT           "Benutzer",IDC_USRST,50,6,33,8
-    COMBOBOX        IDC_USER,86,3,158,217,CBS_DROPDOWNLIST | CBS_SORT | 
+    COMBOBOX        IDC_USER,86,3,216,217,CBS_DROPDOWNLIST | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Erweitert...",IDC_BUTTON1,248,2,43,14
     CONTROL         "Benutzer darf SuRun Einstellungen verändern",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,17,
                     216,10
     CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
                     28,216,10
-    GROUPBOX        "Starte immer, ohne zu fragen:",-1,6,46,378,187
-    PUSHBUTTON      "&Löschen",IDC_DELETE,319,216,50,14
+    GROUPBOX        "Programmliste für den Benutzer (Änderungen werden sofort wirksam, auch wenn 'Abbrechen' gedrückt wird.",
+                    -1,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,8,57,373,154
+    PUSHBUTTON      "&Löschen",IDC_DELETE,319,216,50,14
 END
 
 IDD_SETUP_MAIN DIALOGEX 0, 0, 395, 274
