@@ -95,7 +95,7 @@ typedef struct _LOGONDLGPARAMS
   USERLIST Users;
   int TimeOut;
   DWORD UsrFlags;
-  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags):Users(Adm)
+  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags)
   {
     Msg=M;
     User=Usr;
@@ -430,6 +430,7 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
+  p.Users.SetUsualUsers();
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -440,6 +441,7 @@ BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,true,false);
+  p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -452,6 +454,7 @@ BOOL LogonAdmin(int IDmsg,...)
   TCHAR U[UNLEN+GNLEN+2]={0};
   TCHAR P[PWLEN]={0};
   LOGONDLGPARAMS p(S,U,P,false,true,false);
+  p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS);
   BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),
                     MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
   zero(U);
@@ -519,7 +522,7 @@ BOOL TestLogonDlg()
   l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(User,IDS_ASKOK,0,L"cmd");
+  l=AskCurrentUserOk(User,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
 
@@ -537,7 +540,7 @@ BOOL TestLogonDlg()
   l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(User,IDS_ASKOK,0,L"cmd");
+  l=AskCurrentUserOk(User,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
 
