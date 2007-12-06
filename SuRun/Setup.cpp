@@ -604,40 +604,40 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             }
           }
           return TRUE;
-        case LVN_GETINFOTIP:
-          {
-            LPNMLVGETINFOTIP p=(LPNMLVGETINFOTIP)lParam;
-            TCHAR cmd[4096];
-            ListView_GetItemText(GetDlgItem(hwnd,IDC_WHITELIST),p->iItem,3,cmd,4095);
-            LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
-            switch(p->iSubItem)
-            {
-            case 0: //DontAsk
-              if (IsInWhiteList(u,cmd,FLAG_DONTASK))
-                _tcsncpy(p->pszText,L"SuRun wird nicht fragen, ob das Programm mit erhöhten Rechten gestartet werden darf",p->cchTextMax);
-              else
-                _tcsncpy(p->pszText,L"SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",p->cchTextMax);
-              break;
-            case 1: //ShellExecute
-              if (IsInWhiteList(u,cmd,FLAG_SHELLEXEC))
-                _tcsncpy(p->pszText,L"Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",p->cchTextMax);
-              else
-                _tcsncpy(p->pszText,L"Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",p->cchTextMax);
-              break;
-            case 2: //Restrict
-              if (IsInWhiteList(u,cmd,FLAG_NORESTRICT))
-                _tcsncpy(p->pszText,L"Wenn Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",p->cchTextMax);
-              else
-                _tcsncpy(p->pszText,L"Wenn Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm untersagt",p->cchTextMax);
-              break;
-            case 3: //DontAsk
-            default:
-              DBGTrace1("InfoTip: ????? %d",p->iSubItem);
-              break;
-            }
-            DBGTrace1("InfoTip: %s",p->pszText);
-          }
-          return TRUE;
+//        case LVN_GETINFOTIP:
+//          {
+//            LPNMLVGETINFOTIP p=(LPNMLVGETINFOTIP)lParam;
+//            TCHAR cmd[4096];
+//            ListView_GetItemText(GetDlgItem(hwnd,IDC_WHITELIST),p->iItem,3,cmd,4095);
+//            LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
+//            switch(p->iSubItem)
+//            {
+//            case 0: //DontAsk
+//              if (IsInWhiteList(u,cmd,FLAG_DONTASK))
+//                _tcsncpy(p->pszText,L"SuRun wird nicht fragen, ob das Programm mit erhöhten Rechten gestartet werden darf",p->cchTextMax);
+//              else
+//                _tcsncpy(p->pszText,L"SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",p->cchTextMax);
+//              break;
+//            case 1: //ShellExecute
+//              if (IsInWhiteList(u,cmd,FLAG_SHELLEXEC))
+//                _tcsncpy(p->pszText,L"Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",p->cchTextMax);
+//              else
+//                _tcsncpy(p->pszText,L"Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",p->cchTextMax);
+//              break;
+//            case 2: //Restrict
+//              if (IsInWhiteList(u,cmd,FLAG_NORESTRICT))
+//                _tcsncpy(p->pszText,L"Wenn Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",p->cchTextMax);
+//              else
+//                _tcsncpy(p->pszText,L"Wenn Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm untersagt",p->cchTextMax);
+//              break;
+//            case 3: //DontAsk
+//            default:
+//              DBGTrace1("InfoTip: ????? %d",p->iSubItem);
+//              break;
+//            }
+//            DBGTrace1("InfoTip: %s",p->pszText);
+//          }
+//          return TRUE;
         }//switch (switch(((LPNMHDR)lParam)->code)
       }//switch (wParam)
       break;
