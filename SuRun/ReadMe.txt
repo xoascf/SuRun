@@ -1,9 +1,9 @@
 ToDo:
+*Wenn alle SuRun benutzen dürfen, muss "Jeder" Energieoptionen verändern dürfen
+
 *Domain-Mitglied ermitteln
 
 *"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
-
-*Bei Installation "SuRunners Gruppe nicht benutzen" anbieten.
 
 ==============================================================================
 SuRun...  Super User Run
