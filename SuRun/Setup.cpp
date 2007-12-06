@@ -302,8 +302,9 @@ typedef struct _SETUPDATA
   int DlgExitCode;
   HIMAGELIST ImgList;
   int ImgIconIdx[6];
-  _SETUPDATA():Users(GetAllowAll?_T("*"):SURUNNERSGROUP)
+  _SETUPDATA()
   {
+    Users.SetGroupUsers(SURUNNERSGROUP);
     DlgExitCode=IDCANCEL;
     zero(hTabCtrl);
     CurUser=-1;
@@ -447,7 +448,6 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_SAVEPW,GetSavePW);
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
-      CheckDlgButton(hwnd,IDC_ALLOWALL,GetAllowAll);
 
       CheckDlgButton(hwnd,IDC_CTRLASADMIN,GetCtrlAsAdmin);
       CheckDlgButton(hwnd,IDC_CMDASADMIN,GetCmdAsAdmin);
@@ -473,13 +473,6 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW));
         return TRUE;
-      case MAKELPARAM(IDC_ALLOWALL,BN_CLICKED):
-        {
-          SaveUserFlags();
-          g_SD->Users.SetGroupUsers(IsDlgButtonChecked(hwnd,IDC_ALLOWALL)?_T("*"):SURUNNERSGROUP);
-          UpdateUserList(g_SD->hTabCtrl[1]);
-        }
-        return TRUE;
       }//switch (wParam)
       break;
     }//WM_COMMAND
@@ -489,7 +482,6 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW));
       SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
-      SetAllowAll(IsDlgButtonChecked(hwnd,IDC_ALLOWALL));
       
       SetCtrlAsAdmin(IsDlgButtonChecked(hwnd,IDC_CTRLASADMIN));
       SetCmdAsAdmin(IsDlgButtonChecked(hwnd,IDC_CMDASADMIN));
