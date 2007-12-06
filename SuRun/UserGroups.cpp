@@ -99,28 +99,97 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 /**/
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
-	NET_API_STATUS status;
-	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
-	DWORD num = 0;
-	DWORD total = 0;
-	DWORD_PTR resume = 0;
-	DWORD i;
+  DBGTrace2("SuRun TEST: Is User %s is in Group %s???",DomainAndName,Group);
+  //try to find user in local group
+  NET_API_STATUS status;
 	do
 	{
-		status = NetLocalGroupGetMembers(NULL,Group,3,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
+    LPLOCALGROUP_MEMBERS_INFO_2 Members = NULL;
+    DWORD num = 0;
+    DWORD total = 0;
+    DWORD_PTR resume = 0;
+    DWORD i;
+		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
 		if (((status==NERR_Success)||(status==ERROR_MORE_DATA)))
 		{
 			if (Members)
 				for(i = 0; (i<total); i++)
-					if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
+        {
+          switch (Members[i].lgrmi2_sidusage)
           {
-            NetApiBufferFree(Members);
-            DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
-            return TRUE;
+          case SidTypeUser:
+            if(wcscmp(Members[i].lgrmi2_domainandname, DomainAndName)==0)
+            {
+              NetApiBufferFree(Members);
+              DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
+              return TRUE;
+            }
+            break;
+          case SidTypeComputer:
+          case SidTypeDomain:
+          case SidTypeGroup:
+          case SidTypeWellKnownGroup:
+            //Groups can be member of groups
+            if (IsInGroup(Members[i].lgrmi2_domainandname,DomainAndName))
+              return TRUE;
+            break;
           }
+        }
 		}
+    NetApiBufferFree(Members);
+    Members=0;
 	}while (status==ERROR_MORE_DATA);
-	NetApiBufferFree(Members);
+  //try to find user in network group
+  {
+    TCHAR dn[2*UNLEN+2]={0};
+    _tcscpy(dn,Group);
+    PathRemoveFileSpec(dn);
+    LPTSTR dc=0;
+    if (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success) 
+    {
+      TCHAR gn[2*UNLEN+2]={0};
+      _tcscpy(gn,Group);
+      PathStripPath(gn);
+      DWORD_PTR i=0;
+      for(DWORD res=ERROR_MORE_DATA;res==ERROR_MORE_DATA;)
+      { 
+        LPBYTE pBuff=0;
+        DWORD dwRec=0;
+        DWORD dwTot=0;
+        res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+        if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
+        {
+          DBGTrace3("NetGroupGetUsers(%s,%s) failed: %s",dc,gn,GetErrorNameStatic(res));
+          break;
+        }
+        for(GROUP_USERS_INFO_0* p=(GROUP_USERS_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
+        {
+          USER_INFO_2* b=0;
+          NetUserGetInfo(dc,p->grui0_name,2,(LPBYTE*)&b);
+          if (b)
+          {
+            if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+            {
+              CResStr s(L"%s\\%s",dn,p->grui0_name);
+              if(wcscmp(s, DomainAndName)==0)
+              {
+                NetApiBufferFree(b);
+                NetApiBufferFree(pBuff);
+                NetApiBufferFree(dc);
+                DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
+                return TRUE;
+              }
+            }
+            NetApiBufferFree(b);
+          }else
+            DBGTrace1("NetUserGetInfo failed: %s",GetErrorNameStatic(res));
+        }
+        NetApiBufferFree(pBuff);
+      }
+      NetApiBufferFree(dc);
+    }
+  }
+
   DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
 	return FALSE;
 }
@@ -178,26 +247,10 @@ BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-//List of Users of WellKnownGroups
-USERLIST::USERLIST(BOOL bAdminsOnly)
+USERLIST::USERLIST()
 {
   nUsers=0;
   User=0;
-  if (bAdminsOnly)
-    AddGroupUsers(DOMAIN_ALIAS_RID_ADMINS);
-  else for (int g=0;g<countof(UserGroups);g++)
-    AddGroupUsers(UserGroups[g]);
-}
-
-//List of Users of "GroupName"
-USERLIST::USERLIST(LPWSTR GroupName)
-{
-  nUsers=0;
-  User=0;
-  if (_tcscmp(GroupName,_T("*"))==0)
-    AddAllUsers();
-  else
-    AddGroupUsers(GroupName);
 }
 
 USERLIST::~USERLIST()
@@ -226,7 +279,7 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
   TCHAR un[2*UNLEN+2];
   _tcscpy(un,UserName);
   PathStripPath(un);
-  for (int i=0;nUsers;i++) 
+  for (int i=0;i<nUsers;i++) 
   {
     TCHAR UN[2*UNLEN+2]={0};
     _tcscpy(UN,User[i].UserName);
@@ -235,6 +288,17 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
       return User[i].UserBitmap;
   }
   return 0;
+}
+
+void USERLIST::SetUsualUsers()
+{
+  for (int i=0;i<nUsers;i++)
+    DeleteObject(User[i].UserBitmap);
+  free(User);
+  User=0;
+  nUsers=0;
+  for (int g=0;g<countof(UserGroups);g++)
+    AddGroupUsers(UserGroups[g]);
 }
 
 void USERLIST::SetGroupUsers(LPWSTR GroupName)
@@ -248,6 +312,14 @@ void USERLIST::SetGroupUsers(LPWSTR GroupName)
     AddAllUsers();
   else
     AddGroupUsers(GroupName);
+}
+
+void USERLIST::SetGroupUsers(DWORD WellKnownGroup)
+{
+  DWORD GNLen=GNLEN;
+  WCHAR GroupName[GNLEN+1];
+  if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
+    SetGroupUsers(GroupName);
 }
 
 void USERLIST::Add(LPWSTR UserName)
@@ -269,6 +341,7 @@ void USERLIST::Add(LPWSTR UserName)
   }
   if (j>=nUsers)
     User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
+  DBGTrace1("  AddUser: %s",UserName);
   wcscpy(User[j].UserName,UserName);
   User[j].UserBitmap=LoadUserBitmap(UserName);
   nUsers++;
@@ -277,6 +350,51 @@ void USERLIST::Add(LPWSTR UserName)
 
 void USERLIST::AddGroupUsers(LPWSTR GroupName,bool bNoAdmin/*=FALSE*/)
 {
+  DBGTrace1("AddGroupUsers for Group %s",GroupName);
+  //First try to add network group members
+  {
+    TCHAR dn[2*UNLEN+2]={0};
+    _tcscpy(dn,GroupName);
+    PathRemoveFileSpec(dn);
+    LPTSTR dc=0;
+    if (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success) 
+    {
+      TCHAR gn[2*UNLEN+2]={0};
+      _tcscpy(gn,GroupName);
+      PathStripPath(gn);
+      DWORD_PTR i=0;
+      DWORD res=ERROR_MORE_DATA;
+      for(;res==ERROR_MORE_DATA;)
+      { 
+        LPBYTE pBuff=0;
+        DWORD dwRec=0;
+        DWORD dwTot=0;
+        res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+        if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
+        {
+          DBGTrace3("NetGroupGetUsers(%s,%s) failed: %s",dc,gn,GetErrorNameStatic(res));
+          break;
+        }
+        for(GROUP_USERS_INFO_0* p=(GROUP_USERS_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
+        {
+          USER_INFO_2* b=0;
+          NetUserGetInfo(dc,p->grui0_name,2,(LPBYTE*)&b);
+          if (b)
+          {
+            if (((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+              &&((bNoAdmin==0) || ((b->usri2_priv &USER_PRIV_ADMIN)==0)))
+              Add(CResStr(L"%s\\%s",dn,p->grui0_name));
+            NetApiBufferFree(b);
+          }else
+            DBGTrace1("NetUserGetInfo failed: %s",GetErrorNameStatic(res));
+        }
+        NetApiBufferFree(pBuff);
+      }
+      NetApiBufferFree(dc);
+    }
+  }
+
+  //second try to add local group members
   DWORD_PTR i=0;
   DWORD res=ERROR_MORE_DATA;
   for(;res==ERROR_MORE_DATA;)
@@ -284,7 +402,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,bool bNoAdmin/*=FALSE*/)
     LPBYTE pBuff=0;
     DWORD dwRec=0;
     DWORD dwTot=0;
-    res = NetLocalGroupGetMembers(NULL,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+    res = NetLocalGroupGetMembers(0,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
       DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
@@ -292,24 +410,35 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,bool bNoAdmin/*=FALSE*/)
     }
     for(LOCALGROUP_MEMBERS_INFO_2* p=(LOCALGROUP_MEMBERS_INFO_2*)pBuff;dwRec>0;dwRec--,p++)
     {
-      if (p->lgrmi2_sidusage==SidTypeUser)
+      switch (p->lgrmi2_sidusage)
       {
-        TCHAR un[2*UNLEN+2]={0};
-        TCHAR dn[2*UNLEN+2]={0};
-        _tcscpy(un,p->lgrmi2_domainandname);
-        PathStripPath(un);
-        _tcscpy(dn,p->lgrmi2_domainandname);
-        PathRemoveFileSpec(dn);
-        USER_INFO_2* b=0;
-        NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
-        if (b)
+      case SidTypeUser:
         {
-          if (((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
-            &&((bNoAdmin==0) || ((b->usri2_priv &USER_PRIV_ADMIN)==0)))
-            Add(p->lgrmi2_domainandname);
-          NetApiBufferFree(b);
-        }else
-          DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
+          TCHAR un[2*UNLEN+2]={0};
+          TCHAR dn[2*UNLEN+2]={0};
+          _tcscpy(un,p->lgrmi2_domainandname);
+          PathStripPath(un);
+          _tcscpy(dn,p->lgrmi2_domainandname);
+          PathRemoveFileSpec(dn);
+          USER_INFO_2* b=0;
+          NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
+          if (b)
+          {
+            if (((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+              &&((bNoAdmin==0) || ((b->usri2_priv &USER_PRIV_ADMIN)==0)))
+              Add(p->lgrmi2_domainandname);
+            NetApiBufferFree(b);
+          }else
+            DBGTrace1("NetUserGetInfo failed: %s",GetErrorNameStatic(res));
+        }
+        break;
+      case SidTypeComputer:
+      case SidTypeDomain:
+      case SidTypeGroup:
+      case SidTypeWellKnownGroup:
+        //Groups can be members of Groups...
+        AddGroupUsers(p->lgrmi2_domainandname,bNoAdmin);
+        break;
       }
     }
     NetApiBufferFree(pBuff);
