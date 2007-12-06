@@ -359,8 +359,6 @@ void KillProcess(DWORD PID)
 //////////////////////////////////////////////////////////////////////////////
 BOOL CheckGroupMembership(LPCTSTR UserName)
 {
-  if (GetAllowAll)
-    return TRUE;
   CResStr sCaption(IDS_APPNAME);
   _tcscat(sCaption,L" (");
   _tcscat(sCaption,UserName);
@@ -390,19 +388,6 @@ BOOL CheckGroupMembership(LPCTSTR UserName)
     }
     return TRUE;
   }
-  //Domain user?
-  LPWSTR lpdn=0;
-  NETSETUP_JOIN_STATUS js;
-  if(NetGetJoinInformation(0,&lpdn,&js))
-  {
-    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
-      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS2,lpdn),sCaption,MB_ICONINFORMATION);
-    else
-      MessageBox(0,CBigResStr(IDS_DOMAINGROUPS,lpdn),sCaption,MB_ICONINFORMATION);
-    NetApiBufferFree(lpdn);
-    return FALSE;
-  }
-  //Local User:
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
   {
     if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),sCaption,
