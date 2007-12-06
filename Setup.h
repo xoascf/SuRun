@@ -56,10 +56,6 @@
                             DelRegKey(HKLM,TIMESKEY); \
                           }
 
-//All Users may use SuRun
-#define GetAllowAll       (GetOption(_T("AllowAllUsers"),0)!=0)
-#define SetAllowAll(b)    SetOption(_T("AllowAllUsers"),b)
-
 //////////////////////////////////////////////////////////////////////////////
 //Settings for every user; saved to "HKLM\SECURITY\SuRun\<ComputerName>\<UserName>":
 //////////////////////////////////////////////////////////////////////////////
