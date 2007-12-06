@@ -129,15 +129,13 @@ SuRun 1.0.3.0 - 2007-11-30:
   "'cmd <folder>' as administrator" and "'Explorer <folder>' as administrator"
   are shown.
 * New command line Option: /QUIET
+* New: SuRun runs in a domain. It enumerates domain accounts for administrative 
+  authorization and uses the local group "SuRunners" for local authorization.
 * SuRun waits for max 3 minutes after the Windows start for the Service.
 * SuRun tries to locate the Application to be started. So "surun cmd" will
   make ask SuRun wether "C:\Windows\System32\cmd.exe" is allowed to run.
-* Users can always run specific Applications with privileged rights. To make 
-  this work, SuRun hooks ShellExecute. If the Shell tries to execute a program 
-  that is marked as "Always run this application with elevated rights.", then
-  SuRun starts that application as Administrator. E.g. If you start "cmd" found 
-  as "C:\Windows\System32\cmd.exe" and "C:\Windows\System32\cmd.exe" is in the 
-  list, SuRun will launch cmd automatically elevated.
+* Users can make Windows Explorer run specific Applications always with 
+  elevated rights. (No "SuRun" command required.)
 * SuRun can be restricted on a per User basis:
   - Users can be denied to use "SuRun setup".
   - Users can be restricted to specific applications that are allowed to run 
