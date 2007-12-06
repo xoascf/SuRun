@@ -455,12 +455,11 @@ BEGIN
     PUSHBUTTON      "&Löschen",IDC_DELETE,319,216,50,14
 END
 
-IDD_SETUP_MAIN DIALOGEX 0, 0, 395, 274
-STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
-    DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_NOPARENTNOTIFY
+IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 395, 274
+STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s Einstellungen"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,395,252
@@ -762,8 +761,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2,92
- PRODUCTVERSION 1,0,2,92
+ FILEVERSION 1,0,2,93
+ PRODUCTVERSION 1,0,2,93
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -781,14 +780,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 2, 92\0"
+            VALUE "FileVersion", "1, 0, 2, 93\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 2, 92\0"
+            VALUE "ProductVersion", "1, 0, 2, 93\0"
             VALUE "SpecialBuild", "\0"
         END
     END
