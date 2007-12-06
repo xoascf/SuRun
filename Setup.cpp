@@ -112,32 +112,25 @@ BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable)
 {
-  DWORD dwwl=(GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&(~Flag))|(Enable?Flag:0);
-  return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,dwwl);
+  DWORD d0=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
+  DWORD d1=(d0 &(~Flag))|(Enable?Flag:0);
+  //only save reg key, when flag is different!
+  return (d1==d0)||SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,d1);
 }
 
 BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  DWORD dwwl=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
-  if(dwwl&Flag)
-    dwwl&=~Flag;
+  DWORD d=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
+  if(d&Flag)
+    d&=~Flag;
   else
-    dwwl|=Flag;
-  return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,dwwl);
+    d|=Flag;
+  return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,d);
 }
 
-BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
+BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
 {
-  DWORD dwwl=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&(~Flag);
-  if(dwwl)
-    return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,dwwl);
   return RegDelVal(HKLM,WHTLSTKEY(User),CmdLine);
-}
-
-void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
-{
-  SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,
-    GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)|Flag);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -269,8 +262,10 @@ INT_PTR CALLBACK SetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           {
             TCHAR cmd[4096];
             SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETTEXT,CurSel,(LPARAM)&cmd);
-            RemoveFromWhiteList(g_RunData.UserName,cmd,FLAG_DONTASK);
-            SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_DELETESTRING,CurSel,0);
+            if(RemoveFromWhiteList(g_RunData.UserName,cmd))
+              SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_DELETESTRING,CurSel,0);
+            else
+              MessageBeep(MB_ICONERROR);
           }
           EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
             SendDlgItemMessage(hwnd,IDC_WHITELIST,LB_GETCURSEL,0,0)!=-1);
@@ -566,14 +561,13 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           {
             TCHAR cmd[4096];
             ListView_GetItemText(hWL,CurSel,3,cmd,4095);
-            if(RemoveFromWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd,FLAG_DONTASK))
+            if(RemoveFromWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd))
             {
               ListView_DeleteItem(hWL,CurSel);
               CurSel=ListView_GetSelectionMark(hWL);
               if (CurSel>=0)
                 ListView_SetItemState(hWL,CurSel,LVIS_SELECTED,0x0F);
-            }
-            else
+            }else
               MessageBeep(MB_ICONERROR);
           }
           EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
@@ -598,6 +592,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           }
           break;
         case NM_CLICK:
+        case NM_DBLCLK:
           {
             LPNMITEMACTIVATE p=(LPNMITEMACTIVATE)lParam;
             int Flag=0;
@@ -612,8 +607,10 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               TCHAR cmd[4096];
               HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
               ListView_GetItemText(hWL,p->iItem,3,cmd,4095);
-              ToggleWhiteListFlag(g_SD->Users.GetUserName(g_SD->CurUser),cmd,Flag);
-              UpdateWhiteListFlags(hWL);
+              if(ToggleWhiteListFlag(g_SD->Users.GetUserName(g_SD->CurUser),cmd,Flag))
+                UpdateWhiteListFlags(hWL);
+              else
+                MessageBeep(MB_ICONERROR);
             }
           }
           break;
