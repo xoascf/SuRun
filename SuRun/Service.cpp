@@ -745,7 +745,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   PathQuoteSpaces(ModName);
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetProcessUserName(GetCurrentProcessId(),User);
-  if (CheckServiceStatus()==SERVICE_RUNNING)
+  if (IsInGroup(SURUNNERSGROUP,User) && (CheckServiceStatus()==SERVICE_RUNNING))
   {
     TCHAR SvcFile[4096];
     GetSystemWindowsDirectory(SvcFile,4096);
