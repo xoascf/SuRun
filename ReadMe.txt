@@ -4,6 +4,7 @@ ToDo:
 *Domain-Mitglied ermitteln
 
 *"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
+ ->auch Berechtigungen von SuRunners aus Registry und Dateisystem löschen
 
 ==============================================================================
 SuRun...  Super User Run
