@@ -210,12 +210,10 @@ BEGIN
     IDS_STARTMUNINST        "Usuñ SuRun.lnk"
     IDS_GRPDESC             "Cz³onkowie tej grupy mog¹ u¿ywaæ SuRun."
     IDS_ASKUSRINSTALL       "Czy chcesz zainstalowaæ lub zaktualizowaæ SuRun teraz?\r\n\r\nJeœli klikniesz Tak, pliki SuRun zostan¹ skopiowane do katalogu Windows\r\ni us³uga SuRun zostanie zainstalowana i uruchomiona."
-    IDS_DOMAINGROUPS        "Musisz byæ cz³onkiem grupy ""SuRunners"" ¿eby u¿ywaæ SuRun.\r\n\r\nJesteœ obecnie cz³onkiem domeny %s.\r\nAdministrator domeny musi dodaæ przydzieliæ Twoje konto do grupy ""SuRunners""."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DOMAINGROUPS2       "Musisz byæ cz³onkiem grupy ""SuRunners"" ¿eby u¿ywaæ SuRun.\r\n\r\nJesteœ obecnie cz³onkiem domeny %s.\r\nAdministrator domeny musi usun¹æ Twoje konto z grupy\r\nadministratorów i przydzieliæ je do grupy ""SuRunners""."
     IDS_CANCEL              "Anuluj (%d)"
     IDS_NOADD2USERS         "B³¹d!\r\n\r\nPróba przydzielenia Twojego konta do grupy standardowych u¿ytkowników nie powiod³a siê.\r\nWindows raportuje b³¹d jako:\r\n\r\n%s"
     IDS_NOREMADMINS         "B³¹d!\r\n\r\nPróba usuniêcia Twojego konta z grupy administratorów nie powiod³a siê.\r\nWindows raportuje b³¹d jako:\r\n\r\n%s"
@@ -399,9 +397,6 @@ BEGIN
                     ES_NUMBER
     LTEXT           "min löschen (0 = nie löschen)",IDC_STATIC,226,31,92,8,
                     NOT WS_GROUP
-    CONTROL         "Alle Benutzer dürfen SuRun benutzen (Gruppe 'SuRunners' nicht verwenden)",
-                    IDC_ALLOWALL,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,83,43,285,13
     GROUPBOX        "Zeige im Kontext-Menü:",IDC_STATIC,75,59,145,55,
                     WS_GROUP
     CONTROL         "Systemsteuerung als Administrator",IDC_CTRLASADMIN,
@@ -585,12 +580,10 @@ BEGIN
     IDS_STARTMUNINST        "SuRun Entfernen.lnk"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
     IDS_ASKUSRINSTALL       "Wollen Sie SuRun jetzt installieren bzw. ersetzen?\r\n\r\nWenn Sie auf Ja klicken, werden die SuRun-Dateien in das Windows\r\nVerzeichnis kopiert und der SuRun Dienst installiert und gestartet."
-    IDS_DOMAINGROUPS        "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nSie sind Mitglied der Domäne %s.\r\nLassen Sie sich von einem Domänen-Administrator in die ""SuRunners"" Gruppe eintragen."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DOMAINGROUPS2       "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nSie sind Mitglied der Domäne %s.\r\nLassen Sie sich von einem Domänen-Administrator in die ""SuRunners"" Gruppe ein-\r\nund aus der Administratoren-Gruppe austragen."
     IDS_CANCEL              "Abbrechen (%d)"
     IDS_NOADD2USERS         "Fehler!\r\n\r\nSie konnten nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_NOREMADMINS         "Fehler!\r\n\r\nSie konnten nicht aus der Gruppe der Administratoren ausgetragen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
@@ -849,12 +842,10 @@ BEGIN
     IDS_STARTMUNINST        "Remove SuRun.lnk"
     IDS_GRPDESC             "Members of this group can use SuRun."
     IDS_ASKUSRINSTALL       "Do you want to install or update SuRun now?\r\n\r\nIf you press Yes, SuRun files will be copied to your Windows\r\ndirectory and the SuRun service is installed and run."
-    IDS_DOMAINGROUPS        "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nYou are currently member of domain %s.\r\nA domain administrator must put your account into the ""SuRunners"" group."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DOMAINGROUPS2       "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nYou are currently member of domain %s.\r\nA domain administrator must remove your account from the\r\nadministrators group and put it into the ""SuRunners"" group."
     IDS_CANCEL              "Cancel (%d)"
     IDS_NOADD2USERS         "Error!\r\n\r\nPutting your account into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
