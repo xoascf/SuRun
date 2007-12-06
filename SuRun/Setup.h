@@ -168,8 +168,7 @@ void UpdLastRunTime(LPTSTR UserName);
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable);
 BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
-BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
-void SaveToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
+BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
