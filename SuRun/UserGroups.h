@@ -67,13 +67,12 @@ typedef struct
 class USERLIST
 {
 public:
-  //List of Users of WellKnownGroups
-  USERLIST(BOOL bAdminsOnly);
-  //List of Users of "GroupName"
-  USERLIST(LPWSTR GroupName);
+  USERLIST();
   ~USERLIST();
 public:
+  void SetUsualUsers();
   void SetGroupUsers(LPWSTR GroupName);
+  void SetGroupUsers(DWORD WellKnownGroup);
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
