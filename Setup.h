@@ -36,20 +36,21 @@
 //////////////////////////////////////////////////////////////////////////////
 //Settings for all users; saved to "HKLM\SECURITY\SuRun":
 //////////////////////////////////////////////////////////////////////////////
-#define GetOption(s,d) GetRegInt(HKLM,SVCKEY,s,d)
-#define SetOption(s,v) SetRegInt(HKLM,SVCKEY,s,v)
+#define GetOption(s,d)    GetRegInt(HKLM,SVCKEY,s,d)
+#define SetOption(s,v,d)  if (GetOption(s,d)!=v)\
+                            SetRegInt(HKLM,SVCKEY,s,v)
 
 //blurred user desktop background on secure Desktop
 #define GetBlurDesk       (GetOption(_T("BlurDesktop"),1)!=0)
-#define SetBlurDesk(b)    SetOption(_T("BlurDesktop"),b)
+#define SetBlurDesk(b)    SetOption(_T("BlurDesktop"),b,1)
 
 //Minutes to wait until "Is that OK?" is asked again
 #define GetPwTimeOut      min(60,max(0,(int)GetOption(_T("AskTimeOut"),0)))
-#define SetPwTimeOut(t)   min(60,max(0,(int)SetOption(_T("AskTimeOut"),t)))
+#define SetPwTimeOut(t)   SetOption(_T("AskTimeOut"),(DWORD)min(60,max(0,(int)t)),0)
 
 //Save or not Passwords in the registry
 #define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
-#define SetSavePW(b)      SetOption(_T("SavePasswords"),b); \
+#define SetSavePW(b)      SetOption(_T("SavePasswords"),b,1); \
                           if (!b) \
                           { \
                             DelRegKey(HKLM,PASSWKEY); \
@@ -59,21 +60,23 @@
 //////////////////////////////////////////////////////////////////////////////
 //Settings for every user; saved to "HKLM\SECURITY\SuRun\<ComputerName>\<UserName>":
 //////////////////////////////////////////////////////////////////////////////
-#define GetUsrSetting(u,s,d)  GetRegInt(HKLM,USERKEY(u),s,d)
-#define SetUsrSetting(u,s,v)  SetRegInt(HKLM,USERKEY(u),s,v)
+#define GetUsrSetting(u,s,d)    GetRegInt(HKLM,USERKEY(u),s,d)
+#define SetUsrSetting(u,s,v,d)  if(GetUsrSetting(u,s,d)!=v)\
+                                  SetRegInt(HKLM,USERKEY(u),s,v)
 
 //SuRunner is not allowed to run Setup
 #define GetNoRunSetup(u)      (GetUsrSetting(u,_T("AdminOnlySetup"),0)!=0)
-#define SetNoRunSetup(u,b)    SetUsrSetting(u,_T("AdminOnlySetup"),b)
+#define SetNoRunSetup(u,b)    SetUsrSetting(u,_T("AdminOnlySetup"),b,0)
 //SuRunner may only run predefined Applications
 #define GetRestrictApps(u)    (GetUsrSetting(u,_T("RestrictApps"),0)!=0)
-#define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b)
+#define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
 //////////////////////////////////////////////////////////////////////////////
-#define GetShExtSetting(s,d)  GetRegInt(HKCR,L"CLSID\\" sGUID,s,d)
-#define SetShExtSetting(s,v)  SetRegInt(HKCR,L"CLSID\\" sGUID,s,v)
+#define GetShExtSetting(s,d)    GetRegInt(HKCR,L"CLSID\\" sGUID,s,d)
+#define SetShExtSetting(s,v,d)  if (GetShExtSetting(s,d)!=v)\
+                                  SetRegInt(HKCR,L"CLSID\\" sGUID,s,v)
 
 //the following settings are stored in: HKCR\\CLSID\\sGUID
 #define ControlAsAdmin  L"ControlAsAdmin"  //"Control Panel As Admin" on Desktop Menu
@@ -84,19 +87,19 @@
 
 //"Control Panel As Admin" on Desktop Menu
 #define GetCtrlAsAdmin        (GetShExtSetting(ControlAsAdmin,1)!=0)
-#define SetCtrlAsAdmin(b)     SetShExtSetting(ControlAsAdmin,b)
+#define SetCtrlAsAdmin(b)     SetShExtSetting(ControlAsAdmin,b,1)
 //"Cmd here As Admin" on Folder Menu
 #define GetCmdAsAdmin         (GetShExtSetting(CmdHereAsAdmin,1)!=0)
-#define SetCmdAsAdmin(b)      SetShExtSetting(CmdHereAsAdmin,b)
+#define SetCmdAsAdmin(b)      SetShExtSetting(CmdHereAsAdmin,b,1)
 //"Explorer here As Admin" on Folder Menu
 #define GetExpAsAdmin         (GetShExtSetting(ExpHereAsAdmin,1)!=0)
-#define SetExpAsAdmin(b)      SetShExtSetting(ExpHereAsAdmin,b)
+#define SetExpAsAdmin(b)      SetShExtSetting(ExpHereAsAdmin,b,1)
 //"Restart As Admin" in System-Menu
 #define GetRestartAsAdmin     (GetShExtSetting(RestartAsAdmin,1)!=0)
-#define SetRestartAsAdmin(b)  SetShExtSetting(RestartAsAdmin,b)
+#define SetRestartAsAdmin(b)  SetShExtSetting(RestartAsAdmin,b,1)
 //"Start As Admin" in System-Menu
 #define GetStartAsAdmin       (GetShExtSetting(StartAsAdmin,1)!=0)
-#define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b)
+#define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,1)
 
 //////////////////////////////////////////////////////////////////////////////
 //  Windows Policy Stuff
