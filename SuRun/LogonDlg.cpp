@@ -286,7 +286,14 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         }
       }
       if (p->UserReadonly)
+      {
         EnableWindow(GetDlgItem(hwnd,IDC_USER),false);
+        if (GetNoRunSetup(p->User))
+        {
+          EnableWindow(GetDlgItem(hwnd,IDC_SHELLEXECOK),false);
+          EnableWindow(GetDlgItem(hwnd,IDC_ALWAYSOK),false);
+        }
+      }
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_USER)))
         SetFocus(GetDlgItem(hwnd,IDC_USER));
       else if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
