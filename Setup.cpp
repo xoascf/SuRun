@@ -35,6 +35,7 @@
 #include "Service.h"
 
 #pragma comment(lib,"comctl32.lib")
+#pragma comment(lib,"Comdlg32.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -108,6 +109,12 @@ void UpdLastRunTime(LPTSTR UserName)
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
   return (GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&Flag)==Flag;
+}
+
+BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine)
+{
+  DWORD d=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,-1);
+  return (d!=-1)||SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
 }
 
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable)
@@ -214,6 +221,35 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 // Save Flags for the selected User
 // 
 //////////////////////////////////////////////////////////////////////////////
+static bool GetFileName(HWND hwnd,LPTSTR FileName)
+{
+  OPENFILENAME  ofn={0};
+  ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
+  ofn.hwndOwner         = hwnd;
+  ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
+  ofn.nFilterIndex      = 1;
+  ofn.lpstrFile         = FileName;
+  ofn.nMaxFile          = MAX_PATH;
+  ofn.lpstrTitle        = CResStr(IDS_ADDFILETOLIST);
+  ofn.Flags             = OFN_PATHMUSTEXIST | OFN_LONGNAMES | OFN_ENABLESIZING 
+                        | OFN_DONTADDTORECENT | OFN_FORCESHOWHIDDEN | OFN_NOVALIDATE
+                        | OFN_EXPLORER | OFN_NODEREFERENCELINKS | OFN_NOTESTFILECREATE;
+  ofn.nFileOffset       = 0;
+  ofn.nFileExtension    = 0;
+  ofn.lpstrDefExt       = NULL;
+  ofn.lCustData         = 0;
+  ofn.lpfnHook          = NULL;
+  ofn.lpTemplateName    = NULL;
+  if (GetOpenFileName(&ofn))
+      return true;
+  return false;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// Save Flags for the selected User
+// 
+//////////////////////////////////////////////////////////////////////////////
 static void SaveUserFlags()
 {
   if (g_SD->CurUser>=0)
@@ -287,7 +323,6 @@ static void UpdateUser(HWND hwnd)
     TCHAR cmd[4096];
     for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
     {
-      int Flags=GetRegInt(HKLM,wlkey,cmd,0);
       LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
       ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
     }
@@ -466,6 +501,21 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           EnableWindow(GetDlgItem(hwnd,IDC_ICONHELP),0);
         }
         return TRUE;
+      //Add Button
+        case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
+          {
+            TCHAR cmd[MAX_PATH]={0};
+            if (GetFileName(hwnd,cmd)
+              && AddToWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd))
+            {
+              HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+              LVITEM item={LVIF_IMAGE,0,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
+              ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
+              ListView_SortItemsEx(hWL,ListSortProc,hWL);
+              UpdateWhiteListFlags(hWL);
+            }
+          }
+        break;
       //Delete Button
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
@@ -659,6 +709,8 @@ BOOL TestSetup()
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!RunSetup())
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+
+  ExitProcess(0);
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
   if (!RunSetup())
