@@ -22,6 +22,8 @@
 // 
 //////////////////////////////////////////////////////////////////////////////
 
+#define SVCKEY    _T("SECURITY\\SuRun")
+
 #define PASSWKEY      SVCKEY _T("\\Cache")
 #define TIMESKEY      SVCKEY _T("\\Times")
 #define WHTLSTKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
