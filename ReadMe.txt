@@ -1,10 +1,7 @@
 ToDo:
-*Wenn alle SuRun benutzen dürfen, muss "Jeder" Energieoptionen verändern dürfen
-
-*Domain-Mitglied ermitteln
-
 *"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
  ->auch Berechtigungen von SuRunners aus Registry und Dateisystem löschen
+* Windows Manifeste verarbeiten und automatisch als SuRunner starten!!!
 
 ==============================================================================
 SuRun...  Super User Run
