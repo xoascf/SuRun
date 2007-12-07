@@ -33,6 +33,7 @@
 #define IDS_GRPDESC                     29
 #define IDS_ASKUSRINSTALL               30
 #define IDS_DOMAINGROUPS                31
+#define IDS_ADDFILETOLIST               31
 #define IDS_DOMAINGROUPS2               32
 #define IDS_CANCEL                      33
 #define IDS_NOADD2USERS                 34
