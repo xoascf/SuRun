@@ -106,6 +106,7 @@
 #define IDC_EXTOPT2                     1034
 #define IDC_BUTTON1                     1034
 #define IDC_ADDAPP                      1034
+#define IDC_EDITAPP                     1035
 #define IDC_CTRLASADMIN                 1036
 #define IDC_CMDASADMIN                  1037
 #define IDC_EXPASADMIN                  1038
