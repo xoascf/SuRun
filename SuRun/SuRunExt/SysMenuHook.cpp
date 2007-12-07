@@ -75,12 +75,13 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu((HMENU)wps->wParam) 
-        && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1)
         && (!IsAdmin()))
       {
-        if(GetRestartAsAdmin)
+        if( GetRestartAsAdmin
+        && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1))
           AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,sMenuRestart);
-        if(GetStartAsAdmin)
+        if( GetStartAsAdmin
+        && (GetMenuState((HMENU)wps->wParam,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
           AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,sMenuStart);
       }
       break;
