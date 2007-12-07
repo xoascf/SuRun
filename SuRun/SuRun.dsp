@@ -316,10 +316,6 @@ SOURCE=.\res\ico10607.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\main.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\main.ico
 # End Source File
 # Begin Source File
@@ -329,10 +325,6 @@ SOURCE=.\res\NoQuestion.ico
 # Begin Source File
 
 SOURCE=.\res\NoRestrict.ico
-# End Source File
-# Begin Source File
-
-SOURCE=.\Notes.ico
 # End Source File
 # Begin Source File
 
