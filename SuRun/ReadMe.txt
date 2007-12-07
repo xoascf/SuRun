@@ -120,7 +120,7 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.3.0 - 2007-11-30:
+SuRun 1.0.2.93 - 2007-12-07: (Internal Beta)
 ---------------------------
 * New Commands. If the User right-clicks on a folder background, two new Items,
   "'cmd <folder>' as administrator" and "'Explorer <folder>' as administrator"
