@@ -165,6 +165,7 @@ void UpdLastRunTime(LPTSTR UserName);
 #define FLAG_NORESTRICT 4 //Restricted SuRunner may execute App elevated
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
+BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine);
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable);
 BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine);
