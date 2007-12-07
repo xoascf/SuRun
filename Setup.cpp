@@ -111,15 +111,21 @@ BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
   return (GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&Flag)==Flag;
 }
 
-BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine)
+BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flags/*=0*/)
 {
-  DWORD d=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,-1);
-  return (d!=-1)||SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
+  CBigResStr key(_T("%s\\%s"),SVCKEY,User);
+  DWORD d=GetRegInt(HKLM,key,CmdLine,-1);
+  return (d==Flags)||SetRegInt(HKLM,key,CmdLine,Flags);
+}
+
+DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
+{
+  return GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,Default);
 }
 
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable)
 {
-  DWORD d0=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
+  DWORD d0=GetWhiteListFlags(User,CmdLine,0);
   DWORD d1=(d0 &(~Flag))|(Enable?Flag:0);
   //only save reg key, when flag is different!
   return (d1==d0)||SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,d1);
@@ -127,7 +133,7 @@ BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable)
 
 BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  DWORD d=GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0);
+  DWORD d=GetWhiteListFlags(User,CmdLine,0);
   if(d&Flag)
     d&=~Flag;
   else
@@ -221,7 +227,7 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 // Save Flags for the selected User
 // 
 //////////////////////////////////////////////////////////////////////////////
-static bool GetFileName(HWND hwnd,LPTSTR FileName)
+static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
 {
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
@@ -232,17 +238,10 @@ static bool GetFileName(HWND hwnd,LPTSTR FileName)
   ofn.nMaxFile          = MAX_PATH;
   ofn.lpstrTitle        = CResStr(IDS_ADDFILETOLIST);
   ofn.Flags             = OFN_PATHMUSTEXIST | OFN_LONGNAMES | OFN_ENABLESIZING 
-                        | OFN_DONTADDTORECENT | OFN_FORCESHOWHIDDEN | OFN_NOVALIDATE
-                        | OFN_EXPLORER | OFN_NODEREFERENCELINKS | OFN_NOTESTFILECREATE;
-  ofn.nFileOffset       = 0;
-  ofn.nFileExtension    = 0;
-  ofn.lpstrDefExt       = NULL;
-  ofn.lCustData         = 0;
-  ofn.lpfnHook          = NULL;
-  ofn.lpTemplateName    = NULL;
-  if (GetOpenFileName(&ofn))
-      return true;
-  return false;
+                        | OFN_DONTADDTORECENT | OFN_FORCESHOWHIDDEN 
+                        | OFN_NOVALIDATE | OFN_EXPLORER 
+                        | OFN_NODEREFERENCELINKS | OFN_NOTESTFILECREATE;
+  return GetOpenFileName(&ofn);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -329,12 +328,14 @@ static void UpdateUser(HWND hwnd)
     ListView_SortItemsEx(hWL,ListSortProc,hWL);
     UpdateWhiteListFlags(hWL);
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hWL)!=-1);
+    EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hWL)!=-1);
   }else
   {
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
     EnableWindow(hWL,false);
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),false);
   }
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
   DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
@@ -501,20 +502,55 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           EnableWindow(GetDlgItem(hwnd,IDC_ICONHELP),0);
         }
         return TRUE;
-      //Add Button
-        case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
+      //Edit Button
+      case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
+        {
+          HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+          int CurSel=(int)ListView_GetSelectionMark(hWL);
+          if (CurSel>=0)
           {
-            TCHAR cmd[MAX_PATH]={0};
-            if (GetFileName(hwnd,cmd)
-              && AddToWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd))
+            TCHAR cmd[MAX_PATH];
+            TCHAR CMD[MAX_PATH];
+            ListView_GetItemText(hWL,CurSel,3,cmd,MAX_PATH);
+            _tcscpy(CMD,cmd);
+            if (GetFileName(hwnd,CMD))
+            {
+              LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
+              DWORD f=GetWhiteListFlags(u,cmd,0);
+              if (RemoveFromWhiteList(u,cmd))
+              {
+                if (AddToWhiteList(u,CMD,f))
+                {
+                  ListView_DeleteItem(hWL,CurSel);
+                  LVITEM item={LVIF_IMAGE,0,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
+                  ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,CMD);
+                  ListView_SortItemsEx(hWL,ListSortProc,hWL);
+                  UpdateWhiteListFlags(hWL);
+                }else
+                  MessageBeep(MB_ICONERROR);
+              }else
+                MessageBeep(MB_ICONERROR);
+            }
+          }
+        }
+        break;
+      //Add Button
+      case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
+        {
+          TCHAR cmd[MAX_PATH]={0};
+          if (GetFileName(hwnd,cmd))
+          {
+            if(AddToWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd,0))
             {
               HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
               LVITEM item={LVIF_IMAGE,0,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
               ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
               ListView_SortItemsEx(hWL,ListSortProc,hWL);
               UpdateWhiteListFlags(hWL);
-            }
+            }else
+              MessageBeep(MB_ICONERROR);
           }
+        }
         break;
       //Delete Button
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
@@ -536,6 +572,8 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           }
           EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
             ListView_GetSelectionMark(hWL)!=-1);
+          EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),
+            ListView_GetSelectionMark(hWL)!=-1);
           return TRUE;
         }
       }//switch (wParam)
@@ -552,6 +590,8 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         //Selection changed
         case LVN_ITEMCHANGED:
           EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+            ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_WHITELIST))!=-1);
+          EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),
             ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_WHITELIST))!=-1);
           return TRUE;
         //Mouse Click: Toggle Flags
