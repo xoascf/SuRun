@@ -93,8 +93,9 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,8,57,373,155
+    PUSHBUTTON      "&Edit...",IDC_EDITAPP,166,216,50,14
+    PUSHBUTTON      "&Add...",IDC_ADDAPP,220,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
-    PUSHBUTTON      "A&dd...",IDC_ADDAPP,220,216,50,14
     PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
 END
 
@@ -268,6 +269,7 @@ BEGIN
     IDS_STARTMUNINST        "Usuñ SuRun.lnk"
     IDS_GRPDESC             "Cz³onkowie tej grupy mog¹ u¿ywaæ SuRun."
     IDS_ASKUSRINSTALL       "Czy chcesz zainstalowaæ lub zaktualizowaæ SuRun teraz?\r\n\r\nJeœli klikniesz Tak, pliki SuRun zostan¹ skopiowane do katalogu Windows\r\ni us³uga SuRun zostanie zainstalowana i uruchomiona."
+    IDS_ADDFILETOLIST       "Enter file name and command line"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -512,8 +514,9 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,8,57,373,155
-    PUSHBUTTON      "&Löschen",IDC_DELETE,273,216,50,14
+    PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,166,216,50,14
     PUSHBUTTON      "H&inzu...",IDC_ADDAPP,220,216,50,14
+    PUSHBUTTON      "&Löschen",IDC_DELETE,273,216,50,14
     PUSHBUTTON      "&Hilfe",IDC_ICONHELP,326,216,50,14
 END
 
@@ -652,7 +655,7 @@ BEGIN
     IDS_STARTMUNINST        "SuRun Entfernen.lnk"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
     IDS_ASKUSRINSTALL       "Wollen Sie SuRun jetzt installieren bzw. ersetzen?\r\n\r\nWenn Sie auf Ja klicken, werden die SuRun-Dateien in das Windows\r\nVerzeichnis kopiert und der SuRun Dienst installiert und gestartet."
-    IDS_ADDFILETOLIST       "Geben Sie Dateinamen und Kommandozeilenparameter an:"
+    IDS_ADDFILETOLIST       "Geben Sie Dateinamen und Kommandozeilenparameter an"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -753,8 +756,9 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,8,57,373,155
+    PUSHBUTTON      "&Edit...",IDC_EDITAPP,166,216,50,14
+    PUSHBUTTON      "&Add...",IDC_ADDAPP,220,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
-    PUSHBUTTON      "A&dd...",IDC_ADDAPP,220,216,50,14
     PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
 END
 
@@ -974,6 +978,7 @@ BEGIN
     IDS_STARTMUNINST        "Remove SuRun.lnk"
     IDS_GRPDESC             "Members of this group can use SuRun."
     IDS_ASKUSRINSTALL       "Do you want to install or update SuRun now?\r\n\r\nIf you press Yes, SuRun files will be copied to your Windows\r\ndirectory and the SuRun service is installed and run."
+    IDS_ADDFILETOLIST       "Enter file name and command line"
 END
 
 STRINGTABLE DISCARDABLE 
