@@ -61,6 +61,8 @@
 #define IDD_SETUP2                      112
 #define IDD_SETUP3                      113
 #define IDD_SETUP4                      114
+#define IDD_DIALOG2                     120
+#define IDD_ICONHELP                    120
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
@@ -93,6 +95,7 @@
 #define IDC_SHELLEXECOK                 1026
 #define IDC_DELETE                      1027
 #define IDC_ALLOWTIME                   1028
+#define IDC_ICONHELP                    1028
 #define IDC_OWNERGROUP                  1029
 #define IDC_SETENERGY                   1030
 #define IDC_WINUPD4ALL                  1031
@@ -101,6 +104,7 @@
 #define IDC_SETUP_TAB                   1033
 #define IDC_EXTOPT2                     1034
 #define IDC_BUTTON1                     1034
+#define IDC_ADDAPP                      1034
 #define IDC_CTRLASADMIN                 1036
 #define IDC_CMDASADMIN                  1037
 #define IDC_EXPASADMIN                  1038
@@ -113,7 +117,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        120
+#define _APS_NEXT_RESOURCE_VALUE        121
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1045
 #define _APS_NEXT_SYMED_VALUE           102
