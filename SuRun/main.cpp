@@ -372,7 +372,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   {
     if (!beQuiet)
       MessageBox(0,
-        CResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+        CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
     return -3;
   }
