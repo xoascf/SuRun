@@ -28,6 +28,7 @@
 #include "ResStr.h"
 #include "UserGroups.h"
 #include "Resource.h"
+#include "LogonDlg.h"
 #include "DBGTrace.h"
 
 #pragma comment(lib,"shlwapi.lib")
@@ -239,6 +240,80 @@ BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
 		return TRUE;
 	AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,DomainAndName,1);
 	return FALSE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  BeOrBecomeSuRunner: check, if User is member of SuRunners, 
+//      if not, try to join him
+//////////////////////////////////////////////////////////////////////////////
+BOOL BeOrBecomeSuRunner(LPCTSTR UserName)
+{
+  CResStr sCaption(IDS_APPNAME);
+  _tcscat(sCaption,L" (");
+  _tcscat(sCaption,UserName);
+  _tcscat(sCaption,L")");
+  if (IsBuiltInAdmin(UserName))
+  {
+    MessageBox(0,CBigResStr(IDS_BUILTINADMIN),sCaption,MB_ICONSTOP);
+    return FALSE;
+  }
+  //Is User member of SuRunners?
+  if (IsInSuRunners(UserName))
+  {
+    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+    {
+      DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
+      if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+      {
+        MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+        return FALSE;
+      }
+      dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+      if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+      {
+        MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+  if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+  {
+    if(MessageBox(0,CBigResStr(IDS_ASKSURUNNER),sCaption,
+      MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
+      return FALSE;
+    DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
+    if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+    {
+      MessageBox(0,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      return FALSE;
+    }
+    dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+    if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+    {
+      MessageBox(0,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      return FALSE;
+    }
+    dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
+    if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+    {
+      MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      return FALSE;
+    }
+    MessageBox(0,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
+    return TRUE;
+  }
+  if (!LogonAdmin(IDS_NOSURUNNER))
+    return FALSE;
+  DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
+  if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+  {
+    MessageBox(0,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+    return FALSE;
+  }
+  MessageBox(0,CBigResStr(IDS_SURUNNER_OK),sCaption,MB_ICONINFORMATION);
+  return TRUE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
