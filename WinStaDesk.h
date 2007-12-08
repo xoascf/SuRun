@@ -93,7 +93,7 @@ public:
           TCHAR n[MAX_PATH]={0};
           DWORD l=MAX_PATH;
           if (GetUserObjectInformation(i,UOI_NAME,n,l,&l))
-            if (_tcscmp(n,DeskName))
+            if (_tcsicmp(n,DeskName))
               SwitchDesktop(d);
           CloseDesktop(i);
         }
