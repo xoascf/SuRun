@@ -204,7 +204,7 @@ static int CALLBACK UsrListSortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lPara
   TCHAR s2[MAX_PATH];
   ListView_GetItemText((HWND)lParamSort,lParam1,0,s1,MAX_PATH);
   ListView_GetItemText((HWND)lParamSort,lParam2,0,s2,MAX_PATH);
-  return _tcscmp(s1,s2);
+  return _tcsicmp(s1,s2);
 }
 
 static void SetSelectedNameText(HWND hwnd)
@@ -236,7 +236,8 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       for (int i=0;i<ul.GetCount();i++) 
       {
         LVITEM item={LVIF_TEXT,i,0,0,0,ul.GetUserName(i),0,0,0,0};
-        ListView_InsertItem(hUL,&item);
+        if (!IsInSuRunners(item.pszText))
+          ListView_InsertItem(hUL,&item);
       }
       ListView_SortItemsEx(hUL,UsrListSortProc,hUL);
       ListView_SetColumnWidth(hUL,0,LVSCW_AUTOSIZE_USEHEADER);
@@ -366,7 +367,7 @@ static int CALLBACK ListSortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
   TCHAR s2[4096];
   ListView_GetItemText((HWND)lParamSort,lParam1,3,s1,4096);
   ListView_GetItemText((HWND)lParamSort,lParam2,3,s2,4096);
-  return _tcscmp(s1,s2);
+  return _tcsicmp(s1,s2);
 }
 
 static void UpdateWhiteListFlags(HWND hWL)
@@ -387,6 +388,7 @@ static void UpdateWhiteListFlags(HWND hWL)
     ListView_SetItem(hWL,&item);
   }
   ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
+  InvalidateRect(hWL,0,TRUE);
 }
 
 //////////////////////////////////////////////////////////////////////////////
