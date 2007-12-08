@@ -247,7 +247,7 @@ BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
 //  BeOrBecomeSuRunner: check, if User is member of SuRunners, 
 //      if not, try to join him
 //////////////////////////////////////////////////////////////////////////////
-BOOL BeOrBecomeSuRunner(LPCTSTR UserName)
+BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/)
 {
   CResStr sCaption(IDS_APPNAME);
   _tcscat(sCaption,L" (");
@@ -304,7 +304,7 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName)
     MessageBox(0,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
-  if (!LogonAdmin(IDS_NOSURUNNER))
+  if (bVerifyAdmin && (!LogonAdmin(IDS_NOSURUNNER)))
     return FALSE;
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
@@ -544,7 +544,7 @@ void USERLIST::AddAllUsers()
       return;
     }
     for(LOCALGROUP_INFO_0* p=(LOCALGROUP_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
-      AddGroupUsers(p->lgrpi0_name,TRUE);
+      AddGroupUsers(p->lgrpi0_name,FALSE);
     NetApiBufferFree(pBuff);
   }
 }
