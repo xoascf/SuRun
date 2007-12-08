@@ -198,15 +198,81 @@ static SETUPDATA *g_SD=NULL;
 //  Select a User Dialog
 // 
 //////////////////////////////////////////////////////////////////////////////
+static int CALLBACK UsrListSortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+  TCHAR s1[MAX_PATH];
+  TCHAR s2[MAX_PATH];
+  ListView_GetItemText((HWND)lParamSort,lParam1,0,s1,MAX_PATH);
+  ListView_GetItemText((HWND)lParamSort,lParam2,0,s2,MAX_PATH);
+  return _tcscmp(s1,s2);
+}
+
+static void SetSelectedNameText(HWND hwnd)
+{
+  HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
+  int n=ListView_GetSelectionMark(hUL);
+  if(n>=0)
+  {
+    TCHAR u[MAX_PATH]={0};
+    ListView_GetItemText(hUL,n,0,u,MAX_PATH);
+    if (u[0])
+      SetDlgItemText(hwnd,IDC_USERNAME,u);
+  }
+}
+
 
 INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
   {
+  case WM_INITDIALOG:
+    {
+      USERLIST ul;
+      ul.SetGroupUsers(L"*");
+      HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
+      SendMessage(hUL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
+      LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
+      ListView_InsertColumn(hUL,0,&col);
+      for (int i=0;i<ul.GetCount();i++) 
+      {
+        LPTSTR u=ul.GetUserName(i);
+        if (!IsInSuRunners(u))
+        {
+          LVITEM item={LVIF_TEXT,i,0,0,0,u,0,0,0,0};
+          ListView_InsertItem(hUL,&item);
+        }
+      }
+      ListView_SortItemsEx(hUL,UsrListSortProc,hUL);
+      ListView_SetColumnWidth(hUL,0,LVSCW_AUTOSIZE_USEHEADER);
+      ListView_SetItemState(hUL,0,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
+      SetSelectedNameText(hwnd);
+      SetFocus(GetDlgItem(hwnd,IDC_USERNAME));
+      SendMessage(GetDlgItem(hwnd,IDC_USERNAME),EM_SETSEL,0,-1);
+    }
+    return FALSE;
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_NOTIFY:
+    {
+      switch (wParam)
+      {
+      //Program List Notofications
+      case IDC_USERLIST:
+        if (lParam) switch(((LPNMHDR)lParam)->code)
+        {
+        //Mouse Click
+        case NM_CLICK:
+        case NM_DBLCLK:
+        //Selection changed
+        case LVN_ITEMCHANGED:
+          SetSelectedNameText(hwnd);
+          return TRUE;
+        }//switch (switch(((LPNMHDR)lParam)->code)
+      }//switch (wParam)
+      break;
+    }//WM_NOTIFY
   case WM_COMMAND:
     if (wParam==MAKELPARAM(IDCANCEL,BN_CLICKED))
     {
@@ -215,6 +281,7 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }
     if (wParam==MAKELPARAM(IDOK,BN_CLICKED))
     {
+      GetDlgItemText(hwnd,IDC_USERNAME,g_SD->NewUser,countof(g_SD->NewUser));
       EndDialog(hwnd,1);
       return TRUE;
     }
@@ -301,8 +368,8 @@ static int CALLBACK ListSortProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 {
   TCHAR s1[4096];
   TCHAR s2[4096];
-  ListView_GetItemText((HWND)lParamSort,lParam1,3,s1,4095);
-  ListView_GetItemText((HWND)lParamSort,lParam2,3,s2,4095);
+  ListView_GetItemText((HWND)lParamSort,lParam1,3,s1,4096);
+  ListView_GetItemText((HWND)lParamSort,lParam2,3,s2,4096);
   return _tcscmp(s1,s2);
 }
 
@@ -312,7 +379,7 @@ static void UpdateWhiteListFlags(HWND hWL)
   TCHAR cmd[4096];
   for (int i=0;i<ListView_GetItemCount(hWL);i++)
   {
-    ListView_GetItemText(hWL,i,3,cmd,4095);
+    ListView_GetItemText(hWL,i,3,cmd,4096);
     int Flags=GetRegInt(HKLM,wlkey,cmd,0);
     LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)],0,0};
     ListView_SetItem(hWL,&item);
@@ -380,6 +447,7 @@ static void UpdateUser(HWND hwnd)
     SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,(LPARAM)g_SD->UserIcon);
   }
+  InvalidateRect(hWL,0,TRUE);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -387,7 +455,7 @@ static void UpdateUser(HWND hwnd)
 // Populate User Combobox and the Program list for the selected User
 // 
 //////////////////////////////////////////////////////////////////////////////
-static void UpdateUserList(HWND hwnd)
+static void UpdateUserList(HWND hwnd,LPTSTR UserName=g_RunData.UserName)
 {
   SendDlgItemMessage(hwnd,IDC_USER,CB_RESETCONTENT,0,0);
   SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,-1,0);
@@ -396,7 +464,7 @@ static void UpdateUserList(HWND hwnd)
   {
     LPTSTR u=g_SD->Users.GetUserName(i);
     SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,(LPARAM)u);
-    if (_tcsicmp(u,g_RunData.UserName)==0)
+    if (_tcsicmp(u,UserName)==0)
       g_SD->CurUser=i;
   }
   SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,g_SD->CurUser,0);
@@ -571,10 +639,11 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           zero(g_SD->NewUser);
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
-          if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser))
+          if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE))
           {
             g_SD->Users.SetGroupUsers(SURUNNERSGROUP);
-            UpdateUserList(hwnd);
+            UpdateUserList(hwnd,g_SD->NewUser);
+            zero(g_SD->NewUser);
           }
         }
         return TRUE;
@@ -623,7 +692,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           if (CurSel>=0)
           {
             TCHAR cmd[4096];
-            ListView_GetItemText(hWL,CurSel,3,cmd,4095);
+            ListView_GetItemText(hWL,CurSel,3,cmd,4096);
             if(RemoveFromWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd))
             {
               ListView_DeleteItem(hWL,CurSel);
@@ -673,7 +742,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             {
               TCHAR cmd[4096];
               HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
-              ListView_GetItemText(hWL,p->iItem,3,cmd,4095);
+              ListView_GetItemText(hWL,p->iItem,3,cmd,4096);
               if(ToggleWhiteListFlag(g_SD->Users.GetUserName(g_SD->CurUser),cmd,Flag))
                 UpdateWhiteListFlags(hWL);
               else
