@@ -101,44 +101,54 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
   //try to find user in local group
+  LPLOCALGROUP_MEMBERS_INFO_2 Members = NULL;
   NET_API_STATUS status;
 	do
 	{
-    LPLOCALGROUP_MEMBERS_INFO_2 Members = NULL;
     DWORD num = 0;
     DWORD total = 0;
     DWORD_PTR resume = 0;
-    DWORD i;
 		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
-		if (((status==NERR_Success)||(status==ERROR_MORE_DATA)))
-		{
-			if (Members)
-				for(i = 0; (i<total); i++)
+		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Members)
+    {
+      for(DWORD i = 0; (i<total); i++) 
+        if ((Members[i].lgrmi2_sidusage==SidTypeUser)
+          &&(wcsicmp(Members[i].lgrmi2_domainandname, DomainAndName)==0))
         {
-          switch (Members[i].lgrmi2_sidusage)
-          {
-          case SidTypeUser:
-            if(wcscmp(Members[i].lgrmi2_domainandname, DomainAndName)==0)
-            {
-              NetApiBufferFree(Members);
-              DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
-              return TRUE;
-            }
-            break;
-          case SidTypeComputer:
-          case SidTypeDomain:
-          case SidTypeGroup:
-          case SidTypeWellKnownGroup:
-            //Groups can be member of groups
-            if (IsInGroup(Members[i].lgrmi2_domainandname,DomainAndName))
-              return TRUE;
-            break;
-          }
+          NetApiBufferFree(Members);
+          DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
+          return TRUE;
         }
-		}
-    NetApiBufferFree(Members);
-    Members=0;
+      NetApiBufferFree(Members);
+      Members=0;
+    }
+    
 	}while (status==ERROR_MORE_DATA);
+  //find network groups in local group:
+	do
+	{
+    DWORD num = 0;
+    DWORD total = 0;
+    DWORD_PTR resume = 0;
+		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
+		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA))) && Members)
+    {
+      for(DWORD i = 0; (i<total); i++)
+        switch (Members[i].lgrmi2_sidusage)
+        {
+        case SidTypeComputer:
+        case SidTypeDomain:
+        case SidTypeGroup:
+        case SidTypeWellKnownGroup:
+          //Groups can be member of groups
+          if (IsInGroup(Members[i].lgrmi2_domainandname,DomainAndName))
+            return TRUE;
+        }
+      NetApiBufferFree(Members);
+      Members=0;
+    }
+	}while (status==ERROR_MORE_DATA);
+
   //try to find user in network group
   {
     TCHAR dn[2*UNLEN+2]={0};
@@ -171,7 +181,7 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
             if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
             {
               CResStr s(L"%s\\%s",dn,p->grui0_name);
-              if(wcscmp(s, DomainAndName)==0)
+              if(wcsicmp(s, DomainAndName)==0)
               {
                 NetApiBufferFree(b);
                 NetApiBufferFree(pBuff);
@@ -190,16 +200,6 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
     }
   }
   DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
-	return FALSE;
-}
-/**/
-
-/**
-BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
-{
-	if (AlterGroupMember(Group,DomainAndName,TRUE)==ERROR_MEMBER_IN_ALIAS)
-		return TRUE;
-	AlterGroupMember(Group,DomainAndName,FALSE);
 	return FALSE;
 }
 /**/
@@ -251,29 +251,31 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/,HWND hwnd/*=
   _tcscat(sCaption,L" (");
   _tcscat(sCaption,UserName);
   _tcscat(sCaption,L")");
-  if (IsBuiltInAdmin(UserName))
-  {
-    MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN),sCaption,MB_ICONSTOP);
-    return FALSE;
-  }
+  //Time saver... IsBuiltInAdmin is time consuming in a domain!
+//  if (IsBuiltInAdmin(UserName))
+//  {
+//    MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN),sCaption,MB_ICONSTOP);
+//    return FALSE;
+//  }
   //Is User member of SuRunners?
   if (IsInSuRunners(UserName))
   {
-    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
-    {
-      DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
-      if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
-      {
-        MessageBox(hwnd,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
-        return FALSE;
-      }
-      dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-      if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
-      {
-        MessageBox(hwnd,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
-        return FALSE;
-      }
-    }
+    //Time saver... IsInGroup is time consuming in a domain!
+//    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+//    {
+//      dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+//      if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+//      {
+//        MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+//        return FALSE;
+//      }
+//      DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
+//      if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
+//      {
+//        MessageBox(hwnd,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+//        return FALSE;
+//      }
+//    }
     return TRUE;
   }
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
@@ -281,16 +283,16 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/,HWND hwnd/*=
     if(MessageBox(hwnd,CBigResStr(IDS_ASKSURUNNER),sCaption,
       MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
       return FALSE;
-    DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
+    DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+    if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+    {
+      MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      return FALSE;
+    }
+    dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
     if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
       MessageBox(hwnd,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
-      return FALSE;
-    }
-    dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-    if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
-    {
-      MessageBox(hwnd,CBigResStr(IDS_NOREMADMINS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
     dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
