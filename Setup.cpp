@@ -173,7 +173,7 @@ typedef struct _SETUPDATA
     CurUser=-1;
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
-    ImgList=ImageList_Create(16,16,ILC_COLOR32,6,1);
+    ImgList=ImageList_Create(16,16,ILC_COLOR8,6,1);
     for (int i=0;i<6;i++)
     {
       HICON icon=(HICON)LoadImage(GetModuleHandle(0),
@@ -235,12 +235,8 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       ListView_InsertColumn(hUL,0,&col);
       for (int i=0;i<ul.GetCount();i++) 
       {
-        LPTSTR u=ul.GetUserName(i);
-        if ((!IsInSuRunners(u)) && (!IsBuiltInAdmin(u)))
-        {
-          LVITEM item={LVIF_TEXT,i,0,0,0,u,0,0,0,0};
-          ListView_InsertItem(hUL,&item);
-        }
+        LVITEM item={LVIF_TEXT,i,0,0,0,ul.GetUserName(i),0,0,0,0};
+        ListView_InsertItem(hUL,&item);
       }
       ListView_SortItemsEx(hUL,UsrListSortProc,hUL);
       ListView_SetColumnWidth(hUL,0,LVSCW_AUTOSIZE_USEHEADER);
@@ -646,7 +642,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           zero(g_SD->NewUser);
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
-          if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE))
+          if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE,hwnd))
           {
             g_SD->Users.SetGroupUsers(SURUNNERSGROUP);
             UpdateUserList(hwnd,g_SD->NewUser);
