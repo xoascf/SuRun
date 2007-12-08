@@ -84,7 +84,7 @@ private:
   int nUsers;
   USERDATA* User;
   void Add(LPWSTR UserName);
-  void AddGroupUsers(LPWSTR GroupName,bool bNoAdmin=FALSE);
+  void AddGroupUsers(LPWSTR GroupName);
   void AddGroupUsers(DWORD WellKnownGroup);
   void AddAllUsers();
 };
