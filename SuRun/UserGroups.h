@@ -55,7 +55,7 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName);
 BOOL IsBuiltInAdmin(LPCWSTR DomainAndName);
 
 //  BeOrBecomeSuRunner: check, if User is SuRunner if not, try to join him
-BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin=TRUE);
+BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin=TRUE,HWND hwnd=0);
 
 // User list
 //
