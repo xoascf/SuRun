@@ -162,12 +162,14 @@ typedef struct _SETUPDATA
   int DlgExitCode;
   HIMAGELIST ImgList;
   int ImgIconIdx[6];
+  TCHAR NewUser[2*UNLEN+2];
   _SETUPDATA()
   {
     Users.SetGroupUsers(SURUNNERSGROUP);
     DlgExitCode=IDCANCEL;
     HelpWnd=0;
     zero(hTabCtrl);
+    zero(NewUser);
     CurUser=-1;
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
@@ -189,6 +191,36 @@ typedef struct _SETUPDATA
 
 //There can be only one Setup per Application. It's data is stored in g_SD
 static SETUPDATA *g_SD=NULL;
+
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Select a User Dialog
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
+    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_COMMAND:
+    if (wParam==MAKELPARAM(IDCANCEL,BN_CLICKED))
+    {
+      EndDialog(hwnd,0);
+      return TRUE;
+    }
+    if (wParam==MAKELPARAM(IDOK,BN_CLICKED))
+    {
+      EndDialog(hwnd,1);
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -533,8 +565,39 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             }
           }
         }
-        break;
-      //Add Button
+        return TRUE;
+      //Add User Button
+      case MAKELPARAM(IDC_ADDUSER,BN_CLICKED):
+        {
+          zero(g_SD->NewUser);
+          DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
+          if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser))
+          {
+            g_SD->Users.SetGroupUsers(SURUNNERSGROUP);
+            UpdateUserList(hwnd);
+          }
+        }
+        return TRUE;
+      //Delete User Button
+      case MAKELPARAM(IDC_DELUSER,BN_CLICKED):
+        {
+          LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
+          switch (MessageBox(hwnd,CBigResStr(IDS_DELUSER,u),
+            CResStr(IDS_APPNAME),MB_ICONASTERISK|MB_YESNOCANCEL|MB_DEFBUTTON3))
+          {
+          case IDYES:
+            AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,u,1);
+            //Fall through
+          case IDNO:
+            AlterGroupMember(SURUNNERSGROUP,u,0);
+            DelUsrSettings(u);
+            g_SD->Users.SetGroupUsers(SURUNNERSGROUP);
+            UpdateUserList(hwnd);
+            break;
+          }
+        }
+        return TRUE;
+      //Add App Button
       case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
         {
           TCHAR cmd[MAX_PATH]={0};
@@ -551,8 +614,8 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               MessageBeep(MB_ICONERROR);
           }
         }
-        break;
-      //Delete Button
+        return TRUE;
+      //Delete App Button
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
           HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
@@ -574,8 +637,8 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             ListView_GetSelectionMark(hWL)!=-1);
           EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),
             ListView_GetSelectionMark(hWL)!=-1);
-          return TRUE;
         }
+        return TRUE;
       }//switch (wParam)
       break;
     }//WM_COMMAND
@@ -734,8 +797,8 @@ BOOL RunSetup()
 {
   SETUPDATA sd;
   g_SD=&sd;
-  BOOL bRet=DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
-                           0,MainSetupDlgProc,(LPARAM)&sd)>=0;  
+  BOOL bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
+                           0,MainSetupDlgProc)>=0;  
   g_SD=0;
   return bRet;
 }
@@ -749,8 +812,6 @@ BOOL TestSetup()
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!RunSetup())
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-
-  ExitProcess(0);
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
   if (!RunSetup())
