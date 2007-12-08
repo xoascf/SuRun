@@ -35,6 +35,7 @@
 #define IDS_DOMAINGROUPS                31
 #define IDS_ADDFILETOLIST               31
 #define IDS_DOMAINGROUPS2               32
+#define IDS_DELUSER                     32
 #define IDS_CANCEL                      33
 #define IDS_NOADD2USERS                 34
 #define IDS_NOREMADMINS                 35
@@ -64,6 +65,7 @@
 #define IDD_SETUP4                      114
 #define IDD_DIALOG2                     120
 #define IDD_ICONHELP                    120
+#define IDD_SELUSER                     121
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
@@ -98,6 +100,7 @@
 #define IDC_ALLOWTIME                   1028
 #define IDC_ICONHELP                    1028
 #define IDC_OWNERGROUP                  1029
+#define IDC_DELUSER                     1029
 #define IDC_SETENERGY                   1030
 #define IDC_WINUPD4ALL                  1031
 #define IDC_EXTOPT                      1032
@@ -108,20 +111,23 @@
 #define IDC_ADDAPP                      1034
 #define IDC_EDITAPP                     1035
 #define IDC_CTRLASADMIN                 1036
+#define IDC_ADDUSER                     1036
 #define IDC_CMDASADMIN                  1037
 #define IDC_EXPASADMIN                  1038
 #define IDC_RESTARTADMIN                1039
 #define IDC_STARTADMIN                  1040
 #define IDC_RUNSETUP                    1041
 #define IDC_RESTRICTED                  1042
+#define IDC_EDIT1                       1045
+#define IDC_USERLIST                    1046
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        121
+#define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1045
+#define _APS_NEXT_CONTROL_VALUE         1047
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
