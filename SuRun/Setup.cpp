@@ -236,7 +236,7 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       for (int i=0;i<ul.GetCount();i++) 
       {
         LPTSTR u=ul.GetUserName(i);
-        if (!IsInSuRunners(u))
+        if ((!IsInSuRunners(u)) && (!IsBuiltInAdmin(u)))
         {
           LVITEM item={LVIF_TEXT,i,0,0,0,u,0,0,0,0};
           ListView_InsertItem(hUL,&item);
