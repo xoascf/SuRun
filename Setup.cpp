@@ -403,7 +403,7 @@ static void UpdateUser(HWND hwnd)
   int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
   HBITMAP bm=0;
   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
-  if (g_SD->CurUser==n)
+  if ((n>=0) && (g_SD->CurUser==n))
     return;
   //Save Settings:
   SaveUserFlags();
@@ -412,6 +412,8 @@ static void UpdateUser(HWND hwnd)
   if (n!=CB_ERR)
   {
     bm=g_SD->Users.GetUserBitmap(n);
+    EnableWindow(GetDlgItem(hwnd,IDC_USER),1);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),1);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
     CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
@@ -426,13 +428,18 @@ static void UpdateUser(HWND hwnd)
     }
     ListView_SortItemsEx(hWL,ListSortProc,hWL);
     UpdateWhiteListFlags(hWL);
+
+    EnableWindow(GetDlgItem(hwnd,IDC_ADDAPP),1);
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hWL)!=-1);
     EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hWL)!=-1);
   }else
   {
+    EnableWindow(GetDlgItem(hwnd,IDC_USER),0);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
     EnableWindow(hWL,false);
+    EnableWindow(GetDlgItem(hwnd,IDC_ADDAPP),false);
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),false);
     EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),false);
   }
@@ -881,6 +888,8 @@ BOOL TestSetup()
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!RunSetup())
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  
+  ExitProcess(0);
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
   if (!RunSetup())
