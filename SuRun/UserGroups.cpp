@@ -122,7 +122,6 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
       NetApiBufferFree(Members);
       Members=0;
     }
-    
 	}while (status==ERROR_MORE_DATA);
   //find network groups in local group:
 	do
@@ -148,7 +147,6 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
       Members=0;
     }
 	}while (status==ERROR_MORE_DATA);
-
   //try to find user in network group
   {
     TCHAR dn[2*UNLEN+2]={0};
@@ -247,51 +245,31 @@ BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
 //////////////////////////////////////////////////////////////////////////////
 BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/,HWND hwnd/*=0*/)
 {
+  //Is User member of SuRunners?
+  if (IsInSuRunners(UserName))
+    return TRUE;
   CResStr sCaption(IDS_APPNAME);
   _tcscat(sCaption,L" (");
   _tcscat(sCaption,UserName);
   _tcscat(sCaption,L")");
-  //Time saver... IsBuiltInAdmin is time consuming in a domain!
-//  if (IsBuiltInAdmin(UserName))
-//  {
-//    MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN),sCaption,MB_ICONSTOP);
-//    return FALSE;
-//  }
-  //Is User member of SuRunners?
-  if (IsInSuRunners(UserName))
-  {
-    //Time saver... IsInGroup is time consuming in a domain!
-//    if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
-//    {
-//      dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-//      if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
-//      {
-//        MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
-//        return FALSE;
-//      }
-//      DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
-//      if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
-//      {
-//        MessageBox(hwnd,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
-//        return FALSE;
-//      }
-//    }
-    return TRUE;
-  }
+  //Is User member of Administrators?
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
   {
+    //Whoops...need to become a User!
     if(MessageBox(hwnd,CBigResStr(IDS_ASKSURUNNER),sCaption,
       MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
       return FALSE;
     DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
-    if (dwRet && (dwRet!=ERROR_MEMBER_NOT_IN_ALIAS))
+    if (dwRet)
     {
+      //Built in (or Domain-)Admin... Bail out!
       MessageBox(hwnd,CBigResStr(IDS_BUILTINADMIN,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
     dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
     if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
       MessageBox(hwnd,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
@@ -432,7 +410,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName)
     _tcscpy(dn,GroupName);
     PathRemoveFileSpec(dn);
     LPTSTR dc=0;
-    if (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success) 
+    if (dn[0]/*only domain groups!*/ && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)) 
     {
       TCHAR gn[2*UNLEN+2]={0};
       _tcscpy(gn,GroupName);
@@ -497,7 +475,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName)
           USER_INFO_2* b=0;
           LPTSTR dc=0;
           //
-          if(NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)
+          if(dn[0] && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success))
             NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
           else
             NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
