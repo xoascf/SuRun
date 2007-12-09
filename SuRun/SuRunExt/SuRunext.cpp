@@ -310,14 +310,26 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 {
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
-  DBGTrace3("CShellExt::Initialize(%x, %x, %x)",pIDFolder,pDataObj,hRegKey);
   if (pDataObj==0)
   {
     SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
     TCHAR s[MAX_PATH]={0};
     SHGetFolderPath(0,CSIDL_DESKTOP,0,SHGFP_TYPE_CURRENT,s);
     m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
-  }
+  }else
+  {
+    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    STGMEDIUM m;
+    if ((SUCCEEDED(pDataObj->GetData(&fe,&m)))
+      &&(DragQueryFile((HDROP)m.hGlobal,(UINT)-1,NULL,0)==1)) 
+    {
+      TCHAR path[MAX_PATH];
+      DragQueryFile((HDROP)m.hGlobal, 0, path, countof(path));
+      if (PathIsDirectory(path))
+        _tcscpy(m_ClickFolderName,path);
+      ReleaseStgMedium(&m);
+    }
+  } 
   return NOERROR;
 }
 
