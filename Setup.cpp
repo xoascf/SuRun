@@ -565,7 +565,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       //Program list icons:
       HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
       SendMessage(hWL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,
-        LVS_EX_INFOTIP|LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
+        LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
       ListView_SetImageList(hWL,g_SD->ImgList,LVSIL_SMALL);
       for (int i=0;i<4;i++)
       {
@@ -577,8 +577,14 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORDLG:
+    return (BOOL)PtrToUlong(GetStockObject(NULL_BRUSH));
   case WM_CTLCOLORSTATIC:
     return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_PAINT:
+    // The List Control is (to for some to me unknow reason) NOT displayed if
+    // a user app switches to the user desktop and CStayOnDesktop switches back.
+    RedrawWindow(GetDlgItem(hwnd,IDC_WHITELIST),0,0,RDW_ERASE|RDW_INVALIDATE|RDW_FRAME);
+    break;
   case WM_TIMER:
     {
       if (wParam==1)
@@ -881,10 +887,27 @@ BOOL RunSetup()
 }
 
 #ifdef _DEBUGSETUP
+
+#include "WinStaDesk.h"
 BOOL TestSetup()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
+
+  //Every "secure" Desktop has its own UUID as name:
+  UUID uid;
+  UuidCreate(&uid);
+  LPTSTR DeskName=0;
+  UuidToString(&uid,&DeskName);
+  //Create the new desktop
+  CRunOnNewDeskTop crond(L"WinSta0",DeskName,GetBlurDesk);
+  CStayOnDeskTop csod(DeskName);
+  RpcStringFree(&DeskName);
+  if (!crond.IsValid())    
+  {
+    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    return FALSE;
+  }
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!RunSetup())
