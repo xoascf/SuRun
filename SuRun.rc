@@ -90,7 +90,7 @@ BEGIN
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
                     30,216,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
-                    IDC_STATIC,6,46,378,187
+                    IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
@@ -476,7 +476,7 @@ BEGIN
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
                     30,216,10
     GROUPBOX        "Programmliste für den Benutzer (Änderungen werden sofort wirksam, auch wenn 'Abbrechen' gedrückt wird).",
-                    IDC_STATIC,6,46,378,187
+                    IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
@@ -736,7 +736,7 @@ BEGIN
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
                     30,216,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
-                    IDC_STATIC,6,46,378,187
+                    IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
@@ -898,8 +898,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2,94
- PRODUCTVERSION 1,0,2,94
+ FILEVERSION 1,0,2,95
+ PRODUCTVERSION 1,0,2,95
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -917,14 +917,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 2, 94\0"
+            VALUE "FileVersion", "1, 0, 2, 95\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 2, 94\0"
+            VALUE "ProductVersion", "1, 0, 2, 95\0"
             VALUE "SpecialBuild", "\0"
         END
     END
