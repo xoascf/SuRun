@@ -325,7 +325,7 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 //////////////////////////////////////////////////////////////////////////////
 static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
 {
-  #define ExpAdvReg L"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",1);
   OPENFILENAME  ofn={0};
