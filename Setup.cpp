@@ -333,9 +333,7 @@ static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
   ofn.lpstrFile         = FileName;
   ofn.nMaxFile          = MAX_PATH;
   ofn.lpstrTitle        = CResStr(IDS_ADDFILETOLIST);
-  ofn.Flags             = OFN_PATHMUSTEXIST | OFN_LONGNAMES | OFN_ENABLESIZING 
-                        | OFN_DONTADDTORECENT | OFN_FORCESHOWHIDDEN 
-                        | OFN_NOVALIDATE | OFN_EXPLORER | OFN_NOTESTFILECREATE;
+  ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   return GetOpenFileName(&ofn);
 }
 
