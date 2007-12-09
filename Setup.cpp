@@ -327,7 +327,7 @@ static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
 {
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
-  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",1);
+  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
   ofn.hwndOwner         = hwnd;
