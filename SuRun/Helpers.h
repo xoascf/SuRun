@@ -19,6 +19,7 @@
 
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT
+#define HKCU HKEY_CURRENT_USER
 #define HKLM HKEY_LOCAL_MACHINE
 
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes);
