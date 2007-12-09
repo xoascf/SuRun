@@ -162,6 +162,7 @@ __declspec(dllexport) void InstallShellExt()
   //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Directory\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   //ShellExecuteHook
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
@@ -179,6 +180,7 @@ __declspec(dllexport) void RemoveShellExt()
   //Desktop-Background-Hook
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\shellex\\ContextMenuHandlers\\SuRun");
+  DelRegKey(HKEY_CLASSES_ROOT,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
   //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
   //ShellExecuteHook
   RegDelVal(HKEY_CLASSES_ROOT,
