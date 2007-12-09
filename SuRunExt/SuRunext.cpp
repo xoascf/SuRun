@@ -161,7 +161,6 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
   //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  SetRegStr(HKCR,L"Directory\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   //ShellExecuteHook
@@ -179,7 +178,6 @@ __declspec(dllexport) void RemoveShellExt()
   DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
   //Desktop-Background-Hook
   DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
-  DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\shellex\\ContextMenuHandlers\\SuRun");
   DelRegKey(HKEY_CLASSES_ROOT,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
   //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
   //ShellExecuteHook
@@ -312,6 +310,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 {
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
+  DBGTrace3("CShellExt::Initialize(%x, %x, %x)",pIDFolder,pDataObj,hRegKey);
   if (pDataObj==0)
   {
     SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
