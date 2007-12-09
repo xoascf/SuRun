@@ -325,6 +325,9 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 //////////////////////////////////////////////////////////////////////////////
 static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
 {
+  #define ExpAdvReg L"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
+  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",1);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
   ofn.hwndOwner         = hwnd;
@@ -334,7 +337,10 @@ static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
   ofn.nMaxFile          = MAX_PATH;
   ofn.lpstrTitle        = CResStr(IDS_ADDFILETOLIST);
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
-  return GetOpenFileName(&ofn);
+  BOOL bRet=GetOpenFileName(&ofn);
+  if (HideExt!=-1)
+    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
+  return bRet;
 }
 
 //////////////////////////////////////////////////////////////////////////////
