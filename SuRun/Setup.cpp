@@ -511,8 +511,9 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_SETENERGY,CanSetEnergy);
       return TRUE;
     }//WM_INITDIALOG
-  case WM_CTLCOLORDLG:
   case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
   case WM_COMMAND:
     {
@@ -576,9 +577,9 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       UpdateUserList(hwnd);
       return TRUE;
     }//WM_INITDIALOG
-  case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(NULL_BRUSH));
   case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
   case WM_PAINT:
     // The List Control is (to for some to me unknow reason) NOT displayed if
