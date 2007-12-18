@@ -239,9 +239,9 @@ BEGIN
     CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,24,233,128
-    LTEXT           "or specify a domain user manually in the form '<domain>\\<user>':",
-                    IDC_STATIC,7,157,233,18
+                    WS_BORDER | WS_TABSTOP,7,24,233,141
+    LTEXT           "or specify a domain user manually in the form 'domain\\user':",
+                    IDC_STATIC,7,169,233,10
     EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
@@ -539,8 +539,8 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
                     WS_BORDER | WS_TABSTOP,7,24,233,128
-    LTEXT           "bzw. geben Sie manuell einen Benutzernamen in der Form '<Domäne>\\<Benutzer>' an:",
-                    IDC_STATIC,7,157,233,18
+    LTEXT           "oder geben Sie manuell einen Benutzernamen in der Form 'Domäne\\Benutzer' an:",
+                    IDC_STATIC,7,160,233,18
     EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
@@ -891,9 +891,9 @@ BEGIN
     CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,24,233,128
-    LTEXT           "or specify a domain user manually in the form '<domain>\\<user>':",
-                    IDC_STATIC,7,157,233,18
+                    WS_BORDER | WS_TABSTOP,7,24,233,141
+    LTEXT           "or specify a domain user manually in the form 'domain\\user':",
+                    IDC_STATIC,7,169,233,10
     EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
