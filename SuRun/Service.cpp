@@ -407,7 +407,7 @@ BOOL PrepareSuRun()
   if (crond.IsValid())
   {
     //secure desktop created...
-    if (!BeOrBecomeSuRunner(g_RunData.UserName))
+    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
       return FALSE;
     DWORD f=GetRegInt(HKLM,WHTLSTKEY(g_RunData.UserName),g_RunData.cmdLine,0);
     DWORD l=0;
@@ -485,8 +485,7 @@ BOOL Setup(LPCTSTR WinStaName)
     else
       return RunSetup();
   }
-  if (IsInSuRunners(g_RunData.UserName) 
-    || BeOrBecomeSuRunner(g_RunData.UserName))
+  if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
     return RunSetup();
   return false;
 }
