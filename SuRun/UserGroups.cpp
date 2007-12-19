@@ -343,7 +343,7 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
   return 0;
 }
 
-void USERLIST::SetUsualUsers()
+void USERLIST::SetUsualUsers(BOOL bScanDomain)
 {
   for (int i=0;i<nUsers;i++)
     DeleteObject(User[i].UserBitmap);
@@ -351,10 +351,10 @@ void USERLIST::SetUsualUsers()
   User=0;
   nUsers=0;
   for (int g=0;g<countof(UserGroups);g++)
-    AddGroupUsers(UserGroups[g]);
+    AddGroupUsers(UserGroups[g],bScanDomain);
 }
 
-void USERLIST::SetGroupUsers(LPWSTR GroupName)
+void USERLIST::SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
   for (int i=0;i<nUsers;i++)
     DeleteObject(User[i].UserBitmap);
@@ -362,17 +362,17 @@ void USERLIST::SetGroupUsers(LPWSTR GroupName)
   User=0;
   nUsers=0;
   if (_tcscmp(GroupName,_T("*"))==0)
-    AddAllUsers();
+    AddAllUsers(bScanDomain);
   else
-    AddGroupUsers(GroupName);
+    AddGroupUsers(GroupName,bScanDomain);
 }
 
-void USERLIST::SetGroupUsers(DWORD WellKnownGroup)
+void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
 {
   DWORD GNLen=GNLEN;
   WCHAR GroupName[GNLEN+1];
   if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
-    SetGroupUsers(GroupName);
+    SetGroupUsers(GroupName,bScanDomain);
 }
 
 void USERLIST::Add(LPWSTR UserName)
@@ -401,10 +401,11 @@ void USERLIST::Add(LPWSTR UserName)
   return;
 }
 
-void USERLIST::AddGroupUsers(LPWSTR GroupName)
+void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
   DBGTrace1("AddGroupUsers for Group %s",GroupName);
   //First try to add network group members
+  if(bScanDomain)
   {
     TCHAR dn[2*UNLEN+2]={0};
     _tcscpy(dn,GroupName);
@@ -494,7 +495,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName)
       case SidTypeGroup:
       case SidTypeWellKnownGroup:
         //Groups can be members of Groups...
-        AddGroupUsers(p->lgrmi2_domainandname);
+        AddGroupUsers(p->lgrmi2_domainandname,bScanDomain);
         break;
       }
     }
@@ -502,15 +503,15 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName)
   }
 }
 
-void USERLIST::AddGroupUsers(DWORD WellKnownGroup)
+void USERLIST::AddGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
 {
   DWORD GNLen=GNLEN;
   WCHAR GroupName[GNLEN+1];
   if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
-    AddGroupUsers(GroupName);
+    AddGroupUsers(GroupName,bScanDomain);
 }
 
-void USERLIST::AddAllUsers()
+void USERLIST::AddAllUsers(BOOL bScanDomain)
 {
   DWORD_PTR i=0;
   DWORD res=ERROR_MORE_DATA;
@@ -526,7 +527,7 @@ void USERLIST::AddAllUsers()
       return;
     }
     for(LOCALGROUP_INFO_0* p=(LOCALGROUP_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
-      AddGroupUsers(p->lgrpi0_name);
+      AddGroupUsers(p->lgrpi0_name,bScanDomain);
     NetApiBufferFree(pBuff);
   }
 }
