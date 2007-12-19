@@ -234,14 +234,16 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add user to SuRunners group"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Please select a local user that should be added to the 'SuRunners' group:",
-                    IDC_STATIC,7,4,233,18
+    LTEXT           "Please select a user that should be added to the 'SuRunners' group:",
+                    IDC_STATIC,7,4,233,8
     CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,24,233,141
+                    WS_BORDER | WS_TABSTOP,7,15,233,141
+    CONTROL         "show domain users",IDC_ALLUSERS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,157,233,10
     LTEXT           "or specify a domain user manually in the form 'domain\\user':",
-                    IDC_STATIC,7,169,233,10
+                    IDC_STATIC,7,171,233,8
     EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
@@ -533,14 +535,16 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Benutzer zur SuRunners Gruppe hinzufügen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Bitte wählen Sie einen lokalen Benutzer, der in die Gruppe 'SuRunners' aufgenommen werden soll:",
-                    IDC_STATIC,7,4,233,18
+    LTEXT           "Wählen Sie einen Benutzer, der SuRunner werden soll:",
+                    IDC_STATIC,7,4,233,8
     CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,24,233,128
-    LTEXT           "oder geben Sie manuell einen Benutzernamen in der Form 'Domäne\\Benutzer' an:",
-                    IDC_STATIC,7,160,233,18
+                    WS_BORDER | WS_TABSTOP,7,15,233,141
+    CONTROL         "Zeige auch Domänenbenutzer",IDC_ALLUSERS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,157,233,10
+    LTEXT           "oder geben Sie einen Benutzer in der Form 'Domäne\\Benutzer' an:",
+                    IDC_STATIC,7,171,233,8
     EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
@@ -886,14 +890,16 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add user to SuRunners group"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Please select a local user that should be added to the 'SuRunners' group:",
-                    IDC_STATIC,7,4,233,18
+    LTEXT           "Please select a user that should be added to the 'SuRunners' group:",
+                    IDC_STATIC,7,4,233,8
     CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,24,233,141
+                    WS_BORDER | WS_TABSTOP,7,15,233,141
+    CONTROL         "show domain users",IDC_ALLUSERS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,157,233,10
     LTEXT           "or specify a domain user manually in the form 'domain\\user':",
-                    IDC_STATIC,7,169,233,10
+                    IDC_STATIC,7,171,233,8
     EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
