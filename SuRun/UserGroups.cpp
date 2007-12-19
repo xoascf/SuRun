@@ -101,102 +101,122 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
   //try to find user in local group
-  LPLOCALGROUP_MEMBERS_INFO_2 Members = NULL;
   NET_API_STATUS status;
-	do
 	{
+    LPLOCALGROUP_USERS_INFO_0 Users = 0;
     DWORD num = 0;
     DWORD total = 0;
     DWORD_PTR resume = 0;
-		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
-		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Members)
+    status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
+      (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
+		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
     {
       for(DWORD i = 0; (i<total); i++) 
-        if ((Members[i].lgrmi2_sidusage==SidTypeUser)
-          &&(wcsicmp(Members[i].lgrmi2_domainandname, DomainAndName)==0))
+        if(wcsicmp(Users[i].lgrui0_name, Group)==0)
         {
-          NetApiBufferFree(Members);
+          NetApiBufferFree(Users);
           DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
           return TRUE;
         }
-      NetApiBufferFree(Members);
-      Members=0;
+      NetApiBufferFree(Users);
+      Users=0;
     }
-	}while (status==ERROR_MORE_DATA);
-  //find network groups in local group:
-	do
-	{
-    DWORD num = 0;
-    DWORD total = 0;
-    DWORD_PTR resume = 0;
-		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
-		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA))) && Members)
-    {
-      for(DWORD i = 0; (i<total); i++)
-        switch (Members[i].lgrmi2_sidusage)
-        {
-        case SidTypeComputer:
-        case SidTypeDomain:
-        case SidTypeGroup:
-        case SidTypeWellKnownGroup:
-          //Groups can be member of groups
-          if (IsInGroup(Members[i].lgrmi2_domainandname,DomainAndName))
-            return TRUE;
-        }
-      NetApiBufferFree(Members);
-      Members=0;
-    }
-	}while (status==ERROR_MORE_DATA);
-  //try to find user in network group
-  {
-    TCHAR dn[2*UNLEN+2]={0};
-    _tcscpy(dn,Group);
-    PathRemoveFileSpec(dn);
-    LPTSTR dc=0;
-    if (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success) 
-    {
-      TCHAR gn[2*UNLEN+2]={0};
-      _tcscpy(gn,Group);
-      PathStripPath(gn);
-      DWORD_PTR i=0;
-      for(DWORD res=ERROR_MORE_DATA;res==ERROR_MORE_DATA;)
-      { 
-        LPBYTE pBuff=0;
-        DWORD dwRec=0;
-        DWORD dwTot=0;
-        res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
-        if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
-        {
-          DBGTrace3("NetGroupGetUsers(%s,%s) failed: %s",dc,gn,GetErrorNameStatic(res));
-          break;
-        }
-        for(GROUP_USERS_INFO_0* p=(GROUP_USERS_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
-        {
-          USER_INFO_2* b=0;
-          NetUserGetInfo(dc,p->grui0_name,2,(LPBYTE*)&b);
-          if (b)
-          {
-            if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
-            {
-              CResStr s(L"%s\\%s",dn,p->grui0_name);
-              if(wcsicmp(s, DomainAndName)==0)
-              {
-                NetApiBufferFree(b);
-                NetApiBufferFree(pBuff);
-                NetApiBufferFree(dc);
-                DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
-                return TRUE;
-              }
-            }
-            NetApiBufferFree(b);
-          }else
-            DBGTrace1("NetUserGetInfo failed: %s",GetErrorNameStatic(res));
-        }
-        NetApiBufferFree(pBuff);
-      }
-      NetApiBufferFree(dc);
-    }
-  }
+	}
+//  LPLOCALGROUP_MEMBERS_INFO_2 Members = NULL;
+//	do
+//	{
+//    DWORD num = 0;
+//    DWORD total = 0;
+//    DWORD_PTR resume = 0;
+//		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
+//		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Members)
+//    {
+//      for(DWORD i = 0; (i<total); i++) 
+//        if ((Members[i].lgrmi2_sidusage==SidTypeUser)
+//          &&(wcsicmp(Members[i].lgrmi2_domainandname, DomainAndName)==0))
+//        {
+//          NetApiBufferFree(Members);
+//          DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
+//          return TRUE;
+//        }
+//      NetApiBufferFree(Members);
+//      Members=0;
+//    }
+//	}while (status==ERROR_MORE_DATA);
+//  //find network groups in local group:
+//	do
+//	{
+//    DWORD num = 0;
+//    DWORD total = 0;
+//    DWORD_PTR resume = 0;
+//		status = NetLocalGroupGetMembers(NULL,Group,2,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
+//		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA))) && Members)
+//    {
+//      for(DWORD i = 0; (i<total); i++)
+//        switch (Members[i].lgrmi2_sidusage)
+//        {
+//        case SidTypeComputer:
+//        case SidTypeDomain:
+//        case SidTypeGroup:
+//        case SidTypeWellKnownGroup:
+//          //Groups can be member of groups
+//          if (IsInGroup(Members[i].lgrmi2_domainandname,DomainAndName))
+//            return TRUE;
+//        }
+//      NetApiBufferFree(Members);
+//      Members=0;
+//    }
+//	}while (status==ERROR_MORE_DATA);
+//  //try to find user in network group
+//  {
+//    TCHAR dn[2*UNLEN+2]={0};
+//    _tcscpy(dn,Group);
+//    PathRemoveFileSpec(dn);
+//    LPTSTR dc=0;
+//    if (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success) 
+//    {
+//      TCHAR gn[2*UNLEN+2]={0};
+//      _tcscpy(gn,Group);
+//      PathStripPath(gn);
+//      DWORD_PTR i=0;
+//      for(DWORD res=ERROR_MORE_DATA;res==ERROR_MORE_DATA;)
+//      { 
+//        LPBYTE pBuff=0;
+//        DWORD dwRec=0;
+//        DWORD dwTot=0;
+//        res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+//        if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
+//        {
+//          DBGTrace3("NetGroupGetUsers(%s,%s) failed: %s",dc,gn,GetErrorNameStatic(res));
+//          break;
+//        }
+//        for(GROUP_USERS_INFO_0* p=(GROUP_USERS_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
+//        {
+//          USER_INFO_2* b=0;
+//          NetUserGetInfo(dc,p->grui0_name,2,(LPBYTE*)&b);
+//          if (b)
+//          {
+//            if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
+//            {
+//              CResStr s(L"%s\\%s",dn,p->grui0_name);
+//              if(wcsicmp(s, DomainAndName)==0)
+//              {
+//                NetApiBufferFree(b);
+//                NetApiBufferFree(pBuff);
+//                NetApiBufferFree(dc);
+//                DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
+//                return TRUE;
+//              }
+//            }
+//            NetApiBufferFree(b);
+//          }else
+//            DBGTrace1("NetUserGetInfo failed: %s",GetErrorNameStatic(res));
+//        }
+//        NetApiBufferFree(pBuff);
+//      }
+//      NetApiBufferFree(dc);
+//    }
+//  }
   DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
 	return FALSE;
 }
@@ -411,7 +431,8 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     _tcscpy(dn,GroupName);
     PathRemoveFileSpec(dn);
     LPTSTR dc=0;
-    if (dn[0]/*only domain groups!*/ && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)) 
+    if (dn[0]/*only domain groups!*/  todo:cmp ComputerName
+      && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)) 
     {
       TCHAR gn[2*UNLEN+2]={0};
       _tcscpy(gn,GroupName);
@@ -476,10 +497,9 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
           USER_INFO_2* b=0;
           LPTSTR dc=0;
           //
-          if(dn[0] && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success))
-            NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
-          else
-            NetUserGetInfo(dn,un,2,(LPBYTE*)&b);
+          if(dn[0] todo:cmp ComputerName)
+            NetGetAnyDCName(0,dn,(BYTE**)&dc);
+          NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
           if (b)
           {
             if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
