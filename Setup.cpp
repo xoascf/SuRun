@@ -165,7 +165,7 @@ typedef struct _SETUPDATA
   TCHAR NewUser[2*UNLEN+2];
   _SETUPDATA()
   {
-    Users.SetGroupUsers(SURUNNERSGROUP);
+    Users.SetGroupUsers(SURUNNERSGROUP,FALSE);
     DlgExitCode=IDCANCEL;
     HelpWnd=0;
     zero(hTabCtrl);
@@ -224,10 +224,7 @@ static void AddUsers(HWND hwnd,BOOL bDomainUsers)
 {
   HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
   USERLIST ul;
-  if (bDomainUsers)
-    ul.SetGroupUsers(L"*");
-  else
-    ul.SetUsualUsers();
+  ul.SetGroupUsers(L"*",bDomainUsers);
   ListView_DeleteAllItems(hUL);
   for (int i=0;i<ul.GetCount();i++) 
   {
@@ -671,7 +668,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
           if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE,hwnd))
           {
-            g_SD->Users.SetGroupUsers(SURUNNERSGROUP);
+            g_SD->Users.SetGroupUsers(SURUNNERSGROUP,TRUE);
             UpdateUserList(hwnd,g_SD->NewUser);
             zero(g_SD->NewUser);
           }
@@ -690,7 +687,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           case IDNO:
             AlterGroupMember(SURUNNERSGROUP,u,0);
             DelUsrSettings(u);
-            g_SD->Users.SetGroupUsers(SURUNNERSGROUP);
+            g_SD->Users.SetGroupUsers(SURUNNERSGROUP,TRUE);
             UpdateUserList(hwnd);
             break;
           }
