@@ -287,6 +287,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   zero(g_RunData);
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
+  //ThreadId
+  g_RunData.CliThreadId=GetCurrentThreadId();
   //Session
   ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
   //WindowStation
