@@ -52,7 +52,7 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName);
 BOOL IsInSuRunners(LPCWSTR DomainAndName);
 
 // is User "DomainAndName" the built in administrator? (can't be degraded)
-BOOL IsBuiltInAdmin(LPCWSTR DomainAndName);
+//BOOL IsBuiltInAdmin(LPCWSTR DomainAndName);
 
 //  BeOrBecomeSuRunner: check, if User is SuRunner if not, try to join him
 BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin=TRUE,HWND hwnd=0);
