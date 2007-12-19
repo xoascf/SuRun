@@ -530,4 +530,24 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
       AddGroupUsers(p->lgrpi0_name,bScanDomain);
     NetApiBufferFree(pBuff);
   }
+  if (bScanDomain)
+  {
+    i=0;
+    res=ERROR_MORE_DATA;
+    for(;res==ERROR_MORE_DATA;)
+    { 
+      LPBYTE pBuff=0;
+      DWORD dwRec=0;
+      DWORD dwTot=0;
+      res = NetGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
+      if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
+      {
+        DBGTrace1("NetLocalGroupEnum failed: %s",GetErrorNameStatic(res));
+        return;
+      }
+      for(GROUP_INFO_0* p=(GROUP_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
+        AddGroupUsers(p->grpi0_name,bScanDomain);
+      NetApiBufferFree(pBuff);
+    }
+  }
 }
