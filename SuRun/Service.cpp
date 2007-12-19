@@ -84,6 +84,7 @@ CResStr SvcName(IDS_SERVICE_NAME);
 
 RUNDATA g_RunData={0};
 TCHAR g_RunPwd[PWLEN];
+bool g_CliIsAdmin=FALSE;
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -94,6 +95,7 @@ TCHAR g_RunPwd[PWLEN];
 //////////////////////////////////////////////////////////////////////////////
 DWORD CheckCliProcess(RUNDATA& rd)
 {
+  g_CliIsAdmin=FALSE;
   if (rd.CliProcessId==GetCurrentProcessId())
     return 0;
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,rd.CliProcessId);
@@ -102,6 +104,20 @@ DWORD CheckCliProcess(RUNDATA& rd)
     DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
     return 0;
   }
+  HANDLE hTok=NULL;
+  HANDLE hThread=OpenThread(THREAD_ALL_ACCESS,FALSE,rd.CliThreadId);
+  if (hThread)
+  {
+    OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok);
+    CloseHandle(hThread);
+  }
+  if ((!hTok) &&(!OpenProcessToken(hProcess,TOKEN_DUPLICATE,&hTok)))
+  {
+    DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
+    return 0;
+  }
+  g_CliIsAdmin=IsAdmin(hTok)!=0;
+  CloseHandle(hTok);
   SIZE_T s;
   DWORD d;
   //Check if the calling process is this Executable:
@@ -376,7 +392,8 @@ BOOL PrepareSuRun()
     PwOk=FALSE;
   }else
   //Password is ok:
-  if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
+  //If SuRunner is already Admin, let him run the new process!
+  if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),TRUE;
   //Every "secure" Desktop has its own UUID as name:
   UUID uid;
@@ -459,7 +476,7 @@ BOOL Setup(LPCTSTR WinStaName)
     return FALSE;
   }
   //only Admins and SuRunners may setup SuRun
-  if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName))
+  if (g_CliIsAdmin)
     return RunSetup();
   if (GetNoRunSetup(g_RunData.UserName))
   {
