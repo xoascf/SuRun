@@ -27,6 +27,7 @@
 typedef struct
 {
   DWORD CliProcessId;
+  DWORD CliThreadId;
   DWORD SessionID;
   TCHAR WinSta[MAX_PATH];
   TCHAR Desk[MAX_PATH];
@@ -36,6 +37,8 @@ typedef struct
   DWORD KillPID;
   BOOL  bShlExHook;
 }RUNDATA;
+
+extern bool g_CliIsAdmin;
 
 //This is used to verify that SuRun.exe started by the user is the same as 
 //the Service process
