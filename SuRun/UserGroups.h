@@ -73,9 +73,9 @@ public:
   USERLIST();
   ~USERLIST();
 public:
-  void SetUsualUsers();
-  void SetGroupUsers(LPWSTR GroupName);
-  void SetGroupUsers(DWORD WellKnownGroup);
+  void SetUsualUsers(BOOL bScanDomain);
+  void SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
+  void SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
@@ -84,8 +84,8 @@ private:
   int nUsers;
   USERDATA* User;
   void Add(LPWSTR UserName);
-  void AddGroupUsers(LPWSTR GroupName);
-  void AddGroupUsers(DWORD WellKnownGroup);
-  void AddAllUsers();
+  void AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
+  void AddGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
+  void AddAllUsers(BOOL bScanDomain);
 };
 
