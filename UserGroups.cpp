@@ -228,15 +228,15 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName)
 //
 //  Checks if "DOMAIN\User" is a built in administrator
 /////////////////////////////////////////////////////////////////////////////
-BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
-{
-  if (!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,DomainAndName))
-    return false;
-	if (AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,DomainAndName,0)!=NERR_Success)
-		return TRUE;
-	AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,DomainAndName,1);
-	return FALSE;
-}
+//BOOL IsBuiltInAdmin(LPCWSTR DomainAndName)
+//{
+//  if (!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,DomainAndName))
+//    return false;
+//	if (AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,DomainAndName,0)!=NERR_Success)
+//		return TRUE;
+//	AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,DomainAndName,1);
+//	return FALSE;
+//}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
