@@ -220,6 +220,29 @@ static void SetSelectedNameText(HWND hwnd)
   }
 }
 
+static void AddUsers(HWND hwnd,BOOL bDomainUsers)
+{
+  HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
+  USERLIST ul;
+  if (bDomainUsers)
+    ul.SetGroupUsers(L"*");
+  else
+    ul.SetUsualUsers();
+  ListView_DeleteAllItems(hUL);
+  for (int i=0;i<ul.GetCount();i++) 
+  {
+    LVITEM item={LVIF_TEXT,i,0,0,0,ul.GetUserName(i),0,0,0,0};
+    if (!IsInSuRunners(item.pszText))
+      ListView_InsertItem(hUL,&item);
+  }
+  ListView_SortItemsEx(hUL,UsrListSortProc,hUL);
+  ListView_SetColumnWidth(hUL,0,LVSCW_AUTOSIZE_USEHEADER);
+  ListView_SetItemState(hUL,0,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
+  SetSelectedNameText(hwnd);
+  SetFocus(GetDlgItem(hwnd,IDC_USERNAME));
+  SendMessage(GetDlgItem(hwnd,IDC_USERNAME),EM_SETSEL,0,-1);
+}
+
 
 INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -227,24 +250,11 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-      USERLIST ul;
-      ul.SetGroupUsers(L"*");
       HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
       SendMessage(hUL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
       LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
       ListView_InsertColumn(hUL,0,&col);
-      for (int i=0;i<ul.GetCount();i++) 
-      {
-        LVITEM item={LVIF_TEXT,i,0,0,0,ul.GetUserName(i),0,0,0,0};
-        if (!IsInSuRunners(item.pszText))
-          ListView_InsertItem(hUL,&item);
-      }
-      ListView_SortItemsEx(hUL,UsrListSortProc,hUL);
-      ListView_SetColumnWidth(hUL,0,LVSCW_AUTOSIZE_USEHEADER);
-      ListView_SetItemState(hUL,0,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
-      SetSelectedNameText(hwnd);
-      SetFocus(GetDlgItem(hwnd,IDC_USERNAME));
-      SendMessage(GetDlgItem(hwnd,IDC_USERNAME),EM_SETSEL,0,-1);
+      AddUsers(hwnd,FALSE);
     }
     return FALSE;
   case WM_CTLCOLORSTATIC:
@@ -255,7 +265,7 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       switch (wParam)
       {
-      //Program List Notofications
+      //Program List Notifications
       case IDC_USERLIST:
         if (lParam) switch(((LPNMHDR)lParam)->code)
         {
@@ -271,17 +281,22 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       break;
     }//WM_NOTIFY
   case WM_COMMAND:
-    if (wParam==MAKELPARAM(IDCANCEL,BN_CLICKED))
     {
-      EndDialog(hwnd,0);
-      return TRUE;
-    }
-    if (wParam==MAKELPARAM(IDOK,BN_CLICKED))
-    {
-      GetDlgItemText(hwnd,IDC_USERNAME,g_SD->NewUser,countof(g_SD->NewUser));
-      EndDialog(hwnd,1);
-      return TRUE;
-    }
+      switch (wParam)
+      {
+      case MAKELPARAM(IDC_ALLUSERS,BN_CLICKED):
+        AddUsers(hwnd,IsDlgButtonChecked(hwnd,IDC_ALLUSERS));
+        return TRUE;
+      case MAKELPARAM(IDCANCEL,BN_CLICKED):
+        EndDialog(hwnd,0);
+        return TRUE;
+      case MAKELPARAM(IDOK,BN_CLICKED):
+        GetDlgItemText(hwnd,IDC_USERNAME,g_SD->NewUser,countof(g_SD->NewUser));
+        EndDialog(hwnd,1);
+        return TRUE;
+      }//switch (wParam)
+      break;
+    }//WM_COMMAND
   }
   return FALSE;
 }
