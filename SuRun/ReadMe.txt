@@ -122,6 +122,28 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.96 - 2007-12-23: (Internal Beta)
+---------------------------
+* Setup User Interface improvements
+* Speedups for Domain computers
+* Simplification in the group membership check for SuRunners
+* The "Is Client an Admin?" check is now done with the user token of the client 
+  process and not with the group membership of the client user name
+***Hopefully all speedups and simplifications did not cause security wholes***
+
+SuRun 1.0.2.95 - 2007-12-09: (Internal Beta)
+---------------------------
+* Acronis TrueImage (SwitchDesktop) caused the users files list control not to 
+  be drawn.
+
+SuRun 1.0.2.94 - 2007-12-09: (Internal Beta)
+---------------------------
+* Context menu for Folders in Explorer (cmd/Explorer <here> as admin)
+* When clicking the "Add..." user program button, *.lnk files are resolved to 
+  their targets
+* File Open/Save Dialogs now show all extensions in SuRun Setup.
+
+
 SuRun 1.0.2.93 - 2007-12-07: (Internal Beta)
 ---------------------------
 * New Commands. If the User right-clicks on a folder background, two new Items,
