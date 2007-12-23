@@ -424,6 +424,9 @@ void USERLIST::Add(LPWSTR UserName)
 void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
   DBGTrace1("AddGroupUsers for Group %s",GroupName);
+  TCHAR cn[2*UNLEN+2]={0};
+  DWORD cnl=UNLEN;
+  GetComputerName(cn,&cnl);
   //First try to add network group members
   if(bScanDomain)
   {
@@ -431,7 +434,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     _tcscpy(dn,GroupName);
     PathRemoveFileSpec(dn);
     LPTSTR dc=0;
-    if (dn[0]/*only domain groups!*/  todo:cmp ComputerName
+    if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0)
       && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)) 
     {
       TCHAR gn[2*UNLEN+2]={0};
@@ -496,8 +499,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
           PathRemoveFileSpec(dn);
           USER_INFO_2* b=0;
           LPTSTR dc=0;
-          //
-          if(dn[0] todo:cmp ComputerName)
+          if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0))
             NetGetAnyDCName(0,dn,(BYTE**)&dc);
           NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
           if (b)
