@@ -35,6 +35,7 @@
 #include "../ResStr.h"
 #include "../Helpers.h"
 #include "../Setup.h"
+#include "../IsAdmin.h"
 #include "Resource.h"
 
 #include "../DBGTrace.h"
@@ -310,6 +311,8 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 {
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
+  if (IsAdmin())
+    return NOERROR;
   if (pDataObj==0)
   {
     SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
