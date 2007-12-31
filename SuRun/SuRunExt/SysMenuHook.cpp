@@ -181,11 +181,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
     _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
     _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
-    CResStr rs(g_hInst);
-    rs=IDS_SURUNCMD;//Do not expand %s!
-    _tcscpy(sSuRunCmd,rs);
-    rs=IDS_SURUNEXP;//Do not expand %s!
-    _tcscpy(sSuRunExp,rs);
+    _tcscpy(sSuRunCmd,CResStr(g_hInst,IDS_SURUNCMD));
+    _tcscpy(sSuRunExp,CResStr(g_hInst,IDS_SURUNEXP));
     _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
     _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
   }
