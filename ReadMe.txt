@@ -122,6 +122,13 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.97 - 2007-12-31: (Internal Beta)
+---------------------------
+* fixed command line processing for "SuRun *.msi"
+* changed "'cmd <folder>' as administrator" and "'Explorer <folder>' as 
+  administrator" to "'SuRun cmd' here" and "'SuRun Explorer' here"
+* Administrators will not see any of SuRuns System menu or shell menu entries
+
 SuRun 1.0.2.96 - 2007-12-23: (Internal Beta)
 ---------------------------
 * Setup User Interface improvements
