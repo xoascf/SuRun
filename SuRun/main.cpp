@@ -204,9 +204,15 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   {
     PathQuoteSpaces(app);
     if (args[0] && app[0])
+    {
       wcscat(app,L" ");
-    wcscat(app,args);
-    wcscpy(args,app);
+      wcscat(app,args);
+      wcscpy(args,app);
+    }else
+    {
+      wcscpy(args,L"/i ");
+      wcscat(args,app);
+    }
     GetSystemDirectory(app,4096);
     PathAppend(app,L"msiexec.exe");
   }else 
