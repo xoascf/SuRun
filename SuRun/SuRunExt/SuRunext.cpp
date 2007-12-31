@@ -356,23 +356,16 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
     }else
     if(m_ClickFolderName[0])
     {
-      TCHAR s[MAX_PATH];
       BOOL bCmd=GetCmdAsAdmin;
       BOOL bExp=GetExpAsAdmin;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       //right click target is folder background
       if (bCmd)
-      {
-        _stprintf(s,sSuRunCmd,m_ClickFolderName);
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, s);
-      }
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, sSuRunCmd);
       id++;
       if (bExp)
-      {
-        _stprintf(s,sSuRunExp,m_ClickFolderName);
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, s);
-      }
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, sSuRunExp);
       id++;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
