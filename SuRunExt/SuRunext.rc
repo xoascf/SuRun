@@ -32,8 +32,8 @@ BEGIN
     IDS_ERR                 "B³¹d SuRunExt.dll"
     IDS_TOOLTIP             "Uruchom 'Panel sterowania' z prawami administratora"
     IDS_SURUN               "Panel sterowania jako administrator"
-    IDS_SURUNCMD            "'cmd %s' jako administrator"
-    IDS_SURUNEXP            "'Explorer %s' jako administrator"
+    IDS_SURUNCMD            "'SuRun cmd' here"
+    IDS_SURUNEXP            "'SuRun Explorer' here"
     IDS_MENURESTART         "Uruchom ponownie jako administrator"
 END
 
@@ -66,8 +66,8 @@ BEGIN
     IDS_ERR                 "SuRunExt.dll Fehler"
     IDS_TOOLTIP             "Systemsteuerung als Administrator starten"
     IDS_SURUN               "Systemsteuerung als Administrator"
-    IDS_SURUNCMD            "'cmd %s' als Administrator"
-    IDS_SURUNEXP            "'Explorer %s' als Administrator"
+    IDS_SURUNCMD            "'SuRun cmd' hier"
+    IDS_SURUNEXP            "'SuRun Explorer' hier"
     IDS_MENURESTART         "Neustart als Administrator"
 END
 
@@ -172,8 +172,8 @@ BEGIN
     IDS_ERR                 "SuRunExt.dll error"
     IDS_TOOLTIP             "Launch control panel with administrative rights"
     IDS_SURUN               "Control panel as administrator"
-    IDS_SURUNCMD            "'cmd %s' as administrator"
-    IDS_SURUNEXP            "'Explorer %s' as administrator"
+    IDS_SURUNCMD            "'SuRun cmd' here"
+    IDS_SURUNEXP            "'SuRun Explorer' here"
     IDS_MENURESTART         "Restart as administrator"
 END
 
