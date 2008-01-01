@@ -276,6 +276,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         {
           if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC))
           {
+            //ToDo: check *setup*;*install*;*update*;*.msi;*.msc
+            //ToDo: check for requireAdministrator Manifest
             zero(g_RunPwd);
             g_RunPwd[0]=2;
             GivePassword();
