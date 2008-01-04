@@ -40,6 +40,7 @@
 #include "ResStr.h"
 #include "LogonDlg.h"
 #include "UserGroups.h"
+#include "ReqAdmin.h"
 #include "Helpers.h"
 #include "DBGTrace.h"
 #include "Resource.h"
@@ -274,7 +275,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         //check if the requested App is in the ShellExecHook-Runlist
         if (g_RunData.bShlExHook)
         {
-          if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC))
+          if ((!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC))
+            && (!RequiresAdmin(g_RunData.cmdLine)))
           {
             //ToDo: check *setup*;*install*;*update*;*.msi;*.msc
             //ToDo: check for requireAdministrator Manifest
