@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <shlwapi.h>
+#include "DBGTrace.h"
 #pragma comment(lib,"shlwapi.lib")
 
 
@@ -125,5 +126,6 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       }
     }
   }
+  DBGTrace2("RequiresAdmin(%s)==%d",FileName,bReqAdmin);
   return bReqAdmin;
 }
