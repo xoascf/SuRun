@@ -46,6 +46,7 @@
 #define IDS_SETUP1                      40
 #define IDS_SETUP2                      41
 #define IDS_SETUP3                      42
+#define IDS_ASKAUTO                     42
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
