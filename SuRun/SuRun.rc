@@ -306,6 +306,7 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
     IDS_SETUP1              "Common Settings"
     IDS_SETUP2              "SuRunners group"
+    IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly."
 END
 
 #endif    // Polish resources
@@ -387,7 +388,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Bestätigung erforderlich"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -662,6 +663,7 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun ist für Sie (%s) so konfiguriert, dass Sie damit nur bestimmte Programme starten dürfen.\r\nSie sind nicht berechtigt, '%s' mit SuRun zu starten."
     IDS_SETUP1              "Allgemein"
     IDS_SETUP2              "SuRunners-Gruppe"
+    IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen."
 END
 
 #endif    // German (Germany) resources
@@ -1008,6 +1010,7 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
     IDS_SETUP1              "Common Settings"
     IDS_SETUP2              "SuRunners group"
+    IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly."
 END
 
 #endif    // English (U.S.) resources
