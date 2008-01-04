@@ -66,6 +66,23 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
   memmove(Manifest,LockResource(hg),siz);
   UnlockResource(hg);
   FreeResource(hg);
+#ifdef UNICODE
+  if ((Manifest[0]!=0xFFFE)&&(Manifest[0]!=0xFEFF))
+  {
+    LPTSTR m=(LPTSTR)calloc(siz+1,2);
+    memmove(m,Manifest,2*siz);
+    MultiByteToWideChar(CP_UTF8,0,(char*)m,siz,Manifest,siz);
+    free(m);
+  }
+#else UNICODE
+  if ((Manifest[0]==0xFF)||(Manifest[0]==0xFE))
+  {
+    LPTSTR m=(LPTSTR)calloc(siz+1,2);
+    memmove(m,Manifest,2*siz);
+    WideCharToMultiByte(CP_UTF8,0,(WCHAR*)m,siz/2,Manifest,siz/2,0,0);
+    free(m);
+  }
+#endif UNICODE
   if(Manifest)
   {
     xml_parser xml; //Construct.
