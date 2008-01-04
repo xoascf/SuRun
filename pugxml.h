@@ -25,7 +25,6 @@
 #endif
 
 
-#include <iostream>
 #include <ostream>
 #include <string>
 #if defined(PUGOPT_MEMFIL) | defined(PUGOPT_NONSEG)
@@ -37,6 +36,8 @@
 #	define HIWORD(X) ((unsigned short)((unsigned long)(X)>>16))
 #	define LOWORD(X) ((unsigned short)((unsigned long)(X)&0xFFFF))
 #endif
+
+#define stdstring std::basic_string<TCHAR>
 
 
 //<summary>
@@ -1896,12 +1897,12 @@ public:
 	bool operator==(const xml_attribute& r){ return (_attr == r._attr); } //Compare internal pointer.
 	bool operator!=(const xml_attribute& r){ return (_attr != r._attr); }
 	operator xml_attribute_struct*(){ return _attr; }
-	//<summary>Cast attribute value as std::string. If not found, return empty.</summary>
-	//<returns>The std::string attribute value, or empty.</returns>
+	//<summary>Cast attribute value as stdstring. If not found, return empty.</summary>
+	//<returns>The stdstring attribute value, or empty.</returns>
 	//<remarks>Note: Modifying this will not change the value, e.g. read only.</remarks>
-	operator std::string()
+	operator stdstring()
 	{
-		std::string temp;
+		stdstring temp;
 		if(!empty() && has_value())
 		{
 #ifdef PUGOPT_NONSEG
@@ -1973,10 +1974,10 @@ public:
 				? true : false; //Return true if matches above, else false.
 		}
 	}
-	//<summary>Set attribute to std::string.</summary>
-	//<param name="rhs">Value std::string to set.</param>
+	//<summary>Set attribute to stdstring.</summary>
+	//<param name="rhs">Value stdstring to set.</param>
 	//<returns>Reference to xml_attribute.</returns>
-	xml_attribute& operator=(const std::string& rhs){ value(rhs.c_str()); return *this; }
+	xml_attribute& operator=(const stdstring& rhs){ value(rhs.c_str()); return *this; }
 	//<summary>Set attribute to string.</summary>
 	//<param name="rhs">Value string to set.</param>
 	//<returns>Reference to xml_attribute.</returns>
@@ -2009,10 +2010,10 @@ public:
 		value(rhs?_T("true"):_T("false"));
 		return *this;
 	}
-	//<summary>Right-shift attribute value to std::string.</summary>
-	//<param name="rhs">Reference to std::string to set.</param>
+	//<summary>Right-shift attribute value to stdstring.</summary>
+	//<param name="rhs">Reference to stdstring to set.</param>
 	//<returns>Reference to xml_attribute.</returns>
-	xml_attribute& operator>>(std::string& rhs)
+	xml_attribute& operator>>(stdstring& rhs)
 	{
 #ifdef PUGOPT_NONSEG
 		rhs.clear();
@@ -2382,8 +2383,8 @@ public:
 	bool has_attributes() { return (!empty() && attributes() > 0); } //Node has 1 or more attributes.
 	bool has_siblings() { return (!empty() && siblings() > 0); } //Node has one or more siblings.
 	bool has_name() { return (!empty() && _root->name != 0); } //Node has a name.
-	bool has_name(const std::string& name) { return has_name(name.c_str()); } //Node is named 'name'.
-	bool has_attribute(const std::string& name) { return has_attribute(name.c_str()); } //Node has an attribute named 'name'.
+	bool has_name(const stdstring& name) { return has_name(name.c_str()); } //Node is named 'name'.
+	bool has_attribute(const stdstring& name) { return has_attribute(name.c_str()); } //Node has an attribute named 'name'.
 #ifdef PUGOPT_NONSEG
 	bool has_name(const TCHAR* name) const { return (name && _root && _root->name && _tcsncmp(_root->name,name,_root->name_size)==0); } //Node is named 'name'.
 #else
@@ -2436,7 +2437,7 @@ public:
 	//<summary>Access or create the attribute having 'name'.</summary>
 	//<param name="name">Name of attribute to access/create.</param>
 	//<returns>Reference to xml_attribute wrapper.</returns>
-	xml_attribute attribute(const std::string& name){ return attribute(name.c_str()); }
+	xml_attribute attribute(const stdstring& name){ return attribute(name.c_str()); }
 	//<summary>Access or create the attribute having 'name'.</summary>
 	//<param name="name">Name of attribute to access/create.</param>
 	//<returns>Reference to xml_attribute wrapper.</returns>
@@ -2491,7 +2492,7 @@ public:
 	//<param name="name">Reference to name of attribute to find.</param>
 	//<returns>Pointer to attribute, or NULL if not found.</returns>
 	//<remarks>Implement your own hash table if you have a great many attributes.</remarks>
-	xml_attribute_struct* mapto_attribute_ptr(const std::string& name){ return mapto_attribute_ptr(name.c_str()); }
+	xml_attribute_struct* mapto_attribute_ptr(const stdstring& name){ return mapto_attribute_ptr(name.c_str()); }
 
 	//<summary>Map an attribute name to a pointer to that attribute, if found.</summary>
 	//<param name="name">Pointer to name of attribute to find.</param>
@@ -2539,7 +2540,7 @@ public:
 	//<param name="name">Reference to name of child to find.</param>
 	//<returns>Index of child, or -1 if not found.</returns>
 	//<remarks>Implement your own hash table if you have a great many children.</remarks>
-	xml_node_struct* mapto_child_ptr(const std::string& name){ return mapto_child_ptr(name.c_str()); }
+	xml_node_struct* mapto_child_ptr(const stdstring& name){ return mapto_child_ptr(name.c_str()); }
 
 	//<summary>Map a child name to a pointer to the first instance, if found.</summary>
 	//<param name="name">Pointer to name of child to find.</param>
@@ -2572,7 +2573,7 @@ public:
 	//<param name="name">Reference to name of child to find.</param>
 	//<returns>Index of child, or -1 if not found.</returns>
 	//<remarks>Implement your own hash table if you have a great many children.</remarks>
-	int mapto_child_idx(const std::string& name){ return mapto_child_idx(name.c_str()); }
+	int mapto_child_idx(const stdstring& name){ return mapto_child_idx(name.c_str()); }
 
 	//<summary>Map a child name to the index of the first instance, if found.</summary>
 	//<param name="name">Pointer to name of child to find.</param>
@@ -2607,7 +2608,7 @@ public:
 	//<summary>Find all elements having the given name.</summary>
 	//<param name="name">Reference to name of child to find.</param>
 	//<param name="found">Reference to xml_node_list or pointer_array to receive the matching elements.
-	void all_elements_by_name(const std::string& name,pointer_array& found){ all_elements_by_name(name.c_str(),found); }
+	void all_elements_by_name(const stdstring& name,pointer_array& found){ all_elements_by_name(name.c_str(),found); }
 
 	//<summary>Find all elements having the given name.</summary>
 	//<param name="name">Pointer to name of child to find.</param>
@@ -2650,7 +2651,7 @@ public:
 	//<param name="name">Const reference to name of element to find.</param>
 	//<returns>Valid xml_node if such element named 'name' is found.</returns>
 	//<remarks>xml_node may be invalid if not found; test with 'empty'.</remarks>
-	xml_node first_element_by_name(const std::string& name){ return first_element_by_name(name.c_str()); }
+	xml_node first_element_by_name(const stdstring& name){ return first_element_by_name(name.c_str()); }
 
 	//<summary>
 	//	Recursively-implemented depth-first find the first matching element. 
@@ -2699,7 +2700,7 @@ public:
 	//<param name="value">Reference to PCDATA to find.</param>
 	//<returns>Valid xml_node if such element named 'name' is found with PCDATA 'value'.</returns>
 	//<remarks>xml_node may be invalid if not found; test with 'empty'.</remarks>
-	xml_node first_element_by_value(const std::string& name,const std::string& value){ return first_element_by_value(name.c_str(),value.c_str()); }
+	xml_node first_element_by_value(const stdstring& name,const stdstring& value){ return first_element_by_value(name.c_str(),value.c_str()); }
 
 	//<summary>
 	//	Recursively-implemented depth-first find the first matching element 
@@ -2769,7 +2770,7 @@ public:
 	//<param name="attr_value">Reference to attribute value to find.</param>
 	//<returns>Valid xml_node if such element named 'name' is found.</returns>
 	//<remarks>xml_node may be invalid if not found; test with 'empty'.</remarks>
-	xml_node first_element_by_attribute(const std::string& name,const std::string& attr_name,const std::string& attr_value){ return first_element_by_attribute(name.c_str(),attr_name.c_str(),attr_value.c_str()); }
+	xml_node first_element_by_attribute(const stdstring& name,const stdstring& attr_name,const stdstring& attr_value){ return first_element_by_attribute(name.c_str(),attr_name.c_str(),attr_value.c_str()); }
 
 	//<summary>
 	//	Recursively-implemented depth-first find the first matching element 
@@ -2912,7 +2913,7 @@ public:
 	//<param name="name">Element name of sibling to move to.</param>
 	//<returns>True if sibling was found, and cursor points thereto.</returns>
 	//<remarks>If matching co-node was found, '_root' points thereto.</remarks>
-	bool moveto_first_sibling(const std::string& name){ return moveto_first_sibling(name.c_str()); }
+	bool moveto_first_sibling(const stdstring& name){ return moveto_first_sibling(name.c_str()); }
 
 	//<summary>Move to the current node's first sibling matching given name.</summary>
 	//<param name="name">Element name of sibling to move to.</param>
@@ -2969,7 +2970,7 @@ public:
 	//<param name="name">Element name of child to move to if found.</param>
 	//<returns>True if child was found, and cursor points thereto.</returns>
 	//<remarks>If matching sub-node was found, '_root' points thereto.</remarks>
-	bool moveto_child(const std::string& name){ return moveto_child(name.c_str()); }
+	bool moveto_child(const stdstring& name){ return moveto_child(name.c_str()); }
 
 	//<summary>Move to the current node's child matching given name.</summary>
 	//<param name="name">Element name of child to move to if found.</param>
@@ -3002,7 +3003,7 @@ public:
 	//<summary>Move to the current node's next sibling by position and name.</summary>
 	//<param name="name">Name of sibling to move to if found.</param>
 	//<returns>True if there is a next sibling, and cursor points thereto.</returns>
-	bool moveto_next_sibling(const std::string& name){ return moveto_next_sibling(name.c_str()); }
+	bool moveto_next_sibling(const stdstring& name){ return moveto_next_sibling(name.c_str()); }
 
 	//<summary>Move to the current node's next sibling by position and name.</summary>
 	//<param name="name">Name of sibling to move to if found.</param>
@@ -3076,7 +3077,7 @@ public:
 	//<summary>Compile the absolute node path from root as a text string.</summary>
 	//<param name="delimiter">Delimiter string to insert between element names.</param>
 	//<returns>Path string (e.g. with '/' as delimiter, '/document/.../this'.</returns>
-	std::string path(const TCHAR* delimiter = _T("/"))
+	stdstring path(const TCHAR* delimiter = _T("/"))
 	{
 		TCHAR* path = NULL; //Current path.
 		TCHAR* temp; //Temporary pointer.
@@ -3105,7 +3106,7 @@ public:
 		strcatgrow(&temp,delimiter); //Prepend final delimiter.
 		strcatgrow(&temp,path); //Append current path.
 		free(path); //Free the old path.
-		std::string returns = temp; //Set path as new string.
+		stdstring returns = temp; //Set path as new string.
 		free(temp);
 		return returns; //Return the path;
 	}
@@ -3117,7 +3118,7 @@ public:
 	//</param>
 	//<param name="delimiter">Delimiter string to use in tokenizing path.</param>
 	//<returns>Matching node, or xml_node(NULL) if not found.</returns>
-	xml_node first_element_by_path(const std::string& path,const std::string& delimiter = _T("/")){ return first_element_by_path(path.c_str(),delimiter.c_str()); }
+	xml_node first_element_by_path(const stdstring& path,const stdstring& delimiter = _T("/")){ return first_element_by_path(path.c_str(),delimiter.c_str()); }
 
 	//<summary>Search for a node by path.</summary>
 	//<param name="path">
@@ -3225,7 +3226,7 @@ public:
 	//<summary>Set element name.</summary>
 	//<param name="new_name">New element name.</param>
 	//<returns>Success.</returns>
-	bool name(const std::string& new_name){ return name(new_name.c_str()); }
+	bool name(const stdstring& new_name){ return name(new_name.c_str()); }
 
 	//<summary>Set element name.</summary>
 	//<param name="new_name">New element name.</param>
@@ -3244,7 +3245,7 @@ public:
 	//<summary>Set node data.</summary>
 	//<param name="value">New data (PCDATA, CDATA, or comment) value.</param>
 	//<returns>Success.</returns>
-	bool value(const std::string& new_value){ return value(new_value.c_str()); }
+	bool value(const stdstring& new_value){ return value(new_value.c_str()); }
 
 	//<summary>Set node data.</summary>
 	//<param name="value">New data (PCDATA, CDATA, or comment) value.</param>
@@ -3285,7 +3286,7 @@ public:
 	//<summary>Remove attribute having the given name.</summary>
 	//<param name="name">Name of attribute to delete.</param>
 	//<returns>Success.</returns>
-	bool remove_attribute(const std::string& name){ return remove_attribute(name.c_str()); }
+	bool remove_attribute(const stdstring& name){ return remove_attribute(name.c_str()); }
 
 	//<summary>Remove attribute having the given name.</summary>
 	//<param name="name">Name of attribute to delete.</param>
@@ -3302,7 +3303,7 @@ public:
 	//<param name="value">Value thereof.</param>
 	//<returns>Attribute structure wrapper.</returns>
 	//<remarks>Pointer space may be grown, memory for name/value members allocated.</remarks>
-	xml_attribute append_attribute(const std::string& name,const std::string& value){ return append_attribute(name.c_str(),value.c_str()); }
+	xml_attribute append_attribute(const stdstring& name,const stdstring& value){ return append_attribute(name.c_str(),value.c_str()); }
 
 	//<summary>Append a new attribute to the node list of attributes.</summary>
 	//<param name="name">Name.</param>
