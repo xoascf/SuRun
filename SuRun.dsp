@@ -200,6 +200,10 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\ReqAdmin.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Service.cpp
 # End Source File
 # Begin Source File
@@ -253,6 +257,14 @@ SOURCE=.\LogonDlg.h
 # Begin Source File
 
 SOURCE=.\lsa_laar.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pugxml.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ReqAdmin.h
 # End Source File
 # Begin Source File
 
