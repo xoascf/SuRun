@@ -99,31 +99,43 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
 
 BOOL RequiresAdmin(LPCTSTR FileName)
 {
+  TCHAR FName[4096];
+  _tcscpy(FName,FileName);
+  PathUnquoteSpaces(FName);
   BOOL bReqAdmin=FALSE;
-  HINSTANCE hExe=LoadLibrary(FileName);
+  HINSTANCE hExe=LoadLibrary(FName);
   if (hExe)
   {
+    DBGTrace1("RequiresAdmin(%s) LoadLib ok",FName);
     bReqAdmin=-1;
     EnumResourceNames(hExe,RT_MANIFEST,EnumResProc,(LONG_PTR)&bReqAdmin);
     FreeLibrary(hExe);
     if (bReqAdmin==-1)
+    {
       bReqAdmin=FALSE;
-    else if(!bReqAdmin)
+      DBGTrace1("RequiresAdmin(%s) EnumResourceNames failed",FName);
+    }else if(!bReqAdmin)
     {
       TCHAR s[MAX_PATH];
-      _stprintf(s,_T("%s.%s"),FileName,_T("manifest"));
+      _stprintf(s,_T("%s.%s"),FName,_T("manifest"));
       xml_parser xml;
       if (xml.parse_file(s))
+      {
         bReqAdmin=RequiresAdmin(xml.document());
+        if(bReqAdmin)
+          DBGTrace1("RequiresAdmin(%s) external Manifest OK",FName);
+      }else
+        DBGTrace1("RequiresAdmin(%s) no external Manifest!",FName);
     }
     //Try FileName Pattern matching
     if(!bReqAdmin)
     {
+      DBGTrace1("RequiresAdmin(%s) FileName match???",FName);
       //Split path parts
       TCHAR file[MAX_PATH];
       TCHAR ext[MAX_PATH];
       //Get File, Ext
-      _tcscpy(file,FileName);
+      _tcscpy(file,FName);
       PathRemoveArgs(file);
       _tcsupr(file);
       _tcscpy(ext,PathFindExtension(file));
@@ -131,6 +143,8 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       PathStripPath(file);
       bReqAdmin=(_tcsicmp(ext,_T(".MSI"))==0)
               ||(_tcsicmp(ext,_T(".MSC"))==0);
+      if(bReqAdmin)
+        DBGTrace1("RequiresAdmin(%s) Extension match",FName);
       if(!bReqAdmin)
       {
         if ((_tcsicmp(ext,_T(".EXE"))==0)
@@ -144,7 +158,8 @@ BOOL RequiresAdmin(LPCTSTR FileName)
                   ||(_tcsstr(file,_T("UPDATE"))!=0);
       }
     }
-  }
-  DBGTrace2("RequiresAdmin(%s)==%d",FileName,bReqAdmin);
+  }else
+    DBGTrace1("RequiresAdmin(%s) LoadLibrary failed",FName);
+  DBGTrace2("RequiresAdmin(%s)==%d",FName,bReqAdmin);
   return bReqAdmin;
 }
