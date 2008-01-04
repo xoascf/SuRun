@@ -30,7 +30,6 @@
 #if defined(PUGOPT_MEMFIL) | defined(PUGOPT_NONSEG)
 #	include <assert.h>
 #endif
-#include <strsafe.h>
 
 
 #ifndef HIWORD
@@ -374,7 +373,7 @@ inline static bool strcpyinsitu
 	size_t l = (*dest) ? _tcslen(*dest) : 0; //How long is destination?
 	if(l >= _tcslen(src)) //Destination is large enough, so just copy.
 	{
-		StringCchCopy(*dest,l,src); //Copy.
+		_tcscpy(*dest,src); //Copy.
 		return TRUE; //Success.
 	}
 	else //Destination is too small.
@@ -1989,7 +1988,7 @@ public:
 	xml_attribute& operator=(long rhs)
 	{
 		TCHAR temp[32] = {0};
-		StringCchPrintf(temp,32,_T("%ld"),rhs);
+		_stprintf(temp,_T("%ld"),rhs);
 		value(temp);
 		return *this;
 	}
@@ -1999,7 +1998,7 @@ public:
 	xml_attribute& operator=(double rhs)
 	{
 		TCHAR temp[32] = {0};
-		StringCchPrintf(temp,32,_T("%lf"),rhs);
+		_stprintf(temp,_T("%lf"),rhs);
 		value(temp);
 		return *this;
 	}
@@ -3341,7 +3340,7 @@ public:
 	{
 		if(!name) return false;
 		TCHAR temp[32] = {0};
-		StringCchPrintf(temp,32,_T("%ld"),value);
+		_stprintf(temp,_T("%ld"),value);
 		return append_attribute(name,temp);
 	}
 
@@ -3354,7 +3353,7 @@ public:
 	{
 		if(!name) return false;
 		TCHAR temp[32] = {0};
-		StringCchPrintf(temp,32,_T("%lf"),value);
+		_stprintf(temp,_T("%lf"),value);
 		return append_attribute(name,temp);
 	}
 
