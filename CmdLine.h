@@ -11,7 +11,7 @@
 //    CCmdLine c;
 //    for (int i=0;i<c.argc();i++)
 //      printf(c.argv(i));
-//                                                           (c)2007 Kay Bruns
+//                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 
