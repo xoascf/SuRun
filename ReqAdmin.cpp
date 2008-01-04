@@ -62,7 +62,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
   HRSRC hr=FindResource(hExe,rName,RT_MANIFEST);
   DWORD siz=SizeofResource(hExe,hr);
   HGLOBAL hg=LoadResource(hExe,hr);
-  LPTSTR Manifest=(LPTSTR)calloc(siz+2,1);
+  LPTSTR Manifest=(LPTSTR)calloc(siz+1,2);
   memmove(Manifest,LockResource(hg),siz);
   UnlockResource(hg);
   FreeResource(hg);
@@ -73,6 +73,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
     memmove(m,Manifest,2*siz);
     MultiByteToWideChar(CP_UTF8,0,(char*)m,siz,Manifest,siz);
     free(m);
+    DBGTrace("RequiresAdmin: MultiByteToWideChar!");
   }
 #else UNICODE
   if ((Manifest[0]==0xFF)||(Manifest[0]==0xFE))
@@ -81,6 +82,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
     memmove(m,Manifest,2*siz);
     WideCharToMultiByte(CP_UTF8,0,(WCHAR*)m,siz/2,Manifest,siz/2,0,0);
     free(m);
+    DBGTrace("RequiresAdmin: WideCharToMultiByte!");
   }
 #endif UNICODE
   if(Manifest)
