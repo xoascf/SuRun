@@ -91,7 +91,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
     else if(!bReqAdmin)
     {
       TCHAR s[MAX_PATH];
-      _stprintf(s,"%s.%s",FileName,"manifest");
+      _stprintf(s,_T("%s.%s"),FileName,_T("manifest"));
       xml_parser xml;
       if (xml.parse_file(s))
         bReqAdmin=RequiresAdmin(xml.document());
@@ -119,9 +119,9 @@ BOOL RequiresAdmin(LPCTSTR FileName)
           ||(_tcsicmp(ext,_T(".COM"))==0)
           ||(_tcsicmp(ext,_T(".PIF"))==0)
           ||(_tcsicmp(ext,_T(".BAT"))==0))
-          bReqAdmin=(_tcsstr(file,"INSTALL")!=0)
-                  ||(_tcsstr(file,"SETUP")!=0)
-                  ||(_tcsstr(file,"UPDATE")!=0);
+          bReqAdmin=(_tcsstr(file,_T("INSTALL"))!=0)
+                  ||(_tcsstr(file,_T("SETUP"))!=0)
+                  ||(_tcsstr(file,_T("UPDATE"))!=0);
       }
     }
   }
