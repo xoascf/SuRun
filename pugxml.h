@@ -2383,7 +2383,9 @@ public:
 	bool has_attributes() { return (!empty() && attributes() > 0); } //Node has 1 or more attributes.
 	bool has_siblings() { return (!empty() && siblings() > 0); } //Node has one or more siblings.
 	bool has_name() { return (!empty() && _root->name != 0); } //Node has a name.
+#ifndef _WIN64 //"const stdstring& name" is "const TCHAR* name" in Win64
 	bool has_name(const stdstring& name) { return has_name(name.c_str()); } //Node is named 'name'.
+#endif  _WIN64
 	bool has_attribute(const stdstring& name) { return has_attribute(name.c_str()); } //Node has an attribute named 'name'.
 #ifdef PUGOPT_NONSEG
 	bool has_name(const TCHAR* name) const { return (name && _root && _root->name && _tcsncmp(_root->name,name,_root->name_size)==0); } //Node is named 'name'.
@@ -2473,7 +2475,7 @@ public:
 #ifdef PUGOPT_NONSEG
 						min(valuelen,node->value_size);
 #else
-						min(valuelen,_tcslen(node->value));
+						min(valuelen,(unsigned int)_tcslen(node->value));
 #endif
 					_tcsncpy(value,node->value,n);
 					value[n] = 0;
