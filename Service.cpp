@@ -276,10 +276,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if (g_RunData.bShlExHook)
         {
           if ((!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC))
+            //check for requireAdministrator Manifest and
+            //file names *setup*;*install*;*update*;*.msi;*.msc
             && (!RequiresAdmin(g_RunData.cmdLine)))
           {
-            //ToDo: check *setup*;*install*;*update*;*.msi;*.msc
-            //ToDo: check for requireAdministrator Manifest
             zero(g_RunPwd);
             g_RunPwd[0]=2;
             GivePassword();
@@ -294,7 +294,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_NORESTRICT))
           {
             zero(g_RunPwd);
-            g_RunPwd[0]=3;
+            g_RunPwd[0]=g_RunData.bShlExHook?2:3;
             GivePassword();
             DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
@@ -417,11 +417,11 @@ BOOL PrepareSuRun()
     DWORD l=0;
     if (!PwOk)
     {
-      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,IDS_ASKOK,g_RunData.cmdLine);
+      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
       if (GetSavePW && (l&1))
         SavePassword(g_RunData.UserName,g_RunPwd);
     }else
-      l=AskCurrentUserOk(g_RunData.UserName,f,IDS_ASKOK,g_RunData.cmdLine);
+      l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
     if((l&1)==0)
       return FALSE;
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
@@ -522,7 +522,11 @@ void SuRun(DWORD ProcessID)
   //Start execution
   if (!PrepareSuRun())
   {
-    g_RunPwd[0]=1;
+    if ( g_RunData.bShlExHook
+      &&(!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC)))
+      g_RunPwd[0]=2;//let ShellExecute start the process!
+    else
+      g_RunPwd[0]=1;
     GivePassword();
     return;
   }
@@ -547,6 +551,8 @@ void SuRun(DWORD ProcessID)
     }
     if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
     {
+      zero(g_RunPwd);
+      g_RunPwd[0]=1;
       GivePassword();
       MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
