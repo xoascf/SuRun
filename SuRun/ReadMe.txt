@@ -122,12 +122,20 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.97 - 2007-12-31: (Internal Beta)
+SuRun 1.0.2.97 - 2008-01-04: (Internal Beta)
 ---------------------------
 * fixed command line processing for "SuRun *.msi"
 * changed "'cmd <folder>' as administrator" and "'Explorer <folder>' as 
   administrator" to "'SuRun cmd' here" and "'SuRun Explorer' here"
 * Administrators will not see any of SuRuns System menu or shell menu entries
+* Added parsing for Vista Manifests and Executable file name pattern matching.
+  -All files with extension msi and msc and all files with extension exe, cmd, 
+   lnk, com, pif, bat and a file name that contains install, setup or update 
+   are suspected that they must be run with elevated rights.
+  -All files with a Vista RT_MANIFEST resource containing <*trustInfo>->
+   <*security>-><*requestedPrivileges>-><*requestedExecutionLevel 
+   level="requireAdministrator|highestAvailable"> are suspected that they must 
+   be run with elevated rights.
 
 SuRun 1.0.2.96 - 2007-12-23: (Internal Beta)
 ---------------------------
