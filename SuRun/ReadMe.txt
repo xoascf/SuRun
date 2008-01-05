@@ -122,9 +122,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.97 - 2008-01-14: (Internal Beta)
+SuRun 1.0.2.98 - 2008-01-05: (Internal Beta)
 ---------------------------
 * SuRun is now hidden from the frequently used program list of the Start menu
+* SuRuns file name pattern matching for files with SPACEs did not work.
 
 SuRun 1.0.2.97 - 2008-01-04: (Internal Beta)
 ---------------------------
