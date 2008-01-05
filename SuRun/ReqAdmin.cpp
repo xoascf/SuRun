@@ -101,6 +101,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
 {
   TCHAR FName[4096];
   _tcscpy(FName,FileName);
+  PathRemoveArgs(FName);
   PathUnquoteSpaces(FName);
   BOOL bReqAdmin=FALSE;
   HINSTANCE hExe=LoadLibrary(FName);
@@ -136,15 +137,15 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       TCHAR ext[MAX_PATH];
       //Get File, Ext
       _tcscpy(file,FName);
-      PathRemoveArgs(file);
       _tcsupr(file);
       _tcscpy(ext,PathFindExtension(file));
       PathRemoveExtension(file);
       PathStripPath(file);
+      DBGTrace1("RequiresAdmin(%s) Extension match???",ext);
       bReqAdmin=(_tcsicmp(ext,_T(".MSI"))==0)
               ||(_tcsicmp(ext,_T(".MSC"))==0);
       if(bReqAdmin)
-        DBGTrace1("RequiresAdmin(%s) Extension match",FName);
+        DBGTrace1("RequiresAdmin(%s) Extension match",ext);
       if(!bReqAdmin)
       {
         if ((_tcsicmp(ext,_T(".EXE"))==0)
@@ -153,9 +154,14 @@ BOOL RequiresAdmin(LPCTSTR FileName)
           ||(_tcsicmp(ext,_T(".COM"))==0)
           ||(_tcsicmp(ext,_T(".PIF"))==0)
           ||(_tcsicmp(ext,_T(".BAT"))==0))
+        {
+          DBGTrace1("RequiresAdmin(%s) Executable Extension!",FName);
           bReqAdmin=(_tcsstr(file,_T("INSTALL"))!=0)
-                  ||(_tcsstr(file,_T("SETUP"))!=0)
-                  ||(_tcsstr(file,_T("UPDATE"))!=0);
+            ||(_tcsstr(file,_T("SETUP"))!=0)
+            ||(_tcsstr(file,_T("UPDATE"))!=0);
+          if(bReqAdmin)
+            DBGTrace1("RequiresAdmin(%s) FileName match",file);
+        }
       }
     }
   }else
