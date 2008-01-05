@@ -156,6 +156,10 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 
 __declspec(dllexport) void InstallShellExt()
 {
+  //Disable "Open with..." when right clicking on SuRun.exe
+  SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
+  //Disable putting SuRun in the frequently used apps in the start menu
+  SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
   //COM-Object
   SetRegStr(HKCR,L"CLSID\\" sGUID,L"",L"SuRun Shell Extension");
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"",L"SuRunExt.dll");
@@ -175,18 +179,17 @@ __declspec(dllexport) void InstallShellExt()
 
 __declspec(dllexport) void RemoveShellExt()
 {
+  DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
-  DelRegKey(HKEY_CLASSES_ROOT,L"CLSID\\" sGUID);
+  DelRegKey(HKCR,L"CLSID\\" sGUID);
   //Desktop-Background-Hook
-  DelRegKey(HKEY_CLASSES_ROOT,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
-  DelRegKey(HKEY_CLASSES_ROOT,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
+  DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
+  DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
   //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
   //ShellExecuteHook
-  RegDelVal(HKEY_CLASSES_ROOT,
-    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
+  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
   //self Approval
-  RegDelVal(HKEY_LOCAL_MACHINE,
-    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
+  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
 //////////////////////////////////////////////////////////////////////////////
