@@ -425,7 +425,23 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-  DBGTrace1("SuRun ShellExtHook called with verb %s",pei?pei->lpVerb:0);
+  DBGTrace15(
+        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
+        pei->cbSize,
+        pei->fMask,
+        pei->hwnd,
+        pei->lpVerb,
+        pei->lpFile,
+        pei->lpParameters,
+        pei->lpDirectory,
+        pei->nShow,
+        pei->hInstApp,
+        pei->lpIDList,
+        pei->lpClass,
+        pei->hkeyClass,
+        pei->dwHotKey,
+        pei->hIcon,
+        pei->hProcess);
   //Struct Size Check
   if (!pei)
   {
@@ -442,14 +458,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
     return S_FALSE;
   }
-  //Verb must be "open" or empty
-  if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"open")!=0))
-  {
-    DBGTrace("SuRun ShellExtHook Error: invalid verb!");
-    return S_FALSE;
-  }
   //Check Directory
-  if (pei->lpDirectory && (!SetCurrentDirectory(pei->lpDirectory)))
+  if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
   {
     DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
       pei->lpDirectory,GetLastErrorNameStatic());
@@ -458,11 +468,29 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   //check if this Programm has an Auto-SuRun-Entry in the List
   TCHAR cmd[MAX_PATH];
   TCHAR tmp[MAX_PATH];
+  _tcscpy(tmp,pei->lpFile);
+  //Verb must be "open" or empty
+  if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)
+    &&(_tcsicmp(pei->lpVerb,L"open")!=0)
+    &&(_tcsicmp(pei->lpVerb,L"cplopen")!=0))
+  {
+    if (_tcsicmp(pei->lpVerb,L"AutoRun")!=0)
+    {
+      _tcscat(tmp,L"AutoRun.inf");
+      GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,MAX_PATH,tmp);
+      if (!tmp[0])
+        return S_FALSE;
+    }else
+    {
+      DBGTrace("SuRun ShellExtHook Error: invalid verb!");
+      return S_FALSE;
+    }
+  }
   GetSystemWindowsDirectory(cmd,MAX_PATH);
   PathAppend(cmd, _T("SuRun.exe"));
   PathQuoteSpaces(cmd);
   _tcscat(cmd,L" /TESTAUTOADMIN ");
-  _tcscpy(tmp,pei->lpFile);
+  
   PathQuoteSpaces(tmp);
   _tcscat(cmd,tmp);
   if (pei->lpParameters && _tcslen(pei->lpParameters))
