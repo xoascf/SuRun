@@ -474,7 +474,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     &&(_tcsicmp(pei->lpVerb,L"open")!=0)
     &&(_tcsicmp(pei->lpVerb,L"cplopen")!=0))
   {
-    if (_tcsicmp(pei->lpVerb,L"AutoRun")!=0)
+    if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
     {
       _tcscat(tmp,L"AutoRun.inf");
       GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,MAX_PATH,tmp);
