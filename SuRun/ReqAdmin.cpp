@@ -43,12 +43,6 @@ BOOL RequiresAdmin(xml_node& document)
         xml_node x1 = xn.first_element_by_attribute(name,_T("level"),_T("requireAdministrator"));
         if (!x1.empty())
           bReqAdmin=TRUE;
-        else
-        {
-          x1 = xn.first_element_by_attribute(name,_T("level"),_T("highestAvailable"));
-          if (!x1.empty())
-            bReqAdmin=TRUE;
-        }
       }
     }
   }
