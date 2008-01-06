@@ -152,8 +152,10 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   BOOL fExist=PathFileExists(app);
   //Split path parts
   TCHAR path[4096];
-  TCHAR file[MAX_PATH];
-  TCHAR ext[MAX_PATH];
+  TCHAR file[MAX_PATH+1];
+  TCHAR ext[MAX_PATH+1];
+  TCHAR SysDir[MAX_PATH+1];
+  GetSystemDirectory(SysDir,MAX_PATH);
   Split(app,path,file,ext);
   //Explorer(.exe)
   if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
@@ -173,15 +175,16 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
     zero(args);
   }else
   //Control Panel special folder files:
-  if ((!fExist)
+  if (((!fExist)
     &&((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
     && (args[0]==0))
+    ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"control")) && (!_wcsicmp(ext,L".exe"))))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
     wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
-  }else if ((!_wcsicmp(app,L"ncpa.cpl")) 
-         && (args[0]==0))
+  }else if (((!_wcsicmp(app,L"ncpa.cpl")) && (args[0]==0))
+    ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"ncpa")) && (!_wcsicmp(ext,L".cpl"))))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
