@@ -425,15 +425,36 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
+  DBGTrace1("SuRun ShellExtHook called with verb %s",pei?pei->lpVerb:0);
   //Struct Size Check
-  if ((!pei)||(pei->cbSize<sizeof(SHELLEXECUTEINFO))||(!pei->lpFile))
+  if (!pei)
+  {
+    DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
     return S_FALSE;
+  }
+  if(pei->cbSize<sizeof(SHELLEXECUTEINFO))
+  {
+    DBGTrace2("SuRun ShellExtHook Error: invalid Size (expected=%d;real=%d)",sizeof(SHELLEXECUTEINFO),pei->cbSize);
+    return S_FALSE;
+  }
+  if (!pei->lpFile)
+  {
+    DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
+    return S_FALSE;
+  }
   //Verb must be "open" or empty
   if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)&&(_tcsicmp(pei->lpVerb,L"open")!=0))
+  {
+    DBGTrace("SuRun ShellExtHook Error: invalid verb!");
     return S_FALSE;
+  }
   //Check Directory
   if (pei->lpDirectory && (!SetCurrentDirectory(pei->lpDirectory)))
+  {
+    DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
+      pei->lpDirectory,GetLastErrorNameStatic());
     return S_FALSE;
+  }
   //check if this Programm has an Auto-SuRun-Entry in the List
   TCHAR cmd[MAX_PATH];
   TCHAR tmp[MAX_PATH];
