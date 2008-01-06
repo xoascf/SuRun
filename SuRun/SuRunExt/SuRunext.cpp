@@ -476,8 +476,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   {
     if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
     {
-      _tcscat(tmp,L"AutoRun.inf");
+      PathAppend(tmp,L"AutoRun.inf");
       GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,MAX_PATH,tmp);
+      DBGTrace2("SuRun ShellExtHook AutoRun: GetPrivateProfileString(%s) returned: %s",tmp,cmd);
       if (!cmd[0])
         return S_FALSE;
       _tccpy(tmp,cmd);
