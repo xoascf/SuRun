@@ -761,7 +761,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             int Flag=0;
             switch(p->iSubItem)
             {
-            case 0:Flag=FLAG_DONTASK;     break;
+            case 0:Flag=FLAG_DONTASK;     break; //ToDO: FLAG_AUTOCANCEL
             case 1:Flag=FLAG_SHELLEXEC;   break;
             case 2:Flag=FLAG_NORESTRICT;  break;
             }
