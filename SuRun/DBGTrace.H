@@ -39,6 +39,8 @@ void TRACEx(LPCTSTR s,...);
 #define DBGTrace7(msg,d1,d2,d3,d4,d5,d6,d7)       {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7);}
 #define DBGTrace8(msg,d1,d2,d3,d4,d5,d6,d7,d8)    {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8);}
 #define DBGTrace9(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9) {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8,d9);}
+#define DBGTrace15(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15) \
+  {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15);}
 
 #else DoDBGTrace
 
@@ -52,6 +54,7 @@ void TRACEx(LPCTSTR s,...);
 #define DBGTrace7(msg,d1,d2,d3,d4,d5,d6,d7)       {(void)0;}
 #define DBGTrace8(msg,d1,d2,d3,d4,d5,d6,d7,d8)    {(void)0;}
 #define DBGTrace9(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9) {(void)0;}
+#define DBGTrace15(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15) {(void)0;}
 
 #endif DoDBGTrace 
 
