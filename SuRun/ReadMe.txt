@@ -122,6 +122,11 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.99 - 2008-01-06: (Internal Beta)
+---------------------------
+* Removed parsing for Vista Manifests with <*requestedExecutionLevel 
+   level="highestAvailable">.
+
 SuRun 1.0.2.98 - 2008-01-05: (Internal Beta)
 ---------------------------
 * SuRun is now hidden from the frequently used program list of the Start menu
