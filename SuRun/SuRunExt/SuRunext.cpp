@@ -481,7 +481,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       DBGTrace2("SuRun ShellExtHook AutoRun: GetPrivateProfileString(%s) returned: %s",tmp,cmd);
       if (!cmd[0])
         return S_FALSE;
-      _tccpy(tmp,cmd);
+      _tcscpy(tmp,cmd);
     }else
     {
       DBGTrace("SuRun ShellExtHook Error: invalid verb!");
