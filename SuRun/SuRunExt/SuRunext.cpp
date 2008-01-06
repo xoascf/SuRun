@@ -425,23 +425,23 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-  DBGTrace15(
-        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
-        pei->cbSize,
-        pei->fMask,
-        pei->hwnd,
-        pei->lpVerb,
-        pei->lpFile,
-        pei->lpParameters,
-        pei->lpDirectory,
-        pei->nShow,
-        pei->hInstApp,
-        pei->lpIDList,
-        pei->lpClass,
-        pei->hkeyClass,
-        pei->dwHotKey,
-        pei->hIcon,
-        pei->hProcess);
+//  DBGTrace15(
+//        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
+//        pei->cbSize,
+//        pei->fMask,
+//        pei->hwnd,
+//        pei->lpVerb,
+//        pei->lpFile,
+//        pei->lpParameters,
+//        pei->lpDirectory,
+//        pei->nShow,
+//        pei->hInstApp,
+//        pei->lpIDList,
+//        pei->lpClass,
+//        pei->hkeyClass,
+//        pei->dwHotKey,
+//        pei->hIcon,
+//        pei->hProcess);
   //Struct Size Check
   if (!pei)
   {
@@ -476,9 +476,11 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   {
     if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
     {
+      //AutoRun: get open command
       PathAppend(tmp,L"AutoRun.inf");
+      if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,tmp)!=0)
+        return S_FALSE;
       GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,MAX_PATH,tmp);
-      DBGTrace2("SuRun ShellExtHook AutoRun: GetPrivateProfileString(%s) returned: %s",tmp,cmd);
       if (!cmd[0])
         return S_FALSE;
       _tcscpy(tmp,cmd);
