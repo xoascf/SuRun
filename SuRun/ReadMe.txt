@@ -122,6 +122,17 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.100 - 2008-01-06: (Internal Beta)
+---------------------------
+* Fixed "SuRun %SystemRoot%\System32\control.exe" and
+  "SuRun %SystemRoot%\System32\ncpa.cpl"
+* Added ShellExecuteHook support for verbs "AutoRun" and "cplopen".
+  So SuRun can now automatically start "*.cpl" files and AutoRun.INF entries 
+  on removable media with elevated rights
+* Choosing "Don't ask this question again for this program" and pressing 
+  cancel causes SuRun to auto-cancel all future requests to run this program
+  with elevated rights.
+
 SuRun 1.0.2.99 - 2008-01-06: (Internal Beta)
 ---------------------------
 * Removed parsing for Vista Manifests with <*requestedExecutionLevel 
