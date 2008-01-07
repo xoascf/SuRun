@@ -125,8 +125,8 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.2.101 - 2008-01-07: (Internal Beta)
 ---------------------------
-* Fixed "AutoRun" ShellExecuteHook. In with AutoRun.inf K:\ an [AutoRun] entry
-  of 'open=setup.exe /autorun' caused the wrong command line 
+* Fixed "AutoRun" ShellExecuteHook. In an AutoRun.inf in K:\ win an [AutoRun] 
+  entry of 'open=setup.exe /autorun' caused the wrong command line 
   'SuRun.exe "setup.exe /autorun" /K:\'
 * The english String for <IDS_DELUSER> was missing.
 
