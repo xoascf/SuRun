@@ -123,6 +123,12 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.101 - 2008-01-07: (Internal Beta)
+---------------------------
+* Fixed "AutoRun" ShellExecuteHook. In with AutoRun.inf K:\ an [AutoRun] entry
+  of "open=setup.exe /autorun" caused the command line 
+  "SuRun.exe "setup.exe /autorun" /K:\"
+
 SuRun 1.0.2.100 - 2008-01-07: (Internal Beta)
 ---------------------------
 * Fixed "SuRun %SystemRoot%\System32\control.exe" and
