@@ -1,13 +1,14 @@
 ToDo:
 *"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
  ->auch Berechtigungen von SuRunners aus Registry und Dateisystem löschen
-* Windows Manifeste verarbeiten und automatisch als SuRunner starten!!!
 * Tray-Fenster einblenden, wenn programme automatisch als Admin starten
 * ShellExec-Hook muss überprüfen, ob Client-Prozess schon als Admin läuft.
+* Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
+* Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
 
 ==============================================================================
 SuRun...  Super User Run
-                                                        by Kay Bruns (c) 2007
+                                                      by Kay Bruns (c) 2007,08
 ==============================================================================
 
 ------------------------------------------------------------------------------
