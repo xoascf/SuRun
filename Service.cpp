@@ -272,10 +272,20 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if(CheckCliProcess(rd)==2)
       {
+        DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
+        //check if the requested App is Flagged with AutoCancel
+        if (wlf&FLAG_AUTOCANCEL)
+        {
+          zero(g_RunPwd);
+          g_RunPwd[0]=1;//Access denied!
+          GivePassword();
+          DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+          continue;
+        }
         //check if the requested App is in the ShellExecHook-Runlist
         if (g_RunData.bShlExHook)
         {
-          if ((!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC))
+          if ((!(wlf&FLAG_SHELLEXEC))
             //check for requireAdministrator Manifest and
             //file names *setup*;*install*;*update*;*.msi;*.msc
             && (!RequiresAdmin(g_RunData.cmdLine)))
@@ -291,7 +301,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if  (GetRestrictApps(g_RunData.UserName) 
          && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
         {
-          if (!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_NORESTRICT))
+          if (!(wlf&FLAG_NORESTRICT))
           {
             zero(g_RunPwd);
             g_RunPwd[0]=g_RunData.bShlExHook?2:3;
