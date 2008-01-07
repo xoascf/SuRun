@@ -113,7 +113,7 @@ BEGIN
     PUSHBUTTON      "&Anuluj",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOGEX 0, 0, 260, 142
+IDD_ICONHELP DIALOGEX 0, 0, 260, 160
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Help"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -121,23 +121,26 @@ BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,16,16,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
+    ICON            IDI_LISTICON6,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun will without questioning NEVER start this program with elevated rights",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
+    ICON            IDI_LISTICON2,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
+    LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
-    LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+    LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
-    LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
+    ICON            IDI_LISTICON5,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
+    LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
                     IDC_STATIC,24,98,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,120,262,1
-    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,124,50,14
+    ICON            IDI_LISTICON4,IDC_STATIC,8,116,16,16,SS_REALSIZEIMAGE
+    LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
+                    IDC_STATIC,24,116,226,16
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,138,262,1
+    DEFPUSHBUTTON   "Close",IDCANCEL,105,142,50,14
 END
 
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 135
@@ -504,31 +507,34 @@ BEGIN
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOGEX 0, 0, 260, 142
+IDD_ICONHELP DIALOGEX 0, 0, 260, 160
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SuRun - Listen-Symbole"
+CAPTION "SuRun - Icon Help"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,16,16,SS_REALSIZEIMAGE
-    LTEXT           "SuRun wird nicht fragen, ob das Programm mit erhöhten Rechten gestartet werden darf",
+    LTEXT           "SuRun wird nicht fragen und das Programm immer mit erhöhten Rechten starten",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
-    LTEXT           "SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",
+    ICON            IDI_LISTICON6,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun wird nicht fragen und das Programm NIE mit erhöhten Rechten starten",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
-    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
+    ICON            IDI_LISTICON2,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
-    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
+    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
-    LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
-    LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm untersagt",
+    ICON            IDI_LISTICON5,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
+    LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",
                     IDC_STATIC,24,98,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,120,262,1
-    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,124,50,14
+    ICON            IDI_LISTICON4,IDC_STATIC,8,116,16,16,SS_REALSIZEIMAGE
+    LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm untersagt",
+                    IDC_STATIC,24,116,226,16
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,138,262,1
+    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,142,50,14
 END
 
 IDD_SELUSER DIALOG DISCARDABLE  0, 0, 247, 227
@@ -601,11 +607,12 @@ IDI_INSTALL             ICON    DISCARDABLE     "res\\Software.ico"
 IDI_HELP                ICON    DISCARDABLE     "res\\Notes.ico"
 IDI_SETUP               ICON    DISCARDABLE     "res\\Settings.ico"
 IDI_LISTICON            ICON    DISCARDABLE     "res\\Windows.ico"
-IDI_LISTICON3           ICON    DISCARDABLE     "res\\NoQuestion.ico"
-IDI_LISTICON5           ICON    DISCARDABLE     "res\\NoRestrict.ico"
 IDI_LISTICON1           ICON    DISCARDABLE     "res\\NoWindows.ico"
 IDI_LISTICON2           ICON    DISCARDABLE     "res\\Question.ico"
+IDI_LISTICON3           ICON    DISCARDABLE     "res\\NoQuestion.ico"
+IDI_LISTICON5           ICON    DISCARDABLE     "res\\NoRestrict.ico"
 IDI_LISTICON4           ICON    DISCARDABLE     "res\\Restrict.ico"
+IDI_LISTICON6           ICON    DISCARDABLE     "res\\AutoCancel.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -771,7 +778,7 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOGEX 0, 0, 260, 142
+IDD_ICONHELP DIALOGEX 0, 0, 260, 160
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Help"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -779,23 +786,26 @@ BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,16,16,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
+    ICON            IDI_LISTICON6,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun will without questioning NEVER start this program with elevated rights",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
+    ICON            IDI_LISTICON2,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
+    LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
-    LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+    LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
-    LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
+    ICON            IDI_LISTICON5,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
+    LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
                     IDC_STATIC,24,98,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,120,262,1
-    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,124,50,14
+    ICON            IDI_LISTICON4,IDC_STATIC,8,116,16,16,SS_REALSIZEIMAGE
+    LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
+                    IDC_STATIC,24,116,226,16
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,138,262,1
+    DEFPUSHBUTTON   "Close",IDCANCEL,105,142,50,14
 END
 
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 135
