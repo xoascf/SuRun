@@ -313,6 +313,9 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 UINT g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
 UINT g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
 
+#define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
+#define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
+
 void PrintFileNames(LPDATAOBJECT pDataObj)
 {
   IEnumFORMATETC *pefEtc = 0;
@@ -343,7 +346,20 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
           DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_FILENAMEW:%s",(LPCSTR)stgM.hGlobal); 
         }else if (fEtc.cfFormat==g_CF_ShellIdList)
         {
+          TCHAR s[MAX_PATH]={0};
           DBGTrace("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST"); 
+          LPCITEMIDLIST pIDFolder = HIDA_GetPIDLFolder((LPIDA)stgM.hGlobal);
+          if (pIDFolder)
+          {
+            SHGetPathFromIDList(pIDFolder,s);
+            DBGTrace1("------------------ Folder=%s",s);
+          }
+          for (UINT n=0;n<((LPIDA)stgM.hGlobal)->cidl;n++)
+          {
+            LPCITEMIDLIST pidlItem0=HIDA_GetPIDLItem((LPIDA)stgM.hGlobal,0);
+            SHGetPathFromIDList(pidlItem0,s);
+            DBGTrace2("------------------ Item[%d]=%s",n,s);
+          }
         }else
         {
           TCHAR cfn[MAX_PATH]={0};
