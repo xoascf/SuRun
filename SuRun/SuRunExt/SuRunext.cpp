@@ -535,23 +535,23 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-//  DBGTrace15(
-//        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
-//        pei->cbSize,
-//        pei->fMask,
-//        pei->hwnd,
-//        pei->lpVerb,
-//        pei->lpFile,
-//        pei->lpParameters,
-//        pei->lpDirectory,
-//        pei->nShow,
-//        pei->hInstApp,
-//        pei->lpIDList,
-//        pei->lpClass,
-//        pei->hkeyClass,
-//        pei->dwHotKey,
-//        pei->hIcon,
-//        pei->hProcess);
+  DBGTrace15(
+        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
+        pei->cbSize,
+        pei->fMask,
+        pei->hwnd,
+        pei->lpVerb,
+        pei->lpFile,
+        pei->lpParameters,
+        pei->lpDirectory,
+        pei->nShow,
+        pei->hInstApp,
+        pei->lpIDList,
+        pei->lpClass,
+        pei->hkeyClass,
+        pei->dwHotKey,
+        pei->hIcon,
+        pei->hProcess);
   //Struct Size Check
   if (!pei)
   {
@@ -579,7 +579,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   TCHAR cmd[MAX_PATH];
   TCHAR tmp[MAX_PATH];
   _tcscpy(tmp,pei->lpFile);
+  PathQuoteSpaces(tmp);
   //Verb must be "open" or empty
+  BOOL bNoAutoRun=TRUE;
   if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)
     &&(_tcsicmp(pei->lpVerb,L"open")!=0)
     &&(_tcsicmp(pei->lpVerb,L"cplopen")!=0))
@@ -594,6 +596,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       if (!cmd[0])
         return S_FALSE;
       _tcscpy(tmp,cmd);
+      bNoAutoRun=FALSE;
     }else
     {
       DBGTrace("SuRun ShellExtHook Error: invalid verb!");
@@ -604,10 +607,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   PathAppend(cmd, _T("SuRun.exe"));
   PathQuoteSpaces(cmd);
   _tcscat(cmd,L" /TESTAUTOADMIN ");
-  
-  PathQuoteSpaces(tmp);
   _tcscat(cmd,tmp);
-  if (pei->lpParameters && _tcslen(pei->lpParameters))
+  if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
   {
     _tcscat(cmd,L" ");
     _tcscat(cmd,pei->lpParameters);
