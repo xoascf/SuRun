@@ -326,45 +326,45 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
       switch (stgM.tymed)
       {
       case TYMED_HGLOBAL:
+        if (fEtc.cfFormat==CF_HDROP)
+        {
+          UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
+          if(n>=1) for(UINT x = 0; x < n; x++)
+          {
+            TCHAR f[MAX_PATH]={0};
+            DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
+            DBGTrace1("--------- TYMED_HGLOBAL, CF_HDROP, File=%s",f);
+          }
+        }else
         {
           TCHAR cfn[MAX_PATH]={0};
           GetClipboardFormatName(fEtc.cfFormat,cfn,MAX_PATH);
-          DBGTrace2("CShellExt::Initialize TYMED_HGLOBAL, CF_: %d (%s)",fEtc.cfFormat,cfn);
-          if (fEtc.cfFormat==CF_HDROP)
-          {
-            UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
-            if(n>=1) for(UINT x = 0; x < n; x++)
-            {
-              TCHAR f[MAX_PATH]={0};
-              DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
-              DBGTrace1("-->File: %s",f);
-            }
-          }
+          DBGTrace2("--------- TYMED_HGLOBAL, CF_: %d (%s)",fEtc.cfFormat,cfn);
         }
         break;
       case TYMED_FILE:
-        DBGTrace("CShellExt::Initialize TYMED_FILE");
+        DBGTrace("--------- TYMED_FILE");
         break;
       case TYMED_ISTREAM:
-        DBGTrace("CShellExt::Initialize TYMED_ISTREAM");
+        DBGTrace("--------- TYMED_ISTREAM");
         break;
       case TYMED_ISTORAGE:
-        DBGTrace("CShellExt::Initialize TYMED_ISTORAGE");
+        DBGTrace("--------- TYMED_ISTORAGE");
         break;
       case TYMED_GDI:
-        DBGTrace("CShellExt::Initialize TYMED_GDI");
+        DBGTrace("--------- TYMED_GDI");
         break;
       case TYMED_MFPICT:
-        DBGTrace("CShellExt::Initialize TYMED_MFPICT");
+        DBGTrace("--------- TYMED_MFPICT");
         break;
       case TYMED_ENHMF:
-        DBGTrace("CShellExt::Initialize TYMED_ENHMF");
+        DBGTrace("--------- TYMED_ENHMF");
         break;
       case TYMED_NULL:
-        DBGTrace("CShellExt::Initialize TYMED_NULL");
+        DBGTrace("--------- TYMED_NULL");
         break;
       default:
-        DBGTrace1("CShellExt::Initialize unknown tymed: %d",stgM.tymed);
+        DBGTrace1("--------- unknown tymed: %d",stgM.tymed);
       }
     }
   }
