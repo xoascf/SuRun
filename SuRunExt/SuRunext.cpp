@@ -326,15 +326,19 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
       switch (stgM.tymed)
       {
       case TYMED_HGLOBAL:
-        DBGTrace1("CShellExt::Initialize TYMED_HGLOBAL, CF_: %d",fEtc.cfFormat);
-        if (fEtc.cfFormat==CF_HDROP)
         {
-          UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
-          if(n>=1) for(UINT x = 0; x < n; x++)
+          TCHAR cfn[MAX_PATH]={0};
+          GetClipboardFormatName(fEtc.cfFormat,cfn,MAX_PATH);
+          DBGTrace2("CShellExt::Initialize TYMED_HGLOBAL, CF_: %d (%s)",fEtc.cfFormat,cfn);
+          if (fEtc.cfFormat==CF_HDROP)
           {
-            TCHAR f[MAX_PATH]={0};
-            DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
-            DBGTrace1("-->File: %s",f);
+            UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
+            if(n>=1) for(UINT x = 0; x < n; x++)
+            {
+              TCHAR f[MAX_PATH]={0};
+              DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
+              DBGTrace1("-->File: %s",f);
+            }
           }
         }
         break;
