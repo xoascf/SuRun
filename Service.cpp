@@ -277,7 +277,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if (wlf&FLAG_AUTOCANCEL)
         {
           zero(g_RunPwd);
-          g_RunPwd[0]=1;//Access denied!
+          g_RunPwd[0]=(wlf&FLAG_SHELLEXEC)?2:1;//Access denied!
           GivePassword();
           DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           continue;
@@ -435,11 +435,13 @@ BOOL PrepareSuRun()
     if((l&1)==0)
     {
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
-      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)==0);
+      if((l&2)!=0)
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
       return FALSE;
     }
-    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)==0);
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
+    if((l&2)!=0)
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     return UpdLastRunTime(g_RunData.UserName),TRUE;
   }else //FATAL: secure desktop could not be created!
