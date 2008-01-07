@@ -310,6 +310,64 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 //////////////////////////////////////////////////////////////////////////////
 // IShellExtInit
 //////////////////////////////////////////////////////////////////////////////
+void PrintFileNames(LPDATAOBJECT pDataObj)
+{
+  IEnumFORMATETC *pefEtc = 0;
+  if(SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc)) && SUCCEEDED(pefEtc->Reset()))
+  while(TRUE)
+  {
+    FORMATETC fEtc;
+    ULONG ulFetched = 0L;
+    if(FAILED(pefEtc->Next(1,&fEtc,&ulFetched)) || (ulFetched <= 0))
+      break;
+    STGMEDIUM stgM;
+    if(SUCCEEDED(pDataObj->GetData(&fEtc, &stgM)))
+    {
+      switch (stgM.tymed)
+      {
+      case TYMED_HGLOBAL:
+        DBGTrace1("CShellExt::Initialize TYMED_HGLOBAL, CF_: %d",fEtc.cfFormat);
+        if (fEtc.cfFormat==CF_HDROP)
+        {
+          UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
+          if(n>=1) for(UINT x = 0; x < n; x++)
+          {
+            TCHAR f[MAX_PATH]={0};
+            DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
+            DBGTrace1("-->File: %s",f);
+          }
+        }
+        break;
+      case TYMED_FILE:
+        DBGTrace("CShellExt::Initialize TYMED_FILE");
+        break;
+      case TYMED_ISTREAM:
+        DBGTrace("CShellExt::Initialize TYMED_ISTREAM");
+        break;
+      case TYMED_ISTORAGE:
+        DBGTrace("CShellExt::Initialize TYMED_ISTORAGE");
+        break;
+      case TYMED_GDI:
+        DBGTrace("CShellExt::Initialize TYMED_GDI");
+        break;
+      case TYMED_MFPICT:
+        DBGTrace("CShellExt::Initialize TYMED_MFPICT");
+        break;
+      case TYMED_ENHMF:
+        DBGTrace("CShellExt::Initialize TYMED_ENHMF");
+        break;
+      case TYMED_NULL:
+        DBGTrace("CShellExt::Initialize TYMED_NULL");
+        break;
+      default:
+        DBGTrace1("CShellExt::Initialize unknown tymed: %d",stgM.tymed);
+      }
+    }
+  }
+  if(pefEtc)
+    pefEtc->Release();
+}
+
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef _DEBUG
@@ -332,6 +390,8 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     }
   }
   DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+  if(pDataObj)
+    PrintFileNames(pDataObj);
 #endif _DEBUG
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
