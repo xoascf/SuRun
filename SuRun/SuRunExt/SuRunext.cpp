@@ -310,6 +310,9 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 //////////////////////////////////////////////////////////////////////////////
 // IShellExtInit
 //////////////////////////////////////////////////////////////////////////////
+UINT g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
+UINT g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+
 void PrintFileNames(LPDATAOBJECT pDataObj)
 {
   IEnumFORMATETC *pefEtc = 0;
@@ -335,6 +338,12 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
             DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
             DBGTrace1("--------- TYMED_HGLOBAL, CF_HDROP, File=%s",f);
           }
+        }else if (fEtc.cfFormat==g_CF_FileNameW)
+        {
+          DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_FILENAMEW:%s",(LPCSTR)stgM.hGlobal); 
+        }else if (fEtc.cfFormat==g_CF_ShellIdList)
+        {
+          DBGTrace("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST"); 
         }else
         {
           TCHAR cfn[MAX_PATH]={0};
