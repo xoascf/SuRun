@@ -385,7 +385,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetUserBitmap(hwnd);
         return TRUE;
       case MAKEWPARAM(IDCANCEL,BN_CLICKED):
-        EndDialog(hwnd,0);
+        {
+          INT_PTR ExitCode=(IsDlgButtonChecked(hwnd,IDC_ALWAYSOK)<<1)
+            +(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2);
+          EndDialog(hwnd,ExitCode);
+        }
         return TRUE;
       case MAKEWPARAM(IDOK,BN_CLICKED):
         {
