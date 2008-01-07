@@ -277,7 +277,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if (wlf&FLAG_AUTOCANCEL)
         {
           zero(g_RunPwd);
-          g_RunPwd[0]=(wlf&FLAG_SHELLEXEC)?2:1;//Access denied!
+          g_RunPwd[0]=(g_RunData.bShlExHook)?2:1;//Access denied!
           GivePassword();
           DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           continue;
