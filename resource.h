@@ -73,6 +73,7 @@
 #define IDI_LISTICON3                   203
 #define IDI_LISTICON5                   204
 #define IDI_LISTICON4                   205
+#define IDI_LISTICON6                   207
 #define IDC_USER                        1000
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002
