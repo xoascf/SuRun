@@ -135,9 +135,18 @@ BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
   DWORD d=GetWhiteListFlags(User,CmdLine,0);
   if(d&Flag)
+  {
     d&=~Flag;
+    if (Flag==FLAG_DONTASK)
+      d|=FLAG_AUTOCANCEL;
+  }
   else
-    d|=Flag;
+  {
+    if ((Flag==FLAG_DONTASK)&&(d&FLAG_AUTOCANCEL))
+      d&=~FLAG_AUTOCANCEL;
+    else
+      d|=Flag;
+  }
   return SetRegInt(HKLM,WHTLSTKEY(User),CmdLine,d);
 }
 
@@ -761,7 +770,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             int Flag=0;
             switch(p->iSubItem)
             {
-            case 0:Flag=FLAG_DONTASK;     break; //ToDO: FLAG_AUTOCANCEL
+            case 0:Flag=FLAG_DONTASK;     break;
             case 1:Flag=FLAG_SHELLEXEC;   break;
             case 2:Flag=FLAG_NORESTRICT;  break;
             }
