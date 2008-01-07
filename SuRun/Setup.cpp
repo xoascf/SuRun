@@ -170,7 +170,7 @@ typedef struct _SETUPDATA
   HWND HelpWnd;
   int DlgExitCode;
   HIMAGELIST ImgList;
-  int ImgIconIdx[6];
+  int ImgIconIdx[7];
   TCHAR NewUser[2*UNLEN+2];
   _SETUPDATA()
   {
@@ -182,8 +182,8 @@ typedef struct _SETUPDATA
     CurUser=-1;
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
-    ImgList=ImageList_Create(16,16,ILC_COLOR8,6,1);
-    for (int i=0;i<6;i++)
+    ImgList=ImageList_Create(16,16,ILC_COLOR8,7,1);
+    for (int i=0;i<7;i++)
     {
       HICON icon=(HICON)LoadImage(GetModuleHandle(0),
         MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
