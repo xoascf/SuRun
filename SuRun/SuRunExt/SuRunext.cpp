@@ -316,7 +316,7 @@ UINT g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
 #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
 #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
 
-void PrintFileNames(LPDATAOBJECT pDataObj)
+static void PrintDataObj(LPDATAOBJECT pDataObj)
 {
   IEnumFORMATETC *pefEtc = 0;
   if(SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc)) && SUCCEEDED(pefEtc->Reset()))
@@ -347,7 +347,7 @@ void PrintFileNames(LPDATAOBJECT pDataObj)
         }else if (fEtc.cfFormat==g_CF_ShellIdList)
         {
           TCHAR s[MAX_PATH]={0};
-          DBGTrace("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST"); 
+          DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST, %d Items",((LPIDA)stgM.hGlobal)->cidl); 
           LPCITEMIDLIST pIDFolder = HIDA_GetPIDLFolder((LPIDA)stgM.hGlobal);
           if (pIDFolder)
           {
@@ -420,7 +420,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   }
   DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
   if(pDataObj)
-    PrintFileNames(pDataObj);
+    PrintDataObj(pDataObj);
 #endif _DEBUG
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
