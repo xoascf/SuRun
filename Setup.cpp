@@ -402,7 +402,9 @@ static void UpdateWhiteListFlags(HWND hWL)
   {
     ListView_GetItemText(hWL,i,3,cmd,4096);
     int Flags=GetRegInt(HKLM,wlkey,cmd,0);
-    LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)],0,0};
+    LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,
+      g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)+(Flags&FLAG_AUTOCANCEL?4:0)],
+      0,0};
     ListView_SetItem(hWL,&item);
     item.iSubItem=1;
     item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)];
