@@ -308,6 +308,10 @@ SOURCE=.\res\app.manifest
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\AutoCancel.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\ico10605.ico
 # End Source File
 # Begin Source File
