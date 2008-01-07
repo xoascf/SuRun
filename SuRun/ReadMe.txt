@@ -123,7 +123,7 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.100 - 2008-01-06: (Internal Beta)
+SuRun 1.0.2.100 - 2008-01-07: (Internal Beta)
 ---------------------------
 * Fixed "SuRun %SystemRoot%\System32\control.exe" and
   "SuRun %SystemRoot%\System32\ncpa.cpl"
