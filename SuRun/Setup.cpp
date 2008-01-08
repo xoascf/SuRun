@@ -925,27 +925,29 @@ BOOL TestSetup()
   UuidToString(&uid,&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(L"WinSta0",DeskName,GetBlurDesk);
-  CStayOnDeskTop csod(DeskName);
-  RpcStringFree(&DeskName);
-  if (!crond.IsValid())    
   {
-    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-    return FALSE;
+    CStayOnDeskTop csod(DeskName);
+    RpcStringFree(&DeskName);
+    if (!crond.IsValid())    
+    {
+      MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      return FALSE;
+    }
+    
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
+    if (!RunSetup())
+      DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+    
+    ExitProcess(0);
+    
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+    if (!RunSetup())
+      DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+    
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
+    if (!RunSetup())
+      DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   }
-
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-  if (!RunSetup())
-    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-  
-  ExitProcess(0);
-
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-  if (!RunSetup())
-    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-  
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
-  if (!RunSetup())
-    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   
   ::ExitProcess(0);
   return TRUE;
