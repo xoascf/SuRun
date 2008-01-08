@@ -39,7 +39,7 @@ inline void Blur(HBITMAP hbm,int w,int h)
 {
   g_bmi32.bmiHeader.biHeight=h;
   g_bmi32.bmiHeader.biWidth=w;
-  g_bmi32.bmiHeader.biSizeImage=(w*h)<<2;
+  g_bmi32.bmiHeader.biSizeImage=((((w+3)/4)*4)*((h+3)/4)*4)*4;
   COLORREF* pSrc=(COLORREF*)malloc(g_bmi32.bmiHeader.biSizeImage); 
   if (pSrc==NULL)
     return;
@@ -95,7 +95,10 @@ public:
   void Done()
   {
     if(m_hWnd)
+    {
+      SetWindowLongPtr(m_hWnd,GWLP_USERDATA,0);
       DestroyWindow(m_hWnd);
+    }
     m_hWnd=0;
     if (m_bm)
       DeleteObject(m_bm);
@@ -132,7 +135,7 @@ private:
   {
     CBlurredScreen* sw=(CBlurredScreen*)GetWindowLongPtr(hWnd,GWLP_USERDATA);
     if (sw)
-      return ((CBlurredScreen*)GetWindowLongPtr(hWnd,GWLP_USERDATA))->WindowProc(msg,wParam,lParam);
+      return sw->WindowProc(msg,wParam,lParam);
     return DefWindowProc(hWnd,msg,wParam,lParam);
   }
   LRESULT CALLBACK WindowProc(UINT msg,WPARAM wParam,LPARAM lParam)
