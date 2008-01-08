@@ -127,8 +127,8 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.2.102 - 2008-01-07: (Internal Beta)
 ---------------------------
+* SuRun now runs in Windows Vista :))
 * SuRun now Enables/Disables IShellExecHook in Windows Vista
-* In Windows Vista the secure desktop did not close
 
 SuRun 1.0.2.101 - 2008-01-07: (Internal Beta)
 ---------------------------
