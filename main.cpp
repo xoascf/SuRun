@@ -182,13 +182,23 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
-    wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+    if (LOBYTE(LOWORD(GetVersion()))<6)
+      //2k/XP: Control Panel is beneath "my computer"!
+      wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+    else
+      //Vista: Control Panel is beneath desktop!
+      wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
   }else if (((!_wcsicmp(app,L"ncpa.cpl")) && (args[0]==0))
     ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"ncpa")) && (!_wcsicmp(ext,L".cpl"))))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
-    wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+    if (LOBYTE(LOWORD(GetVersion()))<6)
+      //2k/XP: Control Panel is beneath "my computer"!
+      wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+    else
+      //Vista: Control Panel is beneath desktop!
+      wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
   }else 
   //Control Panel files  
   if (!_wcsicmp(ext, L".cpl")) 
