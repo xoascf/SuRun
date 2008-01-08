@@ -564,6 +564,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
         pei->hIcon,
         pei->hProcess);
   //Struct Size Check
+  if (IsAdmin())
+    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
