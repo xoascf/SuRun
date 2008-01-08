@@ -76,6 +76,8 @@ public:
     free(s);
     if(m_Thread)
       WaitForSingleObject(m_Thread,INFINITE);
+    while (m_Thread)
+      Sleep(55);
   }
   static DWORD WINAPI ThreadProc(void* p)
   {
