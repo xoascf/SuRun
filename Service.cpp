@@ -417,7 +417,7 @@ BOOL PrepareSuRun()
   //Create the new desktop
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,GetBlurDesk);
   {
-    CStayOnDeskTop csod(DeskName);
+    //CStayOnDeskTop csod(DeskName);
     RpcStringFree(&DeskName);
     if (crond.IsValid())
     {
@@ -492,7 +492,7 @@ BOOL Setup(LPCTSTR WinStaName)
   //Create the new desktop
   CRunOnNewDeskTop crond(WinStaName,DeskName,GetBlurDesk);
   {
-    CStayOnDeskTop csod(DeskName);
+    //CStayOnDeskTop csod(DeskName);
     RpcStringFree(&DeskName);
     if (!crond.IsValid())    
     {
