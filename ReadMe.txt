@@ -5,6 +5,7 @@ ToDo:
 * ShellExec-Hook muss überprüfen, ob Client-Prozess schon als Admin läuft.
 * Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
 * Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
+* Konsolen-SuRun
 
 ==============================================================================
 SuRun...  Super User Run
