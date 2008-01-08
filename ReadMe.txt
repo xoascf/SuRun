@@ -4,6 +4,7 @@ ToDo:
 * Tray-Fenster einblenden, wenn programme automatisch als Admin starten
 * Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
 * Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
+* Context-Menü Einträge sollen dynamisch und konfigurierbar werden
 * Konsolen-SuRun
 * Install-Container
 * Vista benutzt kein ShellExecute für AutoRuns, Startmenü und Desktop
