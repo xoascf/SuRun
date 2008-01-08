@@ -125,6 +125,11 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.102 - 2008-01-07: (Internal Beta)
+---------------------------
+* SuRun now Enables/Disables IShellExecHook in Windows Vista
+* In Windows Vista the secure desktop did not close
+
 SuRun 1.0.2.101 - 2008-01-07: (Internal Beta)
 ---------------------------
 * Fixed "AutoRun" ShellExecuteHook. In an AutoRun.inf in K:\ win an [AutoRun] 
