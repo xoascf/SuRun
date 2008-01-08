@@ -957,7 +957,8 @@ bool HandleServiceStuff()
   {
     SuRun(wcstol(cmd.argv(2),0,10));
     ExitProcess(0);
-  }else
+    return true;
+  }
   if (cmd.argc()==2)
   {
     //Service
