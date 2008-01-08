@@ -156,6 +156,12 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 
 __declspec(dllexport) void InstallShellExt()
 {
+  //Vista: Enable IShellExecHook
+  SetOption(L"DelIShellExecHookEnable",
+    (DWORD)(GetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+              L"EnableShellExecuteHooks",-1)==-1),
+    0);
+  SetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",L"EnableShellExecuteHooks",1);
   //Disable "Open with..." when right clicking on SuRun.exe
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
   //Disable putting SuRun in the frequently used apps in the start menu
@@ -179,6 +185,11 @@ __declspec(dllexport) void InstallShellExt()
 
 __declspec(dllexport) void RemoveShellExt()
 {
+  //Vista: Disable ShellExecHook?
+  if (GetOption(L"DelIShellExecHookEnable",0)!=0)
+    RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+              L"EnableShellExecuteHooks");
+  //Clean up:
   DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
   DelRegKey(HKCR,L"CLSID\\" sGUID);
