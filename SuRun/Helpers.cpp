@@ -346,7 +346,8 @@ void SetAdminDenyUserAccess(HANDLE hObject)
   ea[0].grfAccessMode = GRANT_ACCESS;
   ea[0].Trustee.ptstrName  = (LPTSTR)AdminSID;
   // The ACE will deny the current User access to the object.
-  ea[1].grfAccessMode = REVOKE_ACCESS;
+  ea[1].grfAccessPermissions = SYNCHRONIZE;//ToDo: check if this is safe!!!
+  ea[1].grfAccessMode = SET_ACCESS;
   ea[1].Trustee.ptstrName  = (LPTSTR)UserSID;
   // Create a new ACL that merges the new ACE
   // into the existing DACL.
