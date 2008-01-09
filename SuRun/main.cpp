@@ -320,8 +320,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
   //cmdLine
-  BOOL bRunSetup=FALSE;
+  bool bRunSetup=FALSE;
   bool beQuiet=FALSE;
+  bool bReturnPID=FALSE;
   LPTSTR Args=PathGetArgs(GetCommandLine());
   //Parse direct commands:
   while (Args[0]=='/')
@@ -337,6 +338,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!_wcsicmp(c,L"/SETUP"))
     {
       bRunSetup=TRUE;
+      wcscpy(g_RunData.cmdLine,L"/SETUP");
+      break;
+    }else
+    if (!_wcsicmp(c,L"/RETURNPID"))
+    {
+      bReturnPID=TRUE;
       wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
     }else
@@ -359,7 +366,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   {
     if (!beQuiet)
       MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return ERROR_INVALID_PARAMETER;
+    return bReturnPID?0:ERROR_INVALID_PARAMETER;
   }
   //Lets go:
   HANDLE hPipe=INVALID_HANDLE_VALUE;
@@ -373,7 +380,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
-    return -2;
+    return bReturnPID?0:-2;
   zero(g_RunPwd);
   g_RunPwd[0]=0xFF;
   DWORD nWritten=0;
@@ -384,7 +391,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   while ((g_RunPwd[0]==0xFF)&&(n<1000))
     Sleep(60);
   if (g_RunPwd[0]==0xFF)
-    return ERROR_ACCESS_DENIED;
+    return bReturnPID?0:ERROR_ACCESS_DENIED;
   if (bRunSetup)
     return 0;
   if (g_RunPwd[0]==2) //ShellExec->NOT in List
@@ -395,13 +402,14 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       MessageBox(0,
         CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return -3;
+    return bReturnPID?0:-3;
   }
   if (g_RunPwd[0]==1)
-    return ERROR_ACCESS_DENIED;
+    return bReturnPID?0:ERROR_ACCESS_DENIED;
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb = sizeof(STARTUPINFO);
+  GetStartupInfo(&si);
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
   _tcscpy(un,g_RunData.UserName);
@@ -426,7 +434,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       MessageBox(0,
         CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return dwErr;
+    return bReturnPID?0:dwErr;
   }else
   {
     //Clear sensitive Data
@@ -468,5 +476,5 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
   }
-  return 0;
+  return bReturnPID?pi.dwProcessId:0;
 }
