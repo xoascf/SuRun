@@ -409,7 +409,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb = sizeof(STARTUPINFO);
-  GetStartupInfo(&si);
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
   _tcscpy(un,g_RunData.UserName);
