@@ -1,12 +1,17 @@
 ToDo:
+* Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
+* Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
+* Konsolen-SuRun
+* Install-Container
+
 *"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
  ->auch Berechtigungen von SuRunners aus Registry und Dateisystem löschen
 * Tray-Fenster einblenden, wenn programme automatisch als Admin starten
-* Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
-* Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
 * Context-Menü Einträge sollen dynamisch und konfigurierbar werden
-* Konsolen-SuRun
-* Install-Container
+
+* Alle "shell\runas" aus der registry entfernen (mit Backup!)
+* Alle "shell\runas" der registry restaurieren
+
 * Vista benutzt kein ShellExecute für AutoRuns, Startmenü und Desktop
 
 ==============================================================================
@@ -130,6 +135,8 @@ SuRun 1.0.2.102 - 2008-01-07: (Internal Beta)
 ---------------------------
 * SuRun now runs in Windows Vista :))
 * SuRun now Enables/Disables IShellExecHook in Windows Vista
+* "SuRun *.reg" now starts "%Windir%\Regedit.exe *.reg" as Admin
+* Added "Start as Admin" for *.reg files
 
 SuRun 1.0.2.101 - 2008-01-07: (Internal Beta)
 ---------------------------
