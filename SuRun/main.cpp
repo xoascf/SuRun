@@ -200,6 +200,14 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
       //Vista: Control Panel is beneath desktop!
       wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
   }else 
+  //*.reg files
+  if (!_wcsicmp(ext, L".reg")) 
+  {
+    PathQuoteSpaces(app);
+    wcscpy(args,app);
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app, L"regedit.exe");
+  }else
   //Control Panel files  
   if (!_wcsicmp(ext, L".cpl")) 
   {
