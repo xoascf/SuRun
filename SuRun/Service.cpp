@@ -614,6 +614,7 @@ void SuRun(DWORD ProcessID)
 #define BATRUN  L"batfile" SHLRUN
 #define MSIPTCH L"Msi.Patch" SHLRUN
 #define MSIPKG  L"Msi.Package" SHLRUN
+#define REGRUN  L"regfile" SHLRUN
 
 void InstallRegistry()
 {
@@ -644,6 +645,9 @@ void InstallRegistry()
   //batfile
   SetRegStr(HKCR,BATRUN,L"",MenuStr);
   SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
+  //regfile
+  SetRegStr(HKCR,REGRUN,L"",MenuStr);
+  SetRegStr(HKCR,REGRUN L"\\command",L"",DefCmd);
   TCHAR MSIExe[4096];
   GetSystemDirectory(MSIExe,4096);
   PathAppend(MSIExe,L"msiexec.exe");
@@ -679,6 +683,8 @@ void RemoveRegistry()
   DelRegKey(HKCR,MSCRUN);
   //batfile
   DelRegKey(HKCR,BATRUN);
+  //regfile
+  DelRegKey(HKCR,REGRUN);
   //MSI Install
   DelRegKey(HKCR,MSIPKG L" open");
   //MSI Repair
