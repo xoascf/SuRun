@@ -131,8 +131,9 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.102 - 2008-01-07: (Internal Beta)
+SuRun 1.0.2.102 - 2008-01-20: (Internal Beta)
 ---------------------------
+* ShellExecute Hook does not ask Admins...
 * SuRun now runs in Windows Vista :))
 * SuRun now Enables/Disables IShellExecHook in Windows Vista
 * "SuRun *.reg" now starts "%Windir%\Regedit.exe *.reg" as Admin
