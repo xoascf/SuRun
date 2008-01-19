@@ -563,7 +563,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
         pei->dwHotKey,
         pei->hIcon,
         pei->hProcess);
-  //Struct Size Check
+  //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
   if (!pei)
