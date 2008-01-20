@@ -133,8 +133,8 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.2.102 - 2008-01-20: (Internal Beta)
 ---------------------------
-* ShellExecute Hook is disabled for Administrators
-* SuRun now runs in Windows Vista :))
+* ShellExecute Hook is now disabled for Administrators
+* SuRun now runs in Windows Vista :)) with UAC disabled
 * SuRun now Enables/Disables IShellExecHook in Windows Vista
 * "SuRun *.reg" now starts "%Windir%\Regedit.exe *.reg" as Admin
 * Added "Start as Admin" for *.reg files
