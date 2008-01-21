@@ -131,23 +131,28 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.103 - 2008-01-21: (Internal Beta)
+----------------------------
+* ShellExecute Hook and Shell Context menu are now disabled for non "SuRunners"
+* The Acronis TrueImage (SwitchDesktop) fix was disabled in SuRun 1.0.2.102
+
 SuRun 1.0.2.102 - 2008-01-20: (Internal Beta)
----------------------------
-* ShellExecute Hook is now disabled for Administrators
+----------------------------
+* ShellExecute Hook and Shell Context menu are now disabled for Administrators
 * SuRun now runs in Windows Vista :)) with UAC disabled
 * SuRun now Enables/Disables IShellExecHook in Windows Vista
 * "SuRun *.reg" now starts "%Windir%\Regedit.exe *.reg" as Admin
 * Added "Start as Admin" for *.reg files
 
 SuRun 1.0.2.101 - 2008-01-07: (Internal Beta)
----------------------------
+----------------------------
 * Fixed "AutoRun" ShellExecuteHook. In an AutoRun.inf in K:\ win an [AutoRun] 
   entry of 'open=setup.exe /autorun' caused the wrong command line 
   'SuRun.exe "setup.exe /autorun" /K:\'
 * The english String for <IDS_DELUSER> was missing.
 
 SuRun 1.0.2.100 - 2008-01-07: (Internal Beta)
----------------------------
+----------------------------
 * Fixed "SuRun %SystemRoot%\System32\control.exe" and
   "SuRun %SystemRoot%\System32\ncpa.cpl"
 * Added ShellExecuteHook support for verbs "AutoRun" and "cplopen".
