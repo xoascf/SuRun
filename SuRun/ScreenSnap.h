@@ -50,7 +50,7 @@ inline void Blur(HBITMAP hbm,int w,int h)
     free(pSrc);
     return;
   }
-  COLORREF* pDst=(COLORREF*)calloc(w*h,4);
+  COLORREF* pDst=(COLORREF*)calloc(g_bmi32.bmiHeader.biSizeImage,1);
   if (pDst!=NULL)
   {
     for (int y=0;y<h;y++)
