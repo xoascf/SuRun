@@ -24,6 +24,7 @@
 #include <shlobj.h>
 #include <initguid.h>
 #include <shlwapi.h>
+#include <lmcons.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -35,6 +36,7 @@
 #include "../ResStr.h"
 #include "../Helpers.h"
 #include "../Setup.h"
+#include "../UserGroups.h"
 #include "../IsAdmin.h"
 #include "Resource.h"
 
@@ -435,6 +437,14 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 #endif _DEBUG
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
+  {
+    //Non SuRunners don't need the Shell Extension!
+    TCHAR User[UNLEN+GNLEN+2]={0};
+    GetProcessUserName(GetCurrentProcessId(),User);
+    if (!IsInSuRunners(User))
+      return NOERROR;
+  }
+  //Non Admins don't need the Shell Extension!
   if (IsAdmin())
     return NOERROR;
   if (pDataObj==0)
@@ -563,6 +573,13 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
         pei->dwHotKey,
         pei->hIcon,
         pei->hProcess);
+  {
+    //Non SuRunners don't need the ShellExec Hook!
+    TCHAR User[UNLEN+GNLEN+2]={0};
+    GetProcessUserName(GetCurrentProcessId(),User);
+    if (!IsInSuRunners(User))
+      return S_FALSE;
+  }
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
