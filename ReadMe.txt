@@ -1,6 +1,7 @@
 ToDo:
 * Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
 * Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
+* Mache nicht SuRunner automatisch zum SuRunner muss konfigurierbar werden!
 * Konsolen-SuRun
 * Install-Container
 
