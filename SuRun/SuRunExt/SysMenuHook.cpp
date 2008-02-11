@@ -165,6 +165,28 @@ __declspec(dllexport) BOOL SysMenuHookInstalled()
   return (g_hookShell!=0)||(g_hookMenu!=0);
 }
 
+BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
+  return CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
+    lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
+    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+}
+
+BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+    LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
+  return CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
+    lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
+    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+}
+
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   switch(dwReason)
