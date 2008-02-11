@@ -12,6 +12,8 @@
 //                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
 //////////////////////////////////////////////////////////////////////////////
 
+extern HINSTANCE g_hInst;
+
 extern "C" 
 {
 __declspec(dllexport) BOOL InstallSysMenuHook();
