@@ -164,6 +164,10 @@ SOURCE=..\Helpers.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\IATHook.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\IsAdmin.cpp
 # End Source File
 # Begin Source File
@@ -235,6 +239,10 @@ SOURCE=..\UserGroups.cpp
 # Begin Source File
 
 SOURCE=..\Helpers.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\IATHook.h
 # End Source File
 # Begin Source File
 
