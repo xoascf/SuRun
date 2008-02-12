@@ -11,8 +11,7 @@
 // 
 //                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
 //////////////////////////////////////////////////////////////////////////////
-
-extern HINSTANCE g_hInst;
+extern HINSTANCE l_hInst;
 
 extern "C" 
 {
