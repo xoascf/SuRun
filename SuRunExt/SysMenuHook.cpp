@@ -274,47 +274,35 @@ void CheckIAT()
   CloseHandle(hProc);
 }
 
-DWORD WINAPI Msg(void* p)
-{
-  return MessageBox(0,L"Hello from admin!",0,0);
-}
-
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
-  switch(dwReason)
+  if(dwReason!=DLL_PROCESS_ATTACH)
+    return TRUE;
+  DWORD PID=GetCurrentProcessId();
+  if ((PID!=g_ProcID)||(g_hInst!=hInstDLL))
   {
-  case DLL_PROCESS_ATTACH:
-    DBGTrace2("DLL_PROCESS_ATTACH id=%d, g_ProcID=%d",GetCurrentProcessId(),g_ProcID);
-    if ((GetCurrentProcessId()!=g_ProcID)
-      ||(g_hInst!=hInstDLL))
-    {
-#ifdef _DEBUG_ENU
-      SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-#endif _DEBUG_ENU
-      g_hInst=hInstDLL;
-      WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-      WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-      DisableThreadLibraryCalls(hInstDLL);
-      _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
-      _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
-      _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
-      _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
-      _tcscpy(sSuRunCmd,CResStr(g_hInst,IDS_SURUNCMD));
-      _tcscpy(sSuRunExp,CResStr(g_hInst,IDS_SURUNEXP));
-      _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
-      _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
 #ifdef _DEBUG
-      TCHAR f[MAX_PATH];
-      GetModuleFileName(0,f,MAX_PATH);
-      DBGTrace3("Attach to Process %d:%s Admin=%d",GetCurrentProcessId(),f,IsAdmin());
-      if (IsAdmin())
-      {
-        DWORD t;
-        CreateThread(0,0,Msg,0,0,&t);
-      }
-//      CheckIAT();
+    TCHAR f[MAX_PATH];
+    GetModuleFileName(0,f,MAX_PATH);
+    DBGTrace4("DLL_PROCESS_ATTACH %d:%s (g_ProcID=%d), Admin=%d",PID,f,g_ProcID,IsAdmin());
+    //      CheckIAT();
 #endif _DEBUG
-    }
+    g_ProcID=PID;
+#ifdef _DEBUG_ENU
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+#endif _DEBUG_ENU
+    g_hInst=hInstDLL;
+    WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+    WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+    DisableThreadLibraryCalls(hInstDLL);
+    _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
+    _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
+    _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
+    _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
+    _tcscpy(sSuRunCmd,CResStr(g_hInst,IDS_SURUNCMD));
+    _tcscpy(sSuRunExp,CResStr(g_hInst,IDS_SURUNEXP));
+    _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
+    _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
   }
   return TRUE;
 }
