@@ -249,8 +249,8 @@ void CheckIAT(HMODULE hMod)
   DBGTrace1("Hooking Module %x",hMod);
   HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryA,(PROC)LoadLibA);
   HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryW,(PROC)LoadLibW);
-//  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExA,(PROC)LoadLibExA);
-//  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExW,(PROC)LoadLibExW);
+  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExA,(PROC)LoadLibExA);
+  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExW,(PROC)LoadLibExW);
   HookIAT(hMod,"kernel32.dll",(PROC)CreateProcessA,(PROC)CreateProcA);
   HookIAT(hMod,"kernel32.dll",(PROC)CreateProcessW,(PROC)CreateProcW);
 }
