@@ -39,10 +39,7 @@
 
 HHOOK       g_hookShell = NULL;
 HHOOK       g_hookMenu  = NULL;
-DWORD       g_ProcID    = 0;
-HINSTANCE   g_hInst     = NULL;
-UINT        WM_SYSMH0   = 0;
-UINT        WM_SYSMH1   = 0;
+HINSTANCE   g_hHookInst = NULL;
 
 TCHAR sMenuRestart[MAX_PATH];
 TCHAR sMenuStart[MAX_PATH];
@@ -55,6 +52,10 @@ TCHAR sTip[MAX_PATH];
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHDATA,RWS")
+
+UINT        WM_SYSMH0   = 0;
+UINT        WM_SYSMH1   = 0;
+HINSTANCE   l_hInst     = NULL;
 
 // extern "C" prevents name mangling so that procedures can be referenced from outside the DLL
 extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -142,13 +143,14 @@ __declspec(dllexport) BOOL InstallSysMenuHook()
     DBGTrace2("InstallSysMenuHook failed: Still Hooked (%x,%x)",g_hookShell,g_hookMenu);
     return FALSE;
   }
-  g_hookShell=SetWindowsHookEx(WH_CALLWNDPROC,(HOOKPROC)ShellProc,g_hInst,0);
+  g_hookShell=SetWindowsHookEx(WH_CALLWNDPROC,(HOOKPROC)ShellProc,l_hInst,0);
   if (g_hookShell==NULL)
     DBGTrace1("SetWindowsHookEx(Shell) failed: %s",GetLastErrorNameStatic());
-  g_hookMenu =SetWindowsHookEx(WH_GETMESSAGE ,(HOOKPROC)MenuProc ,g_hInst,0);
+  g_hookMenu =SetWindowsHookEx(WH_GETMESSAGE ,(HOOKPROC)MenuProc ,l_hInst,0);
   if (g_hookMenu==NULL)
     DBGTrace1("SetWindowsHookEx(Menu) failed: %s",GetLastErrorNameStatic());
   DBGTrace2("InstallSysMenuHook exit (%x,%x)",g_hookShell,g_hookMenu);
+  g_hHookInst=l_hInst;
   return (g_hookShell!= NULL) && (g_hookMenu != NULL);
 }
 
@@ -161,6 +163,7 @@ __declspec(dllexport) BOOL UninstallSysMenuHook()
   if(g_hookMenu)
     bRet&=(UnhookWindowsHookEx(g_hookMenu)!=0);
   g_hookMenu=NULL;
+  g_hHookInst=NULL;
   return bRet;
 }
 
@@ -244,7 +247,7 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 
 void CheckIAT(HMODULE hMod)
 {
-  if(hMod == g_hInst)
+  if(hMod == l_hInst)
     return;
   DBGTrace1("Hooking Module %x",hMod);
   HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryA,(PROC)LoadLibA);
@@ -267,7 +270,7 @@ void CheckIAT()
   {
     EnumProcessModules(hProc,hModues,Siz,&Siz);
     for (HMODULE* hMod=hModues;(DWORD)hMod<(DWORD)hModues+Siz;hMod++) 
-      if(*hMod != g_hInst)
+      if(*hMod != l_hInst)
         CheckIAT(*hMod);
     free(hModues);
   }
@@ -276,33 +279,41 @@ void CheckIAT()
 
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
+  if (dwReason==DLL_PROCESS_DETACH)
+  {
+    if(l_hInst==g_hHookInst)
+      UninstallSysMenuHook();
+  }
   if(dwReason!=DLL_PROCESS_ATTACH)
     return TRUE;
-  DWORD PID=GetCurrentProcessId();
-  if ((PID!=g_ProcID)||(g_hInst!=hInstDLL))
+  if (l_hInst!=hInstDLL)
   {
 #ifdef _DEBUG
     TCHAR f[MAX_PATH];
     GetModuleFileName(0,f,MAX_PATH);
-    DBGTrace4("DLL_PROCESS_ATTACH %d:%s (g_ProcID=%d), Admin=%d",PID,f,g_ProcID,IsAdmin());
+    DWORD PID=GetCurrentProcessId();
+    DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, g_hHookInst=%x, Admin=%d",
+      hInstDLL,PID,f,g_hHookInst,IsAdmin());
     //      CheckIAT();
 #endif _DEBUG
-    g_ProcID=PID;
 #ifdef _DEBUG_ENU
     SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
-    g_hInst=hInstDLL;
+    l_hInst=hInstDLL;
     WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     DisableThreadLibraryCalls(hInstDLL);
-    _tcscpy(sMenuRestart,CResStr(g_hInst,IDS_MENURESTART));
-    _tcscpy(sMenuStart,CResStr(g_hInst,IDS_MENUSTART));
-    _tcscpy(sFileNotFound,CResStr(g_hInst,IDS_FILENOTFOUND));
-    _tcscpy(sSuRun,CResStr(g_hInst,IDS_SURUN));
-    _tcscpy(sSuRunCmd,CResStr(g_hInst,IDS_SURUNCMD));
-    _tcscpy(sSuRunExp,CResStr(g_hInst,IDS_SURUNEXP));
-    _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
-    _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
+    if(sMenuRestart==0)
+    {
+      _tcscpy(sMenuRestart,CResStr(l_hInst,IDS_MENURESTART));
+      _tcscpy(sMenuStart,CResStr(l_hInst,IDS_MENUSTART));
+      _tcscpy(sFileNotFound,CResStr(l_hInst,IDS_FILENOTFOUND));
+      _tcscpy(sSuRun,CResStr(l_hInst,IDS_SURUN));
+      _tcscpy(sSuRunCmd,CResStr(l_hInst,IDS_SURUNCMD));
+      _tcscpy(sSuRunExp,CResStr(l_hInst,IDS_SURUNEXP));
+      _tcscpy(sErr,CResStr(l_hInst,IDS_ERR));
+      _tcscpy(sTip,CResStr(l_hInst,IDS_TOOLTIP));
+    }
   }
   return TRUE;
 }
