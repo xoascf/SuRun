@@ -46,7 +46,7 @@ DWORD WINAPI HookIAT(HMODULE hMod,LPCSTR DllName,PROC origFunc, PROC newFunc)
     // stricmp returns 0 if strings are equal, case insensitive
     if(_stricmp(name, DllName) == 0)
     {
-      PIMAGE_THUNK_DATA pThunk = (PIMAGE_THUNK_DATA)((DWORD) pDosH + (DWORD) pImportDesc->FirstThunk);
+      PIMAGE_THUNK_DATA pThunk=(PIMAGE_THUNK_DATA)((DWORD)pDosH+(DWORD)pImportDesc->FirstThunk);
       while(pThunk->u1.Function)
       {
         // get the pointer of the imported function and see if it matches up with the original
