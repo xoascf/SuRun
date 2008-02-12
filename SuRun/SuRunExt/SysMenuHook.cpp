@@ -24,6 +24,7 @@
 #include "../Setup.h"
 #include "SuRunExt.h"
 #include "Resource.h"
+#include "IATHook.h"
 
 #pragma comment(lib,"shlwapi")
 
@@ -165,12 +166,35 @@ __declspec(dllexport) BOOL SysMenuHookInstalled()
   return (g_hookShell!=0)||(g_hookMenu!=0);
 }
 
+LPWSTR AToW(LPCSTR aStr)
+{
+  if(!aStr)
+    return 0;
+  DWORD nChars=strlen(aStr);
+  if (!nChars)
+    return 0;
+  LPWSTR lpw=(LPWSTR)calloc(sizeof(WCHAR)*nChars,1);
+  if(!lpw)
+    return 0;
+  WideCharToMultiByte(CP_ACP,0,lpw,-1,(char*)aStr,nChars,NULL,NULL);
+  return lpw;
+}
+
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
     BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
+  {
+    LPWSTR a=AToW(lpApplicationName);
+    LPWSTR c=AToW(lpCommandLine);
+    LPWSTR d=AToW(lpCurrentDirectory);
+    DBGTrace3("CreateProcessA-Hook(%s,%s,x,x,x,x,x,%s,x,x);",a,c,d);
+    free(a);
+    free(c);
+    free(d);
+  }
   return CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
     lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
     lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -182,6 +206,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
+  DBGTrace3("CreateProcessW-Hook(%s,%s,x,x,x,x,x,%s,x,x);",
+    lpApplicationName,lpCommandLine,lpCurrentDirectory);
   return CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
     lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
     lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -207,6 +233,10 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     _tcscpy(sSuRunExp,CResStr(g_hInst,IDS_SURUNEXP));
     _tcscpy(sErr,CResStr(g_hInst,IDS_ERR));
     _tcscpy(sTip,CResStr(g_hInst,IDS_TOOLTIP));
+#ifdef _DEBUG
+    HookIAT("kernel32.dll",(PROC)CreateProcessA,(PROC)CreateProcA);
+    HookIAT("kernel32.dll",(PROC)CreateProcessW,(PROC)CreateProcW);
+#endif _DEBUG
   }
   return TRUE;
 }
