@@ -274,6 +274,11 @@ void CheckIAT()
   CloseHandle(hProc);
 }
 
+DWORD WINAPI Msg(void* p)
+{
+  return MessageBox(0,L"Hello from admin!",0,0);
+}
+
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   switch(dwReason)
@@ -302,6 +307,11 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
       TCHAR f[MAX_PATH];
       GetModuleFileName(0,f,MAX_PATH);
       DBGTrace3("Attach to Process %d:%s Admin=%d",GetCurrentProcessId(),f,IsAdmin());
+      if (IsAdmin())
+      {
+        DWORD t;
+        CreateThread(0,0,Msg,0,0,&t);
+      }
 //      CheckIAT();
 #endif _DEBUG
     }
