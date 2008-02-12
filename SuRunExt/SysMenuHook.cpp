@@ -41,14 +41,14 @@ HHOOK       g_hookShell = NULL;
 HHOOK       g_hookMenu  = NULL;
 HINSTANCE   g_hHookInst = NULL;
 
-TCHAR sMenuRestart[MAX_PATH];
-TCHAR sMenuStart[MAX_PATH];
-TCHAR sFileNotFound[MAX_PATH];
-TCHAR sSuRun[MAX_PATH];
-TCHAR sSuRunCmd[MAX_PATH];
-TCHAR sSuRunExp[MAX_PATH];
-TCHAR sErr[MAX_PATH];
-TCHAR sTip[MAX_PATH];
+TCHAR sMenuRestart[MAX_PATH]={0};
+TCHAR sMenuStart[MAX_PATH]={0};
+TCHAR sFileNotFound[MAX_PATH]={0};
+TCHAR sSuRun[MAX_PATH]={0};
+TCHAR sSuRunCmd[MAX_PATH]={0};
+TCHAR sSuRunExp[MAX_PATH]={0};
+TCHAR sErr[MAX_PATH]={0};
+TCHAR sTip[MAX_PATH]={0};
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHDATA,RWS")
@@ -303,7 +303,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     DisableThreadLibraryCalls(hInstDLL);
-    if(sMenuRestart==0)
+    if(sMenuRestart[0]==0)
     {
       _tcscpy(sMenuRestart,CResStr(l_hInst,IDS_MENURESTART));
       _tcscpy(sMenuStart,CResStr(l_hInst,IDS_MENUSTART));
