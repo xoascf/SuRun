@@ -211,6 +211,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 
 HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
+  DBGTrace("LoadLibA");
   HMODULE hMOD=LoadLibraryA(lpLibFileName);
   CheckIAT(hMOD);
   return hMOD;
@@ -218,6 +219,7 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 
 HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
+  DBGTrace1("LoadLibW %s",lpLibFileName);
   HMODULE hMOD=LoadLibraryW(lpLibFileName);
   CheckIAT(hMOD);
   return hMOD;
@@ -225,6 +227,7 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 
 HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
+  DBGTrace("LoadLibExA");
   HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
   CheckIAT(hMOD);
   return hMOD;
@@ -232,6 +235,7 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 
 HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
+  DBGTrace1("LoadLibExW %s",lpLibFileName);
   HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
   CheckIAT(hMOD);
   return hMOD;
@@ -241,10 +245,11 @@ void CheckIAT(HMODULE hMod)
 {
   if(hMod == g_hInst)
     return;
+  DBGTrace1("Hooking Module %x",hMod);
   HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryA,(PROC)LoadLibA);
   HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryW,(PROC)LoadLibW);
-  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExA,(PROC)LoadLibExA);
-  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExW,(PROC)LoadLibExW);
+//  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExA,(PROC)LoadLibExA);
+//  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExW,(PROC)LoadLibExW);
   HookIAT(hMod,"kernel32.dll",(PROC)CreateProcessA,(PROC)CreateProcA);
   HookIAT(hMod,"kernel32.dll",(PROC)CreateProcessW,(PROC)CreateProcW);
 }
