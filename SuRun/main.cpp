@@ -452,30 +452,20 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     SetAdminDenyUserAccess(pi.hThread);
     SetAdminDenyUserAccess(pi.hProcess);
     //Complain if the shell is runnig with administrative privileges:
-    DWORD ShellID=0;
-    GetWindowThreadProcessId(GetShellWindow(),&ShellID);
-    if (ShellID)
+    HANDLE hTok=GetShellProcessToken();
+    if(hTok)
     {
-      HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
-      if (hShell)
+      if(IsAdmin(hTok))
       {
-        HANDLE hTok=0;
-        if(OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
-        {
-          if(IsAdmin(hTok))
-          {
-            TCHAR s[MAX_PATH]={0};
-            GetRegStr(HKEY_LOCAL_MACHINE,
-              L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-              L"Shell",s,MAX_PATH);
-            if (!beQuiet)
-              MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-                MB_ICONEXCLAMATION|MB_SETFOREGROUND);
-          }
-          CloseHandle(hTok);
-        }
-        CloseHandle(hShell);
+        TCHAR s[MAX_PATH]={0};
+        GetRegStr(HKEY_LOCAL_MACHINE,
+          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+          L"Shell",s,MAX_PATH);
+        if (!beQuiet)
+          MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+          MB_ICONEXCLAMATION|MB_SETFOREGROUND);
       }
+      CloseHandle(hTok);
     }
     //Start the main thread
     ResumeThread(pi.hThread);
