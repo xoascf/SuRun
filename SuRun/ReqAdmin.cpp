@@ -6,6 +6,9 @@
 #include "DBGTrace.h"
 #pragma comment(lib,"shlwapi.lib")
 
+#define InfoDBGTrace(msg)                             {(void)0;}
+#define InfoDBGTrace1(msg,d1)                         {(void)0;}
+#define InfoDBGTrace2(msg,d1,d2)                      {(void)0;}
 
 //Define this in any implementation, before "pugxml.h", to be notified of API campatibility.
 #define PUGAPI_VARIANT 0x58475550	//The Pug XML library variant we are using in this implementation.
@@ -67,7 +70,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
     memmove(m,Manifest,2*siz);
     MultiByteToWideChar(CP_UTF8,0,(char*)m,siz,Manifest,siz);
     free(m);
-    DBGTrace("RequiresAdmin: MultiByteToWideChar!");
+    InfoDBGTrace("RequiresAdmin: MultiByteToWideChar!");
   }
 #else UNICODE
   if ((Manifest[0]==0xFF)||(Manifest[0]==0xFE))
@@ -76,7 +79,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
     memmove(m,Manifest,2*siz);
     WideCharToMultiByte(CP_UTF8,0,(WCHAR*)m,siz/2,Manifest,siz/2,0,0);
     free(m);
-    DBGTrace("RequiresAdmin: WideCharToMultiByte!");
+    InfoDBGTrace("RequiresAdmin: WideCharToMultiByte!");
   }
 #endif UNICODE
   if(Manifest)
@@ -101,14 +104,14 @@ BOOL RequiresAdmin(LPCTSTR FileName)
   HINSTANCE hExe=LoadLibrary(FName);
   if (hExe)
   {
-    DBGTrace1("RequiresAdmin(%s) LoadLib ok",FName);
+    InfoDBGTrace1("RequiresAdmin(%s) LoadLib ok",FName);
     bReqAdmin=-1;
     EnumResourceNames(hExe,RT_MANIFEST,EnumResProc,(LONG_PTR)&bReqAdmin);
     FreeLibrary(hExe);
     if (bReqAdmin==-1)
     {
       bReqAdmin=FALSE;
-      DBGTrace1("RequiresAdmin(%s) EnumResourceNames failed",FName);
+      InfoDBGTrace1("RequiresAdmin(%s) EnumResourceNames failed",FName);
     }else if(!bReqAdmin)
     {
       TCHAR s[MAX_PATH];
@@ -118,14 +121,14 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       {
         bReqAdmin=RequiresAdmin(xml.document());
         if(bReqAdmin)
-          DBGTrace1("RequiresAdmin(%s) external Manifest OK",FName);
+          InfoDBGTrace1("RequiresAdmin(%s) external Manifest OK",FName);
       }else
-        DBGTrace1("RequiresAdmin(%s) no external Manifest!",FName);
+        InfoDBGTrace1("RequiresAdmin(%s) no external Manifest!",FName);
     }
     //Try FileName Pattern matching
     if(!bReqAdmin)
     {
-      DBGTrace1("RequiresAdmin(%s) FileName match???",FName);
+      InfoDBGTrace1("RequiresAdmin(%s) FileName match???",FName);
       //Split path parts
       TCHAR file[MAX_PATH];
       TCHAR ext[MAX_PATH];
@@ -135,11 +138,11 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       _tcscpy(ext,PathFindExtension(file));
       PathRemoveExtension(file);
       PathStripPath(file);
-      DBGTrace1("RequiresAdmin(%s) Extension match???",ext);
+      InfoDBGTrace1("RequiresAdmin(%s) Extension match???",ext);
       bReqAdmin=(_tcsicmp(ext,_T(".MSI"))==0)
               ||(_tcsicmp(ext,_T(".MSC"))==0);
       if(bReqAdmin)
-        DBGTrace1("RequiresAdmin(%s) Extension match",ext);
+        InfoDBGTrace1("RequiresAdmin(%s) Extension match",ext);
       if(!bReqAdmin)
       {
         if ((_tcsicmp(ext,_T(".EXE"))==0)
@@ -149,17 +152,17 @@ BOOL RequiresAdmin(LPCTSTR FileName)
           ||(_tcsicmp(ext,_T(".PIF"))==0)
           ||(_tcsicmp(ext,_T(".BAT"))==0))
         {
-          DBGTrace1("RequiresAdmin(%s) Executable Extension!",FName);
+          InfoDBGTrace1("RequiresAdmin(%s) Executable Extension!",FName);
           bReqAdmin=(_tcsstr(file,_T("INSTALL"))!=0)
             ||(_tcsstr(file,_T("SETUP"))!=0)
             ||(_tcsstr(file,_T("UPDATE"))!=0);
           if(bReqAdmin)
-            DBGTrace1("RequiresAdmin(%s) FileName match",file);
+            InfoDBGTrace1("RequiresAdmin(%s) FileName match",file);
         }
       }
     }
   }else
-    DBGTrace1("RequiresAdmin(%s) LoadLibrary failed",FName);
-  DBGTrace2("RequiresAdmin(%s)==%d",FName,bReqAdmin);
+    InfoDBGTrace1("RequiresAdmin(%s) LoadLibrary failed",FName);
+  InfoDBGTrace2("RequiresAdmin(%s)==%d",FName,bReqAdmin);
   return bReqAdmin;
 }
