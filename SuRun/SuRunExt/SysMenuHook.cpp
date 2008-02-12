@@ -39,9 +39,10 @@
 
 HHOOK       g_hookShell = NULL;
 HHOOK       g_hookMenu  = NULL;
+DWORD       g_ProcID    = 0;
 HINSTANCE   g_hInst     = NULL;
-UINT        WM_SYSMH0    = 0;
-UINT        WM_SYSMH1    = 0;
+UINT        WM_SYSMH0   = 0;
+UINT        WM_SYSMH1   = 0;
 
 TCHAR sMenuRestart[MAX_PATH];
 TCHAR sMenuStart[MAX_PATH];
@@ -273,12 +274,12 @@ void CheckIAT()
   CloseHandle(hProc);
 }
 
-DWORD g_ProcID=0;
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   switch(dwReason)
   {
   case DLL_PROCESS_ATTACH:
+    DBGTrace2("DLL_PROCESS_ATTACH id=%d, g_ProcID=%d",GetCurrentProcessId(),g_ProcID);
     if ((GetCurrentProcessId()!=g_ProcID)
       ||(g_hInst!=hInstDLL))
     {
