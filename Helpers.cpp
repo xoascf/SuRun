@@ -600,7 +600,7 @@ PSID GetProcessUserSID(DWORD ProcessID)
     return 0;
   HANDLE hToken;
   PSID sid=0;
-  // Open impersonation token for Shell process
+  // Open impersonation token for process
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
     DWORD dwLen=0;
@@ -639,7 +639,7 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
     return 0;
   HANDLE hToken;
   bool bRet=false;
-  // Open impersonation token for Shell process
+  // Open impersonation token for process
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
     bRet=GetTokenUserName(hToken,User,Domain);
@@ -647,6 +647,27 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
   }
   CloseHandle(hProc);
   return bRet;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// GetShellProcessToken
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+HANDLE GetShellProcessToken()
+{
+  DWORD ShellID=0;
+  GetWindowThreadProcessId(GetShellWindow(),&ShellID);
+  if (!ShellID)
+    return 0;
+  HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
+  if (!hShell)
+    return 0;
+  HANDLE hTok=0;
+  OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok);
+  CloseHandle(hShell);
+  return hTok;
 }
 
 /////////////////////////////////////////////////////////////////////////////
