@@ -35,7 +35,7 @@
 // global data within shared data segment to allow sharing across instances
 //
 //////////////////////////////////////////////////////////////////////////////
-#pragma data_seg("SHAREDDATA")
+#pragma data_seg(".SHDATA")
 
 HHOOK       g_hookShell = NULL;
 HHOOK       g_hookMenu  = NULL;
@@ -54,7 +54,7 @@ TCHAR sErr[MAX_PATH];
 TCHAR sTip[MAX_PATH];
 
 #pragma data_seg()
-#pragma comment(linker, "/section:SHAREDDATA,RWS")
+#pragma comment(linker, "/section:.SHDATA,RWS")
 
 // extern "C" prevents name mangling so that procedures can be referenced from outside the DLL
 extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -301,8 +301,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #ifdef _DEBUG
       TCHAR f[MAX_PATH];
       GetModuleFileName(0,f,MAX_PATH);
-      DBGTrace2("Attach to Process %d:%s",GetCurrentProcessId(),f);
-      CheckIAT();
+      DBGTrace3("Attach to Process %d:%s Admin=%d",GetCurrentProcessId(),f,IsAdmin());
+//      CheckIAT();
 #endif _DEBUG
     }
   }
