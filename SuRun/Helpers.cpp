@@ -320,7 +320,7 @@ Cleanup:
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void SetAdminDenyUserAccess(HANDLE hObject)
+void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/)
 {
   DWORD dwRes;
   PACL pOldDACL=NULL, pNewDACL=NULL;
@@ -328,7 +328,9 @@ void SetAdminDenyUserAccess(HANDLE hObject)
   EXPLICIT_ACCESS ea[2]={0};
   SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
   PSID AdminSID = NULL;
-  PSID UserSID  = GetProcessUserSID(GetCurrentProcessId());
+  if (ProcessID==0)
+    ProcessID=GetCurrentProcessId();
+  PSID UserSID  = GetProcessUserSID(ProcessID);
   if (NULL == hObject) 
     goto Cleanup; 
   // Get a pointer to the existing DACL.
