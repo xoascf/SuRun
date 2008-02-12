@@ -53,11 +53,13 @@ DWORD WINAPI HookIAT(HMODULE hMod,LPCSTR DllName,PROC origFunc, PROC newFunc)
         if((DWORD) pThunk->u1.Function == (DWORD) origFunc)
         {
           MEMORY_BASIC_INFORMATION mbi;
-          DWORD oldProt;
-          VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-          VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_READWRITE, &oldProt);
-          pThunk->u1.Function = (DWORD) newFunc;
-          VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
+          if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
+          {
+            DWORD oldProt;
+            if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_READWRITE, &oldProt))
+              pThunk->u1.Function = (DWORD) newFunc;
+            VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
+          }
         }
         ++pThunk;
       }
