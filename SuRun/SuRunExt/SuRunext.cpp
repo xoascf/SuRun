@@ -47,13 +47,13 @@
 // global data within shared data segment to allow sharing across instances
 //
 //////////////////////////////////////////////////////////////////////////////
-#pragma data_seg("SHAREDDATA")
+#pragma data_seg(".SHDATA")
 
 UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// Strings: these are defined in SysMenuHook.cpp and placed in "SHAREDDATA"
+// Strings: these are defined in SysMenuHook.cpp and placed in ".SHDATA"
 //
 //////////////////////////////////////////////////////////////////////////////
 extern TCHAR sFileNotFound[MAX_PATH];
@@ -64,7 +64,7 @@ extern TCHAR sErr[MAX_PATH];
 extern TCHAR sTip[MAX_PATH];
 
 #pragma data_seg()
-#pragma comment(linker, "/section:SHAREDDATA,RWS")
+#pragma comment(linker, "/section:.SHDATA,RWS")
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -413,27 +413,27 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef _DEBUG
-  TCHAR Path[MAX_PATH]={0};
-  if (pIDFolder)
-    SHGetPathFromIDList(pIDFolder,Path);
-  TCHAR FileClass[MAX_PATH]={0};
-  if(hRegKey)
-    GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
-  TCHAR File[MAX_PATH]={0};
-  if(pDataObj)
-  {
-    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-    STGMEDIUM stm;
-    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-    {
-      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-        DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
-      ReleaseStgMedium(&stm);
-    }
-  }
-  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-  if(pDataObj)
-    PrintDataObj(pDataObj);
+//  TCHAR Path[MAX_PATH]={0};
+//  if (pIDFolder)
+//    SHGetPathFromIDList(pIDFolder,Path);
+//  TCHAR FileClass[MAX_PATH]={0};
+//  if(hRegKey)
+//    GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
+//  TCHAR File[MAX_PATH]={0};
+//  if(pDataObj)
+//  {
+//    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+//    STGMEDIUM stm;
+//    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+//    {
+//      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+//        DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
+//      ReleaseStgMedium(&stm);
+//    }
+//  }
+//  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+//  if(pDataObj)
+//    PrintDataObj(pDataObj);
 #endif _DEBUG
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
@@ -556,23 +556,23 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-  DBGTrace15(
-        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
-        pei->cbSize,
-        pei->fMask,
-        pei->hwnd,
-        pei->lpVerb,
-        pei->lpFile,
-        pei->lpParameters,
-        pei->lpDirectory,
-        pei->nShow,
-        pei->hInstApp,
-        pei->lpIDList,
-        pei->lpClass,
-        pei->hkeyClass,
-        pei->dwHotKey,
-        pei->hIcon,
-        pei->hProcess);
+//  DBGTrace15(
+//        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
+//        pei->cbSize,
+//        pei->fMask,
+//        pei->hwnd,
+//        pei->lpVerb,
+//        pei->lpFile,
+//        pei->lpParameters,
+//        pei->lpDirectory,
+//        pei->nShow,
+//        pei->hInstApp,
+//        pei->lpIDList,
+//        pei->lpClass,
+//        pei->hkeyClass,
+//        pei->dwHotKey,
+//        pei->hIcon,
+//        pei->hProcess);
   {
     //Non SuRunners don't need the ShellExec Hook!
     TCHAR User[UNLEN+GNLEN+2]={0};
@@ -663,7 +663,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       }
       else 
       {
-        DBGTrace2("SuRun ShellExtHook: failed to execute %s; %s",cmd,GetErrorNameStatic(ExitCode));
+        //DBGTrace2("SuRun ShellExtHook: failed to execute %s; %s",cmd,GetErrorNameStatic(ExitCode));
         if(ExitCode==ERROR_ACCESS_DENIED)
           pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
       }
