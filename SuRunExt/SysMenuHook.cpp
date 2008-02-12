@@ -41,6 +41,13 @@ HHOOK       g_hookShell = NULL;
 HHOOK       g_hookMenu  = NULL;
 HINSTANCE   g_hHookInst = NULL;
 
+#pragma data_seg()
+#pragma comment(linker, "/section:.SHDATA,RWS")
+
+UINT        WM_SYSMH0   = 0;
+UINT        WM_SYSMH1   = 0;
+HINSTANCE   l_hInst     = NULL;
+
 TCHAR sMenuRestart[MAX_PATH]={0};
 TCHAR sMenuStart[MAX_PATH]={0};
 TCHAR sFileNotFound[MAX_PATH]={0};
@@ -49,13 +56,6 @@ TCHAR sSuRunCmd[MAX_PATH]={0};
 TCHAR sSuRunExp[MAX_PATH]={0};
 TCHAR sErr[MAX_PATH]={0};
 TCHAR sTip[MAX_PATH]={0};
-
-#pragma data_seg()
-#pragma comment(linker, "/section:.SHDATA,RWS")
-
-UINT        WM_SYSMH0   = 0;
-UINT        WM_SYSMH1   = 0;
-HINSTANCE   l_hInst     = NULL;
 
 // extern "C" prevents name mangling so that procedures can be referenced from outside the DLL
 extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -303,17 +303,14 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     DisableThreadLibraryCalls(hInstDLL);
-    if(sMenuRestart[0]==0)
-    {
-      _tcscpy(sMenuRestart,CResStr(l_hInst,IDS_MENURESTART));
-      _tcscpy(sMenuStart,CResStr(l_hInst,IDS_MENUSTART));
-      _tcscpy(sFileNotFound,CResStr(l_hInst,IDS_FILENOTFOUND));
-      _tcscpy(sSuRun,CResStr(l_hInst,IDS_SURUN));
-      _tcscpy(sSuRunCmd,CResStr(l_hInst,IDS_SURUNCMD));
-      _tcscpy(sSuRunExp,CResStr(l_hInst,IDS_SURUNEXP));
-      _tcscpy(sErr,CResStr(l_hInst,IDS_ERR));
-      _tcscpy(sTip,CResStr(l_hInst,IDS_TOOLTIP));
-    }
+    _tcscpy(sMenuRestart,CResStr(l_hInst,IDS_MENURESTART));
+    _tcscpy(sMenuStart,CResStr(l_hInst,IDS_MENUSTART));
+    _tcscpy(sFileNotFound,CResStr(l_hInst,IDS_FILENOTFOUND));
+    _tcscpy(sSuRun,CResStr(l_hInst,IDS_SURUN));
+    _tcscpy(sSuRunCmd,CResStr(l_hInst,IDS_SURUNCMD));
+    _tcscpy(sSuRunExp,CResStr(l_hInst,IDS_SURUNEXP));
+    _tcscpy(sErr,CResStr(l_hInst,IDS_ERR));
+    _tcscpy(sTip,CResStr(l_hInst,IDS_TOOLTIP));
   }
   return TRUE;
 }
