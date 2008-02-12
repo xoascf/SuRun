@@ -47,16 +47,13 @@
 // global data within shared data segment to allow sharing across instances
 //
 //////////////////////////////////////////////////////////////////////////////
-#pragma data_seg(".SHARDATA")
+#pragma data_seg("SHAREDDATA")
 
 UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 
-#pragma data_seg()
-#pragma comment(linker, "/section:.SHARDATA,rws")
-
 //////////////////////////////////////////////////////////////////////////////
 //
-// Strings: these are defined in SysMenuHook.cpp and placed in ".SHARDATA"
+// Strings: these are defined in SysMenuHook.cpp and placed in "SHAREDDATA"
 //
 //////////////////////////////////////////////////////////////////////////////
 extern TCHAR sFileNotFound[MAX_PATH];
@@ -65,6 +62,9 @@ extern TCHAR sSuRunCmd[MAX_PATH];
 extern TCHAR sSuRunExp[MAX_PATH];
 extern TCHAR sErr[MAX_PATH];
 extern TCHAR sTip[MAX_PATH];
+
+#pragma data_seg()
+#pragma comment(linker, "/section:SHAREDDATA,RWS")
 
 //////////////////////////////////////////////////////////////////////////////
 //
