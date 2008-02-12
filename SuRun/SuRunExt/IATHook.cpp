@@ -32,7 +32,7 @@ DWORD WINAPI HookIAT(LPCSTR DllName,PROC origFunc, PROC newFunc)
   if(!hModues)
     return CloseHandle(hProc),0;
   EnumProcessModules(hProc,hModues,Siz,&Siz);
-  for (HMODULE* hMod=hModues;hMod<hModues+Siz;hMod++) if(*hMod != g_hInst)
+  for (HMODULE* hMod=hModues;(DWORD)hMod<(DWORD)hModues+Siz;hMod++) if(*hMod != g_hInst)
   {
     // Get DOS Header
     PIMAGE_DOS_HEADER pDosH = (PIMAGE_DOS_HEADER) *hMod;
@@ -78,5 +78,7 @@ DWORD WINAPI HookIAT(LPCSTR DllName,PROC origFunc, PROC newFunc)
       ++pImportDesc;
     }
   }
-  return free(hModues),CloseHandle(hProc),0;      
+  free(hModues);
+  CloseHandle(hProc);
+  return 0;
 }
