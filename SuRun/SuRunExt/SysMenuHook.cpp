@@ -35,7 +35,7 @@
 // global data within shared data segment to allow sharing across instances
 //
 //////////////////////////////////////////////////////////////////////////////
-#pragma data_seg(".SHARDATA")
+#pragma data_seg("SHAREDDATA")
 
 HHOOK       g_hookShell = NULL;
 HHOOK       g_hookMenu  = NULL;
@@ -54,7 +54,7 @@ TCHAR sErr[MAX_PATH];
 TCHAR sTip[MAX_PATH];
 
 #pragma data_seg()
-#pragma comment(linker, "/section:.SHARDATA,rws")
+#pragma comment(linker, "/section:SHAREDDATA,RWS")
 
 // extern "C" prevents name mangling so that procedures can be referenced from outside the DLL
 extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
