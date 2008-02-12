@@ -186,15 +186,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  {
-    LPWSTR a=AToW(lpApplicationName);
-    LPWSTR c=AToW(lpCommandLine);
-    LPWSTR d=AToW(lpCurrentDirectory);
-    DBGTrace3("CreateProcessA-Hook(%s,%s,x,x,x,x,x,%s,x,x);",a,c,d);
-    free(a);
-    free(c);
-    free(d);
-  }
+  DBGTrace("CreateProcessA-Hook()");
   return CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
     lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
     lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -206,8 +198,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DBGTrace3("CreateProcessW-Hook(%s,%s,x,x,x,x,x,%s,x,x);",
-    lpApplicationName,lpCommandLine,lpCurrentDirectory);
+  DBGTrace2("CreateProcessW-Hook(%s,%s);",
+    lpApplicationName?lpApplicationName:L"",lpCommandLine?lpCommandLine:L"");
   return CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
     lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
     lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
