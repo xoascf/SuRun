@@ -271,7 +271,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   PROC p=DoHookFn(f,(char*)lpProcName);
   if(!p)
     p=GetProcAddress(hModule,lpProcName);;
-  DBGTrace4("GetProcAddress(%x [%s],%s)==%x",hModule,CAToWStr(f),CAToWStr(lpProcName),p);
+  //DBGTrace4("GetProcAddress(%x [%s],%s)==%x",hModule,CAToWStr(f),CAToWStr(lpProcName),p);
   return p;
 }
 
@@ -281,7 +281,7 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
   HMODULE hMOD=LoadLibraryA(lpLibFileName);
   if(hMOD)
     HookModules();
-  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
+//  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
@@ -292,7 +292,7 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
   HMODULE hMOD=LoadLibraryW(lpLibFileName);
   if(hMOD)
     HookModules();
-  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
+//  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
@@ -303,7 +303,7 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
-  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
+//  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
@@ -314,7 +314,7 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
-  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
+//  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
