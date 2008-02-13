@@ -48,6 +48,37 @@ BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax);
                           _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                           _T("limitblankpassworduse"),(b)==0)
 
+// String converter
+LPWSTR AToW(LPCSTR aStr);
+
+class CAToWStr
+{
+public:
+  CAToWStr(LPCSTR s)
+  {
+    m_wStr=AToW(s);
+  }
+  ~CAToWStr()
+  {
+    free(m_wStr);
+  }
+  const LPCWSTR operator =(LPCSTR s)
+  {
+    free(m_wStr);
+    m_wStr=AToW(s);
+    return m_wStr;
+  }
+  const WCHAR operator [](int Index)
+  {
+    return (Index<(int)wcslen(m_wStr))?((Index>0)?m_wStr[Index]:'\0'):'\0';
+  }
+  operator LPWSTR() { return m_wStr; };
+  operator LPCWSTR(){ return m_wStr; };
+protected:
+  LPWSTR m_wStr;
+};
+
+
 // Privilege stuff
 BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name);
 BOOL EnablePrivilege(LPCTSTR name);
