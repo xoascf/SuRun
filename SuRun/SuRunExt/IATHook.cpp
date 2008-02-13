@@ -113,13 +113,6 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
   DWORD nHooked=0;
   if(hMod==l_hInst)
     return nHooked;
-#ifdef _DEBUG
-//  char f[MAX_PATH]={0};
-//  GetModuleFileNameA(hMod,f,MAX_PATH);
-//  PathStripPathA(f);
-//  CAToWStr mfn(f);
-//  DBGTrace3("HookIAT(0x%08X[%s],%d)",hMod,mfn,bUnHook);
-#endif 
   // check "MZ" and DOS Header size
   if(IsBadReadPtr(hMod,sizeof(IMAGE_DOS_HEADER))
     || (((PIMAGE_DOS_HEADER)hMod)->e_magic!=IMAGE_DOS_SIGNATURE))
@@ -164,8 +157,6 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                     {
                       pThunk->u1.Function = it->orgFunc;
                       g_HookList.erase(it);
-//                      DBGTrace5("HookIAT: Unhooked %s,%s from 0x%08x to 0x%08x in %s",
-//                        CAToWStr(DllName),CAToWStr((char*)pBN->Name),it->newFunc,it->orgFunc,mfn);
                       g_nHooked--;
                       nHooked++;
                       break;
@@ -175,8 +166,6 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                   //add Data to g_HookList for UnHook
                   HOOKDATA hd={hMod,pThunk->u1.Function,newFunc};
                   g_HookList.push_back(hd);
-//                      DBGTrace5("HookIAT: Hooked %s,%s from 0x%08x to 0x%08x in %s",
-//                        CAToWStr(DllName),CAToWStr((char*)pBN->Name),hd.orgFunc,hd.newFunc,mfn);
                   pThunk->u1.Function = (DWORD) newFunc;
                   g_nHooked++;
                   nHooked++;
@@ -218,7 +207,6 @@ DWORD HookModules()
     g_ModList.merge(newMods);
     free(hMod);
   }
-  //DBGTrace3("Hooked %d functions; %d [%d] total hooks",nHooked,g_nHooked,g_HookList.size());
   CloseHandle(hProc);
   return nHooked;
 }
