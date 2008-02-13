@@ -57,6 +57,7 @@ typedef struct
 typedef std::list<HOOKDATA> HookList;
 typedef std::list<HMODULE> ModList;
 
+int g_nHooked=0;
 ModList g_ModList;
 HookList g_HookList;
 
@@ -77,9 +78,9 @@ const HOOKDESCRIPTOR hdt[]=
   {"kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW},
   {"kernel32.dll","GetProcAddress",(PROC)GetProcAddr},
   //User Hooks:
-  {"kernel32.dll","CreateProcessA",(PROC)CreateProcA},
-  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW},
-  {"advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW},
+//  {"kernel32.dll","CreateProcessA",(PROC)CreateProcA},
+//  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW},
+//  {"advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW},
 };
 
 //relative pointers in PE images
@@ -109,21 +110,22 @@ PROC DoHookFn(char* DllName,char* ImpName)
 
 DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
 {
+  DWORD nHooked=0;
   if(hMod==l_hInst)
-    return 0;
+    return nHooked;
   // check "MZ" and DOS Header size
   if(IsBadReadPtr(hMod, sizeof(IMAGE_DOS_HEADER))
     || (((PIMAGE_DOS_HEADER)hMod)->e_magic != IMAGE_DOS_SIGNATURE))
-    return 0;
+    return nHooked;
   // check "PE" and DOS Header size
   PIMAGE_NT_HEADERS pNTH = RelPtr(PIMAGE_NT_HEADERS,hMod,((PIMAGE_DOS_HEADER)hMod)->e_lfanew);
   if(IsBadReadPtr(pNTH, sizeof(IMAGE_NT_HEADERS)) ||(pNTH->Signature != IMAGE_NT_SIGNATURE))
-    return 0;
+    return nHooked;
   //patch IAT
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,
     pNTH->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
   if((void*)pID == (void*)pNTH) 
-    return 0;
+    return nHooked;
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
@@ -133,6 +135,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
       for(;pOrgThunk->u1.Function;pOrgThunk++,pThunk++)
         if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
+        __try
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
@@ -155,6 +158,8 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                     {
                       pThunk->u1.Function = it->orgFunc;
                       g_HookList.erase(it);
+                      g_nHooked++;
+                      nHooked++;
                       break;
                     }
                 }else
@@ -163,15 +168,20 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                   HOOKDATA hd={hMod,pThunk->u1.Function,newFunc};
                   g_HookList.push_back(hd);
                   pThunk->u1.Function = (DWORD) newFunc;
+                  g_nHooked--;
+                  nHooked++;
                 }
               }
               VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
             }
           }
-        }
-    }
-  }
-  return 0;
+        }//__try
+        __finally
+        {
+        }//__finally
+    }//if(DoHookDll(DllName))
+  }//for(;pID->Name;pID++) 
+  return nHooked;
 }
 
 DWORD HookModules()
@@ -180,6 +190,7 @@ DWORD HookModules()
   if (!hProc)
     return 0;
   DWORD Siz=0;
+  DWORD nHooked=0;
   EnumProcessModules(hProc,0,0,&Siz);
   HMODULE* hMod=(HMODULE*)malloc(Siz);
   if(hMod)
@@ -192,11 +203,12 @@ DWORD HookModules()
     std::set_difference(hMod,hMod+n,g_ModList.begin(),g_ModList.end(),std::back_inserter(newMods));
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
-      HookIAT(*it,false);
+      nHooked+=HookIAT(*it,false);
     //merge new hModules to list
     g_ModList.merge(newMods);
     free(hMod);
   }
+  DBGTrace2("Hooked %d functions; %d total hooks",nHooked,g_nHooked);
   CloseHandle(hProc);
   return 0;
 }
@@ -204,9 +216,11 @@ DWORD HookModules()
 DWORD UnHookModules()
 {
   //UnHook all hModules
+  DWORD nHooked=0;
   for(ModList::iterator it=g_ModList.begin();it!=g_ModList.end();++it)
-    HookIAT(*it,TRUE);
+    nHooked+=HookIAT(*it,TRUE);
   g_ModList.clear();
+  DBGTrace2("Unhooked %d functions; %d total hooks",nHooked,g_nHooked);
   return 0;
 }
 
@@ -279,9 +293,9 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryA(lpLibFileName);
+  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   if(hMOD)
     HookModules();
-//  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
@@ -290,9 +304,9 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryW(lpLibFileName);
+  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
   if(hMOD)
     HookModules();
-//  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
@@ -301,9 +315,9 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
+  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   if(hMOD)
     HookModules();
-//  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
@@ -312,9 +326,9 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
+  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
   if(hMOD)
     HookModules();
-//  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
