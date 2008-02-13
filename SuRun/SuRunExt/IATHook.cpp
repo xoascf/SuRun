@@ -204,7 +204,7 @@ DWORD HookModules()
     g_ModList.merge(newMods);
     free(hMod);
   }
-  DBGTrace2("Hooked %d functions; %d total hooks",nHooked,g_nHooked);
+  DBGTrace3("Hooked %d functions; %d [%d] total hooks",nHooked,g_nHooked,g_HookList.size());
   CloseHandle(hProc);
   return 0;
 }
