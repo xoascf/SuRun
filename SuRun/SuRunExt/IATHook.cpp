@@ -332,7 +332,9 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 void LoadHooks()
 {
   InitializeCriticalSection(&g_HookCs);
+  EnterCriticalSection(&g_HookCs);
   HookModules();
+  LeaveCriticalSection(&g_HookCs);
 }
 
 void UnloadHooks()
