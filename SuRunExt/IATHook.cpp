@@ -216,12 +216,13 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DBGTrace2("CreateProcessA-Hook(%s,%s);",
-    lpApplicationName?CAToWStr(lpApplicationName):L"",
-    lpCommandLine?CAToWStr(lpCommandLine):L"");
-  return CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
+  BOOL b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
     lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
     lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  DBGTrace3("CreateProcessA-Hook(%s,%s)=%x",
+    lpApplicationName?CAToWStr(lpApplicationName):L"",
+    lpCommandLine?CAToWStr(lpCommandLine):L"",b);
+  return b;
 }
 
 BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
@@ -230,11 +231,12 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DBGTrace2("CreateProcessW-Hook(%s,%s);",
-    lpApplicationName?lpApplicationName:L"",lpCommandLine?lpCommandLine:L"");
-  return CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
+  BOOL b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
     lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
     lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  DBGTrace3("CreateProcessW-Hook(%s,%s)=%x",
+    lpApplicationName?lpApplicationName:L"",lpCommandLine?lpCommandLine:L"",b);
+  return b;
 }
 
 BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpPassword,
@@ -242,19 +244,19 @@ BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpP
     LPVOID lpEnvironment,LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
+//  DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
   BOOL b=CreateProcessWithLogonW(lpUsername,lpDomain,lpPassword,dwLogonFlags,
-    lpApplicationName,lpCommandLine,cf,lpEnvironment,lpCurrentDirectory,
+    lpApplicationName,lpCommandLine,dwCreationFlags,lpEnvironment,lpCurrentDirectory,
     lpStartupInfo,lpProcessInformation);
-  if (b)
-  {
-    //Process is suspended...
-    DBGTrace6("CreateProcessWithLogonW-Hook(%s,%s,%s,%s,%s,%s);",
-      lpUsername,lpDomain,lpPassword,dwLogonFlags,lpApplicationName,lpCommandLine);
-    //Resume main thread:
-    if ((CREATE_SUSPENDED & dwCreationFlags)==0)
-      ResumeThread(lpProcessInformation->hThread);
-  }
+//  if (b)
+//  {
+//    //Process is suspended...
+//    //Resume main thread:
+//    if ((CREATE_SUSPENDED & dwCreationFlags)==0)
+//      ResumeThread(lpProcessInformation->hThread);
+//  }
+  DBGTrace6("CreateProcessWithLogonW-Hook(%s,%s,%s,%s,%s)==%x",
+    lpUsername,lpDomain,lpPassword,lpApplicationName,lpCommandLine,b);
   return b;
 }
 
@@ -279,8 +281,8 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
   HMODULE hMOD=LoadLibraryA(lpLibFileName);
   if(hMOD)
     HookModules();
-  LeaveCriticalSection(&g_HookCs);
   DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
+  LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
 
@@ -290,8 +292,8 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
   HMODULE hMOD=LoadLibraryW(lpLibFileName);
   if(hMOD)
     HookModules();
-  LeaveCriticalSection(&g_HookCs);
   DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
+  LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
 
@@ -301,8 +303,8 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
-  LeaveCriticalSection(&g_HookCs);
   DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
+  LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
 
@@ -312,8 +314,8 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
-  LeaveCriticalSection(&g_HookCs);
   DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
+  LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
 
