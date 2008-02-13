@@ -1,7 +1,12 @@
 ToDo:
+*Mache Zum SuRunner:
+  * Alle außer vordef. Admin
+  * keinen
+  * Alle außer, die in der Liste:
+
 * Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
 * Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
-* Mache nicht SuRunner automatisch zum SuRunner muss konfigurierbar werden!
+* Mache nicht User automatisch zum SuRunner muss konfigurierbar werden!
 * Konsolen-SuRun
 * Install-Container
 
