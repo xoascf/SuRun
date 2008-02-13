@@ -177,9 +177,11 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
+#ifdef _DEBUG
     DBGTrace4("DLL_PROCESS_DETACH(hInst=%x) %d:%s, Admin=%d",
       hInstDLL,PID,fMod,IsAdmin());
     UnloadHooks();
+#endif _DEBUG
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
