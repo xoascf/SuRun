@@ -12,10 +12,15 @@
 //                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
 //////////////////////////////////////////////////////////////////////////////
 
+#define _WIN32_WINNT 0x0500
+#define WINVER       0x0500
+
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include <Psapi.h>
 #include <shlwapi.h>
+
 #include "SysMenuHook.h"
 #include "../DBGTrace.H"
 #include "../ResStr.h"
@@ -25,7 +30,6 @@
 #include "SuRunExt.h"
 #include "Resource.h"
 #include "IATHook.h"
-#include <Psapi.h>
 
 #pragma comment(lib,"PSAPI.lib")
 #pragma comment(lib,"shlwapi")
@@ -166,27 +170,33 @@ __declspec(dllexport) BOOL UninstallSysMenuHook()
 
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
+  CTimeLog l(L"Surun:DllMain");
+  TCHAR fMod[MAX_PATH];
+  GetModuleFileName(0,fMod,MAX_PATH);
+  DWORD PID=GetCurrentProcessId();
+  //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
+    DBGTrace4("DLL_PROCESS_DETACH(hInst=%x) %d:%s, Admin=%d",
+      hInstDLL,PID,fMod,IsAdmin());
     UnloadHooks();
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
     return TRUE;
+  //Process Attach:
   DisableThreadLibraryCalls(hInstDLL);
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
   //Do not set hooks into SuRun!
-  TCHAR fMod[MAX_PATH];
-  GetModuleFileName(0,fMod,MAX_PATH);
   TCHAR fSuRunExe[MAX_PATH];
   GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
   PathAppend(fSuRunExe,L"SuRun.exe");
   BOOL bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0);
 #ifdef _DEBUG
   DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, Admin=%d, SetHook=%d",
-    hInstDLL,GetCurrentProcessId(),fMod,IsAdmin(),bSetHook);
+    hInstDLL,PID,fMod,IsAdmin(),bSetHook);
   if(bSetHook)
     LoadHooks();
 #endif _DEBUG
