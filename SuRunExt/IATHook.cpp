@@ -17,6 +17,7 @@
 
 #include <windows.h>
 #include <Psapi.h>
+#include <ShlWapi.h>
 
 #include <list>
 #include <algorithm>
@@ -27,6 +28,7 @@
 #include "SysMenuHook.h"
 
 #pragma comment(lib,"Advapi32.lib")
+#pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 
 //Forward decl:
@@ -95,7 +97,9 @@ BOOL DoHookDll(char* DllName)
 //returns newFunc if DllName->ImpName is one to be hooked up
 PROC DoHookFn(char* DllName,char* ImpName)
 {
-  if (ImpName && *ImpName)
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
+    return 0;
+  if(*DllName && *ImpName)
     for(int i=0;i<countof(hdt);i++)
       if (stricmp(hdt[i].DllName,DllName)==0)
         if (stricmp(hdt[i].FuncName,ImpName)==0)
@@ -125,12 +129,13 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     char* DllName=RelPtr(char*,hMod,pID->Name);
     if(DoHookDll(DllName))
     {
+      PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
-      for(;pThunk->u1.Function;pThunk++)
-        if ((pThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
+      for(;pOrgThunk->u1.Function;pOrgThunk++,pThunk++)
+        if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
         {
-          PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pThunk->u1.AddressOfData);
-          PROC newFunc = DoHookFn(RelPtr(char*,hMod,pID->Name),(char*)pBN->Name);
+          PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
           if (newFunc 
             && ((!bUnHook) && (pThunk->u1.Function!=(DWORD)newFunc)
             ||( bUnHook  && (pThunk->u1.Function==(DWORD)newFunc)))
@@ -244,7 +249,8 @@ BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpP
   if (b)
   {
     //Process is suspended...
-
+    DBGTrace6("CreateProcessWithLogonW-Hook(%s,%s,%s,%s,%s,%s);",
+      lpUsername,lpDomain,lpPassword,dwLogonFlags,lpApplicationName,lpCommandLine);
     //Resume main thread:
     if ((CREATE_SUSPENDED & dwCreationFlags)==0)
       ResumeThread(lpProcessInformation->hThread);
@@ -259,10 +265,11 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 {
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
+  PathStripPathA(f);
   PROC p=DoHookFn(f,(char*)lpProcName);
   if(!p)
     p=GetProcAddress(hModule,lpProcName);;
-  DBGTrace4("GetProcAddress(%x(%s),%s)==%x",hModule,CAToWStr(f),CAToWStr(lpProcName),p);
+  DBGTrace4("GetProcAddress(%x [%s],%s)==%x",hModule,CAToWStr(f),CAToWStr(lpProcName),p);
   return p;
 }
 
