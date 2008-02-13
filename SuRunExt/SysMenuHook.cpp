@@ -173,6 +173,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   CTimeLog l(L"Surun:DllMain");
   TCHAR fMod[MAX_PATH];
   GetModuleFileName(0,fMod,MAX_PATH);
+
   DWORD PID=GetCurrentProcessId();
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
