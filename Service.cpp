@@ -835,8 +835,6 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   RemoveRegistry();
   if (bJustStop)
     return TRUE;
-  //Shell Extension
-  RemoveShellExt();
   //HKLM\Security\SuRun
   DelRegKey(HKLM,SVCKEY);
   //ToDo: SuRunners->Administratoren
@@ -892,8 +890,6 @@ BOOL InstallService()
   {
     //Registry
     InstallRegistry();
-    //Shell Extension
-    InstallShellExt();
     //"SuDuers" Group
     CreateSuRunnersGroup();
     //Install Start menu Links
@@ -972,9 +968,13 @@ bool HandleServiceStuff()
     {
       if (!IsLocalSystem())
         return false;
+      //Shell Extension
+      InstallShellExt();
       SERVICE_TABLE_ENTRY DispatchTable[]={{SvcName,ServiceMain},{0,0}};
       //StartServiceCtrlDispatcher is a blocking call
       StartServiceCtrlDispatcher(DispatchTable);
+      //Shell Extension
+      RemoveShellExt();
       ExitProcess(0);
       return true;
     }
@@ -1057,6 +1057,11 @@ bool HandleServiceStuff()
         Sleep(1000);
   //The Service must be running!
   ss=CheckServiceStatus();
+  if (ss==SERVICE_STOPPED)
+  {
+    ExitProcess(-2);//Let ShellExec Hook return
+    return false;
+  }
   while(ss!=SERVICE_RUNNING)
   {
     if (!UserInstall(IDS_ASKINSTALL))
