@@ -158,7 +158,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                     {
                       pThunk->u1.Function = it->orgFunc;
                       g_HookList.erase(it);
-                      g_nHooked++;
+                      g_nHooked--;
                       nHooked++;
                       break;
                     }
@@ -168,7 +168,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                   HOOKDATA hd={hMod,pThunk->u1.Function,newFunc};
                   g_HookList.push_back(hd);
                   pThunk->u1.Function = (DWORD) newFunc;
-                  g_nHooked--;
+                  g_nHooked++;
                   nHooked++;
                 }
               }
