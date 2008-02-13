@@ -352,7 +352,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!_wcsicmp(c,L"/RETURNPID"))
     {
       bReturnPID=TRUE;
-      wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
     }else
     if (!_wcsicmp(c,L"/TESTAUTOADMIN"))
