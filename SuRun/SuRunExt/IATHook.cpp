@@ -74,13 +74,13 @@ const HOOKDESCRIPTOR hdt[]=
   //Standard Hooks: These must be implemented!
   {"kernel32.dll","LoadLibraryA",(PROC)LoadLibA},
   {"kernel32.dll","LoadLibraryW",(PROC)LoadLibW},
-//  {"kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA},
-//  {"kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW},
-//  {"kernel32.dll","GetProcAddress",(PROC)GetProcAddr},
+  {"kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA},
+  {"kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW},
+  {"kernel32.dll","GetProcAddress",(PROC)GetProcAddr},
   //User Hooks:
-//  {"kernel32.dll","CreateProcessA",(PROC)CreateProcA},
-//  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW},
-//  {"advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW},
+  {"kernel32.dll","CreateProcessA",(PROC)CreateProcA},
+  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW},
+  {"advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW},
 };
 
 //relative pointers in PE images
