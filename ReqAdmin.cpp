@@ -101,7 +101,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
   PathRemoveArgs(FName);
   PathUnquoteSpaces(FName);
   BOOL bReqAdmin=FALSE;
-  HINSTANCE hExe=LoadLibrary(FName);
+  HINSTANCE hExe=LoadLibraryEx(FName,0,LOAD_LIBRARY_AS_DATAFILE);
   if (hExe)
   {
     InfoDBGTrace1("RequiresAdmin(%s) LoadLib ok",FName);
@@ -162,7 +162,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       }
     }
   }else
-    InfoDBGTrace1("RequiresAdmin(%s) LoadLibrary failed",FName);
+    InfoDBGTrace1("RequiresAdmin(%s) LoadLibraryEx failed",FName);
   InfoDBGTrace2("RequiresAdmin(%s)==%d",FName,bReqAdmin);
   return bReqAdmin;
 }
