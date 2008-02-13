@@ -230,7 +230,7 @@ DWORD UnHookModules()
   for(ModList::iterator it=g_ModList.begin();it!=g_ModList.end();++it)
     nHooked+=HookIAT(*it,TRUE);
   g_ModList.clear();
-  DBGTrace2("Unhooked %d functions; %d total hooks",nHooked,g_nHooked);
+//  DBGTrace2("Unhooked %d functions; %d total hooks",nHooked,g_nHooked);
   return nHooked;
 }
 
@@ -303,7 +303,7 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryA(lpLibFileName);
-  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
+//  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -314,7 +314,7 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryW(lpLibFileName);
-  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
+//  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -325,7 +325,7 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
-  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
+//  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -336,7 +336,7 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
-  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
+//  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
