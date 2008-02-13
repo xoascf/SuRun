@@ -132,6 +132,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.104 - 2008-02-16: (Internal Beta)
+----------------------------
+* ShellExtension will be installed/remnoved with Service Start/Stop
+
 SuRun 1.0.2.103 - 2008-01-21: (Internal Beta)
 ----------------------------
 * ShellExecute Hook and Shell Context menu are now disabled for non "SuRunners"
