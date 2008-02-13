@@ -164,133 +164,34 @@ __declspec(dllexport) BOOL UninstallSysMenuHook()
   return bRet;
 }
 
-__declspec(dllexport) BOOL SysMenuHookInstalled()
-{
-  return (g_hookShell!=0)||(g_hookMenu!=0);
-}
-
-LPWSTR AToW(LPCSTR aStr)
-{
-  if(!aStr)
-    return 0;
-  DWORD nChars=strlen(aStr);
-  if (!nChars)
-    return 0;
-  LPWSTR lpw=(LPWSTR)calloc(sizeof(WCHAR)*nChars,1);
-  if(!lpw)
-    return 0;
-  WideCharToMultiByte(CP_ACP,0,lpw,-1,(char*)aStr,nChars,NULL,NULL);
-  return lpw;
-}
-
-void CheckIAT(HMODULE hMod);
-
-BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
-    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
-    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
-    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation)
-{
-  DBGTrace("CreateProcessA-Hook()");
-  return CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
-    lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
-    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-}
-
-BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
-    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
-    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
-    LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation)
-{
-  DBGTrace2("CreateProcessW-Hook(%s,%s);",
-    lpApplicationName?lpApplicationName:L"",lpCommandLine?lpCommandLine:L"");
-  return CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
-    lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
-    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-}
-
-HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
-{
-  DBGTrace("LoadLibA");
-  HMODULE hMOD=LoadLibraryA(lpLibFileName);
-  CheckIAT(hMOD);
-  return hMOD;
-}
-
-HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
-{
-  DBGTrace1("LoadLibW %s",lpLibFileName);
-  HMODULE hMOD=LoadLibraryW(lpLibFileName);
-  CheckIAT(hMOD);
-  return hMOD;
-}
-
-HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
-{
-  DBGTrace("LoadLibExA");
-  HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
-  CheckIAT(hMOD);
-  return hMOD;
-}
-
-HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
-{
-  DBGTrace1("LoadLibExW %s",lpLibFileName);
-  HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
-  CheckIAT(hMOD);
-  return hMOD;
-}
-
-void CheckIAT(HMODULE hMod)
-{
-  if(hMod == l_hInst)
-    return;
-  DBGTrace1("Hooking Module %x",hMod);
-  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryA,(PROC)LoadLibA);
-  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryW,(PROC)LoadLibW);
-  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExA,(PROC)LoadLibExA);
-  HookIAT(hMod,"kernel32.dll",(PROC)LoadLibraryExW,(PROC)LoadLibExW);
-  HookIAT(hMod,"kernel32.dll",(PROC)CreateProcessA,(PROC)CreateProcA);
-  HookIAT(hMod,"kernel32.dll",(PROC)CreateProcessW,(PROC)CreateProcW);
-}
-
-void CheckIAT()
-{
-  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,GetCurrentProcessId());
-  if (!hProc)
-    return;
-  DWORD Siz=0;
-  EnumProcessModules(hProc,0,0,&Siz);
-  HMODULE* hModues=(HMODULE*)malloc(Siz);
-  if(hModues)
-  {
-    EnumProcessModules(hProc,hModues,Siz,&Siz);
-    for (HMODULE* hMod=hModues;(DWORD)hMod<(DWORD)hModues+Siz;hMod++) 
-      if(*hMod != l_hInst)
-        CheckIAT(*hMod);
-    free(hModues);
-  }
-  CloseHandle(hProc);
-}
-
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
+  if(dwReason==DLL_PROCESS_DETACH)
+  {
+    UnloadHooks();
+    return TRUE;
+  }
   if(dwReason!=DLL_PROCESS_ATTACH)
     return TRUE;
   if (l_hInst==hInstDLL)
     return TRUE;
+  l_hInst=hInstDLL;
+  //Do not set hooks into SuRun!
+  TCHAR fMod[MAX_PATH];
+  GetModuleFileName(0,fMod,MAX_PATH);
+  TCHAR fSuRunExe[MAX_PATH];
+  GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
+  PathAppend(fSuRunExe,L"SuRun.exe");
+  BOOL bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0);
 #ifdef _DEBUG
-  TCHAR f[MAX_PATH];
-  GetModuleFileName(0,f,MAX_PATH);
-  DWORD PID=GetCurrentProcessId();
-  DBGTrace4("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, Admin=%d",hInstDLL,PID,f,IsAdmin());
-  //CheckIAT();
+  DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, Admin=%d, SetHook=%d",
+    hInstDLL,GetCurrentProcessId(),fMod,IsAdmin(),bSetHook);
+  if(bSetHook)
+    LoadHooks();
 #endif _DEBUG
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
-  l_hInst=hInstDLL;
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   DisableThreadLibraryCalls(hInstDLL);
