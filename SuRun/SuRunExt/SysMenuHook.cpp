@@ -173,6 +173,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
     return TRUE;
+  DisableThreadLibraryCalls(hInstDLL);
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
@@ -194,7 +195,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #endif _DEBUG_ENU
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  DisableThreadLibraryCalls(hInstDLL);
   _tcscpy(sMenuRestart,CResStr(l_hInst,IDS_MENURESTART));
   _tcscpy(sMenuStart,CResStr(l_hInst,IDS_MENUSTART));
   _tcscpy(sFileNotFound,CResStr(l_hInst,IDS_FILENOTFOUND));
