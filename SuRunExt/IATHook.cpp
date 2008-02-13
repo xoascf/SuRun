@@ -135,7 +135,6 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
       for(;pOrgThunk->u1.Function;pOrgThunk++,pThunk++)
         if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
-        __try
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
@@ -175,10 +174,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
               VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
             }
           }
-        }//__try
-        __finally
-        {
-        }//__finally
+        }
     }//if(DoHookDll(DllName))
   }//for(;pID->Name;pID++) 
   return nHooked;
