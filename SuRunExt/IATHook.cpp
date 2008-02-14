@@ -319,7 +319,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-      InjectIATHook(lpProcessInformation->hProcess);
+      //InjectIATHook(lpProcessInformation->hProcess);
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
@@ -384,7 +384,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-      InjectIATHook(lpProcessInformation->hProcess);
+      //InjectIATHook(lpProcessInformation->hProcess);
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
