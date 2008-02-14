@@ -568,7 +568,7 @@ DWORD StartAdminProcessTrampoline()
         rd.CliProcessId=pi.dwProcessId;
         rd.CliThreadId=pi.dwThreadId;
         rd.KillPID=0;
-        if (!WriteProcessMemory(pi.hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
+        if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
           TerminateProcess(pi.hProcess,0);
         else if (!WriteProcessMemory(pi.hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
           TerminateProcess(pi.hProcess,0);
