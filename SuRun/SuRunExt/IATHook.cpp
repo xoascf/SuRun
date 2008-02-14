@@ -246,7 +246,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
   BOOL HasParams=lpCommandLine && strlen(lpCommandLine);
   if(lpApplicationName)
   {
-    strcpy(cmd,lpApplicationName);
+    strcat(cmd,lpApplicationName);
     PathQuoteSpacesA(cmd);
     if (HasParams)
       strcat(cmd," ");
@@ -262,7 +262,6 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
   if (CreateProcessA(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     CloseHandle(pi.hThread );
-    
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
@@ -297,7 +296,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   BOOL HasParams=lpCommandLine && wcslen(lpCommandLine);
   if(lpApplicationName)
   {
-    wcscpy(cmd,lpApplicationName);
+    wcscat(cmd,lpApplicationName);
     PathQuoteSpacesW(cmd);
     if (HasParams)
       wcscat(cmd,L" ");
@@ -313,7 +312,6 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     CloseHandle(pi.hThread );
-    
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
