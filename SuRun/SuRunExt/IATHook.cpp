@@ -241,24 +241,31 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
   DBGTrace2("CreateProcessA-Hook(%s,%s)",
     lpApplicationName?CAToWStr(lpApplicationName):L"",
     lpCommandLine?CAToWStr(lpCommandLine):L"");
-  char cmd[MAX_PATH];
-  GetSystemWindowsDirectoryA(cmd,MAX_PATH);
+  char cmd[4096];
+  GetSystemWindowsDirectoryA(cmd,4096);
   PathAppendA(cmd,"SuRun.exe");
   PathQuoteSpacesA(cmd);
   strcat(cmd," /TESTAUTOADMIN ");
-  BOOL HasParams=lpCommandLine && strlen(lpCommandLine);
+  char* parms=(lpCommandLine && strlen(lpCommandLine))?lpCommandLine:0;
   if(lpApplicationName)
   {
-    char tmp[MAX_PATH];
+    char tmp[4096];
+    if (parms)
+    {
+      strcpy(tmp,lpCommandLine);
+      PathRemoveArgsA(tmp);
+      PathUnquoteSpacesA(tmp);
+      if (stricmp(tmp,lpApplicationName)!=0)
+        parms=PathGetArgsA(lpCommandLine);
+    }
     strcpy(tmp,lpApplicationName);
     PathQuoteSpacesA(tmp);
     strcat(cmd,tmp);
-    PathQuoteSpacesA(cmd);
-    if (HasParams)
+    if (parms)
       strcat(cmd," ");
   }
-  if (HasParams)
-    strcat(cmd,lpCommandLine);
+  if (parms)
+    strcat(cmd,parms);
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   STARTUPINFOA si;
   PROCESS_INFORMATION pi;
@@ -304,23 +311,31 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   DBGTrace2("CreateProcessW-Hook(%s,%s)",
     lpApplicationName?lpApplicationName:L"",
     lpCommandLine?lpCommandLine:L"");
-  WCHAR cmd[MAX_PATH];
-  GetSystemWindowsDirectoryW(cmd,MAX_PATH);
+  WCHAR cmd[4096];
+  GetSystemWindowsDirectoryW(cmd,4096);
   PathAppendW(cmd,L"SuRun.exe");
   PathQuoteSpacesW(cmd);
   wcscat(cmd,L" /TESTAUTOADMIN ");
-  BOOL HasParams=lpCommandLine && wcslen(lpCommandLine);
+  WCHAR* parms=(lpCommandLine && wcslen(lpCommandLine))?lpCommandLine:0;
   if(lpApplicationName)
   {
-    WCHAR tmp[MAX_PATH];
+    WCHAR tmp[4096];
+    if (parms)
+    {
+      wcscpy(tmp,lpCommandLine);
+      PathRemoveArgsW(tmp);
+      PathUnquoteSpacesW(tmp);
+      if (wcsicmp(tmp,lpApplicationName)!=0)
+        parms=PathGetArgsW(lpCommandLine);
+    }
     wcscpy(tmp,lpApplicationName);
     PathQuoteSpacesW(tmp);
     wcscat(cmd,tmp);
-    if (HasParams)
+    if (parms)
       wcscat(cmd,L" ");
   }
-  if (HasParams)
-    wcscat(cmd,lpCommandLine);
+  if (parms)
+    wcscat(cmd,parms);
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   STARTUPINFOW si;
   PROCESS_INFORMATION pi;
