@@ -600,6 +600,7 @@ DWORD StartAdminProcessTrampoline()
     UnloadUserProfile(hUser,ProfInf.hProfile);
   }
   CloseHandle(hUser);
+  //ToDo: return a valid PROCESS_INFORMATION!
   return RetVal;
 }
 //////////////////////////////////////////////////////////////////////////////
