@@ -306,9 +306,10 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir)
   // Start the child process.
   if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
-    CloseHandle(pi.hThread );
+    CloseHandle(pi.hThread);
     if(WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
       GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
+    //ToDo: return a valid PROCESS_INFORMATION!
     CloseHandle(pi.hProcess);
   }
   return ExitCode==0;
