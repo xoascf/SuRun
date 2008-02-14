@@ -84,7 +84,7 @@ const HOOKDESCRIPTOR hdt[]=
 };
 
 //relative pointers in PE images
-#define RelPtr(_T,pe,rpt) (_T)( (DWORD)(pe)+(DWORD)(rpt))
+#define RelPtr(_T,pe,rpt) (_T)( (DWORD_PTR)(pe)+(DWORD_PTR)(rpt))
 
 //returns true if DllName is one to be hooked up
 BOOL DoHookDll(char* DllName)
@@ -139,8 +139,8 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
           if (newFunc 
-            && ((!bUnHook) && (pThunk->u1.Function!=(DWORD)newFunc)
-            ||( bUnHook  && (pThunk->u1.Function==(DWORD)newFunc)))
+            && ((!bUnHook) && (pThunk->u1.Function!=(DWORD_PTR)newFunc)
+            ||( bUnHook  && (pThunk->u1.Function==(DWORD_PTR)newFunc)))
             )
           {
             MEMORY_BASIC_INFORMATION mbi;
@@ -166,7 +166,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                   //add Data to g_HookList for UnHook
                   HOOKDATA hd={hMod,pThunk->u1.Function,newFunc};
                   g_HookList.push_back(hd);
-                  pThunk->u1.Function = (DWORD) newFunc;
+                  pThunk->u1.Function = (DWORD_PTR) newFunc;
                   g_nHooked++;
                   nHooked++;
                 }
