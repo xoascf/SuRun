@@ -303,116 +303,8 @@ void KillProcessNice(DWORD PID)
   //The service will call TerminateProcess()...
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// WinMain
-//
-//////////////////////////////////////////////////////////////////////////////
-int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
+int Run()
 {
-  LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
-  zero(g_RunData);
-  //ProcessId
-  g_RunData.CliProcessId=GetCurrentProcessId();
-  //ThreadId
-  g_RunData.CliThreadId=GetCurrentThreadId();
-  //Session
-  ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
-  //WindowStation
-  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
-  //Desktop
-  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
-  //UserName
-  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-  //Current Directory
-  GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
-  NetworkPathToUNCPath(g_RunData.CurDir);
-  //cmdLine
-  bool bRunSetup=FALSE;
-  bool beQuiet=FALSE;
-  bool bReturnPID=FALSE;
-  LPTSTR Args=PathGetArgs(GetCommandLine());
-  //Parse direct commands:
-  while (Args[0]=='/')
-  {
-    LPTSTR c=Args;
-    Args=PathGetArgs(Args);
-    if (*(Args-1)==' ')
-      *(Args-1)=0;
-    if (!_wcsicmp(c,L"/QUIET"))
-    {
-      beQuiet=TRUE;
-    }else
-    if (!_wcsicmp(c,L"/SETUP"))
-    {
-      bRunSetup=TRUE;
-      wcscpy(g_RunData.cmdLine,L"/SETUP");
-      break;
-    }else
-    if (!_wcsicmp(c,L"/RETURNPID"))
-    {
-      bReturnPID=TRUE;
-      break;
-    }else
-    if (!_wcsicmp(c,L"/TESTAUTOADMIN"))
-    {
-      g_RunData.bShlExHook=TRUE;
-    }else
-    if (!_wcsicmp(c,L"/KILL"))
-    {
-      g_RunData.KillPID=wcstol(Args,0,10);
-      Args=PathGetArgs(Args);
-      KillProcessNice(g_RunData.KillPID);
-    }
-  }
-  //Convert Command Line
-  if (!bRunSetup)
-    ArgsToCommand(Args,g_RunData.cmdLine);
-  //Usage
-  if (!g_RunData.cmdLine[0])
-  {
-    if (!beQuiet)
-      MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return bReturnPID?0:ERROR_INVALID_PARAMETER;
-  }
-  //Lets go:
-  HANDLE hPipe=INVALID_HANDLE_VALUE;
-  //retry if the pipe is busy: (max 240s)
-  for(int i=0;i<720;i++)
-  {
-    hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
-    if(hPipe!=INVALID_HANDLE_VALUE)
-      break;
-    Sleep(250);
-  }
-  //No Pipe handle: fail!
-  if (hPipe==INVALID_HANDLE_VALUE)
-    return bReturnPID?0:-2;
-  zero(g_RunPwd);
-  g_RunPwd[0]=0xFF;
-  DWORD nWritten=0;
-  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
-  CloseHandle(hPipe);
-  int n=0;
-  //Wait for max 60s for the Password...
-  while ((g_RunPwd[0]==0xFF)&&(n<1000))
-    Sleep(60);
-  if (g_RunPwd[0]==0xFF)
-    return bReturnPID?0:ERROR_ACCESS_DENIED;
-  if (bRunSetup)
-    return 0;
-  if (g_RunPwd[0]==2) //ShellExec->NOT in List
-    return -2;
-  if (g_RunPwd[0]==3) //Restricted User, may not run App!
-  {
-    if (!beQuiet)
-      MessageBox(0,
-        CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
-        CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return bReturnPID?0:-3;
-  }
-  if (g_RunPwd[0]==1)
-    return bReturnPID?0:ERROR_ACCESS_DENIED;
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb = sizeof(STARTUPINFO);
@@ -436,11 +328,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     //Clear sensitive Data
     zero(g_RunPwd);
     DWORD dwErr=GetLastError();
-    if (!beQuiet)
+    if (!g_RunData.beQuiet)
       MessageBox(0,
-        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
-        CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return bReturnPID?0:dwErr;
+      CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
+      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return dwErr;
   }else
   {
     //Clear sensitive Data
@@ -460,7 +352,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         GetRegStr(HKEY_LOCAL_MACHINE,
           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
           L"Shell",s,MAX_PATH);
-        if (!beQuiet)
+        if (!g_RunData.beQuiet)
           MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
           MB_ICONEXCLAMATION|MB_SETFOREGROUND);
       }
@@ -471,6 +363,110 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     //Ok, we're done with the handles:
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
+    return 0;
   }
-  return bReturnPID?pi.dwProcessId:0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// WinMain
+//
+//////////////////////////////////////////////////////////////////////////////
+int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
+{
+  if (g_RunPwd[0]!=0)
+    return Run();
+  LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
+  //ProcessId
+  g_RunData.CliProcessId=GetCurrentProcessId();
+  //ThreadId
+  g_RunData.CliThreadId=GetCurrentThreadId();
+  //Session
+  ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
+  //WindowStation
+  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+  //Desktop
+  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
+  //UserName
+  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+  //Current Directory
+  GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
+  NetworkPathToUNCPath(g_RunData.CurDir);
+  //cmdLine
+  LPTSTR Args=PathGetArgs(GetCommandLine());
+  //Parse direct commands:
+  bool bRunSetup=FALSE;
+  while (Args[0]=='/')
+  {
+    LPTSTR c=Args;
+    Args=PathGetArgs(Args);
+    if (*(Args-1)==' ')
+      *(Args-1)=0;
+    if (!_wcsicmp(c,L"/QUIET"))
+    {
+      g_RunData.beQuiet=TRUE;
+    }else if (!_wcsicmp(c,L"/SETUP"))
+    {
+      bRunSetup=TRUE;
+      wcscpy(g_RunData.cmdLine,L"/SETUP");
+      break;
+    }else if (!_wcsicmp(c,L"/TESTAUTOADMIN"))
+    {
+      g_RunData.bShlExHook=TRUE;
+    }else if (!_wcsicmp(c,L"/KILL"))
+    {
+      g_RunData.KillPID=wcstol(Args,0,10);
+      Args=PathGetArgs(Args);
+      KillProcessNice(g_RunData.KillPID);
+    }
+  }
+  //Convert Command Line
+  if (!bRunSetup)
+    ArgsToCommand(Args,g_RunData.cmdLine);
+  //Usage
+  if (!g_RunData.cmdLine[0])
+  {
+    if (!g_RunData.beQuiet)
+      MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return ERROR_INVALID_PARAMETER;
+  }
+  //Lets go:
+  HANDLE hPipe=INVALID_HANDLE_VALUE;
+  //retry if the pipe is busy: (max 240s)
+  for(int i=0;i<720;i++)
+  {
+    hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+    if(hPipe!=INVALID_HANDLE_VALUE)
+      break;
+    Sleep(250);
+  }
+  //No Pipe handle: fail!
+  if (hPipe==INVALID_HANDLE_VALUE)
+    return -2;
+  zero(g_RunPwd);
+  g_RunPwd[0]=0xFF;
+  DWORD nWritten=0;
+  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
+  CloseHandle(hPipe);
+  int n=0;
+  //Wait for max 60s for the Password...
+  while ((g_RunPwd[0]==0xFF)&&(n<1000))
+    Sleep(60);
+  if (g_RunPwd[0]==0xFF)
+    return ERROR_ACCESS_DENIED;
+  if (bRunSetup)
+    return 0;
+  if (g_RunPwd[0]==2) //ShellExec->NOT in List
+    return -2;
+  if (g_RunPwd[0]==3) //Restricted User, may not run App!
+  {
+    if (!g_RunData.beQuiet)
+      MessageBox(0,
+      CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return -3;
+  }
+  if (g_RunPwd[0]==1)
+    return ERROR_ACCESS_DENIED;
+  return 0;
 }
