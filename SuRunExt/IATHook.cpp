@@ -238,12 +238,48 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  BOOL b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
-    lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
-    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  DBGTrace3("CreateProcessA-Hook(%s,%s)=%x",
-    lpApplicationName?CAToWStr(lpApplicationName):L"",
-    lpCommandLine?CAToWStr(lpCommandLine):L"",b);
+  char cmd[MAX_PATH];
+  GetSystemWindowsDirectoryA(cmd,MAX_PATH);
+  PathAppendA(cmd,"SuRun.exe");
+  PathQuoteSpacesA(cmd);
+  strcat(cmd," /TESTAUTOADMIN ");
+  BOOL HasParams=lpCommandLine && strlen(lpCommandLine);
+  if(lpApplicationName)
+  {
+    strcpy(cmd,lpApplicationName);
+    PathQuoteSpacesA(cmd);
+    if (HasParams)
+      strcat(cmd," ");
+  }
+  if (HasParams)
+    strcat(cmd,lpCommandLine);
+  DWORD ExitCode=ERROR_ACCESS_DENIED;
+  STARTUPINFOA si;
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  // Start the child process.
+  if (CreateProcessA(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+  {
+    CloseHandle(pi.hThread );
+    
+    if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+      && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
+    {
+      //ExitCode==-2 means that the program is not in the WhiteList
+      if (ExitCode==0)
+      {
+        //ToDo: Show ToolTip "<Program> is running elevated"...
+        //SuRun started the Program as admin.
+      }
+    }
+    CloseHandle(pi.hProcess);
+  }
+  BOOL b=FALSE;
+  if (ExitCode!=0)
+    b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
+      lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
+      lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
   return b;
 }
 
@@ -253,11 +289,48 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  BOOL b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
-    lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
-    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  DBGTrace3("CreateProcessW-Hook(%s,%s)=%x",
-    lpApplicationName?lpApplicationName:L"",lpCommandLine?lpCommandLine:L"",b);
+  WCHAR cmd[MAX_PATH];
+  GetSystemWindowsDirectoryW(cmd,MAX_PATH);
+  PathAppendW(cmd,L"SuRun.exe");
+  PathQuoteSpacesW(cmd);
+  wcscat(cmd,L" /TESTAUTOADMIN ");
+  BOOL HasParams=lpCommandLine && wcslen(lpCommandLine);
+  if(lpApplicationName)
+  {
+    wcscpy(cmd,lpApplicationName);
+    PathQuoteSpacesW(cmd);
+    if (HasParams)
+      wcscat(cmd,L" ");
+  }
+  if (HasParams)
+    wcscat(cmd,lpCommandLine);
+  DWORD ExitCode=ERROR_ACCESS_DENIED;
+  STARTUPINFOW si;
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  // Start the child process.
+  if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+  {
+    CloseHandle(pi.hThread );
+    
+    if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+      && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
+    {
+      //ExitCode==-2 means that the program is not in the WhiteList
+      if (ExitCode==0)
+      {
+        //ToDo: Show ToolTip "<Program> is running elevated"...
+        //SuRun started the Program as admin.
+      }
+    }
+    CloseHandle(pi.hProcess);
+  }
+  BOOL b=FALSE;
+  if (ExitCode!=0)
+    b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
+      lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
+      lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
   return b;
 }
 
