@@ -590,6 +590,8 @@ void SuRun(DWORD ProcessID)
   //Add user to admins group
   AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
   //Give Password to the calling process
+  RunAs(g_RunData.cmdLine,g_RunData.UserName,g_RunPwd);
+  g_RunPwd[0]=2;
   GivePassword();
   //Reset status of "use of empty passwords for network logon"
   if (g_RunPwd[0]==0)
