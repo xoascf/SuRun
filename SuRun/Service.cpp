@@ -84,7 +84,8 @@ static HANDLE g_hPipe=INVALID_HANDLE_VALUE;
 CResStr SvcName(IDS_SERVICE_NAME);
 
 RUNDATA g_RunData={0};
-TCHAR g_RunPwd[PWLEN];
+TCHAR g_RunPwd[PWLEN]={0};
+int g_RetVal=0;
 bool g_CliIsAdmin=FALSE;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -166,10 +167,10 @@ DWORD CheckCliProcess(RUNDATA& rd)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  GivePassword
+//  ResumeClient
 // 
 //////////////////////////////////////////////////////////////////////////////
-BOOL GivePassword() 
+BOOL ResumeClient(int RetVal) 
 {
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.CliProcessId);
   if (!hProcess)
@@ -178,8 +179,8 @@ BOOL GivePassword()
     return FALSE;
   }
   SIZE_T n;
-  //Since it's the same process, g_RunPwd has the same address!
-  if (!WriteProcessMemory(hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
+  //Since it's the same process, g_RetVal has the same address!
+  if (!WriteProcessMemory(hProcess,&g_RetVal,&RetVal,sizeof(int),&n))
   {
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
@@ -276,9 +277,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         //check if the requested App is Flagged with AutoCancel
         if (wlf&FLAG_AUTOCANCEL)
         {
-          zero(g_RunPwd);
-          g_RunPwd[0]=(g_RunData.bShlExHook)?2:1;//Access denied!
-          GivePassword();
+          //Access denied!
+          ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED);
           DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           continue;
         }
@@ -290,9 +290,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             //file names *setup*;*install*;*update*;*.msi;*.msc
             && (!RequiresAdmin(g_RunData.cmdLine)))
           {
-            zero(g_RunPwd);
-            g_RunPwd[0]=2;
-            GivePassword();
+            ResumeClient(RETVAL_SX_NOTINLIST);
             DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
           }
@@ -303,9 +301,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         {
           if (!(wlf&FLAG_NORESTRICT))
           {
-            zero(g_RunPwd);
-            g_RunPwd[0]=g_RunData.bShlExHook?2:3;
-            GivePassword();
+            ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
             DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
           }
@@ -517,7 +513,7 @@ BOOL Setup(LPCTSTR WinStaName)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  ...
+//  StartAdminProcessTrampoline
 // 
 //////////////////////////////////////////////////////////////////////////////
 DWORD StartAdminProcessTrampoline() 
@@ -526,25 +522,25 @@ DWORD StartAdminProcessTrampoline()
   GetSystemWindowsDirectory(cmd,4096);
   PathAppend(cmd,L"SuRun.exe");
   PathQuoteSpaces(cmd);
-  DWORD RetVal=ERROR_ACCESS_DENIED;
+  DWORD RetVal=-1;
   HANDLE hUser=NULL;
   {
     HANDLE hToken=NULL;
     EnablePrivilege(SE_DEBUG_NAME);
     HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
     if (!hProc)
-      return 0;
+      return -1;
     // Open impersonation token for Shell process
     OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
       |TOKEN_ASSIGN_PRIMARY,&hToken);
     CloseHandle(hProc);
     if(!hToken)
-      return 0;
+      return -1;
     DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
       TokenPrimary,&hUser); 
     CloseHandle(hToken);
     if(!hUser)
-      return 0;
+      return -1;
   }
   PROCESS_INFORMATION pi={0};
   TCHAR UserName[MAX_PATH]={0};
@@ -562,14 +558,12 @@ DWORD StartAdminProcessTrampoline()
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      //Add user to admins group
-      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
       if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
         CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
         //Put g_RunData an g_RunPassword in!:
         SIZE_T n;
-        //Since it's the same process, g_RunPwd has the same address!
+        //Since it's the same process, g_RunData and g_RunPwd have the same address!
         RUNDATA rd=g_RunData;
         rd.CliProcessId=pi.dwProcessId;
         rd.CliThreadId=pi.dwThreadId;
@@ -578,15 +572,29 @@ DWORD StartAdminProcessTrampoline()
           TerminateProcess(pi.hProcess,0);
         else if (!WriteProcessMemory(pi.hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
           TerminateProcess(pi.hProcess,0);
+        //Enable use of empty passwords for network logon
+        BOOL bEmptyPWAllowed=FALSE;
+        if (g_RunPwd[0]==0)
+        {
+          bEmptyPWAllowed=EmptyPWAllowed;
+          AllowEmptyPW(TRUE);
+        }
+        //Add user to admins group
+        AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
         ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
         WaitForSingleObject(pi.hProcess,INFINITE);
+        //Remove user from Administrators group
+        AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
+        //Reset status of "use of empty passwords for network logon"
+        if (g_RunPwd[0]==0)
+          AllowEmptyPW(bEmptyPWAllowed);
+        //Clear Password
+        zero(g_RunPwd);
         GetExitCodeProcess(pi.hProcess,&RetVal);
         CloseHandle(pi.hProcess);
       }else
         RetVal=GetLastError();
-      //Remove user from Administrators group
-      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
       DestroyEnvironmentBlock(Env);
     }
     UnloadUserProfile(hUser,ProfInf.hProfile);
@@ -606,7 +614,6 @@ void SuRun(DWORD ProcessID)
     return;
   zero(g_RunData);
   zero(g_RunPwd);
-  g_RunPwd[0]=1;
   RUNDATA RD={0};
   RD.CliProcessId=ProcessID;
   if(CheckCliProcess(RD)!=1)
@@ -614,7 +621,7 @@ void SuRun(DWORD ProcessID)
   //Setup?
   if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
   {
-    GivePassword();
+    ResumeClient(RETVAL_OK);
     Setup(g_RunData.WinSta);
     return;
   }
@@ -624,10 +631,9 @@ void SuRun(DWORD ProcessID)
   {
     if ( g_RunData.bShlExHook
       &&(!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC)))
-      g_RunPwd[0]=2;//let ShellExecute start the process!
+      ResumeClient(RETVAL_SX_NOTINLIST);//let ShellExecute start the process!
     else
-      g_RunPwd[0]=1;
-    GivePassword();
+      ResumeClient(RETVAL_ACCESSDENIED);
     return;
   }
   //Secondary Logon service is required by CreateProcessWithLogonW
@@ -651,28 +657,16 @@ void SuRun(DWORD ProcessID)
     }
     if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
     {
-      zero(g_RunPwd);
-      g_RunPwd[0]=1;
-      GivePassword();
+      ResumeClient(RETVAL_ACCESSDENIED);
       MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
     }
   }
   //copy the password to the client
-  //Enable use of empty passwords for network logon
-  BOOL bEmptyPWAllowed=FALSE;
-  if (g_RunPwd[0]==0)
-  {
-    bEmptyPWAllowed=EmptyPWAllowed;
-    AllowEmptyPW(TRUE);
-  }
   StartAdminProcessTrampoline();
-  //Reset status of "use of empty passwords for network logon"
-  if (g_RunPwd[0]==0)
-    AllowEmptyPW(bEmptyPWAllowed);
-  g_RunPwd[0]=0;
-  GivePassword();
+  //Clear Password
   zero(g_RunPwd);
+  ResumeClient(RETVAL_OK);
 }
 
 //////////////////////////////////////////////////////////////////////////////
