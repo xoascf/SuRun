@@ -35,6 +35,8 @@ typedef struct
   TCHAR cmdLine[4096];
   TCHAR CurDir[MAX_PATH];
   DWORD KillPID;
+  DWORD RetPID;
+  DWORD_PTR RetPtr;
   BOOL  bShlExHook;
   bool  beQuiet;
 }RUNDATA;
