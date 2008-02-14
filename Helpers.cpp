@@ -175,13 +175,13 @@ LPWSTR AToW(LPCSTR aStr)
     return 0;
   if(*aStr==0)
     return 0;
-  DWORD nChars=strlen(aStr);
+  size_t nChars=strlen(aStr);
   if (!nChars)
     return 0;
   LPWSTR lpw=(LPWSTR)calloc(sizeof(WCHAR)*(nChars+1),1);
   if(!lpw)
     return 0;
-  MultiByteToWideChar(CP_ACP,0,aStr,-1,lpw,nChars+1);
+  MultiByteToWideChar(CP_ACP,0,aStr,-1,lpw,(int)nChars+1);
   return lpw;
 }
 
