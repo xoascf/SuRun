@@ -27,6 +27,7 @@
 #include "../helpers.h"
 #include "../IsAdmin.h"
 #include "../UserGroups.h"
+#include "../Service.h"
 #include "../DBGTrace.h"
 #include "SysMenuHook.h"
 
@@ -267,7 +268,7 @@ BOOL InjectIATHook(HANDLE hProc)
   return hThread!=0;
 }
 
-BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir)
+BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
@@ -282,7 +283,8 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir)
   GetSystemWindowsDirectoryW(cmd,4096);
   PathAppendW(cmd,L"SuRun.exe");
   PathQuoteSpacesW(cmd);
-  wcscat(cmd,L" /TESTAUTOADMIN ");
+  PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
+  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x ",GetCurrentProcessId,ppi);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   if(lpApp)
   {
@@ -307,12 +309,22 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir)
   if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
-    if(WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
-      GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
+    WaitForSingleObject(pi.hProcess,INFINITE);
+    GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
     //ToDo: return a valid PROCESS_INFORMATION!
     CloseHandle(pi.hProcess);
+    if (ExitCode==RETVAL_OK)
+    {
+      ppi->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
+      ppi->hThread=OpenThread(SYNCHRONIZE,false,ppi->dwThreadId);
+      if(lppi)
+        memmove(lppi,ppi,sizeof(PROCESS_INFORMATION));
+      DBGTrace5("AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
+        cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
+    }
+    free(ppi);
   }
-  return ExitCode==0;
+  return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_ACCESSDENIED);
 }
 
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
@@ -322,7 +334,8 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-  if (!AutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),CAToWStr(lpCurrentDirectory)))
+  if (!AutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),
+    CAToWStr(lpCurrentDirectory),lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
@@ -347,7 +360,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-  if (!AutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory))
+  if (!AutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
