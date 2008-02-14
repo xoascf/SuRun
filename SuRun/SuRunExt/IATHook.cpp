@@ -191,7 +191,7 @@ DWORD HookModules()
   DWORD Siz=0;
   DWORD nHooked=0;
   EnumProcessModules(hProc,0,0,&Siz);
-  HMODULE* hMod=(HMODULE*)malloc(Siz);
+  HMODULE* hMod=Siz?(HMODULE*)malloc(Siz):0;
   if(hMod)
   {
     DWORD n=Siz/sizeof(HMODULE);
