@@ -26,9 +26,9 @@
 class CCmdLine
 {
 public:
-  CCmdLine()
+  CCmdLine(LPCTSTR CmdLine)
   {
-    m_CmdLine=_tcsdup(GetCommandLine());
+    m_CmdLine=_tcsdup(CmdLine?CmdLine:GetCommandLine());
     m_Argc=0;
     //Count command line args and remove spaces
     for (LPTSTR p=m_CmdLine;p && *p;m_Argc++)
