@@ -122,6 +122,13 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
   if(IsBadReadPtr(pNTH, sizeof(IMAGE_NT_HEADERS)) ||(pNTH->Signature != IMAGE_NT_SIGNATURE))
     return nHooked;
   //the right header?
+#ifdef _WIN64
+  if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64)
+    return nHooked;
+#else _WIN64
+  if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_I386)
+    return nHooked;
+#endif _WIN64
   if(pNTH->FileHeader.SizeOfOptionalHeader!=sizeof(IMAGE_OPTIONAL_HEADER))
     return nHooked;
   //patch IAT
