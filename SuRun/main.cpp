@@ -381,15 +381,13 @@ int Run()
     //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
     if((g_RunData.RetPID)&&(g_RunData.RetPtr))
     {
-      DBGTrace3("AutoSuRun(%s) Writing Process Memory: PID=%d Prt=%x",
-        g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr);
       pi.hThread=0;
       pi.hProcess=0;
-      HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.RetPID);
+      HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
       if (hProcess)
       {
         SIZE_T n;
-        if (!WriteProcessMemory(hProcess,&g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+        if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
           DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
             g_RunData.cmdLine,GetLastErrorNameStatic());
         CloseHandle(hProcess);
@@ -461,8 +459,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
       g_RunData.RetPtr=wcstoul(Args,0,16);
       Args=PathGetArgs(Args);
-      DBGTrace3("AutoSuRun(%s) PID=%d Prt=%x ...warming up.",
-        g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr);
     }else if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
