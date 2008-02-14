@@ -246,7 +246,10 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
   BOOL HasParams=lpCommandLine && strlen(lpCommandLine);
   if(lpApplicationName)
   {
-    strcat(cmd,lpApplicationName);
+    char tmp[MAX_PATH];
+    strcpy(tmp,lpApplicationName);
+    PathQuoteSpacesA(tmp);
+    strcat(cmd,tmp);
     PathQuoteSpacesA(cmd);
     if (HasParams)
       strcat(cmd," ");
@@ -296,8 +299,10 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   BOOL HasParams=lpCommandLine && wcslen(lpCommandLine);
   if(lpApplicationName)
   {
-    wcscat(cmd,lpApplicationName);
-    PathQuoteSpacesW(cmd);
+    WCHAR tmp[MAX_PATH];
+    wcscpy(tmp,lpApplicationName);
+    PathQuoteSpacesW(tmp);
+    wcscat(cmd,tmp);
     if (HasParams)
       wcscat(cmd,L" ");
   }
