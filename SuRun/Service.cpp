@@ -589,6 +589,11 @@ void SuRun(DWORD ProcessID)
   }
   //Add user to admins group
   AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
+
+  HANDLE hProc=0;
+  if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
+    SetAccessToWinDesk(hProc,g_RunData.WinSta,g_RunData.Desk,true);
+  SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
   //Give Password to the calling process
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
@@ -638,6 +643,11 @@ void SuRun(DWORD ProcessID)
     //Ok, we're done with the handles:
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
+  }
+  if(hProc)
+  {
+    SetAccessToWinDesk(hProc,g_RunData.WinSta,g_RunData.Desk,false);
+    CloseHandle(hProc);
   }
   g_RunPwd[0]=2;
   GivePassword();
