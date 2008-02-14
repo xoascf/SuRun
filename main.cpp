@@ -26,6 +26,7 @@
 #include "DBGTrace.h"
 #include "Resource.h"
 
+#ifndef _WIN64
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
 #pragma comment(linker,"/DELAYLOAD:advapi32.dll")
@@ -48,6 +49,7 @@
 #pragma comment(linker,"/DELAYLOAD:netapi32.dll")
 #pragma comment(linker,"/DELAYLOAD:psapi.dll")
 #pragma comment(lib,"Delayimp")
+#endif _WIN64
 
 //////////////////////////////////////////////////////////////////////////////
 //
