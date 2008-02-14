@@ -238,6 +238,9 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
+  DBGTrace2("CreateProcessA-Hook(%s,%s)",
+    lpApplicationName?CAToWStr(lpApplicationName):L"",
+    lpCommandLine?CAToWStr(lpCommandLine):L"");
   char cmd[MAX_PATH];
   GetSystemWindowsDirectoryA(cmd,MAX_PATH);
   PathAppendA(cmd,"SuRun.exe");
@@ -273,15 +276,22 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
       {
         //ToDo: Show ToolTip "<Program> is running elevated"...
         //SuRun started the Program as admin.
+      }else
+      {
+        DBGTrace1("CreateProcessA-Hook(%s) NO SURUN!",CAToWStr(cmd));
       }
     }
     CloseHandle(pi.hProcess);
-  }
+  }else
+    DBGTrace1("CreateProcessA-Hook CreateProcessA failed:%s",GetLastErrorNameStatic());
   BOOL b=FALSE;
   if (ExitCode!=0)
+  {
+    DBGTrace("CreateProcessA-Hook calling real CreateProcessA");
     b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
       lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
       lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  }
   return b;
 }
 
@@ -291,6 +301,9 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
+  DBGTrace2("CreateProcessW-Hook(%s,%s)",
+    lpApplicationName?lpApplicationName:L"",
+    lpCommandLine?lpCommandLine:L"");
   WCHAR cmd[MAX_PATH];
   GetSystemWindowsDirectoryW(cmd,MAX_PATH);
   PathAppendW(cmd,L"SuRun.exe");
@@ -325,15 +338,22 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
       {
         //ToDo: Show ToolTip "<Program> is running elevated"...
         //SuRun started the Program as admin.
+      }else
+      {
+        DBGTrace1("CreateProcessA-Hook(%s) NO SURUN!",cmd);
       }
     }
     CloseHandle(pi.hProcess);
-  }
+  }else
+    DBGTrace1("CreateProcessW-Hook CreateProcessW failed:%s",GetLastErrorNameStatic());
   BOOL b=FALSE;
   if (ExitCode!=0)
+  {
+    DBGTrace("CreateProcessW-Hook calling real CreateProcessW");
     b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
       lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
       lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  }
   return b;
 }
 
