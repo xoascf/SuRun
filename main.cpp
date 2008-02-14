@@ -493,7 +493,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
-    return ERROR_ACCESS_DENIED;
+    return RETVAL_ACCESSDENIED;
   g_RetVal=RETVAL_WAIT;
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
