@@ -181,7 +181,7 @@ __declspec(dllexport) void InstallShellExt()
     if (s[0])
       _tcscat(s,_T(","));
     _tcscat(s,_T("SuRunExt.dll"));
-    SetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+    SetRegStr(HKLM,_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
       _T("AppInit_DLLs"),s);
   }/**/
 }
@@ -205,7 +205,7 @@ __declspec(dllexport) void RemoveShellExt()
     *p=0;
     if (*(p1))
       _tcscat(p,p1);
-    SetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+    SetRegStr(HKLM,_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
       _T("AppInit_DLLs"),s);
   }/**/
   //"Open with..." when right clicking on SuRun.exe
