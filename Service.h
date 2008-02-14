@@ -49,4 +49,11 @@ extern RUNDATA g_RunData;
 //SuRun.exe that was started by the user
 extern TCHAR g_RunPwd[PWLEN];
 
+#define RETVAL_WAIT        -1
+#define RETVAL_OK           0
+#define RETVAL_ACCESSDENIED 1
+#define RETVAL_SX_NOTINLIST 2
+#define RETVAL_RESTRICT     3
+extern int g_RetVal;
+
 #pragma pack(pop)
