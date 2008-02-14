@@ -28,6 +28,22 @@
 
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
+#pragma comment(linker,"/DELAYLOAD:advapi32.dll")
+#pragma comment(linker,"/DELAYLOAD:surunext.dll")
+#pragma comment(linker,"/DELAYLOAD:mpr.dll")
+#pragma comment(linker,"/DELAYLOAD:version.dll")
+#pragma comment(linker,"/DELAYLOAD:comctl32.dll")
+#pragma comment(linker,"/DELAYLOAD:rpcrt4.dll")
+#pragma comment(linker,"/DELAYLOAD:userenv.dll")
+#pragma comment(linker,"/DELAYLOAD:comdlg32.dll")
+#pragma comment(linker,"/DELAYLOAD:gdi32.dll")
+#pragma comment(linker,"/DELAYLOAD:user32.dll")
+#pragma comment(linker,"/DELAYLOAD:shell32.dll")
+#pragma comment(linker,"/DELAYLOAD:shlwapi.dll")
+#pragma comment(linker,"/DELAYLOAD:ole32.dll")
+#pragma comment(linker,"/DELAYLOAD:netapi32.dll")
+#pragma comment(linker,"/DELAYLOAD:psapi.dll")
+#pragma comment(lib,"Delayimp")
 
 //////////////////////////////////////////////////////////////////////////////
 //
