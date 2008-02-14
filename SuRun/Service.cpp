@@ -185,7 +185,7 @@ BOOL ResumeClient(int RetVal)
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
   }
-  if (PWLEN!=n)
+  if (sizeof(int)!=n)
   {
     DBGTrace2("WriteProcessMemory invalid size %d != %d ",PWLEN,n);
     return CloseHandle(hProcess),FALSE;
