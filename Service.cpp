@@ -1024,7 +1024,7 @@ bool HandleServiceStuff()
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
-  CCmdLine cmd;
+  CCmdLine cmd(0);
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
     SuRun(wcstol(cmd.argv(2),0,10));
