@@ -174,7 +174,7 @@ __declspec(dllexport) void InstallShellExt()
   //add to AppInit_Dlls
   /* ToDo: Do not use AppInit_Dlls! */
   TCHAR s[4096]={0};
-  GetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+  GetRegStr(HKLM,_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
     _T("AppInit_DLLs"),s,4096);
   if (_tcsstr(s,_T("SuRunExt.dll"))==0)
   {
@@ -192,7 +192,7 @@ __declspec(dllexport) void RemoveShellExt()
   /* ToDo: Do not use AppInit_Dlls! */
   //remove from AppInit_Dlls
   TCHAR s[4096]={0};
-  GetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+  GetRegStr(HKLM,_T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
     _T("AppInit_DLLs"),s,4096);
   LPTSTR p=_tcsstr(s,_T("SuRunExt.dll"));
   if (p!=0)
