@@ -31,6 +31,7 @@
 #include "Resource.h"
 #include "IATHook.h"
 
+#ifndef _WIN64
 #pragma comment(lib,"PSAPI")
 #pragma comment(lib,"shlwapi")
 #pragma comment(linker,"/DELAYLOAD:user32.dll")
@@ -42,6 +43,7 @@
 #pragma comment(linker,"/DELAYLOAD:psapi.dll")
 #pragma comment(linker,"/DELAYLOAD:shlwapi.dll")
 #pragma comment(lib,"Delayimp")
+#endif _WIN64
 
 
 //////////////////////////////////////////////////////////////////////////////
