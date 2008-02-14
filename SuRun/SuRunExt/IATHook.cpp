@@ -37,8 +37,8 @@ BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
-BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
-                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
+//BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
+//                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
 FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
 
@@ -79,8 +79,7 @@ const HOOKDESCRIPTOR hdt[]=
   {"kernel32.dll","GetProcAddress",(PROC)GetProcAddr},
   //User Hooks:
   {"kernel32.dll","CreateProcessA",(PROC)CreateProcA},
-  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW},
-  {"advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW},
+  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW}
 };
 
 //relative pointers in PE images
@@ -228,8 +227,40 @@ DWORD UnHookModules()
   for(ModList::iterator it=g_ModList.begin();it!=g_ModList.end();++it)
     nHooked+=HookIAT(*it,TRUE);
   g_ModList.clear();
-//  DBGTrace2("Unhooked %d functions; %d total hooks",nHooked,g_nHooked);
   return nHooked;
+}
+
+BOOL InjectIATHook(HANDLE hProc)
+{
+  HANDLE hThread=0;
+  __try
+  {
+    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
+    if(!pLoadLib)
+      return false;
+	  char DllName[MAX_PATH];
+	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
+		  return false;
+	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
+	  if(RmteName==NULL)
+		  return false;
+	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
+    __try
+    {
+      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
+    }__except(1)
+    {
+    }
+	  if(hThread!=NULL )
+    {
+      WaitForSingleObject(hThread,INFINITE);
+      CloseHandle(hThread);
+    }
+	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
+  }__except(1)
+  {
+  }
+  return hThread!=0;
 }
 
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
@@ -238,9 +269,6 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DBGTrace2("CreateProcessA-Hook(%s,%s)",
-    lpApplicationName?CAToWStr(lpApplicationName):L"",
-    lpCommandLine?CAToWStr(lpCommandLine):L"");
   char cmd[4096];
   GetSystemWindowsDirectoryA(cmd,4096);
   PathAppendA(cmd,"SuRun.exe");
@@ -252,6 +280,8 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     char tmp[4096];
     if (parms)
     {
+      //lpApplicationName and the first token of lpCommandLine may be the same
+      //we need to check this:
       strcpy(tmp,lpCommandLine);
       PathRemoveArgsA(tmp);
       PathUnquoteSpacesA(tmp);
@@ -275,29 +305,25 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
   if (CreateProcessA(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     CloseHandle(pi.hThread );
-    if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
-      && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
-    {
-      //ExitCode==-2 means that the program is not in the WhiteList
-      if (ExitCode==0)
-      {
-        //ToDo: Show ToolTip "<Program> is running elevated"...
-        //SuRun started the Program as admin.
-      }else
-      {
-        DBGTrace1("CreateProcessA-Hook(%s) NO SURUN!",CAToWStr(cmd));
-      }
-    }
+    if(WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+      GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
     CloseHandle(pi.hProcess);
-  }else
-    DBGTrace1("CreateProcessA-Hook CreateProcessA failed:%s",GetLastErrorNameStatic());
+  }
   BOOL b=FALSE;
   if (ExitCode!=0)
   {
-    DBGTrace("CreateProcessA-Hook calling real CreateProcessA");
+    DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
-      lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
-      lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+        lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
+        lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+    if (b)
+    {
+      //Process is suspended...
+      InjectIATHook(lpProcessInformation->hProcess);
+      //Resume main thread:
+      if ((CREATE_SUSPENDED & dwCreationFlags)==0)
+        ResumeThread(lpProcessInformation->hThread);
+    }
   }
   return b;
 }
@@ -308,9 +334,6 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DBGTrace2("CreateProcessW-Hook(%s,%s)",
-    lpApplicationName?lpApplicationName:L"",
-    lpCommandLine?lpCommandLine:L"");
   WCHAR cmd[4096];
   GetSystemWindowsDirectoryW(cmd,4096);
   PathAppendW(cmd,L"SuRun.exe");
@@ -322,6 +345,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     WCHAR tmp[4096];
     if (parms)
     {
+      //lpApplicationName and the first token of lpCommandLine may be the same
+      //we need to check this:
       wcscpy(tmp,lpCommandLine);
       PathRemoveArgsW(tmp);
       PathUnquoteSpacesW(tmp);
@@ -345,54 +370,28 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     CloseHandle(pi.hThread );
-    if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
-      && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
-    {
-      //ExitCode==-2 means that the program is not in the WhiteList
-      if (ExitCode==0)
-      {
-        //ToDo: Show ToolTip "<Program> is running elevated"...
-        //SuRun started the Program as admin.
-      }else
-      {
-        DBGTrace1("CreateProcessW-Hook(%s) NO SURUN!",cmd);
-      }
-    }
+    if(WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+      GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
     CloseHandle(pi.hProcess);
-  }else
-    DBGTrace1("CreateProcessW-Hook CreateProcessW failed:%s",GetLastErrorNameStatic());
+  }
   BOOL b=FALSE;
   if (ExitCode!=0)
   {
-    DBGTrace("CreateProcessW-Hook calling real CreateProcessW");
+    DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
-      lpThreadAttributes,bInheritHandles,dwCreationFlags,lpEnvironment,
-      lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+        lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
+        lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+    if (b)
+    {
+      //Process is suspended...
+      InjectIATHook(lpProcessInformation->hProcess);
+      //Resume main thread:
+      if ((CREATE_SUSPENDED & dwCreationFlags)==0)
+        ResumeThread(lpProcessInformation->hThread);
+    }
   }
   return b;
 }
-
-BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpPassword,
-    DWORD dwLogonFlags,LPCWSTR lpApplicationName,LPWSTR lpCommandLine,DWORD dwCreationFlags,
-    LPVOID lpEnvironment,LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation)
-{
-  DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-  BOOL b=CreateProcessWithLogonW(lpUsername,lpDomain,lpPassword,dwLogonFlags,
-    lpApplicationName,lpCommandLine,cf,lpEnvironment,lpCurrentDirectory,
-    lpStartupInfo,lpProcessInformation);
-  if (b)
-  {
-    //Process is suspended...
-    DBGTrace6("CreateProcessWithLogonW-Hook(%s,%s,%s,%s,%s)==%x",
-      lpUsername,lpDomain,lpPassword,lpApplicationName,lpCommandLine,b);
-    //Resume main thread:
-    if ((CREATE_SUSPENDED & dwCreationFlags)==0)
-      ResumeThread(lpProcessInformation->hThread);
-  }
-  return b;
-}
-
 
 CRITICAL_SECTION g_HookCs;
 
@@ -404,7 +403,6 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   PROC p=DoHookFn(f,(char*)lpProcName);
   if(!p)
     p=GetProcAddress(hModule,lpProcName);;
-  //DBGTrace4("GetProcAddress(%x [%s],%s)==%x",hModule,CAToWStr(f),CAToWStr(lpProcName),p);
   return p;
 }
 
@@ -412,7 +410,6 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryA(lpLibFileName);
-//  DBGTrace2("LoadLibA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -423,7 +420,6 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryW(lpLibFileName);
-//  DBGTrace2("LoadLibW(%s)==%x",lpLibFileName,hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -434,7 +430,6 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
-//  DBGTrace2("LoadLibExA(%s)==%x",CAToWStr(lpLibFileName),hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -445,7 +440,6 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
-//  DBGTrace2("LoadLibExW(%s)==%x",lpLibFileName,hMOD);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
