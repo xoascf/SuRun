@@ -18,8 +18,6 @@ ToDo:
 * Alle "shell\runas" aus der registry entfernen (mit Backup!)
 * Alle "shell\runas" der registry restaurieren
 
-* Vista benutzt kein ShellExecute für AutoRuns, Startmenü und Desktop
-
 ==============================================================================
 SuRun...  Super User Run
                                                       by Kay Bruns (c) 2007,08
@@ -137,9 +135,20 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.104 - 2008-02-16: (Internal Beta)
+SuRun 1.0.2.104 - 2008-02-14: (Internal Beta)
 ----------------------------
-* ShellExtension will be installed/remnoved with Service Start/Stop
+* ShellExecuteHook was replaced by Import Address Table (IAT) Hooking
+  WARNING: This is pretty experimental:
+  SuRunExt.dll get loaded into all Processes that have a Window or are linked 
+  to user32.dll. SuRun intercepts all calls to LoadLobrary, CreateProcess 
+  and GetProcAddress. This ables SuRun to run predefined apps with elevated 
+  rights and to check for manifests/setup programs more efficiently than with 
+  a IShellExecute hook.
+* FIX: SuRun could be hooked by IAT-Hookers. CreateProcessWithLogonW could 
+  be intercepted by an IAT-Hooker and the Credentials could be used to run an 
+  administrative process. Now a clean SuRun is started by the Service with 
+  "AppInit_Dlls" disabled to do a clean CreateProcessWithLogonW.
+* ShellExtension will be installed/removed with Service Start/Stop
 
 SuRun 1.0.2.103 - 2008-01-21: (Internal Beta)
 ----------------------------
@@ -229,7 +238,7 @@ SuRun 1.0.2.93 - 2007-12-07: (Internal Beta)
   authorization and uses the local group "SuRunners" for local authorization.
 * SuRun waits for max 3 minutes after the Windows start for the Service.
 * SuRun tries to locate the Application to be started. So "surun cmd" will
-  make ask SuRun wether "C:\Windows\System32\cmd.exe" is allowed to run.
+  make ask SuRun whether "C:\Windows\System32\cmd.exe" is allowed to run.
 * Users can make Windows Explorer run specific Applications always with 
   elevated rights. (No "SuRun" command required.)
 * SuRun can be restricted on a per User basis:
@@ -268,7 +277,7 @@ SuRun 1.0.2.6 - 2007-09-20:
 
 SuRun 1.0.2.6 - 2007-09-14:
 ---------------------------
-* With the Option "Store &Passwords (protected, encrypted)" disabled SurRun 
+* With the Option "Store &Passwords (protected, encrypted)" disabled SuRun 
   did not start any Process...Thanks to A.H.Klein for reporting.
 
 SuRun 1.0.2.5 - 2007-09-05:
@@ -341,7 +350,7 @@ SuRun 1.0.1.0 - 2007-05-11:
 * Logon dialogs are resized only if the command line is too long
 * Dialogs have a 40s Timeout to automatic "cancel"
 * SuRun retries to open the service pipe for 3 minutes. This is useful, when a 
-  user starts multiple apps in short intervalls. (e.g. from the StartUp menu)
+  user starts multiple apps in short intervals. (e.g. from the StartUp menu)
 
 SuRun 1.0.0.1 - 2007-05-09:
 ---------------------------
@@ -353,5 +362,5 @@ SuRun 1.0.0.0 - 2007-05-08:
 * first public release
 
 ==============================================================================
-                                    by Kay Bruns (c) 2007, http://kay-bruns.de
+                                 by Kay Bruns (c) 2007,08, http://kay-bruns.de
 ==============================================================================
