@@ -207,7 +207,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   TCHAR fSuRunExe[MAX_PATH];
   GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
   PathAppend(fSuRunExe,L"SuRun.exe");
-  BOOL bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0);
+  BOOL bSetHook=(!IsAdmin())&&(_tcsicmp(fMod,fSuRunExe)!=0);
 #ifdef _DEBUG
   DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, Admin=%d, SetHook=%d",
     hInstDLL,PID,fMod,IsAdmin(),bSetHook);
