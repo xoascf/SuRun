@@ -369,7 +369,6 @@ int Run()
   {
     //Clear sensitive Data
     zero(g_RunPwd);
-    zero(g_RunData);
     //Allow access to the Process and Thread to the Administrators and deny 
     //access for the current user
     SetAdminDenyUserAccess(pi.hThread);
@@ -396,6 +395,7 @@ int Run()
       }else
         DBGTrace1("AutoSuRun(%s) OpenProcess failed: %s",GetLastErrorNameStatic());
     }
+    zero(g_RunData);
     return RETVAL_OK;
   }
 }
@@ -457,8 +457,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
       g_RunData.RetPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
-      g_RunData.RetPtr=wcstol(Args,0,16);
+      g_RunData.RetPtr=wcstoul(Args,0,16);
       Args=PathGetArgs(Args);
+      DBGTrace3("AutoSuRun(%s) PID=%d Prt=%x ...warming up.",
+        g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr);
     }else if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
