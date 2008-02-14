@@ -171,18 +171,15 @@ BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
   while (p && *p)
   {
     LPTSTR p1=PathGetArgs(p);
-    if(p1)
+    if(p1 && *p1)
       *(p1-1)=0;
     PathRemoveBlanks(p);
     PathUnquoteSpaces(p);
     PathQuoteSpaces(p);
     _tcscat(app,p);
-    if (p1)
-    {
-      if(*p1)
+    if (p1 && *p1)
         _tcscat(app,_T(" "));
-      p=p1;
-    }
+    p=p1;
   }
   //Save parameters
   _tcscpy(args,PathGetArgs(app));
