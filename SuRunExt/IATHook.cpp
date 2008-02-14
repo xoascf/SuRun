@@ -288,15 +288,9 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir)
   {
     WCHAR tmp[4096];
     if (parms)
-    {
-      //lpApplicationName and the first token of lpCommandLine may be the same
+      //lpApplicationName and the first token of lpCommandLine are the same
       //we need to check this:
-      wcscpy(tmp,lpCmd);
-      PathRemoveArgsW(tmp);
-      PathUnquoteSpacesW(tmp);
-      if (wcsicmp(tmp,lpApp)==0)
-        parms=PathGetArgsW(lpCmd);
-    }
+      parms=PathGetArgsW(lpCmd);
     wcscpy(tmp,lpApp);
     PathQuoteSpacesW(tmp);
     wcscat(cmd,tmp);
