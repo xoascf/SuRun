@@ -443,30 +443,29 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
     return -2;
-  zero(g_RunPwd);
-  g_RunPwd[0]=0xFF;
+  g_RetVal=RETVAL_WAIT;
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   CloseHandle(hPipe);
   int n=0;
   //Wait for max 60s for the Password...
-  while ((g_RunPwd[0]==0xFF)&&(n<1000))
+  while ((g_RetVal==RETVAL_WAIT)&&(n<1000))
     Sleep(60);
-  if (g_RunPwd[0]==0xFF)
+  if (g_RetVal==RETVAL_WAIT)
     return ERROR_ACCESS_DENIED;
   if (bRunSetup)
     return 0;
-  if (g_RunPwd[0]==2) //ShellExec->NOT in List
+  if (g_RetVal==RETVAL_SX_NOTINLIST) //ShellExec->NOT in List
     return -2;
-  if (g_RunPwd[0]==3) //Restricted User, may not run App!
+  if (g_RetVal==RETVAL_RESTRICT) //Restricted User, may not run App!
   {
     if (!g_RunData.beQuiet)
       MessageBox(0,
-      CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
-      CResStr(IDS_APPNAME),MB_ICONSTOP);
+        CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+        CResStr(IDS_APPNAME),MB_ICONSTOP);
     return -3;
   }
-  if (g_RunPwd[0]==1)
+  if (g_RetVal==RETVAL_ACCESSDENIED)
     return ERROR_ACCESS_DENIED;
   return 0;
 }
