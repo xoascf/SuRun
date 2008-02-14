@@ -379,27 +379,12 @@ int Run()
     //access for the current user
     SetAdminDenyUserAccess(pi.hThread);
     SetAdminDenyUserAccess(pi.hProcess);
-    //Complain if the shell is runnig with administrative privileges:
-    HANDLE hTok=GetShellProcessToken();
-    if(hTok)
-    {
-      if(IsAdmin(hTok))
-      {
-        TCHAR s[MAX_PATH]={0};
-        GetRegStr(HKEY_LOCAL_MACHINE,
-          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-          L"Shell",s,MAX_PATH);
-        if (!g_RunData.beQuiet)
-          MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-          MB_ICONEXCLAMATION|MB_SETFOREGROUND);
-      }
-      CloseHandle(hTok);
-    }
     //Start the main thread
     ResumeThread(pi.hThread);
     //Ok, we're done with the handles:
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
+    //ToDo: return a valid PROCESS_INFORMATION!
     return 0;
   }
 }
@@ -502,6 +487,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return 0;
   if (g_RetVal==RETVAL_SX_NOTINLIST) //ShellExec->NOT in List
     return -2;
+  if (g_RunData.bShlExHook)
+    return 0;
   if (g_RetVal==RETVAL_RESTRICT) //Restricted User, may not run App!
   {
     if (!g_RunData.beQuiet)
@@ -512,5 +499,22 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   if (g_RetVal==RETVAL_ACCESSDENIED)
     return ERROR_ACCESS_DENIED;
+  //Complain if the shell is runnig with administrative privileges:
+  HANDLE hTok=GetShellProcessToken();
+  if(hTok)
+  {
+    if(IsAdmin(hTok))
+    {
+      TCHAR s[MAX_PATH]={0};
+      GetRegStr(HKEY_LOCAL_MACHINE,
+        L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+        L"Shell",s,MAX_PATH);
+      if (!g_RunData.beQuiet)
+        MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+        MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+    }
+    CloseHandle(hTok);
+  }
+  //ToDo: return a valid PROCESS_INFORMATION!
   return 0;
 }
