@@ -18,12 +18,15 @@
 #include <windows.h>
 #include <Psapi.h>
 #include <ShlWapi.h>
+#include <LMCons.h>
 
 #include <list>
 #include <algorithm>
 #include <iterator>
 
 #include "../helpers.h"
+#include "../IsAdmin.h"
+#include "../UserGroups.h"
 #include "../DBGTrace.h"
 #include "SysMenuHook.h"
 
@@ -235,6 +238,7 @@ BOOL InjectIATHook(HANDLE hProc)
   HANDLE hThread=0;
   __try
   {
+    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
     PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
     if(!pLoadLib)
       return false;
@@ -263,54 +267,67 @@ BOOL InjectIATHook(HANDLE hProc)
   return hThread!=0;
 }
 
-BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
-    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
-    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
-    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation)
+BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir)
 {
-  char cmd[4096];
-  GetSystemWindowsDirectoryA(cmd,4096);
-  PathAppendA(cmd,"SuRun.exe");
-  PathQuoteSpacesA(cmd);
-  strcat(cmd," /TESTAUTOADMIN ");
-  char* parms=(lpCommandLine && strlen(lpCommandLine))?lpCommandLine:0;
-  if(lpApplicationName)
+  DWORD ExitCode=ERROR_ACCESS_DENIED;
+  if(IsAdmin())
+    return FALSE;
   {
-    char tmp[4096];
+    TCHAR User[UNLEN+GNLEN+2]={0};
+    GetProcessUserName(GetCurrentProcessId(),User);
+    if (!IsInSuRunners(User))
+      return FALSE;
+  }
+  WCHAR cmd[4096];
+  GetSystemWindowsDirectoryW(cmd,4096);
+  PathAppendW(cmd,L"SuRun.exe");
+  PathQuoteSpacesW(cmd);
+  wcscat(cmd,L" /TESTAUTOADMIN ");
+  WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
+  if(lpApp)
+  {
+    WCHAR tmp[4096];
     if (parms)
     {
       //lpApplicationName and the first token of lpCommandLine may be the same
       //we need to check this:
-      strcpy(tmp,lpCommandLine);
-      PathRemoveArgsA(tmp);
-      PathUnquoteSpacesA(tmp);
-      if (stricmp(tmp,lpApplicationName)==0)
-        parms=PathGetArgsA(lpCommandLine);
+      wcscpy(tmp,lpCmd);
+      PathRemoveArgsW(tmp);
+      PathUnquoteSpacesW(tmp);
+      if (wcsicmp(tmp,lpApp)==0)
+        parms=PathGetArgsW(lpCmd);
     }
-    strcpy(tmp,lpApplicationName);
-    PathQuoteSpacesA(tmp);
-    strcat(cmd,tmp);
+    wcscpy(tmp,lpApp);
+    PathQuoteSpacesW(tmp);
+    wcscat(cmd,tmp);
     if (parms)
-      strcat(cmd," ");
+      wcscat(cmd,L" ");
   }
   if (parms)
-    strcat(cmd,parms);
-  DWORD ExitCode=ERROR_ACCESS_DENIED;
-  STARTUPINFOA si;
+    wcscat(cmd,parms);
+  STARTUPINFOW si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  if (CreateProcessA(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+  if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread );
     if(WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
       GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
     CloseHandle(pi.hProcess);
   }
+  return ExitCode==0;
+}
+
+BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
   BOOL b=FALSE;
-  if (ExitCode!=0)
+  if (!AutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),CAToWStr(lpCurrentDirectory)))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
@@ -334,48 +351,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  WCHAR cmd[4096];
-  GetSystemWindowsDirectoryW(cmd,4096);
-  PathAppendW(cmd,L"SuRun.exe");
-  PathQuoteSpacesW(cmd);
-  wcscat(cmd,L" /TESTAUTOADMIN ");
-  WCHAR* parms=(lpCommandLine && wcslen(lpCommandLine))?lpCommandLine:0;
-  if(lpApplicationName)
-  {
-    WCHAR tmp[4096];
-    if (parms)
-    {
-      //lpApplicationName and the first token of lpCommandLine may be the same
-      //we need to check this:
-      wcscpy(tmp,lpCommandLine);
-      PathRemoveArgsW(tmp);
-      PathUnquoteSpacesW(tmp);
-      if (wcsicmp(tmp,lpApplicationName)==0)
-        parms=PathGetArgsW(lpCommandLine);
-    }
-    wcscpy(tmp,lpApplicationName);
-    PathQuoteSpacesW(tmp);
-    wcscat(cmd,tmp);
-    if (parms)
-      wcscat(cmd,L" ");
-  }
-  if (parms)
-    wcscat(cmd,parms);
-  DWORD ExitCode=ERROR_ACCESS_DENIED;
-  STARTUPINFOW si;
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&si, sizeof(si));
-  si.cb = sizeof(si);
-  // Start the child process.
-  if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-  {
-    CloseHandle(pi.hThread );
-    if(WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
-      GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
-    CloseHandle(pi.hProcess);
-  }
   BOOL b=FALSE;
-  if (ExitCode!=0)
+  if (!AutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
