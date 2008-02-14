@@ -385,15 +385,17 @@ int Run()
         g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr);
       pi.hThread=0;
       pi.hProcess=0;
-      HANDLE hProcess=OpenProcess(PROCESS_VM_WRITE|PROCESS_VM_OPERATION,FALSE,g_RunData.RetPID);
+      HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.RetPID);
       if (hProcess)
       {
         SIZE_T n;
         if (!WriteProcessMemory(hProcess,&g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-          DBGTrace1("AutoSuRun(%s) WriteProcessMemory failed: %s",GetLastErrorNameStatic());
+          DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+            g_RunData.cmdLine,GetLastErrorNameStatic());
         CloseHandle(hProcess);
       }else
-        DBGTrace1("AutoSuRun(%s) OpenProcess failed: %s",GetLastErrorNameStatic());
+        DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+          g_RunData.cmdLine,GetLastErrorNameStatic());
     }
     zero(g_RunData);
     return RETVAL_OK;
