@@ -171,11 +171,44 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
+  //add to AppInit_Dlls
+  /* ToDo: Do not use AppInit_Dlls! */
+  TCHAR s[4096]={0};
+  GetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+    _T("AppInit_DLLs"),s,4096);
+  if (_tcsstr(s,_T("SuRunExt.dll"))==0)
+  {
+    if (s[0])
+      _tcscat(s,_T(","));
+    _tcscat(s,_T("SuRunExt.dll"));
+    SetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+      _T("AppInit_DLLs"),s);
+  }/**/
 }
 
 __declspec(dllexport) void RemoveShellExt()
 {
   //Clean up:
+  /* ToDo: Do not use AppInit_Dlls! */
+  //remove from AppInit_Dlls
+  TCHAR s[4096]={0};
+  GetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+    _T("AppInit_DLLs"),s,4096);
+  LPTSTR p=_tcsstr(s,_T("SuRunExt.dll"));
+  if (p!=0)
+  {
+    LPTSTR p1=p+_tcslen(_T("SuRunExt.dll"));
+    if((*p1==' ')||(*p1==','))
+      p1++;
+    if (p!=s)
+      p--;
+    *p=0;
+    if (*(p1))
+      _tcscat(p,p1);
+    SetRegStr(HKLM,_T("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows"),
+      _T("AppInit_DLLs"),s);
+  }/**/
+  //"Open with..." when right clicking on SuRun.exe
   DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
   DelRegKey(HKCR,L"CLSID\\" sGUID);
