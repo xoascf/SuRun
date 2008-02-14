@@ -364,12 +364,7 @@ int Run()
   {
     //Clear sensitive Data
     zero(g_RunPwd);
-    DWORD dwErr=GetLastError();
-    if (!g_RunData.beQuiet)
-      MessageBox(0,
-      CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
-      CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return dwErr;
+    return RETVAL_ACCESSDENIED;
   }else
   {
     //Clear sensitive Data
@@ -384,8 +379,20 @@ int Run()
     //Ok, we're done with the handles:
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
-    //ToDo: return a valid PROCESS_INFORMATION!
-    return 0;
+    //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+    if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+    {
+      pi.hThread=0;
+      pi.hProcess=0;
+      HANDLE hProcess=OpenProcess(PROCESS_VM_WRITE|PROCESS_VM_OPERATION,FALSE,g_RunData.RetPID);
+      if (hProcess)
+      {
+        SIZE_T n;
+        WriteProcessMemory(hProcess,&g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n);
+        CloseHandle(hProcess);
+      }
+    }
+    return RETVAL_OK;
   }
 }
 
@@ -440,9 +447,14 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       bRunSetup=TRUE;
       wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
-    }else if (!_wcsicmp(c,L"/TESTAUTOADMIN"))
+    }else if (!_wcsicmp(c,L"/TESTAA"))
     {
       g_RunData.bShlExHook=TRUE;
+      //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+      g_RunData.RetPID=wcstol(Args,0,10);
+      Args=PathGetArgs(Args);
+      g_RunData.RetPtr=wcstol(Args,0,16);
+      Args=PathGetArgs(Args);
     }else if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
@@ -458,7 +470,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   {
     if (!g_RunData.beQuiet)
       MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return ERROR_INVALID_PARAMETER;
+    return RETVAL_ACCESSDENIED;
   }
   //Lets go:
   HANDLE hPipe=INVALID_HANDLE_VALUE;
@@ -472,7 +484,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
-    return -2;
+    return ERROR_ACCESS_DENIED;
   g_RetVal=RETVAL_WAIT;
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
@@ -481,40 +493,42 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Wait for max 60s for the Password...
   while ((g_RetVal==RETVAL_WAIT)&&(n<1000))
     Sleep(60);
-  if (g_RetVal==RETVAL_WAIT)
-    return ERROR_ACCESS_DENIED;
   if (bRunSetup)
-    return 0;
-  if (g_RetVal==RETVAL_SX_NOTINLIST) //ShellExec->NOT in List
-    return -2;
-  if (g_RunData.bShlExHook)
-    return 0;
-  if (g_RetVal==RETVAL_RESTRICT) //Restricted User, may not run App!
+    return RETVAL_OK;
+  switch(g_RetVal)
   {
+  case RETVAL_WAIT:
+    return ERROR_ACCESS_DENIED;
+  case RETVAL_SX_NOTINLIST: //ShellExec->NOT in List
+    return RETVAL_SX_NOTINLIST;
+  case RETVAL_RESTRICT: //Restricted User, may not run App!
     if (!g_RunData.beQuiet)
       MessageBox(0,
-        CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
-        CResStr(IDS_APPNAME),MB_ICONSTOP);
-    return -3;
-  }
-  if (g_RetVal==RETVAL_ACCESSDENIED)
-    return ERROR_ACCESS_DENIED;
-  //Complain if the shell is runnig with administrative privileges:
-  HANDLE hTok=GetShellProcessToken();
-  if(hTok)
-  {
-    if(IsAdmin(hTok))
+      CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return RETVAL_RESTRICT;
+  case RETVAL_ACCESSDENIED:
+    if (!g_RunData.beQuiet)
+      MessageBox(0,CResStr(IDS_RUNFAILED,g_RunData.cmdLine),
+      CResStr(IDS_APPNAME),MB_ICONSTOP);
+    return RETVAL_ACCESSDENIED;
+  case RETVAL_OK:
+    HANDLE hTok=GetShellProcessToken();
+    if(hTok)
     {
-      TCHAR s[MAX_PATH]={0};
-      GetRegStr(HKEY_LOCAL_MACHINE,
-        L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-        L"Shell",s,MAX_PATH);
-      if (!g_RunData.beQuiet)
-        MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-        MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+      if(IsAdmin(hTok))
+      {
+        TCHAR s[MAX_PATH]={0};
+        GetRegStr(HKEY_LOCAL_MACHINE,
+          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+          L"Shell",s,MAX_PATH);
+        if (!g_RunData.beQuiet)
+          MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+          MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+      }
+      CloseHandle(hTok);
     }
-    CloseHandle(hTok);
+    return RETVAL_OK;
   }
-  //ToDo: return a valid PROCESS_INFORMATION!
-  return 0;
+  return RETVAL_ACCESSDENIED;
 }
