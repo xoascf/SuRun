@@ -190,8 +190,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #ifdef _DEBUG
     DBGTrace4("DLL_PROCESS_DETACH(hInst=%x) %d:%s, Admin=%d",
       hInstDLL,PID,fMod,IsAdmin());
-//    UnloadHooks();
 #endif _DEBUG
+    UnloadHooks();
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
@@ -209,9 +209,9 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #ifdef _DEBUG
   DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, Admin=%d, SetHook=%d",
     hInstDLL,PID,fMod,IsAdmin(),bSetHook);
-//  if(bSetHook)
-//    LoadHooks();
 #endif _DEBUG
+  if(bSetHook)
+    LoadHooks();
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
