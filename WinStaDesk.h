@@ -30,6 +30,9 @@
 BOOL GetWinStaName(LPTSTR WinSta,DWORD ccWinSta);
 BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName);
 
+void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk);
+void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant);
+
 //This class creates a new desktop with a darkened blurred image of the 
 //current dektop as background.
 class CRunOnNewDeskTop
