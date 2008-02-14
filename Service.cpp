@@ -590,7 +590,55 @@ void SuRun(DWORD ProcessID)
   //Add user to admins group
   AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
   //Give Password to the calling process
-  RunAs(g_RunData.cmdLine,g_RunData.UserName,g_RunPwd);
+  PROCESS_INFORMATION pi={0};
+  STARTUPINFO si={0};
+  si.cb = sizeof(STARTUPINFO);
+  TCHAR un[2*UNLEN+2]={0};
+  TCHAR dn[2*UNLEN+2]={0};
+  _tcscpy(un,g_RunData.UserName);
+  PathStripPath(un);
+  _tcscpy(dn,g_RunData.UserName);
+  PathRemoveFileSpec(dn);
+  if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
+    g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT|CREATE_SUSPENDED,NULL,
+    g_RunData.CurDir,&si,&pi))
+  {
+    //Clear sensitive Data
+    zero(g_RunPwd);
+    DWORD dwErr=GetLastError();
+      MessageBox(0,
+        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
+        CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+  }else
+  {
+    //Clear sensitive Data
+    zero(g_RunPwd);
+    zero(g_RunData);
+    //Allow access to the Process and Thread to the Administrators and deny 
+    //access for the current user
+    SetAdminDenyUserAccess(pi.hThread);
+    SetAdminDenyUserAccess(pi.hProcess);
+    //Complain if the shell is runnig with administrative privileges:
+    HANDLE hTok=GetShellProcessToken();
+    if(hTok)
+    {
+      if(IsAdmin(hTok))
+      {
+        TCHAR s[MAX_PATH]={0};
+        GetRegStr(HKEY_LOCAL_MACHINE,
+          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+          L"Shell",s,MAX_PATH);
+          MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+          MB_ICONEXCLAMATION|MB_SETFOREGROUND|MB_SERVICE_NOTIFICATION);
+      }
+      CloseHandle(hTok);
+    }
+    //Start the main thread
+    ResumeThread(pi.hThread);
+    //Ok, we're done with the handles:
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
+  }
   g_RunPwd[0]=2;
   GivePassword();
   //Reset status of "use of empty passwords for network logon"
