@@ -182,7 +182,6 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
-  //ToDo: AppInit_DLLs
 }
 
 __declspec(dllexport) void RemoveShellExt()
