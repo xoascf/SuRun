@@ -255,7 +255,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
       strcpy(tmp,lpCommandLine);
       PathRemoveArgsA(tmp);
       PathUnquoteSpacesA(tmp);
-      if (stricmp(tmp,lpApplicationName)!=0)
+      if (stricmp(tmp,lpApplicationName)==0)
         parms=PathGetArgsA(lpCommandLine);
     }
     strcpy(tmp,lpApplicationName);
@@ -325,7 +325,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
       wcscpy(tmp,lpCommandLine);
       PathRemoveArgsW(tmp);
       PathUnquoteSpacesW(tmp);
-      if (wcsicmp(tmp,lpApplicationName)!=0)
+      if (wcsicmp(tmp,lpApplicationName)==0)
         parms=PathGetArgsW(lpCommandLine);
     }
     wcscpy(tmp,lpApplicationName);
@@ -355,7 +355,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
         //SuRun started the Program as admin.
       }else
       {
-        DBGTrace1("CreateProcessA-Hook(%s) NO SURUN!",cmd);
+        DBGTrace1("CreateProcessW-Hook(%s) NO SURUN!",cmd);
       }
     }
     CloseHandle(pi.hProcess);
