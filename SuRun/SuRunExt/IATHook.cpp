@@ -284,7 +284,7 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
   PathAppendW(cmd,L"SuRun.exe");
   PathQuoteSpacesW(cmd);
   PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
-  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x ",GetCurrentProcessId,ppi);
+  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x ",GetCurrentProcessId(),ppi);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   if(lpApp)
   {
