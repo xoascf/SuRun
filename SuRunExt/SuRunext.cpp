@@ -93,7 +93,7 @@ typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
 // this is the actual OLE Shell context menu handler
 //
 //////////////////////////////////////////////////////////////////////////////
-class CShellExt : public IContextMenu, IShellExtInit, IShellExecuteHook
+class CShellExt : public IContextMenu, IShellExtInit/*, IShellExecuteHook*/
 {
 protected:
   ULONG m_cRef;
@@ -112,8 +112,8 @@ public:
   STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT FAR *, LPSTR, UINT);
   //IShellExtInit methods
   STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
-  //IShellExecuteHook methods
-  STDMETHODIMP Execute(LPSHELLEXECUTEINFO pei);
+//  //IShellExecuteHook methods
+//  STDMETHODIMP Execute(LPSHELLEXECUTEINFO pei);
 };
 
 typedef CShellExt *LPCSHELLEXT;
@@ -158,19 +158,19 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 
 __declspec(dllexport) void InstallShellExt()
 {
-  //Vista: Enable IShellExecHook
-  SetOption(L"DelIShellExecHookEnable",
-    (DWORD)(GetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-              L"EnableShellExecuteHooks",-1)==-1),
-    0);
-  SetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",L"EnableShellExecuteHooks",1);
+//  //Vista: Enable IShellExecHook
+//  SetOption(L"DelIShellExecHookEnable",
+//    (DWORD)(GetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+//              L"EnableShellExecuteHooks",-1)==-1),
+//    0);
+//  SetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",L"EnableShellExecuteHooks",1);
   //COM-Object
   SetRegStr(HKCR,L"CLSID\\" sGUID,L"",L"SuRun Shell Extension");
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"",L"SuRunExt.dll");
   SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
-  //ShellExecuteHook
-  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
-            sGUID,L"");
+//  //ShellExecuteHook
+//  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
+//            sGUID,L"");
   //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
@@ -186,10 +186,10 @@ __declspec(dllexport) void InstallShellExt()
 
 __declspec(dllexport) void RemoveShellExt()
 {
-  //Vista: Disable ShellExecHook?
-  if (GetOption(L"DelIShellExecHookEnable",0)!=0)
-    RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-              L"EnableShellExecuteHooks");
+//  //Vista: Disable ShellExecHook?
+//  if (GetOption(L"DelIShellExecHookEnable",0)!=0)
+//    RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+//              L"EnableShellExecuteHooks");
   //Clean up:
   DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
@@ -198,8 +198,8 @@ __declspec(dllexport) void RemoveShellExt()
   DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
   DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
   //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
-  //ShellExecuteHook
-  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
+//  //ShellExecuteHook
+//  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
   //self Approval
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
@@ -296,8 +296,8 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
     *ppv = (LPSHELLEXTINIT)this;
   else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
-  if (IsEqualIID(riid, IID_IShellExecuteHook))
-    *ppv = (IShellExecuteHook*)this;
+//  if (IsEqualIID(riid, IID_IShellExecuteHook))
+//    *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
   {
     AddRef();
@@ -553,7 +553,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
-STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
+/*STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
 //  DBGTrace15(
 //        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
@@ -572,16 +572,16 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 //        pei->dwHotKey,
 //        pei->hIcon,
 //        pei->hProcess);
+  //Admins don't need the ShellExec Hook!
+  if (IsAdmin())
+    return S_FALSE;
+  //Non SuRunners don't need the ShellExec Hook!
   {
-    //Non SuRunners don't need the ShellExec Hook!
     TCHAR User[UNLEN+GNLEN+2]={0};
     GetProcessUserName(GetCurrentProcessId(),User);
     if (!IsInSuRunners(User))
       return S_FALSE;
   }
-  //Admins don't need the ShellExec Hook!
-  if (IsAdmin())
-    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
@@ -605,43 +605,30 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     return S_FALSE;
   }
   //check if this Programm has an Auto-SuRun-Entry in the List
+  //Verb must be "AutoRun"
+  if ((!pei->lpVerb)
+    ||(_tcslen(pei->lpVerb)!=0)
+    ||(_tcsicmp(pei->lpVerb,L"AutoRun")!=0))
+  {
+    DBGTrace("SuRun ShellExtHook Error: invalid verb!");
+    return S_FALSE;
+  }
   TCHAR cmd[MAX_PATH];
   TCHAR tmp[MAX_PATH];
-  _tcscpy(tmp,pei->lpFile);
-  PathQuoteSpaces(tmp);
-  //Verb must be "open" or empty
-  BOOL bNoAutoRun=TRUE;
-  if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)
-    &&(_tcsicmp(pei->lpVerb,L"open")!=0)
-    &&(_tcsicmp(pei->lpVerb,L"cplopen")!=0))
-  {
-    if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
-    {
-      //AutoRun: get open command
-      PathAppend(tmp,L"AutoRun.inf");
-      if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,tmp)!=0)
-        return S_FALSE;
-      GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,MAX_PATH,tmp);
-      if (!cmd[0])
-        return S_FALSE;
-      _tcscpy(tmp,cmd);
-      bNoAutoRun=FALSE;
-    }else
-    {
-      DBGTrace("SuRun ShellExtHook Error: invalid verb!");
-      return S_FALSE;
-    }
-  }
+  _tcscpy(cmd,pei->lpFile);
+  PathQuoteSpaces(cmd);
+  //AutoRun: get open command
+  PathAppend(cmd,L"AutoRun.inf");
+  if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,cmd)!=0)
+    return S_FALSE;
+  GetPrivateProfileString(L"AutoRun",L"open",L"",tmp,MAX_PATH,cmd);
+  if (!tmp[0])
+    return S_FALSE;
   GetSystemWindowsDirectory(cmd,MAX_PATH);
-  PathAppend(cmd, _T("SuRun.exe"));
+  PathAppend(cmd,_T("SuRun.exe"));
   PathQuoteSpaces(cmd);
   _tcscat(cmd,L" /TESTAUTOADMIN ");
   _tcscat(cmd,tmp);
-  if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
-  {
-    _tcscat(cmd,L" ");
-    _tcscat(cmd,pei->lpParameters);
-  }
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
@@ -673,4 +660,4 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   return S_FALSE;
-}
+}*/
