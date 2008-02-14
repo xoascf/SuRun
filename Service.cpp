@@ -185,13 +185,13 @@ BOOL ResumeClient(int RetVal)
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
   }
+  CloseHandle(hProcess);
   if (sizeof(int)!=n)
   {
     DBGTrace2("WriteProcessMemory invalid size %d != %d ",PWLEN,n);
-    return CloseHandle(hProcess),FALSE;
+    return FALSE;
   }
-  WaitForSingleObject(hProcess,15000);
-  return CloseHandle(hProcess),TRUE;
+  return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -522,25 +522,25 @@ DWORD StartAdminProcessTrampoline()
   GetSystemWindowsDirectory(cmd,4096);
   PathAppend(cmd,L"SuRun.exe");
   PathQuoteSpaces(cmd);
-  DWORD RetVal=-1;
+  DWORD RetVal=RETVAL_ACCESSDENIED;
   HANDLE hUser=NULL;
   {
     HANDLE hToken=NULL;
     EnablePrivilege(SE_DEBUG_NAME);
     HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
     if (!hProc)
-      return -1;
+      return RetVal;
     // Open impersonation token for Shell process
     OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
       |TOKEN_ASSIGN_PRIMARY,&hToken);
     CloseHandle(hProc);
     if(!hToken)
-      return -1;
+      return RetVal;
     DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
       TokenPrimary,&hUser); 
     CloseHandle(hToken);
     if(!hUser)
-      return -1;
+      return RetVal;
   }
   PROCESS_INFORMATION pi={0};
   TCHAR UserName[MAX_PATH]={0};
@@ -579,6 +579,15 @@ DWORD StartAdminProcessTrampoline()
           bEmptyPWAllowed=EmptyPWAllowed;
           AllowEmptyPW(TRUE);
         }
+        //Disable AppInitHooks
+        TCHAR s[2048]={0};
+        GetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s,2048);
+        SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),_T(""));
+#ifdef _WIN64
+        TCHAR s32[2048]={0};
+        GetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32,2048);
+        SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),_T(""));
+#endif _WIN64
         //Add user to admins group
         AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
         ResumeThread(pi.hThread);
@@ -586,6 +595,11 @@ DWORD StartAdminProcessTrampoline()
         WaitForSingleObject(pi.hProcess,INFINITE);
         //Remove user from Administrators group
         AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
+        //Enable AppInitHooks
+        SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s);
+#ifdef _WIN64
+        SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32);
+#endif _WIN64
         //Reset status of "use of empty passwords for network logon"
         if (g_RunPwd[0]==0)
           AllowEmptyPW(bEmptyPWAllowed);
@@ -593,14 +607,12 @@ DWORD StartAdminProcessTrampoline()
         zero(g_RunPwd);
         GetExitCodeProcess(pi.hProcess,&RetVal);
         CloseHandle(pi.hProcess);
-      }else
-        RetVal=GetLastError();
+      }
       DestroyEnvironmentBlock(Env);
     }
     UnloadUserProfile(hUser,ProfInf.hProfile);
   }
   CloseHandle(hUser);
-  //ToDo: return a valid PROCESS_INFORMATION!
   return RetVal;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -664,10 +676,10 @@ void SuRun(DWORD ProcessID)
     }
   }
   //copy the password to the client
-  StartAdminProcessTrampoline();
+  DWORD RetVal=StartAdminProcessTrampoline();
   //Clear Password
   zero(g_RunPwd);
-  ResumeClient(RETVAL_OK);
+  ResumeClient(RetVal);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -812,7 +824,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
       if (WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
         GetExitCodeProcess(pi.hProcess,&ExitCode);
       CloseHandle(pi.hProcess);
-      if (ExitCode==ERROR_ACCESS_DENIED)
+      if (ExitCode==RETVAL_ACCESSDENIED)
         return FALSE;
       if (ExitCode==0)
         WaitFor(CheckServiceStatus()==WaitStat);
