@@ -135,10 +135,10 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
   if(pNTH->FileHeader.SizeOfOptionalHeader!=sizeof(IMAGE_OPTIONAL_HEADER))
     return nHooked;
   //patch IAT
-  PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,
-    pNTH->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
-  if((HMODULE)pID == hMod) 
+  DWORD_PTR va=pNTH->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+  if(va==0) 
     return nHooked;
+  PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
@@ -146,7 +146,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     {
       PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
-      for(;pOrgThunk->u1.Function;pOrgThunk++,pThunk++)
+      for(;(pOrgThunk->u1.Function)&&(pOrgThunk->u1.Function);pOrgThunk++,pThunk++)
         if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
