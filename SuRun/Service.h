@@ -36,6 +36,7 @@ typedef struct
   TCHAR CurDir[MAX_PATH];
   DWORD KillPID;
   BOOL  bShlExHook;
+  bool  beQuiet;
 }RUNDATA;
 
 extern bool g_CliIsAdmin;
