@@ -374,7 +374,15 @@ int Run()
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  //After the User presses OK, the service starts a clean SuRun exe with the 
+  //Clients user token, it fills g_RunData and g_RunPwd
+  //We must Do this for two reasons:
+  //1. CreateProcessWithLogonW does not work directly from the service
+  //2. IAT-Hookers may have infect the Client-SuRun.exe and intercept
+  //   CreateProcessWithLogonW. If SuRun.exe is directly started from the 
+  //   service, no common injection methods will work.
   if (g_RunPwd[0]!=0)
+    //Started from services:
     return Run();
   LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   //ProcessId
