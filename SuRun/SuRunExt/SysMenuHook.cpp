@@ -31,8 +31,18 @@
 #include "Resource.h"
 #include "IATHook.h"
 
-#pragma comment(lib,"PSAPI.lib")
+#pragma comment(lib,"PSAPI")
 #pragma comment(lib,"shlwapi")
+#pragma comment(linker,"/DELAYLOAD:user32.dll")
+#pragma comment(linker,"/DELAYLOAD:shfolder.dll")
+#pragma comment(linker,"/DELAYLOAD:gdi32.dll")
+#pragma comment(linker,"/DELAYLOAD:netapi32.dll")
+#pragma comment(linker,"/DELAYLOAD:ole32.dll")
+#pragma comment(linker,"/DELAYLOAD:shell32.dll")
+#pragma comment(linker,"/DELAYLOAD:psapi.dll")
+#pragma comment(linker,"/DELAYLOAD:shlwapi.dll")
+#pragma comment(lib,"Delayimp")
+
 
 //////////////////////////////////////////////////////////////////////////////
 //
