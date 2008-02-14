@@ -162,12 +162,30 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
 //////////////////////////////////////////////////////////////////////////////
 BOOL ArgsToCommand(IN LPWSTR Args,OUT LPTSTR cmd)
 {
-  //Save parameters
-  TCHAR args[4096]={0};
-  _tcscpy(args,PathGetArgs(Args));
   //Application
   TCHAR app[4096]={0};
-  _tcscpy(app,Args);
+  TCHAR args[4096]={0};
+  _tcscpy(args,Args);
+  //Clean up double spaces or unneeded quotes
+  LPTSTR p=&args[0];
+  while (p && *p)
+  {
+    LPTSTR p1=PathGetArgs(p);
+    if(p1)
+      *(p1-1)=0;
+    PathRemoveBlanks(p);
+    PathUnquoteSpaces(p);
+    PathQuoteSpaces(p);
+    _tcscat(app,p);
+    if (p1)
+    {
+      if(*p1)
+        _tcscat(app,_T(" "));
+      p=p1;
+    }
+  }
+  //Save parameters
+  _tcscpy(args,PathGetArgs(app));
   PathRemoveArgs(app);
   PathUnquoteSpaces(app);
   NetworkPathToUNCPath(app);
