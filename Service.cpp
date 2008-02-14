@@ -517,6 +517,85 @@ BOOL Setup(LPCTSTR WinStaName)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  ...
+// 
+//////////////////////////////////////////////////////////////////////////////
+DWORD StartAdminProcessTrampoline() 
+{
+  TCHAR cmd[4096]={0};
+  GetSystemWindowsDirectory(cmd,4096);
+  PathAppend(cmd,L"SuRun.exe");
+  PathQuoteSpaces(cmd);
+  DWORD RetVal=ERROR_ACCESS_DENIED;
+  HANDLE hUser=NULL;
+  {
+    HANDLE hToken=NULL;
+    EnablePrivilege(SE_DEBUG_NAME);
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
+    if (!hProc)
+      return 0;
+    // Open impersonation token for Shell process
+    OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+      |TOKEN_ASSIGN_PRIMARY,&hToken);
+    CloseHandle(hProc);
+    if(!hToken)
+      return 0;
+    DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+      TokenPrimary,&hUser); 
+    CloseHandle(hToken);
+    if(!hUser)
+      return 0;
+  }
+  PROCESS_INFORMATION pi={0};
+  TCHAR UserName[MAX_PATH]={0};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+  if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
+  {
+    void* Env=0;
+    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    {
+      STARTUPINFO si={0};
+      si.cb	= sizeof(si);
+      //Do not inherit Desktop from calling process, use Tokens Desktop
+      si.lpDesktop = _T("");
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      //Add user to admins group
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
+      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+      {
+        //Put g_RunData an g_RunPassword in!:
+        SIZE_T n;
+        //Since it's the same process, g_RunPwd has the same address!
+        RUNDATA rd=g_RunData;
+        rd.CliProcessId=pi.dwProcessId;
+        rd.CliThreadId=pi.dwThreadId;
+        rd.KillPID=0;
+        if (!WriteProcessMemory(pi.hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n))
+          TerminateProcess(pi.hProcess,0);
+        else if (!WriteProcessMemory(pi.hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
+          TerminateProcess(pi.hProcess,0);
+        ResumeThread(pi.hThread);
+        CloseHandle(pi.hThread);
+        WaitForSingleObject(pi.hProcess,INFINITE);
+        GetExitCodeProcess(pi.hProcess,&RetVal);
+        CloseHandle(pi.hProcess);
+      }else
+        RetVal=GetLastError();
+      //Remove user from Administrators group
+      AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
+      DestroyEnvironmentBlock(Env);
+    }
+    UnloadUserProfile(hUser,ProfInf.hProfile);
+  }
+  CloseHandle(hUser);
+  return RetVal;
+}
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  SuRun
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -587,75 +666,12 @@ void SuRun(DWORD ProcessID)
     bEmptyPWAllowed=EmptyPWAllowed;
     AllowEmptyPW(TRUE);
   }
-  //Add user to admins group
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
-
-  HANDLE hProc=0;
-  if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
-    SetAccessToWinDesk(hProc,g_RunData.WinSta,g_RunData.Desk,true);
-  SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-  //Give Password to the calling process
-  PROCESS_INFORMATION pi={0};
-  STARTUPINFO si={0};
-  si.cb = sizeof(STARTUPINFO);
-  TCHAR un[2*UNLEN+2]={0};
-  TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(un,g_RunData.UserName);
-  PathStripPath(un);
-  _tcscpy(dn,g_RunData.UserName);
-  PathRemoveFileSpec(dn);
-  if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
-    g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT|CREATE_SUSPENDED,NULL,
-    g_RunData.CurDir,&si,&pi))
-  {
-    //Clear sensitive Data
-    zero(g_RunPwd);
-    DWORD dwErr=GetLastError();
-      MessageBox(0,
-        CResStr(IDS_RUNFAILED,g_RunData.cmdLine,GetErrorNameStatic(dwErr)),
-        CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-  }else
-  {
-    //Clear sensitive Data
-    zero(g_RunPwd);
-    zero(g_RunData);
-    //Allow access to the Process and Thread to the Administrators and deny 
-    //access for the current user
-    SetAdminDenyUserAccess(pi.hThread);
-    SetAdminDenyUserAccess(pi.hProcess);
-    //Complain if the shell is runnig with administrative privileges:
-    HANDLE hTok=GetShellProcessToken();
-    if(hTok)
-    {
-      if(IsAdmin(hTok))
-      {
-        TCHAR s[MAX_PATH]={0};
-        GetRegStr(HKEY_LOCAL_MACHINE,
-          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-          L"Shell",s,MAX_PATH);
-          MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-          MB_ICONEXCLAMATION|MB_SETFOREGROUND|MB_SERVICE_NOTIFICATION);
-      }
-      CloseHandle(hTok);
-    }
-    //Start the main thread
-    ResumeThread(pi.hThread);
-    //Ok, we're done with the handles:
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
-  }
-  if(hProc)
-  {
-    SetAccessToWinDesk(hProc,g_RunData.WinSta,g_RunData.Desk,false);
-    CloseHandle(hProc);
-  }
-  g_RunPwd[0]=2;
-  GivePassword();
+  StartAdminProcessTrampoline();
   //Reset status of "use of empty passwords for network logon"
   if (g_RunPwd[0]==0)
     AllowEmptyPW(bEmptyPWAllowed);
-  //Remove user from Administrators group
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
+  g_RunPwd[0]=0;
+  GivePassword();
   zero(g_RunPwd);
 }
 
