@@ -25,3 +25,6 @@ bool IsLocalSystem();
 
 //Start a process with Admin cedentials and wait until it closed
 BOOL RunAsAdmin(LPCTSTR lpCmdLine,int IDmsg);
+
+//  RunAs: Start a process with other user cedentials
+BOOL RunAs(LPCWSTR lpCmdLine,LPCWSTR szUser,LPCWSTR szPassword);
