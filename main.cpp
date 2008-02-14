@@ -29,7 +29,11 @@
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
 #pragma comment(linker,"/DELAYLOAD:advapi32.dll")
+#ifdef _SR32
+#pragma comment(linker,"/DELAYLOAD:surunext32.dll")
+#else _SR32
 #pragma comment(linker,"/DELAYLOAD:surunext.dll")
+#endif _SR32
 #pragma comment(linker,"/DELAYLOAD:mpr.dll")
 #pragma comment(linker,"/DELAYLOAD:version.dll")
 #pragma comment(linker,"/DELAYLOAD:comctl32.dll")
