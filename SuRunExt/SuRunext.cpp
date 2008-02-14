@@ -215,11 +215,11 @@ __declspec(dllexport) void InstallShellExt()
 
 __declspec(dllexport) void RemoveShellExt()
 {
+  //Clean up:
   RemoveAppInit(AppInit,_T("SuRunExt.dll"));
 #ifdef _WIN64
   RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
 #endif _WIN64
-  //Clean up:
   //"Open with..." when right clicking on SuRun.exe
   DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
