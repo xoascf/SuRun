@@ -311,10 +311,10 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
     GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
-    //ToDo: return a valid PROCESS_INFORMATION!
     CloseHandle(pi.hProcess);
     if (ExitCode==RETVAL_OK)
     {
+      //return a valid PROCESS_INFORMATION!
       ppi->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
       ppi->hThread=OpenThread(SYNCHRONIZE,false,ppi->dwThreadId);
       if(lppi)
