@@ -189,8 +189,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if(dwReason==DLL_PROCESS_DETACH)
   {
 #ifdef _DEBUG
-    DBGTrace4("DLL_PROCESS_DETACH(hInst=%x) %d:%s, Admin=%d",
-      hInstDLL,PID,fMod,IsAdmin());
+    DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
 #endif _DEBUG
     UnloadHooks();
     return TRUE;
@@ -208,8 +208,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   PathAppend(fSuRunExe,L"SuRun.exe");
   BOOL bSetHook=(!IsAdmin())&&(_tcsicmp(fMod,fSuRunExe)!=0);
 #ifdef _DEBUG
-  DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s, Admin=%d, SetHook=%d",
-    hInstDLL,PID,fMod,IsAdmin(),bSetHook);
+  DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d, SetHook=%d",
+    hInstDLL,PID,fMod,GetCommandLine(),IsAdmin(),bSetHook);
 #endif _DEBUG
   if(bSetHook)
     LoadHooks();
