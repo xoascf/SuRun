@@ -61,19 +61,10 @@ BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUT
 
 FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
 
-typedef struct 
-{
-  HMODULE hMod;
-  DWORD orgFunc;
-  PROC newFunc;
-}HOOKDATA;
-
-typedef std::list<HOOKDATA> HookList;
 typedef std::list<HMODULE> ModList;
 
 int g_nHooked=0;
 ModList g_ModList;
-HookList g_HookList;
 
 //Hook Descriptor
 typedef struct 
@@ -192,7 +183,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     GetModuleFileNameA(hMod,p,MAX_PATH);
     PathStripPathA(p);
   }
-  //TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
+//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
@@ -211,8 +202,8 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
             ||( bUnHook  && (pThunk->u1.Function==(DWORD_PTR)newFunc)))
             )
           {
-            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
-              fmod,DllName,pBN->Name,oldFunc,newFunc);
+//            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
+//              fmod,DllName,pBN->Name,oldFunc,newFunc);
             MEMORY_BASIC_INFORMATION mbi;
             if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
             {
@@ -221,25 +212,15 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
               {
                 if (bUnHook)
                 {
-                  //search g_HookList for the function and revert the IAT change
-                  for(HookList::iterator it=g_HookList.begin();it!=g_HookList.end();++it)
-                    if ((it->hMod==hMod)&&(it->newFunc==newFunc))
-                    {
-                      pThunk->u1.Function = it->orgFunc;
-                      g_HookList.erase(it);
-                      g_nHooked--;
-                      nHooked++;
-                      break;
-                    }
+                  pThunk->u1.Function = (DWORD_PTR) oldFunc;
+                  g_nHooked--;
                 }else
                 {
                   //add Data to g_HookList for UnHook
-                  HOOKDATA hd={hMod,pThunk->u1.Function,newFunc};
-                  g_HookList.push_back(hd);
                   pThunk->u1.Function = (DWORD_PTR) newFunc;
                   g_nHooked++;
-                  nHooked++;
                 }
+                nHooked++;
               }
               VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
             }
