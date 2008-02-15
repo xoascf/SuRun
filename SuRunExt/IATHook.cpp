@@ -51,6 +51,16 @@ HMODULE WINAPI LoadLibW(LPCWSTR);
 HMODULE WINAPI LoadLibExA(LPCSTR,HANDLE,DWORD);
 HMODULE WINAPI LoadLibExW(LPCWSTR,HANDLE,DWORD);
 
+BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
+BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+                        BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
+
+//BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
+//                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
+
+FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
+
 typedef struct 
 {
   HMODULE hMod;
@@ -88,6 +98,33 @@ const HOOKDESCRIPTOR hdt[]=
   MAKEHOOKDESC("kernel32.dll","CreateProcessA",CreateProcA),
   MAKEHOOKDESC("kernel32.dll","CreateProcessW",CreateProcW),
 };
+
+HMODULE (WINAPI* orgLoadLibraryA)(LPCSTR)
+                                    =(HMODULE (WINAPI*)(LPCSTR))hdt[0].orgFunc;
+HMODULE (WINAPI* orgLoadLibraryW)(LPCWSTR)
+                                   =(HMODULE (WINAPI*)(LPCWSTR))hdt[1].orgFunc;
+HMODULE (WINAPI* orgLoadLibraryExA)(LPCSTR,HANDLE,DWORD)
+                       =(HMODULE (WINAPI*)(LPCSTR,HANDLE,DWORD))hdt[2].orgFunc;
+HMODULE (WINAPI* orgLoadLibraryExW)(LPCWSTR,HANDLE,DWORD)
+                      =(HMODULE (WINAPI*)(LPCWSTR,HANDLE,DWORD))hdt[3].orgFunc;
+
+FARPROC (WINAPI* orgGetProcAddress)(HMODULE,LPCSTR)
+                            =(FARPROC (WINAPI*)(HMODULE,LPCSTR))hdt[4].orgFunc;
+
+BOOL (WINAPI* orgCreateProcessA)(LPCSTR,LPSTR,
+              LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+              BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,
+              LPPROCESS_INFORMATION)
+ =(BOOL (WINAPI*)(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,
+              LPSECURITY_ATTRIBUTES,BOOL,DWORD,LPVOID,
+              LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION))     hdt[5].orgFunc;
+BOOL (WINAPI* orgCreateProcessW)(LPCWSTR,LPWSTR,
+              LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+              BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,
+              LPPROCESS_INFORMATION)
+ =(BOOL (WINAPI*)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
+              LPSECURITY_ATTRIBUTES,BOOL,DWORD,LPVOID,
+              LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION))    hdt[6].orgFunc;
 
 //relative pointers in PE images
 #define RelPtr(_T,pe,rpt) (_T)( (DWORD_PTR)(pe)+(DWORD_PTR)(rpt))
@@ -327,7 +364,7 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  if (CreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
+  if (orgCreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
@@ -360,7 +397,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     CAToWStr(lpCurrentDirectory),lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    b=CreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
+    b=orgCreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
         lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
         lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     if (b)
@@ -385,7 +422,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   if (!AutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    b=CreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
+    b=orgCreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
         lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
         lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     if (b)
@@ -409,14 +446,14 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   PathStripPathA(f);
   PROC p=DoHookFn(f,(char*)lpProcName,0);
   if(!p)
-    p=GetProcAddress(hModule,lpProcName);;
+    p=orgGetProcAddress(hModule,lpProcName);;
   return p;
 }
 
 HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=LoadLibraryA(lpLibFileName);
+  HMODULE hMOD=orgLoadLibraryA(lpLibFileName);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -426,7 +463,7 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=LoadLibraryW(lpLibFileName);
+  HMODULE hMOD=orgLoadLibraryW(lpLibFileName);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -436,7 +473,7 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=LoadLibraryExA(lpLibFileName,hFile,dwFlags);
+  HMODULE hMOD=orgLoadLibraryExA(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -446,7 +483,7 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=LoadLibraryExW(lpLibFileName,hFile,dwFlags);
+  HMODULE hMOD=orgLoadLibraryExW(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
