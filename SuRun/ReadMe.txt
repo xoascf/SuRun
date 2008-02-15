@@ -135,7 +135,7 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
-SuRun 1.0.2.104 - 2008-02-14: (Internal Beta)
+SuRun 1.0.2.104 - 2008-02-15: (Internal Beta)
 ----------------------------
 * ShellExecuteHook was replaced by Import Address Table (IAT) Hooking
   WARNING: This is pretty experimental:
