@@ -506,7 +506,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     Sleep(60);
   //For Vista! The Desktop is sometimes not switched back...
   while(!SwitchDesktop(hDesk))
+  {
+    DBGTrace1("SwitchDesktop failed: %s",GetLastErrorNameStatic());
     Sleep(10);
+  }
   CloseDesktop(hDesk);
   if (bRunSetup)
     return RETVAL_OK;
