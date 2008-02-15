@@ -324,6 +324,7 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
     }
     free(ppi);
   }
+  SetLastError((ExitCode==RETVAL_OK)?NOERROR:ERROR_ACCESS_DENIED);
   return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_ACCESSDENIED);
 }
 
