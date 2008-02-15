@@ -1,4 +1,7 @@
 ToDo:
+* "rundll32.exe newdev.dll" abfangen
+* Netzlaufwerke wiederverbinden
+
 *Mache Zum SuRunner:
   * Alle auﬂer vordef. Admin
   * keinen
