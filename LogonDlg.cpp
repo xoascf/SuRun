@@ -321,18 +321,21 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       HGDIOBJ fs=GetStockObject(DEFAULT_GUI_FONT);
       HGDIOBJ f=(HGDIOBJ)SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_GETFONT,0,0);
       SendDlgItemMessage(hwnd,IDC_DLGQUESTION,WM_SETFONT,(WPARAM)fs,0);
-      DeleteObject(f);
+      if(f)
+        DeleteObject(f);
       if (GetDlgItem(hwnd,IDC_HINT))
       {
         f=(HGDIOBJ)SendDlgItemMessage(hwnd,IDC_HINT,WM_GETFONT,0,0);
         SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,(WPARAM)fs,0);
-        DeleteObject(f);
+        if(f)
+          DeleteObject(f);
       }
       return TRUE;
     }
   case WM_NCDESTROY:
     {
-      DeleteObject(g_HintBrush);
+      if(g_HintBrush)
+        DeleteObject(g_HintBrush);
       g_HintBrush=0;
       DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
       DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
