@@ -500,9 +500,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //For Vista! The Desktop is sometimes not switched back...
   HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
   DWORD nWritten=0;
-  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
+  BOOL bw=WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
+  if (!bw)
+    DBGTrace1("WriteFile to SuRun Pipe failed: %s",GetLastErrorNameStatic());
   CloseHandle(hPipe);
-  
+  if (!bw)
+    return RETVAL_ACCESSDENIED;
   //Wait for max 60s for the Password...
   for(int n=0;(g_RetVal==RETVAL_WAIT)&&(n<1000);n++)
     Sleep(60);
@@ -518,6 +521,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   switch(g_RetVal)
   {
   case RETVAL_WAIT:
+    DBGTrace("ERROR: SuRun got no response from Service!");
     return ERROR_ACCESS_DENIED;
   case RETVAL_SX_NOTINLIST: //ShellExec->NOT in List
     return RETVAL_SX_NOTINLIST;
