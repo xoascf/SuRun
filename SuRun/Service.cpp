@@ -590,10 +590,6 @@ DWORD StartAdminProcessTrampoline()
           bEmptyPWAllowed=EmptyPWAllowed;
           AllowEmptyPW(TRUE);
         }
-        //Allow access to the Process and Thread to the Administrators and deny 
-        //access for the current user
-        SetAdminDenyUserAccess(pi.hThread,g_RunData.CliProcessId);
-        SetAdminDenyUserAccess(pi.hProcess,g_RunData.CliProcessId);
         //Add user to admins group
         AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
         ResumeThread(pi.hThread);
