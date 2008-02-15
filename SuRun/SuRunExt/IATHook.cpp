@@ -155,7 +155,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     GetModuleFileNameA(hMod,p,MAX_PATH);
     PathStripPathA(p);
   }
-  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
+  //TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
