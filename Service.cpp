@@ -558,6 +558,17 @@ DWORD StartAdminProcessTrampoline()
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      //Disable AppInitHooks
+      TCHAR s[2048]={0};
+      int LdAID=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
+      GetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s,2048);
+      SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),_T(""));
+#ifdef _WIN64
+      TCHAR s32[2048]={0};
+      GetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32,2048);
+      SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),_T(""));
+      int LdAID32=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
+#endif _WIN64
       if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
         CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
@@ -579,15 +590,6 @@ DWORD StartAdminProcessTrampoline()
           bEmptyPWAllowed=EmptyPWAllowed;
           AllowEmptyPW(TRUE);
         }
-        //Disable AppInitHooks
-        TCHAR s[2048]={0};
-        GetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s,2048);
-        SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),_T(""));
-#ifdef _WIN64
-        TCHAR s32[2048]={0};
-        GetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32,2048);
-        SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),_T(""));
-#endif _WIN64
         //Add user to admins group
         AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
         ResumeThread(pi.hThread);
@@ -595,11 +597,6 @@ DWORD StartAdminProcessTrampoline()
         WaitForSingleObject(pi.hProcess,INFINITE);
         //Remove user from Administrators group
         AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
-        //Enable AppInitHooks
-        SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s);
-#ifdef _WIN64
-        SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32);
-#endif _WIN64
         //Reset status of "use of empty passwords for network logon"
         if (g_RunPwd[0]==0)
           AllowEmptyPW(bEmptyPWAllowed);
@@ -608,6 +605,13 @@ DWORD StartAdminProcessTrampoline()
         GetExitCodeProcess(pi.hProcess,&RetVal);
         CloseHandle(pi.hProcess);
       }
+      //Enable AppInitHooks
+      SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),LdAID);
+      SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s);
+#ifdef _WIN64
+      SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),LdAID32);
+      SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32);
+#endif _WIN64
       DestroyEnvironmentBlock(Env);
     }
     UnloadUserProfile(hUser,ProfInf.hProfile);
