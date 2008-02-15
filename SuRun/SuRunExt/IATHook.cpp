@@ -481,15 +481,15 @@ DWORD WINAPI InitHookProc(void* p)
   char f[MAX_PATH];
   GetModuleFileNameA(l_hInst,f,MAX_PATH);
   orgLoadLibraryA(f);
+  EnterCriticalSection(&g_HookCs);
+  HookModules();
+  LeaveCriticalSection(&g_HookCs);
   return 0;
 }
 
 void LoadHooks()
 {
   InitializeCriticalSection(&g_HookCs);
-  EnterCriticalSection(&g_HookCs);
-  HookModules();
-  LeaveCriticalSection(&g_HookCs);
   CreateThread(0,0,InitHookProc,0,0,0);
 }
 
@@ -505,7 +505,7 @@ void UnloadHooks()
     GetModuleFileNameA(l_hInst,p,MAX_PATH);
     PathStripPathA(p);
   }
-  TRACExA("IATHook.dll: %s WARNING: Unloading IAT Hooks!\n",fmod);
+  TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!\n",fmod);
 #endif _DEBUG
   EnterCriticalSection(&g_HookCs);
   UnHookModules();
