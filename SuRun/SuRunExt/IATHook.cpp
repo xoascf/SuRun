@@ -234,39 +234,40 @@ DWORD UnHookModules()
   return nHooked;
 }
 
-BOOL InjectIATHook(HANDLE hProc)
-{
-  HANDLE hThread=0;
-  __try
-  {
-    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
-    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
-    if(!pLoadLib)
-      return false;
-	  char DllName[MAX_PATH];
-	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
-		  return false;
-	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
-	  if(RmteName==NULL)
-		  return false;
-	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
-    __try
-    {
-      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
-    }__except(1)
-    {
-    }
-	  if(hThread!=NULL )
-    {
-      WaitForSingleObject(hThread,INFINITE);
-      CloseHandle(hThread);
-    }
-	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
-  }__except(1)
-  {
-  }
-  return hThread!=0;
-}
+//BOOL InjectIATHook(HANDLE hProc)
+//{
+//  HANDLE hThread=0;
+//  //This does not work on Vista!
+//  __try
+//  {
+//    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
+//    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
+//    if(!pLoadLib)
+//      return false;
+//	  char DllName[MAX_PATH];
+//	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
+//		  return false;
+//	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
+//	  if(RmteName==NULL)
+//		  return false;
+//	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
+//    __try
+//    {
+//      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
+//    }__except(1)
+//    {
+//    }
+//	  if(hThread!=NULL )
+//    {
+//      WaitForSingleObject(hThread,INFINITE);
+//      CloseHandle(hThread);
+//    }
+//	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
+//  }__except(1)
+//  {
+//  }
+//  return hThread!=0;
+//}
 
 BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
