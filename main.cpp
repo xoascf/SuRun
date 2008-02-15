@@ -386,8 +386,6 @@ int Run()
     //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
     if((g_RunData.RetPID)&&(g_RunData.RetPtr))
     {
-      DBGTrace3("AutoSuRun(%s) Writing Process Memory: PID=%d Prt=%x",
-        g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr);
       pi.hThread=0;
       pi.hProcess=0;
       HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
@@ -497,27 +495,17 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
     return RETVAL_ACCESSDENIED;
-  //For Vista! The Desktop is sometimes not switched back...
+  //For Vista! The Thread Desktop is not set per default...
   HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
   SetThreadDesktop(hDesk);
-  DBGTrace3("Writing Pipe Client(%d) %d Ptr=0x%08X",
-    g_RunData.CliProcessId,g_RetVal,&g_RetVal);
   DWORD nWritten=0;
-  BOOL bw=WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
-  if (!bw)
-    DBGTrace1("WriteFile to SuRun Pipe failed: %s",GetLastErrorNameStatic());
+  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   CloseHandle(hPipe);
-  if (!bw)
-    return CloseDesktop(hDesk),RETVAL_ACCESSDENIED;
   //Wait for max 60s for the Password...
   for(int n=0;(g_RetVal==RETVAL_WAIT)&&(n<1000);n++)
     Sleep(60);
-  //For Vista! The Desktop is sometimes not switched back...
-  while(!SwitchDesktop(hDesk))
-  {
-    DBGTrace1("SwitchDesktop failed: %s",GetLastErrorNameStatic());
-    Sleep(10);
-  }
+  //For Vista! The Thread Desktop is not set per default...
+  SwitchDesktop(hDesk);
   SetThreadDesktop(hDesk);
   CloseDesktop(hDesk);
   if (bRunSetup)
