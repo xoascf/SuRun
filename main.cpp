@@ -386,6 +386,8 @@ int Run()
     //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
     if((g_RunData.RetPID)&&(g_RunData.RetPtr))
     {
+      DBGTrace3("AutoSuRun(%s) Writing Process Memory: PID=%d Prt=%x",
+        g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr);
       pi.hThread=0;
       pi.hProcess=0;
       HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
