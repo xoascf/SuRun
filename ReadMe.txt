@@ -138,6 +138,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.105 - 2008-02-15: (Internal Beta)
+----------------------------
+*FIX: The IAT-Hook could cause circular calls that lead to Stack overflow
+
 SuRun 1.0.2.104 - 2008-02-15: (Internal Beta)
 ----------------------------
 * FIX: Vista does not set a Threads Desktop until it creates a Window.
