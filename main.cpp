@@ -499,13 +499,16 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return RETVAL_ACCESSDENIED;
   //For Vista! The Desktop is sometimes not switched back...
   HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
+  SetThreadDesktop(hDesk);
+  DBGTrace3("Writing Pipe Client(%d) %d Ptr=0x%08X",
+    g_RunData.CliProcessId,g_RetVal,&g_RetVal);
   DWORD nWritten=0;
   BOOL bw=WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   if (!bw)
     DBGTrace1("WriteFile to SuRun Pipe failed: %s",GetLastErrorNameStatic());
   CloseHandle(hPipe);
   if (!bw)
-    return RETVAL_ACCESSDENIED;
+    return CloseDesktop(hDesk),RETVAL_ACCESSDENIED;
   //Wait for max 60s for the Password...
   for(int n=0;(g_RetVal==RETVAL_WAIT)&&(n<1000);n++)
     Sleep(60);
@@ -515,6 +518,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     DBGTrace1("SwitchDesktop failed: %s",GetLastErrorNameStatic());
     Sleep(10);
   }
+  SetThreadDesktop(hDesk);
   CloseDesktop(hDesk);
   if (bRunSetup)
     return RETVAL_OK;
