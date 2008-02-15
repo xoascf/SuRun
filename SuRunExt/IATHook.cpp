@@ -71,19 +71,22 @@ typedef struct
   LPCSTR DllName;
   LPCSTR FuncName;
   PROC newFunc;
+  PROC orgFunc;
 }HOOKDESCRIPTOR; 
+
+#define MAKEHOOKDESC(d,f,n) {d,f,(PROC)n,GetProcAddress(GetModuleHandleA(d),f)}
 
 const HOOKDESCRIPTOR hdt[]=
 {
   //Standard Hooks: These must be implemented!
-  {"kernel32.dll","LoadLibraryA",(PROC)LoadLibA},
-  {"kernel32.dll","LoadLibraryW",(PROC)LoadLibW},
-  {"kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA},
-  {"kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW},
-  {"kernel32.dll","GetProcAddress",(PROC)GetProcAddr},
+  MAKEHOOKDESC("kernel32.dll","LoadLibraryA",LoadLibA),
+  MAKEHOOKDESC("kernel32.dll","LoadLibraryW",LoadLibW),
+  MAKEHOOKDESC("kernel32.dll","LoadLibraryExA",LoadLibExA),
+  MAKEHOOKDESC("kernel32.dll","LoadLibraryExW",LoadLibExW),
+  MAKEHOOKDESC("kernel32.dll","GetProcAddress",GetProcAddr),
   //User Hooks:
-  {"kernel32.dll","CreateProcessA",(PROC)CreateProcA},
-  {"kernel32.dll","CreateProcessW",(PROC)CreateProcW}
+  MAKEHOOKDESC("kernel32.dll","CreateProcessA",CreateProcA),
+  MAKEHOOKDESC("kernel32.dll","CreateProcessW",CreateProcW),
 };
 
 //relative pointers in PE images
@@ -99,7 +102,7 @@ BOOL DoHookDll(char* DllName)
 }
 
 //returns newFunc if DllName->ImpName is one to be hooked up
-PROC DoHookFn(char* DllName,char* ImpName)
+PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFN)
 {
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
@@ -107,7 +110,11 @@ PROC DoHookFn(char* DllName,char* ImpName)
     for(int i=0;i<countof(hdt);i++)
       if (stricmp(hdt[i].DllName,DllName)==0)
         if (stricmp(hdt[i].FuncName,ImpName)==0)
+        {
+          if(orgFN)
+            *orgFN=hdt[i].orgFunc;
           return hdt[i].newFunc;
+        }
   return false;
 }
 
@@ -139,6 +146,16 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
   if(va==0) 
     return nHooked;
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hMod,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
@@ -150,12 +167,15 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
         if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
-          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
+          PROC oldFunc=0;
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&oldFunc);
           if (newFunc 
-            && ((!bUnHook) && (pThunk->u1.Function!=(DWORD_PTR)newFunc)
+            && ((!bUnHook) && (pThunk->u1.Function==(DWORD_PTR)oldFunc)
             ||( bUnHook  && (pThunk->u1.Function==(DWORD_PTR)newFunc)))
             )
           {
+            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
+              fmod,DllName,pBN->Name,oldFunc,newFunc);
             MEMORY_BASIC_INFORMATION mbi;
             if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
             {
@@ -387,7 +407,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
   PathStripPathA(f);
-  PROC p=DoHookFn(f,(char*)lpProcName);
+  PROC p=DoHookFn(f,(char*)lpProcName,0);
   if(!p)
     p=GetProcAddress(hModule,lpProcName);;
   return p;
