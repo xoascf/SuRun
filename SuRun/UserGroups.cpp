@@ -216,7 +216,8 @@ USERLIST::USERLIST()
 USERLIST::~USERLIST()
 {
   for (int i=0;i<nUsers;i++)
-    DeleteObject(User[i].UserBitmap);
+    if(User[i].UserBitmap)
+      DeleteObject(User[i].UserBitmap);
   free(User);
 }
 
@@ -253,7 +254,8 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
 void USERLIST::SetUsualUsers(BOOL bScanDomain)
 {
   for (int i=0;i<nUsers;i++)
-    DeleteObject(User[i].UserBitmap);
+    if(User[i].UserBitmap)
+      DeleteObject(User[i].UserBitmap);
   free(User);
   User=0;
   nUsers=0;
@@ -264,7 +266,8 @@ void USERLIST::SetUsualUsers(BOOL bScanDomain)
 void USERLIST::SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
   for (int i=0;i<nUsers;i++)
-    DeleteObject(User[i].UserBitmap);
+    if(User[i].UserBitmap)
+      DeleteObject(User[i].UserBitmap);
   free(User);
   User=0;
   nUsers=0;
