@@ -137,6 +137,9 @@ Changes:
 ------------------------------------------------------------------------------
 SuRun 1.0.2.104 - 2008-02-15: (Internal Beta)
 ----------------------------
+* FIX: Vista does not set a Threads Desktop until it creates a Window.
+  This caused a Deadlock because the SuRun client did show a Message Box on 
+  the secure Desktop that it does not have access to.
 * ShellExecuteHook was replaced by Import Address Table (IAT) Hooking
   WARNING: This is pretty experimental:
   SuRunExt.dll get loaded into all Processes that have a Window or are linked 
