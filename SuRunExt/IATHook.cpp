@@ -174,6 +174,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
   if(va==0) 
     return nHooked;
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
+#ifdef _DEBUG
   char fmod[MAX_PATH]={0};
   {
     GetModuleFileNameA(0,fmod,MAX_PATH);
@@ -183,7 +184,8 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     GetModuleFileNameA(hMod,p,MAX_PATH);
     PathStripPathA(p);
   }
-//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
+  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
+#endif _DEBUG
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
@@ -202,8 +204,10 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
             ||( bUnHook  && (pThunk->u1.Function==(DWORD_PTR)newFunc)))
             )
           {
-//            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
-//              fmod,DllName,pBN->Name,oldFunc,newFunc);
+#ifdef _DEBUG
+            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
+              fmod,DllName,pBN->Name,oldFunc,newFunc);
+#endif _DEBUG
             MEMORY_BASIC_INFORMATION mbi;
             if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
             {
@@ -216,7 +220,6 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                   g_nHooked--;
                 }else
                 {
-                  //add Data to g_HookList for UnHook
                   pThunk->u1.Function = (DWORD_PTR) newFunc;
                   g_nHooked++;
                 }
@@ -471,16 +474,39 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   return hMOD;
 }
 
+DWORD WINAPI InitHookProc(void* p)
+{
+  //The DLL must not be unloaded while the process is running!
+  //Increment lock count!
+  char f[MAX_PATH];
+  GetModuleFileNameA(l_hInst,f,MAX_PATH);
+  orgLoadLibraryA(f);
+  return 0;
+}
+
 void LoadHooks()
 {
   InitializeCriticalSection(&g_HookCs);
   EnterCriticalSection(&g_HookCs);
   HookModules();
   LeaveCriticalSection(&g_HookCs);
+  CreateThread(0,0,InitHookProc,0,0,0);
 }
 
 void UnloadHooks()
 {
+#ifdef _DEBUG
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(l_hInst,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  TRACExA("IATHook.dll: %s WARNING: Unloading IAT Hooks!\n",fmod);
+#endif _DEBUG
   EnterCriticalSection(&g_HookCs);
   UnHookModules();
   LeaveCriticalSection(&g_HookCs);
