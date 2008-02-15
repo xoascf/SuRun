@@ -494,6 +494,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
     return RETVAL_ACCESSDENIED;
+  //For Vista! The Desktop is sometimes not switched back...
+  HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
   g_RetVal=RETVAL_WAIT;
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
@@ -502,6 +504,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Wait for max 60s for the Password...
   while ((g_RetVal==RETVAL_WAIT)&&(n<1000))
     Sleep(60);
+  //For Vista! The Desktop is sometimes not switched back...
+  while(!SwitchDesktop(hDesk))
+    Sleep(10);
+  CloseDesktop(hDesk);
   if (bRunSetup)
     return RETVAL_OK;
   switch(g_RetVal)
