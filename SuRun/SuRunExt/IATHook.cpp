@@ -319,6 +319,8 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
       ppi->hThread=OpenThread(SYNCHRONIZE,false,ppi->dwThreadId);
       if(lppi)
         memmove(lppi,ppi,sizeof(PROCESS_INFORMATION));
+      DBGTrace5("AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
+        cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
     }
     free(ppi);
   }
