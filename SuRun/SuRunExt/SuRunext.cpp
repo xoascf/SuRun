@@ -160,40 +160,40 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 //
 //////////////////////////////////////////////////////////////////////////////
 
-static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  /* ToDo: Do not use AppInit_Dlls! */
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  if (_tcsstr(s,Dll)==0)
-  {
-    if (s[0])
-      _tcscat(s,_T(","));
-    _tcscat(s,Dll);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }/**/
-}
-static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  /* ToDo: Do not use AppInit_Dlls! */
-  //remove from AppInit_Dlls
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  LPTSTR p=_tcsstr(s,Dll);
-  if (p!=0)
-  {
-    LPTSTR p1=p+_tcslen(Dll);
-    if((*p1==' ')||(*p1==','))
-      p1++;
-    if (p!=s)
-      p--;
-    *p=0;
-    if (*(p1))
-      _tcscat(p,p1);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }
-  /**/
-}
+//static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
+//{
+//  /* ToDo: Do not use AppInit_Dlls! */
+//  TCHAR s[4096]={0};
+//  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+//  if (_tcsstr(s,Dll)==0)
+//  {
+//    if (s[0])
+//      _tcscat(s,_T(","));
+//    _tcscat(s,Dll);
+//    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+//  }/**/
+//}
+//static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
+//{
+//  /* ToDo: Do not use AppInit_Dlls! */
+//  //remove from AppInit_Dlls
+//  TCHAR s[4096]={0};
+//  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+//  LPTSTR p=_tcsstr(s,Dll);
+//  if (p!=0)
+//  {
+//    LPTSTR p1=p+_tcslen(Dll);
+//    if((*p1==' ')||(*p1==','))
+//      p1++;
+//    if (p!=s)
+//      p--;
+//    *p=0;
+//    if (*(p1))
+//      _tcscat(p,p1);
+//    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+//  }
+//  /**/
+//}
 
 __declspec(dllexport) void InstallShellExt()
 {
@@ -213,24 +213,26 @@ __declspec(dllexport) void InstallShellExt()
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
   //add to AppInit_Dlls
-  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
-  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
-  AddAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
-  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
-#endif _WIN64
+//  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
+//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+//  AddAppInit(AppInit,_T("SuRunExt.dll"));
+//#ifdef _WIN64
+//  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
+//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+//  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+//#endif _WIN64
 }
 
 __declspec(dllexport) void RemoveShellExt()
 {
   //Clean up:
-  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
-  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
-  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
-#endif _WIN64
+  //AppInit_Dlls
+//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
+//  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
+//#ifdef _WIN64
+//  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
+//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
+//#endif _WIN64
   //"Open with..." when right clicking on SuRun.exe
   DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
