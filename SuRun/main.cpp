@@ -412,7 +412,6 @@ int Run()
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-  LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   //After the User presses OK, the service starts a clean SuRun exe with the 
   //Clients user token, it fills g_RunData and g_RunPwd
   //We must Do this for two reasons:
@@ -474,6 +473,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Convert Command Line
   if (!bRunSetup)
     ArgsToCommand(Args,g_RunData.cmdLine);
+  LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   //Usage
   if (!g_RunData.cmdLine[0])
   {
