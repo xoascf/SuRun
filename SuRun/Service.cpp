@@ -399,38 +399,37 @@ BOOL PrepareSuRun()
   UuidToString(&uid,&DeskName);
   //Create the new desktop
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,GetBlurDesk);
+  CStayOnDeskTop csod(DeskName);
+  RpcStringFree(&DeskName);
+  if (crond.IsValid())
   {
-    CStayOnDeskTop csod(DeskName);
-    RpcStringFree(&DeskName);
-    if (crond.IsValid())
+    //secure desktop created...
+    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
+      return FALSE;
+    DWORD f=GetRegInt(HKLM,WHTLSTKEY(g_RunData.UserName),g_RunData.cmdLine,0);
+    DWORD l=0;
+    if (!PwOk)
     {
-      //secure desktop created...
-      if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
-        return FALSE;
-      DWORD f=GetRegInt(HKLM,WHTLSTKEY(g_RunData.UserName),g_RunData.cmdLine,0);
-      DWORD l=0;
-      if (!PwOk)
-      {
-        l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-        if (GetSavePW && (l&1))
-          SavePassword(g_RunData.UserName,g_RunPwd);
-      }else
-        l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-      if((l&1)==0)
-      {
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
-        if((l&2)!=0)
-          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
-        return FALSE;
-      }
-      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
+      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
+      if (GetSavePW && (l&1))
+        SavePassword(g_RunData.UserName,g_RunPwd);
+    }else
+      l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
+    crond.CleanUp();
+    if((l&1)==0)
+    {
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
       if((l&2)!=0)
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
-      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
-      return UpdLastRunTime(g_RunData.UserName),TRUE;
-    }else //FATAL: secure desktop could not be created!
-      MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-  }
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
+      return FALSE;
+    }
+    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
+    if((l&2)!=0)
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
+    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
+    return UpdLastRunTime(g_RunData.UserName),TRUE;
+  }else //FATAL: secure desktop could not be created!
+    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return FALSE;
 }
 
