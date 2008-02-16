@@ -102,67 +102,54 @@ DWORD CheckCliProcess(RUNDATA& rd)
     return 0;
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,rd.CliProcessId);
   if (!hProcess)
-  {
-    DBGTrace1("OpenProcess failed: %s",GetLastErrorNameStatic());
     return 0;
-  }
-  HANDLE hTok=NULL;
-  HANDLE hThread=OpenThread(THREAD_ALL_ACCESS,FALSE,rd.CliThreadId);
-  if (hThread)
+  //g_CliIsAdmin
   {
-    OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok);
-    CloseHandle(hThread);
+    HANDLE hTok=NULL;
+    HANDLE hThread=OpenThread(THREAD_ALL_ACCESS,FALSE,rd.CliThreadId);
+    if (hThread)
+    {
+      OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok);
+      CloseHandle(hThread);
+    }
+    if ((!hTok)&&(!OpenProcessToken(hProcess,TOKEN_DUPLICATE,&hTok)))
+      return CloseHandle(hProcess),0;
+    g_CliIsAdmin=IsAdmin(hTok)!=0;
+    CloseHandle(hTok);
   }
-  if ((!hTok) &&(!OpenProcessToken(hProcess,TOKEN_DUPLICATE,&hTok)))
-  {
-    DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
-    return 0;
-  }
-  g_CliIsAdmin=IsAdmin(hTok)!=0;
-  CloseHandle(hTok);
   SIZE_T s;
-  DWORD d;
   //Check if the calling process is this Executable:
-  HMODULE hMod;
-  TCHAR f1[MAX_PATH];
-  TCHAR f2[MAX_PATH];
-  if (!GetModuleFileName(0,f1,MAX_PATH))
+#ifndef _DEBUG
   {
-    DBGTrace1("GetModuleFileName failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),0;
+    DWORD d;
+    HMODULE hMod;
+    TCHAR f1[MAX_PATH];
+    TCHAR f2[MAX_PATH];
+    if (!GetModuleFileName(0,f1,MAX_PATH))
+      return CloseHandle(hProcess),0;
+    if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
+      return CloseHandle(hProcess),0;
+    if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
+      return CloseHandle(hProcess),0;
+    if(_tcsicmp(f1,f2)!=0)
+    {
+      DBGTrace2("Invalid Process! %s != %s !",f1,f2);
+      return CloseHandle(hProcess),0;
+    }
   }
-  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
-  {
-    DBGTrace1("EnumProcessModules failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),0;
-  }
-  if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
-  {
-    DBGTrace1("GetModuleFileNameEx failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),0;
-  }
-  if(_tcsicmp(f1,f2)!=0)
-  {
-    DBGTrace2("Invalid Process! %s != %s !",f1,f2);
-    return CloseHandle(hProcess),0;
-  }
+#endif _DEBUG
   //Since it's the same process, g_RunData has the same address!
   if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&s))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
   }
+  CloseHandle(hProcess);
   if (sizeof(RUNDATA)!=s)
-  {
-    DBGTrace2("ReadProcessMemory invalid size %d != %d ",sizeof(RUNDATA),s);
-    return CloseHandle(hProcess),0;
-  }
+    return 0;
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
-  {
-    DBGTrace("RunData is different!");
-    return CloseHandle(hProcess),1;
-  }
-  return CloseHandle(hProcess),2;
+    return 1;
+  return 2;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1122,6 +1109,7 @@ bool HandleServiceStuff()
     }
   }
   //Are we run from the Windows directory?, if Not, ask for Install/update
+#ifndef _DEBUG
   {
     TCHAR fn[4096];
     TCHAR wd[4096];
@@ -1139,6 +1127,7 @@ bool HandleServiceStuff()
       return true;
     }
   }
+#endif _DEBUG
   //In the first three Minutes after Sytstem start:
   //Wait for the service to start
   DWORD ss=CheckServiceStatus();
