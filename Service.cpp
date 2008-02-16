@@ -54,6 +54,7 @@
 #pragma comment(lib,"PSAPI.lib")
 
 #ifndef _DEBUG
+
   #ifdef _WIN64
     #pragma comment(lib,"SuRunExt/ReleaseUx64/SuRunExt.lib")
   #else  _WIN64
@@ -63,12 +64,17 @@
       #pragma comment(lib,"SuRunExt/ReleaseU/SuRunExt.lib")
     #endif _SR32
   #endif _WIN64
+
 #else _DEBUG
+
   #ifdef _WIN64
     #pragma comment(lib,"SuRunExt/DebugUx64/SuRunExt.lib")
   #else  _WIN64
     #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
   #endif _WIN64
+
+#define _DEBUG_SVC
+
 #endif _DEBUG
 
 //////////////////////////////////////////////////////////////////////////////
@@ -295,26 +301,19 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
-#ifndef _DEBUG
+#ifndef _DEBUG_SVC
         if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
-#else _DEBUG
+#else _DEBUG_SVC
         {
-          HANDLE hToken=NULL;
-          EnablePrivilege(SE_DEBUG_NAME);
-          HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
-          if (hProc)
+          HANDLE hProc1=OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
+          if (hProc1)
           {
-            OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY,&hToken);
-            CloseHandle(hProc);
-            if(hToken)
-            {
-              DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,TokenPrimary,&hProc); 
-              CloseHandle(hToken);
-            }
+            OpenProcessToken(hProc1,TOKEN_ALL_ACCESS,&hProc);
+            CloseHandle(hProc1);
           }
         }
         if (hProc)
-#endif _DEBUG
+#endif _DEBUG_SVC
         {
           HANDLE hRun=0;
           if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
@@ -409,7 +408,7 @@ BOOL PrepareSuRun()
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),TRUE;
-#ifndef _DEBUG
+#ifndef _DEBUG_SVC
   //Every "secure" Desktop has its own UUID as name:
   UUID uid;
   UuidCreate(&uid);
@@ -419,9 +418,12 @@ BOOL PrepareSuRun()
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,GetBlurDesk);
   CStayOnDeskTop csod(DeskName);
   RpcStringFree(&DeskName);
+#else _DEBUG_SVC
+  CRunOnNewDeskTop crond(g_RunData.WinSta,L"NoDefault",1);
+  CStayOnDeskTop csod(L"NoDefault");
+#endif _DEBUG_SVC
   if (crond.IsValid())
   {
-#endif _DEBUG
     //secure desktop created...
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
       return FALSE;
@@ -446,10 +448,8 @@ BOOL PrepareSuRun()
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     return UpdLastRunTime(g_RunData.UserName),TRUE;
-#ifndef _DEBUG
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-#endif _DEBUG
   return FALSE;
 }
 
@@ -492,32 +492,31 @@ BOOL Setup(LPCTSTR WinStaName)
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
-#ifndef _DEBUG
+#ifndef _DEBUG_SVC
   CRunOnNewDeskTop crond(WinStaName,DeskName,GetBlurDesk);
+  CStayOnDeskTop csod(DeskName);
+  RpcStringFree(&DeskName);
+#else _DEBUG_SVC
+  CRunOnNewDeskTop crond(g_RunData.WinSta,L"NoDefault",1);
+  CStayOnDeskTop csod(L"NoDefault");
+#endif _DEBUG_SVC
+  if (!crond.IsValid())    
   {
-    CStayOnDeskTop csod(DeskName);
-    RpcStringFree(&DeskName);
-    if (!crond.IsValid())    
-    {
-      MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      return FALSE;
-    }
-#endif _DEBUG
-    //only Admins and SuRunners may setup SuRun
-    if (g_CliIsAdmin)
-      return RunSetup();
-    if (GetNoRunSetup(g_RunData.UserName))
-    {
-      if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
-        return FALSE;
-      else
-        return RunSetup();
-    }
-    if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
-      return RunSetup();
-#ifndef _DEBUG
+    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    return FALSE;
   }
-#endif _DEBUG
+  //only Admins and SuRunners may setup SuRun
+  if (g_CliIsAdmin)
+    return RunSetup();
+  if (GetNoRunSetup(g_RunData.UserName))
+  {
+    if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
+      return FALSE;
+    else
+      return RunSetup();
+  }
+  if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
+    return RunSetup();
   return false;
 }
 
@@ -553,6 +552,7 @@ DWORD StartAdminProcessTrampoline()
       return RetVal;
   }
   PROCESS_INFORMATION pi={0};
+#ifndef _DEBUG_SVC
   TCHAR UserName[MAX_PATH]={0};
   PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
   if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
@@ -560,6 +560,7 @@ DWORD StartAdminProcessTrampoline()
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hUser,FALSE))
     {
+#endif _DEBUG_SVC
       STARTUPINFO si={0};
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
@@ -579,8 +580,12 @@ DWORD StartAdminProcessTrampoline()
       SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),_T(""));
       int LdAID32=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
 #endif _WIN64
+#ifndef _DEBUG_SVC
       if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
         CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+#else _DEBUG_SVC
+      if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+#endif _DEBUG_SVC
       {
         //Put g_RunData an g_RunPassword in!:
         SIZE_T n;
@@ -614,7 +619,8 @@ DWORD StartAdminProcessTrampoline()
         zero(g_RunPwd);
         GetExitCodeProcess(pi.hProcess,&RetVal);
         CloseHandle(pi.hProcess);
-      }
+      }else
+        DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
       //Enable AppInitHooks
       SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),LdAID);
       SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s);
@@ -622,10 +628,12 @@ DWORD StartAdminProcessTrampoline()
       SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),LdAID32);
       SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32);
 #endif _WIN64
+#ifndef _DEBUG_SVC
       DestroyEnvironmentBlock(Env);
     }
     UnloadUserProfile(hUser,ProfInf.hProfile);
   }
+#endif _DEBUG_SVC
   CloseHandle(hUser);
   return RetVal;
 }
@@ -638,8 +646,10 @@ DWORD StartAdminProcessTrampoline()
 void SuRun(DWORD ProcessID)
 {
   //This is called from a separate process created by the service
+#ifndef _DEBUG_SVC
   if (!IsLocalSystem())
     return;
+#endif _DEBUG_SVC
   zero(g_RunData);
   zero(g_RunPwd);
   RUNDATA RD={0};
