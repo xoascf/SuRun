@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /stack:0x200000 /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 OutDir=.\DebugU
@@ -88,7 +88,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
-# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /stack:0x200000 /subsystem:windows /machine:I386 /IGNORE:4089
+# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 # Begin Special Build Tool
 OutDir=.\ReleaseU
@@ -122,7 +122,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
 # SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
-# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib bufferoverflowu.lib /stack:0x200000 /nologo /subsystem:windows /machine:IX86 /IGNORE:4089 /machine:AMD64
+# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib bufferoverflowu.lib /nologo /subsystem:windows /machine:IX86 /IGNORE:4089 /machine:AMD64
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 OutDir=.\ReleaseUx64
@@ -154,7 +154,7 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo /o"ReleaseUsr32/SuRun32.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /stack:0x200000 /subsystem:windows /machine:I386 /IGNORE:4089
+# ADD BASE LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
 # SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
 # ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /out:"ReleaseUx64/SuRun32.bin" /IGNORE:4089
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
