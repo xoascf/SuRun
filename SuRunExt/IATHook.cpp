@@ -347,6 +347,7 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
+  DBGTrace1("AutoSuRun(%s) test",cmd);
   // Start the child process.
   if (orgCreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
