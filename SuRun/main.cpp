@@ -26,9 +26,9 @@
 #include "DBGTrace.h"
 #include "Resource.h"
 
-#ifndef _WIN64
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
+#ifndef _WIN64
 #pragma comment(linker,"/DELAYLOAD:advapi32.dll")
 #ifdef _SR32
 #pragma comment(linker,"/DELAYLOAD:surunext32.dll")
@@ -497,7 +497,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return RETVAL_ACCESSDENIED;
   //For Vista! The Thread Desktop is not set per default...
   HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
-  SetThreadDesktop(hDesk);
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   CloseHandle(hPipe);
@@ -506,7 +505,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     Sleep(60);
   //For Vista! The Thread Desktop is not set per default...
   SwitchDesktop(hDesk);
-  SetThreadDesktop(hDesk);
   CloseDesktop(hDesk);
   if (bRunSetup)
     return RETVAL_OK;
@@ -520,13 +518,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case RETVAL_RESTRICT: //Restricted User, may not run App!
     if (!g_RunData.beQuiet)
       MessageBox(0,
-      CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
-      CResStr(IDS_APPNAME),MB_ICONSTOP);
+        CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
+        CResStr(IDS_APPNAME),MB_ICONSTOP);
     return RETVAL_RESTRICT;
   case RETVAL_ACCESSDENIED:
     if (!g_RunData.beQuiet)
       MessageBox(0,CResStr(IDS_RUNFAILED,g_RunData.cmdLine),
-      CResStr(IDS_APPNAME),MB_ICONSTOP);
+        CResStr(IDS_APPNAME),MB_ICONSTOP);
     return RETVAL_ACCESSDENIED;
   case RETVAL_OK:
     HANDLE hTok=GetShellProcessToken();
