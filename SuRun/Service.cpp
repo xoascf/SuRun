@@ -119,7 +119,6 @@ DWORD CheckCliProcess(RUNDATA& rd)
   }
   SIZE_T s;
   //Check if the calling process is this Executable:
-#ifndef _DEBUG
   {
     DWORD d;
     HMODULE hMod;
@@ -137,7 +136,6 @@ DWORD CheckCliProcess(RUNDATA& rd)
       return CloseHandle(hProcess),0;
     }
   }
-#endif _DEBUG
   //Since it's the same process, g_RunData has the same address!
   if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&s))
   {
@@ -1134,7 +1132,6 @@ bool HandleServiceStuff()
     }
   }
   //Are we run from the Windows directory?, if Not, ask for Install/update
-#ifndef _DEBUG
   {
     TCHAR fn[4096];
     TCHAR wd[4096];
@@ -1152,7 +1149,6 @@ bool HandleServiceStuff()
       return true;
     }
   }
-#endif _DEBUG
   //In the first three Minutes after Sytstem start:
   //Wait for the service to start
   DWORD ss=CheckServiceStatus();
