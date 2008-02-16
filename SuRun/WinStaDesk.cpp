@@ -367,12 +367,12 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
       return;
     }
     LocalFree(saDesktop.lpSecurityDescriptor);
-    if (!SetThreadDesktop(m_hdeskUser))
-    {
-      DBGTrace("CRunOnNewDeskTop::SetThreadDesktop failed!");
-      CleanUp();
-      return;
-    }
+  }
+  if (!SetThreadDesktop(m_hdeskUser))
+  {
+    DBGTrace("CRunOnNewDeskTop::SetThreadDesktop failed!");
+    CleanUp();
+    return;
   }
   //DenyUserAccessToDesktop(m_hDeskSwitch);
   //Switch to the new Desktop
