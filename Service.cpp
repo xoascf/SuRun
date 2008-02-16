@@ -297,7 +297,26 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
+#ifndef _DEBUG
         if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
+#else _DEBUG
+        {
+          HANDLE hToken=NULL;
+          EnablePrivilege(SE_DEBUG_NAME);
+          HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
+          if (hProc)
+          {
+            OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE|TOKEN_ASSIGN_PRIMARY,&hToken);
+            CloseHandle(hProc);
+            if(hToken)
+            {
+              DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,TokenPrimary,&hProc); 
+              CloseHandle(hToken);
+            }
+          }
+        }
+        if (hProc)
+#endif _DEBUG
         {
           HANDLE hRun=0;
           if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
@@ -392,6 +411,7 @@ BOOL PrepareSuRun()
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),TRUE;
+#ifndef _DEBUG
   //Every "secure" Desktop has its own UUID as name:
   UUID uid;
   UuidCreate(&uid);
@@ -403,6 +423,7 @@ BOOL PrepareSuRun()
   RpcStringFree(&DeskName);
   if (crond.IsValid())
   {
+#endif _DEBUG
     //secure desktop created...
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
       return FALSE;
@@ -415,7 +436,6 @@ BOOL PrepareSuRun()
         SavePassword(g_RunData.UserName,g_RunPwd);
     }else
       l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-    crond.CleanUp();
     if((l&1)==0)
     {
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
@@ -428,8 +448,10 @@ BOOL PrepareSuRun()
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     return UpdLastRunTime(g_RunData.UserName),TRUE;
+#ifndef _DEBUG
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+#endif _DEBUG
   return FALSE;
 }
 
@@ -472,6 +494,7 @@ BOOL Setup(LPCTSTR WinStaName)
   LPTSTR DeskName=0;
   UuidToString(&uid,&DeskName);
   //Create the new desktop
+#ifndef _DEBUG
   CRunOnNewDeskTop crond(WinStaName,DeskName,GetBlurDesk);
   {
     CStayOnDeskTop csod(DeskName);
@@ -481,6 +504,7 @@ BOOL Setup(LPCTSTR WinStaName)
       MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return FALSE;
     }
+#endif _DEBUG
     //only Admins and SuRunners may setup SuRun
     if (g_CliIsAdmin)
       return RunSetup();
@@ -493,7 +517,9 @@ BOOL Setup(LPCTSTR WinStaName)
     }
     if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
       return RunSetup();
+#ifndef _DEBUG
   }
+#endif _DEBUG
   return false;
 }
 
