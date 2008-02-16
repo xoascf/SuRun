@@ -41,8 +41,8 @@ public:
   CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCreateBkWnd);
   ~CRunOnNewDeskTop();
   bool IsValid();
-private:
   void CleanUp();
+private:
   bool    m_bOk;
   HWINSTA m_hwinstaSave;
   HWINSTA m_hwinstaUser;
