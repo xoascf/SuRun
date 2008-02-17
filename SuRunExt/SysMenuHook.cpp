@@ -44,6 +44,7 @@
 #pragma comment(lib,"Delayimp")
 #endif _WIN64
 
+#define USEIATHOOK
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -192,7 +193,9 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
       hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
 #endif _DEBUG
+#ifdef USEIATHOOK
     UnloadHooks();
+#endif USEIATHOOK
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
@@ -203,6 +206,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   l_hInst=hInstDLL;
   //Do not set hooks into SuRun!
+#ifdef USEIATHOOK
   TCHAR fSuRunExe[MAX_PATH];
   GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
   PathAppend(fSuRunExe,L"SuRun.exe");
@@ -213,6 +217,12 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #endif _DEBUG
   if(bSetHook)
     LoadHooks();
+#else USEIATHOOK
+#ifdef _DEBUG
+  DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
+    hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
+#endif _DEBUG
+#endif USEIATHOOK
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
