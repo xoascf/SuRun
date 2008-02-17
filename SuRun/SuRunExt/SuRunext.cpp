@@ -721,7 +721,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   GetSystemWindowsDirectory(cmd,MAX_PATH);
   PathAppend(cmd, _T("SuRun.exe"));
   PathQuoteSpaces(cmd);
-  if (_wcsnicmp(cmd,tmp,wcslen(cmd)))
+  if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return S_FALSE;
   PROCESS_INFORMATION piRet;
