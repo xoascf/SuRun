@@ -38,7 +38,6 @@
 #pragma comment(linker,"/DELAYLOAD:mpr.dll")
 #pragma comment(linker,"/DELAYLOAD:version.dll")
 #pragma comment(linker,"/DELAYLOAD:comctl32.dll")
-#pragma comment(linker,"/DELAYLOAD:rpcrt4.dll")
 #pragma comment(linker,"/DELAYLOAD:userenv.dll")
 #pragma comment(linker,"/DELAYLOAD:comdlg32.dll")
 #pragma comment(linker,"/DELAYLOAD:gdi32.dll")
