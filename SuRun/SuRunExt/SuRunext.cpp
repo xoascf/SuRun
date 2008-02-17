@@ -712,7 +712,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscat(tmp,pei->lpParameters);
   }
   GetCurrentDirectory(MAX_PATH,cmd);
-  ResolveCommandLine(tmp,cmd,cmd);
+  ResolveCommandLine(tmp,cmd,tmp);
 
   GetSystemWindowsDirectory(cmd,MAX_PATH);
   PathAppend(cmd, _T("SuRun.exe"));
