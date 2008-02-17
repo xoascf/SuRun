@@ -35,6 +35,8 @@
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 
+//#define INJECTIAT
+
 //Function Prototypes:
 typedef HMODULE (WINAPI* lpLoadLibraryA)(LPCSTR);
 typedef HMODULE (WINAPI* lpLoadLibraryW)(LPCWSTR);
@@ -286,40 +288,42 @@ DWORD UnHookModules()
   return nHooked;
 }
 
-//BOOL InjectIATHook(HANDLE hProc)
-//{
-//  HANDLE hThread=0;
-//  //This does not work on Vista!
-//  __try
-//  {
-//    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
-//    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
-//    if(!pLoadLib)
-//      return false;
-//	  char DllName[MAX_PATH];
-//	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
-//		  return false;
-//	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
-//	  if(RmteName==NULL)
-//		  return false;
-//	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
-//    __try
-//    {
-//      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
-//    }__except(1)
-//    {
-//    }
-//	  if(hThread!=NULL )
-//    {
-//      WaitForSingleObject(hThread,INFINITE);
-//      CloseHandle(hThread);
-//    }
-//	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
-//  }__except(1)
-//  {
-//  }
-//  return hThread!=0;
-//}
+#ifdef INJECTIAT
+BOOL InjectIATHook(HANDLE hProc)
+{
+  HANDLE hThread=0;
+  //This does not work on Vista!
+  __try
+  {
+    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
+    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
+    if(!pLoadLib)
+      return false;
+	  char DllName[MAX_PATH];
+	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
+		  return false;
+	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
+	  if(RmteName==NULL)
+		  return false;
+	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
+    __try
+    {
+      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
+    }__except(1)
+    {
+    }
+	  if(hThread!=NULL )
+    {
+      WaitForSingleObject(hThread,INFINITE);
+      CloseHandle(hThread);
+    }
+	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
+  }__except(1)
+  {
+  }
+  return hThread!=0;
+}
+#endif INJECTIAT
 
 BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
@@ -411,7 +415,9 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-      //InjectIATHook(lpProcessInformation->hProcess);
+#ifdef INJECTIAT
+      InjectIATHook(lpProcessInformation->hProcess);
+#endif INJECTIAT
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
@@ -439,7 +445,9 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-      //InjectIATHook(lpProcessInformation->hProcess);
+#ifdef INJECTIAT
+      InjectIATHook(lpProcessInformation->hProcess);
+#endif INJECTIAT
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
@@ -588,7 +596,7 @@ void UnloadHooks()
       GetModuleFileNameA(l_hInst,p,MAX_PATH);
       PathStripPathA(p);
     }
-    TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!#############################################\n",fmod);
+    TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!#############################\n",fmod);
 #endif _DEBUG
     EnterCriticalSection(&g_HookCs);
     UnHookModules();
