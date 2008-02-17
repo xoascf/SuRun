@@ -114,14 +114,14 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
         if(wcsicmp(Users[i].lgrui0_name, Group)==0)
         {
           NetApiBufferFree(Users);
-          DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
+//          DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
           return TRUE;
         }
       NetApiBufferFree(Users);
       Users=0;
     }
 	}
-  DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
+//  DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
 	return FALSE;
 }
 
@@ -304,7 +304,7 @@ void USERLIST::Add(LPWSTR UserName)
   }
   if (j>=nUsers)
     User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
-  DBGTrace1("-->AddUser: %s",UserName);
+//  DBGTrace1("-->AddUser: %s",UserName);
   wcscpy(User[j].UserName,UserName);
   User[j].UserBitmap=LoadUserBitmap(UserName);
   nUsers++;
@@ -313,7 +313,7 @@ void USERLIST::Add(LPWSTR UserName)
 
 void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
-  DBGTrace1("AddGroupUsers for Group %s",GroupName);
+//  DBGTrace1("AddGroupUsers for Group %s",GroupName);
   TCHAR cn[2*UNLEN+2]={0};
   DWORD cnl=UNLEN;
   GetComputerName(cn,&cnl);
