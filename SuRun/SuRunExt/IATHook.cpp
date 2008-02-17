@@ -94,24 +94,38 @@ public:
   PROC orgfn()
   {
     if (IsBadCodePtr(orgFunc))
+    {
+      DBGTrace4("WARNING: IATHook changing original Function %s %s 0x%08x to 0x%08x",
+        DllName,FuncName,orgFunc,GetProcAddress(GetModuleHandleA(DllName),FuncName));
       orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
+    }
     return orgFunc;
   }
 }; 
 
-const CHookDescriptor hdt[]=
+//Standard Hooks: These must be implemented!
+static CHookDescriptor hkLdLibA  ("kernel32.dll","LoadLibraryA",(PROC)LoadLibA);
+static CHookDescriptor hkLdLibW  ("kernel32.dll","LoadLibraryW",(PROC)LoadLibW);
+static CHookDescriptor hkLdLibXA ("kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA);
+static CHookDescriptor hkLdLibXW ("kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW);
+static CHookDescriptor hkGetPAdr ("kernel32.dll","GetProcAddress",(PROC)GetProcAddr);
+static CHookDescriptor hkFreeLib ("kernel32.dll","FreeLibrary",(PROC)FreeLib);
+static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PROC)FreeLibAndExitThread);
+//User Hooks:
+static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
+static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
+
+const CHookDescriptor* hdt[]=
 {
-  //Standard Hooks: These must be implemented!
-  CHookDescriptor("kernel32.dll","LoadLibraryA",(PROC)LoadLibA),
-  CHookDescriptor("kernel32.dll","LoadLibraryW",(PROC)LoadLibW),
-  CHookDescriptor("kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA),
-  CHookDescriptor("kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW),
-  CHookDescriptor("kernel32.dll","GetProcAddress",(PROC)GetProcAddr),
-  CHookDescriptor("kernel32.dll","FreeLibrary",(PROC)FreeLib),
-  CHookDescriptor("kernel32.dll","FreeLibraryAndExitThread",(PROC)FreeLibAndExitThread),
-  //User Hooks:
-  CHookDescriptor("kernel32.dll","CreateProcessA",(PROC)CreateProcA),
-  CHookDescriptor("kernel32.dll","CreateProcessW",(PROC)CreateProcW),
+  &hkLdLibA,
+  &hkLdLibW, 
+  &hkLdLibXA, 
+  &hkLdLibXW, 
+  &hkGetPAdr, 
+  &hkFreeLib, 
+  &hkFrLibXT, 
+  &hkCrProcA, 
+  &hkCrProcW 
 };
 
 //relative pointers in PE images
@@ -121,7 +135,7 @@ const CHookDescriptor hdt[]=
 BOOL DoHookDll(char* DllName)
 {
   for(int i=0;i<countof(hdt);i++)
-    if (stricmp(hdt[i].DllName,DllName)==0)
+    if (stricmp(hdt[i]->DllName,DllName)==0)
       return true;
   return false;
 }
@@ -133,12 +147,12 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFN)
     return 0;
   if(*DllName && *ImpName)
     for(int i=0;i<countof(hdt);i++)
-      if (stricmp(hdt[i].DllName,DllName)==0)
-        if (stricmp(hdt[i].FuncName,ImpName)==0)
+      if (stricmp(hdt[i]->DllName,DllName)==0)
+        if (stricmp(hdt[i]->FuncName,ImpName)==0)
         {
           if(orgFN)
-            *orgFN=hdt[i].orgFunc;
-          return hdt[i].newFunc;
+            *orgFN=hdt[i]->orgFunc;
+          return hdt[i]->newFunc;
         }
   return false;
 }
@@ -346,7 +360,10 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
   si.cb = sizeof(si);
   DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   // Start the child process.
-  if (orgCreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
+  lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
+  if(!cpw)
+    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  if (cpw(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
@@ -379,7 +396,10 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     CAToWStr(lpCurrentDirectory),lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    b=orgCreateProcessA(lpApplicationName,lpCommandLine,lpProcessAttributes,
+    lpCreateProcessA cpa=(lpCreateProcessA)hkCrProcA.orgfn();
+    if(!cpa)
+      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+    b=cpa(lpApplicationName,lpCommandLine,lpProcessAttributes,
         lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
         lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     if (b)
@@ -404,7 +424,10 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   if (!AutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    b=orgCreateProcessW(lpApplicationName,lpCommandLine,lpProcessAttributes,
+    lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
+    if(!cpw)
+      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+    b=cpw(lpApplicationName,lpCommandLine,lpProcessAttributes,
         lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
         lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     if (b)
@@ -428,14 +451,22 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   PathStripPathA(f);
   PROC p=DoHookFn(f,(char*)lpProcName,0);
   if(!p)
-    p=orgGetProcAddress(hModule,lpProcName);;
+  {
+    lpGetProcAddress gpa=(lpGetProcAddress)hkGetPAdr.orgfn();
+    if(!gpa)
+      return SetLastError(ERROR_ACCESS_DENIED),0;
+    p=gpa(hModule,lpProcName);;
+  }
   return p;
 }
 
 HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
+  lpLoadLibraryA p=(lpLoadLibraryA)hkLdLibA.orgfn();
+  if(!p)
+    return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=orgLoadLibraryA(lpLibFileName);
+  HMODULE hMOD=p(lpLibFileName);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -444,8 +475,11 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 
 HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
+  lpLoadLibraryW p=(lpLoadLibraryW)hkLdLibW.orgfn();
+  if(!p)
+    return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=orgLoadLibraryW(lpLibFileName);
+  HMODULE hMOD=p(lpLibFileName);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -454,8 +488,11 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 
 HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
+  lpLoadLibraryExA p=(lpLoadLibraryExA)hkLdLibXA.orgfn();
+  if(!p)
+    return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=orgLoadLibraryExA(lpLibFileName,hFile,dwFlags);
+  HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -464,8 +501,11 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 
 HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
+  lpLoadLibraryExW p=(lpLoadLibraryExW)hkLdLibXW.orgfn();
+  if(!p)
+    return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=orgLoadLibraryExW(lpLibFileName,hFile,dwFlags);
+  HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -476,24 +516,31 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
 {
   if (hLibModule==l_hInst)
     return true;
-  return orgFreeLibrary(hLibModule);
+  lpFreeLibrary p=(lpFreeLibrary)hkFreeLib.orgfn();
+  if(!p)
+    return SetLastError(ERROR_ACCESS_DENIED),0;
+  return p(hLibModule);
 }
 
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 {
   if (hLibModule!=l_hInst)
-    orgFreeLibraryAndExitThread(hLibModule,dwExitCode);
+  {
+    lpFreeLibraryAndExitThread p=(lpFreeLibraryAndExitThread)hkFrLibXT.orgfn();
+    if(p)
+      p(hLibModule,dwExitCode);
+  }
   else
     ExitThread(dwExitCode);
 }
 
 DWORD WINAPI InitHookProc(void* p)
 {
-  //The DLL must not be unloaded while the process is running!
-  //Increment lock count!
-  char f[MAX_PATH];
-  GetModuleFileNameA(l_hInst,f,MAX_PATH);
-  orgLoadLibraryA(f);
+//  //The DLL must not be unloaded while the process is running!
+//  //Increment lock count!
+//  char f[MAX_PATH];
+//  GetModuleFileNameA(l_hInst,f,MAX_PATH);
+//  orgLoadLibraryA(f);
   EnterCriticalSection(&g_HookCs);
   HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -503,7 +550,8 @@ DWORD WINAPI InitHookProc(void* p)
 void LoadHooks()
 {
   InitializeCriticalSection(&g_HookCs);
-  CreateThread(0,0,InitHookProc,0,0,0);
+//  CreateThread(0,0,InitHookProc,0,0,0);
+  InitHookProc(0);
 }
 
 void UnloadHooks()
