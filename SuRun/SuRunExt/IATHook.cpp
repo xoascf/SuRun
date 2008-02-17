@@ -209,7 +209,7 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           PROC oldFunc=0;
-          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&oldFunc);
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,bUnHook?&oldFunc:0);
           if (newFunc 
             && ((!bUnHook) && (pThunk->u1.Function==(DWORD_PTR)oldFunc)
             ||( bUnHook  && (pThunk->u1.Function==(DWORD_PTR)newFunc)))
