@@ -515,7 +515,21 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 BOOL WINAPI FreeLib(HMODULE hLibModule)
 {
   if (hLibModule==l_hInst)
+  {
+#ifdef _DEBUG
+    char fmod[MAX_PATH]={0};
+    {
+      GetModuleFileNameA(0,fmod,MAX_PATH);
+      PathStripPathA(fmod);
+      strcat(fmod,": ");
+      char* p=&fmod[strlen(fmod)];
+      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+      PathStripPathA(p);
+    }
+    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])\n",fmod,hLibModule);
+#endif _DEBUG
     return true;
+  }
   lpFreeLibrary p=(lpFreeLibrary)hkFreeLib.orgfn();
   if(!p)
     return SetLastError(ERROR_ACCESS_DENIED),0;
@@ -566,7 +580,7 @@ void UnloadHooks()
     GetModuleFileNameA(l_hInst,p,MAX_PATH);
     PathStripPathA(p);
   }
-  TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!\n",fmod);
+  TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!#############################################\n",fmod);
 #endif _DEBUG
   EnterCriticalSection(&g_HookCs);
   UnHookModules();
