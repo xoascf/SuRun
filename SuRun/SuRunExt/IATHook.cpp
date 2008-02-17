@@ -557,9 +557,21 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
     lpFreeLibraryAndExitThread p=(lpFreeLibraryAndExitThread)hkFrLibXT.orgfn();
     if(p)
       p(hLibModule,dwExitCode);
+    return;
   }
-  else
-    ExitThread(dwExitCode);
+#ifdef _DEBUG
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hLibModule,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
+#endif _DEBUG
+  ExitThread(dwExitCode);
 }
 
 DWORD WINAPI InitHookProc(void* p)
