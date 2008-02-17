@@ -95,7 +95,7 @@ public:
   {
     if (IsBadCodePtr(orgFunc))
     {
-      DBGTrace4("WARNING: IATHook changing original Function %s %s 0x%08x to 0x%08x",
+      DBGTrace4("WARNING: IATHook changing original Function %s %s 0x%08x to 0x%08x #############################",
         DllName,FuncName,orgFunc,GetProcAddress(GetModuleHandleA(DllName),FuncName));
       orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
     }
@@ -186,16 +186,16 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     return nHooked;
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
 #ifdef _DEBUG
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hMod,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hMod,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
 #endif _DEBUG
   for(;pID->Name;pID++) 
   {
@@ -216,8 +216,8 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
             )
           {
 #ifdef _DEBUG
-            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
-              fmod,DllName,pBN->Name,oldFunc,newFunc);
+//            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
+//              fmod,DllName,pBN->Name,oldFunc,newFunc);
 #endif _DEBUG
             MEMORY_BASIC_INFORMATION mbi;
             if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
@@ -526,7 +526,7 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
       GetModuleFileNameA(hLibModule,p,MAX_PATH);
       PathStripPathA(p);
     }
-    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])\n",fmod,hLibModule);
+    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif _DEBUG
     return true;
   }
