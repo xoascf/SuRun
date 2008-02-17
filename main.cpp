@@ -494,8 +494,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
     return RETVAL_ACCESSDENIED;
-  //For Vista!
-  HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   CloseHandle(hPipe);
@@ -504,12 +502,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     Sleep(60);
   if (bRunSetup)
     return RETVAL_OK;
-  //For Vista!
-  if (hDesk)
-  {
-    SwitchDesktop(hDesk);
-    CloseDesktop(hDesk);
-  }
   switch(g_RetVal)
   {
   case RETVAL_WAIT:
