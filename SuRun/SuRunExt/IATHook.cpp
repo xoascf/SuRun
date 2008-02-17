@@ -329,12 +329,18 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
 {
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
+  {
+    DBGTrace1("IATHook AutoSuRun(%s) Isadmin",lpCmd);
     return FALSE;
+  }
   {
     TCHAR User[UNLEN+GNLEN+2]={0};
     GetProcessUserName(GetCurrentProcessId(),User);
     if (!IsInSuRunners(User))
+    {
+      DBGTrace2("IATHook AutoSuRun(%s) %s is no SuRunner",lpCmd,User);
       return FALSE;
+    }
   }
   WCHAR cmd[4096]={0};
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
@@ -359,8 +365,11 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     PathAppendW(cmd,L"SuRun.exe");
     PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
+    {
       //Never start SuRun administrative
+      DBGTrace2("IATHook AutoSuRun(%s) no exec SuRun! %s",cmd,tmp);
       return free(ppi),FALSE;
+    }
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
     
   }
