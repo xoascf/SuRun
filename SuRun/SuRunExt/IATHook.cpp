@@ -354,7 +354,7 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     GetSystemWindowsDirectoryW(cmd,4096);
     PathAppendW(cmd,L"SuRun.exe");
     PathQuoteSpacesW(cmd);
-    if (_wcsnicmp(cmd,tmp,wcslen(cmd)))
+    if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
       return free(ppi),FALSE;
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
