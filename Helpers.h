@@ -97,6 +97,9 @@ PSECURITY_DESCRIPTOR GetUserAccessSD();
 //  NetworkPathToUNCPath
 BOOL NetworkPathToUNCPath(LPTSTR path);
 
+// ResolveCommandLine: Beautify path, try to resolve executables (msi,cpl...)
+BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd);
+
 //Link Creation
 BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname,int iIcon);
 
