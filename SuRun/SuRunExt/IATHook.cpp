@@ -576,21 +576,24 @@ void LoadHooks()
 
 void UnloadHooks()
 {
-#ifdef _DEBUG
-  char fmod[MAX_PATH]={0};
+  if(g_ModList.size()!=0)
   {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(l_hInst,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!#############################################\n",fmod);
+#ifdef _DEBUG
+    char fmod[MAX_PATH]={0};
+    {
+      GetModuleFileNameA(0,fmod,MAX_PATH);
+      PathStripPathA(fmod);
+      strcat(fmod,": ");
+      char* p=&fmod[strlen(fmod)];
+      GetModuleFileNameA(l_hInst,p,MAX_PATH);
+      PathStripPathA(p);
+    }
+    TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!#############################################\n",fmod);
 #endif _DEBUG
-  EnterCriticalSection(&g_HookCs);
-  UnHookModules();
-  LeaveCriticalSection(&g_HookCs);
+    EnterCriticalSection(&g_HookCs);
+    UnHookModules();
+    LeaveCriticalSection(&g_HookCs);
+  }
   DeleteCriticalSection(&g_HookCs);
 }
 
