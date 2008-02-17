@@ -42,7 +42,7 @@
 
 #include "../DBGTrace.h"
 
-//#define ISHELLEXHK
+#define ISHELLEXHK
 //#define USE_APPINIT
 
 //////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,10 @@ typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
 // this is the actual OLE Shell context menu handler
 //
 //////////////////////////////////////////////////////////////////////////////
-class CShellExt : public IContextMenu, IShellExtInit, IShellExecuteHook
+class CShellExt : public IContextMenu, IShellExtInit
+#ifdef ISHELLEXHK
+  , IShellExecuteHook
+#endif ISHELLEXHK
 {
 protected:
   ULONG m_cRef;
@@ -121,8 +124,10 @@ public:
   STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT FAR *, LPSTR, UINT);
   //IShellExtInit methods
   STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
+#ifdef ISHELLEXHK
   //IShellExecuteHook methods
   STDMETHODIMP Execute(LPSHELLEXECUTEINFO pei);
+#endif ISHELLEXHK
 };
 
 typedef CShellExt *LPCSHELLEXT;
@@ -622,6 +627,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   return hr;
 }
 
+#ifdef ISHELLEXHK
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
@@ -704,17 +710,23 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       return S_FALSE;
     }
   }
+  if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
+  {
+    _tcscat(tmp,L" ");
+    _tcscat(tmp,pei->lpParameters);
+  }
+  GetCurrentDirectory(MAX_PATH,cmd);
+  ResolveCommandLine(tmp,cmd,cmd);
+
   GetSystemWindowsDirectory(cmd,MAX_PATH);
   PathAppend(cmd, _T("SuRun.exe"));
   PathQuoteSpaces(cmd);
+  if (_wcsnicmp(cmd,tmp,wcslen(cmd)))
+    //Never start SuRun administrative
+    return S_FALSE;
   PROCESS_INFORMATION piRet;
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x ",GetCurrentProcessId(),&piRet);
   _tcscat(cmd,tmp);
-  if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
-  {
-    _tcscat(cmd,L" ");
-    _tcscat(cmd,pei->lpParameters);
-  }
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -750,3 +762,4 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   return S_FALSE;
 }
+#endif ISHELLEXHK
