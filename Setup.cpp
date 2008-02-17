@@ -917,38 +917,30 @@ BOOL TestSetup()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
-
-  //Every "secure" Desktop has its own UUID as name:
-  UUID uid;
-  UuidCreate(&uid);
-  LPTSTR DeskName=0;
-  UuidToString(&uid,&DeskName);
+  //Every "secure" Desktop has its own name:
+  CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
-  CRunOnNewDeskTop crond(L"WinSta0",DeskName,GetBlurDesk);
+  CRunOnNewDeskTop crond(g_RunData.WinStaName,DeskName,GetBlurDesk);
+  CStayOnDeskTop csod(DeskName);
+  if (!crond.IsValid())    
   {
-    CStayOnDeskTop csod(DeskName);
-    RpcStringFree(&DeskName);
-    if (!crond.IsValid())    
-    {
-      MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      return FALSE;
-    }
-    
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-    if (!RunSetup())
-      DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-    
-    ExitProcess(0);
-    
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-    if (!RunSetup())
-      DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-    
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
-    if (!RunSetup())
-      DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    return FALSE;
   }
   
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
+  if (!RunSetup())
+    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  
+  ExitProcess(0);
+  
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+  if (!RunSetup())
+    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
+  
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
+  if (!RunSetup())
+    DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   ::ExitProcess(0);
   return TRUE;
 }
