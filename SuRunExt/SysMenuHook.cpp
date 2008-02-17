@@ -219,7 +219,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     LoadHooks();
 #else USEIATHOOK
 #ifdef _DEBUG
-  DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
+  DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
     hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
 #endif _DEBUG
 #endif USEIATHOOK
