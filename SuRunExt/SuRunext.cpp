@@ -42,7 +42,7 @@
 
 #include "../DBGTrace.h"
 
-#define ISHELLEXHK
+//#define ISHELLEXHK
 //#define USE_APPINIT
 
 //////////////////////////////////////////////////////////////////////////////
@@ -102,10 +102,7 @@ typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
 // this is the actual OLE Shell context menu handler
 //
 //////////////////////////////////////////////////////////////////////////////
-class CShellExt : public IContextMenu, IShellExtInit
-#ifdef ISHELLEXHK
-  , IShellExecuteHook
-#endif ISHELLEXHK
+class CShellExt : public IContextMenu, IShellExtInit, IShellExecuteHook
 {
 protected:
   ULONG m_cRef;
@@ -124,10 +121,8 @@ public:
   STDMETHODIMP GetCommandString(UINT_PTR, UINT, UINT FAR *, LPSTR, UINT);
   //IShellExtInit methods
   STDMETHODIMP Initialize(LPCITEMIDLIST, LPDATAOBJECT, HKEY);
-#ifdef ISHELLEXHK
   //IShellExecuteHook methods
   STDMETHODIMP Execute(LPSHELLEXECUTEINFO pei);
-#endif ISHELLEXHK
 };
 
 typedef CShellExt *LPCSHELLEXT;
@@ -375,6 +370,8 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
     *ppv = (LPSHELLEXTINIT)this;
   else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
+  else if (IsEqualIID(riid, IID_IShellExecuteHook))
+    *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
   {
     AddRef();
@@ -627,7 +624,6 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   return hr;
 }
 
-#ifdef ISHELLEXHK
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
@@ -762,4 +758,3 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   return S_FALSE;
 }
-#endif ISHELLEXHK
