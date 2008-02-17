@@ -42,7 +42,7 @@
 
 #include "../DBGTrace.h"
 
-#define ISHELLEXHK
+//#define ISHELLEXHK
 //#define USE_APPINIT
 
 //////////////////////////////////////////////////////////////////////////////
@@ -719,10 +719,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   PathQuoteSpaces(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
-  {
-    DBGTrace2("ShellExecuteHook Not AutoRunning SuRun %s == %s",cmd,tmp);
     return S_FALSE;
-  }
   PROCESS_INFORMATION piRet;
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&piRet,tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
