@@ -27,7 +27,6 @@
 #include <shlwapi.h>
 #include <stdio.h>
 #include <tchar.h>
-#include <Rpcdce.h>
 #include <lm.h>
 #include <ntsecapi.h>
 #include <USERENV.H>
@@ -48,7 +47,6 @@
 #include "SuRunExt/SysMenuHook.h"
 
 #pragma comment(lib,"shlwapi.lib")
-#pragma comment(lib,"Rpcrt4.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"AdvApi32.lib")
 #pragma comment(lib,"PSAPI.lib")
@@ -73,7 +71,7 @@
     #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
   #endif _WIN64
 
-#define _DEBUG_SVC
+//#define _DEBUG_SVC
 
 #endif _DEBUG
 
@@ -408,20 +406,11 @@ BOOL PrepareSuRun()
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),TRUE;
-#ifndef _DEBUG_SVC
-  //Every "secure" Desktop has its own UUID as name:
-  UUID uid;
-  UuidCreate(&uid);
-  LPTSTR DeskName=0;
-  UuidToString(&uid,&DeskName);
+  //Every "secure" Desktop has its own name:
+  CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
   CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,GetBlurDesk);
   CStayOnDeskTop csod(DeskName);
-  RpcStringFree(&DeskName);
-#else _DEBUG_SVC
-  CRunOnNewDeskTop crond(g_RunData.WinSta,L"NoDefault",1);
-  CStayOnDeskTop csod(L"NoDefault");
-#endif _DEBUG_SVC
   if (crond.IsValid())
   {
     //secure desktop created...
@@ -486,20 +475,11 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 
 BOOL Setup(LPCTSTR WinStaName)
 {
-  //Every "secure" Desktop has its own UUID as name:
-  UUID uid;
-  UuidCreate(&uid);
-  LPTSTR DeskName=0;
-  UuidToString(&uid,&DeskName);
+  //Every "secure" Desktop has its own name:
+  CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
-#ifndef _DEBUG_SVC
   CRunOnNewDeskTop crond(WinStaName,DeskName,GetBlurDesk);
   CStayOnDeskTop csod(DeskName);
-  RpcStringFree(&DeskName);
-#else _DEBUG_SVC
-  CRunOnNewDeskTop crond(g_RunData.WinSta,L"NoDefault",1);
-  CStayOnDeskTop csod(L"NoDefault");
-#endif _DEBUG_SVC
   if (!crond.IsValid())    
   {
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
