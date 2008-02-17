@@ -679,8 +679,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     return S_FALSE;
   }
   //check if this Programm has an Auto-SuRun-Entry in the List
-  TCHAR cmd[MAX_PATH];
-  TCHAR tmp[MAX_PATH];
+  TCHAR cmd[4096];
+  TCHAR tmp[4096];
   _tcscpy(tmp,pei->lpFile);
   PathQuoteSpaces(tmp);
   //Verb must be "open" or empty
@@ -695,7 +695,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       PathAppend(tmp,L"AutoRun.inf");
       if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,tmp)!=0)
         return S_FALSE;
-      GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,MAX_PATH,tmp);
+      GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,4095,tmp);
       if (!cmd[0])
         return S_FALSE;
       _tcscpy(tmp,cmd);
@@ -719,10 +719,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   PathQuoteSpaces(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
+  {
+    DBGTrace2("ShellExecuteHook Not AutoRunning SuRun %s == %s",cmd,tmp);
     return S_FALSE;
+  }
   PROCESS_INFORMATION piRet;
-  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x ",GetCurrentProcessId(),&piRet);
-  _tcscat(cmd,tmp);
+  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&piRet,tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
