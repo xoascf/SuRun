@@ -35,6 +35,23 @@
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 
+//Function Prototypes:
+typedef HMODULE (WINAPI* lpLoadLibraryA)(LPCSTR);
+typedef HMODULE (WINAPI* lpLoadLibraryW)(LPCWSTR);
+typedef HMODULE (WINAPI* lpLoadLibraryExA)(LPCSTR,HANDLE,DWORD);
+typedef HMODULE (WINAPI* lpLoadLibraryExW)(LPCWSTR,HANDLE,DWORD);
+typedef FARPROC (WINAPI* lpGetProcAddress)(HMODULE,LPCSTR);
+typedef BOOL (WINAPI* lpFreeLibrary)(HMODULE);
+typedef VOID (WINAPI* lpFreeLibraryAndExitThread)(HMODULE,DWORD);
+typedef BOOL (WINAPI* lpCreateProcessA)(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,
+                                        LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+                                        LPVOID,LPCSTR,LPSTARTUPINFOA,
+                                        LPPROCESS_INFORMATION);
+typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
+                                         LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
+                                         LPPROCESS_INFORMATION);
+
 //Forward decl:
 BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
@@ -44,22 +61,15 @@ BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUT
 //BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
 //                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
-FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
-
 HMODULE WINAPI LoadLibA(LPCSTR);
 HMODULE WINAPI LoadLibW(LPCWSTR);
 HMODULE WINAPI LoadLibExA(LPCSTR,HANDLE,DWORD);
 HMODULE WINAPI LoadLibExW(LPCWSTR,HANDLE,DWORD);
 
-BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
-                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
-BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
-                        BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
-
-//BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
-//                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
-
 FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
+
+BOOL WINAPI FreeLib(HMODULE);
+VOID WINAPI FreeLibAndExitThread(HMODULE,DWORD);
 
 typedef std::list<HMODULE> ModList;
 
@@ -67,55 +77,42 @@ int g_nHooked=0;
 ModList g_ModList;
 
 //Hook Descriptor
-typedef struct 
+class CHookDescriptor
 {
+public:
   LPCSTR DllName;
   LPCSTR FuncName;
   PROC newFunc;
   PROC orgFunc;
-}HOOKDESCRIPTOR; 
+  CHookDescriptor(LPCSTR Dll,LPCSTR Func,PROC nFunc)
+  {
+    DllName=Dll;
+    FuncName=Func;
+    newFunc=nFunc;
+    orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
+  }
+  PROC orgfn()
+  {
+    if (IsBadCodePtr(orgFunc))
+      orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
+    return orgFunc;
+  }
+}; 
 
-#define MAKEHOOKDESC(d,f,n) {d,f,(PROC)n,GetProcAddress(GetModuleHandleA(d),f)}
-
-const HOOKDESCRIPTOR hdt[]=
+const CHookDescriptor hdt[]=
 {
   //Standard Hooks: These must be implemented!
-  MAKEHOOKDESC("kernel32.dll","LoadLibraryA",LoadLibA),
-  MAKEHOOKDESC("kernel32.dll","LoadLibraryW",LoadLibW),
-  MAKEHOOKDESC("kernel32.dll","LoadLibraryExA",LoadLibExA),
-  MAKEHOOKDESC("kernel32.dll","LoadLibraryExW",LoadLibExW),
-  MAKEHOOKDESC("kernel32.dll","GetProcAddress",GetProcAddr),
+  CHookDescriptor("kernel32.dll","LoadLibraryA",(PROC)LoadLibA),
+  CHookDescriptor("kernel32.dll","LoadLibraryW",(PROC)LoadLibW),
+  CHookDescriptor("kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA),
+  CHookDescriptor("kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW),
+  CHookDescriptor("kernel32.dll","GetProcAddress",(PROC)GetProcAddr),
+  CHookDescriptor("kernel32.dll","FreeLibrary",(PROC)FreeLib),
+  CHookDescriptor("kernel32.dll","FreeLibraryAndExitThread",(PROC)FreeLibAndExitThread),
   //User Hooks:
-  MAKEHOOKDESC("kernel32.dll","CreateProcessA",CreateProcA),
-  MAKEHOOKDESC("kernel32.dll","CreateProcessW",CreateProcW),
+  CHookDescriptor("kernel32.dll","CreateProcessA",(PROC)CreateProcA),
+  CHookDescriptor("kernel32.dll","CreateProcessW",(PROC)CreateProcW),
 };
-
-HMODULE (WINAPI* orgLoadLibraryA)(LPCSTR)
-                                    =(HMODULE (WINAPI*)(LPCSTR))hdt[0].orgFunc;
-HMODULE (WINAPI* orgLoadLibraryW)(LPCWSTR)
-                                   =(HMODULE (WINAPI*)(LPCWSTR))hdt[1].orgFunc;
-HMODULE (WINAPI* orgLoadLibraryExA)(LPCSTR,HANDLE,DWORD)
-                       =(HMODULE (WINAPI*)(LPCSTR,HANDLE,DWORD))hdt[2].orgFunc;
-HMODULE (WINAPI* orgLoadLibraryExW)(LPCWSTR,HANDLE,DWORD)
-                      =(HMODULE (WINAPI*)(LPCWSTR,HANDLE,DWORD))hdt[3].orgFunc;
-
-FARPROC (WINAPI* orgGetProcAddress)(HMODULE,LPCSTR)
-                            =(FARPROC (WINAPI*)(HMODULE,LPCSTR))hdt[4].orgFunc;
-
-BOOL (WINAPI* orgCreateProcessA)(LPCSTR,LPSTR,
-              LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
-              BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,
-              LPPROCESS_INFORMATION)
- =(BOOL (WINAPI*)(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,
-              LPSECURITY_ATTRIBUTES,BOOL,DWORD,LPVOID,
-              LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION))     hdt[5].orgFunc;
-BOOL (WINAPI* orgCreateProcessW)(LPCWSTR,LPWSTR,
-              LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
-              BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,
-              LPPROCESS_INFORMATION)
- =(BOOL (WINAPI*)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
-              LPSECURITY_ATTRIBUTES,BOOL,DWORD,LPVOID,
-              LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION))    hdt[6].orgFunc;
 
 //relative pointers in PE images
 #define RelPtr(_T,pe,rpt) (_T)( (DWORD_PTR)(pe)+(DWORD_PTR)(rpt))
@@ -475,8 +472,20 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   return hMOD;
 }
 
-ToDo: FreeLibrary!
-      FreeLibraryAndExitThread
+BOOL WINAPI FreeLib(HMODULE hLibModule)
+{
+  if (hLibModule==l_hInst)
+    return true;
+  return orgFreeLibrary(hLibModule);
+}
+
+VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
+{
+  if (hLibModule!=l_hInst)
+    orgFreeLibraryAndExitThread(hLibModule,dwExitCode);
+  else
+    ExitThread(dwExitCode);
+}
 
 DWORD WINAPI InitHookProc(void* p)
 {
