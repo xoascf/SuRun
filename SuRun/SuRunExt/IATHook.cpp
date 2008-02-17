@@ -347,7 +347,7 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
-  DBGTrace1("AutoSuRun(%s) test",cmd);
+  DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   // Start the child process.
   if (orgCreateProcessW(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
@@ -362,7 +362,7 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
       ppi->hThread=OpenThread(SYNCHRONIZE,false,ppi->dwThreadId);
       if(lppi)
         memmove(lppi,ppi,sizeof(PROCESS_INFORMATION));
-      DBGTrace5("AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
+      DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
         cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
     }
     free(ppi);
@@ -474,6 +474,9 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   LeaveCriticalSection(&g_HookCs);
   return hMOD;
 }
+
+ToDo: FreeLibrary!
+      FreeLibraryAndExitThread
 
 DWORD WINAPI InitHookProc(void* p)
 {
