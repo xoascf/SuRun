@@ -115,7 +115,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
 
-const CHookDescriptor* hdt[]=
+static CHookDescriptor* hdt[]=
 {
   &hkLdLibA,
   &hkLdLibW, 
@@ -151,7 +151,7 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFN)
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
         {
           if(orgFN)
-            *orgFN=hdt[i]->orgFunc;
+            *orgFN=hdt[i]->orgfn();
           return hdt[i]->newFunc;
         }
   return false;
@@ -321,7 +321,7 @@ DWORD UnHookModules()
 //  return hThread!=0;
 //}
 
-BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
@@ -332,28 +332,34 @@ BOOL AutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION
     if (!IsInSuRunners(User))
       return FALSE;
   }
-  WCHAR cmd[4096];
-  GetSystemWindowsDirectoryW(cmd,4096);
-  PathAppendW(cmd,L"SuRun.exe");
-  PathQuoteSpacesW(cmd);
-  PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
-  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x ",GetCurrentProcessId(),ppi);
+  WCHAR cmd[4096]={0};
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   if(lpApp)
   {
-    WCHAR tmp[4096];
+    wcscat(cmd,lpApp);
+    PathQuoteSpacesW(cmd);
     if (parms)
       //lpApplicationName and the first token of lpCommandLine are the same
       //we need to check this:
       parms=PathGetArgsW(lpCmd);
-    wcscpy(tmp,lpApp);
-    PathQuoteSpacesW(tmp);
-    wcscat(cmd,tmp);
     if (parms)
       wcscat(cmd,L" ");
   }
   if (parms)
     wcscat(cmd,parms);
+  PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
+  {
+    WCHAR tmp[4096]={0};
+    ResolveCommandLine(cmd,lpCurDir,tmp);
+    GetSystemWindowsDirectoryW(cmd,4096);
+    PathAppendW(cmd,L"SuRun.exe");
+    PathQuoteSpacesW(cmd);
+    if (_wcsnicmp(cmd,tmp,wcslen(cmd)))
+      //Never start SuRun administrative
+      return free(ppi),FALSE;
+    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
+    
+  }
   STARTUPINFOW si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
@@ -392,7 +398,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-  if (!AutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),
+  if (!TestAutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),
     CAToWStr(lpCurrentDirectory),lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
@@ -421,7 +427,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-  if (!AutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
+  if (!TestAutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
