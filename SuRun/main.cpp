@@ -211,7 +211,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       PathAppend(g_RunData.cmdLine,L"rundll32.exe");
       _tcscat(g_RunData.cmdLine,L" ");
       _tcscat(g_RunData.cmdLine,PathGetArgs(Args));
-      Args[0]=0;
+      bRunSetup=TRUE;
       break;
     }else if (!_wcsicmp(c,L"/KILL"))
     {
