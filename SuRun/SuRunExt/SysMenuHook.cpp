@@ -29,7 +29,6 @@
 #include "../Setup.h"
 #include "SuRunExt.h"
 #include "Resource.h"
-#include "IATHook.h"
 
 #pragma comment(lib,"PSAPI")
 #pragma comment(lib,"shlwapi")
@@ -44,8 +43,6 @@
 #pragma comment(lib,"Delayimp")
 #endif _WIN64
 
-#define USEIATHOOK
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // global data within shared data segment to allow sharing across instances
@@ -59,21 +56,12 @@ HHOOK       g_hookMenu  = NULL;
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHDATA,RWS")
 
-UINT        WM_SYSMH0   = 0;
-UINT        WM_SYSMH1   = 0;
-HINSTANCE   l_hInst     = NULL;
+extern HINSTANCE l_hInst; //the local Dll instance
 
-TCHAR sMenuRestart[MAX_PATH]={0};
-TCHAR sMenuStart[MAX_PATH]={0};
-TCHAR sFileNotFound[MAX_PATH]={0};
-TCHAR sSuRun[MAX_PATH]={0};
-TCHAR sSuRunCmd[MAX_PATH]={0};
-TCHAR sSuRunExp[MAX_PATH]={0};
-TCHAR sErr[MAX_PATH]={0};
-TCHAR sTip[MAX_PATH]={0};
+extern UINT      WM_SYSMH0;
+extern UINT      WM_SYSMH1;
 
-// extern "C" prevents name mangling so that procedures can be referenced from outside the DLL
-extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if(nCode>=0)
   {
@@ -99,10 +87,10 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
       {
         if( GetRestartAsAdmin
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1))
-          AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,sMenuRestart);
+          AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART));
         if( GetStartAsAdmin
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
-          AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,sMenuStart);
+          AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,CResStr(l_hInst,IDS_MENUSTART));
       }
       break;
     }
@@ -111,7 +99,7 @@ extern "C" static LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lP
   return CallNextHookEx(g_hookShell, nCode, wParam, lParam);
 }
 
-extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   #define msg ((MSG*)lParam)
   if ((nCode>=0)&&(msg->message==WM_SYSCOMMAND)&&(wParam==PM_REMOVE)
@@ -140,7 +128,7 @@ extern "C" static LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lPa
       if (msg->wParam==WM_SYSMH0)
         ::ExitProcess(0);
     }else
-      MessageBox(msg->hwnd,sFileNotFound,0,MB_ICONSTOP);
+      MessageBox(msg->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
     //We processed the Message: Stop calling other hooks!
     return 0;
   }
@@ -178,63 +166,4 @@ __declspec(dllexport) BOOL UninstallSysMenuHook()
     bRet&=(UnhookWindowsHookEx(g_hookMenu)!=0);
   g_hookMenu=NULL;
   return bRet;
-}
-
-BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
-{
-  TCHAR fMod[MAX_PATH];
-  GetModuleFileName(0,fMod,MAX_PATH);
-
-  DWORD PID=GetCurrentProcessId();
-  //Process Detach:
-  if(dwReason==DLL_PROCESS_DETACH)
-  {
-#ifdef _DEBUG
-    DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
-#endif _DEBUG
-#ifdef USEIATHOOK
-    UnloadHooks();
-#endif USEIATHOOK
-    return TRUE;
-  }
-  if(dwReason!=DLL_PROCESS_ATTACH)
-    return TRUE;
-  //Process Attach:
-  DisableThreadLibraryCalls(hInstDLL);
-  if (l_hInst==hInstDLL)
-    return TRUE;
-  l_hInst=hInstDLL;
-  //Do not set hooks into SuRun!
-#ifdef USEIATHOOK
-  TCHAR fSuRunExe[MAX_PATH];
-  GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
-  PathAppend(fSuRunExe,L"SuRun.exe");
-  BOOL bSetHook=(!IsAdmin())&&(_tcsicmp(fMod,fSuRunExe)!=0);
-#ifdef _DEBUG
-  DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d, SetHook=%d",
-    hInstDLL,PID,fMod,GetCommandLine(),IsAdmin(),bSetHook);
-#endif _DEBUG
-  if(bSetHook)
-    LoadHooks();
-#else USEIATHOOK
-#ifdef _DEBUG
-  DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
-    hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
-#endif _DEBUG
-#endif USEIATHOOK
-#ifdef _DEBUG_ENU
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-#endif _DEBUG_ENU
-  WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  _tcscpy(sMenuRestart,CResStr(l_hInst,IDS_MENURESTART));
-  _tcscpy(sMenuStart,CResStr(l_hInst,IDS_MENUSTART));
-  _tcscpy(sFileNotFound,CResStr(l_hInst,IDS_FILENOTFOUND));
-  _tcscpy(sSuRun,CResStr(l_hInst,IDS_SURUN));
-  _tcscpy(sSuRunCmd,CResStr(l_hInst,IDS_SURUNCMD));
-  _tcscpy(sSuRunExp,CResStr(l_hInst,IDS_SURUNEXP));
-  _tcscpy(sErr,CResStr(l_hInst,IDS_ERR));
-  _tcscpy(sTip,CResStr(l_hInst,IDS_TOOLTIP));
-  return TRUE;
 }
