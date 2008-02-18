@@ -33,6 +33,7 @@
 #pragma comment(lib,"Shlwapi.lib")
 
 #include "SuRunExt.h"
+#include "IATHook.h"
 #include "../ResStr.h"
 #include "../Helpers.h"
 #include "../Setup.h"
@@ -41,9 +42,6 @@
 #include "Resource.h"
 
 #include "../DBGTrace.h"
-
-//#define ISHELLEXHK
-//#define USE_APPINIT
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -60,20 +58,13 @@ DWORD g_LoadAppInitDLLs = 0;
 DWORD g_LoadAppInit32DLLs = 0;
 #endif _Win64
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// Strings: these are defined in SysMenuHook.cpp and placed in ".SHDATA"
-//
-//////////////////////////////////////////////////////////////////////////////
-extern TCHAR sFileNotFound[MAX_PATH];
-extern TCHAR sSuRun[MAX_PATH];
-extern TCHAR sSuRunCmd[MAX_PATH];
-extern TCHAR sSuRunExp[MAX_PATH];
-extern TCHAR sErr[MAX_PATH];
-extern TCHAR sTip[MAX_PATH];
-
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHDATA,RWS")
+
+HINSTANCE   l_hInst     = NULL;
+
+UINT        WM_SYSMH0   = 0;
+UINT        WM_SYSMH1   = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -157,125 +148,6 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
     return pcf->QueryInterface(riid, ppvOut);
   }
   return CLASS_E_CLASSNOTAVAILABLE;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// Install/Uninstall
-//
-//////////////////////////////////////////////////////////////////////////////
-
-#ifdef USE_APPINIT
-static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  /* ToDo: Do not use AppInit_Dlls! */
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  if (_tcsstr(s,Dll)==0)
-  {
-    if (s[0])
-      _tcscat(s,_T(","));
-    _tcscat(s,Dll);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }/**/
-}
-
-static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  /* ToDo: Do not use AppInit_Dlls! */
-  //remove from AppInit_Dlls
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  LPTSTR p=_tcsstr(s,Dll);
-  if (p!=0)
-  {
-    LPTSTR p1=p+_tcslen(Dll);
-    if((*p1==' ')||(*p1==','))
-      p1++;
-    if (p!=s)
-      p--;
-    *p=0;
-    if (*(p1))
-      _tcscat(p,p1);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }
-  /**/
-}
-#endif USE_APPINIT
-
-__declspec(dllexport) void InstallShellExt()
-{
-#ifdef ISHELLEXHK
-  //Vista: Enable IShellExecHook
-  SetOption(L"DelIShellExecHookEnable",
-    (DWORD)(GetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-              L"EnableShellExecuteHooks",-1)==-1),
-    0);
-  SetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",L"EnableShellExecuteHooks",1);
-#endif ISHELLEXHK
-  //COM-Object
-  SetRegStr(HKCR,L"CLSID\\" sGUID,L"",L"SuRun Shell Extension");
-  SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"",L"SuRunExt.dll");
-  SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
-#ifdef ISHELLEXHK
-  //ShellExecuteHook
-  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
-            sGUID,L"");
-#endif ISHELLEXHK
-  //Desktop-Background-Hook
-  SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  //self Approval
-  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
-            sGUID,L"SuRun Shell Extension");
-  //Disable "Open with..." when right clicking on SuRun.exe
-  SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
-  //Disable putting SuRun in the frequently used apps in the start menu
-  SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
-#ifdef USE_APPINIT
-  //add to AppInit_Dlls
-  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
-  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
-  AddAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
-  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
-  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
-#endif _WIN64
-#endif USE_APPINIT
-}
-
-__declspec(dllexport) void RemoveShellExt()
-{
-  //Clean up:
-#ifdef USE_APPINIT
-  //AppInit_Dlls
-  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
-  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
-  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
-#endif _WIN64
-#endif USE_APPINIT
-#ifdef ISHELLEXHK
-  //Vista: Disable ShellExecHook?
-  if (GetOption(L"DelIShellExecHookEnable",0)!=0)
-    RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-              L"EnableShellExecuteHooks");
-#endif ISHELLEXHK
-  //"Open with..." when right clicking on SuRun.exe
-  DelRegKey(HKCR,L"Applications\\SuRun.exe");
-  //COM-Object
-  DelRegKey(HKCR,L"CLSID\\" sGUID);
-  //Desktop-Background-Hook
-  DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
-  DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
-  //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
-  //ShellExecuteHook
-  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
-  //self Approval
-  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -370,7 +242,7 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
     *ppv = (LPSHELLEXTINIT)this;
   else if (IsEqualIID(riid, IID_IContextMenu))
     *ppv = (LPCONTEXTMENU)this;
-  else if (IsEqualIID(riid, IID_IShellExecuteHook))
+  else if (GetUseIShExHook && IsEqualIID(riid, IID_IShellExecuteHook))
     *ppv = (IShellExecuteHook*)this;
   if (*ppv) 
   {
@@ -557,7 +429,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       {
         //right click target is folder background
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, sSuRun);
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, CResStr(l_hInst,IDS_SURUN));
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       }
     }else
@@ -569,10 +441,10 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       //right click target is folder background
       if (bCmd)
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, sSuRunCmd);
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNCMD));
       id++;
       if (bExp)
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, sSuRunExp);
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNEXP));
       id++;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
@@ -583,8 +455,9 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
 
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *reserved,LPSTR pszName,UINT cchMax)
 {
-  if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(sTip)))
-    wcscpy((LPWSTR)pszName,sTip);
+  CResStr s(l_hInst,IDS_TOOLTIP);
+  if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(s)))
+    wcscpy((LPWSTR)pszName,s);
   return NOERROR;
 }
 
@@ -619,7 +492,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
       CloseHandle( pi.hThread );
       hr = NOERROR;
     }else
-      MessageBoxW(lpcmi->hwnd,sFileNotFound,sErr,MB_ICONSTOP);
+      MessageBoxW(lpcmi->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),CResStr(l_hInst,IDS_ERR),MB_ICONSTOP);
   }
   return hr;
 }
@@ -756,4 +629,174 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   return S_FALSE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Install/Uninstall
+//
+//////////////////////////////////////////////////////////////////////////////
+
+static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
+{
+  /* ToDo: Do not use AppInit_Dlls! */
+  TCHAR s[4096]={0};
+  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+  if (_tcsstr(s,Dll)==0)
+  {
+    if (s[0])
+      _tcscat(s,_T(","));
+    _tcscat(s,Dll);
+    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+  }/**/
+}
+
+static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
+{
+  /* ToDo: Do not use AppInit_Dlls! */
+  //remove from AppInit_Dlls
+  TCHAR s[4096]={0};
+  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+  LPTSTR p=_tcsstr(s,Dll);
+  if (p!=0)
+  {
+    LPTSTR p1=p+_tcslen(Dll);
+    if((*p1==' ')||(*p1==','))
+      p1++;
+    if (p!=s)
+      p--;
+    *p=0;
+    if (*(p1))
+      _tcscat(p,p1);
+    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+  }
+  /**/
+}
+
+__declspec(dllexport) void InstallShellExt()
+{
+  if(GetUseIShExHook)
+  {
+    //Vista: Enable IShellExecHook
+    SetOption(L"DelIShellExecHookEnable",
+      (DWORD)(GetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+      L"EnableShellExecuteHooks",-1)==-1),
+      0);
+    SetRegInt(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",L"EnableShellExecuteHooks",1);
+  }
+  //COM-Object
+  SetRegStr(HKCR,L"CLSID\\" sGUID,L"",L"SuRun Shell Extension");
+  SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"",L"SuRunExt.dll");
+  SetRegStr(HKCR,L"CLSID\\" sGUID L"\\InProcServer32",L"ThreadingModel",L"Apartment");
+  if(GetUseIShExHook)
+    //ShellExecuteHook
+    SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",
+              sGUID,L"");
+  //Desktop-Background-Hook
+  SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  //self Approval
+  SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
+            sGUID,L"SuRun Shell Extension");
+  //Disable "Open with..." when right clicking on SuRun.exe
+  SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
+  //Disable putting SuRun in the frequently used apps in the start menu
+  SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
+  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
+#ifdef _WIN64
+  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
+#endif _WIN64
+  if (GetUseAppInit)
+  {
+    //add to AppInit_Dlls
+    SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+    AddAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+    SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+    AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+#endif _WIN64
+  }
+}
+
+__declspec(dllexport) void RemoveShellExt()
+{
+  //Clean up:
+  //AppInit_Dlls
+  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
+  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
+  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
+#endif _WIN64
+  //Vista: Disable ShellExecHook?
+  if (GetOption(L"DelIShellExecHookEnable",0)!=0)
+    RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+              L"EnableShellExecuteHooks");
+  //"Open with..." when right clicking on SuRun.exe
+  DelRegKey(HKCR,L"Applications\\SuRun.exe");
+  //COM-Object
+  DelRegKey(HKCR,L"CLSID\\" sGUID);
+  //Desktop-Background-Hook
+  DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
+  DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
+  //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
+  //ShellExecuteHook
+  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
+  //self Approval
+  RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// DllMain
+//
+//////////////////////////////////////////////////////////////////////////////
+BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
+{
+  TCHAR fMod[MAX_PATH];
+  GetModuleFileName(0,fMod,MAX_PATH);
+
+  DWORD PID=GetCurrentProcessId();
+  //Process Detach:
+  if(dwReason==DLL_PROCESS_DETACH)
+  {
+#ifdef _DEBUG
+    DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
+#endif _DEBUG
+    //UnloadHooks(); //Never call UnloadHooks!
+    return TRUE;
+  }
+  if(dwReason!=DLL_PROCESS_ATTACH)
+    return TRUE;
+  //Process Attach:
+  DisableThreadLibraryCalls(hInstDLL);
+  if (l_hInst==hInstDLL)
+    return TRUE;
+  l_hInst=hInstDLL;
+  //Resources
+#ifdef _DEBUG_ENU
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+#endif _DEBUG_ENU
+  WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+  WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+  //IAT Hook:
+  if (GetUseIATHook)
+  {
+    //Do not set hooks into SuRun!
+    TCHAR fSuRunExe[MAX_PATH];
+    GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
+    PathAppend(fSuRunExe,L"SuRun.exe");
+    BOOL bSetHook=(!IsAdmin())&&(_tcsicmp(fMod,fSuRunExe)!=0);
+    DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d, SetHook=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin(),bSetHook);
+    if(bSetHook)
+      LoadHooks();
+  }else
+#ifdef _DEBUG
+    DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
+#endif _DEBUG
+  return TRUE;
 }
