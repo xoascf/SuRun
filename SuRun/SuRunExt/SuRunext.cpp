@@ -784,7 +784,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //IAT Hook:
   if (GetUseIATHook)
   {
-    //Do not set hooks into SuRun!
+    //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[MAX_PATH];
     GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
     PathAppend(fSuRunExe,L"SuRun.exe");
