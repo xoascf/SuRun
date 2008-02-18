@@ -133,7 +133,8 @@ static CHookDescriptor* hdt[]=
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
-  &hkCrProcW 
+  &hkCrProcW,
+  &hkCrPWLOW
 };
 
 //relative pointers in PE images
