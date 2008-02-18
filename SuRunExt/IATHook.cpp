@@ -24,18 +24,18 @@
 #include <algorithm>
 #include <iterator>
 
+#include "../Setup.h"
 #include "../helpers.h"
 #include "../IsAdmin.h"
 #include "../UserGroups.h"
 #include "../Service.h"
 #include "../DBGTrace.h"
-#include "SysMenuHook.h"
 
 #pragma comment(lib,"Advapi32.lib")
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 
-//#define INJECTIAT
+extern HINSTANCE l_hInst;
 
 //Function Prototypes:
 typedef HMODULE (WINAPI* lpLoadLibraryA)(LPCSTR);
@@ -249,6 +249,8 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
 
 DWORD HookModules()
 {
+  if (!GetUseIATHook)
+    return 0;
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,GetCurrentProcessId());
   if (!hProc)
   {
@@ -288,9 +290,10 @@ DWORD UnHookModules()
   return nHooked;
 }
 
-#ifdef INJECTIAT
 BOOL InjectIATHook(HANDLE hProc)
 {
+  if (!GetUseRmteThread)
+    return FALSE;
   HANDLE hThread=0;
   //This does not work on Vista!
   __try
@@ -323,10 +326,11 @@ BOOL InjectIATHook(HANDLE hProc)
   }
   return hThread!=0;
 }
-#endif INJECTIAT
 
 BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
+  if (!GetUseIATHook)
+    return FALSE;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
     return FALSE;
@@ -414,9 +418,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-#ifdef INJECTIAT
       InjectIATHook(lpProcessInformation->hProcess);
-#endif INJECTIAT
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
@@ -444,9 +446,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-#ifdef INJECTIAT
       InjectIATHook(lpProcessInformation->hProcess);
-#endif INJECTIAT
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
@@ -580,6 +580,8 @@ DWORD WINAPI InitHookProc(void* p)
 //  char f[MAX_PATH];
 //  GetModuleFileNameA(l_hInst,f,MAX_PATH);
 //  orgLoadLibraryA(f);
+  if (!GetUseIATHook)
+    return 0;
   EnterCriticalSection(&g_HookCs);
   HookModules();
   LeaveCriticalSection(&g_HookCs);
