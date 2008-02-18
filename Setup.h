@@ -123,8 +123,8 @@
 #define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 #define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
   //...This is defined here but stored in HKLM\Security:
-#define GetUseAppInit         (GetOption(UseAppInit,defHk)!=0)
-#define SetUseAppInit(b)       SetOption(UseAppInit,b,defHk)
+#define GetUseAppInit         (GetOption(UseAppInit,0)!=0)
+#define SetUseAppInit(b)       SetOption(UseAppInit,b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //  Windows Policy Stuff
