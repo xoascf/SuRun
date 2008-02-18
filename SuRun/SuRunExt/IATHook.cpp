@@ -50,9 +50,14 @@ typedef BOOL (WINAPI* lpCreateProcessA)(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,
                                         LPVOID,LPCSTR,LPSTARTUPINFOA,
                                         LPPROCESS_INFORMATION);
 typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
-                                         LPSECURITY_ATTRIBUTES,BOOL,DWORD,
-                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
-                                         LPPROCESS_INFORMATION);
+                                        LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+                                        LPVOID,LPCWSTR,LPSTARTUPINFOW,
+                                        LPPROCESS_INFORMATION);
+
+typedef BOOL (WINAPI* lpCreateProcessWithLogonW)(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,
+                                                 LPCWSTR,LPWSTR,DWORD,LPVOID,
+                                                 LPCWSTR,LPSTARTUPINFOW,
+                                                 LPPROCESS_INFORMATION);
 
 //Forward decl:
 BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
@@ -60,8 +65,8 @@ BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
-//BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
-//                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
+BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
+                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
 HMODULE WINAPI LoadLibA(LPCSTR);
 HMODULE WINAPI LoadLibW(LPCWSTR);
@@ -116,6 +121,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 //User Hooks:
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
+static CHookDescriptor hkCrPWLOW ("kernel32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW);
 
 static CHookDescriptor* hdt[]=
 {
@@ -451,6 +457,29 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
     }
+  }
+  return b;
+}
+
+BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpPassword,
+    DWORD dwLogonFlags,LPCWSTR lpApplicationName,LPWSTR lpCommandLine,DWORD dwCreationFlags,
+    LPVOID lpEnvironment,LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
+  DBGTrace6("IATHook: CreateProcWithLogonW(%s,%s,%s,x,%s,%s,x,x,%s,x,x) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+    lpUsername,lpDomain,lpPassword,lpApplicationName,lpCommandLine,lpCurrentDirectory);
+  DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
+  lpCreateProcessWithLogonW cpw=(lpCreateProcessWithLogonW)hkCrPWLOW.orgfn();
+  if(!cpw)
+    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  BOOL b=cpw(lpUsername,lpDomain,lpPassword,dwLogonFlags,lpApplicationName,
+    lpCommandLine,cf,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  if (b)
+  {
+    //Process is suspended...
+    //Resume main thread:
+    if ((CREATE_SUSPENDED & dwCreationFlags)==0)
+      ResumeThread(lpProcessInformation->hThread);
   }
   return b;
 }
