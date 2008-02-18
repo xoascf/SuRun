@@ -765,7 +765,7 @@ DWORD WINAPI NewDevProc(void* p)
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  DBGTrace1("ShellExecuteHook NewDev(%s) test",cmd);
+  //DBGTrace1("ShellExecuteHook NewDev(%s) test",cmd);
   if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     CloseHandle(pi.hThread );
