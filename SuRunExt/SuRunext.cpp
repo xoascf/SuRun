@@ -32,11 +32,11 @@
 #pragma comment(lib,"ShFolder.Lib")
 #pragma comment(lib,"Shlwapi.lib")
 
+#include "../Setup.h"
 #include "SuRunExt.h"
 #include "IATHook.h"
 #include "../ResStr.h"
 #include "../Helpers.h"
-#include "../Setup.h"
 #include "../UserGroups.h"
 #include "../IsAdmin.h"
 #include "Resource.h"
@@ -749,6 +749,33 @@ __declspec(dllexport) void RemoveShellExt()
 
 //////////////////////////////////////////////////////////////////////////////
 //
+// Command Line==
+//   "%sysdir%\rundll32.exe newdev.dll,"...
+//
+//////////////////////////////////////////////////////////////////////////////
+DWORD WINAPI NewDevProc(void* p)
+{
+  TCHAR cmd[MAX_PATH];
+  GetSystemWindowsDirectory(cmd,MAX_PATH);
+  PathAppend(cmd, _T("SuRun.exe"));
+  PathQuoteSpaces(cmd);
+  _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  // Start the child process.
+  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+  {
+    CloseHandle(pi.hThread );
+    CloseHandle(pi.hProcess);
+  }
+  ExitProcess(0);
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
 // DllMain
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -756,14 +783,14 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   TCHAR fMod[MAX_PATH];
   GetModuleFileName(0,fMod,MAX_PATH);
-
+  BOOL bAdmin=IsAdmin();
   DWORD PID=GetCurrentProcessId();
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
 #ifdef _DEBUG
     DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
+      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
 #endif _DEBUG
     //UnloadHooks(); //Never call UnloadHooks!
     return TRUE;
@@ -782,22 +809,39 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   //IAT Hook:
-  if (GetUseIATHook)
+  if ((!bAdmin) && GetUseIATHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[MAX_PATH];
     GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
     PathAppend(fSuRunExe,L"SuRun.exe");
-    BOOL bSetHook=(!IsAdmin())&&(_tcsicmp(fMod,fSuRunExe)!=0);
+    PathQuoteSpaces(fSuRunExe);
+    BOOL bSetHook=(!bAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
     DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d, SetHook=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin(),bSetHook);
+      hInstDLL,PID,fMod,GetCommandLine(),bAdmin,bSetHook);
     if(bSetHook)
       LoadHooks();
   }
 #ifdef _DEBUG
   else
     DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
+      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
 #endif _DEBUG
+  //DevInst
+  if(!bAdmin)
+  {
+    TCHAR f[MAX_PATH];
+    GetSystemDirectory(f,MAX_PATH);
+    PathAppend(f,L"rundll32.exe");
+    PathQuoteSpaces(f);
+    if((_tcsicmp(f,fMod)==0)
+      &&(_tcsnicmp(L"newdev.dll,",PathGetArgs(GetCommandLine()),11)==0))
+    {
+      TCHAR UserName[UNLEN+UNLEN+2]={0};
+      GetProcessUserName(PID,UserName);
+      if(GetInstallDevs(UserName))
+        SetThreadPriority(CreateThread(0,0,NewDevProc,0,0,0),THREAD_PRIORITY_HIGHEST);
+    }
+  }
   return TRUE;
 }
