@@ -502,6 +502,30 @@ BOOL Setup(LPCTSTR WinStaName)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  GetCliUserToken get User Token for g_RunData.CliProcessId
+// 
+//////////////////////////////////////////////////////////////////////////////
+HANDLE GetCliUserToken()
+{
+  HANDLE hToken=NULL;
+  EnablePrivilege(SE_DEBUG_NAME);
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
+  if (!hProc)
+    return hToken;
+  // Open impersonation token for Shell process
+  OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+    |TOKEN_ASSIGN_PRIMARY,&hToken);
+  CloseHandle(hProc);
+  if(!hToken)
+    return hToken;
+  HANDLE hUser=0;
+  DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+    TokenPrimary,&hUser); 
+  return CloseHandle(hToken),hUser;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  StartAdminProcessTrampoline
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -512,25 +536,7 @@ DWORD StartAdminProcessTrampoline()
   PathAppend(cmd,L"SuRun.exe");
   PathQuoteSpaces(cmd);
   DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=NULL;
-  {
-    HANDLE hToken=NULL;
-    EnablePrivilege(SE_DEBUG_NAME);
-    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
-    if (!hProc)
-      return RetVal;
-    // Open impersonation token for Shell process
-    OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-      |TOKEN_ASSIGN_PRIMARY,&hToken);
-    CloseHandle(hProc);
-    if(!hToken)
-      return RetVal;
-    DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
-      TokenPrimary,&hUser); 
-    CloseHandle(hToken);
-    if(!hUser)
-      return RetVal;
-  }
+  HANDLE hUser=GetCliUserToken();
   PROCESS_INFORMATION pi={0};
 #ifndef _DEBUG_SVC
   TCHAR UserName[MAX_PATH]={0};
@@ -618,6 +624,42 @@ DWORD StartAdminProcessTrampoline()
   return RetVal;
 }
 
+DWORD DirectStartUserProcess() 
+{
+  DWORD RetVal=RETVAL_ACCESSDENIED;
+  HANDLE hUser=GetCliUserToken();
+  PROCESS_INFORMATION pi={0};
+  STARTUPINFO si={0};
+  si.cb	= sizeof(si);
+  //Do not inherit Desktop from calling process, use Tokens Desktop
+  si.lpDesktop = _T("");
+  if (CreateProcess(NULL,g_RunData.cmdLine,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+  {
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
+    //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+    if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+    {
+      pi.hThread=0;
+      pi.hProcess=0;
+      HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+      if (hProcess)
+      {
+        SIZE_T n;
+        if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+          DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+            g_RunData.cmdLine,GetLastErrorNameStatic());
+        CloseHandle(hProcess);
+      }else
+        DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+          g_RunData.cmdLine,GetLastErrorNameStatic());
+    }
+  }else
+    DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
+  CloseHandle(hUser);
+  return RetVal;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  SuRun
@@ -644,6 +686,12 @@ void SuRun(DWORD ProcessID)
     return;
   }
   KillProcess(g_RunData.KillPID);
+  if (g_CliIsAdmin && GetNoConvAdmin)
+  {
+    //Just start the client process!
+    ResumeClient(DirectStartUserProcess());
+    return;
+  }
   //Start execution
   if (!PrepareSuRun())
   {
