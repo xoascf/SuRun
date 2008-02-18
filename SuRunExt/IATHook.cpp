@@ -121,7 +121,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 //User Hooks:
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
-static CHookDescriptor hkCrPWLOW ("kernel32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW);
+static CHookDescriptor hkCrPWLOW ("Advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW);
 
 static CHookDescriptor* hdt[]=
 {
