@@ -89,6 +89,11 @@
 #define RestartAsAdmin  L"RestartAsAdmin"  //"Restart As Admin" in System-Menu
 #define StartAsAdmin    L"StartAsAdmin"    //"Start As Admin" in System-Menu
 
+#define UseIShExHook    L"UseIShExHook"    //install IShellExecuteHook
+#define UseIATHook      L"UseIATHook"      //install IAT Hook
+#define UseAppInit      L"UseAppInit"      //use AppInit_DLLs
+#define UseRemoteThread L"UseRemoteThread" //use CreateRemoteThread
+
 //"Control Panel As Admin" on Desktop Menu
 #define GetCtrlAsAdmin        (GetShExtSetting(ControlAsAdmin,1)!=0)
 #define SetCtrlAsAdmin(b)     SetShExtSetting(ControlAsAdmin,b,1)
@@ -104,6 +109,17 @@
 //"Start As Admin" in System-Menu
 #define GetStartAsAdmin       (GetShExtSetting(StartAsAdmin,1)!=0)
 #define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,1)
+
+//Hook stuff
+#define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
+#define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
+#define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
+#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,0)
+#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
+#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
+  //...This is defined here but stored in HKLM\Security:
+#define GetUseAppInit         (GetOption(UseAppInit,1)!=0)
+#define SetUseAppInit(b)       SetOption(UseAppInit,b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //  Windows Policy Stuff
