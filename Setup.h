@@ -120,8 +120,8 @@
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,defHk)!=0)
 #define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,defHk)
-#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,defHk)!=0)
-#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,defHk)
+#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
+#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
   //...This is defined here but stored in HKLM\Security:
 #define GetUseAppInit         (GetOption(UseAppInit,defHk)!=0)
 #define SetUseAppInit(b)       SetOption(UseAppInit,b,defHk)
