@@ -203,16 +203,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
       g_RunData.RetPtr=wcstoul(Args,0,16);
       Args=PathGetArgs(Args);
-    }else if (!_wcsicmp(c,L"/NEWDEV"))
-    {
-      g_RunData.bShlExHook=2;
-      //New Device
-      GetSystemDirectory(g_RunData.cmdLine,4096);
-      PathAppend(g_RunData.cmdLine,L"rundll32.exe");
-      _tcscat(g_RunData.cmdLine,L" ");
-      _tcscat(g_RunData.cmdLine,PathGetArgs(Args));
-      bRunSetup=TRUE;
-      break;
     }else if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
