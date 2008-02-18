@@ -793,8 +793,9 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
       hInstDLL,PID,fMod,GetCommandLine(),IsAdmin(),bSetHook);
     if(bSetHook)
       LoadHooks();
-  }else
+  }
 #ifdef _DEBUG
+  else
     DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
       hInstDLL,PID,fMod,GetCommandLine(),IsAdmin());
 #endif _DEBUG
