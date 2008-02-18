@@ -1,7 +1,4 @@
 ToDo:
-* "rundll32.exe newdev.dll" abfangen
-* Netzlaufwerke wiederverbinden: NetUseEnum/NetUseAdd
-
 *Mache Zum SuRunner:
   * Alle auﬂer vordef. Admin
   * keinen
@@ -20,6 +17,8 @@ ToDo:
 * Alle "shell\runas" aus der registry entfernen (mit Backup!)
 * Alle "shell\runas" der registry restaurieren
 
+* "rundll32.exe newdev.dll" abfangen
+* Netzlaufwerke wiederverbinden: NetUseEnum/NetUseAdd
 ==============================================================================
 SuRun...  Super User Run
                                                       by Kay Bruns (c) 2007,08
