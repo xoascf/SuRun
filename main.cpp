@@ -212,6 +212,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       _tcscat(g_RunData.cmdLine,L" ");
       _tcscat(g_RunData.cmdLine,PathGetArgs(Args));
       Args[0]=0;
+      break;
     }else if (!_wcsicmp(c,L"/KILL"))
     {
       g_RunData.KillPID=wcstol(Args,0,10);
