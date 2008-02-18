@@ -29,12 +29,6 @@
 #define WHTLSTKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
 #define USERKEY(u)    CBigResStr(_T("%s\\%s\\Settings"),SVCKEY,u)
 
-#ifdef _DEBUG
-#define defHk 1
-#else _DEBUG
-#define defHk 0
-#endif _DEBUG
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Macros for all Settings
@@ -56,6 +50,8 @@
 #define GetPwTimeOut      min(60,max(0,(int)GetOption(_T("AskTimeOut"),0)))
 #define SetPwTimeOut(t)   SetOption(_T("AskTimeOut"),(DWORD)min(60,max(0,(int)t)),0)
 
+#define GetNoConvAdmin    (GetOption(_T("NoAutoAdminToSuRunner"),0)!=0)
+#define SetNoConvAdmin(b) SetOption(_T("NoAutoAdminToSuRunner"),b,0)
 //Save or not Passwords in the registry
 #define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
 #define SetSavePW(b)      SetOption(_T("SavePasswords"),b,1); \
@@ -81,8 +77,8 @@
 #define GetRestrictApps(u)    (GetUsrSetting(u,_T("RestrictApps"),0)!=0)
 #define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b,0)
 //SuRunner may install Devices
-#define GetInstallDevs(u)      (GetUsrSetting(u,_T("AllowDevInst"),defHk)!=0)
-#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("AllowDevInst"),b,defHk)
+#define GetInstallDevs(u)      (GetUsrSetting(u,_T("AllowDevInst"),0)!=0)
+#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("AllowDevInst"),b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
@@ -122,8 +118,8 @@
 //Hook stuff
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
-#define GetUseIATHook         (GetShExtSetting(UseIATHook,defHk)!=0)
-#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,defHk)
+#define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
+#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
 #define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 #define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
   //...This is defined here but stored in HKLM\Security:
