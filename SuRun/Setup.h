@@ -29,6 +29,12 @@
 #define WHTLSTKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
 #define USERKEY(u)    CBigResStr(_T("%s\\%s\\Settings"),SVCKEY,u)
 
+#ifdef _DEBUG
+#define defHk 1
+#else _DEBUG
+#define defHk 0
+#endif _DEBUG
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Macros for all Settings
@@ -74,6 +80,9 @@
 //SuRunner may only run predefined Applications
 #define GetRestrictApps(u)    (GetUsrSetting(u,_T("RestrictApps"),0)!=0)
 #define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b,0)
+//SuRunner may install Devices
+#define GetInstallDevs(u)      (GetUsrSetting(u,_T("AllowDevInst"),defHk)!=0)
+#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("AllowDevInst"),b,defHk)
 
 //////////////////////////////////////////////////////////////////////////////
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
@@ -111,11 +120,6 @@
 #define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,1)
 
 //Hook stuff
-#ifdef _DEBUG
-#define defHk 1
-#else _DEBUG
-#define defHk 0
-#endif _DEBUG
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,defHk)!=0)
