@@ -111,15 +111,20 @@
 #define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,1)
 
 //Hook stuff
+#ifdef _DEBUG
+#define defHk 1
+#else _DEBUG
+#define defHk 0
+#endif _DEBUG
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
-#define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
-#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,0)
-#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
-#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
+#define GetUseIATHook         (GetShExtSetting(UseIATHook,defHk)!=0)
+#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,defHk)
+#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,defHk)!=0)
+#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,defHk)
   //...This is defined here but stored in HKLM\Security:
-#define GetUseAppInit         (GetOption(UseAppInit,1)!=0)
-#define SetUseAppInit(b)       SetOption(UseAppInit,b,0)
+#define GetUseAppInit         (GetOption(UseAppInit,defHk)!=0)
+#define SetUseAppInit(b)       SetOption(UseAppInit,b,defHk)
 
 //////////////////////////////////////////////////////////////////////////////
 //  Windows Policy Stuff
