@@ -267,7 +267,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if (wlf&FLAG_AUTOCANCEL)
         {
           //Access denied!
-          ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED);
+          ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
           DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           continue;
         }
@@ -384,7 +384,7 @@ void KillProcess(DWORD PID)
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
-BOOL PrepareSuRun()
+DWORD PrepareSuRun()
 {
   zero(g_RunPwd);
   //Do we have a Password for this user?
@@ -395,9 +395,12 @@ BOOL PrepareSuRun()
   if (!PwOk)
     DBGTrace2("Password (%s) for %s is NOT ok!",g_RunPwd,g_RunData.UserName);
 #endif _DEBUG
-  if ((!PwOk)||(!IsInSuRunners(g_RunData.UserName)))
+  BOOL bIsSuRunner=IsInSuRunners(g_RunData.UserName);
+  if ((!PwOk)||(!bIsSuRunner))
   //Password is NOT ok:
   {
+    if((!bIsSuRunner) && GetNoConvUser)
+      return RETVAL_ACCESSDENIED;
     zero(g_RunPwd);
     DeletePassword(g_RunData.UserName);
     PwOk=FALSE;
@@ -405,7 +408,7 @@ BOOL PrepareSuRun()
   //Password is ok:
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
-    return UpdLastRunTime(g_RunData.UserName),TRUE;
+    return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
@@ -415,7 +418,7 @@ BOOL PrepareSuRun()
   {
     //secure desktop created...
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
-      return FALSE;
+      return RETVAL_CANCELLED;
     DWORD f=GetRegInt(HKLM,WHTLSTKEY(g_RunData.UserName),g_RunData.cmdLine,0);
     DWORD l=0;
     if (!PwOk)
@@ -430,16 +433,16 @@ BOOL PrepareSuRun()
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
       if((l&2)!=0)
         SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
-      return FALSE;
+      return RETVAL_CANCELLED;
     }
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
     if((l&2)!=0)
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
-    return UpdLastRunTime(g_RunData.UserName),TRUE;
+    return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   }else //FATAL: secure desktop could not be created!
     MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-  return FALSE;
+  return RETVAL_ACCESSDENIED;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -488,12 +491,12 @@ BOOL Setup(LPCTSTR WinStaName)
   //only Admins and SuRunners may setup SuRun
   if (g_CliIsAdmin)
     return RunSetup();
-  if (GetNoRunSetup(g_RunData.UserName))
+  if (GetNoRunSetup(g_RunData.UserName) 
+    ||(GetNoConvUser && (!IsInSuRunners(g_RunData.UserName))))
   {
     if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
-    else
-      return RunSetup();
+    return RunSetup();
   }
   if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
     return RunSetup();
@@ -693,13 +696,14 @@ void SuRun(DWORD ProcessID)
     return;
   }
   //Start execution
-  if (!PrepareSuRun())
+  DWORD RetVal=PrepareSuRun();
+  if (RetVal!=RETVAL_OK)
   {
     if ( g_RunData.bShlExHook
       &&(!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC)))
       ResumeClient(RETVAL_SX_NOTINLIST);//let ShellExecute start the process!
     else
-      ResumeClient(RETVAL_ACCESSDENIED);
+      ResumeClient(RetVal);
     return;
   }
   //Secondary Logon service is required by CreateProcessWithLogonW
@@ -723,13 +727,14 @@ void SuRun(DWORD ProcessID)
     }
     if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
     {
-      ResumeClient(RETVAL_ACCESSDENIED);
+      zero(g_RunPwd);
+      ResumeClient(RETVAL_CANCELLED);
       MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
     }
   }
   //copy the password to the client
-  DWORD RetVal=StartAdminProcessTrampoline();
+  RetVal=StartAdminProcessTrampoline();
   //Clear Password
   zero(g_RunPwd);
   ResumeClient(RetVal);
@@ -751,6 +756,7 @@ void SuRun(DWORD ProcessID)
 #define MSIPTCH L"Msi.Patch" SHLRUN
 #define MSIPKG  L"Msi.Package" SHLRUN
 #define REGRUN  L"regfile" SHLRUN
+#define CPLREG  L"CLSID\\{21EC2020-3AEA-1069-A2DD-08002B30309D}"  SHLRUN
 
 void InstallRegistry()
 {
@@ -800,6 +806,9 @@ void InstallRegistry()
   //MSP Apply
   SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
   SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
+  //Control Panel
+  SetRegStr(HKCR,CPLREG,L"",MenuStr);
+  SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -827,6 +836,8 @@ void RemoveRegistry()
   DelRegKey(HKCR,MSIPKG L" repair");
   //MSI Uninstall
   DelRegKey(HKCR,MSIPKG L" Uninstall");
+  //Control Panel
+  DelRegKey(HKCR,CPLREG);
   //AutoRun, System Menu Hook
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
   //UnInstall
@@ -877,7 +888,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
       if (WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
         GetExitCodeProcess(pi.hProcess,&ExitCode);
       CloseHandle(pi.hProcess);
-      if (ExitCode==RETVAL_ACCESSDENIED)
+      if (ExitCode!=RETVAL_OK)
         return FALSE;
       if (ExitCode==0)
         WaitFor(CheckServiceStatus()==WaitStat);
@@ -924,7 +935,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     cbs.Init();
     cbs.Show();
     if(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
-                  MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)==IDNO)
+         MB_SYSTEMMODAL|MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO)
     return false;
     cbs.MsgLoop();
   }
@@ -971,12 +982,29 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   RemoveRegistry();
   if (bJustStop)
     return TRUE;
+  //Remove SuRunners from Registry
+  SetEnergy(false);
   //HKLM\Security\SuRun
   DelRegKey(HKLM,SVCKEY);
-  //ToDo: SuRunners->Administratoren
+  //Delete "SuRunners"?
+  if (MessageBox(0,CBigResStr(IDS_DELSURUNERGRP),CResStr(IDS_APPNAME),
+    MB_ICONQUESTION|MB_SYSTEMMODAL|MB_YESNO)==IDYES)
+  {
+    //Make "SuRunners"->"Administrators"?
+    if (MessageBox(0,CBigResStr(IDS_MKALLSURUNERSADMIN),CResStr(IDS_APPNAME),
+      MB_ICONQUESTION|MB_SYSTEMMODAL|MB_YESNO|MB_DEFBUTTON2)==IDYES)
+    {
+      USERLIST SuRunners;
+      SuRunners.SetGroupUsers(SURUNNERSGROUP,FALSE);
+      for (int i=0;i<SuRunners.GetCount();i++)
+        AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,SuRunners.GetUserName(i),1);
+    }
+    DeleteSuRunnersGroup();
+  }
+
   //Ok!
   MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
-    MB_ICONINFORMATION|MB_SETFOREGROUND);
+    MB_ICONINFORMATION|MB_SYSTEMMODAL);
   return bRet;
 }
 
@@ -1062,7 +1090,7 @@ BOOL UserInstall(int IDSMsg)
   cbs.Init();
   cbs.Show();
   if (MessageBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SETFOREGROUND)!=IDYES)
+    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SYSTEMMODAL)!=IDYES)
     return FALSE;
   cbs.MsgLoop();
   if (!InstallService())
@@ -1073,7 +1101,7 @@ BOOL UserInstall(int IDSMsg)
   //This mostly does not work...
   //ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
   if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO|MB_SETFOREGROUND)==IDYES)
+    MB_ICONQUESTION|MB_YESNO|MB_SYSTEMMODAL)==IDYES)
     ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
   return TRUE;
 }
