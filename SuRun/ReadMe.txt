@@ -1,10 +1,10 @@
 To be tested:
 ---------------------
 * When finally uninstalling SuRun, ask to make "SuRunners" to Administrators
-* Option that new SuRunners cannot modify SuRun settings
 
 tested:
 ---------------------
+* Option that new SuRunners cannot modify SuRun settings
 * Setup Dialog for UseIShExHook, UseIATHook, NoAutoAdminToSuRunner, NoAutoSuRunner
 * "Run as Admin" for Right click on Control Panel
 * When User clicks "Cancel" don't tell that Process creation failed!
@@ -14,6 +14,8 @@ tested:
 ToDo:
 ---------------------
 * On Login after Logout Explorer sometimes crashes with IATHook enabled
+* When User is in SuRunners and Explorer runs as Admin, tell user to logoff!
+* [Add IsInSuRunners() to shell hooks]
 * Show Tray Tooltip after elevated AutoRunning a process
 
 To be done in future:
