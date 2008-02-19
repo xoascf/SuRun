@@ -6,3 +6,4 @@ SECTIONS
 EXPORTS
    DllCanUnloadNow   PRIVATE
    DllGetClassObject PRIVATE
+   CPlApplet         PRIVATE
