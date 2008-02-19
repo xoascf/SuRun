@@ -50,8 +50,22 @@
 #define GetPwTimeOut      min(60,max(0,(int)GetOption(_T("AskTimeOut"),0)))
 #define SetPwTimeOut(t)   SetOption(_T("AskTimeOut"),(DWORD)min(60,max(0,(int)t)),0)
 
+//Do not ask an Admin to become a SuRunner
 #define GetNoConvAdmin    (GetOption(_T("NoAutoAdminToSuRunner"),0)!=0)
 #define SetNoConvAdmin(b) SetOption(_T("NoAutoAdminToSuRunner"),b,0)
+
+//Do not ask anyone to become a SuRunner
+#define GetNoConvUser     (GetOption(_T("NoAutoUserToSuRunner"),0)!=0)
+#define SetNoConvUser(b)  SetOption(_T("NoAutoUserToSuRunner"),b,0)
+
+//New SuRunners are Restricted
+#define GetRestrictNew    (GetOption(_T("RestrictNewRunner"),0)!=0)
+#define SetRestrictNew(b) SetOption(_T("RestrictNewRunner"),b,0)
+
+//New SuRunners may not Run Setup
+#define GetNoSetupNew     (GetOption(_T("NewRunnerDenySetup"),0)!=0)
+#define SetNoSetupNew(b)  SetOption(_T("NewRunnerDenySetup"),b,0)
+
 //Save or not Passwords in the registry
 #define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
 #define SetSavePW(b)      SetOption(_T("SavePasswords"),b,1); \
@@ -77,8 +91,8 @@
 #define GetRestrictApps(u)    (GetUsrSetting(u,_T("RestrictApps"),0)!=0)
 #define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b,0)
 //SuRunner may install Devices
-#define GetInstallDevs(u)      (GetUsrSetting(u,_T("AllowDevInst"),0)!=0)
-#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("AllowDevInst"),b,0)
+//#define GetInstallDevs(u)      (GetUsrSetting(u,_T("AllowDevInst"),0)!=0)
+//#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("AllowDevInst"),b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
@@ -120,11 +134,12 @@
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
 #define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
-#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
-#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
+
+//#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
+//#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
   //...This is defined here but stored in HKLM\Security:
-#define GetUseAppInit         (GetOption(UseAppInit,0)!=0)
-#define SetUseAppInit(b)       SetOption(UseAppInit,b,0)
+//#define GetUseAppInit         (GetOption(UseAppInit,0)!=0)
+//#define SetUseAppInit(b)       SetOption(UseAppInit,b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //  Windows Policy Stuff
