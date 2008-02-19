@@ -847,40 +847,40 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     LPTSTR args=PathGetArgs(GetCommandLine());
     if((_tcsicmp(f,fMod)==0) &&(_tcsnicmp(L"newdev.dll,",args,11)==0))
     {
-      if(_tcsnicmp(L"newdev.dll,ClientSideInstall",args,28)==0)
-      {
-        HANDLE hPipe=CreateFile(PathGetArgs(args),GENERIC_READ,0,0,OPEN_EXISTING,0,0);
-        if (hPipe)
-        {
-          DWORD n;
-          DWORD siz;
-          TCHAR EvtName[MAX_PATH]={0};
-          ReadFile(hPipe,&siz,4,&n,0);
-          ReadFile(hPipe,&EvtName,siz,&n,0);
-          HANDLE ev=OpenEvent(EVENT_MODIFY_STATE|SYNCHRONIZE,FALSE,EvtName);
-          if(ev)
-          {
-            SetEvent(ev);
-            CloseHandle(ev);
-          }
-          siz=0;
-          BYTE buf[8192];
-          do
-          {
-            ReadFile(hPipe,&buf[siz],1,&n,0);
-            siz+=n;
-          }while (n && (siz<8191));
-          CloseHandle(hPipe);
-          hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
-          if(hPipe)
-          {
-            WriteFile(hPipe,&buf,siz,&n,0);
-            CloseHandle(hPipe);
-          }
-        }
-        //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
-        //start newdev.dll,DevInstall
-      }
+//      if(_tcsnicmp(L"newdev.dll,ClientSideInstall",args,28)==0)
+//      {
+//        HANDLE hPipe=CreateFile(PathGetArgs(args),GENERIC_READ,0,0,OPEN_EXISTING,0,0);
+//        if (hPipe)
+//        {
+//          DWORD n;
+//          DWORD siz;
+//          TCHAR EvtName[MAX_PATH]={0};
+//          ReadFile(hPipe,&siz,4,&n,0);
+//          ReadFile(hPipe,&EvtName,siz,&n,0);
+//          HANDLE ev=OpenEvent(EVENT_MODIFY_STATE|SYNCHRONIZE,FALSE,EvtName);
+//          if(ev)
+//          {
+//            SetEvent(ev);
+//            CloseHandle(ev);
+//          }
+//          siz=0;
+//          BYTE buf[8192];
+//          do
+//          {
+//            ReadFile(hPipe,&buf[siz],1,&n,0);
+//            siz+=n;
+//          }while (n && (siz<8191));
+//          CloseHandle(hPipe);
+//          hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
+//          if(hPipe)
+//          {
+//            WriteFile(hPipe,&buf,siz,&n,0);
+//            CloseHandle(hPipe);
+//          }
+//        }
+//        //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
+//        //start newdev.dll,DevInstall
+//      }
 //      TCHAR UserName[UNLEN+UNLEN+2]={0};
 //      GetProcessUserName(PID,UserName);
 //      if(GetInstallDevs(UserName))
