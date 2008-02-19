@@ -839,6 +839,10 @@ void InstallRegistry()
   //Control Panel
   SetRegStr(HKCR,CPLREG,L"",MenuStr);
   SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
+  //Control Panel Applet
+  GetSystemWindowsDirectory(SuRunExe,4096);
+  PathAppend(SuRunExe,L"SuRunExt.dll");
+  SetRegStr(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl",SuRunExe);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -868,6 +872,8 @@ void RemoveRegistry()
   DelRegKey(HKCR,MSIPKG L" Uninstall");
   //Control Panel
   DelRegKey(HKCR,CPLREG);
+  //Control Panel Applet
+  RegDelVal(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl");
   //AutoRun, System Menu Hook
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
   //UnInstall
