@@ -553,7 +553,9 @@ DWORD StartAdminProcessTrampoline()
       STARTUPINFO si={0};
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
-      si.lpDesktop = _T("");
+      TCHAR WinstaDesk[MAX_PATH];
+      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      si.lpDesktop = WinstaDesk;
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
@@ -642,7 +644,9 @@ DWORD DirectStartUserProcess()
       PROCESS_INFORMATION pi={0};
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
-      si.lpDesktop = _T("");
+      TCHAR WinstaDesk[MAX_PATH];
+      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      si.lpDesktop = WinstaDesk;
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
