@@ -648,7 +648,7 @@ DWORD DirectStartUserProcess()
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (CreateProcessAsUser(hUser,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+            CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
       {
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
