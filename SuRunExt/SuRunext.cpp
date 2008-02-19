@@ -749,9 +749,20 @@ __declspec(dllexport) void RemoveShellExt()
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// Command Line==
-//   "%sysdir%\rundll32.exe newdev.dll,"...
-//
+// NewDevProc:
+// 
+// Win2k: rundll32.exe newdev.dll,DevInstall USB\Vid_0451&Pid_3410\TUSB3410________
+//  ::ExitProcess(0), SuRun /newdev newdev.dll,DevInstall USB\Vid_0451&Pid_3410\TUSB3410________
+//        
+// WinXP  rundll32.exe newdev.dll,ClientSideInstall \\.\pipe\PNP_Device_Install_Pipe_0.{8182B56F-B591-4785-8A9A-72477416A865}
+//        CreateProcWithLogonW(rundll32.exe newdev.dll,DevInstall USB\Vid_0451&Pid_3410\TUSB3410________)
+//        
+//       Pipe:\\.\pipe\PNP_Device_Install_Pipe_0.{8182B56F-B591-4785-8A9A-72477416A865}
+//        ->DWORD len;
+//        ->wchar EventName[Len] 
+// 
+// Vista: rundll32.exe C:\Windows\system32\newdev.dll,pDiDeviceInstallAction \\.\pipe\PNP_Device_Install_Pipe_1.{a3312ee6-66f2-4163-94fb-403a447ab42b} "USB\VID_0451&PID_3410\TUSB3410________"
+//  ::ExitProcess(0), SuRun C:\Windows\system32\newdev.dll,pDiDeviceInstallAction \\.\pipe\PNP_Device_Install_Pipe_1.{a3312ee6-66f2-4163-94fb-403a447ab42b} "USB\VID_0451&PID_3410\TUSB3410________"
 //////////////////////////////////////////////////////////////////////////////
 DWORD WINAPI NewDevProc(void* p)
 {
@@ -763,7 +774,12 @@ DWORD WINAPI NewDevProc(void* p)
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
-  if(_tcsnicmp(L"newdev.dll,DevInstall",PathGetArgs(GetCommandLine()),21)==0)
+  if(_tcsnicmp(L"newdev.dll,ClientSideInstall",PathGetArgs(GetCommandLine()),28)==0)
+  {
+    //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
+    //start newdev.dll,DevInstall
+  }else
+  //if(_tcsnicmp(L"newdev.dll,DevInstall",PathGetArgs(GetCommandLine()),21)==0)
   {
     //Win2k! Kill the Process and run a new one:
     _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
@@ -775,11 +791,6 @@ DWORD WINAPI NewDevProc(void* p)
     }
     ExitProcess(0);
     return 0;
-  }
-  if(_tcsnicmp(L"newdev.dll,ClientSideInstall",PathGetArgs(GetCommandLine()),28)==0)
-  {
-    //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
-    //start newdev.dll,DevInstall
   }
   return 0;
 }
@@ -838,54 +849,20 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
       hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
 #endif _DEBUG
   //DevInst
-  if(!bAdmin)
-  {
-    TCHAR f[MAX_PATH];
-    GetSystemDirectory(f,MAX_PATH);
-    PathAppend(f,L"rundll32.exe");
-    PathQuoteSpaces(f);
-    LPTSTR args=PathGetArgs(GetCommandLine());
-    if((_tcsicmp(f,fMod)==0) &&(_tcsnicmp(L"newdev.dll,",args,11)==0))
-    {
-//      if(_tcsnicmp(L"newdev.dll,ClientSideInstall",args,28)==0)
-//      {
-//        HANDLE hPipe=CreateFile(PathGetArgs(args),GENERIC_READ,0,0,OPEN_EXISTING,0,0);
-//        if (hPipe)
-//        {
-//          DWORD n;
-//          DWORD siz;
-//          TCHAR EvtName[MAX_PATH]={0};
-//          ReadFile(hPipe,&siz,4,&n,0);
-//          ReadFile(hPipe,&EvtName,siz,&n,0);
-//          HANDLE ev=OpenEvent(EVENT_MODIFY_STATE|SYNCHRONIZE,FALSE,EvtName);
-//          if(ev)
-//          {
-//            SetEvent(ev);
-//            CloseHandle(ev);
-//          }
-//          siz=0;
-//          BYTE buf[8192];
-//          do
-//          {
-//            ReadFile(hPipe,&buf[siz],1,&n,0);
-//            siz+=n;
-//          }while (n && (siz<8191));
-//          CloseHandle(hPipe);
-//          hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
-//          if(hPipe)
-//          {
-//            WriteFile(hPipe,&buf,siz,&n,0);
-//            CloseHandle(hPipe);
-//          }
-//        }
-//        //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
-//        //start newdev.dll,DevInstall
-//      }
+//  if(!bAdmin)
+//  {
+//    TCHAR f[MAX_PATH];
+//    GetSystemDirectory(f,MAX_PATH);
+//    PathAppend(f,L"rundll32.exe");
+//    PathQuoteSpaces(f);
+//    LPTSTR args=PathGetArgs(GetCommandLine());
+//    if((_tcsicmp(f,fMod)==0) &&(_tcsnicmp(L"newdev.dll,",args,11)==0))
+//    {
 //      TCHAR UserName[UNLEN+UNLEN+2]={0};
 //      GetProcessUserName(PID,UserName);
 //      if(GetInstallDevs(UserName))
 //        CreateThread(0,0,NewDevProc,0,0,0);
-    }
-  }
+//    }
+//  }
   return TRUE;
 }
