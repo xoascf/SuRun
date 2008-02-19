@@ -1,6 +1,7 @@
 To be tested:
 ---------------------
 * When finally uninstalling SuRun, ask to make "SuRunners" to Administrators
+* When User is in SuRunners and Explorer runs as Admin, tell user to logoff!
 
 tested:
 ---------------------
@@ -14,7 +15,6 @@ tested:
 ToDo:
 ---------------------
 * On Login after Logout Explorer sometimes crashes with IATHook enabled
-* When User is in SuRunners and Explorer runs as Admin, tell user to logoff!
 * [Add IsInSuRunners() to shell hooks]
 * Show Tray Tooltip after elevated AutoRunning a process
 
