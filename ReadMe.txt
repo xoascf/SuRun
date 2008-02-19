@@ -1,24 +1,34 @@
+To be tested:
+---------------------
+* When finally uninstallingSuRun, ask to make "SuRunners" to Administrators
+* When User clicks "Cancel" don't tell that Process creation failed!
+* Setup Dialog for UseIShExHook, UseIATHook, NoAutoAdminToSuRunner, NoAutoSuRunner
+* Option that new SuRunners cannot modify SuRun settings
+* Option that SuRun does not ask to make Users to SuRunners
+* "Run as Admin" for Right click on Control Panel
+
 ToDo:
-*Mache Zum SuRunner:
-  * Alle außer vordef. Admin
-  * keinen
-  * Alle außer, die in der Liste:
+---------------------
+* if IShellExecHook and IATHook are used together, don't check or ask twice!
+* Show Tray Tooltip after elevated AutoRunning a process
 
-* Neue SuRunners Mitglieder sollen optional SuRun nicht ändern dürfen
-* Hash-Wert für Programme in der Whitelist mit FLAG_DONTASK
-* Konsolen-SuRun
-* Install-Container
+To be done in future:
+---------------------
+* Installation Container
+* Make "SuRun"-Shell entries in Registry as Install-Option
+* make context menu entries dynamically with ShellExt 
+  (E.g.: msi with popup-menu)
 
-*"SuRunners" bei Deinstall löschen und optional den Administratoren zuordnen
- ->auch Berechtigungen von SuRunners aus Registry und Dateisystem löschen
-* Tray-Fenster einblenden, wenn programme automatisch als Admin starten
-* Context-Menü Einträge sollen dynamisch und konfigurierbar werden
-
-* Alle "shell\runas" aus der registry entfernen (mit Backup!)
-* Alle "shell\runas" der registry restaurieren
-
-* "rundll32.exe newdev.dll" abfangen
-* Netzlaufwerke wiederverbinden: NetUseEnum/NetUseAdd
+Deferred Whishlist:
+---------------------
+* use MD5-Hash for "Always Yes" programs: 
+    High Impact on Performance
+* Console SuRun support: 
+    Very difficult! Pipes need to be redirected.
+* Connect Network drives for admin process: 
+    High Impact on Performance and Resources NetUseEnum/NetUseAdd
+* Intercept "rundll32.exe newdev.dll,": 
+    needs CredUI hack for Windows XP/2k3; ok with 2k and Vista
 ==============================================================================
 SuRun...  Super User Run
                                                       by Kay Bruns (c) 2007,08
