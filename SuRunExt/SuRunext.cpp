@@ -821,7 +821,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
       hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
 #endif _DEBUG
-    //UnloadHooks(); //Never call UnloadHooks!
+    UnloadHooks(); //Never call UnloadHooks!
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
