@@ -33,6 +33,7 @@
 #pragma comment(lib,"Shlwapi.lib")
 
 #include "../Setup.h"
+#include "../Service.h"
 #include "SuRunExt.h"
 #include "IATHook.h"
 #include "../ResStr.h"
@@ -65,6 +66,9 @@ HINSTANCE   l_hInst     = NULL;
 
 UINT        WM_SYSMH0   = 0;
 UINT        WM_SYSMH1   = 0;
+
+//For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
+LPTSTR g_LastFailedCmd=0;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -593,8 +597,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return S_FALSE;
-  PROCESS_INFORMATION piRet;
-  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&piRet,tmp);
+  //ToDo: Directly write to service pipe!
+  PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
+  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -609,25 +614,28 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
       //ExitCode==-2 means that the program is not in the WhiteList
-      if (ExitCode==0)
+      if (ExitCode==RETVAL_OK)
       {
         pei->hInstApp=(HINSTANCE)33;
         DBGTrace5("ShellExecuteHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
-          cmd,piRet.dwProcessId,piRet.hProcess,piRet.dwThreadId,piRet.hThread);
-        //ToDo: Show ToolTip "<Program> is running elevated"...
-      }
-      else 
+          cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
+      }else 
       {
-        //DBGTrace2("SuRun ShellExtHook: failed to execute %s; %s",cmd,GetErrorNameStatic(ExitCode));
-        if(ExitCode==ERROR_ACCESS_DENIED)
-          pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
+        if(ExitCode==RETVAL_CANCELLED)
+          pei->hInstApp=(HINSTANCE)34;
+        //Tell IAT-Hook to not check "tmp" again!
+        free(g_LastFailedCmd);
+        g_LastFailedCmd=0;
+        g_LastFailedCmd=_tcsdup(tmp);
       }
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
-    return ((ExitCode==NOERROR)||(ExitCode==ERROR_ACCESS_DENIED))?S_OK:S_FALSE;
+    free(ppi);
+    return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
+  free(ppi);
   return S_FALSE;
 }
 
@@ -637,41 +645,41 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 //
 //////////////////////////////////////////////////////////////////////////////
 
-static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  /* ToDo: Do not use AppInit_Dlls! */
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  if (_tcsstr(s,Dll)==0)
-  {
-    if (s[0])
-      _tcscat(s,_T(","));
-    _tcscat(s,Dll);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }/**/
-}
-
-static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  /* ToDo: Do not use AppInit_Dlls! */
-  //remove from AppInit_Dlls
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  LPTSTR p=_tcsstr(s,Dll);
-  if (p!=0)
-  {
-    LPTSTR p1=p+_tcslen(Dll);
-    if((*p1==' ')||(*p1==','))
-      p1++;
-    if (p!=s)
-      p--;
-    *p=0;
-    if (*(p1))
-      _tcscat(p,p1);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }
-  /**/
-}
+//static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
+//{
+//  /* ToDo: Do not use AppInit_Dlls! */
+//  TCHAR s[4096]={0};
+//  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+//  if (_tcsstr(s,Dll)==0)
+//  {
+//    if (s[0])
+//      _tcscat(s,_T(","));
+//    _tcscat(s,Dll);
+//    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+//  }/**/
+//}
+//
+//static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
+//{
+//  /* ToDo: Do not use AppInit_Dlls! */
+//  //remove from AppInit_Dlls
+//  TCHAR s[4096]={0};
+//  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+//  LPTSTR p=_tcsstr(s,Dll);
+//  if (p!=0)
+//  {
+//    LPTSTR p1=p+_tcslen(Dll);
+//    if((*p1==' ')||(*p1==','))
+//      p1++;
+//    if (p!=s)
+//      p--;
+//    *p=0;
+//    if (*(p1))
+//      _tcscat(p,p1);
+//    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+//  }
+//  /**/
+//}
 
 __declspec(dllexport) void InstallShellExt()
 {
@@ -703,32 +711,32 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
-  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
-#ifdef _WIN64
-  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
-#endif _WIN64
-  if (GetUseAppInit)
-  {
-    //add to AppInit_Dlls
-    SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
-    AddAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-    SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
-    AddAppInit(AppInit32,_T("SuRunExt32.dll"));
-#endif _WIN64
-  }
+//  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
+//#ifdef _WIN64
+//  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
+//#endif _WIN64
+//  if (GetUseAppInit)
+//  {
+//    //add to AppInit_Dlls
+//    SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+//    AddAppInit(AppInit,_T("SuRunExt.dll"));
+//#ifdef _WIN64
+//    SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+//    AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+//#endif _WIN64
+//  }
 }
 
 __declspec(dllexport) void RemoveShellExt()
 {
   //Clean up:
-  //AppInit_Dlls
-  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
-  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
-  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
-#endif _WIN64
+//  //AppInit_Dlls
+//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
+//  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
+//#ifdef _WIN64
+//  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
+//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
+//#endif _WIN64
   //Vista: Disable ShellExecHook?
   if (GetOption(L"DelIShellExecHookEnable",0)!=0)
     RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
@@ -764,36 +772,36 @@ __declspec(dllexport) void RemoveShellExt()
 // Vista: rundll32.exe C:\Windows\system32\newdev.dll,pDiDeviceInstallAction \\.\pipe\PNP_Device_Install_Pipe_1.{a3312ee6-66f2-4163-94fb-403a447ab42b} "USB\VID_0451&PID_3410\TUSB3410________"
 //  ::ExitProcess(0), SuRun C:\Windows\system32\newdev.dll,pDiDeviceInstallAction \\.\pipe\PNP_Device_Install_Pipe_1.{a3312ee6-66f2-4163-94fb-403a447ab42b} "USB\VID_0451&PID_3410\TUSB3410________"
 //////////////////////////////////////////////////////////////////////////////
-DWORD WINAPI NewDevProc(void* p)
-{
-  TCHAR cmd[MAX_PATH];
-  GetSystemWindowsDirectory(cmd,MAX_PATH);
-  PathAppend(cmd, _T("SuRun.exe"));
-  PathQuoteSpaces(cmd);
-  STARTUPINFO si;
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&si, sizeof(si));
-  si.cb = sizeof(si);
-  if(_tcsnicmp(L"newdev.dll,ClientSideInstall",PathGetArgs(GetCommandLine()),28)==0)
-  {
-    //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
-    //start newdev.dll,DevInstall
-  }else
-  //if(_tcsnicmp(L"newdev.dll,DevInstall",PathGetArgs(GetCommandLine()),21)==0)
-  {
-    //Win2k! Kill the Process and run a new one:
-    _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
-    // Start the child process.
-    if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-    {
-      CloseHandle(pi.hThread );
-      CloseHandle(pi.hProcess);
-    }
-    ExitProcess(0);
-    return 0;
-  }
-  return 0;
-}
+//DWORD WINAPI NewDevProc(void* p)
+//{
+//  TCHAR cmd[MAX_PATH];
+//  GetSystemWindowsDirectory(cmd,MAX_PATH);
+//  PathAppend(cmd, _T("SuRun.exe"));
+//  PathQuoteSpaces(cmd);
+//  STARTUPINFO si;
+//  PROCESS_INFORMATION pi;
+//  ZeroMemory(&si, sizeof(si));
+//  si.cb = sizeof(si);
+//  if(_tcsnicmp(L"newdev.dll,ClientSideInstall",PathGetArgs(GetCommandLine()),28)==0)
+//  {
+//    //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
+//    //start newdev.dll,DevInstall
+//  }else
+//  //if(_tcsnicmp(L"newdev.dll,DevInstall",PathGetArgs(GetCommandLine()),21)==0)
+//  {
+//    //Win2k! Kill the Process and run a new one:
+//    _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
+//    // Start the child process.
+//    if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+//    {
+//      CloseHandle(pi.hThread );
+//      CloseHandle(pi.hProcess);
+//    }
+//    ExitProcess(0);
+//    return 0;
+//  }
+//  return 0;
+//}
 
 //////////////////////////////////////////////////////////////////////////////
 //
