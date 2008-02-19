@@ -152,7 +152,7 @@ int Run()
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-  DBGTrace1("SuRun: %s",lpCmdLine);
+  DBGTrace1("SuRun: %s",GetCommandLine());
   //After the User presses OK, the service starts a clean SuRun exe with the 
   //Clients user token, it fills g_RunData and g_RunPwd
   //We must Do this for two reasons:
