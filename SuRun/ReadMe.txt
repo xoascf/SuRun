@@ -1,15 +1,15 @@
 To be tested:
 ---------------------
 * When finally uninstalling SuRun, ask to make "SuRunners" to Administrators
-* Setup Dialog for UseIShExHook, UseIATHook, NoAutoAdminToSuRunner, NoAutoSuRunner
 * Option that new SuRunners cannot modify SuRun settings
-* Option that SuRun does not ask to make Users to SuRunners
 
 tested:
 ---------------------
+* Setup Dialog for UseIShExHook, UseIATHook, NoAutoAdminToSuRunner, NoAutoSuRunner
 * "Run as Admin" for Right click on Control Panel
 * When User clicks "Cancel" don't tell that Process creation failed!
 * if IShellExecHook and IATHook are used together, don't check or ask twice!
+* Option that SuRun does not ask to make Users to SuRunners
 
 ToDo:
 ---------------------
