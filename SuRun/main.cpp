@@ -261,21 +261,30 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       MessageBox(0,CResStr(IDS_RUNFAILED,g_RunData.cmdLine),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
     return RETVAL_ACCESSDENIED;
+  case RETVAL_CANCELLED:
+    return RETVAL_CANCELLED;
   case RETVAL_OK:
-    HANDLE hTok=GetShellProcessToken();
-    if(hTok)
+    if (g_RunData.bShlExHook)
     {
-      if(IsAdmin(hTok))
+      //ToDo: Show ToolTip "<Program> is running elevated"...
+    }else
+    {
+      //Complain if shell user is an admin!
+      HANDLE hTok=GetShellProcessToken();
+      if(hTok)
       {
-        TCHAR s[MAX_PATH]={0};
-        GetRegStr(HKEY_LOCAL_MACHINE,
-          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-          L"Shell",s,MAX_PATH);
-        if (!g_RunData.beQuiet)
-          MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-          MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+        if(IsAdmin(hTok))
+        {
+          TCHAR s[MAX_PATH]={0};
+          GetRegStr(HKEY_LOCAL_MACHINE,
+            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+            L"Shell",s,MAX_PATH);
+          if (!g_RunData.beQuiet)
+            MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
+            MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+        }
+        CloseHandle(hTok);
       }
-      CloseHandle(hTok);
     }
     return RETVAL_OK;
   }
