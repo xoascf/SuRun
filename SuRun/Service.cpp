@@ -640,6 +640,7 @@ DWORD DirectStartUserProcess()
   {
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
+    RetVal=RETVAL_OK;
     //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
     if((g_RunData.RetPID)&&(g_RunData.RetPtr))
     {
@@ -689,7 +690,7 @@ void SuRun(DWORD ProcessID)
     return;
   }
   KillProcess(g_RunData.KillPID);
-  if (g_CliIsAdmin && GetNoConvAdmin)
+  if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
   {
     //Just start the client process!
     ResumeClient(DirectStartUserProcess());
