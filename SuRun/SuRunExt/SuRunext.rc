@@ -34,6 +34,7 @@ BEGIN
     IDS_SURUN               "Panel sterowania jako administrator"
     IDS_SURUNCMD            "'SuRun cmd' here"
     IDS_SURUNEXP            "'SuRun Explorer' here"
+    IDS_CPLNAME             "SuRun Settings"
     IDS_MENURESTART         "Uruchom ponownie jako administrator"
 END
 
@@ -185,6 +186,7 @@ BEGIN
     IDS_SURUN               "Control panel as administrator"
     IDS_SURUNCMD            "'SuRun cmd' here"
     IDS_SURUNEXP            "'SuRun Explorer' here"
+    IDS_CPLNAME             "SuRun Settings"
     IDS_MENURESTART         "Restart as administrator"
 END
 
