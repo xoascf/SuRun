@@ -152,6 +152,7 @@ int Run()
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  DBGTrace1("SuRun: %s",lpCmdLine);
   //After the User presses OK, the service starts a clean SuRun exe with the 
   //Clients user token, it fills g_RunData and g_RunPwd
   //We must Do this for two reasons:
@@ -221,7 +222,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return RETVAL_ACCESSDENIED;
   }
-  DBGTrace1("g_RunData.cmdLine: %s",g_RunData.cmdLine);
+  DBGTrace2("g_RunData.cmdLine: %s in %s",g_RunData.cmdLine,g_RunData.CurDir);
   //Lets go:
   g_RetVal=RETVAL_WAIT;
   HANDLE hPipe=INVALID_HANDLE_VALUE;
