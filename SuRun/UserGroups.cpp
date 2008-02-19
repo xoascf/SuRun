@@ -27,6 +27,7 @@
 #include "Helpers.h"
 #include "ResStr.h"
 #include "UserGroups.h"
+#include "Setup.h"
 #include "Resource.h"
 #include "LogonDlg.h"
 #include "DBGTrace.h"
@@ -44,6 +45,16 @@ void CreateSuRunnersGroup()
   LOCALGROUP_INFO_1	lgri1={SURUNNERSGROUP,CResStr(IDS_GRPDESC)};
   DWORD error;
   NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DeleteSuRunnersGroup
+//
+/////////////////////////////////////////////////////////////////////////////
+void DeleteSuRunnersGroup()
+{
+  NetLocalGroupDel(NULL,SURUNNERSGROUP);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -186,6 +197,8 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/,HWND hwnd/*=
       MessageBox(hwnd,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
       return FALSE;
     }
+    SetRestrictApps(UserName,(DWORD)GetRestrictNew);
+    SetNoRunSetup(UserName,(DWORD)GetNoSetupNew);
     MessageBox(hwnd,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
@@ -197,6 +210,8 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/,HWND hwnd/*=
     MessageBox(hwnd,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
     return FALSE;
   }
+  SetRestrictApps(UserName,(DWORD)GetRestrictNew);
+  SetNoRunSetup(UserName,(DWORD)GetNoSetupNew);
   MessageBox(hwnd,CBigResStr(IDS_SURUNNER_OK),sCaption,MB_ICONINFORMATION);
   return TRUE;
 }
