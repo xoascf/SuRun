@@ -24,6 +24,7 @@
 #include "ResStr.h"
 #include "Service.h"
 #include "DBGTrace.h"
+#include "UserGroups.h"
 #include "Resource.h"
 
 #pragma comment(lib,"shlwapi.lib")
@@ -212,7 +213,26 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   }
   //Convert Command Line
   if (!bRunSetup)
+  {
+    //If shell is Admin but User is SuRunner, the Shell must be restarted
+    if (IsInSuRunners(g_RunData.UserName))
+    {
+      //Complain if shell user is an admin!
+      HANDLE hTok=GetShellProcessToken();
+      if(hTok)
+      {
+        BOOL bAdmin=IsAdmin(hTok);
+        CloseHandle(hTok);
+        if (bAdmin)
+        {
+          MessageBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+          return RETVAL_ACCESSDENIED;
+        }
+        
+      }
+    }  
     ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
+  }
   LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
   //Usage
   if (!g_RunData.cmdLine[0])
@@ -267,24 +287,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (g_RunData.bShlExHook)
     {
       //ToDo: Show ToolTip "<Program> is running elevated"...
-    }else if (!IsAdmin())
-    {
-      //Complain if shell user is an admin!
-      HANDLE hTok=GetShellProcessToken();
-      if(hTok)
-      {
-        if(IsAdmin(hTok))
-        {
-          TCHAR s[MAX_PATH]={0};
-          GetRegStr(HKEY_LOCAL_MACHINE,
-            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
-            L"Shell",s,MAX_PATH);
-          if (!g_RunData.beQuiet)
-            MessageBox(0,CBigResStr(IDS_ADMINSHELL,s),CResStr(IDS_APPNAME),
-            MB_ICONEXCLAMATION|MB_SETFOREGROUND);
-        }
-        CloseHandle(hTok);
-      }
     }
     return RETVAL_OK;
   }
