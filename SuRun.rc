@@ -101,6 +101,42 @@ BEGIN
     PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
 END
 
+IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Try starting certain programs AUTOMAGICALLY with elevated rights",
+                    IDC_STATIC,10,9,320,94
+    CONTROL         "User official Windows Hook Interface (recommended)",
+                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,22,
+                    191,10
+    CONTROL         "Modify Dll Import Address Tables (experimental)",
+                    IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,34,
+                    201,10
+    LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.\n- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
+                    IDC_STATIC,21,48,300,35
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",
+                    IDC_STATIC,10,113,320,57
+    CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
+                    IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    127,263,8
+    CONTROL         "Never ask anyone to become member of 'SuRunners'",
+                    IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    140,263,8
+    LTEXT           "You always can add users to the group 'SuRunners' on the page 'SuRunners group'.",
+                    IDC_STATIC,20,157,306,8
+    GROUPBOX        "If a user has been added to the group 'SuRunners':",
+                    IDC_STATIC,10,178,320,45
+    CONTROL         "New SuRunners can change SuRun settings",
+                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    192,263,10
+    CONTROL         "New SuRunners can only run predefined programs with eleveted rights",
+                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    206,263,10
+    CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
+                    IDC_STATIC,14,90,312,8
+END
+
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 395, 274
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -310,7 +346,10 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
     IDS_SETUP1              "Common Settings"
     IDS_SETUP2              "SuRunners group"
+    IDS_SETUP3              "Advanced"
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
+    IDS_MKALLSURUNERSADMIN  "Should all 'SuRunners' group members become local Administrators?"
+    IDS_DELSURUNERGRP       "Should the local user group 'SuRunners' be deleted?"
 END
 
 #endif    // Polish resources
@@ -496,6 +535,42 @@ BEGIN
     PUSHBUTTON      "&Hilfe",IDC_ICONHELP,326,216,50,14
 END
 
+IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Versuche bestimmte Programme AUTOMAGISCH mit gehobenen Rechten zu starten",
+                    IDC_STATIC,10,9,320,94
+    CONTROL         "Benutze offizielles Windows Hook Interface (empfohlen)",
+                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,22,
+                    191,10
+    CONTROL         "Modifiziere Dll Importtabellen der Programme (experimentell)",
+                    IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,34,
+                    201,10
+    LTEXT           "SuRun wird vorschlagen folgendes mit gehobenen Rechten zu starten:\n- Programme die der Benutzer festgelegt hat.\n- Programme, die ein Vista ""requireAdministrator"" Manifest haben\n- Programme, die Install, Setup, Update etc. im Dateinamen haben",
+                    IDC_STATIC,21,48,300,35
+    GROUPBOX        "Wenn der Benutzer nicht Mitglied der Gruppe 'SuRunners' ist und SuRun benutzen will:",
+                    IDC_STATIC,10,113,320,57
+    CONTROL         "Frage Administratoren niemals, ob sie zu 'SuRunners' gemacht werden wollen",
+                    IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    127,263,8
+    CONTROL         "Frage niemanden, ob er zu 'SuRunner' gemacht werden will",
+                    IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    140,263,8
+    LTEXT           "Auf der Seite 'SuRunners-Gruppe' können Benutzer immer zur Gruppe 'SuRunners' hinzugefügt werden.",
+                    IDC_STATIC,20,157,306,8
+    GROUPBOX        "Wenn Benutzer zur Gruppe 'SuRunners' hinzugefügt werden:",
+                    IDC_STATIC,10,178,320,45
+    CONTROL         "Neue SuRunner dürfen SuRuns Einstellungen verändern",
+                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    192,263,10
+    CONTROL         "Neue SuRunner dürfen nur festgelegte Programme mit SuRun starten",
+                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    206,263,10
+    CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
+                    IDC_STATIC,14,90,312,8
+END
+
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 395, 274
 STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | 
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -558,7 +633,6 @@ BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,188,208,50,14
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -671,7 +745,10 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun ist für Sie (%s) so konfiguriert, dass Sie damit nur bestimmte Programme starten dürfen.\r\nSie sind nicht berechtigt, '%s' mit SuRun zu starten."
     IDS_SETUP1              "Allgemein"
     IDS_SETUP2              "SuRunners-Gruppe"
+    IDS_SETUP3              "Erweitert"
     IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen.\r\n\r\nWenn Sie  'Abbrechen' wählen, wird das Programm ohne erhöhte Rechte gestartet."
+    IDS_MKALLSURUNERSADMIN  "Sollen alle Mitglider der Gruppe 'SuRunners' zu lokalen Administratoren gemacht werden?"
+    IDS_DELSURUNERGRP       "Soll die lokale Benutzergruppe 'SuRunners' gelöscht werden?"
 END
 
 #endif    // German (Germany) resources
@@ -765,6 +842,42 @@ BEGIN
     PUSHBUTTON      "&Edit...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
     PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
+END
+
+IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Try starting certain programs AUTOMAGICALLY with elevated rights",
+                    IDC_STATIC,10,9,320,94
+    CONTROL         "User official Windows Hook Interface (recommended)",
+                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,22,
+                    191,10
+    CONTROL         "Modify Dll Import Address Tables (experimental)",
+                    IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,34,
+                    201,10
+    LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.\n- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
+                    IDC_STATIC,21,48,300,35
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",
+                    IDC_STATIC,10,113,320,57
+    CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
+                    IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    127,263,8
+    CONTROL         "Never ask anyone to become member of 'SuRunners'",
+                    IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    140,263,8
+    LTEXT           "You always can add users to the group 'SuRunners' on the page 'SuRunners group'.",
+                    IDC_STATIC,20,157,306,8
+    GROUPBOX        "If a user has been added to the group 'SuRunners':",
+                    IDC_STATIC,10,178,320,45
+    CONTROL         "New SuRunners can change SuRun settings",
+                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    192,263,10
+    CONTROL         "New SuRunners can only run predefined programs with eleveted rights",
+                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    206,263,10
+    CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
+                    IDC_STATIC,14,90,312,8
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 395, 274
@@ -1022,7 +1135,10 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
     IDS_SETUP1              "Common Settings"
     IDS_SETUP2              "SuRunners group"
+    IDS_SETUP3              "Advanced"
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
+    IDS_MKALLSURUNERSADMIN  "Should all 'SuRunners' group members become local Administrators?"
+    IDS_DELSURUNERGRP       "Should the local user group 'SuRunners' be deleted?"
 END
 
 #endif    // English (U.S.) resources
