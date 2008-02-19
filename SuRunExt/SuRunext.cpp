@@ -849,13 +849,14 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     {
       if(_tcsnicmp(L"newdev.dll,ClientSideInstall",args,28)==0)
       {
-        HANDLE hPipe=CreateFile(PathGetArgs(args),
-          GENERIC_READ,0,0,OPEN_EXISTING,0,0);
+        HANDLE hPipe=CreateFile(PathGetArgs(args),GENERIC_READ,0,0,OPEN_EXISTING,0,0);
         if (hPipe)
         {
           DWORD n;
+          DWORD siz;
           TCHAR devname[4096]={0};
-          ReadFile(hPipe,&devname,4096,&n,0);
+          ReadFile(hPipe,&siz,4,&n,0);
+          ReadFile(hPipe,&devname,siz,&n,0);
           CloseHandle(hPipe);
           hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
           if(hPipe)
@@ -867,10 +868,10 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
         //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
         //start newdev.dll,DevInstall
       }
-      TCHAR UserName[UNLEN+UNLEN+2]={0};
-      GetProcessUserName(PID,UserName);
-      if(GetInstallDevs(UserName))
-        CreateThread(0,0,NewDevProc,0,0,0);
+//      TCHAR UserName[UNLEN+UNLEN+2]={0};
+//      GetProcessUserName(PID,UserName);
+//      if(GetInstallDevs(UserName))
+//        CreateThread(0,0,NewDevProc,0,0,0);
     }
   }
   return TRUE;
