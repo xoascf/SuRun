@@ -35,6 +35,9 @@ const DWORD UserGroups[]=
 // this Creates the local user group "SuRunners"
 void CreateSuRunnersGroup();
 
+// this Deletes the local user group "SuRunners"
+void DeleteSuRunnersGroup();
+
 // Get the name of a well known group
 BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName);
 
