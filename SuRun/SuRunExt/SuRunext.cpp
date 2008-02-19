@@ -590,6 +590,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   GetCurrentDirectory(MAX_PATH,cmd);
   ResolveCommandLine(tmp,cmd,tmp);
+  free(g_LastFailedCmd);
+  g_LastFailedCmd=0;
 
   GetSystemWindowsDirectory(cmd,MAX_PATH);
   PathAppend(cmd, _T("SuRun.exe"));
@@ -624,8 +626,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
         if(ExitCode==RETVAL_CANCELLED)
           pei->hInstApp=(HINSTANCE)34;
         //Tell IAT-Hook to not check "tmp" again!
-        free(g_LastFailedCmd);
-        g_LastFailedCmd=0;
         g_LastFailedCmd=_tcsdup(tmp);
       }
     }else
