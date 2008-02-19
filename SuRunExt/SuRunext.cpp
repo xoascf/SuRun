@@ -749,6 +749,36 @@ __declspec(dllexport) void RemoveShellExt()
 
 //////////////////////////////////////////////////////////////////////////////
 //
+// Command Line==
+//   "%sysdir%\rundll32.exe newdev.dll,"...
+//
+//////////////////////////////////////////////////////////////////////////////
+DWORD WINAPI NewDevProc(void* p)
+{
+  //Try to find and to kill the main Window!
+//  GetWindowThreadProcessId()
+//  EnumWindows()
+//  TCHAR cmd[MAX_PATH];
+//  GetSystemWindowsDirectory(cmd,MAX_PATH);
+//  PathAppend(cmd, _T("SuRun.exe"));
+//  PathQuoteSpaces(cmd);
+//  _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
+//  STARTUPINFO si;
+//  PROCESS_INFORMATION pi;
+//  ZeroMemory(&si, sizeof(si));
+//  si.cb = sizeof(si);
+//  // Start the child process.
+//  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+//  {
+//    CloseHandle(pi.hThread );
+//    CloseHandle(pi.hProcess);
+//  }
+//  ExitProcess(0);
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
 // DllMain
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -800,5 +830,21 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
       hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
 #endif _DEBUG
+  //DevInst
+  if(!bAdmin)
+  {
+    TCHAR f[MAX_PATH];
+    GetSystemDirectory(f,MAX_PATH);
+    PathAppend(f,L"rundll32.exe");
+    PathQuoteSpaces(f);
+    if((_tcsicmp(f,fMod)==0)
+      &&(_tcsnicmp(L"newdev.dll,",PathGetArgs(GetCommandLine()),11)==0))
+    {
+      TCHAR UserName[UNLEN+UNLEN+2]={0};
+      GetProcessUserName(PID,UserName);
+      if(GetInstallDevs(UserName))
+        CreateThread(0,0,NewDevProc,0,0,0);
+    }
+  }
   return TRUE;
 }
