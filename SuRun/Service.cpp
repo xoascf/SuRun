@@ -1147,6 +1147,10 @@ bool HandleServiceStuff()
     {
       if (IsAdmin())
         return ExitProcess(0),true;
+      
+      //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
+      //if the hooks are still loaded
+
       //In the first three Minutes after Sytstem start:
       //Wait for the service to start
       DWORD ss=CheckServiceStatus();
