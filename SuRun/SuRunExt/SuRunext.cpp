@@ -523,6 +523,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 //        pei->dwHotKey,
 //        pei->hIcon,
 //        pei->hProcess);
+  //Admins don't need the ShellExec Hook!
+  if (IsAdmin())
+    return S_FALSE;
   {
     //Non SuRunners don't need the ShellExec Hook!
     TCHAR User[UNLEN+GNLEN+2]={0};
@@ -530,9 +533,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     if (!IsInSuRunners(User))
       return S_FALSE;
   }
-  //Admins don't need the ShellExec Hook!
-  if (IsAdmin())
-    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
@@ -641,7 +641,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// Control Panel
+// Control Panel Applet
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Cpl.h>
