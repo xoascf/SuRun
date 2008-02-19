@@ -631,35 +631,51 @@ DWORD DirectStartUserProcess()
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   HANDLE hUser=GetCliUserToken();
-  PROCESS_INFORMATION pi={0};
-  STARTUPINFO si={0};
-  si.cb	= sizeof(si);
-  //Do not inherit Desktop from calling process, use Tokens Desktop
-  si.lpDesktop = _T("");
-  if (CreateProcess(NULL,g_RunData.cmdLine,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+  TCHAR UserName[MAX_PATH]={0};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+  if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
   {
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
-    RetVal=RETVAL_OK;
-    //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-    if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+    void* Env=0;
+    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
     {
-      pi.hThread=0;
-      pi.hProcess=0;
-      HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
-      if (hProcess)
+      STARTUPINFO si={0};
+      PROCESS_INFORMATION pi={0};
+      si.cb	= sizeof(si);
+      //Do not inherit Desktop from calling process, use Tokens Desktop
+      si.lpDesktop = _T("");
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      if (CreateProcessAsUser(hUser,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
+        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
-        SIZE_T n;
-        if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-          DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+        RetVal=RETVAL_OK;
+        //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+        if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+        {
+          pi.hThread=0;
+          pi.hProcess=0;
+          HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+          if (hProcess)
+          {
+            SIZE_T n;
+            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+              DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+              g_RunData.cmdLine,GetLastErrorNameStatic());
+            CloseHandle(hProcess);
+          }else
+            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
             g_RunData.cmdLine,GetLastErrorNameStatic());
-        CloseHandle(hProcess);
+        }
       }else
-        DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-          g_RunData.cmdLine,GetLastErrorNameStatic());
+        DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
+      DestroyEnvironmentBlock(Env);
     }
-  }else
-    DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
+    UnloadUserProfile(hUser,ProfInf.hProfile);
+  }
   CloseHandle(hUser);
   return RetVal;
 }
