@@ -56,6 +56,7 @@ extern TCHAR g_RunPwd[PWLEN];
 #define RETVAL_ACCESSDENIED 1
 #define RETVAL_SX_NOTINLIST 2
 #define RETVAL_RESTRICT     3
+#define RETVAL_CANCELLED    4
 extern int g_RetVal;
 
 #pragma pack(pop)
