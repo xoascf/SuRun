@@ -57,6 +57,16 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAINICON            ICON    DISCARDABLE     "..\\res\\main.ico"
+IDI_SETUP               ICON    DISCARDABLE     "..\\res\\Settings.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
@@ -68,6 +78,7 @@ BEGIN
     IDS_SURUN               "Systemsteuerung als Administrator"
     IDS_SURUNCMD            "'SuRun cmd' hier"
     IDS_SURUNEXP            "'SuRun Explorer' hier"
+    IDS_CPLNAME             "SuRun Einstellungen"
     IDS_MENURESTART         "Neustart als Administrator"
 END
 
