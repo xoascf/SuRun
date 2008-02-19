@@ -755,25 +755,32 @@ __declspec(dllexport) void RemoveShellExt()
 //////////////////////////////////////////////////////////////////////////////
 DWORD WINAPI NewDevProc(void* p)
 {
-  //Try to find and to kill the main Window!
-//  GetWindowThreadProcessId()
-//  EnumWindows()
-//  TCHAR cmd[MAX_PATH];
-//  GetSystemWindowsDirectory(cmd,MAX_PATH);
-//  PathAppend(cmd, _T("SuRun.exe"));
-//  PathQuoteSpaces(cmd);
-//  _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
-//  STARTUPINFO si;
-//  PROCESS_INFORMATION pi;
-//  ZeroMemory(&si, sizeof(si));
-//  si.cb = sizeof(si);
-//  // Start the child process.
-//  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-//  {
-//    CloseHandle(pi.hThread );
-//    CloseHandle(pi.hProcess);
-//  }
-//  ExitProcess(0);
+  TCHAR cmd[MAX_PATH];
+  GetSystemWindowsDirectory(cmd,MAX_PATH);
+  PathAppend(cmd, _T("SuRun.exe"));
+  PathQuoteSpaces(cmd);
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  if(_tcsnicmp(L"newdev.dll,DevInstall",PathGetArgs(GetCommandLine()),21)==0)
+  {
+    //Win2k! Kill the Process and run a new one:
+    _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
+    // Start the child process.
+    if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+    {
+      CloseHandle(pi.hThread );
+      CloseHandle(pi.hProcess);
+    }
+    ExitProcess(0);
+    return 0;
+  }
+  if(_tcsnicmp(L"newdev.dll,ClientSideInstall",PathGetArgs(GetCommandLine()),28)==0)
+  {
+    //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
+    //start newdev.dll,DevInstall
+  }
   return 0;
 }
 
@@ -837,9 +844,29 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     GetSystemDirectory(f,MAX_PATH);
     PathAppend(f,L"rundll32.exe");
     PathQuoteSpaces(f);
-    if((_tcsicmp(f,fMod)==0)
-      &&(_tcsnicmp(L"newdev.dll,",PathGetArgs(GetCommandLine()),11)==0))
+    LPTSTR args=PathGetArgs(GetCommandLine());
+    if((_tcsicmp(f,fMod)==0) &&(_tcsnicmp(L"newdev.dll,",args,11)==0))
     {
+      if(_tcsnicmp(L"newdev.dll,ClientSideInstall",args,28)==0)
+      {
+        HANDLE hPipe=CreateFile(PathGetArgs(args),
+          GENERIC_READ,0,0,OPEN_EXISTING,0,0);
+        if (hPipe)
+        {
+          DWORD n;
+          TCHAR devname[4096]={0};
+          ReadFile(hPipe,&devname,4096,&n,0);
+          CloseHandle(hPipe);
+          hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
+          if(hPipe)
+          {
+            WriteFile(hPipe,&devname,4096,&n,0);
+            CloseHandle(hPipe);
+          }
+        }
+        //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
+        //start newdev.dll,DevInstall
+      }
       TCHAR UserName[UNLEN+UNLEN+2]={0};
       GetProcessUserName(PID,UserName);
       if(GetInstallDevs(UserName))
