@@ -267,7 +267,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (g_RunData.bShlExHook)
     {
       //ToDo: Show ToolTip "<Program> is running elevated"...
-    }else
+    }else if (!IsAdmin())
     {
       //Complain if shell user is an admin!
       HANDLE hTok=GetShellProcessToken();
