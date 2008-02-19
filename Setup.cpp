@@ -160,7 +160,7 @@ BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
 //  Setup Dialog Data
 // 
 //////////////////////////////////////////////////////////////////////////////
-#define nTabs 2
+#define nTabs 3
 typedef struct _SETUPDATA 
 {
   USERLIST Users;
@@ -807,6 +807,44 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+// Dialog Proc for third Tab-Control
+// 
+//////////////////////////////////////////////////////////////////////////////
+INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      CheckDlgButton(hwnd,IDC_SHEXHOOK,GetUseIShExHook);
+      CheckDlgButton(hwnd,IDC_IATHOOK,GetUseIATHook);
+      CheckDlgButton(hwnd,IDC_NOCONVADMIN,GetNoConvAdmin);
+      CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
+      CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
+      CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
+      return TRUE;
+    }//WM_INITDIALOG
+  case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
+    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_DESTROY:
+    if (g_SD->DlgExitCode==IDOK) //User pressed OK, save settings
+    {
+      SetUseIShExHook(IsDlgButtonChecked(hwnd,IDC_SHEXHOOK));
+      SetUseIATHook(IsDlgButtonChecked(hwnd,IDC_IATHOOK));
+      SetNoConvAdmin(IsDlgButtonChecked(hwnd,IDC_NOCONVADMIN));
+      SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
+      SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
+      SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
+      return TRUE;
+    }//WM_DESTROY
+  }
+  return FALSE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 // Main Setup Dialog Proc
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -830,9 +868,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       }
       //Tab Control
       HWND hTab=GetDlgItem(hwnd,IDC_SETUP_TAB);
-      int TabNames[nTabs]= {IDS_SETUP1, IDS_SETUP2};
-      int TabIDs[nTabs]= { IDD_SETUP1,IDD_SETUP2};
-      DLGPROC TabProcs[nTabs]= { SetupDlg1Proc,SetupDlg2Proc};
+      int TabNames[nTabs]= {IDS_SETUP1,IDS_SETUP2,IDS_SETUP3};
+      int TabIDs[nTabs]= { IDD_SETUP1,IDD_SETUP2,IDD_SETUP3};
+      DLGPROC TabProcs[nTabs]= { SetupDlg1Proc,SetupDlg2Proc,SetupDlg3Proc};
       for (int i=0;i<nTabs;i++)
       {
         TCITEM tie={TCIF_TEXT,0,0,CResStr(TabNames[i]),0,0,0};
@@ -920,7 +958,7 @@ BOOL TestSetup()
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
-  CRunOnNewDeskTop crond(g_RunData.WinStaName,DeskName,GetBlurDesk);
+  CRunOnNewDeskTop crond(L"WinSta0",DeskName,GetBlurDesk);
   CStayOnDeskTop csod(DeskName);
   if (!crond.IsValid())    
   {
