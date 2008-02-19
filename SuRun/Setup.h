@@ -132,8 +132,8 @@
 //Hook stuff
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
-#define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
-#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
+#define GetUseIATHook         (GetShExtSetting(UseIATHook,0)!=0)
+#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,0)
 
 //#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 //#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
