@@ -133,8 +133,8 @@ static CHookDescriptor* hdt[]=
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
-  &hkCrProcW,
-  &hkCrPWLOW
+  &hkCrProcW
+  //&hkCrPWLOW
 };
 
 //relative pointers in PE images
@@ -297,42 +297,45 @@ DWORD UnHookModules()
   return nHooked;
 }
 
-BOOL InjectIATHook(HANDLE hProc)
-{
-  if (!GetUseRmteThread)
-    return FALSE;
-  HANDLE hThread=0;
-  //This does not work on Vista!
-  __try
-  {
-    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
-    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
-    if(!pLoadLib)
-      return false;
-	  char DllName[MAX_PATH];
-	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
-		  return false;
-	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
-	  if(RmteName==NULL)
-		  return false;
-	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
-    __try
-    {
-      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
-    }__except(1)
-    {
-    }
-	  if(hThread!=NULL )
-    {
-      WaitForSingleObject(hThread,INFINITE);
-      CloseHandle(hThread);
-    }
-	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
-  }__except(1)
-  {
-  }
-  return hThread!=0;
-}
+//BOOL InjectIATHook(HANDLE hProc)
+//{
+//  if (!GetUseRmteThread)
+//    return FALSE;
+//  HANDLE hThread=0;
+//  //This does not work on Vista!
+//  __try
+//  {
+//    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
+//    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
+//    if(!pLoadLib)
+//      return false;
+//	  char DllName[MAX_PATH];
+//	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
+//		  return false;
+//	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
+//	  if(RmteName==NULL)
+//		  return false;
+//	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
+//    __try
+//    {
+//      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
+//    }__except(1)
+//    {
+//    }
+//	  if(hThread!=NULL )
+//    {
+//      WaitForSingleObject(hThread,INFINITE);
+//      CloseHandle(hThread);
+//    }
+//	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
+//  }__except(1)
+//  {
+//  }
+//  return hThread!=0;
+//}
+
+//For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
+extern LPTSTR g_LastFailedCmd; //defined in SuSunExt.cpp
 
 BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
@@ -362,10 +365,20 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   }
   if (parms)
     wcscat(cmd,parms);
+  //ToDo: Directly write to service pipe!
   PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
   {
     WCHAR tmp[4096]={0};
     ResolveCommandLine(cmd,lpCurDir,tmp);
+    //Exit if ShellExecHook failed on "tmp"
+    if(g_LastFailedCmd)
+    {
+      BOOL bExitNow=_tcsicmp(tmp,g_LastFailedCmd)==0;
+      free(g_LastFailedCmd);
+      g_LastFailedCmd=0;
+      if(bExitNow)
+        return free(ppi),FALSE;  
+    }
     GetSystemWindowsDirectoryW(cmd,4096);
     PathAppendW(cmd,L"SuRun.exe");
     PathQuoteSpacesW(cmd);
@@ -378,11 +391,11 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
-  DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   // Start the child process.
   lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
   if(!cpw)
-    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+    return free(ppi),FALSE;
+  DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   if (cpw(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
@@ -399,10 +412,10 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
         cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
     }
-    free(ppi);
   }
+  free(ppi);
   SetLastError((ExitCode==RETVAL_OK)?NOERROR:ERROR_ACCESS_DENIED);
-  return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_ACCESSDENIED);
+  return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
 }
 
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
@@ -425,7 +438,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-      InjectIATHook(lpProcessInformation->hProcess);
+      //InjectIATHook(lpProcessInformation->hProcess);
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
@@ -453,7 +466,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     if (b)
     {
       //Process is suspended...
-      InjectIATHook(lpProcessInformation->hProcess);
+      //InjectIATHook(lpProcessInformation->hProcess);
       //Resume main thread:
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
