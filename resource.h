@@ -46,7 +46,9 @@
 #define IDS_SETUP1                      40
 #define IDS_SETUP2                      41
 #define IDS_SETUP3                      42
-#define IDS_ASKAUTO                     42
+#define IDS_ASKAUTO                     44
+#define IDS_MKALLSURUNERSADMIN          45
+#define IDS_DELSURUNERGRP               46
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
@@ -124,6 +126,12 @@
 #define IDC_USERLIST                    1046
 #define IDC_USERNAME                    1047
 #define IDC_ALLUSERS                    1048
+#define IDC_SHEXHOOK                    1049
+#define IDC_IATHOOK                     1050
+#define IDC_NOCONVADMIN                 1052
+#define IDC_NOCONVUSER                  1053
+#define IDC_RESTRICTNEW                 1054
+#define IDC_NOSETUPNEW                  1055
 
 // Next default values for new objects
 // 
@@ -131,7 +139,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        122
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1049
+#define _APS_NEXT_CONTROL_VALUE         1055
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
