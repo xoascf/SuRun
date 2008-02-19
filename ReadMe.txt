@@ -24,6 +24,8 @@ To be done in future:
 * Make "SuRun"-Shell entries in Registry as Install-Option
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
+* Make a Control panel applet for "SuRun /Setup" instead of putting SuRun 
+  into the start menu
 
 Deferred Whishlist:
 ---------------------
