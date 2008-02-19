@@ -274,6 +274,12 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         //check if the requested App is in the ShellExecHook-Runlist
         if (g_RunData.bShlExHook)
         {
+          //Only SuRunners will can use the hooks
+          if (!IsInSuRunners(g_RunData.UserName))
+          {
+            ResumeClient(RETVAL_SX_NOTINLIST);
+            continue;
+          }
           if ((!(wlf&FLAG_SHELLEXEC))
             //check for requireAdministrator Manifest and
             //file names *setup*;*install*;*update*;*.msi;*.msc
@@ -421,7 +427,7 @@ DWORD PrepareSuRun()
       return RETVAL_CANCELLED;
     //Is User Restricted?
     DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
-    if  (GetRestrictApps(g_RunData.UserName) && (f&FLAG_NORESTRICT==0))
+    if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
       return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
     DWORD l=0;
     if (!PwOk)
