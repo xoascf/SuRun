@@ -419,7 +419,10 @@ DWORD PrepareSuRun()
     //secure desktop created...
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
       return RETVAL_CANCELLED;
-    DWORD f=GetRegInt(HKLM,WHTLSTKEY(g_RunData.UserName),g_RunData.cmdLine,0);
+    //Is User Restricted?
+    DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
+    if  (GetRestrictApps(g_RunData.UserName) && (f&FLAG_NORESTRICT==0))
+      return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
     DWORD l=0;
     if (!PwOk)
     {
