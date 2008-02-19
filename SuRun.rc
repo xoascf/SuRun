@@ -115,8 +115,8 @@ BEGIN
                     201,10
     LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.\n- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
                     IDC_STATIC,21,48,300,35
-    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",
-                    IDC_STATIC,10,113,320,57
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,10,
+                    113,320,57
     CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,263,8
@@ -127,7 +127,7 @@ BEGIN
                     IDC_STATIC,20,157,306,8
     GROUPBOX        "If a user has been added to the group 'SuRunners':",
                     IDC_STATIC,10,178,320,45
-    CONTROL         "New SuRunners can change SuRun settings",
+    CONTROL         "New SuRunners MUST NOT change SuRun settings",
                     IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     192,263,10
     CONTROL         "New SuRunners can only run predefined programs with eleveted rights",
@@ -561,7 +561,7 @@ BEGIN
                     IDC_STATIC,20,157,306,8
     GROUPBOX        "Wenn Benutzer zur Gruppe 'SuRunners' hinzugefügt werden:",
                     IDC_STATIC,10,178,320,45
-    CONTROL         "Neue SuRunner dürfen SuRuns Einstellungen verändern",
+    CONTROL         "Neue SuRunner dürfen SuRuns Einstellungen NICHT verändern",
                     IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     192,263,10
     CONTROL         "Neue SuRunner dürfen nur festgelegte Programme mit SuRun starten",
@@ -633,6 +633,7 @@ BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,188,208,50,14
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -858,8 +859,8 @@ BEGIN
                     201,10
     LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.\n- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
                     IDC_STATIC,21,48,300,35
-    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",
-                    IDC_STATIC,10,113,320,57
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,10,
+                    113,320,57
     CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,263,8
@@ -870,7 +871,7 @@ BEGIN
                     IDC_STATIC,20,157,306,8
     GROUPBOX        "If a user has been added to the group 'SuRunners':",
                     IDC_STATIC,10,178,320,45
-    CONTROL         "New SuRunners can change SuRun settings",
+    CONTROL         "New SuRunners MUST NOT change SuRun settings",
                     IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     192,263,10
     CONTROL         "New SuRunners can only run predefined programs with eleveted rights",
