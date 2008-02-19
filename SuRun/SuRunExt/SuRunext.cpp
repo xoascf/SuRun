@@ -854,9 +854,14 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
         {
           DWORD n;
           DWORD siz;
-          TCHAR devname[4096]={0};
+          TCHAR devname[8192]={0};
           ReadFile(hPipe,&siz,4,&n,0);
           ReadFile(hPipe,&devname,siz,&n,0);
+          do
+          {
+            ReadFile(hPipe,&devname[siz],1,&n,0);
+            siz+=n;
+          }while (n && (siz<8191));
           CloseHandle(hPipe);
           hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
           if(hPipe)
