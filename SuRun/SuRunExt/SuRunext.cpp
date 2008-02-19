@@ -854,21 +854,15 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
         {
           DWORD n;
           DWORD siz;
-          TCHAR devname[8192]={0};
+          TCHAR EvtName[MAX_PATH]={0};
           ReadFile(hPipe,&siz,4,&n,0);
-          ReadFile(hPipe,&devname,siz,&n,0);
-          do
-          {
-            ReadFile(hPipe,&devname[siz],1,&n,0);
-            siz+=n;
-          }while (n && (siz<8191));
+          ReadFile(hPipe,&EvtName,siz,&n,0);
           CloseHandle(hPipe);
-          hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
-          if(hPipe)
+          HANDLE ev=OpenEvent(EVENT_MODIFY_STATE|SYNCHRONIZE,FALSE,EvtName);
+          if(ev)
           {
-            WriteFile(hPipe,&siz,4,&n,0);
-            WriteFile(hPipe,&devname,siz,&n,0);
-            CloseHandle(hPipe);
+            SetEvent(ev);
+            CloseHandle(ev);
           }
         }
         //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
