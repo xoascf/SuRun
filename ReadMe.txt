@@ -1,21 +1,6 @@
-To be tested:
----------------------
-* When finally uninstalling SuRun, ask to make "SuRunners" to Administrators
-* When User is in SuRunners and Explorer runs as Admin, tell user to logoff!
-
-tested:
----------------------
-* Option that new SuRunners cannot modify SuRun settings
-* Setup Dialog for UseIShExHook, UseIATHook, NoAutoAdminToSuRunner, NoAutoSuRunner
-* "Run as Admin" for Right click on Control Panel
-* When User clicks "Cancel" don't tell that Process creation failed!
-* if IShellExecHook and IATHook are used together, don't check or ask twice!
-* Option that SuRun does not ask to make Users to SuRunners
-
 ToDo:
 ---------------------
 * On Login after Logout Explorer sometimes crashes with IATHook enabled
-* [Add IsInSuRunners() to shell hooks]
 * Show Tray Tooltip after elevated AutoRunning a process
 
 To be done in future:
@@ -24,8 +9,6 @@ To be done in future:
 * Make "SuRun"-Shell entries in Registry as Install-Option
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
-* Make a Control panel applet for "SuRun /Setup" instead of putting SuRun 
-  into the start menu
 
 Deferred Whishlist:
 ---------------------
@@ -154,6 +137,24 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+SuRun 1.0.2.106 - 2008-02-19: (Internal Beta)
+----------------------------
+* When User is in SuRunners and Explorer runs as Admin, SuRun asks the user 
+  to before it can be used logoff!
+* When finally uninstalling SuRun, SuRun asks if the SuRunners group should be 
+  removed and if all "SuRunners" should become Administrators
+* New Setup Options: 
+  -what Hooks SuRun should use (ShellExec, IAT-Hook, none)
+  -Admins will/not be asked to become SuRunner
+  -No one will/not be asked to become SuRunner
+  -New SuRunners can/cannot modify SuRun settings
+  -New SuRunners are/not restricted to run predefined programs
+* "Run as Admin" context menu for the "Control Panel" on "My Computer"
+* When User selects to "Cancel", SuRun will not complain that the program 
+  could not be run
+* IShellExecute Hook is again implemented in SuRun
+* "SuRun Settings" Control panel applet
+
 SuRun 1.0.2.105 - 2008-02-15: (Internal Beta)
 ----------------------------
 *FIX: The IAT-Hook could cause circular calls that lead to Stack overflow
