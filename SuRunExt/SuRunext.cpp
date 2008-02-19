@@ -641,6 +641,44 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 
 //////////////////////////////////////////////////////////////////////////////
 //
+// Control Panel
+//
+//////////////////////////////////////////////////////////////////////////////
+#include <Cpl.h>
+
+LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
+{ 
+  switch (uMsg) 
+  { 
+  case CPL_INIT:
+    return TRUE; 
+  case CPL_GETCOUNT:
+    return 1; 
+  case CPL_INQUIRE:
+    {
+      LPCPLINFO cpli=(LPCPLINFO)lParam2; 
+      cpli->lData = 0; 
+      cpli->idIcon = IDI_SETUP;
+      cpli->idName = IDS_CPLNAME;
+      cpli->idInfo = 0;
+      return 0;
+    }
+  case CPL_DBLCLK:    // application icon double-clicked 
+    {
+      TCHAR fSuRunExe[MAX_PATH];
+      GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
+      PathAppend(fSuRunExe,L"SuRun.exe");
+      PathQuoteSpaces(fSuRunExe);
+      _tcscat(fSuRunExe,L" /Setup");
+      ShellExecute(hwnd,L"open",fSuRunExe,0,0,SW_SHOW);
+      return 0;
+    }
+  } 
+  return 0; 
+} 
+
+//////////////////////////////////////////////////////////////////////////////
+//
 // Install/Uninstall
 //
 //////////////////////////////////////////////////////////////////////////////
