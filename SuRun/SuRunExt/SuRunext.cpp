@@ -669,8 +669,7 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
       GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
       PathAppend(fSuRunExe,L"SuRun.exe");
       PathQuoteSpaces(fSuRunExe);
-      _tcscat(fSuRunExe,L" /Setup");
-      ShellExecute(hwnd,L"open",fSuRunExe,0,0,SW_SHOW);
+      ShellExecute(hwnd,L"open",fSuRunExe,L"/Setup",0,SW_SHOW);
       return 0;
     }
   } 
