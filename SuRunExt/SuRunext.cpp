@@ -861,7 +861,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
           hPipe=CreateFile(L"D:\\Download\\1",GENERIC_WRITE,0,0,CREATE_ALWAYS,0,0);
           if(hPipe)
           {
-            WriteFile(hPipe,&devname,4096,&n,0);
+            WriteFile(hPipe,&siz,4,&n,0);
+            WriteFile(hPipe,&devname,siz,&n,0);
             CloseHandle(hPipe);
           }
         }
