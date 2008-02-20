@@ -1,3 +1,9 @@
+New:
+---------------------
+* "Start as admin" for MSC files was not removed
+* Setup Dialog hides Windows flag Icons if hooks are disabled
+* Setup Dialog hides Smiley Icons if hooks are disabled
+
 ToDo:
 ---------------------
 * On Login after Logout Explorer sometimes crashes with IATHook enabled
