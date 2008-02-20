@@ -781,7 +781,8 @@ __declspec(dllexport) void RemoveShellExt()
   //"Open with..." when right clicking on SuRun.exe
   DelRegKey(HKCR,L"Applications\\SuRun.exe");
   //COM-Object
-  DelRegKey(HKCR,L"CLSID\\" sGUID);
+  DelRegKey(HKCR,L"CLSID\\" sGUID L"\\InProcServer32");
+
   //Desktop-Background-Hook
   DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
   DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
