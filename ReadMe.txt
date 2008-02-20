@@ -15,7 +15,6 @@ New:
 
 ToDo:
 ---------------------
-* On Login after Logout Explorer sometimes crashes with IATHook enabled
 * Show Tray Tooltip after elevated AutoRunning a process
 
 To be done in future:
