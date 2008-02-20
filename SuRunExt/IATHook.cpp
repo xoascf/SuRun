@@ -387,7 +387,7 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
       return free(ppi),FALSE;
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
   }
-  CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
+  //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
   STARTUPINFOW si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
