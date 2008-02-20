@@ -870,6 +870,8 @@ void RemoveRegistry()
   DelRegKey(HKCR,MSIPKG L" repair");
   //MSI Uninstall
   DelRegKey(HKCR,MSIPKG L" Uninstall");
+  //MSP Apply
+  DelRegKey(HKCR,MSIPTCH L" open");
   //Control Panel
   DelRegKey(HKCR,CPLREG);
   //Control Panel Applet
