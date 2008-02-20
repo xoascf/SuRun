@@ -599,7 +599,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return S_FALSE;
-  CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
+  //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
   //ToDo: Directly write to service pipe!
   PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
