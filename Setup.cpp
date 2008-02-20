@@ -726,6 +726,9 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           }
         }
         return TRUE;
+      case MAKELPARAM(IDC_RESTRICTED,BN_CLICKED):
+        UpdateWhiteListFlags(GetDlgItem(hwnd,IDC_WHITELIST));
+        return TRUE;
       //Delete App Button
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
@@ -826,7 +829,6 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
-      UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -902,6 +904,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       ShowWindow(g_SD->hTabCtrl[0],TRUE);
       //...
       SetFocus(hTab);
+      UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
       return FALSE;
     }//WM_INITDIALOG
   case WM_NCDESTROY:
@@ -939,10 +942,6 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       case MAKELPARAM(IDOK,BN_CLICKED):
         {
           g_SD->DlgExitCode=IDOK;
-          SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
-            IsDlgButtonChecked(hwnd,IDC_RUNSETUP)==0);
-          SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
-            IsDlgButtonChecked(hwnd,IDC_RESTRICTED)!=0);
           EndDialog(hwnd,1);
           return TRUE;
         }
