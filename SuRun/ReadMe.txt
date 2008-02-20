@@ -1,9 +1,9 @@
 New:
 ---------------------
-* "Start as admin" for MSC files was not removed
-* Setup Dialog hides Windows flag Icons if hooks are disabled
-* Setup Dialog hides Smiley Icons if hooks are disabled
-* SuRun when restarting the SuRun Service all Settings where set to defaults
+* When uninstalling "Start as admin" for *.msc files was not removed
+* Setup Dialog hides Autorun icons if hooks are disabled
+* Setup Dialog hides restriction icons if user is not restricted
+* When restarting the SuRun Service all these Settings where set to defaults:
   * "Control Panel As Admin" on Desktop Menu
   * "Cmd here As Admin" on Folder Menu
   * "Explorer here As Admin" on Folder Menu
