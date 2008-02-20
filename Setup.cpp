@@ -416,6 +416,7 @@ static void UpdateWhiteListFlags(HWND hWL)
   ListView_SetColumnWidth(hWL,1,
      (IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK)
    ||IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK))?22:0);
+  ListView_SetColumnWidth(hWL,2,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)?22:0);
   ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
   InvalidateRect(hWL,0,TRUE);
 }
@@ -825,6 +826,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
+      UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
