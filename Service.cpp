@@ -1020,6 +1020,8 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   RemoveRegistry();
   if (bJustStop)
     return TRUE;
+  //remove COM Object Settings
+  DelRegKey(HKCR,L"CLSID\\" sGUID);
   //Remove SuRunners from Registry
   SetEnergy(false);
   //HKLM\Security\SuRun
