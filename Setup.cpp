@@ -413,6 +413,9 @@ static void UpdateWhiteListFlags(HWND hWL)
     item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
     ListView_SetItem(hWL,&item);
   }
+  ListView_SetColumnWidth(hWL,1,
+     IsDlgButtonChecked(g_SD->hTabCtrl[0],IDC_SHEXHOOK)
+   ||IsDlgButtonChecked(g_SD->hTabCtrl[0],IDC_IATHOOK)?22:0);
   ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
   InvalidateRect(hWL,0,TRUE);
 }
@@ -839,6 +842,16 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
       return TRUE;
     }//WM_DESTROY
+  case WM_COMMAND:
+    {
+      switch (wParam)
+      {
+      case MAKELPARAM(IDC_IATHOOK,BN_CLICKED):
+      case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
+        UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
+        return TRUE;
+      }
+    }
   }
   return FALSE;
 }
