@@ -414,8 +414,8 @@ static void UpdateWhiteListFlags(HWND hWL)
     ListView_SetItem(hWL,&item);
   }
   ListView_SetColumnWidth(hWL,1,
-     IsDlgButtonChecked(g_SD->hTabCtrl[0],IDC_SHEXHOOK)
-   ||IsDlgButtonChecked(g_SD->hTabCtrl[0],IDC_IATHOOK)?22:0);
+     (IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK)
+   ||IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK))?22:0);
   ListView_SetColumnWidth(hWL,3,LVSCW_AUTOSIZE_USEHEADER);
   InvalidateRect(hWL,0,TRUE);
 }
