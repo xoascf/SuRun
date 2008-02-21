@@ -49,6 +49,7 @@
 #define IDS_ASKAUTO                     44
 #define IDS_MKALLSURUNERSADMIN          45
 #define IDS_DELSURUNERGRP               46
+#define IDS_STARTED                     47
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
