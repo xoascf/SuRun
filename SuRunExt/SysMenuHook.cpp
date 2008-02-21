@@ -128,7 +128,7 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
       if (msg->wParam==WM_SYSMH0)
         ::ExitProcess(0);
     }else
-      MessageBox(msg->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
+      SafeMsgBox(msg->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
     //We processed the Message: Stop calling other hooks!
     return 0;
   }
