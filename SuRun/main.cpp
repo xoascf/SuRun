@@ -233,6 +233,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     }  
     ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
   }
+  LoadLibrary(_T("Shell32.dll"));
   //Usage
   if (!g_RunData.cmdLine[0])
   {
