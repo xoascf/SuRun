@@ -571,6 +571,7 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 
 BOOL WINAPI FreeLib(HMODULE hLibModule)
 {
+  //The DLL must not be unloaded while the process is running!
   if (hLibModule==l_hInst)
   {
 #ifdef _DEBUG
@@ -595,6 +596,7 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
 
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 {
+  //The DLL must not be unloaded while the process is running!
   if (hLibModule!=l_hInst)
   {
     lpFreeLibraryAndExitThread p=(lpFreeLibraryAndExitThread)hkFrLibXT.orgfn();
@@ -619,11 +621,6 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 
 DWORD WINAPI InitHookProc(void* p)
 {
-//  //The DLL must not be unloaded while the process is running!
-//  //Increment lock count!
-//  char f[MAX_PATH];
-//  GetModuleFileNameA(l_hInst,f,MAX_PATH);
-//  orgLoadLibraryA(f);
   if (!GetUseIATHook)
     return 0;
   EnterCriticalSection(&g_HookCs);
@@ -641,25 +638,9 @@ void LoadHooks()
 
 void UnloadHooks()
 {
-  if(g_ModList.size()!=0)
-  {
-//#ifdef _DEBUG
-//    char fmod[MAX_PATH]={0};
-//    {
-//      GetModuleFileNameA(0,fmod,MAX_PATH);
-//      PathStripPathA(fmod);
-//      strcat(fmod,": ");
-//      char* p=&fmod[strlen(fmod)];
-//      GetModuleFileNameA(l_hInst,p,MAX_PATH);
-//      PathStripPathA(p);
-//    }
-//    TRACExA("SuRunExt32.dll: %s WARNING: Unloading IAT Hooks!#############################\n",fmod);
-//#endif _DEBUG
-    EnterCriticalSection(&g_HookCs);
-    //Do not unload the hooks, but wait for the Critical Section
-//    UnHookModules();
-    LeaveCriticalSection(&g_HookCs);
-  }
+  //Do not unload the hooks, but wait for the Critical Section
+  EnterCriticalSection(&g_HookCs);
+  LeaveCriticalSection(&g_HookCs);
   DeleteCriticalSection(&g_HookCs);
 }
 
