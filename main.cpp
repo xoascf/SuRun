@@ -23,6 +23,7 @@
 #include "Helpers.h"
 #include "ResStr.h"
 #include "Service.h"
+#include "TrayMsgWnd.h"
 #include "DBGTrace.h"
 #include "UserGroups.h"
 #include "Resource.h"
@@ -287,7 +288,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case RETVAL_OK:
     if (g_RunData.bShlExHook)
     {
-      //ToDo: Show ToolTip "<Program> is running elevated"...
+      //Show ToolTip "<Program> is running elevated"...
+      TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,g_RunData.cmdLine));
     }
     return RETVAL_OK;
   }
