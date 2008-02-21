@@ -225,8 +225,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         CloseHandle(hTok);
         if (bAdmin)
         {
-          LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
-          MessageBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+          SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
           return RETVAL_ACCESSDENIED;
         }
         
@@ -237,9 +236,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Usage
   if (!g_RunData.cmdLine[0])
   {
-    LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
     if (!g_RunData.beQuiet)
-      MessageBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
+      SafeMsgBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
     return RETVAL_ACCESSDENIED;
   }
   //Lets go:
@@ -273,18 +271,14 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return RETVAL_SX_NOTINLIST;
   case RETVAL_RESTRICT: //Restricted User, may not run App!
     if (!g_RunData.beQuiet)
-    {
-      LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
-      MessageBox(0,
+      SafeMsgBox(0,
         CBigResStr(IDS_RUNRESTRICTED,g_RunData.UserName,g_RunData.cmdLine),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
-    }
     return RETVAL_RESTRICT;
   case RETVAL_ACCESSDENIED:
     if (!g_RunData.beQuiet)
     {
-      LoadLibrary(_T("Shell32.dll"));//To make MessageBox work with Themes
-      MessageBox(0,CResStr(IDS_RUNFAILED,g_RunData.cmdLine),
+      SafeMsgBox(0,CResStr(IDS_RUNFAILED,g_RunData.cmdLine),
         CResStr(IDS_APPNAME),MB_ICONSTOP);
     }
     return RETVAL_ACCESSDENIED;
