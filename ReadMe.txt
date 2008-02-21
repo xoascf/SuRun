@@ -1,5 +1,6 @@
 New:
 ---------------------
+* LoadLibrary("Shell32.dll") in Main() caused YZShadow to crash SuRun Setup
 * When uninstalling "Start as admin" for *.msc files was not removed
 * Setup Dialog hides Autorun icons if hooks are disabled
 * Setup Dialog hides restriction icons if user is not restricted
