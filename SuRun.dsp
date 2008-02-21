@@ -221,6 +221,10 @@ SOURCE=.\SuRun.rc
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrayMsgWnd.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\UserGroups.cpp
 # End Source File
 # Begin Source File
@@ -290,6 +294,10 @@ SOURCE=.\Setup.h
 # Begin Source File
 
 SOURCE=.\sspi_auth.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrayMsgWnd.h
 # End Source File
 # Begin Source File
 
