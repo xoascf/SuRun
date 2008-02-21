@@ -1,72 +1,42 @@
-// TrayMsgWnd.cpp : implementation file
+//////////////////////////////////////////////////////////////////////////////
 //
-
-#include "stdafx.h"
-#include "q8tool.h"
-#include "Q8ToolNet.h"
-#include "GfX.h"
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Application icons are from Foood's "iCandy" icon 
+// set (http://www.iconaholic.com). the Shield Icons are taken from Windows XP 
+// Service Pack 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
+//////////////////////////////////////////////////////////////////////////////
+#define _WIN32_WINNT 0x0500
+#define WINVER       0x0500
+#include <windows.h>
+#include <tchar.h>
 #include "TrayMsgWnd.h"
-#include "Monitor.h"
-#include "ThreadStuff.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CTrayMsgWnd window
 
-class CTrayMsgWnd : public CWnd
+class CTrayMsgWnd
 {
-// Construction
 public:
-	CTrayMsgWnd(LPCTSTR Text);
-
-// Attributes
-public:
-
-// Operations
-public:
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CTrayMsgWnd)
-	public:
-	protected:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
-	virtual ~CTrayMsgWnd();
-  void Slide(int Height){m_DoSlide+=Height; SetTimer(1,10,0);};
-
-	// Generated message map functions
+	CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text);
+	~CTrayMsgWnd();
+  void Slide(int Height);
+  bool MsgLoop();
+  HWND m_hWnd;
 protected:
-  CStatic m_MsgText;
-  CString m_Text;
-  CFont m_Font;
-  CBrush m_bkBrush;
-  CRect m_wr;
+  HFONT m_hFont;
+  HBRUSH m_bkBrush;
+  RECT m_wr;
   int m_DoSlide;
-	//{{AFX_MSG(CTrayMsgWnd)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg void OnClose();
-	afx_msg void OnNcDestroy();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-  CMainWndIconSet m_Icons;
+private:
+  static LRESULT CALLBACK WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam);
+  LRESULT CALLBACK WinProc(UINT msg,WPARAM wParam,LPARAM lParam);
 };
-
-/////////////////////////////////////////////////////////////////////////////
-// The List:
-/////////////////////////////////////////////////////////////////////////////
-CList <CTrayMsgWnd*,CTrayMsgWnd*> g_MsgWindows;
 
 /////////////////////////////////////////////////////////////////////////////
 //Public Message Functions:
@@ -75,224 +45,159 @@ CList <CTrayMsgWnd*,CTrayMsgWnd*> g_MsgWindows;
 #define WS_EX_NOACTIVATE        0x08000000L
 #endif
 
-UINT TrayMsgWndProc(void* p)
-{
-  LPTSTR Title=(LPTSTR)p;
-  LPTSTR Message=&Title[_tcslen(Title)+1];
-  TrayMsgWnd(Title,Message);
-  free(p);
-  return 0;
-}
-
-void TrayMsgWnd(void* Buf)
-{
-  void* p=malloc(_msize(Buf));
-  memmove(p,Buf,_msize(Buf));
-  StartThread(TrayMsgWndProc,p);
-}
-
 void TrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Message)
 {
+  int prio=GetThreadPriority(GetCurrentThread());
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
-  //CQ8ToolClient ruft das hier auf:
-  RECT rc={0};
-  CTrayMsgWnd* w=new CTrayMsgWnd(Message);
-  CString S=Q8ToolServiceName;
-  if (DlgTitle && *DlgTitle)
-    S.Format("%s - %s",DlgTitle,Q8ToolServiceName);
-  w->CreateEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE|WS_EX_TOPMOST,"Q8TMSGWND",S,
-              WS_VISIBLE|WS_CAPTION|WS_SYSMENU|WS_BORDER,rc,0,0);
-  while (::IsWindow(w->m_hWnd))
-  {
-    MSG msg;
-    while(PeekMessage(&msg,0,0,0,PM_REMOVE))
-      DispatchMessage(&msg);
+  CTrayMsgWnd* w=new CTrayMsgWnd(DlgTitle,Message);
+  while (w->MsgLoop())
     Sleep(10);
-  }
+  delete w;
+  SetThreadPriority(GetCurrentThread(),prio);
 }
-
-void TrayMsg(LPTSTR DlgTitle,int nID,...)
-{
-  CString s=LoadCString(nID);
-  if (!s.IsEmpty())
-  {
-    va_list argList;
-    va_start(argList, nID);
-    CString s1;
-    s1.FormatV(s,argList);
-    va_end(argList);
-    //CNetSwitch verteilt an alle Clients!
-    SendTrayMsg(DlgTitle,(LPTSTR)(LPCTSTR)s1);
-  }
-}
-
-void TrayMsg(LPTSTR DlgTitle,CString s,...)
-{
-  va_list argList;
-  va_start(argList, s);
-  CString s1;
-  s1.FormatV(s,argList);
-  va_end(argList);
-  //CNetSwitch verteilt an alle Clients!
-  SendTrayMsg(DlgTitle,(LPTSTR)(LPCTSTR)s1);
-}
-
-void TrayMsgClear()
-{
-  while(g_MsgWindows.GetCount())
-  {
-     CTrayMsgWnd* w=g_MsgWindows.GetTail();
-     if (w)
-     {
-       g_MsgWindows.RemoveTail();
-       w->DestroyWindow();
-       delete w;
-     }
-  }
-}
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CTrayMsgWnd
 
-CTrayMsgWnd::CTrayMsgWnd(LPCTSTR Text)
+#define Classname _T("SRTRMSGWND")
+CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text)
 {
+  LoadLibrary(_T("Shell32.dll"));//Load Shell Window Classes
   m_DoSlide=0;
-  m_Text=Text;
-  CreatePointFont(m_Font,8,"MS Sans Serif");
+  m_hFont=CreateFont(-10,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("MS Shell Dlg"));
   {
-    CDC MemDC;
-    MemDC.CreateCompatibleDC(0);
-    MemDC.SelectObject(m_Font);
+    HDC MemDC=CreateCompatibleDC(0);
+    SelectObject(MemDC,m_hFont);
     m_wr.left=0;
     m_wr.top=0;
-    m_wr.right=180;
+    m_wr.right=200;
     m_wr.bottom=400;
-    MemDC.DrawText(m_Text,m_wr,DT_CALCRECT|DT_NOPREFIX|DT_WORDBREAK);
-    m_wr.right=180+2*GetSystemMetrics(SM_CXDLGFRAME)+10;
+    DrawText(MemDC,Text,-1,&m_wr,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
+    m_wr.right+=2*GetSystemMetrics(SM_CXDLGFRAME)+10;
     m_wr.bottom+=2*GetSystemMetrics(SM_CYDLGFRAME)+GetSystemMetrics(SM_CYSMCAPTION)+10;
+    //Window Rect
+    RECT rd={0};
+    SystemParametersInfo(SPI_GETWORKAREA,0,&rd,0);
+    OffsetRect(&m_wr,rd.right-m_wr.right+m_wr.left,rd.bottom-m_wr.bottom+m_wr.top);
+    HWND w=WindowFromPoint(*((POINT*)&m_wr.left));
+    while (w)
+    {
+      TCHAR cn[32];
+      if (GetClassName(w,cn,31) && _tcsicmp(cn,Classname)==0)
+        w=WindowFromPoint(*((POINT*)&m_wr.left));
+      else
+        w=0;
+    }
   }
-
-  m_bkBrush.CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+  m_bkBrush=CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+  WNDCLASS wc={0};
+  wc.lpfnWndProc=CTrayMsgWnd::WindowProc;
+  wc.lpszClassName=Classname;
+  wc.hbrBackground=m_bkBrush;
+  RegisterClass(&wc);
+  m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE|WS_EX_TOPMOST,
+    Classname,DlgTitle,WS_VISIBLE|WS_CAPTION|WS_SYSMENU|WS_BORDER,
+    m_wr.left,m_wr.top,m_wr.right-m_wr.left,m_wr.bottom-m_wr.top,
+    0,0,0,0);
+  SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
+  //Static
+  RECT cr;
+  GetClientRect(m_hWnd,&cr);
+  InflateRect(&cr,-5,-5);
+  HWND s=CreateWindowEx(0,_T("Static"),Text,WS_CHILD|WS_VISIBLE|SS_NOPREFIX,
+    cr.left,cr.top,cr.right-cr.left,cr.bottom-cr.top,m_hWnd,0,0,0);
+  if (!s)
+    DWORD dwe=GetLastError();
+  SendMessage(s,WM_SETFONT,(WPARAM)m_hFont,1);
+  SetTimer(m_hWnd,2,20000,0);
+  InvalidateRect(m_hWnd,0,1);
+  UpdateWindow(m_hWnd);
+  MsgLoop();
 }
 
 CTrayMsgWnd::~CTrayMsgWnd()
 {
+  DeleteObject(m_hFont);
 }
 
-
-BEGIN_MESSAGE_MAP(CTrayMsgWnd, CWnd)
-	//{{AFX_MSG_MAP(CTrayMsgWnd)
-	ON_WM_CREATE()
-	ON_WM_CTLCOLOR()
-	ON_WM_MOVING()
-	ON_WM_DESTROY()
-	ON_WM_TIMER()
-	ON_WM_CLOSE()
-	ON_WM_NCDESTROY()
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-
-/////////////////////////////////////////////////////////////////////////////
-// CTrayMsgWnd message handlers
-
-BOOL CTrayMsgWnd::PreCreateWindow(CREATESTRUCT& cs) 
+bool CTrayMsgWnd::MsgLoop()
 {
-  if (!CWnd::PreCreateWindow(cs))
+  if (!IsWindow(m_hWnd))
     return FALSE;
-  cs.style     |= WS_CLIPCHILDREN|WS_CAPTION;
-  cs.dwExStyle |= WS_EX_TOOLWINDOW|WS_EX_TOPMOST;
-  cs.lpszClass  = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW, ::LoadCursor(NULL, IDC_ARROW), (HBRUSH)m_bkBrush.m_hObject, NULL);
+  MSG msg;
+  while (PeekMessage(&msg,0,0,0,PM_REMOVE))
+  {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
   return TRUE;
 }
 
-int CTrayMsgWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+LRESULT CALLBACK CTrayMsgWnd::WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
-	if (CWnd::OnCreate(lpCreateStruct) == -1)
-		return -1;
-  //Window Rect
-  RECT rd={0};
-  GetCurrentWorkArea(m_hWnd,&rd);
-  POSITION p=g_MsgWindows.GetHeadPosition();
-  while(p)
+  CTrayMsgWnd* sw=(CTrayMsgWnd*)GetWindowLongPtr(hWnd,GWLP_USERDATA);
+  if (sw)
+    return sw->WinProc(msg,wParam,lParam);
+  return DefWindowProc(hWnd,msg,wParam,lParam);
+}
+
+LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch (msg)
   {
-     CTrayMsgWnd* w=g_MsgWindows.GetNext(p);
-     if (w && (w->m_wr.top<rd.bottom))
-       rd.bottom=w->m_wr.top;
+  case WM_CLOSE:
+    {
+      KillTimer(m_hWnd,1);
+      KillTimer(m_hWnd,2);
+      DestroyWindow(m_hWnd);
+//      POSITION p=g_MsgWindows.Find(this);
+//      while(p)
+//      {
+//        CTrayMsgWnd* w=g_MsgWindows.GetNext(p);
+//        if (w)
+//          w->Slide(m_wr.Height());
+//      }
+//      p=g_MsgWindows.Find(this);
+//      g_MsgWindows.RemoveAt(p);
+    }
+    return 0;
+  case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
+    return (DWORD)m_bkBrush;
+  case WM_MOVING:
+	  *((RECT*)lParam)=m_wr;
+    return TRUE;
+  case WM_TIMER:
+    if (wParam==2)
+    {
+      KillTimer(m_hWnd,2);
+      PostMessage(m_hWnd,WM_CLOSE,0,0);
+    }else
+    if (wParam==1)
+    {
+      if (m_DoSlide)
+      {
+        OffsetRect(&m_wr,0,min(5,m_DoSlide));
+        SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,
+          m_wr.right-m_wr.left,m_wr.bottom-m_wr.top,
+          SWP_NOZORDER|SWP_NOACTIVATE);
+        m_DoSlide-=5;
+      }
+      if (m_DoSlide<=0)
+      {
+        m_DoSlide=0;
+        KillTimer(m_hWnd,1);
+      }
+    }
+    return 0;
   }
-  m_wr.OffsetRect(rd.right-m_wr.Width(),rd.bottom-m_wr.Height());
-  ClipOrCenterRectToMonitor(m_wr,0);
-  ::SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,m_wr.Width(),m_wr.Height(),SWP_NOZORDER|SWP_NOACTIVATE);
-  m_Icons.Init(*this,IDR_MAINFRAME,IDR_MAINFRAME1);
-  //Static
-  CRect cr;
-  GetClientRect(cr);
-  cr.DeflateRect(5,5);
-  m_MsgText.Create(m_Text,WS_CHILD|WS_VISIBLE,cr,this);
-  m_MsgText.SetFont(&m_Font);
-  g_MsgWindows.AddTail(this);
-  Invalidate();
-  SetTimer(2,20000,0);
-	return 0;
+  return DefWindowProc(m_hWnd,msg,wParam,lParam);
 }
 
-HBRUSH CTrayMsgWnd::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+void CTrayMsgWnd::Slide(int Height)
 {
-	return (HBRUSH)m_bkBrush.m_hObject;
-}
+  m_DoSlide+=Height; 
+  SetTimer(m_hWnd,1,10,0);
+};
 
-void CTrayMsgWnd::OnMoving(UINT fwSide, LPRECT pRect) 
-{
-	CWnd::OnMoving(fwSide, pRect);
-	*pRect=m_wr;
-}
-
-void CTrayMsgWnd::OnTimer(UINT nIDEvent) 
-{
-  if (nIDEvent==2)
-  {
-    if (g_MsgWindows.GetCount()>1)
-    {
-      KillTimer(2);
-      PostMessage(WM_CLOSE);
-    }
-  }else
-  if (nIDEvent==1)
-  {
-    if (m_DoSlide)
-    {
-      m_wr.OffsetRect(0,min(5,m_DoSlide));
-      ::SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,m_wr.Width(),m_wr.Height(),SWP_NOZORDER|SWP_NOACTIVATE);
-      m_DoSlide-=5;
-    }
-    if (m_DoSlide<=0)
-    {
-      m_DoSlide=0;
-      KillTimer(1);
-    }
-  }else
-	  CWnd::OnTimer(nIDEvent);
-}
-
-void CTrayMsgWnd::OnClose() 
-{
-  KillTimer(1);
-  KillTimer(2);
-  POSITION p=g_MsgWindows.Find(this);
-  while(p)
-  {
-     CTrayMsgWnd* w=g_MsgWindows.GetNext(p);
-     if (w)
-       w->Slide(m_wr.Height());
-  }
-  p=g_MsgWindows.Find(this);
-  g_MsgWindows.RemoveAt(p);
-	CWnd::OnClose();
-}
-
-void CTrayMsgWnd::OnNcDestroy() 
-{
-	CWnd::OnNcDestroy();
-  delete this;
-}
