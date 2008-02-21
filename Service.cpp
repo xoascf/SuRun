@@ -450,7 +450,7 @@ DWORD PrepareSuRun()
     SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   }else //FATAL: secure desktop could not be created!
-    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return RETVAL_ACCESSDENIED;
 }
 
@@ -494,7 +494,7 @@ BOOL Setup(LPCTSTR WinStaName)
   CStayOnDeskTop csod(DeskName);
   if (!crond.IsValid())    
   {
-    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     return FALSE;
   }
   //only Admins and SuRunners may setup SuRun
@@ -759,7 +759,7 @@ void SuRun(DWORD ProcessID)
     {
       zero(g_RunPwd);
       ResumeClient(RETVAL_CANCELLED);
-      MessageBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      SafeMsgBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
     }
   }
@@ -972,7 +972,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   {
     cbs.Init();
     cbs.Show();
-    if(MessageBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
+    if(SafeMsgBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
          MB_SYSTEMMODAL|MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO)
     return false;
     cbs.MsgLoop();
@@ -1027,11 +1027,11 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   //HKLM\Security\SuRun
   DelRegKey(HKLM,SVCKEY);
   //Delete "SuRunners"?
-  if (MessageBox(0,CBigResStr(IDS_DELSURUNERGRP),CResStr(IDS_APPNAME),
+  if (SafeMsgBox(0,CBigResStr(IDS_DELSURUNERGRP),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_SYSTEMMODAL|MB_YESNO)==IDYES)
   {
     //Make "SuRunners"->"Administrators"?
-    if (MessageBox(0,CBigResStr(IDS_MKALLSURUNERSADMIN),CResStr(IDS_APPNAME),
+    if (SafeMsgBox(0,CBigResStr(IDS_MKALLSURUNERSADMIN),CResStr(IDS_APPNAME),
       MB_ICONQUESTION|MB_SYSTEMMODAL|MB_YESNO|MB_DEFBUTTON2)==IDYES)
     {
       USERLIST SuRunners;
@@ -1043,7 +1043,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   }
 
   //Ok!
-  MessageBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
+  SafeMsgBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
     MB_ICONINFORMATION|MB_SYSTEMMODAL);
   return bRet;
 }
@@ -1129,7 +1129,7 @@ BOOL UserInstall(int IDSMsg)
   CBlurredScreen cbs;
   cbs.Init();
   cbs.Show();
-  if (MessageBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
+  if (SafeMsgBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SYSTEMMODAL)!=IDYES)
     return FALSE;
   cbs.MsgLoop();
@@ -1140,7 +1140,7 @@ BOOL UserInstall(int IDSMsg)
   PathAppend(SuRunExe,L"SuRun.exe");
   //This mostly does not work...
   //ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
-  if (MessageBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
+  if (SafeMsgBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
     MB_ICONQUESTION|MB_YESNO|MB_SYSTEMMODAL)==IDYES)
     ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
   return TRUE;
@@ -1291,8 +1291,6 @@ bool HandleServiceStuff()
 //  since HandleServiceStuff will call ExitProcess()
 //////////////////////////////////////////////////////////////////////////////
 
-//To make DialogBoxParam and MessageBox work with Themes:
 //#ifndef _DEBUG
-HANDLE g_hShell32=LoadLibrary(_T("Shell32.dll"));
 static bool g_IsServiceStuff=HandleServiceStuff();
 //#endif _DEBUG
