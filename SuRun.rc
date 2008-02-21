@@ -350,6 +350,7 @@ BEGIN
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
     IDS_MKALLSURUNERSADMIN  "Should all 'SuRunners' group members become local Administrators?"
     IDS_DELSURUNERGRP       "Should the local user group 'SuRunners' be deleted?"
+    IDS_STARTED             "%s\r\n\tis running with eleveted rights."
 END
 
 #endif    // Polish resources
@@ -750,6 +751,7 @@ BEGIN
     IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen.\r\n\r\nWenn Sie  'Abbrechen' wählen, wird das Programm ohne erhöhte Rechte gestartet."
     IDS_MKALLSURUNERSADMIN  "Sollen alle Mitglider der Gruppe 'SuRunners' zu lokalen Administratoren gemacht werden?"
     IDS_DELSURUNERGRP       "Soll die lokale Benutzergruppe 'SuRunners' gelöscht werden?"
+    IDS_STARTED             "%s\r\n\twird mit erhöhten Rechten ausgeführt."
 END
 
 #endif    // German (Germany) resources
@@ -1140,6 +1142,7 @@ BEGIN
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
     IDS_MKALLSURUNERSADMIN  "Should all 'SuRunners' group members become local Administrators?"
     IDS_DELSURUNERGRP       "Should the local user group 'SuRunners' be deleted?"
+    IDS_STARTED             "%s\r\n\tis running with eleveted rights."
 END
 
 #endif    // English (U.S.) resources
