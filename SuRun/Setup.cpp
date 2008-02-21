@@ -693,7 +693,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_DELUSER,BN_CLICKED):
         {
           LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
-          switch (MessageBox(hwnd,CBigResStr(IDS_DELUSER,u),
+          switch (SafeMsgBox(hwnd,CBigResStr(IDS_DELUSER,u),
             CResStr(IDS_APPNAME),MB_ICONASTERISK|MB_YESNOCANCEL|MB_DEFBUTTON3))
           {
           case IDYES:
@@ -976,7 +976,7 @@ BOOL TestSetup()
   CStayOnDeskTop csod(DeskName);
   if (!crond.IsValid())    
   {
-    MessageBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     return FALSE;
   }
   
