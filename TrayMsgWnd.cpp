@@ -70,7 +70,7 @@ private:
   }
   static VOID CALLBACK MaxYProc(HWND hwnd,UINT uMsg,ULONG_PTR dwData,LRESULT lResult)
   {
-    if(lResult)
+    if(lResult>100)
       ((CTrayMsgWnd*)dwData)->MaxYProc(lResult);
   }
   VOID CALLBACK MaxYProc(int y)
