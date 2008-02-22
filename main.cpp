@@ -210,6 +210,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       g_RunData.KillPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
       KillProcessNice(g_RunData.KillPID);
+    }else if (!_wcsicmp(c,L"/SAY"))
+    {
+      //Show ToolTip "<Program> is running elevated"...
+      TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,PathGetArgs(Args)));
+      ExitProcess(0);
     }
   }
   //Convert Command Line
@@ -286,9 +291,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case RETVAL_CANCELLED:
     return RETVAL_CANCELLED;
   case RETVAL_OK:
-    if (g_RunData.bShlExHook)
-      //Show ToolTip "<Program> is running elevated"...
-      TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,g_RunData.cmdLine));
     return RETVAL_OK;
   }
   return RETVAL_ACCESSDENIED;
