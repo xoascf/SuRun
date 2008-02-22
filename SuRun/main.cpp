@@ -213,7 +213,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     }else if (!_wcsicmp(c,L"/SAY"))
     {
       //Show ToolTip "<Program> is running elevated"...
-      TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,PathGetArgs(Args)));
+      TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,Args));
       ExitProcess(0);
     }
   }
