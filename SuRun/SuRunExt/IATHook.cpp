@@ -80,7 +80,6 @@ VOID WINAPI FreeLibAndExitThread(HMODULE,DWORD);
 
 typedef std::list<HMODULE> ModList;
 
-int g_nHooked=0;
 ModList g_ModList;
 
 //Hook Descriptor
@@ -228,24 +227,22 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
 //            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
 //              fmod,DllName,pBN->Name,oldFunc,newFunc);
 #endif _DEBUG
-            MEMORY_BASIC_INFORMATION mbi;
-            if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
+            __try
             {
-              DWORD oldProt;
-              if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_READWRITE, &oldProt))
+              MEMORY_BASIC_INFORMATION mbi;
+              if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
               {
-                if (bUnHook)
+                DWORD oldProt;
+                if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_READWRITE, &oldProt))
                 {
-                  pThunk->u1.Function = (DWORD_PTR) oldFunc;
-                  g_nHooked--;
-                }else
-                {
-                  pThunk->u1.Function = (DWORD_PTR) newFunc;
-                  g_nHooked++;
+                  pThunk->u1.Function = (DWORD_PTR)(bUnHook?oldFunc:newFunc);
+                  nHooked++;
                 }
-                nHooked++;
+                VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
               }
-              VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
+            }
+            __except(1)
+            {
             }
           }
         }
