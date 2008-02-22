@@ -86,7 +86,7 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,86,19,216,10
-    CONTROL         "The can only run predefined programs with eleveted rights",
+    CONTROL         "The can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
                     30,216,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
@@ -135,7 +135,7 @@ BEGIN
     CONTROL         "New SuRunners MUST NOT change SuRun settings",
                     IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     197,263,10
-    CONTROL         "New SuRunners can only run predefined programs with eleveted rights",
+    CONTROL         "New SuRunners can only run predefined programs with elevated rights",
                     IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     211,263,10
 END
@@ -353,7 +353,7 @@ BEGIN
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
     IDS_MKALLSURUNERSADMIN  "Should all 'SuRunners' group members become local Administrators?"
     IDS_DELSURUNERGRP       "Should the local user group 'SuRunners' be deleted?"
-    IDS_STARTED             "Info:\r\n%s\r\nis running with eleveted rights."
+    IDS_STARTED             "Info:\r\n%s\r\nis running with elevated rights."
 END
 
 #endif    // Polish resources
@@ -838,7 +838,7 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,86,19,216,10
-    CONTROL         "The can only run predefined programs with eleveted rights",
+    CONTROL         "The can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
                     30,216,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
@@ -887,7 +887,7 @@ BEGIN
     CONTROL         "New SuRunners MUST NOT change SuRun settings",
                     IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     197,263,10
-    CONTROL         "New SuRunners can only run predefined programs with eleveted rights",
+    CONTROL         "New SuRunners can only run predefined programs with elevated rights",
                     IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     211,263,10
 END
@@ -1151,7 +1151,7 @@ BEGIN
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
     IDS_MKALLSURUNERSADMIN  "Should all 'SuRunners' group members become local Administrators?"
     IDS_DELSURUNERGRP       "Should the local user group 'SuRunners' be deleted?"
-    IDS_STARTED             "Info:\r\n%s\r\nis running with eleveted rights."
+    IDS_STARTED             "Info:\r\n%s\r\nis running with elevated rights."
 END
 
 #endif    // English (U.S.) resources
