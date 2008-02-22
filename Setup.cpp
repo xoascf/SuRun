@@ -825,6 +825,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       CheckDlgButton(hwnd,IDC_SHEXHOOK,GetUseIShExHook);
       CheckDlgButton(hwnd,IDC_IATHOOK,GetUseIATHook);
+      CheckDlgButton(hwnd,IDC_SHOWTRAY,GetShowAutoRuns);
       CheckDlgButton(hwnd,IDC_NOCONVADMIN,GetNoConvAdmin);
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
@@ -840,6 +841,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       SetUseIShExHook(IsDlgButtonChecked(hwnd,IDC_SHEXHOOK));
       SetUseIATHook(IsDlgButtonChecked(hwnd,IDC_IATHOOK));
+      SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
       SetNoConvAdmin(IsDlgButtonChecked(hwnd,IDC_NOCONVADMIN));
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
       SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
