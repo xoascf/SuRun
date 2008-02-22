@@ -191,7 +191,7 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (DWORD)m_bkBrush;
+    return (DWORD_PTR)m_bkBrush;
   case WM_MOVING:
 	  *((RECT*)lParam)=m_wr;
     return TRUE;
