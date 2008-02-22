@@ -103,7 +103,9 @@ public:
     {
       DBGTrace4("WARNING: IATHook changing original Function %s %s 0x%08x to 0x%08x #############################",
         DllName,FuncName,orgFunc,GetProcAddress(GetModuleHandleA(DllName),FuncName));
-      orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
+      PROC of=GetProcAddress(GetModuleHandleA(DllName),FuncName);
+      if(newFunc!=of)
+        orgFunc=of;
     }
     return orgFunc;
   }
@@ -170,6 +172,14 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
   DWORD nHooked=0;
   if(hMod==l_hInst)
     return nHooked;
+  {
+    char f0[MAX_PATH]={0};
+    char f1[MAX_PATH]={0};
+    GetModuleFileNameA(hMod,f0,MAX_PATH);
+    GetModuleFileNameA(l_hInst,f0,MAX_PATH);
+    if (stricmp(f0,f1)==0)
+      return nHooked;
+  }
   // check "MZ" and DOS Header size
   if(IsBadReadPtr(hMod,sizeof(IMAGE_DOS_HEADER))
     || (((PIMAGE_DOS_HEADER)hMod)->e_magic!=IMAGE_DOS_SIGNATURE))
