@@ -41,6 +41,7 @@
 #include "UserGroups.h"
 #include "ReqAdmin.h"
 #include "Helpers.h"
+#include "TrayMsgWnd.h"
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
@@ -619,6 +620,18 @@ DWORD StartAdminProcessTrampoline()
         zero(g_RunPwd);
         GetExitCodeProcess(pi.hProcess,&RetVal);
         CloseHandle(pi.hProcess);
+        if (g_RunData.bShlExHook)
+        {
+          //Show ToolTip "<Program> is running elevated"...
+          _tcscat(cmd,L" /SAY ");
+          _tcscat(cmd,g_RunData.cmdLine);
+          if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+            CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+          {
+            CloseHandle(pi.hThread);
+            CloseHandle(pi.hProcess);
+          }
+        }
       }else
         DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
       //Enable AppInitHooks
