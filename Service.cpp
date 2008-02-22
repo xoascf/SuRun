@@ -41,7 +41,6 @@
 #include "UserGroups.h"
 #include "ReqAdmin.h"
 #include "Helpers.h"
-#include "TrayMsgWnd.h"
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
@@ -623,11 +622,15 @@ DWORD StartAdminProcessTrampoline()
         if (g_RunData.bShlExHook)
         {
           //Show ToolTip "<Program> is running elevated"...
-          _tcscat(cmd,L" /SAY ");
-          _tcscat(cmd,g_RunData.cmdLine);
           if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-            CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+            CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
           {
+            //Tell SuRun to Say something:
+            rd.CliProcessId=0;
+            rd.CliThreadId=pi.dwThreadId;
+            if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
+              TerminateProcess(pi.hProcess,0);
+            ResumeThread(pi.hThread);
             CloseHandle(pi.hThread);
             CloseHandle(pi.hProcess);
           }
