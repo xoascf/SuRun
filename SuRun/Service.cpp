@@ -45,7 +45,6 @@
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
 #include "SuRunExt/SysMenuHook.h"
-#include "TrayMsgWnd.h"
 
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Userenv.lib")
@@ -1154,8 +1153,6 @@ BOOL UserInstall(int IDSMsg)
 //////////////////////////////////////////////////////////////////////////////
 bool HandleServiceStuff()
 {
-  TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,_T("C:\\WINDOWS\\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}")));
-  ::ExitProcess(0);
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
 #ifdef _DEBUG_ENU
