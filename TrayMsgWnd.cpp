@@ -55,7 +55,12 @@ private:
     //Wait 100ms until y does not change
     while (!t.TimedOut())
     {
-      MsgLoop();
+      MSG msg;
+      while (PeekMessage(&msg,0,0,0,PM_REMOVE))
+      {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+      }
       if(y!=m_wr.bottom)
       {
         y=m_wr.bottom;
@@ -141,6 +146,7 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text)
   InvalidateRect(m_hWnd,0,1);
   UpdateWindow(m_hWnd);
   MsgLoop();
+  SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 }
 
 CTrayMsgWnd::~CTrayMsgWnd()
@@ -201,9 +207,7 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
       if (m_DoSlide)
       {
         OffsetRect(&m_wr,0,min(5,m_DoSlide));
-        SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,
-          m_wr.right-m_wr.left,m_wr.bottom-m_wr.top,
-          SWP_NOZORDER|SWP_NOACTIVATE);
+        SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
         m_DoSlide-=5;
       }
       if (m_DoSlide<=0)
