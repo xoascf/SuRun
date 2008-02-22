@@ -129,6 +129,7 @@
 #define IDC_ALLUSERS                    1048
 #define IDC_SHEXHOOK                    1049
 #define IDC_IATHOOK                     1050
+#define IDC_SHOWTRAY                    1051
 #define IDC_NOCONVADMIN                 1052
 #define IDC_NOCONVUSER                  1053
 #define IDC_RESTRICTNEW                 1054
