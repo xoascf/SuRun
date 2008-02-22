@@ -970,10 +970,9 @@ BOOL TestSetup()
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
   //Every "secure" Desktop has its own name:
-  CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
-  CRunOnNewDeskTop crond(L"WinSta0",DeskName,GetBlurDesk);
-  CStayOnDeskTop csod(DeskName);
+  CRunOnNewDeskTop crond(L"WinSta0",L"Default",GetBlurDesk);
+  CStayOnDeskTop csod(L"Default");
   if (!crond.IsValid())    
   {
     SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
