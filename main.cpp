@@ -164,6 +164,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   if (g_RunData.CliProcessId==GetCurrentProcessId())
     //Started from services:
     return Run();
+  if (g_RunData.CliThreadId==GetCurrentThreadId())
+  {
+    //Started from services:
+    //Show ToolTip "<Program> is running elevated"...
+    TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,g_RunData.cmdLine));
+    return RETVAL_OK;
+  }
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //ThreadId
@@ -210,11 +217,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       g_RunData.KillPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
       KillProcessNice(g_RunData.KillPID);
-    }else if (!_wcsicmp(c,L"/SAY"))
-    {
-      //Show ToolTip "<Program> is running elevated"...
-      TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,Args));
-      ExitProcess(0);
     }
   }
   //Convert Command Line
