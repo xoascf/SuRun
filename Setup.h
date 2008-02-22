@@ -113,6 +113,8 @@
 #define UseAppInit      L"UseAppInit"      //use AppInit_DLLs
 #define UseRemoteThread L"UseRemoteThread" //use CreateRemoteThread
 
+#define ShowAutoRuns    L"ShowAutoRuns"    //use Show Message in Tray
+
 //"Control Panel As Admin" on Desktop Menu
 #define GetCtrlAsAdmin        (GetShExtSetting(ControlAsAdmin,1)!=0)
 #define SetCtrlAsAdmin(b)     SetShExtSetting(ControlAsAdmin,b,1)
@@ -134,6 +136,10 @@
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,0)!=0)
 #define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,0)
+
+//TrayMsg stuff
+#define GetShowAutoRuns       (GetShExtSetting(ShowAutoRuns,1)!=0)
+#define SetShowAutoRuns(b)    SetShExtSetting(ShowAutoRuns,b,1)
 
 //#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 //#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
