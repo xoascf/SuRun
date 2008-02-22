@@ -17,7 +17,7 @@
 #include <tchar.h>
 #include "TrayMsgWnd.h"
 #include "Helpers.h"
-#include "DBGTrace.h"
+#include "Setup.h"
 #include "Resource.h"
 
 #define Classname _T("SRTRMSGWND")
@@ -70,8 +70,8 @@ private:
   }
   static VOID CALLBACK MaxYProc(HWND hwnd,UINT uMsg,ULONG_PTR dwData,LRESULT lResult)
   {
-    if(lResult>100)
-      ((CTrayMsgWnd*)dwData)->MaxYProc(lResult);
+    if(LOWORD(lResult)==10131)
+      ((CTrayMsgWnd*)dwData)->MaxYProc(HIWORD(lResult));
   }
   VOID CALLBACK MaxYProc(int y)
   {
@@ -88,7 +88,6 @@ private:
 
 CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text)
 {
-  CTimeLog l(L"CTrayMsgWnd");
   LoadLibrary(_T("Shell32.dll"));//Load Shell Window Classes
   m_Icon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SHIELD),IMAGE_ICON,16,16,0);
 
@@ -219,7 +218,7 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
     return 0;
   default:
     if (msg==WM_SRTRMSGWNDGETPOS)
-      return m_wr.top;
+      return MAKELONG(10131,m_wr.top);
     if (msg==WM_SRTRMSGWNDCLOSED)
     {
       int t=HIWORD(wParam);
@@ -242,11 +241,13 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 void TrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Message)
 {
+  if (!GetShowAutoRuns)
+    return;
+  CTrayMsgWnd* w=new CTrayMsgWnd(DlgTitle,Message);
   int prio=GetThreadPriority(GetCurrentThread());
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
-  CTrayMsgWnd* w=new CTrayMsgWnd(DlgTitle,Message);
   while (w->MsgLoop())
     Sleep(10);
-  delete w;
   SetThreadPriority(GetCurrentThread(),prio);
+  delete w;
 }
