@@ -1,22 +1,5 @@
-New:
----------------------
-* LoadLibrary("Shell32.dll") in Main() caused YZShadow to crash SuRun Setup
-* When uninstalling "Start as admin" for *.msc files was not removed
-* Setup Dialog hides Autorun icons if hooks are disabled
-* Setup Dialog hides restriction icons if user is not restricted
-* When restarting the SuRun Service all these Settings where set to defaults:
-  * "Control Panel As Admin" on Desktop Menu
-  * "Cmd here As Admin" on Folder Menu
-  * "Explorer here As Admin" on Folder Menu
-  * "Restart As Admin" in System-Menu
-  * "Start As Admin" in System-Menu
-  * Use IAT-Hook
-  * Use Shellexec Hook
-
-
 ToDo:
 ---------------------
-* Show Tray Tooltip after elevated AutoRunning a process
 
 To be done in future:
 ---------------------
@@ -152,6 +135,27 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.0.2.107 - 2008-02-22: (Internal Beta)
+----------------------------
+* SuRun optinally shows a tray window after elevated AutoRunning a process
+* FIX: When uninstalling "Start as admin" for *.msc files was not removed
+* Setup Dialog hides autorun icons if hooks are disabled
+* Setup Dialog hides restriction icons if user is not restricted
+* LoadLibrary("Shell32.dll") in WinMain() caused YZShadow to crash SuRun Setup
+  When using YZShadow, you must manually add the following to YzShadow.ini:
+    EXCLUSION_LIST_CLASSNAME=ScreenWndClass[TAB]#32770
+    EXCLUSION_LIST_EXENAME=C:\WINDOWS\surun.exe[TAB]C:\WINDOWS\surun.exe
+    ([TAB] means a TAB character (code 09))
+* When restarting the SuRun Service all these Settings where set to defaults:
+  * "Control Panel As Admin" on Desktop Menu
+  * "Cmd here As Admin" on Folder Menu
+  * "Explorer here As Admin" on Folder Menu
+  * "Restart As Admin" in System-Menu
+  * "Start As Admin" in System-Menu
+  * Use IAT-Hook
+  * Use Shellexec Hook
+
 SuRun 1.0.2.106 - 2008-02-19: (Internal Beta)
 ----------------------------
 * When User is in SuRunners and Explorer runs as Admin, SuRun asks the user 
