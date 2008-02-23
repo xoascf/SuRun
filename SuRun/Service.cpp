@@ -1261,7 +1261,7 @@ bool HandleServiceStuff()
   {
     TCHAR fn[4096];
     TCHAR wd[4096];
-    GetModuleFileName(NULL,fn,MAX_PATH);
+    GetModuleFileName(NULL,fn,4096);
     NetworkPathToUNCPath(fn);
     PathRemoveFileSpec(fn);
     PathRemoveBackslash(fn);
