@@ -1,3 +1,6 @@
+* TrayWindow is size limited
+* MAX_PATH
+
 ToDo:
 ---------------------
 * SuRun /SYSMENUHOOK must exit when no hooks are used at all
