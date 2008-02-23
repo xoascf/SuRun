@@ -628,6 +628,8 @@ DWORD StartAdminProcessTrampoline()
             //Tell SuRun to Say something:
             rd.CliProcessId=0;
             rd.CliThreadId=pi.dwThreadId;
+            rd.RetPtr=0;
+            rd.RetPID=0;
             if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
               TerminateProcess(pi.hProcess,0);
             ResumeThread(pi.hThread);
