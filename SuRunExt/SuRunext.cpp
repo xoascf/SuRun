@@ -102,7 +102,7 @@ class CShellExt : public IContextMenu, IShellExtInit, IShellExecuteHook
 protected:
   ULONG m_cRef;
   bool m_pDeskClicked;
-  TCHAR m_ClickFolderName[MAX_PATH];
+  TCHAR m_ClickFolderName[4096];
 public:
   CShellExt();
   ~CShellExt();
@@ -299,8 +299,8 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
           UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
           if(n>=1) for(UINT x = 0; x < n; x++)
           {
-            TCHAR f[MAX_PATH]={0};
-            DragQueryFile((HDROP)stgM.hGlobal,x,f,MAX_PATH-1);
+            TCHAR f[4096]={0};
+            DragQueryFile((HDROP)stgM.hGlobal,x,f,4096-1);
             DBGTrace1("--------- TYMED_HGLOBAL, CF_HDROP, File=%s",f);
           }
         }else if (fEtc.cfFormat==g_CF_FileNameW)
@@ -308,7 +308,7 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
           DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_FILENAMEW:%s",(LPCSTR)stgM.hGlobal); 
         }else if (fEtc.cfFormat==g_CF_ShellIdList)
         {
-          TCHAR s[MAX_PATH]={0};
+          TCHAR s[4096]={0};
           DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST, %d Items",((LPIDA)stgM.hGlobal)->cidl); 
           LPCITEMIDLIST pIDFolder = HIDA_GetPIDLFolder((LPIDA)stgM.hGlobal);
           if (pIDFolder)
@@ -324,8 +324,8 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
           }
         }else
         {
-          TCHAR cfn[MAX_PATH]={0};
-          GetClipboardFormatName(fEtc.cfFormat,cfn,MAX_PATH);
+          TCHAR cfn[4096]={0};
+          GetClipboardFormatName(fEtc.cfFormat,cfn,4096);
           DBGTrace2("--------- TYMED_HGLOBAL, CF_: %d (%s)",fEtc.cfFormat,cfn);
         }
         break;
@@ -362,13 +362,13 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef _DEBUG
-//  TCHAR Path[MAX_PATH]={0};
+//  TCHAR Path[4096]={0};
 //  if (pIDFolder)
 //    SHGetPathFromIDList(pIDFolder,Path);
-//  TCHAR FileClass[MAX_PATH]={0};
+//  TCHAR FileClass[4096]={0};
 //  if(hRegKey)
-//    GetRegStr(hRegKey,0,L"",FileClass,MAX_PATH);
-//  TCHAR File[MAX_PATH]={0};
+//    GetRegStr(hRegKey,0,L"",FileClass,4096);
+//  TCHAR File[4096]={0};
 //  if(pDataObj)
 //  {
 //    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
@@ -376,7 +376,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 //    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
 //    {
 //      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-//        DragQueryFile((HDROP)stm.hGlobal,0,File,MAX_PATH-1);
+//        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
 //      ReleaseStgMedium(&stm);
 //    }
 //  }
@@ -399,7 +399,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   if (pDataObj==0)
   {
     SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
-    TCHAR s[MAX_PATH]={0};
+    TCHAR s[4096]={0};
     SHGetFolderPath(0,CSIDL_DESKTOP,0,SHGFP_TYPE_CURRENT,s);
     m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
   }else
@@ -409,7 +409,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     if ((SUCCEEDED(pDataObj->GetData(&fe,&m)))
       &&(DragQueryFile((HDROP)m.hGlobal,(UINT)-1,NULL,0)==1)) 
     {
-      TCHAR path[MAX_PATH];
+      TCHAR path[4096];
       DragQueryFile((HDROP)m.hGlobal, 0, path, countof(path));
       if (PathIsDirectory(path))
         _tcscpy(m_ClickFolderName,path);
@@ -472,10 +472,10 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
-    TCHAR cmd[MAX_PATH];
+    TCHAR cmd[4096];
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
-    GetSystemWindowsDirectory(cmd,MAX_PATH);
+    GetSystemWindowsDirectory(cmd,4096);
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
     if (m_pDeskClicked)
@@ -588,12 +588,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscat(tmp,L" ");
     _tcscat(tmp,pei->lpParameters);
   }
-  GetCurrentDirectory(MAX_PATH,cmd);
+  GetCurrentDirectory(4096,cmd);
   ResolveCommandLine(tmp,cmd,tmp);
   free(g_LastFailedCmd);
   g_LastFailedCmd=0;
 
-  GetSystemWindowsDirectory(cmd,MAX_PATH);
+  GetSystemWindowsDirectory(cmd,4096);
   PathAppend(cmd, _T("SuRun.exe"));
   PathQuoteSpaces(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
@@ -666,8 +666,8 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
     }
   case CPL_DBLCLK:    // application icon double-clicked 
     {
-      TCHAR fSuRunExe[MAX_PATH];
-      GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
+      TCHAR fSuRunExe[4096];
+      GetSystemWindowsDirectory(fSuRunExe,4096);
       PathAppend(fSuRunExe,L"SuRun.exe");
       PathQuoteSpaces(fSuRunExe);
       ShellExecute(hwnd,L"open",fSuRunExe,L"/Setup",0,SW_SHOW);
@@ -880,8 +880,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if ((!bAdmin) && GetUseIATHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
-    TCHAR fSuRunExe[MAX_PATH];
-    GetSystemWindowsDirectory(fSuRunExe,MAX_PATH);
+    TCHAR fSuRunExe[4096];
+    GetSystemWindowsDirectory(fSuRunExe,4096);
     PathAppend(fSuRunExe,L"SuRun.exe");
     PathQuoteSpaces(fSuRunExe);
     BOOL bSetHook=(!bAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
@@ -898,8 +898,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //DevInst
 //  if(!bAdmin)
 //  {
-//    TCHAR f[MAX_PATH];
-//    GetSystemDirectory(f,MAX_PATH);
+//    TCHAR f[4096];
+//    GetSystemDirectory(f,4096);
 //    PathAppend(f,L"rundll32.exe");
 //    PathQuoteSpaces(f);
 //    LPTSTR args=PathGetArgs(GetCommandLine());
