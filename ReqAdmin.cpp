@@ -27,7 +27,7 @@ BOOL RequiresAdmin(xml_node& document)
   xml_node xn = document.first_element_by_name(_T("*trustInfo"));
   if (!xn.empty())
   {
-    TCHAR name[MAX_PATH];
+    TCHAR name[4096];
     _tcscpy(name,xn.name());
     LPTSTR p=_tcschr(name,':');
     if (p)
@@ -114,7 +114,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       InfoDBGTrace1("RequiresAdmin(%s) EnumResourceNames failed",FName);
     }else if(!bReqAdmin)
     {
-      TCHAR s[MAX_PATH];
+      TCHAR s[4096];
       _stprintf(s,_T("%s.%s"),FName,_T("manifest"));
       xml_parser xml;
       if (xml.parse_file(s))
@@ -130,8 +130,8 @@ BOOL RequiresAdmin(LPCTSTR FileName)
     {
       InfoDBGTrace1("RequiresAdmin(%s) FileName match???",FName);
       //Split path parts
-      TCHAR file[MAX_PATH];
-      TCHAR ext[MAX_PATH];
+      TCHAR file[4096];
+      TCHAR ext[4096];
       //Get File, Ext
       _tcscpy(file,FName);
       _tcsupr(file);
