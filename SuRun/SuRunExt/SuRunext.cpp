@@ -506,23 +506,23 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-//  DBGTrace15(
-//        "SuRun ShellExtHook: siz=%d, msk=%x wnd=%x, verb=%s, file=%s, parms=%s, dir=%s, nShow=%x, inst=%x, idlist=%x, class=%s, hkc=%x, hotkey=%x, hicon=%x, hProc=%x",
-//        pei->cbSize,
-//        pei->fMask,
-//        pei->hwnd,
-//        pei->lpVerb,
-//        pei->lpFile,
-//        pei->lpParameters,
-//        pei->lpDirectory,
-//        pei->nShow,
-//        pei->hInstApp,
-//        pei->lpIDList,
-//        pei->lpClass,
-//        pei->hkeyClass,
-//        pei->dwHotKey,
-//        pei->hIcon,
-//        pei->hProcess);
+  DBGTrace15(
+        "SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+        pei->cbSize,
+        pei->fMask,
+        pei->hwnd,
+        pei->lpVerb,
+        pei->lpFile,
+        pei->lpParameters,
+        pei->lpDirectory,
+        pei->nShow,
+        pei->hInstApp,
+        pei->lpIDList,
+        pei->lpClass,
+        pei->hkeyClass,
+        pei->dwHotKey,
+        pei->hIcon,
+        pei->hProcess);
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
@@ -631,9 +631,26 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
-    if ((ExitCode==RETVAL_OK)&&(pei->fMask&SEE_MASK_NOCLOSEPROCESS))
+    if (ExitCode==RETVAL_OK)
+    {
       //return a valid PROCESS_INFORMATION!
       pei->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
+      if(pei->fMask&SEE_MASK_FLAG_DDEWAIT)
+      {
+        DBGTrace1("SuRun ShellExtHook: WaitForInputIdle %x",pei->hProcess);
+        WaitForInputIdle(pei->hProcess,60000);
+        MSG msg;
+        while (PeekMessage(&msg,0,0,0,PM_REMOVE))
+        {
+          TranslateMessage(&msg);
+          DispatchMessage(&msg);
+        }
+      }
+      if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
+        DBGTrace("SuRun ShellExtHook: returning hProcess")
+      else
+        CloseHandle(pei->hProcess);
+    }
     free(ppi);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
