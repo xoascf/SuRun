@@ -33,7 +33,7 @@ typedef struct
   TCHAR Desk[MAX_PATH];
   TCHAR UserName[UNLEN+UNLEN+2];
   TCHAR cmdLine[4096];
-  TCHAR CurDir[MAX_PATH];
+  TCHAR CurDir[4096];
   DWORD KillPID;
   DWORD RetPID;
   DWORD_PTR RetPtr;
