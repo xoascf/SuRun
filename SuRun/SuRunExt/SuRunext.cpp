@@ -514,11 +514,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
-  if((pei->fMask&SEE_MASK_FLAG_DDEWAIT) && GetUseIATHook)
-  {
-    DBGTrace("SuRun ShellExtHook Let IATHook handle App because of SEE_MASK_FLAG_DDEWAIT");
-    return S_FALSE;
-  }
   {
     //Non SuRunners don't need the ShellExec Hook!
     TCHAR User[UNLEN+GNLEN+2]={0};
@@ -596,8 +591,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
   //ToDo: Directly write to service pipe!
-  PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
-  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
+  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA 0 0 %s",tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -616,8 +610,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       if (ExitCode==RETVAL_OK)
       {
         pei->hInstApp=(HINSTANCE)33;
-        DBGTrace5("ShellExecuteHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
-          cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
+        DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",cmd);
       }else 
       {
         pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
@@ -627,24 +620,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
-    if (ExitCode==RETVAL_OK)
-    {
-      //return a valid PROCESS_INFORMATION!
-      pei->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
-      if(pei->fMask&SEE_MASK_FLAG_DDEWAIT)
-      {
-        Sleep(1500);
-        WaitForInputIdle(pei->hProcess,60000);
-      }
-      if((pei->fMask&SEE_MASK_NOCLOSEPROCESS)==0)
-        CloseHandle(pei->hProcess);
-    }
-    free(ppi);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   SetCurrentDirectory(CurDir);
-  free(ppi);
   return S_FALSE;
 }
 
