@@ -1,5 +1,6 @@
 * TrayWindow is size limited
 * MAX_PATH
+* IShellExecHook returns valid hProcess
 
 ToDo:
 ---------------------
