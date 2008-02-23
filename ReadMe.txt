@@ -1,5 +1,7 @@
 ToDo:
 ---------------------
+* SuRun /SYSMENUHOOK must exit when no hooks are used at all
+* BeOrBecomeSuRunner must use different Strings for Setup/Run
 
 To be done in future:
 ---------------------
