@@ -624,14 +624,16 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
           cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
       }else 
       {
-        if(ExitCode==RETVAL_CANCELLED)
-          pei->hInstApp=(HINSTANCE)34;
+        pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
         //Tell IAT-Hook to not check "tmp" again!
         g_LastFailedCmd=_tcsdup(tmp);
       }
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
+    if ((ExitCode==RETVAL_OK)&&(pei->fMask&SEE_MASK_NOCLOSEPROCESS))
+      //return a valid PROCESS_INFORMATION!
+      pei->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
     free(ppi);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
