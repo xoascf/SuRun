@@ -501,8 +501,8 @@ BOOL TestLogonDlg()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
-  TCHAR User[MAX_PATH]=L"Bruns\\KAY";
-  TCHAR Password[MAX_PATH]={0};
+  TCHAR User[4096]=L"Bruns\\KAY";
+  TCHAR Password[4096]={0};
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
