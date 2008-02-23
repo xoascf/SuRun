@@ -196,8 +196,8 @@ BOOL RunAs(LPCWSTR lpCmdLine,LPCWSTR szUser,LPCWSTR szPassword)
   PROCESS_INFORMATION pi = {0};
   STARTUPINFOW si = {0};
   si.cb = sizeof(STARTUPINFO);
-  WCHAR CurDir[MAX_PATH];
-  GetCurrentDirectoryW(MAX_PATH,CurDir);
+  WCHAR CurDir[4096];
+  GetCurrentDirectoryW(4096,CurDir);
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
   _tcscpy(un,szUser);
