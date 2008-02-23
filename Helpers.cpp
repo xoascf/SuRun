@@ -150,12 +150,12 @@ BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
   HKEY hEnumKey;
   if(RegOpenKeyEx(hKey,pszSubKey,0,KEY_ENUMERATE_SUB_KEYS,&hEnumKey)!=NOERROR)
     return FALSE;
-  TCHAR szKey[MAX_PATH];
-  DWORD dwSize = MAX_PATH;
+  TCHAR szKey[4096];
+  DWORD dwSize = 4096;
   while (ERROR_SUCCESS==RegEnumKeyEx(hEnumKey,0,szKey,&dwSize,0,0,0,0))
   {
     DelRegKey(hEnumKey, szKey);
-    dwSize=MAX_PATH;
+    dwSize=4096;
   }
   RegCloseKey(hEnumKey);
   RegDeleteKey(hKey, pszSubKey);
@@ -613,10 +613,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   BOOL fExist=PathFileExists(app);
   //Split path parts
   TCHAR path[4096];
-  TCHAR file[MAX_PATH+1];
-  TCHAR ext[MAX_PATH+1];
-  TCHAR SysDir[MAX_PATH+1];
-  GetSystemDirectory(SysDir,MAX_PATH);
+  TCHAR file[4096+1];
+  TCHAR ext[4096+1];
+  TCHAR SysDir[4096+1];
+  GetSystemDirectory(SysDir,4096);
   Split(app,path,file,ext);
   //Explorer(.exe)
   if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
@@ -796,7 +796,7 @@ bool DeleteDirectory(LPCTSTR DIR)
 {
   bool bRet=true;
   WIN32_FIND_DATA fd={0};
-  TCHAR s[MAX_PATH];
+  TCHAR s[4096];
   _tcscpy(s,DIR);
   PathAppend(s,_T("*.*"));
   HANDLE hFind=FindFirstFile(s,&fd);
@@ -963,8 +963,8 @@ LPCTSTR GetVersionString()
 {
   if (verstr[0]!=0)
     return verstr;
-  TCHAR FName[MAX_PATH];
-  GetModuleFileName(0,FName,MAX_PATH);
+  TCHAR FName[4096];
+  GetModuleFileName(0,FName,4096);
   int cbVerInfo=GetFileVersionInfoSize(FName,0);
   if (cbVerInfo)
   {
@@ -996,10 +996,10 @@ LPCTSTR GetVersionString()
 
 HBITMAP LoadUserBitmap(LPCTSTR UserName)
 {
-  TCHAR PicDir[MAX_PATH];
+  TCHAR PicDir[4096];
   GetRegStr(HKEY_LOCAL_MACHINE,
     _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"),
-    _T("Common AppData"),PicDir,MAX_PATH);
+    _T("Common AppData"),PicDir,4096);
   PathUnquoteSpaces(PicDir);
   PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
   TCHAR Pic[UNLEN+1];
