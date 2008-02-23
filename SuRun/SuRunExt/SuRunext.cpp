@@ -506,26 +506,19 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-  DBGTrace15(
-        "SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-        pei->cbSize,
-        pei->fMask,
-        pei->hwnd,
-        pei->lpVerb,
-        pei->lpFile,
-        pei->lpParameters,
-        pei->lpDirectory,
-        pei->nShow,
-        pei->hInstApp,
-        pei->lpIDList,
-        pei->lpClass,
-        pei->hkeyClass,
-        pei->dwHotKey,
-        pei->hIcon,
-        pei->hProcess);
+//  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+//    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+//    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+//    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,pei->lpClass,
+//    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
+  if((pei->fMask&SEE_MASK_FLAG_DDEWAIT) && GetUseIATHook)
+  {
+    DBGTrace("SuRun ShellExtHook Let IATHook handle App because of SEE_MASK_FLAG_DDEWAIT");
+    return S_FALSE;
+  }
   {
     //Non SuRunners don't need the ShellExec Hook!
     TCHAR User[UNLEN+GNLEN+2]={0};
@@ -546,13 +539,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (!pei->lpFile)
   {
     DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
-    return S_FALSE;
-  }
-  //Check Directory
-  if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
-  {
-    DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
-      pei->lpDirectory,GetLastErrorNameStatic());
     return S_FALSE;
   }
   //check if this Programm has an Auto-SuRun-Entry in the List
@@ -599,6 +585,15 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return S_FALSE;
+  TCHAR CurDir[4096]={0};
+  GetCurrentDirectory(4096,CurDir);
+  //Check Directory
+  if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
+  {
+    DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
+      pei->lpDirectory,GetLastErrorNameStatic());
+    return S_FALSE;
+  }
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
   //ToDo: Directly write to service pipe!
   PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
@@ -611,6 +606,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   // Start the child process.
   if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
+    SetCurrentDirectory(CurDir);
     CloseHandle(pi.hThread );
     DWORD ExitCode=ERROR_ACCESS_DENIED;
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
@@ -637,24 +633,17 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       pei->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
       if(pei->fMask&SEE_MASK_FLAG_DDEWAIT)
       {
-        DBGTrace1("SuRun ShellExtHook: WaitForInputIdle %x",pei->hProcess);
+        Sleep(1500);
         WaitForInputIdle(pei->hProcess,60000);
-        MSG msg;
-        while (PeekMessage(&msg,0,0,0,PM_REMOVE))
-        {
-          TranslateMessage(&msg);
-          DispatchMessage(&msg);
-        }
       }
-      if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
-        DBGTrace("SuRun ShellExtHook: returning hProcess")
-      else
+      if((pei->fMask&SEE_MASK_NOCLOSEPROCESS)==0)
         CloseHandle(pei->hProcess);
     }
     free(ppi);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
+  SetCurrentDirectory(CurDir);
   free(ppi);
   return S_FALSE;
 }
