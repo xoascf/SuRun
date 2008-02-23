@@ -355,7 +355,7 @@ static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
   ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
   ofn.nFilterIndex      = 1;
   ofn.lpstrFile         = FileName;
-  ofn.nMaxFile          = MAX_PATH;
+  ofn.nMaxFile          = 4096;
   ofn.lpstrTitle        = CResStr(IDS_ADDFILETOLIST);
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   BOOL bRet=GetOpenFileName(&ofn);
@@ -651,9 +651,9 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           int CurSel=(int)ListView_GetSelectionMark(hWL);
           if (CurSel>=0)
           {
-            TCHAR cmd[MAX_PATH];
-            TCHAR CMD[MAX_PATH];
-            ListView_GetItemText(hWL,CurSel,3,cmd,MAX_PATH);
+            TCHAR cmd[4096];
+            TCHAR CMD[4096];
+            ListView_GetItemText(hWL,CurSel,3,cmd,4096);
             _tcscpy(CMD,cmd);
             if (GetFileName(hwnd,CMD))
             {
@@ -711,7 +711,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       //Add App Button
       case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
         {
-          TCHAR cmd[MAX_PATH]={0};
+          TCHAR cmd[4096]={0};
           if (GetFileName(hwnd,cmd))
           {
             if(AddToWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd,0))
