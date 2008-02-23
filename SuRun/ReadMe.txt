@@ -1,6 +1,6 @@
-* TrayWindow is size limited
-* MAX_PATH
-* IShellExecHook returns valid hProcess
+* FIX: TrayWindow was not size limited
+* FIX: IShellExecHook and FireFox Update did not work
+* FIX: ResolveCommandLine failed with Spaces at start
 
 ToDo:
 ---------------------
