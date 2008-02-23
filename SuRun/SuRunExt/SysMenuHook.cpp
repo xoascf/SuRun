@@ -109,7 +109,7 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     PROCESS_INFORMATION pi;
     si.cb = sizeof(si);
     TCHAR cmd[4096];
-    GetSystemWindowsDirectory(cmd, MAX_PATH);
+    GetSystemWindowsDirectory(cmd, 4096);
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
     _tcscat(cmd,_T(" "));
