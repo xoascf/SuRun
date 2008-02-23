@@ -96,6 +96,10 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text)
   m_DoSlide=0;
   m_hFont=CreateFont(-14,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("MS Shell Dlg"));
   {
+    //Desktop Rect
+    RECT rd={0};
+    SystemParametersInfo(SPI_GETWORKAREA,0,&rd,0);
+    //Client Rect
     HDC MemDC=CreateCompatibleDC(0);
     SelectObject(MemDC,m_hFont);
     m_wr.left=0;
@@ -103,12 +107,20 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text)
     m_wr.right=200;
     m_wr.bottom=800;
     DrawText(MemDC,Text,-1,&m_wr,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
+    //Limit the width the screen width
+    int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)-40;
+    if (m_wr.right-m_wr.left>maxDX)
+    {
+      TEXTMETRIC tm;
+      GetTextMetrics(MemDC,&tm);
+      m_wr.bottom+=tm.tmHeight*((m_wr.right-m_wr.left)/maxDX);
+      m_wr.right=maxDX;
+    }
+    //Icon height
     m_wr.bottom=max(m_wr.top+16,m_wr.bottom);
+    //Window Rect
     m_wr.right+=2*GetSystemMetrics(SM_CXDLGFRAME)+10+16+5;
     m_wr.bottom+=2*GetSystemMetrics(SM_CYDLGFRAME)+GetSystemMetrics(SM_CYSMCAPTION)+10;
-    //Window Rect
-    RECT rd={0};
-    SystemParametersInfo(SPI_GETWORKAREA,0,&rd,0);
     OffsetRect(&m_wr,rd.right-m_wr.right+m_wr.left,rd.bottom-m_wr.bottom+m_wr.top);
   }
   //Get Position:
