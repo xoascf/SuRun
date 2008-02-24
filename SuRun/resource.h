@@ -50,6 +50,10 @@
 #define IDS_MKALLSURUNERSADMIN          45
 #define IDS_DELSURUNERGRP               46
 #define IDS_STARTED                     47
+#define IDS_ASKSURUNNER1                48
+#define IDS_BUILTINADMIN1               49
+#define IDS_NOADD2USERS1                50
+#define IDS_SURUNNER_ERR1               51
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDI_INSTALL                     101
