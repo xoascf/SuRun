@@ -423,7 +423,7 @@ DWORD PrepareSuRun()
   if (crond.IsValid())
   {
     //secure desktop created...
-    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
+    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
       return RETVAL_CANCELLED;
     //Is User Restricted?
     DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
@@ -507,7 +507,7 @@ BOOL Setup(LPCTSTR WinStaName)
       return FALSE;
     return RunSetup();
   }
-  if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE))
+  if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
     return RunSetup();
   return false;
 }
