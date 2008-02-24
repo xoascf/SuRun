@@ -5,11 +5,10 @@
     Admin" System Menu hooks are used
 * SuRun has no Start Menu entry anymore. You can configure and uninstall SuRun 
   from the Control Panel
+* BeOrBecomeSuRunner uses different Strings for Setup/Run
 
 ToDo:
 ---------------------
-* SuRun /SYSMENUHOOK must exit when no hooks are used at all
-* BeOrBecomeSuRunner must use different Strings for Setup/Run
 
 To be done in future:
 ---------------------
