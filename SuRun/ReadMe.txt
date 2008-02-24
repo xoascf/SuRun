@@ -1,19 +1,12 @@
-* FIX: TrayWindow was not size limited
-* FIX: FireFox Update did not work with ShellExec-Hook
-* FIX: ResolveCommandLine failed with leading Spaces
-* SuRun /SysmenuHook exits immediately if no IAT-Hook and no "(Re)Start as 
-    Admin" System Menu hooks are used
-* SuRun has no Start Menu entry anymore. 
-  You can configure and uninstall SuRun from the Control Panel
-* BeOrBecomeSuRunner uses different Strings (User/YOU) for Setup/Run
-
-ToDo:
+ToDo for next release:
 ---------------------
+* Control Panel Icon
+* Installation Dialog
+* Installation Container
+* Make "SuRun"-Shell entries in Registry as Install-Option
 
 To be done in future:
 ---------------------
-* Installation Container
-* Make "SuRun"-Shell entries in Registry as Install-Option
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
 
@@ -144,6 +137,17 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.0.2.108 - 2008-02-24: (Internal Beta)
+----------------------------
+* FIX: TrayWindow was not size limited
+* FIX: FireFox Update did not work with ShellExec-Hook
+* FIX: ResolveCommandLine failed with leading Spaces
+* SuRun /SysmenuHook exits immediately if no IAT-Hook and no "(Re)Start as 
+    Admin" System Menu hooks are used
+* SuRun has no Start Menu entry anymore. 
+  You can configure and uninstall SuRun from the Control Panel
+* BeOrBecomeSuRunner uses different Strings (User/YOU) for Setup/Run
 
 SuRun 1.0.2.107 - 2008-02-22: (Internal Beta)
 ----------------------------
