@@ -1,11 +1,11 @@
 * FIX: TrayWindow was not size limited
-* FIX: IShellExecHook and FireFox Update did not work
-* FIX: ResolveCommandLine failed with Spaces at start
+* FIX: FireFox Update did not work with ShellExec-Hook
+* FIX: ResolveCommandLine failed with leading Spaces
 * SuRun /SysmenuHook exits immediately if no IAT-Hook and no "(Re)Start as 
     Admin" System Menu hooks are used
-* SuRun has no Start Menu entry anymore. You can configure and uninstall SuRun 
-  from the Control Panel
-* BeOrBecomeSuRunner uses different Strings for Setup/Run
+* SuRun has no Start Menu entry anymore. 
+  You can configure and uninstall SuRun from the Control Panel
+* BeOrBecomeSuRunner uses different Strings (User/YOU) for Setup/Run
 
 ToDo:
 ---------------------
@@ -20,7 +20,7 @@ To be done in future:
 Deferred Whishlist:
 ---------------------
 * use MD5-Hash for "Always Yes" programs: 
-    High Impact on Performance
+    High Impact on Performance; (I'm too lazy right now)
 * Console SuRun support: 
     Very difficult! Pipes need to be redirected.
 * Connect Network drives for admin process: 
