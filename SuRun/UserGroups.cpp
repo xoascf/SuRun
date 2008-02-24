@@ -161,58 +161,76 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName)
 //  BeOrBecomeSuRunner: check, if User is member of SuRunners, 
 //      if not, try to join him
 //////////////////////////////////////////////////////////////////////////////
-BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bVerifyAdmin/*=TRUE*/,HWND hwnd/*=0*/)
+BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
 {
   //Is User member of SuRunners?
   if (IsInSuRunners(UserName))
     return TRUE;
   CResStr sCaption(IDS_APPNAME);
-  _tcscat(sCaption,L" (");
-  _tcscat(sCaption,UserName);
-  _tcscat(sCaption,L")");
+  if(bHimSelf)
+  {
+    _tcscat(sCaption,L" (");
+    _tcscat(sCaption,UserName);
+    _tcscat(sCaption,L")");
+  }
   //Is User member of Administrators?
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
   {
     //Whoops...need to become a User!
-    if(SafeMsgBox(hwnd,CBigResStr(IDS_ASKSURUNNER),sCaption,
-      MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
+    if(SafeMsgBox(hwnd,
+      CBigResStr((bHimSelf?IDS_ASKSURUNNER:IDS_ASKSURUNNER1),UserName,UserName),
+      sCaption,MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO)
       return FALSE;
     DWORD dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
     if (dwRet)
     {
       //Built in (or Domain-)Admin... Bail out!
-      SafeMsgBox(hwnd,CBigResStr(IDS_BUILTINADMIN,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      SafeMsgBox(hwnd,
+        bHimSelf?CBigResStr(IDS_BUILTINADMIN,GetErrorNameStatic(dwRet)):\
+                 CBigResStr(IDS_BUILTINADMIN1,UserName,GetErrorNameStatic(dwRet)),
+        sCaption,MB_ICONSTOP);
       return FALSE;
     }
     dwRet=AlterGroupMember(DOMAIN_ALIAS_RID_USERS,UserName,1);
     if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
       AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
-      SafeMsgBox(hwnd,CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      SafeMsgBox(hwnd,
+        bHimSelf?CBigResStr(IDS_NOADD2USERS,GetErrorNameStatic(dwRet)):\
+                 CBigResStr(IDS_NOADD2USERS1,UserName,GetErrorNameStatic(dwRet)),
+        sCaption,MB_ICONSTOP);
       return FALSE;
     }
     dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
     if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
     {
-      SafeMsgBox(hwnd,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+      SafeMsgBox(hwnd,
+        bHimSelf?CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)):\
+                 CBigResStr(IDS_SURUNNER_ERR1,UserName,GetErrorNameStatic(dwRet)),
+        sCaption,MB_ICONSTOP);
       return FALSE;
     }
     SetRestrictApps(UserName,(DWORD)GetRestrictNew);
     SetNoRunSetup(UserName,(DWORD)GetNoSetupNew);
-    SafeMsgBox(hwnd,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
+    if (bHimSelf)
+      SafeMsgBox(hwnd,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
-  if (bVerifyAdmin && (!LogonAdmin(IDS_NOSURUNNER)))
+  if (bHimSelf && (!LogonAdmin(IDS_NOSURUNNER)))
     return FALSE;
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
   {
-    SafeMsgBox(hwnd,CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)),sCaption,MB_ICONSTOP);
+    SafeMsgBox(hwnd,
+      bHimSelf?CBigResStr(IDS_SURUNNER_ERR,GetErrorNameStatic(dwRet)):\
+               CBigResStr(IDS_SURUNNER_ERR1,UserName,GetErrorNameStatic(dwRet)),
+      sCaption,MB_ICONSTOP);
     return FALSE;
   }
   SetRestrictApps(UserName,(DWORD)GetRestrictNew);
   SetNoRunSetup(UserName,(DWORD)GetNoSetupNew);
-  SafeMsgBox(hwnd,CBigResStr(IDS_SURUNNER_OK),sCaption,MB_ICONINFORMATION);
+  if (bHimSelf)
+    SafeMsgBox(hwnd,CBigResStr(IDS_SURUNNER_OK),sCaption,MB_ICONINFORMATION);
   return TRUE;
 }
 
