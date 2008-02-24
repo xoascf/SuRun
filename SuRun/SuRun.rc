@@ -312,17 +312,22 @@ BEGIN
     IDS_NOADMIN             "B³¹d!\r\n\r\nU¿ytkownik %s nie jest administratorem!"
     IDS_NOSURUNNER          "Musisz byæ cz³onkiem grupy ""SuRunners"" ¿eby u¿ywaæ SuRun.\r\n\r\nWpisz dane administratora, ¿eby staæ siê cz³onkiem tej grupy.\r\n\r\nW innym wypadku kliknij 'Anuluj'!"
     IDS_ASKSURUNNER         "Musisz byæ cz³onkiem grupy ""SuRunners"" ¿eby u¿ywaæ SuRun.\r\n\r\nChcesz zostaæ cz³onkiem tej grupy?\r\n\r\nJeœli klikniesz Tak, zostaniesz SuRunner'em i STRACISZ STATUS ADMINISTRATORA.\r\n\r\nJeœli nie jesteœ pewien, kliknij ""Nie""."
-    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
     IDS_MENUSTR             "Uruchom jako administrator"
     IDS_BUILTINADMIN        "Jesteœ ""wbudowanym"" administratorem.\r\n\r\nNie mo¿esz u¿ywaæ SuRun, poniewa¿ nie mo¿esz byæ traktowany jak zwyk³y u¿ytkownik!"
-    IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
     IDS_SURUNNER_OK         "Zosta³eœ pomyœlnie dodany do grupy ""SuRunners""."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR        "B³¹d!\r\n\r\nPróba dodania Twojego konta do grupy ""SuRunners"" nie powiod³a siê.\r\nWindows raportuje b³¹d jako:\r\n\r\n%s"
+    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
+    IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
+    IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nPutting '%s' into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SURUNNER_ERR        "B³¹d!\r\n\r\nPróba dodania Twojego konta do grupy ""SuRunners"" nie powiod³a siê.\r\nWindows raportuje b³¹d jako:\r\n\r\n%s"
     IDS_LOGOFFON            "Zosta³eœ pomyœlnie dodany do grupy ""SuRunners"" i usuniêty z grupy Administratorzy.\r\n\r\nMusisz siê przelogowaæ, ¿eby korzystaæ z komputera z ograniczonymi prawami."
     IDS_SYSMENUEXT          "SuRun Rozszerzenie menu systemowego"
     IDS_SURUNINST           "Zainstaluj jako administrator"
@@ -345,7 +350,6 @@ BEGIN
     IDS_DELUSER             "You want to remove the user '%s' from the local SuRunners group.\r\n\r\nAll user specific SuRun settings will be deleted.\r\n\r\nDo you want to join the user to the local administrators group?"
     IDS_CANCEL              "Anuluj (%d)"
     IDS_NOADD2USERS         "B³¹d!\r\n\r\nPróba przydzielenia Twojego konta do grupy standardowych u¿ytkowników nie powiod³a siê.\r\nWindows raportuje b³¹d jako:\r\n\r\n%s"
-    IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_NOREMADMINS         "B³¹d!\r\n\r\nPróba usuniêcia Twojego konta z grupy administratorów nie powiod³a siê.\r\nWindows raportuje b³¹d jako:\r\n\r\n%s"
     IDS_ADMINSHELL          "The Windows Shell is currently running with administrative rights!\r\n\r\nYou need to log off and on before using SuRun."
     IDS_NOSECLOGON          "B£¥D KRYTYCZNY:\r\n\r\nSuRun do poprawnego dzia³ania wymaga us³ugi 'secondary logon', a nie jest ona uruchomiona."
@@ -720,17 +724,22 @@ BEGIN
     IDS_NOADMIN             "Fehler!\r\n\r\nBenutzer %s ist kein Administrator."
     IDS_NOSURUNNER          "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nIdentifizieren Sie sich als Administrator, um Mitglied von ""SuRunners"" zu werden.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
     IDS_ASKSURUNNER         "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nWollen Sie Mitglied der ""SuRunners"" Gruppe und aus der Administratoren Gruppe ausgetragen werden?\r\n\r\nWenn Sie Ja wählen, werden Sie KEIN ADMINISTRATOR, sondern SuRunner.\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
-    IDS_ASKSURUNNER1        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe und aus der Administratoren Gruppe ausgetragen wird?\r\n\r\nWenn Sie Ja wählen, ist %s KEIN ADMINISTRATOR mehr, sondern SuRunner."
     IDS_MENUSTR             "Starte als Administrator"
     IDS_BUILTINADMIN        "Sie sind ein vordefinierter Administrator!\r\n\r\nSie können SuRun nicht benutzen, weil Sie nicht zum normalen Benutzer degradiert werden können."
-    IDS_BUILTINADMIN1       "'%s' ist ein vordefinierter Administrator!\r\n\r\nEr kann SuRun nicht benutzen, weil er nicht zum normalen Benutzer degradiert werden kann."
     IDS_SURUNNER_OK         "Sie sind erfolgreich als Mitglied in die Gruppe ""SuRunners"" aufgenommen worden."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR        "Fehler!\r\n\r\nSie konnten nicht in die ""SuRunners"" Gruppe aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
+    IDS_ASKSURUNNER1        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe und aus der Administratoren Gruppe ausgetragen wird?\r\n\r\nWenn Sie Ja wählen, ist %s KEIN ADMINISTRATOR mehr, sondern SuRunner."
+    IDS_BUILTINADMIN1       "'%s' ist ein vordefinierter Administrator!\r\n\r\nEr kann SuRun nicht benutzen, weil er nicht zum normalen Benutzer degradiert werden kann."
+    IDS_NOADD2USERS1        "Fehler!\r\n\r\n'%s' konnte nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Fehler!\r\n\r\n'%s' konnte nicht in die ""SuRunners"" Gruppe aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SURUNNER_ERR        "Fehler!\r\n\r\nSie konnten nicht in die ""SuRunners"" Gruppe aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_LOGOFFON            "Sie sind erfolgreich in die Gruppe ""SuRunners"" aufgenommen und aus\r\nder Administratoren-Gruppe ausgetragen worden.\r\n\r\nSie müssen sich jetzt ab und wieder anmelden, \r\num mit eingeschränkten Rechten zu arbeiten."
     IDS_SYSMENUEXT          "SuRun Systemmenü-Erweiterung"
     IDS_SURUNINST           "Als Administrator installieren"
@@ -753,7 +762,6 @@ BEGIN
     IDS_DELUSER             "Sie wollen Benutzer '%s' aus der lokalen Bentuzergruppe SuRunners austragen.\r\n\r\nAlle Benutzerspezifischen SuRun Einstellungen werden gelöscht.\r\n\r\nSoll dieser Bentuzer danach in die Gruppe der lokalen Administratoren aufgenommen werden?"
     IDS_CANCEL              "Abbrechen (%d)"
     IDS_NOADD2USERS         "Fehler!\r\n\r\nSie konnten nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
-    IDS_NOADD2USERS1        "Fehler!\r\n\r\n'%s' konnte nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_NOREMADMINS         "Fehler!\r\n\r\nSie konnten nicht aus der Gruppe der Administratoren ausgetragen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_ADMINSHELL          "Die Windows Shell läuft mit Administrator-Rechten!\r\n\r\nSie können SuRun erst benutzen, nachdem Sie sich ab- und wieder anmelden."
     IDS_NOSECLOGON          "FATAL:\r\n\r\nSuRun benötigt den Windows Dienst 'Sekundäre Anmeldung'.\r\n\r\nDieser Dienst ist nicht gestartet."
@@ -1060,8 +1068,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2,107
- PRODUCTVERSION 1,0,2,107
+ FILEVERSION 1,0,2,108
+ PRODUCTVERSION 1,0,2,108
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1079,14 +1087,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 2, 107\0"
+            VALUE "FileVersion", "1, 0, 2, 108\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 2, 107\0"
+            VALUE "ProductVersion", "1, 0, 2, 108\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1118,17 +1126,22 @@ BEGIN
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
     IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
-    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
     IDS_MENUSTR             "Start as administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot use SuRun because you cannot act as normal user!"
-    IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
     IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR        "Error!\r\n\r\nPutting your account into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
+    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
+    IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
+    IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nPutting '%s' into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SURUNNER_ERR        "Error!\r\n\r\nPutting your account into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_LOGOFFON            "You have successfully been added to the ""SuRunners"" and removed from the Administrators user groups.\r\n\r\nTo continue using you computer with limited access rights you need to log off and log on."
     IDS_SYSMENUEXT          "SuRun System Menu Extension"
     IDS_SURUNINST           "Install as administrator"
@@ -1151,7 +1164,6 @@ BEGIN
     IDS_DELUSER             "You want to remove the user '%s' from the local SuRunners group.\r\n\r\nAll user specific SuRun settings will be deleted.\r\n\r\nDo you want to join the user to the local administrators group?"
     IDS_CANCEL              "Cancel (%d)"
     IDS_NOADD2USERS         "Error!\r\n\r\nPutting your account into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
-    IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_ADMINSHELL          "The Windows Shell is currently running with administrative rights!\r\n\r\nYou need to log off and on before using SuRun."
     IDS_NOSECLOGON          "FATAL:\r\n\r\nSuRun depends on the 'secondary logon' service but this service is not running."
