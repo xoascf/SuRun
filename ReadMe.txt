@@ -1,6 +1,10 @@
 * FIX: TrayWindow was not size limited
 * FIX: IShellExecHook and FireFox Update did not work
 * FIX: ResolveCommandLine failed with Spaces at start
+* SuRun /SysmenuHook exits immediately if no IAT-Hook and no "(Re)Start as 
+    Admin" System Menu hooks are used
+* SuRun has no Start Menu entry anymore. You can configure and uninstall SuRun 
+  from the Control Panel
 
 ToDo:
 ---------------------
