@@ -1112,29 +1112,29 @@ BOOL InstallService()
   {
     //Registry
     InstallRegistry();
-    //"SuDuers" Group
+    //"SuRunners" Group
     CreateSuRunnersGroup();
-    //Install Start menu Links
-    CoInitialize(0);
-    TCHAR lnk[4096]={0};
-    TCHAR file[4096]={0};
-    GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
-      L"Common Programs",file,4096);
-    ExpandEnvironmentStrings(file,lnk,4096);
-    PathAppend(lnk,CResStr(IDS_STARTMENUDIR));
-    CreateDirectory(lnk,0); 
-    PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
-    GetSystemWindowsDirectory(file,4096);
-    PathAppend(file,L"SuRun.exe /SETUP");
-    CreateLink(file,lnk,2);
-    PathRemoveFileSpec(lnk);
-    PathAppend(lnk,CResStr(IDS_STARTMUNINST));
-    GetSystemWindowsDirectory(file,4096);
-    PathAppend(file,L"SuRun.exe");
-    PathQuoteSpaces(file);
-    _tcscat(file,L" /UNINSTALL");
-    CreateLink(file,lnk,1);
-    CoUninitialize();
+//    //Install Start menu Links
+//    CoInitialize(0);
+//    TCHAR lnk[4096]={0};
+//    TCHAR file[4096]={0};
+//    GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
+//      L"Common Programs",file,4096);
+//    ExpandEnvironmentStrings(file,lnk,4096);
+//    PathAppend(lnk,CResStr(IDS_STARTMENUDIR));
+//    CreateDirectory(lnk,0); 
+//    PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
+//    GetSystemWindowsDirectory(file,4096);
+//    PathAppend(file,L"SuRun.exe /SETUP");
+//    CreateLink(file,lnk,2);
+//    PathRemoveFileSpec(lnk);
+//    PathAppend(lnk,CResStr(IDS_STARTMUNINST));
+//    GetSystemWindowsDirectory(file,4096);
+//    PathAppend(file,L"SuRun.exe");
+//    PathQuoteSpaces(file);
+//    _tcscat(file,L" /UNINSTALL");
+//    CreateLink(file,lnk,1);
+//    CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
   return bRet;
@@ -1205,7 +1205,8 @@ bool HandleServiceStuff()
     {
       if (IsAdmin())
         return ExitProcess(0),true;
-      
+      if ((!GetUseIATHook) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+        return ExitProcess(0),true;
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
