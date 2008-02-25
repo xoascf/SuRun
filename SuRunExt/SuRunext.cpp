@@ -569,8 +569,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscat(tmp,L" ");
     _tcscat(tmp,pei->lpParameters);
   }
-  GetCurrentDirectory(4096,cmd);
-  ResolveCommandLine(tmp,cmd,tmp);
+  TCHAR CurDir[4096]={0};
+  GetCurrentDirectory(4096,CurDir);
+  ResolveCommandLine(tmp,CurDir,tmp);
   free(g_LastFailedCmd);
   g_LastFailedCmd=0;
 
@@ -580,8 +581,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return S_FALSE;
-  TCHAR CurDir[4096]={0};
-  GetCurrentDirectory(4096,CurDir);
   //Check Directory
   if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
   {
