@@ -330,7 +330,6 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
 {
   if (!GetUseIATHook)
     return FALSE;
-  return FALSE;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
     return FALSE;
@@ -340,6 +339,8 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     if (!IsInSuRunners(User))
       return FALSE;
   }
+  TCHAR CurDir[4096]={0};
+  GetCurrentDirectory(4096,CurDir);
   WCHAR cmd[4096]={0};
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   if(lpApp)
@@ -356,7 +357,7 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   if (parms)
     wcscat(cmd,parms);
   //ToDo: Directly write to service pipe!
-  PPROCESS_INFORMATION ppi=(PPROCESS_INFORMATION)calloc(sizeof(PPROCESS_INFORMATION),1);
+  PROCESS_INFORMATION rpi={0};
   {
     WCHAR tmp[4096]={0};
     ResolveCommandLine(cmd,lpCurDir,tmp);
@@ -367,15 +368,15 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
       free(g_LastFailedCmd);
       g_LastFailedCmd=0;
       if(bExitNow)
-        return free(ppi),FALSE;  
+        return FALSE;  
     }
     GetSystemWindowsDirectoryW(cmd,4096);
     PathAppendW(cmd,L"SuRun.exe");
     PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
-      return free(ppi),FALSE;
-    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),ppi,tmp);
+      return FALSE;
+    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&rpi,tmp);
   }
   //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
   STARTUPINFOW si;
@@ -385,10 +386,8 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   // Start the child process.
   lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
   if(!cpw)
-    return free(ppi),FALSE;
+    return FALSE;
   DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
-  TCHAR CurDir[4096]={0};
-  GetCurrentDirectory(4096,CurDir);
   if (cpw(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
@@ -398,16 +397,15 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     if (ExitCode==RETVAL_OK)
     {
       //return a valid PROCESS_INFORMATION!
-      ppi->hProcess=OpenProcess(SYNCHRONIZE,false,ppi->dwProcessId);
-      ppi->hThread=OpenThread(SYNCHRONIZE,false,ppi->dwThreadId);
+      rpi.hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
+      rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
       if(lppi)
-        memmove(lppi,ppi,sizeof(PROCESS_INFORMATION));
+        memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
-        cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
+        cmd,rpi.dwProcessId,rpi.hProcess,rpi.dwThreadId,rpi.hThread);
     }
   }
   SetCurrentDirectory(CurDir);
-  free(ppi);
   return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
 }
 
