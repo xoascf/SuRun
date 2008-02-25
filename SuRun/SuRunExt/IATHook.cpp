@@ -151,7 +151,7 @@ BOOL DoHookDll(char* DllName)
 }
 
 //returns newFunc if DllName->ImpName is one to be hooked up
-PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFN)
+PROC DoHookFn(char* DllName,char* ImpName)
 {
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
@@ -159,15 +159,11 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFN)
     for(int i=0;i<countof(hdt);i++)
       if (stricmp(hdt[i]->DllName,DllName)==0)
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
-        {
-          if(orgFN)
-            *orgFN=hdt[i]->orgfn();
           return hdt[i]->newFunc;
-        }
   return false;
 }
 
-DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
+DWORD HookIAT(HMODULE hMod)
 {
   DWORD nHooked=0;
   if(hMod==l_hInst)
@@ -204,16 +200,16 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
     return nHooked;
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
 #ifdef _DEBUG
-//  char fmod[MAX_PATH]={0};
-//  {
-//    GetModuleFileNameA(0,fmod,MAX_PATH);
-//    PathStripPathA(fmod);
-//    strcat(fmod,": ");
-//    char* p=&fmod[strlen(fmod)];
-//    GetModuleFileNameA(hMod,p,MAX_PATH);
-//    PathStripPathA(p);
-//  }
-//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x],%d)\n",fmod,hMod,bUnHook);
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hMod,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif _DEBUG
   for(;pID->Name;pID++) 
   {
@@ -223,19 +219,15 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
       PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
       for(;(pOrgThunk->u1.Function)&&(pOrgThunk->u1.Function);pOrgThunk++,pThunk++)
-        if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )!=IMAGE_ORDINAL_FLAG)
+        if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )==0)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
-          PROC oldFunc=0;
-          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,bUnHook?&oldFunc:0);
-          if (newFunc 
-            && ((!bUnHook) && (pThunk->u1.Function!=(DWORD_PTR)newFunc)
-            ||( bUnHook  && (pThunk->u1.Function==(DWORD_PTR)newFunc)))
-            )
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
+          if (newFunc && (pThunk->u1.Function!=(DWORD_PTR)newFunc))
           {
 #ifdef _DEBUG
-//            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x)\n",
-//              fmod,DllName,pBN->Name,oldFunc,newFunc);
+            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (->%x)\n",
+              fmod,DllName,pBN->Name,newFunc);
 #endif _DEBUG
             __try
             {
@@ -245,10 +237,10 @@ DWORD HookIAT(HMODULE hMod,BOOL bUnHook)
                 DWORD oldProt;
                 if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_READWRITE, &oldProt))
                 {
-                  pThunk->u1.Function = (DWORD_PTR)(bUnHook?oldFunc:newFunc);
+                  pThunk->u1.Function = (DWORD_PTR)newFunc;
+                  VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
                   nHooked++;
                 }
-                VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
               }
             }
             __except(1)
@@ -285,22 +277,12 @@ DWORD HookModules()
     std::set_difference(hMod,hMod+n,g_ModList.begin(),g_ModList.end(),std::back_inserter(newMods));
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
-      nHooked+=HookIAT(*it,false);
+      nHooked+=HookIAT(*it);
     //merge new hModules to list
     g_ModList.merge(newMods);
     free(hMod);
   }
   CloseHandle(hProc);
-  return nHooked;
-}
-
-DWORD UnHookModules()
-{
-  //UnHook all hModules
-  DWORD nHooked=0;
-  for(ModList::iterator it=g_ModList.begin();it!=g_ModList.end();++it)
-    nHooked+=HookIAT(*it,TRUE);
-  g_ModList.clear();
   return nHooked;
 }
 
@@ -422,7 +404,6 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     }
   }
   free(ppi);
-  SetLastError((ExitCode==RETVAL_OK)?NOERROR:ERROR_ACCESS_DENIED);
   return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
 }
 
@@ -451,7 +432,8 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
     }
-  }
+  }else
+    SetLastError(NOERROR);
   return b;
 }
 
@@ -479,7 +461,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
     }
-  }
+  }else
+    SetLastError(NOERROR);
   return b;
 }
 
@@ -513,7 +496,8 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
   PathStripPathA(f);
-  PROC p=DoHookFn(f,(char*)lpProcName,0);
+  PROC p=DoHookFn(f,(char*)lpProcName);
+  SetLastError(NOERROR);
   if(!p)
   {
     lpGetProcAddress gpa=(lpGetProcAddress)hkGetPAdr.orgfn();
@@ -531,9 +515,11 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
     return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=p(lpLibFileName);
+  DWORD dwe=GetLastError();
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
   return hMOD;
 }
 
@@ -544,9 +530,11 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
     return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=p(lpLibFileName);
+  DWORD dwe=GetLastError();
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
   return hMOD;
 }
 
@@ -557,9 +545,11 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
     return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
   HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
+  DWORD dwe=GetLastError();
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
   return hMOD;
 }
 
@@ -569,10 +559,12 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   if(!p)
     return SetLastError(ERROR_ACCESS_DENIED),0;
   EnterCriticalSection(&g_HookCs);
+  DWORD dwe=GetLastError();
   HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
   return hMOD;
 }
 
@@ -593,11 +585,13 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
     }
     TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif _DEBUG
+    SetLastError(NOERROR);
     return true;
   }
   lpFreeLibrary p=(lpFreeLibrary)hkFreeLib.orgfn();
   if(!p)
     return SetLastError(ERROR_ACCESS_DENIED),0;
+  SetLastError(NOERROR);
   return p(hLibModule);
 }
 
@@ -623,6 +617,7 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
   }
   TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif _DEBUG
+  SetLastError(NOERROR);
   ExitThread(dwExitCode);
 }
 
@@ -639,8 +634,8 @@ DWORD WINAPI InitHookProc(void* p)
 void LoadHooks()
 {
   InitializeCriticalSection(&g_HookCs);
-//  CreateThread(0,0,InitHookProc,0,0,0);
-  InitHookProc(0);
+  CreateThread(0,0,InitHookProc,0,0,0);
+  //InitHookProc(0);
 }
 
 void UnloadHooks()
