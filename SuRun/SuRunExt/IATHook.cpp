@@ -330,6 +330,7 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
 {
   if (!GetUseIATHook)
     return FALSE;
+  return FALSE;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
     return FALSE;
@@ -637,8 +638,8 @@ DWORD WINAPI InitHookProc(void* p)
 void LoadHooks()
 {
   InitializeCriticalSection(&g_HookCs);
-  CreateThread(0,0,InitHookProc,0,0,0);
-  //InitHookProc(0);
+  //CreateThread(0,0,InitHookProc,0,0,0);
+  InitHookProc(0);
 }
 
 void UnloadHooks()
