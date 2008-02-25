@@ -200,16 +200,16 @@ DWORD HookIAT(HMODULE hMod)
     return nHooked;
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
 #ifdef _DEBUG
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hMod,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hMod,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif _DEBUG
   for(;pID->Name;pID++) 
   {
@@ -226,8 +226,8 @@ DWORD HookIAT(HMODULE hMod)
           if (newFunc && (pThunk->u1.Function!=(DWORD_PTR)newFunc))
           {
 #ifdef _DEBUG
-            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (->%x)\n",
-              fmod,DllName,pBN->Name,newFunc);
+//            TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (->%x)\n",
+//              fmod,DllName,pBN->Name,newFunc);
 #endif _DEBUG
             __try
             {
@@ -386,6 +386,8 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   if(!cpw)
     return free(ppi),FALSE;
   DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
+  TCHAR CurDir[4096]={0};
+  GetCurrentDirectory(4096,CurDir);
   if (cpw(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
@@ -403,6 +405,7 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
         cmd,ppi->dwProcessId,ppi->hProcess,ppi->dwThreadId,ppi->hThread);
     }
   }
+  SetCurrentDirectory(CurDir);
   free(ppi);
   return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
 }
