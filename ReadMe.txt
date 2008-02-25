@@ -1,5 +1,7 @@
 ToDo for next release:
 ---------------------
+* VC6 MIDL compiler
+
 * Control Panel Icon
 * Installation Dialog
 * Installation Container
