@@ -504,6 +504,11 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
+extern TCHAR g_TAA_cmd[4096];
+extern TCHAR g_TAA_tmp[4096];
+extern TCHAR g_TAA_CurDir[4096];
+extern CRITICAL_SECTION g_HookCs;
+
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
 //  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
@@ -528,7 +533,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   if(pei->cbSize<sizeof(SHELLEXECUTEINFO))
   {
-    DBGTrace2("SuRun ShellExtHook Error: invalid Size (expected=%d;real=%d)",sizeof(SHELLEXECUTEINFO),pei->cbSize);
+    DBGTrace2("SuRun ShellExtHook Error: invalid Size (expected=%d;real=%d)",
+      sizeof(SHELLEXECUTEINFO),pei->cbSize);
     return S_FALSE;
   }
   if (!pei->lpFile)
@@ -536,11 +542,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
     return S_FALSE;
   }
+  EnterCriticalSection(&g_HookCs);
   //check if this Programm has an Auto-SuRun-Entry in the List
-  TCHAR cmd[4096];
-  TCHAR tmp[4096];
-  _tcscpy(tmp,pei->lpFile);
-  PathQuoteSpaces(tmp);
+  _tcscpy(g_TAA_tmp,pei->lpFile);
+  PathQuoteSpaces(g_TAA_tmp);
   //Verb must be "open" or empty
   BOOL bNoAutoRun=TRUE;
   if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)
@@ -550,56 +555,55 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
     {
       //AutoRun: get open command
-      PathAppend(tmp,L"AutoRun.inf");
-      if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,tmp)!=0)
-        return S_FALSE;
-      GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,4095,tmp);
-      if (!cmd[0])
-        return S_FALSE;
-      _tcscpy(tmp,cmd);
+      PathAppend(g_TAA_tmp,L"AutoRun.inf");
+      if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,g_TAA_tmp)!=0)
+        return LeaveCriticalSection(&g_HookCs),S_FALSE;
+      GetPrivateProfileString(L"AutoRun",L"open",L"",g_TAA_cmd,countof(g_TAA_cmd)-1,g_TAA_tmp);
+      if (!g_TAA_cmd[0])
+        return LeaveCriticalSection(&g_HookCs),S_FALSE;
+      _tcscpy(g_TAA_tmp,g_TAA_cmd);
       bNoAutoRun=FALSE;
     }else
     {
       DBGTrace("SuRun ShellExtHook Error: invalid verb!");
-      return S_FALSE;
+      return LeaveCriticalSection(&g_HookCs),S_FALSE;
     }
   }
   if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
   {
-    _tcscat(tmp,L" ");
-    _tcscat(tmp,pei->lpParameters);
+    _tcscat(g_TAA_tmp,L" ");
+    _tcscat(g_TAA_tmp,pei->lpParameters);
   }
-  TCHAR CurDir[4096]={0};
-  GetCurrentDirectory(4096,CurDir);
-  ResolveCommandLine(tmp,CurDir,tmp);
+  GetCurrentDirectory(countof(g_TAA_CurDir),g_TAA_CurDir);
+  ResolveCommandLine(g_TAA_tmp,g_TAA_CurDir,g_TAA_tmp);
   free(g_LastFailedCmd);
   g_LastFailedCmd=0;
 
-  GetSystemWindowsDirectory(cmd,4096);
-  PathAppend(cmd, _T("SuRun.exe"));
-  PathQuoteSpaces(cmd);
-  if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
+  GetSystemWindowsDirectory(g_TAA_cmd,countof(g_TAA_cmd));
+  PathAppend(g_TAA_cmd, _T("SuRun.exe"));
+  PathQuoteSpaces(g_TAA_cmd);
+  if (_wcsnicmp(g_TAA_cmd,g_TAA_tmp,wcslen(g_TAA_cmd))==0)
     //Never start SuRun administrative
-    return S_FALSE;
+    return LeaveCriticalSection(&g_HookCs),S_FALSE;
   //Check Directory
   if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
   {
     DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
       pei->lpDirectory,GetLastErrorNameStatic());
-    return S_FALSE;
+    return LeaveCriticalSection(&g_HookCs),S_FALSE;
   }
-  //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
+  //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",g_TAA_tmp);
   //ToDo: Directly write to service pipe!
-  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA 0 0 %s",tmp);
-  DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
+  _stprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA 0 0 %s",g_TAA_tmp);
+  DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",g_TAA_cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+  if (CreateProcess(NULL,g_TAA_cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
-    SetCurrentDirectory(CurDir);
+    SetCurrentDirectory(g_TAA_CurDir);
     CloseHandle(pi.hThread );
     DWORD ExitCode=ERROR_ACCESS_DENIED;
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
@@ -609,20 +613,22 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       if (ExitCode==RETVAL_OK)
       {
         pei->hInstApp=(HINSTANCE)33;
-        DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",cmd);
+        DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",g_TAA_cmd);
       }else 
       {
         pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
-        //Tell IAT-Hook to not check "tmp" again!
-        g_LastFailedCmd=_tcsdup(tmp);
+        //Tell IAT-Hook to not check "g_TAA_tmp" again!
+        g_LastFailedCmd=_tcsdup(g_TAA_tmp);
       }
     }else
-      DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
+      DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",g_TAA_cmd);
     CloseHandle(pi.hProcess);
+    LeaveCriticalSection(&g_HookCs);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
-    DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
-  SetCurrentDirectory(CurDir);
+    DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",g_TAA_cmd,GetLastErrorNameStatic());
+  SetCurrentDirectory(g_TAA_CurDir);
+  LeaveCriticalSection(&g_HookCs);
   return S_FALSE;
 }
 
