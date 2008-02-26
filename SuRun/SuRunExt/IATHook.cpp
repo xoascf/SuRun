@@ -316,13 +316,8 @@ CRITICAL_SECTION g_HookCs;
 //For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
 extern LPTSTR g_LastFailedCmd; //defined in SuSunExt.cpp
 
-TCHAR g_TAA_CurDir[4096]={0};
-WCHAR g_TAA_cmd[4096]={0};
-WCHAR g_TAA_tmp[4096]={0};
-PROCESS_INFORMATION g_TAA_rpi={0};
-BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+BOOL TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
-  return FALSE;
   if (!GetUseIATHook)
     return FALSE;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
@@ -335,41 +330,45 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
       return FALSE;
   }
   EnterCriticalSection(&g_HookCs);
-  GetCurrentDirectory(countof(g_TAA_CurDir),g_TAA_CurDir);
+  TCHAR CurDir[4096]={0};
+  GetCurrentDirectory(countof(CurDir),CurDir);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
+  WCHAR cmd[4096]={0};
   if(lpApp)
   {
-    wcscat(g_TAA_cmd,lpApp);
-    PathQuoteSpacesW(g_TAA_cmd);
+    wcscat(cmd,lpApp);
+    PathQuoteSpacesW(cmd);
     if (parms)
       //lpApplicationName and the first token of lpCommandLine are the same
       //we need to check this:
       parms=PathGetArgsW(lpCmd);
     if (parms)
-      wcscat(g_TAA_cmd,L" ");
+      wcscat(cmd,L" ");
   }
   if (parms)
-    wcscat(g_TAA_cmd,parms);
+    wcscat(cmd,parms);
+  PROCESS_INFORMATION rpi={0};
   //ToDo: Directly write to service pipe!
   {
-    ResolveCommandLine(g_TAA_cmd,lpCurDir,g_TAA_tmp);
-    //Exit if ShellExecHook failed on "g_TAA_tmp"
+    WCHAR tmp[4096]={0};
+    ResolveCommandLine(cmd,lpCurDir,tmp);
+    //Exit if ShellExecHook failed on "tmp"
     if(g_LastFailedCmd)
     {
-      BOOL bExitNow=_tcsicmp(g_TAA_tmp,g_LastFailedCmd)==0;
+      BOOL bExitNow=_tcsicmp(tmp,g_LastFailedCmd)==0;
       free(g_LastFailedCmd);
       g_LastFailedCmd=0;
       if(bExitNow)
         return LeaveCriticalSection(&g_HookCs),FALSE;  
     }
-    GetSystemWindowsDirectoryW(g_TAA_cmd,countof(g_TAA_cmd));
-    PathAppendW(g_TAA_cmd,L"SuRun.exe");
-    PathQuoteSpacesW(g_TAA_cmd);
-    if (_wcsnicmp(g_TAA_cmd,g_TAA_tmp,wcslen(g_TAA_cmd))==0)
+    GetSystemWindowsDirectoryW(cmd,countof(cmd));
+    PathAppendW(cmd,L"SuRun.exe");
+    PathQuoteSpacesW(cmd);
+    if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
       return LeaveCriticalSection(&g_HookCs),FALSE;
-    wsprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA %d %x %s",
-      GetCurrentProcessId(),&g_TAA_rpi,g_TAA_tmp);
+    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
+      GetCurrentProcessId(),&rpi,tmp);
   }
   //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
   STARTUPINFOW si;
@@ -377,9 +376,9 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  DBGTrace1("IATHook AutoSuRun(%s) test",g_TAA_cmd);
+  DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   if (((lpCreateProcessW)hkCrProcW.orgFunc)
-    (NULL,g_TAA_cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
+    (NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
@@ -388,18 +387,29 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     if (ExitCode==RETVAL_OK)
     {
       //return a valid PROCESS_INFORMATION!
-      g_TAA_rpi.hProcess=OpenProcess(SYNCHRONIZE,false,g_TAA_rpi.dwProcessId);
-      g_TAA_rpi.hThread=OpenThread(SYNCHRONIZE,false,g_TAA_rpi.dwThreadId);
+      rpi.hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
+      rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
       if(lppi)
-        memmove(lppi,&g_TAA_rpi,sizeof(PROCESS_INFORMATION));
+        memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
-        g_TAA_cmd,g_TAA_rpi.dwProcessId,g_TAA_rpi.hProcess,
-        g_TAA_rpi.dwThreadId,g_TAA_rpi.hThread);
+        cmd,rpi.dwProcessId,rpi.hProcess,
+        rpi.dwThreadId,rpi.hThread);
     }
   }
-  SetCurrentDirectory(g_TAA_CurDir);
+  SetCurrentDirectory(CurDir);
   LeaveCriticalSection(&g_HookCs);
   return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
+}
+
+BOOL TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+{
+  WCHAR wApp[4096];
+  MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
+  WCHAR wCmd[4096];
+  MultiByteToWideChar(CP_ACP,0,lpCmd,-1,wCmd,(int)4096);
+  WCHAR wCurDir[4096];
+  MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
+  return TestAutoSuRunW(wApp,wCmd,wCurDir,lppi);
 }
 
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
@@ -409,8 +419,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-//  if (!TestAutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),
-//    CAToWStr(lpCurrentDirectory),lpProcessInformation))
+  if (!TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
@@ -425,8 +434,8 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
         ResumeThread(lpProcessInformation->hThread);
     }
   }
-//  else
-//    SetLastError(NOERROR);
+  else
+    SetLastError(NOERROR);
   return b;
 }
 
@@ -437,7 +446,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-  if (!TestAutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
+  if (!TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
