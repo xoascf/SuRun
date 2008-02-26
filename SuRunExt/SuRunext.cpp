@@ -507,6 +507,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 extern TCHAR g_TAA_cmd[4096];
 extern TCHAR g_TAA_tmp[4096];
 extern TCHAR g_TAA_CurDir[4096];
+extern PROCESS_INFORMATION g_TAA_rpi;
 extern CRITICAL_SECTION g_HookCs;
 
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
@@ -594,7 +595,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",g_TAA_tmp);
   //ToDo: Directly write to service pipe!
-  _stprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA 0 0 %s",g_TAA_tmp);
+  //_stprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA 0 0 %s",g_TAA_tmp);
+  
+  _stprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA %d %x %s",
+    GetCurrentProcessId(),g_TAA_rpi,g_TAA_tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",g_TAA_cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -623,6 +627,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",g_TAA_cmd);
     CloseHandle(pi.hProcess);
+    if ((ExitCode==RETVAL_OK)&&(pei->fMask&SEE_MASK_NOCLOSEPROCESS))
+      //return a valid PROCESS_INFORMATION!
+      pei->hProcess=OpenProcess(SYNCHRONIZE,false,g_TAA_rpi.dwProcessId);
     LeaveCriticalSection(&g_HookCs);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
