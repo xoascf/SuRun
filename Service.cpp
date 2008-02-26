@@ -1301,15 +1301,3 @@ bool HandleServiceStuff()
   }
   return false;
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-// The Trick: 
-//  The statement below will call HandleServiceStuff() before WinMain.
-//  if our process runs as service, WinMain will never get called
-//  since HandleServiceStuff will call ExitProcess()
-//////////////////////////////////////////////////////////////////////////////
-
-//#ifndef _DEBUG
-static bool g_IsServiceStuff=HandleServiceStuff();
-//#endif _DEBUG
