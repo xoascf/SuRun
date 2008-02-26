@@ -322,6 +322,7 @@ WCHAR g_TAA_tmp[4096]={0};
 PROCESS_INFORMATION g_TAA_rpi={0};
 BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
+  return FALSE;
   if (!GetUseIATHook)
     return FALSE;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
@@ -408,8 +409,8 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   BOOL b=FALSE;
-  if (!TestAutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),
-    CAToWStr(lpCurrentDirectory),lpProcessInformation))
+//  if (!TestAutoSuRun(CAToWStr(lpApplicationName),CAToWStr(lpCommandLine),
+//    CAToWStr(lpCurrentDirectory),lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
     b=((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
@@ -423,8 +424,9 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
       if ((CREATE_SUSPENDED & dwCreationFlags)==0)
         ResumeThread(lpProcessInformation->hThread);
     }
-  }else
-    SetLastError(NOERROR);
+  }
+//  else
+//    SetLastError(NOERROR);
   return b;
 }
 
