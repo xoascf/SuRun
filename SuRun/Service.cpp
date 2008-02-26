@@ -1289,7 +1289,7 @@ bool HandleServiceStuff()
   if (ss==SERVICE_STOPPED)
   {
     ExitProcess(-2);//Let ShellExec Hook return
-    return false;
+    return true;
   }
   while(ss!=SERVICE_RUNNING)
   {
