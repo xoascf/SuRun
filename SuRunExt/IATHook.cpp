@@ -97,18 +97,6 @@ public:
     newFunc=nFunc;
     orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
   }
-  PROC orgfn()
-  {
-    if (IsBadCodePtr(orgFunc))
-    {
-      DBGTrace4("WARNING: IATHook changing original Function %s %s 0x%08x to 0x%08x #############################",
-        DllName,FuncName,orgFunc,GetProcAddress(GetModuleHandleA(DllName),FuncName));
-      PROC of=GetProcAddress(GetModuleHandleA(DllName),FuncName);
-      if(newFunc!=of)
-        orgFunc=of;
-    }
-    return orgFunc;
-  }
 }; 
 
 //Standard Hooks: These must be implemented!
@@ -323,9 +311,15 @@ DWORD HookModules()
 //  return hThread!=0;
 //}
 
+CRITICAL_SECTION g_HookCs;
+
 //For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
 extern LPTSTR g_LastFailedCmd; //defined in SuSunExt.cpp
 
+TCHAR g_TAA_CurDir[4096]={0};
+WCHAR g_TAA_cmd[4096]={0};
+WCHAR g_TAA_tmp[4096]={0};
+PROCESS_INFORMATION g_TAA_rpi={0};
 BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
   if (!GetUseIATHook)
@@ -339,44 +333,48 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     if (!IsInSuRunners(User))
       return FALSE;
   }
-  TCHAR CurDir[4096]={0};
-  GetCurrentDirectory(4096,CurDir);
-  WCHAR cmd[4096]={0};
+  EnterCriticalSection(&g_HookCs);
+  GetCurrentDirectory(countof(g_TAA_CurDir),g_TAA_CurDir);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   if(lpApp)
   {
-    wcscat(cmd,lpApp);
-    PathQuoteSpacesW(cmd);
+    wcscat(g_TAA_cmd,lpApp);
+    PathQuoteSpacesW(g_TAA_cmd);
     if (parms)
       //lpApplicationName and the first token of lpCommandLine are the same
       //we need to check this:
       parms=PathGetArgsW(lpCmd);
     if (parms)
-      wcscat(cmd,L" ");
+      wcscat(g_TAA_cmd,L" ");
   }
   if (parms)
-    wcscat(cmd,parms);
+    wcscat(g_TAA_cmd,parms);
   //ToDo: Directly write to service pipe!
-  PROCESS_INFORMATION rpi={0};
   {
-    WCHAR tmp[4096]={0};
-    ResolveCommandLine(cmd,lpCurDir,tmp);
-    //Exit if ShellExecHook failed on "tmp"
+    ResolveCommandLine(g_TAA_cmd,lpCurDir,g_TAA_tmp);
+    //Exit if ShellExecHook failed on "g_TAA_tmp"
     if(g_LastFailedCmd)
     {
-      BOOL bExitNow=_tcsicmp(tmp,g_LastFailedCmd)==0;
+      BOOL bExitNow=_tcsicmp(g_TAA_tmp,g_LastFailedCmd)==0;
       free(g_LastFailedCmd);
       g_LastFailedCmd=0;
       if(bExitNow)
+      {
+        LeaveCriticalSection(&g_HookCs);
         return FALSE;  
+      }
     }
-    GetSystemWindowsDirectoryW(cmd,4096);
-    PathAppendW(cmd,L"SuRun.exe");
-    PathQuoteSpacesW(cmd);
-    if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
+    GetSystemWindowsDirectoryW(g_TAA_cmd,countof(g_TAA_cmd));
+    PathAppendW(g_TAA_cmd,L"SuRun.exe");
+    PathQuoteSpacesW(g_TAA_cmd);
+    if (_wcsnicmp(g_TAA_cmd,g_TAA_tmp,wcslen(g_TAA_cmd))==0)
       //Never start SuRun administrative
+    {
+      LeaveCriticalSection(&g_HookCs);
       return FALSE;
-    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&rpi,tmp);
+    }
+    wsprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA %d %x %s",
+      GetCurrentProcessId(),&g_TAA_rpi,g_TAA_tmp);
   }
   //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
   STARTUPINFOW si;
@@ -384,11 +382,9 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
-  if(!cpw)
-    return FALSE;
-  DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
-  if (cpw(NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
+  DBGTrace1("IATHook AutoSuRun(%s) test",g_TAA_cmd);
+  if (((lpCreateProcessW)hkCrProcW.orgFunc)
+    (NULL,g_TAA_cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
@@ -397,15 +393,17 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
     if (ExitCode==RETVAL_OK)
     {
       //return a valid PROCESS_INFORMATION!
-      rpi.hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
-      rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
+      g_TAA_rpi.hProcess=OpenProcess(SYNCHRONIZE,false,g_TAA_rpi.dwProcessId);
+      g_TAA_rpi.hThread=OpenThread(SYNCHRONIZE,false,g_TAA_rpi.dwThreadId);
       if(lppi)
-        memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
+        memmove(lppi,&g_TAA_rpi,sizeof(PROCESS_INFORMATION));
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
-        cmd,rpi.dwProcessId,rpi.hProcess,rpi.dwThreadId,rpi.hThread);
+        g_TAA_cmd,g_TAA_rpi.dwProcessId,g_TAA_rpi.hProcess,
+        g_TAA_rpi.dwThreadId,g_TAA_rpi.hThread);
     }
   }
-  SetCurrentDirectory(CurDir);
+  SetCurrentDirectory(g_TAA_CurDir);
+  LeaveCriticalSection(&g_HookCs);
   return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
 }
 
@@ -420,11 +418,8 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     CAToWStr(lpCurrentDirectory),lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    lpCreateProcessA cpa=(lpCreateProcessA)hkCrProcA.orgfn();
-    if(!cpa)
-      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-    b=cpa(lpApplicationName,lpCommandLine,lpProcessAttributes,
-        lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
+    b=((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
+        lpProcessAttributes,lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
         lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     if (b)
     {
@@ -449,11 +444,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   if (!TestAutoSuRun(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
   {
     DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    lpCreateProcessW cpw=(lpCreateProcessW)hkCrProcW.orgfn();
-    if(!cpw)
-      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-    b=cpw(lpApplicationName,lpCommandLine,lpProcessAttributes,
-        lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
+    b=((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
+        lpProcessAttributes,lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
         lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     if (b)
     {
@@ -476,11 +468,9 @@ BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpP
   DBGTrace6("IATHook: CreateProcWithLogonW(%s,%s,%s,x,%s,%s,x,x,%s,x,x) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
     lpUsername,lpDomain,lpPassword,lpApplicationName,lpCommandLine,lpCurrentDirectory);
   DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-  lpCreateProcessWithLogonW cpw=(lpCreateProcessWithLogonW)hkCrPWLOW.orgfn();
-  if(!cpw)
-    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-  BOOL b=cpw(lpUsername,lpDomain,lpPassword,dwLogonFlags,lpApplicationName,
-    lpCommandLine,cf,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  BOOL b=((lpCreateProcessWithLogonW)hkCrPWLOW.orgFunc)(lpUsername,lpDomain,
+    lpPassword,dwLogonFlags,lpApplicationName,lpCommandLine,cf,lpEnvironment,
+    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
   if (b)
   {
     //Process is suspended...
@@ -499,99 +489,56 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   PROC p=DoHookFn(f,(char*)lpProcName);
   SetLastError(NOERROR);
   if(!p)
-  {
-    lpGetProcAddress gpa=(lpGetProcAddress)hkGetPAdr.orgfn();
-    if(!gpa)
-      return SetLastError(ERROR_ACCESS_DENIED),0;
-    p=gpa(hModule,lpProcName);;
-  }
+    p=((lpGetProcAddress)hkGetPAdr.orgFunc)(hModule,lpProcName);;
   return p;
 }
 
-CRITICAL_SECTION g_HookCs;
-
 HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
-  __try
-  {
-    lpLoadLibraryA p=(lpLoadLibraryA)hkLdLibA.orgfn();
-    if(!p)
-      return SetLastError(ERROR_ACCESS_DENIED),0;
-    EnterCriticalSection(&g_HookCs);
-    HMODULE hMOD=p(lpLibFileName);
-    DWORD dwe=GetLastError();
-    if(hMOD)
-      HookModules();
-    LeaveCriticalSection(&g_HookCs);
-    SetLastError(dwe);
-    return hMOD;
-  }__except(EXCEPTION_EXECUTE_HANDLER)
-  {
-    return SetLastError(ERROR_ACCESS_DENIED),0;
-  }
+  EnterCriticalSection(&g_HookCs);
+  HMODULE hMOD=((lpLoadLibraryA)hkLdLibA.orgFunc)(lpLibFileName);
+  DWORD dwe=GetLastError();
+  if(hMOD)
+    HookModules();
+  LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
+  return hMOD;
 }
 
 HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
-  __try
-  {
-    lpLoadLibraryW p=(lpLoadLibraryW)hkLdLibW.orgfn();
-    if(!p)
-      return SetLastError(ERROR_ACCESS_DENIED),0;
-    EnterCriticalSection(&g_HookCs);
-    HMODULE hMOD=p(lpLibFileName);
-    DWORD dwe=GetLastError();
-    if(hMOD)
-      HookModules();
-    LeaveCriticalSection(&g_HookCs);
-    SetLastError(dwe);
-    return hMOD;
-  }__except(EXCEPTION_EXECUTE_HANDLER)
-  {
-    return SetLastError(ERROR_ACCESS_DENIED),0;
-  }
+  EnterCriticalSection(&g_HookCs);
+  HMODULE hMOD=((lpLoadLibraryW)hkLdLibW.orgFunc)(lpLibFileName);
+  DWORD dwe=GetLastError();
+  if(hMOD)
+    HookModules();
+  LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
+  return hMOD;
 }
 
 HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
-  __try
-  {
-    lpLoadLibraryExA p=(lpLoadLibraryExA)hkLdLibXA.orgfn();
-    if(!p)
-      return SetLastError(ERROR_ACCESS_DENIED),0;
-    EnterCriticalSection(&g_HookCs);
-    HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
-    DWORD dwe=GetLastError();
-    if(hMOD)
-      HookModules();
-    LeaveCriticalSection(&g_HookCs);
-    SetLastError(dwe);
-    return hMOD;
-  }__except(EXCEPTION_EXECUTE_HANDLER)
-  {
-    return SetLastError(ERROR_ACCESS_DENIED),0;
-  }
+  EnterCriticalSection(&g_HookCs);
+  HMODULE hMOD=((lpLoadLibraryExA)hkLdLibXA.orgFunc)(lpLibFileName,hFile,dwFlags);
+  DWORD dwe=GetLastError();
+  if(hMOD)
+    HookModules();
+  LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
+  return hMOD;
 }
 
 HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
-  __try
-  {
-    lpLoadLibraryExW p=(lpLoadLibraryExW)hkLdLibXW.orgfn();
-    if(!p)
-      return SetLastError(ERROR_ACCESS_DENIED),0;
-    EnterCriticalSection(&g_HookCs);
-    DWORD dwe=GetLastError();
-    HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
-    if(hMOD)
-      HookModules();
-    LeaveCriticalSection(&g_HookCs);
-    SetLastError(dwe);
-    return hMOD;
-  }__except(EXCEPTION_EXECUTE_HANDLER)
-  {
-    return SetLastError(ERROR_ACCESS_DENIED),0;
-  }
+  EnterCriticalSection(&g_HookCs);
+  DWORD dwe=GetLastError();
+  HMODULE hMOD=((lpLoadLibraryExW)hkLdLibXW.orgFunc)(lpLibFileName,hFile,dwFlags);
+  if(hMOD)
+    HookModules();
+  LeaveCriticalSection(&g_HookCs);
+  SetLastError(dwe);
+  return hMOD;
 }
 
 BOOL WINAPI FreeLib(HMODULE hLibModule)
@@ -614,11 +561,11 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
     SetLastError(NOERROR);
     return true;
   }
-  lpFreeLibrary p=(lpFreeLibrary)hkFreeLib.orgfn();
-  if(!p)
-    return SetLastError(ERROR_ACCESS_DENIED),0;
   SetLastError(NOERROR);
-  return p(hLibModule);
+  EnterCriticalSection(&g_HookCs);
+  BOOL bRet=((lpFreeLibrary)hkFreeLib.orgFunc)(hLibModule);
+  LeaveCriticalSection(&g_HookCs);
+  return bRet;
 }
 
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
@@ -626,18 +573,9 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
   //The DLL must not be unloaded while the process is running!
   if (hLibModule!=l_hInst)
   {
-    lpFreeLibraryAndExitThread p=(lpFreeLibraryAndExitThread)hkFrLibXT.orgfn();
-    if(p)
-    {
-      __try
-      {
-        EnterCriticalSection(&g_HookCs);
-        LeaveCriticalSection(&g_HookCs);
-      }__except(EXCEPTION_EXECUTE_HANDLER)
-      {
-      }
-      p(hLibModule,dwExitCode);
-    }
+    EnterCriticalSection(&g_HookCs);
+    LeaveCriticalSection(&g_HookCs);
+    ((lpFreeLibraryAndExitThread)hkFrLibXT.orgFunc)(hLibModule,dwExitCode);
     return;
   }
 #ifdef _DEBUG
@@ -660,14 +598,9 @@ DWORD WINAPI InitHookProc(void* p)
 {
   if (!GetUseIATHook)
     return 0;
-  __try
-  {
-    EnterCriticalSection(&g_HookCs);
-    HookModules();
-    LeaveCriticalSection(&g_HookCs);
-  }__except(EXCEPTION_EXECUTE_HANDLER)
-  {
-  }
+  EnterCriticalSection(&g_HookCs);
+  HookModules();
+  LeaveCriticalSection(&g_HookCs);
   return 0;
 }
 
@@ -681,13 +614,8 @@ void LoadHooks()
 void UnloadHooks()
 {
   //Do not unload the hooks, but wait for the Critical Section
-  __try
-  {
-    EnterCriticalSection(&g_HookCs);
-    LeaveCriticalSection(&g_HookCs);
-    DeleteCriticalSection(&g_HookCs);
-  }__except(EXCEPTION_EXECUTE_HANDLER)
-  {
-  }
+  EnterCriticalSection(&g_HookCs);
+  LeaveCriticalSection(&g_HookCs);
+  DeleteCriticalSection(&g_HookCs);
 }
 
