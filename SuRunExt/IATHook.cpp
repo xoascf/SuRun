@@ -359,20 +359,14 @@ BOOL TestAutoSuRun(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMA
       free(g_LastFailedCmd);
       g_LastFailedCmd=0;
       if(bExitNow)
-      {
-        LeaveCriticalSection(&g_HookCs);
-        return FALSE;  
-      }
+        return LeaveCriticalSection(&g_HookCs),FALSE;  
     }
     GetSystemWindowsDirectoryW(g_TAA_cmd,countof(g_TAA_cmd));
     PathAppendW(g_TAA_cmd,L"SuRun.exe");
     PathQuoteSpacesW(g_TAA_cmd);
     if (_wcsnicmp(g_TAA_cmd,g_TAA_tmp,wcslen(g_TAA_cmd))==0)
       //Never start SuRun administrative
-    {
-      LeaveCriticalSection(&g_HookCs);
-      return FALSE;
-    }
+      return LeaveCriticalSection(&g_HookCs),FALSE;
     wsprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA %d %x %s",
       GetCurrentProcessId(),&g_TAA_rpi,g_TAA_tmp);
   }
