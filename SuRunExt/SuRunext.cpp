@@ -507,7 +507,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 TCHAR g_SXH_cmd[4096];
 TCHAR g_SXH_tmp[4096];
 TCHAR g_SXH_CurDir[4096];
-//PROCESS_INFORMATION g_SXH_rpi;
+PROCESS_INFORMATION g_SXH_rpi;
 CRITICAL_SECTION g_SXH_Cs;
 
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
@@ -595,10 +595,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",g_SXH_tmp);
   //ToDo: Directly write to service pipe!
-  _stprintf(&g_SXH_cmd[wcslen(g_SXH_cmd)],L" /QUIET /TESTAA 0 0 %s",g_SXH_tmp);
+//  _stprintf(&g_SXH_cmd[wcslen(g_SXH_cmd)],L" /QUIET /TESTAA 0 0 %s",g_SXH_tmp);
   
-//  _stprintf(&g_SXH_cmd[wcslen(g_SXH_cmd)],L" /QUIET /TESTAA %d %x %s",
-//    GetCurrentProcessId(),&g_SXH_rpi,g_SXH_tmp);
+  _stprintf(&g_SXH_cmd[wcslen(g_SXH_cmd)],L" /QUIET /TESTAA %d %x %s",
+    GetCurrentProcessId(),&g_SXH_rpi,g_SXH_tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",g_SXH_cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -627,9 +627,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",g_SXH_cmd);
     CloseHandle(pi.hProcess);
-//    if ((ExitCode==RETVAL_OK)&&(pei->fMask&SEE_MASK_NOCLOSEPROCESS))
-//      //return a valid PROCESS_INFORMATION!
-//      pei->hProcess=OpenProcess(SYNCHRONIZE,false,g_SXH_rpi.dwProcessId);
+    if ((ExitCode==RETVAL_OK)&&(pei->fMask&SEE_MASK_NOCLOSEPROCESS))
+      //return a valid PROCESS_INFORMATION!
+      pei->hProcess=OpenProcess(SYNCHRONIZE,false,g_SXH_rpi.dwProcessId);
     LeaveCriticalSection(&g_SXH_Cs);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
