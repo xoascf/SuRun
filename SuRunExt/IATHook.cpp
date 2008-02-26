@@ -604,7 +604,11 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
   {
     lpFreeLibraryAndExitThread p=(lpFreeLibraryAndExitThread)hkFrLibXT.orgfn();
     if(p)
+    {
+      EnterCriticalSection(&g_HookCs);
+      LeaveCriticalSection(&g_HookCs);
       p(hLibModule,dwExitCode);
+    }
     return;
   }
 #ifdef _DEBUG
