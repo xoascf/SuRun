@@ -491,8 +491,6 @@ BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpP
   return b;
 }
 
-CRITICAL_SECTION g_HookCs;
-
 FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 {
   char f[MAX_PATH]={0};
@@ -510,64 +508,90 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   return p;
 }
 
+CRITICAL_SECTION g_HookCs;
+
 HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
-  lpLoadLibraryA p=(lpLoadLibraryA)hkLdLibA.orgfn();
-  if(!p)
+  __try
+  {
+    lpLoadLibraryA p=(lpLoadLibraryA)hkLdLibA.orgfn();
+    if(!p)
+      return SetLastError(ERROR_ACCESS_DENIED),0;
+    EnterCriticalSection(&g_HookCs);
+    HMODULE hMOD=p(lpLibFileName);
+    DWORD dwe=GetLastError();
+    if(hMOD)
+      HookModules();
+    LeaveCriticalSection(&g_HookCs);
+    SetLastError(dwe);
+    return hMOD;
+  }__except(EXCEPTION_EXECUTE_HANDLER)
+  {
     return SetLastError(ERROR_ACCESS_DENIED),0;
-  EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=p(lpLibFileName);
-  DWORD dwe=GetLastError();
-  if(hMOD)
-    HookModules();
-  LeaveCriticalSection(&g_HookCs);
-  SetLastError(dwe);
-  return hMOD;
+  }
 }
 
 HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
-  lpLoadLibraryW p=(lpLoadLibraryW)hkLdLibW.orgfn();
-  if(!p)
+  __try
+  {
+    lpLoadLibraryW p=(lpLoadLibraryW)hkLdLibW.orgfn();
+    if(!p)
+      return SetLastError(ERROR_ACCESS_DENIED),0;
+    EnterCriticalSection(&g_HookCs);
+    HMODULE hMOD=p(lpLibFileName);
+    DWORD dwe=GetLastError();
+    if(hMOD)
+      HookModules();
+    LeaveCriticalSection(&g_HookCs);
+    SetLastError(dwe);
+    return hMOD;
+  }__except(EXCEPTION_EXECUTE_HANDLER)
+  {
     return SetLastError(ERROR_ACCESS_DENIED),0;
-  EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=p(lpLibFileName);
-  DWORD dwe=GetLastError();
-  if(hMOD)
-    HookModules();
-  LeaveCriticalSection(&g_HookCs);
-  SetLastError(dwe);
-  return hMOD;
+  }
 }
 
 HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
-  lpLoadLibraryExA p=(lpLoadLibraryExA)hkLdLibXA.orgfn();
-  if(!p)
+  __try
+  {
+    lpLoadLibraryExA p=(lpLoadLibraryExA)hkLdLibXA.orgfn();
+    if(!p)
+      return SetLastError(ERROR_ACCESS_DENIED),0;
+    EnterCriticalSection(&g_HookCs);
+    HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
+    DWORD dwe=GetLastError();
+    if(hMOD)
+      HookModules();
+    LeaveCriticalSection(&g_HookCs);
+    SetLastError(dwe);
+    return hMOD;
+  }__except(EXCEPTION_EXECUTE_HANDLER)
+  {
     return SetLastError(ERROR_ACCESS_DENIED),0;
-  EnterCriticalSection(&g_HookCs);
-  HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
-  DWORD dwe=GetLastError();
-  if(hMOD)
-    HookModules();
-  LeaveCriticalSection(&g_HookCs);
-  SetLastError(dwe);
-  return hMOD;
+  }
 }
 
 HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
-  lpLoadLibraryExW p=(lpLoadLibraryExW)hkLdLibXW.orgfn();
-  if(!p)
+  __try
+  {
+    lpLoadLibraryExW p=(lpLoadLibraryExW)hkLdLibXW.orgfn();
+    if(!p)
+      return SetLastError(ERROR_ACCESS_DENIED),0;
+    EnterCriticalSection(&g_HookCs);
+    DWORD dwe=GetLastError();
+    HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
+    if(hMOD)
+      HookModules();
+    LeaveCriticalSection(&g_HookCs);
+    SetLastError(dwe);
+    return hMOD;
+  }__except(EXCEPTION_EXECUTE_HANDLER)
+  {
     return SetLastError(ERROR_ACCESS_DENIED),0;
-  EnterCriticalSection(&g_HookCs);
-  DWORD dwe=GetLastError();
-  HMODULE hMOD=p(lpLibFileName,hFile,dwFlags);
-  if(hMOD)
-    HookModules();
-  LeaveCriticalSection(&g_HookCs);
-  SetLastError(dwe);
-  return hMOD;
+  }
 }
 
 BOOL WINAPI FreeLib(HMODULE hLibModule)
@@ -605,8 +629,13 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
     lpFreeLibraryAndExitThread p=(lpFreeLibraryAndExitThread)hkFrLibXT.orgfn();
     if(p)
     {
-      EnterCriticalSection(&g_HookCs);
-      LeaveCriticalSection(&g_HookCs);
+      __try
+      {
+        EnterCriticalSection(&g_HookCs);
+        LeaveCriticalSection(&g_HookCs);
+      }__except(EXCEPTION_EXECUTE_HANDLER)
+      {
+      }
       p(hLibModule,dwExitCode);
     }
     return;
@@ -631,9 +660,14 @@ DWORD WINAPI InitHookProc(void* p)
 {
   if (!GetUseIATHook)
     return 0;
-  EnterCriticalSection(&g_HookCs);
-  HookModules();
-  LeaveCriticalSection(&g_HookCs);
+  __try
+  {
+    EnterCriticalSection(&g_HookCs);
+    HookModules();
+    LeaveCriticalSection(&g_HookCs);
+  }__except(EXCEPTION_EXECUTE_HANDLER)
+  {
+  }
   return 0;
 }
 
@@ -647,8 +681,13 @@ void LoadHooks()
 void UnloadHooks()
 {
   //Do not unload the hooks, but wait for the Critical Section
-  EnterCriticalSection(&g_HookCs);
-  LeaveCriticalSection(&g_HookCs);
-  DeleteCriticalSection(&g_HookCs);
+  __try
+  {
+    EnterCriticalSection(&g_HookCs);
+    LeaveCriticalSection(&g_HookCs);
+    DeleteCriticalSection(&g_HookCs);
+  }__except(EXCEPTION_EXECUTE_HANDLER)
+  {
+  }
 }
 
