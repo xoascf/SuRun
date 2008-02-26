@@ -598,7 +598,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   //_stprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA 0 0 %s",g_TAA_tmp);
   
   _stprintf(&g_TAA_cmd[wcslen(g_TAA_cmd)],L" /QUIET /TESTAA %d %x %s",
-    GetCurrentProcessId(),g_TAA_rpi,g_TAA_tmp);
+    GetCurrentProcessId(),&g_TAA_rpi,g_TAA_tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",g_TAA_cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
