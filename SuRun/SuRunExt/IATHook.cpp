@@ -588,8 +588,13 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
   ExitThread(dwExitCode);
 }
 
+BOOL g_IATInit=FALSE;
 DWORD WINAPI InitHookProc(void* p)
 {
+  if (g_IATInit)
+    return 0;
+  InitializeCriticalSection(&g_HookCs);
+  g_IATInit=TRUE;
   if (!GetUseIATHook)
     return 0;
   EnterCriticalSection(&g_HookCs);
@@ -600,13 +605,14 @@ DWORD WINAPI InitHookProc(void* p)
 
 void LoadHooks()
 {
-  InitializeCriticalSection(&g_HookCs);
   //CreateThread(0,0,InitHookProc,0,0,0);
   InitHookProc(0);
 }
 
 void UnloadHooks()
 {
+  if (!g_IATInit)
+    return;
   //Do not unload the hooks, but wait for the Critical Section
   EnterCriticalSection(&g_HookCs);
   LeaveCriticalSection(&g_HookCs);
