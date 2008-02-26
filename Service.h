@@ -59,4 +59,6 @@ extern TCHAR g_RunPwd[PWLEN];
 #define RETVAL_CANCELLED    4
 extern int g_RetVal;
 
+bool HandleServiceStuff();
+
 #pragma pack(pop)
