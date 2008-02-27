@@ -222,8 +222,8 @@ DWORD HookIAT(HMODULE hMod)
               MEMORY_BASIC_INFORMATION mbi;
               if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
               {
-                DWORD oldProt;
-                if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_READWRITE, &oldProt))
+                DWORD oldProt=PAGE_READWRITE;
+                if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize,PAGE_EXECUTE_WRITECOPY,&oldProt))
                 {
                   pThunk->u1.Function = (DWORD_PTR)newFunc;
                   VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
