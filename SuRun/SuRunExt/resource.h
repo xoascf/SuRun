@@ -13,7 +13,6 @@
 #define IDS_MENURESTART                 13
 #define IDS_MENUSTART                   18
 #define IDI_MAINICON                    100
-#define IDI_SETUP                       102
 
 // Next default values for new objects
 // 
