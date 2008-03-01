@@ -56,9 +56,6 @@
 #define IDS_SURUNNER_ERR1               51
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
-#define IDI_INSTALL                     101
-#define IDI_SETUP                       102
-#define IDI_HELP                        103
 #define IDD_DIALOG1                     104
 #define IDI_SHIELD                      104
 #define IDI_SHIELD2                     105
