@@ -16,7 +16,6 @@
 #include <LMAccess.h>
 #include <SHLWAPI.H>
 #include <TCHAR.h>
-#include <strsafe.h>
 #include "IsAdmin.h"
 #include "Helpers.h"
 #include "LogonDlg.h"
@@ -200,9 +199,9 @@ BOOL RunAs(LPCWSTR lpCmdLine,LPCWSTR szUser,LPCWSTR szPassword)
   GetCurrentDirectoryW(4096,CurDir);
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
-  StringCchCopy(un,2*UNLEN,szUser);
+  _tcscpy(un,szUser);
   PathStripPath(un);
-  StringCchCopy(dn,2*UNLEN,szUser);
+  _tcscpy(dn,szUser);
   PathRemoveFileSpec(dn);
   if (!CreateProcessWithLogonW(un,dn,szPassword,1,0,(LPWSTR)lpCmdLine,
         CREATE_UNICODE_ENVIRONMENT,0,CurDir,&si,&pi))
@@ -231,7 +230,7 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
   {
     TCHAR cmd[4096]={0};
     LPTSTR p=PathGetArgs(cmdline);
-    StringCchCopy(cmd,4096,cmdline);
+    _tcscpy(cmd,cmdline);
     PathRemoveArgs(cmd);
     PathUnquoteSpaces(cmd);
     NetworkPathToUNCPath(cmd);
