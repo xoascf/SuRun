@@ -263,11 +263,7 @@ SOURCE=.\SysMenuHook.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=..\res\main.ico
-# End Source File
-# Begin Source File
-
-SOURCE=..\res\Settings.ico
+SOURCE=..\res\SuRun.ico
 # End Source File
 # End Group
 # End Target
