@@ -792,6 +792,9 @@ void SuRun(DWORD ProcessID)
 //  InstallRegistry
 // 
 //////////////////////////////////////////////////////////////////////////////
+bool g_bRunSetupAfterInstall=TRUE;
+bool g_bKeepRegistry=FALSE;
+
 #define UNINSTL L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SuRun"
 
 #define SHLRUN  L"\\Shell\\SuRun"
@@ -819,43 +822,46 @@ void InstallRegistry()
   //AutoRun, System Menu Hook
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
     CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
-  //exefile
-  SetRegStr(HKCR,EXERUN,L"",MenuStr);
-  SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
-  //cmdfile
-  SetRegStr(HKCR,CMDRUN,L"",MenuStr);
-  SetRegStr(HKCR,CMDRUN L"\\command",L"",DefCmd);
-  //cplfile
-  SetRegStr(HKCR,CPLRUN,L"",MenuStr);
-  SetRegStr(HKCR,CPLRUN L"\\command",L"",DefCmd);
-  //MSCFile
-  SetRegStr(HKCR,MSCRUN,L"",MenuStr);
-  SetRegStr(HKCR,MSCRUN L"\\command",L"",DefCmd);
-  //batfile
-  SetRegStr(HKCR,BATRUN,L"",MenuStr);
-  SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
-  //regfile
-  SetRegStr(HKCR,REGRUN,L"",MenuStr);
-  SetRegStr(HKCR,REGRUN L"\\command",L"",DefCmd);
-  TCHAR MSIExe[4096];
-  GetSystemDirectory(MSIExe,4096);
-  PathAppend(MSIExe,L"msiexec.exe");
-  PathQuoteSpaces(MSIExe);
-  //MSI Install
-  SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
-  SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s %s /i \"%%1\" %%*",SuRunExe,MSIExe));
-  //MSI Repair
-  SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
-  SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s %s /f \"%%1\" %%*",SuRunExe,MSIExe));
-  //MSI Uninstall
-  SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
-  SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s %s /x \"%%1\" %%*",SuRunExe,MSIExe));
-  //MSP Apply
-  SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
-  SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
-  //Control Panel
-  SetRegStr(HKCR,CPLREG,L"",MenuStr);
-  SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
+  if (!g_bKeepRegistry)
+  {
+    //exefile
+    SetRegStr(HKCR,EXERUN,L"",MenuStr);
+    SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
+    //cmdfile
+    SetRegStr(HKCR,CMDRUN,L"",MenuStr);
+    SetRegStr(HKCR,CMDRUN L"\\command",L"",DefCmd);
+    //cplfile
+    SetRegStr(HKCR,CPLRUN,L"",MenuStr);
+    SetRegStr(HKCR,CPLRUN L"\\command",L"",DefCmd);
+    //MSCFile
+    SetRegStr(HKCR,MSCRUN,L"",MenuStr);
+    SetRegStr(HKCR,MSCRUN L"\\command",L"",DefCmd);
+    //batfile
+    SetRegStr(HKCR,BATRUN,L"",MenuStr);
+    SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
+    //regfile
+    SetRegStr(HKCR,REGRUN,L"",MenuStr);
+    SetRegStr(HKCR,REGRUN L"\\command",L"",DefCmd);
+    TCHAR MSIExe[4096];
+    GetSystemDirectory(MSIExe,4096);
+    PathAppend(MSIExe,L"msiexec.exe");
+    PathQuoteSpaces(MSIExe);
+    //MSI Install
+    SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
+    SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s %s /i \"%%1\" %%*",SuRunExe,MSIExe));
+    //MSI Repair
+    SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
+    SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s %s /f \"%%1\" %%*",SuRunExe,MSIExe));
+    //MSI Uninstall
+    SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
+    SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s %s /x \"%%1\" %%*",SuRunExe,MSIExe));
+    //MSP Apply
+    SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
+    SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
+    //Control Panel
+    SetRegStr(HKCR,CPLREG,L"",MenuStr);
+    SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
+  }
   //Control Panel Applet
   GetSystemWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRunExt.dll");
@@ -869,28 +875,31 @@ void InstallRegistry()
 //////////////////////////////////////////////////////////////////////////////
 void RemoveRegistry()
 {
-  //exefile
-  DelRegKey(HKCR,EXERUN);
-  //cmdfile
-  DelRegKey(HKCR,CMDRUN);
-  //cplfile
-  DelRegKey(HKCR,CPLRUN);
-  //MSCFile
-  DelRegKey(HKCR,MSCRUN);
-  //batfile
-  DelRegKey(HKCR,BATRUN);
-  //regfile
-  DelRegKey(HKCR,REGRUN);
-  //MSI Install
-  DelRegKey(HKCR,MSIPKG L" open");
-  //MSI Repair
-  DelRegKey(HKCR,MSIPKG L" repair");
-  //MSI Uninstall
-  DelRegKey(HKCR,MSIPKG L" Uninstall");
-  //MSP Apply
-  DelRegKey(HKCR,MSIPTCH L" open");
-  //Control Panel
-  DelRegKey(HKCR,CPLREG);
+  if (!g_bKeepRegistry)
+  {
+    //exefile
+    DelRegKey(HKCR,EXERUN);
+    //cmdfile
+    DelRegKey(HKCR,CMDRUN);
+    //cplfile
+    DelRegKey(HKCR,CPLRUN);
+    //MSCFile
+    DelRegKey(HKCR,MSCRUN);
+    //batfile
+    DelRegKey(HKCR,BATRUN);
+    //regfile
+    DelRegKey(HKCR,REGRUN);
+    //MSI Install
+    DelRegKey(HKCR,MSIPKG L" open");
+    //MSI Repair
+    DelRegKey(HKCR,MSIPKG L" repair");
+    //MSI Uninstall
+    DelRegKey(HKCR,MSIPKG L" Uninstall");
+    //MSP Apply
+    DelRegKey(HKCR,MSIPTCH L" open");
+    //Control Panel
+    DelRegKey(HKCR,CPLREG);
+  }
   //Control Panel Applet
   RegDelVal(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl");
   //AutoRun, System Menu Hook
@@ -1139,27 +1148,123 @@ BOOL InstallService()
   return bRet;
 }
 
-BOOL UserInstall(int IDSMsg)
+//////////////////////////////////////////////////////////////////////////////
+// 
+// Install/Update Dialogs Proc
+// 
+//////////////////////////////////////////////////////////////////////////////
+INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      SendMessage(hwnd,WM_SETICON,ICON_BIG,
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
+        IMAGE_ICON,32,32,0));
+      SendMessage(hwnd,WM_SETICON,ICON_SMALL,
+        (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
+        IMAGE_ICON,16,16,0));
+      {
+        TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
+        GetWindowText(hwnd,WndText,MAX_PATH);
+        _stprintf(newText,WndText,GetVersionString());
+        SetWindowText(hwnd,newText);
+      }
+      SendDlgItemMessage(hwnd,IDC_QUESTION,WM_SETFONT,
+        (WPARAM)CreateFont(-24,0,0,0,FW_BOLD,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
+      CheckDlgButton(hwnd,IDC_RUNSETUP,g_bRunSetupAfterInstall);
+      CheckDlgButton(hwnd,IDC_KEEPREGISTRY,g_bKeepRegistry);
+      CheckDlgButton(hwnd,IDC_OWNERGROUP,1);
+      return FALSE;
+    }//WM_INITDIALOG
+  case WM_DESTROY:
+    {
+      HGDIOBJ fs=GetStockObject(DEFAULT_GUI_FONT);
+      HGDIOBJ f=(HGDIOBJ)SendDlgItemMessage(hwnd,IDC_QUESTION,WM_GETFONT,0,0);
+      SendDlgItemMessage(hwnd,IDC_QUESTION,WM_SETFONT,(WPARAM)fs,0);
+      if(f)
+        DeleteObject(f);
+      return TRUE;
+    }
+  case WM_CTLCOLORSTATIC:
+    {
+      int CtlId=GetDlgCtrlID((HWND)lParam);
+      if ((CtlId==IDC_QUESTION)||(CtlId==IDC_SECICON))
+      {
+        SetBkMode((HDC)wParam,TRANSPARENT);
+        return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+      }
+    }
+    break;
+  case WM_NCDESTROY:
+    {
+      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
+      DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_SMALL,0));
+      return TRUE;
+    }//WM_NCDESTROY
+  case WM_COMMAND:
+    {
+      switch (wParam)
+      {
+      case MAKELPARAM(IDCANCEL,BN_CLICKED):
+        EndDialog(hwnd,IDCANCEL);
+        return TRUE;
+      case MAKELPARAM(IDLOGOFF,BN_CLICKED):
+        EndDialog(hwnd,IDLOGOFF);
+        return TRUE;
+      case MAKELPARAM(IDOK,BN_CLICKED):
+        {
+          g_bRunSetupAfterInstall=IsDlgButtonChecked(hwnd,IDC_RUNSETUP)!=0;
+          g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
+          if (IsDlgButtonChecked(hwnd,IDC_OWNERGROUP))
+            SetOwnerAdminGrp(IsDlgButtonChecked(hwnd,1));
+          EndDialog(hwnd,IDOK);
+          return TRUE;
+        }
+      }//switch (wParam)
+      break;
+    }//WM_COMMAND
+  }
+  return FALSE;
+}
+
+BOOL UserInstall()
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/USERINST"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   CBlurredScreen cbs;
   cbs.Init();
   cbs.Show();
-  if (SafeMsgBox(0,CBigResStr(IDSMsg),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2|MB_SYSTEMMODAL)!=IDYES)
-    return FALSE;
+  cbs.MsgLoop();
+  if(DialogBox(GetModuleHandle(0),
+      MAKEINTRESOURCE((CheckServiceStatus()!=0)?IDD_UPDATE:IDD_INSTALL),
+      0,InstallDlgProc)==IDCANCEL)
+      return FALSE;
   cbs.MsgLoop();
   if (!InstallService())
+  {
+    if(DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_INSTALL2),0,InstallDlgProc))
     return FALSE;
-  TCHAR SuRunExe[4096];
-  GetSystemWindowsDirectory(SuRunExe,4096);
-  PathAppend(SuRunExe,L"SuRun.exe");
-  //This mostly does not work...
-  //ShellExecute(0,L"open",SuRunExe,L"/SYSMENUHOOK",0,SW_HIDE);
-  if (SafeMsgBox(0,CBigResStr(IDS_INSTALLOK),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_YESNO|MB_SYSTEMMODAL)==IDYES)
-    ShellExecute(0,L"open",SuRunExe,L"/SETUP",0,SW_SHOWNORMAL);
+  }
+  if (g_bRunSetupAfterInstall)
+  {
+    TCHAR SuRunExe[4096];
+    GetSystemWindowsDirectory(SuRunExe,4096);
+    PathAppend(SuRunExe,L"SuRun.exe /SETUP");
+    PROCESS_INFORMATION pi={0};
+    STARTUPINFO si={0};
+    si.cb	= sizeof(si);
+    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
+    {
+      CloseHandle(pi.hThread);
+      WaitForSingleObject(pi.hProcess,INFINITE);
+      CloseHandle(pi.hProcess);
+    }
+  }
+  if(DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_INSTALL1),
+      0,InstallDlgProc)==IDLOGOFF)
+      ExitWindowsEx(EWX_LOGOFF|EWX_FORCE|EWX_FORCEIFHUNG,0);
   return TRUE;
 }
 
@@ -1254,7 +1359,7 @@ bool HandleServiceStuff()
     //UserInst:
     if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
     {
-      UserInstall(IDS_ASKUSRINSTALL);
+      UserInstall();
       ExitProcess(0);
       return true;
     }
@@ -1272,7 +1377,7 @@ bool HandleServiceStuff()
     if(_tcsicmp(fn,wd))
     {
       DBGTrace2("Running from \"%s\" and NOT from WinDir(\"%s\")",fn,wd);
-      UserInstall(IDS_ASKUSRINSTALL);
+      UserInstall();
       ExitProcess(0);
       return true;
     }
@@ -1285,18 +1390,10 @@ bool HandleServiceStuff()
         Sleep(1000);
   //The Service must be running!
   ss=CheckServiceStatus();
-  if (ss==SERVICE_STOPPED)
+  if (ss!=SERVICE_RUNNING)
   {
     ExitProcess(-2);//Let ShellExec Hook return
     return true;
-  }
-  while(ss!=SERVICE_RUNNING)
-  {
-    if (!UserInstall(IDS_ASKINSTALL))
-      ExitProcess(0);
-    if (cmd.argc()==1)
-      ExitProcess(0);
-    ss=CheckServiceStatus();
   }
   return false;
 }
