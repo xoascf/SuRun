@@ -296,44 +296,74 @@ IDD_INSTALL DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
+    DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
-    LTEXT           "Wollen Sie SuRun jetzt installieren?",IDC_QUESTION,39,7,
-                    317,25,SS_CENTERIMAGE
-    CONTROL         "Starte 'SuRun Einstellungen' nach der Installation",
-                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
-                    171,10
-    LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
+    LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CONTROL         "Start 'SuRun Settings' after installation",IDC_RUNSETUP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,171,10
+    LTEXT           "For security the following group policy must be activated:",
                     -1,18,60,203,8
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+    CONTROL         "Zmieñ domyœlnego w³aœciciela obiektów utworzonych przez administratorów na 'Administratorzy'.\nUWAGA: Jeœli ta opcja jest nieaktywna, u¿ytkownicy z ograniczeniami mog¹ modyfikowaæ pliki i klucze rejestru utworzone przez administratorów SuRun.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,105,68,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
 END
 
 IDD_UPDATE DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
-    LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
-                    25,SS_CENTERIMAGE
-    CONTROL         "Verknüpungen mit SuRun beibehalten, wie sie sind",
+    LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
+                    SS_CENTERIMAGE
+    CONTROL         "Keep SuRuns associations, as they are now",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     18,44,176,10
-    LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
+    LTEXT           "For security the following group policy must be activated:",
                     IDC_STATIC,18,60,203,8
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+    CONTROL         "Zmieñ domyœlnego w³aœciciela obiektów utworzonych przez administratorów na 'Administratorzy'.\nUWAGA: Jeœli ta opcja jest nieaktywna, u¿ytkownicy z ograniczeniami mog¹ modyfikowaæ pliki i klucze rejestru utworzone przez administratorów SuRun.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,105,68,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
+END
+
+IDD_INSTALL1 DIALOG DISCARDABLE  0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "SuRun %s - Installation"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "&Logoff NOW",IDLOGOFF,289,105,68,14
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
+    LTEXT           "Installation successfull",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CTEXT           "You need to log off before using SuRun.",IDC_STATIC,7,
+                    49,350,44,SS_CENTERIMAGE
+    PUSHBUTTON      "&Close",IDOK,215,105,68,14
+END
+
+IDD_INSTALL2 DIALOG DISCARDABLE  0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "SuRun %s - Installation"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
+    LTEXT           "Installation failed",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CTEXT           "An error occured during SuRun Installation",IDC_STATIC,
+                    7,47,350,49,SS_CENTERIMAGE
+    DEFPUSHBUTTON   "&Close",IDOK,289,105,68,14
 END
 
 
@@ -360,6 +390,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 119
     END
+
+    IDD_INSTALL1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_INSTALL2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -376,7 +422,6 @@ BEGIN
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "B³¹d!\r\n\r\nUtworzenie pulpitu nie powiod³o siê!"
     IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
-    IDS_ASKINSTALL          "SuRun nie jest obecnie zainstalowany na tym komputerze.\r\n\r\nCzy chcesz zainstalowaæ SuRun teraz?\r\n\r\nJeœli klikniesz Tak, pliki SuRun zostan¹ skopiowane do katalogu Windows\r\ni us³uga SuRun zostanie zainstalowana i uruchomiona."
     IDS_UNINSTALLADMIN      "Musisz posiadaæ prawa administratora, ¿eby usun¹æ SuRun.\r\n\r\nProszê wpisaæ dane administratora dla tego systemu:"
     IDS_INSTALLADMIN        "Musisz posiadaæ prawa administratora, ¿eby zainstalowaæ SuRun.\r\n\r\nProszê wpisaæ dane administratora dla tego systemu:"
     IDS_LOGONFAILED         "Logowanie nie powiod³o siê!\r\n\r\nSprawdŸ nazwê u¿ytkownika i has³o i spróbuj ponownie!\r\n\r\nPamiêtaj, ¿e wielkoœæ liter ma znaczenie."
@@ -412,7 +457,6 @@ BEGIN
     IDS_ASKUNINST           "Czy chcesz usun¹æ SuRun z tego systemu?"
     IDS_STARTMUNINST        "Usuñ SuRun.lnk"
     IDS_GRPDESC             "Cz³onkowie tej grupy mog¹ u¿ywaæ SuRun."
-    IDS_ASKUSRINSTALL       "Czy chcesz zainstalowaæ lub zaktualizowaæ SuRun teraz?\r\n\r\nJeœli klikniesz Tak, pliki SuRun zostan¹ skopiowane do katalogu Windows\r\ni us³uga SuRun zostanie zainstalowana i uruchomiona."
     IDS_ADDFILETOLIST       "Enter file name and command line"
 END
 
@@ -724,7 +768,7 @@ IDD_UPDATE DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
@@ -746,7 +790,7 @@ IDD_INSTALL DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
@@ -768,7 +812,7 @@ IDD_INSTALL1 DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Jetzt &abmelden",IDLOGOFF,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
@@ -784,7 +828,7 @@ IDD_INSTALL2 DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
@@ -794,6 +838,49 @@ BEGIN
     CTEXT           "Während der SuRun Installation ist ein Fehler aufgetreten!",
                     IDC_STATIC,7,47,350,49,SS_CENTERIMAGE
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_UPDATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_INSTALL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_INSTALL1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_INSTALL2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -850,49 +937,6 @@ IDI_LISTICON6           ICON    DISCARDABLE     "res\\AutoCancel.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_UPDATE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL1, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL2, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
@@ -903,7 +947,6 @@ BEGIN
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
     IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
-    IDS_ASKINSTALL          "SuRun ist momentan nicht oder nicht korrekt installiert\r\n\r\nWollen Sie SuRun jetzt installieren?\r\n\r\nWenn Sie auf Ja klicken, werden die SuRun-Dateien in das Windows\r\nVerzeichnis kopiert und der SuRun Dienst installiert und gestartet."
     IDS_UNINSTALLADMIN      "Sie benötigen Administrator-Rechte, um SuRun zu entfernen.\r\n\r\nIdentifizieren Sie sich als Computer-Administrator:"
     IDS_INSTALLADMIN        "Sie benötigen Administrator-Rechte, um SuRun zu installieren.\r\n\r\nIdentifizieren Sie sich als Computer-Administrator:"
     IDS_LOGONFAILED         "Anmeldung fehlgeschlagen!\r\n\r\nDer Benutzername und/oder das Passwort sind falsch.\r\n\r\nAchten Sie auf Groß- und Kleinschreibung."
@@ -939,7 +982,6 @@ BEGIN
     IDS_ASKUNINST           "Soll SuRun deinstalliert werden?"
     IDS_STARTMUNINST        "SuRun Entfernen.lnk"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
-    IDS_ASKUSRINSTALL       "Wollen Sie SuRun jetzt installieren bzw. ersetzen?\r\n\r\nWenn Sie auf Ja klicken, werden die SuRun-Dateien in das Windows\r\nVerzeichnis kopiert und der SuRun Dienst installiert und gestartet."
     IDS_ADDFILETOLIST       "Geben Sie Dateinamen und Kommandozeilenparameter an"
 END
 
@@ -1250,45 +1292,118 @@ IDD_INSTALL DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
+    DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
-    LTEXT           "Wollen Sie SuRun jetzt installieren?",IDC_QUESTION,39,7,
-                    317,25,SS_CENTERIMAGE
-    CONTROL         "Starte 'SuRun Einstellungen' nach der Installation",
-                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
-                    171,10
-    LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
+    LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CONTROL         "Start 'SuRun Settings' after installation",IDC_RUNSETUP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,171,10
+    LTEXT           "For security the following group policy must be activated:",
                     -1,18,60,203,8
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,105,68,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
 END
 
 IDD_UPDATE DIALOG DISCARDABLE  0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
-    LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
-                    25,SS_CENTERIMAGE
-    CONTROL         "Verknüpungen mit SuRun beibehalten, wie sie sind",
+    LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
+                    SS_CENTERIMAGE
+    CONTROL         "Keep SuRuns associations, as they are now",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     18,44,176,10
-    LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
+    LTEXT           "For security the following group policy must be activated:",
                     IDC_STATIC,18,60,203,8
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,105,68,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
 END
+
+IDD_INSTALL1 DIALOG DISCARDABLE  0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "SuRun %s - Installation"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "&Logoff NOW",IDLOGOFF,289,105,68,14
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
+    LTEXT           "Installation successfull",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CTEXT           "You need to log off before using SuRun.",IDC_STATIC,7,
+                    49,350,44,SS_CENTERIMAGE
+    PUSHBUTTON      "&Close",IDOK,215,105,68,14
+END
+
+IDD_INSTALL2 DIALOG DISCARDABLE  0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "SuRun %s - Installation"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
+    LTEXT           "Installation failed",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CTEXT           "An error occured during SuRun Installation",IDC_STATIC,
+                    7,47,350,49,SS_CENTERIMAGE
+    DEFPUSHBUTTON   "&Close",IDOK,289,105,68,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_INSTALL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_UPDATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_INSTALL1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_INSTALL2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 357
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 #ifndef _MAC
@@ -1339,33 +1454,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_INSTALL, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_UPDATE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
@@ -1376,7 +1464,6 @@ BEGIN
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
     IDS_SERVICE_NAME        "Super User Run (SuRun) Service"
-    IDS_ASKINSTALL          "SuRun is currently not or not correctly installed on this system.\r\n\r\nDo you want to install SuRun now?\r\n\r\nIf you press Yes, SuRun files will be copied to your Windows\r\ndirectory and the SuRun service is installed and run."
     IDS_UNINSTALLADMIN      "You need to have administrative rights to uninstall SuRun.\r\n\r\nPlease enter the credentials of an Administrator for this system:"
     IDS_INSTALLADMIN        "You need to have administrative rights to install SuRun.\r\n\r\nPlease enter the credentials of an Administrator for this system:"
     IDS_LOGONFAILED         "Logon failed!\r\n\r\nCheck the users name and password and try again!\r\n\r\nNote that the user name and password are case sensitive."
@@ -1412,7 +1499,6 @@ BEGIN
     IDS_ASKUNINST           "Do you want to remove SuRun from this system?"
     IDS_STARTMUNINST        "Remove SuRun.lnk"
     IDS_GRPDESC             "Members of this group can use SuRun."
-    IDS_ASKUSRINSTALL       "Do you want to install or update SuRun now?\r\n\r\nIf you press Yes, SuRun files will be copied to your Windows\r\ndirectory and the SuRun service is installed and run."
     IDS_ADDFILETOLIST       "Enter file name and command line"
 END
 
