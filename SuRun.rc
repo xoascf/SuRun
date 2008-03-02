@@ -299,7 +299,8 @@ CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -320,7 +321,8 @@ CAPTION "SuRun %s - Update"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
@@ -341,7 +343,8 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Installation successfull",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -356,7 +359,8 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Installation failed",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -374,37 +378,6 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_INSTALL, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_UPDATE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL1, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL2, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -769,8 +742,9 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Update"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    DEFPUSHBUTTON   "&Update >>",IDOK,289,106,68,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
                     25,SS_CENTERIMAGE
@@ -782,7 +756,7 @@ BEGIN
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,105,68,14
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,106,68,14
 END
 
 IDD_INSTALL DIALOG DISCARDABLE  0, 0, 364, 126
@@ -792,7 +766,8 @@ CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt installieren?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
@@ -813,7 +788,8 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Installation erfolgreich",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -828,7 +804,8 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Installation fehlgeschlagen",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -846,37 +823,6 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_UPDATE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL1, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL2, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -1293,7 +1239,8 @@ CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -1314,7 +1261,8 @@ CAPTION "SuRun %s - Update"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
@@ -1335,7 +1283,8 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Installation successfull",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -1350,7 +1299,8 @@ STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP |
 CAPTION "SuRun %s - Installation"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,363,38
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,364,1
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     ICON            IDI_SHIELD,IDC_SECICON,9,9,20,20
     LTEXT           "Installation failed",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -1368,37 +1318,6 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
-    IDD_INSTALL, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_UPDATE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL1, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
-
-    IDD_INSTALL2, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 357
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 119
-    END
 END
 #endif    // APSTUDIO_INVOKED
 
