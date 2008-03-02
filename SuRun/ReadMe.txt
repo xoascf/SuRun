@@ -1,15 +1,13 @@
 ---------------------
 * Control Panel Icon
 * VC6 MIDL compiler
-
-ToDo for next release:
----------------------
 * Installation Dialog
   * "Do not change SuRuns file associations"
   * "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators."
 
+ToDo for next release:
+---------------------
 * Installation Container
-* Make "SuRun"-Shell entries in Registry as Install-Option
 
 To be done in future:
 ---------------------
