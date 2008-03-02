@@ -690,7 +690,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_MAINICON            ICON    DISCARDABLE     "res\\main.ico"
+IDI_MAINICON            ICON    DISCARDABLE     "res\\SuRun.ico"
 IDI_SHIELD              ICON    DISCARDABLE     "res\\ico10605.ico"
 IDI_SHIELD2             ICON    DISCARDABLE     "res\\ico10606.ico"
 IDI_SHIELD1             ICON    DISCARDABLE     "res\\ico10607.ico"
