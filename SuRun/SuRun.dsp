@@ -333,19 +333,11 @@ SOURCE=.\res\ico10607.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\SuRun.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\NoQuestion.ico
 # End Source File
 # Begin Source File
 
 SOURCE=.\res\NoRestrict.ico
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\Notes.ico
 # End Source File
 # Begin Source File
 
@@ -361,11 +353,7 @@ SOURCE=.\res\Restrict.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\Settings.ico
-# End Source File
-# Begin Source File
-
-SOURCE=.\res\Software.ico
+SOURCE=.\res\SuRun.ico
 # End Source File
 # Begin Source File
 
