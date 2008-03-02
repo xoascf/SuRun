@@ -71,6 +71,10 @@
 #define IDD_DIALOG2                     120
 #define IDD_ICONHELP                    120
 #define IDD_SELUSER                     121
+#define IDD_UPDATE                      122
+#define IDD_INSTALL                     123
+#define IDD_INSTALL1                    124
+#define IDD_INSTALL2                    125
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
@@ -135,14 +139,17 @@
 #define IDC_NOCONVUSER                  1053
 #define IDC_RESTRICTNEW                 1054
 #define IDC_NOSETUPNEW                  1055
+#define IDC_KEEPREGISTRY                1055
+#define IDC_QUESTION                    1057
+#define IDLOGOFF                        1058
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        122
+#define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1055
+#define _APS_NEXT_CONTROL_VALUE         1059
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
