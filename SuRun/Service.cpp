@@ -1210,9 +1210,6 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         EndDialog(hwnd,IDCANCEL);
         return TRUE;
-      case MAKELPARAM(IDLOGOFF,BN_CLICKED):
-        EndDialog(hwnd,IDLOGOFF);
-        return TRUE;
       case MAKELPARAM(IDOK,BN_CLICKED):
         {
           g_bRunSetupAfterInstall=IsDlgButtonChecked(hwnd,IDC_RUNSETUP)!=0;
@@ -1262,9 +1259,7 @@ BOOL UserInstall()
       CloseHandle(pi.hProcess);
     }
   }
-  if(DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_INSTALL1),
-      0,InstallDlgProc)==IDLOGOFF)
-      ExitWindowsEx(EWX_LOGOFF|EWX_FORCE|EWX_FORCEIFHUNG,0);
+  DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_INSTALL1),0,InstallDlgProc);
   return TRUE;
 }
 
