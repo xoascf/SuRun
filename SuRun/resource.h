@@ -7,7 +7,6 @@
 #define IDS_APPNAME                     3
 #define IDS_NODESK                      4
 #define IDS_SERVICE_NAME                5
-#define IDS_ASKINSTALL                  6
 #define IDS_UNINSTALLADMIN              7
 #define IDS_INSTALLADMIN                8
 #define IDS_LOGONFAILED                 9
@@ -31,7 +30,6 @@
 #define IDS_ASKUNINST                   27
 #define IDS_STARTMUNINST                28
 #define IDS_GRPDESC                     29
-#define IDS_ASKUSRINSTALL               30
 #define IDS_DOMAINGROUPS                31
 #define IDS_ADDFILETOLIST               31
 #define IDS_DOMAINGROUPS2               32
