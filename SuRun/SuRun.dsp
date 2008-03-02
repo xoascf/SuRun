@@ -333,7 +333,7 @@ SOURCE=.\res\ico10607.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\main.ico
+SOURCE=.\res\SuRun.ico
 # End Source File
 # Begin Source File
 
