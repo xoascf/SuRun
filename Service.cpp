@@ -1215,7 +1215,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           g_bRunSetupAfterInstall=IsDlgButtonChecked(hwnd,IDC_RUNSETUP)!=0;
           g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
           if (IsDlgButtonChecked(hwnd,IDC_OWNERGROUP))
-            SetOwnerAdminGrp(IsDlgButtonChecked(hwnd,1));
+            SetOwnerAdminGrp(1);
           EndDialog(hwnd,IDOK);
           return TRUE;
         }
