@@ -139,7 +139,6 @@
 #define IDC_NOSETUPNEW                  1055
 #define IDC_KEEPREGISTRY                1055
 #define IDC_QUESTION                    1057
-#define IDLOGOFF                        1058
 
 // Next default values for new objects
 // 
