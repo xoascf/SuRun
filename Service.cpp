@@ -984,8 +984,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
       CloseHandle(pi.hProcess);
       if (ExitCode!=RETVAL_OK)
         return FALSE;
-      if (ExitCode==0)
-        WaitFor(CheckServiceStatus()==WaitStat);
+      WaitFor(CheckServiceStatus()==WaitStat);
     }
   }
   _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
