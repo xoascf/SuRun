@@ -53,19 +53,11 @@ typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
                                         LPPROCESS_INFORMATION);
 
-typedef BOOL (WINAPI* lpCreateProcessWithLogonW)(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,
-                                                 LPCWSTR,LPWSTR,DWORD,LPVOID,
-                                                 LPCWSTR,LPSTARTUPINFOW,
-                                                 LPPROCESS_INFORMATION);
-
 //Forward decl:
 BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
-
-BOOL WINAPI CreateProcWithLogonW(LPCWSTR,LPCWSTR,LPCWSTR,DWORD,LPCWSTR,LPWSTR,DWORD,
-                                 LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
 HMODULE WINAPI LoadLibA(LPCSTR);
 HMODULE WINAPI LoadLibW(LPCWSTR);
@@ -109,7 +101,6 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 //User Hooks:
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
-static CHookDescriptor hkCrPWLOW ("Advapi32.dll","CreateProcessWithLogonW",(PROC)CreateProcWithLogonW);
 
 static CHookDescriptor* hdt[]=
 {
@@ -122,7 +113,6 @@ static CHookDescriptor* hdt[]=
   &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW
-  //&hkCrPWLOW
 };
 
 //relative pointers in PE images
@@ -273,49 +263,12 @@ DWORD HookModules()
   return nHooked;
 }
 
-//BOOL InjectIATHook(HANDLE hProc)
-//{
-//  if (!GetUseRmteThread)
-//    return FALSE;
-//  HANDLE hThread=0;
-//  //This does not work on Vista!
-//  __try
-//  {
-//    //ToDo: GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA"); does not work!
-//    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
-//    if(!pLoadLib)
-//      return false;
-//	  char DllName[MAX_PATH];
-//	  if(!GetModuleFileNameA(l_hInst,DllName,MAX_PATH))
-//		  return false;
-//	  void* RmteName=VirtualAllocEx(hProc,NULL,sizeof(DllName),MEM_COMMIT,PAGE_READWRITE);
-//	  if(RmteName==NULL)
-//		  return false;
-//	  WriteProcessMemory(hProc,RmteName,(void*)DllName,sizeof(DllName),NULL);
-//    __try
-//    {
-//      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
-//    }__except(1)
-//    {
-//    }
-//	  if(hThread!=NULL )
-//    {
-//      WaitForSingleObject(hThread,INFINITE);
-//      CloseHandle(hThread);
-//    }
-//	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
-//  }__except(1)
-//  {
-//  }
-//  return hThread!=0;
-//}
-
 CRITICAL_SECTION g_HookCs;
 
 //For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
 extern LPTSTR g_LastFailedCmd; //defined in SuSunExt.cpp
 
-BOOL TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
   if (!GetUseIATHook)
     return FALSE;
@@ -397,10 +350,10 @@ BOOL TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORM
   }
   SetCurrentDirectory(CurDir);
   LeaveCriticalSection(&g_HookCs);
-  return (ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED);
+  return ExitCode;
 }
 
-BOOL TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,LPPROCESS_INFORMATION lppi)
 {
   WCHAR wApp[4096];
   MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
@@ -417,25 +370,15 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  BOOL b=FALSE;
-  if (!TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
-  {
-    DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    b=((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
-        lpProcessAttributes,lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
-        lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-    if (b)
-    {
-      //Process is suspended...
-      //InjectIATHook(lpProcessInformation->hProcess);
-      //Resume main thread:
-      if ((CREATE_SUSPENDED & dwCreationFlags)==0)
-        ResumeThread(lpProcessInformation->hThread);
-    }
-  }
-  else
-    SetLastError(NOERROR);
-  return b;
+  DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+                           lpProcessInformation);
+  if (!tas)
+    return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
+        lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+        lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  if(tas==RETVAL_OK)
+    return SetLastError(NOERROR),TRUE;
+  return FALSE;
 }
 
 BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
@@ -444,45 +387,15 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  BOOL b=FALSE;
-  if (!TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,lpProcessInformation))
-  {
-    DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-    b=((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
-        lpProcessAttributes,lpThreadAttributes,bInheritHandles,cf,lpEnvironment,
-        lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-    if (b)
-    {
-      //Process is suspended...
-      //InjectIATHook(lpProcessInformation->hProcess);
-      //Resume main thread:
-      if ((CREATE_SUSPENDED & dwCreationFlags)==0)
-        ResumeThread(lpProcessInformation->hThread);
-    }
-  }else
-    SetLastError(NOERROR);
-  return b;
-}
-
-BOOL WINAPI CreateProcWithLogonW(LPCWSTR lpUsername,LPCWSTR lpDomain,LPCWSTR lpPassword,
-    DWORD dwLogonFlags,LPCWSTR lpApplicationName,LPWSTR lpCommandLine,DWORD dwCreationFlags,
-    LPVOID lpEnvironment,LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation)
-{
-  DBGTrace6("IATHook: CreateProcWithLogonW(%s,%s,%s,x,%s,%s,x,x,%s,x,x) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-    lpUsername,lpDomain,lpPassword,lpApplicationName,lpCommandLine,lpCurrentDirectory);
-  DWORD cf=CREATE_SUSPENDED|dwCreationFlags;
-  BOOL b=((lpCreateProcessWithLogonW)hkCrPWLOW.orgFunc)(lpUsername,lpDomain,
-    lpPassword,dwLogonFlags,lpApplicationName,lpCommandLine,cf,lpEnvironment,
-    lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  if (b)
-  {
-    //Process is suspended...
-    //Resume main thread:
-    if ((CREATE_SUSPENDED & dwCreationFlags)==0)
-      ResumeThread(lpProcessInformation->hThread);
-  }
-  return b;
+  DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+                           lpProcessInformation);
+  if (!tas)
+    return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
+        lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+        lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  if(tas==RETVAL_OK)
+    return SetLastError(NOERROR),TRUE;
+  return FALSE;
 }
 
 FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
