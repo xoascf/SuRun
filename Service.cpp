@@ -30,6 +30,7 @@
 #include <ntsecapi.h>
 #include <USERENV.H>
 #include <Psapi.h>
+#include <Wtsapi32.h>
 #include "Setup.h"
 #include "Service.h"
 #include "IsAdmin.h"
@@ -45,6 +46,7 @@
 #include "SuRunExt/SuRunExt.h"
 #include "SuRunExt/SysMenuHook.h"
 
+#pragma comment(lib,"Wtsapi32.lib")
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"AdvApi32.lib")
@@ -792,8 +794,17 @@ void SuRun(DWORD ProcessID)
 //  InstallRegistry
 // 
 //////////////////////////////////////////////////////////////////////////////
-bool g_bRunSetupAfterInstall=TRUE;
 bool g_bKeepRegistry=FALSE;
+bool g_bDelSuRunners=TRUE;
+bool g_bSR2Admins=FALSE;
+HWND g_InstLog=0;
+#define InstLog(s)  \
+{\
+  SendMessage(g_InstLog,LB_SETTOPINDEX,\
+    SendMessage(g_InstLog,LB_ADDSTRING,0,(LPARAM)(LPCTSTR)s),0);\
+  MsgLoop();\
+  Sleep(250);\
+}
 
 #define UNINSTL L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SuRun"
 
@@ -808,10 +819,22 @@ bool g_bKeepRegistry=FALSE;
 #define REGRUN  L"regfile" SHLRUN
 #define CPLREG  L"CLSID\\{21EC2020-3AEA-1069-A2DD-08002B30309D}"  SHLRUN
 
+static void MsgLoop()
+{
+  MSG msg;
+  int count=0;
+  while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<100))
+  {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+}
+
 void InstallRegistry()
 {
   TCHAR SuRunExe[4096];
   GetSystemWindowsDirectory(SuRunExe,4096);
+  InstLog(CResStr(IDS_ADDUNINST));
   PathAppend(SuRunExe,L"SuRun.exe");
   PathQuoteSpaces(SuRunExe);
   CResStr MenuStr(IDS_MENUSTR);
@@ -820,10 +843,12 @@ void InstallRegistry()
   SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
   SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /UNINSTALL",SuRunExe,SuRunExe));
   //AutoRun, System Menu Hook
+  InstLog(CResStr(IDS_ADDAUTORUN));
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
     CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
   if (!g_bKeepRegistry)
   {
+    InstLog(CResStr(IDS_ADDASSOC));
     //exefile
     SetRegStr(HKCR,EXERUN,L"",MenuStr);
     SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
@@ -863,6 +888,7 @@ void InstallRegistry()
     SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
   }
   //Control Panel Applet
+  InstLog(CResStr(IDS_ADDCPL));
   GetSystemWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRunExt.dll");
   SetRegStr(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl",SuRunExe);
@@ -877,6 +903,7 @@ void RemoveRegistry()
 {
   if (!g_bKeepRegistry)
   {
+    InstLog(CResStr(IDS_REMASSOC));
     //exefile
     DelRegKey(HKCR,EXERUN);
     //cmdfile
@@ -901,10 +928,13 @@ void RemoveRegistry()
     DelRegKey(HKCR,CPLREG);
   }
   //Control Panel Applet
+  InstLog(CResStr(IDS_REMCPL));
   RegDelVal(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl");
   //AutoRun, System Menu Hook
+  InstLog(CResStr(IDS_REMAUTORUN));
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
   //UnInstall
+  InstLog(CResStr(IDS_REMUNINST));
   DelRegKey(HKLM,UNINSTL);
 }
 
@@ -966,11 +996,13 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
 
 void DelFile(LPCTSTR File)
 {
+  InstLog(CBigResStr(IDS_DELFILE,File));
   if (PathFileExists(File) && (!DeleteFile(File)))
   {
     CBigResStr tmp(_T("%s.tmp"),File);
     while (_trename(File,tmp))
       _tcscat(tmp,L".tmp");
+    InstLog(CBigResStr(IDS_DELFILEBOOT,(LPCTSTR)tmp));
     MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
   }
 }
@@ -986,24 +1018,14 @@ void CopyToWinDir(LPCTSTR File)
   GetSystemWindowsDirectory(DstFile,4096);
   PathAppend(DstFile,File);
   DelFile(DstFile);
+  InstLog(CBigResStr(IDS_COPYFILE,SrcFile,DstFile));
   CopyFile(SrcFile,DstFile,FALSE);
 }
 
 BOOL DeleteService(BOOL bJustStop=FALSE)
 {
-  if (!IsAdmin())
-    return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
-  CBlurredScreen cbs;
-  if(!bJustStop)
-  {
-    cbs.Init();
-    cbs.Show();
-    if(SafeMsgBox(0,CBigResStr(IDS_ASKUNINST),CResStr(IDS_APPNAME),
-         MB_SYSTEMMODAL|MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO)
-    return false;
-    cbs.MsgLoop();
-  }
   BOOL bRet=FALSE;
+  InstLog(CResStr(IDS_DELSERVICE));
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
   {
@@ -1046,31 +1068,34 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   RemoveRegistry();
   if (bJustStop)
     return TRUE;
-  //remove COM Object Settings
-  DelRegKey(HKCR,L"CLSID\\" sGUID);
+  if (!g_bKeepRegistry)
+  {
+    InstLog(CResStr(IDS_DELREG));
+    //remove COM Object Settings
+    DelRegKey(HKCR,L"CLSID\\" sGUID);
+  }
   //Remove SuRunners from Registry
   SetEnergy(false);
   //HKLM\Security\SuRun
-  DelRegKey(HKLM,SVCKEY);
+  if (!g_bKeepRegistry)
+    DelRegKey(HKLM,SVCKEY);
   //Delete "SuRunners"?
-  if (SafeMsgBox(0,CBigResStr(IDS_DELSURUNERGRP),CResStr(IDS_APPNAME),
-    MB_ICONQUESTION|MB_SYSTEMMODAL|MB_YESNO)==IDYES)
+  if(g_bDelSuRunners)
   {
     //Make "SuRunners"->"Administrators"?
-    if (SafeMsgBox(0,CBigResStr(IDS_MKALLSURUNERSADMIN),CResStr(IDS_APPNAME),
-      MB_ICONQUESTION|MB_SYSTEMMODAL|MB_YESNO|MB_DEFBUTTON2)==IDYES)
+    if (g_bSR2Admins)
     {
       USERLIST SuRunners;
       SuRunners.SetGroupUsers(SURUNNERSGROUP,FALSE);
       for (int i=0;i<SuRunners.GetCount();i++)
+      {
+        InstLog(CResStr(IDS_SR2ADMIN,SuRunners.GetUserName(i)));
         AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,SuRunners.GetUserName(i),1);
+      }
     }
+    InstLog(CResStr(IDS_DELSURUNNERS));
     DeleteSuRunnersGroup();
   }
-
-  //Ok!
-  SafeMsgBox(0,CBigResStr(IDS_UNINSTREBOOT),CResStr(IDS_APPNAME),
-    MB_ICONINFORMATION|MB_SYSTEMMODAL);
   return bRet;
 }
 
@@ -1094,6 +1119,7 @@ BOOL InstallService()
   CopyToWinDir(_T("SuRun32.bin"));
   CopyToWinDir(_T("SuRunExt32.dll"));
 #endif _WIN64
+  InstLog(CResStr(IDS_INSTSVC));
   TCHAR SvcFile[4096];
   GetSystemWindowsDirectory(SvcFile,4096);
   PathAppend(SvcFile,_T("SuRun.exe"));
@@ -1105,6 +1131,7 @@ BOOL InstallService()
   if (!hdlServ) 
     return CloseServiceHandle(hdlSCM),FALSE;
   CloseServiceHandle(hdlServ);
+  InstLog(CResStr(IDS_STARTSVC));
   hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START);
   BOOL bRet=StartService(hdlServ,0,0);
   if (!bRet)
@@ -1173,9 +1200,12 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       }
       SendDlgItemMessage(hwnd,IDC_QUESTION,WM_SETFONT,
         (WPARAM)CreateFont(-24,0,0,0,FW_BOLD,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
-      CheckDlgButton(hwnd,IDC_RUNSETUP,g_bRunSetupAfterInstall);
+      CheckDlgButton(hwnd,IDC_RUNSETUP,1);
       CheckDlgButton(hwnd,IDC_KEEPREGISTRY,g_bKeepRegistry);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,1);
+      CheckDlgButton(hwnd,IDC_DELSURUNNERS,g_bDelSuRunners);
+      CheckDlgButton(hwnd,IDC_SR2ADMIN,g_bSR2Admins);
+      g_InstLog=GetDlgItem(hwnd,IDC_INSTLOG);
       return FALSE;
     }//WM_INITDIALOG
   case WM_DESTROY:
@@ -1207,18 +1237,122 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       switch (wParam)
       {
-      case MAKELPARAM(IDCANCEL,BN_CLICKED):
-        EndDialog(hwnd,IDCANCEL);
-        return TRUE;
-      case MAKELPARAM(IDOK,BN_CLICKED):
+      case MAKELPARAM(IDOK,BN_CLICKED): //Install SuRun:
         {
-          g_bRunSetupAfterInstall=IsDlgButtonChecked(hwnd,IDC_RUNSETUP)!=0;
+          //Settings
           g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
           if (IsDlgButtonChecked(hwnd,IDC_OWNERGROUP))
             SetOwnerAdminGrp(1);
-          EndDialog(hwnd,IDOK);
+          //Hide Checkboxes, show Listbox
+          ShowWindow(GetDlgItem(hwnd,IDC_RUNSETUP),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),SW_HIDE);
+          ShowWindow(g_InstLog,SW_SHOW);
+          //Disable Buttons
+          EnableWindow(GetDlgItem(hwnd,IDOK),0);
+          EnableWindow(GetDlgItem(hwnd,IDCANCEL),0);
+          //Show some Progress
+          SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDC_INSTALL));
+          MsgLoop();
+          if (!InstallService())
+          {
+            //Install failed:
+            InstLog(CResStr(IDS_INSTFAILED));
+            SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTFAILED));
+            //Make IDOK->Close, hide IDCANCEL
+            SetDlgItemText(hwnd,IDOK,CResStr(IDC_CLOSE));
+            ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
+            EnableWindow(GetDlgItem(hwnd,IDOK),1);
+            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
+            return TRUE;
+          }
+          //Run Setup?
+          if (IsDlgButtonChecked(hwnd,IDC_RUNSETUP)!=0)
+          {
+            TCHAR SuRunExe[4096];
+            GetSystemWindowsDirectory(SuRunExe,4096);
+            PathAppend(SuRunExe,L"SuRun.exe /SETUP");
+            PROCESS_INFORMATION pi={0};
+            STARTUPINFO si={0};
+            si.cb	= sizeof(si);
+            if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
+            {
+              CloseHandle(pi.hThread);
+              WaitForSingleObject(pi.hProcess,INFINITE);
+              CloseHandle(pi.hProcess);
+            }
+          }
+          //Show success
+          SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTSUCCESS));
+          //Show "need logoff"
+          InstLog(_T(" "));
+          InstLog(CResStr(IDS_INSTSUCCESS2));
+          //Enable OK, CANCEL
+          EnableWindow(GetDlgItem(hwnd,IDOK),1);
+          EnableWindow(GetDlgItem(hwnd,IDCANCEL),1);
+          //Cancel->Close; OK->Logoff
+          SetDlgItemText(hwnd,IDCANCEL,CResStr(IDC_CLOSE));
+          SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
+          SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
+          SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
           return TRUE;
         }
+      case MAKELPARAM(IDCANCEL,BN_CLICKED): //Close Dlg
+        EndDialog(hwnd,IDCANCEL);
+        return TRUE;
+      case MAKELPARAM(IDCLOSE,BN_CLICKED): //Close Dlg
+        EndDialog(hwnd,IDCLOSE);
+        return TRUE;
+      case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
+        WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
+        EndDialog(hwnd,IDCONTINUE);
+        return TRUE;
+      case MAKELPARAM(IDIGNORE,BN_CLICKED): //Remove SuRun:
+        {
+          //Settings
+          g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
+          g_bDelSuRunners=IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS)!=0;
+          g_bSR2Admins=IsDlgButtonChecked(hwnd,IDC_SR2ADMIN)!=0;
+          //Hide Checkboxes, show Listbox
+          ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_DELSURUNNERS),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_SR2ADMIN),SW_HIDE);
+          ShowWindow(g_InstLog,SW_SHOW);
+          //Disable Buttons
+          EnableWindow(GetDlgItem(hwnd,IDIGNORE),0);
+          EnableWindow(GetDlgItem(hwnd,IDCANCEL),0);
+          //Show some Progress
+          SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDC_UNINSTALL));
+          //Make IDIGNORE->Close, hide IDCANCEL
+          SetDlgItemText(hwnd,IDIGNORE,CResStr(IDC_CLOSE));
+          SetWindowLongPtr(GetDlgItem(hwnd,IDIGNORE),GWL_ID,IDCLOSE);
+          ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
+          MsgLoop();
+          if (!DeleteService(FALSE))
+          {
+            //Install failed:
+            InstLog(CResStr(IDS_UNINSTFAILED));
+            SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_UNINSTFAILED));
+            //Enable CLOSE
+            EnableWindow(GetDlgItem(hwnd,IDCLOSE),1);
+            return TRUE;
+          }
+          //Show success
+          SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_UNINSTSUCCESS));
+          InstLog(_T(" "));
+          InstLog(CResStr(IDS_UNINSTSUCCESS));
+          //Enable CLOSE
+          EnableWindow(GetDlgItem(hwnd,IDCLOSE),1);
+          return TRUE;
+        }
+      case MAKELPARAM(IDC_KEEPREGISTRY,BN_CLICKED):
+        g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
+        EnableWindow(GetDlgItem(hwnd,IDC_DELSURUNNERS),!g_bKeepRegistry);
+        //fall through:
+      case MAKELPARAM(IDC_DELSURUNNERS,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_SR2ADMIN),
+          IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS) &&(!g_bKeepRegistry));
+        return TRUE;
       }//switch (wParam)
       break;
     }//WM_COMMAND
@@ -1230,37 +1364,17 @@ BOOL UserInstall()
 {
   if (!IsAdmin())
     return RunThisAsAdmin(_T("/USERINST"),SERVICE_RUNNING,IDS_INSTALLADMIN);
-  CBlurredScreen cbs;
-  cbs.Init();
-  cbs.Show();
-  cbs.MsgLoop();
-  if(DialogBox(GetModuleHandle(0),
+  return DialogBox(GetModuleHandle(0),
       MAKEINTRESOURCE((CheckServiceStatus()!=0)?IDD_UPDATE:IDD_INSTALL),
-      0,InstallDlgProc)==IDCANCEL)
-      return FALSE;
-  cbs.MsgLoop();
-  if (!InstallService())
-  {
-    if(DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_INSTALL2),0,InstallDlgProc))
-    return FALSE;
-  }
-  if (g_bRunSetupAfterInstall)
-  {
-    TCHAR SuRunExe[4096];
-    GetSystemWindowsDirectory(SuRunExe,4096);
-    PathAppend(SuRunExe,L"SuRun.exe /SETUP");
-    PROCESS_INFORMATION pi={0};
-    STARTUPINFO si={0};
-    si.cb	= sizeof(si);
-    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
-    {
-      CloseHandle(pi.hThread);
-      WaitForSingleObject(pi.hProcess,INFINITE);
-      CloseHandle(pi.hProcess);
-    }
-  }
-  DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_INSTALL1),0,InstallDlgProc);
-  return TRUE;
+      0,InstallDlgProc)!=IDCANCEL;
+}
+
+BOOL UserUninstall()
+{
+  if (!IsAdmin())
+    return RunThisAsAdmin(_T("/UNINSTALL"),0,IDS_UNINSTALLADMIN);
+  return DialogBox(GetModuleHandle(0),
+    MAKEINTRESOURCE(IDD_UNINSTALL),0,InstallDlgProc)!=IDCANCEL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1347,7 +1461,7 @@ bool HandleServiceStuff()
     //UnInstall
     if (_tcsicmp(cmd.argv(1),_T("/UNINSTALL"))==0)
     {
-      DeleteService();
+      UserUninstall();
       ExitProcess(0);
       return true;
     }
