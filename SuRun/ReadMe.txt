@@ -4,6 +4,7 @@ Done
 
 ToDo for next release:
 ---------------------
+* FireFox Install/Update stil does not work
 * Polish resources
 
 To be done in future:
