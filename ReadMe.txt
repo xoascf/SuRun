@@ -1,6 +1,7 @@
 Done
 ---------------------
 * InstallSuRun was not compatible with older SuRun (<=1.0.3.0) versions
+* LogonCurrentUser/CurrUserAck did not display User Picture
 
 ToDo for next release:
 ---------------------
