@@ -372,7 +372,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
 {
   DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
                            lpProcessInformation);
-  if (!tas)
+  if ((!tas)||(tas==RETVAL_SX_NOTINLIST))
     return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
         lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
         lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -389,7 +389,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 {
   DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
                            lpProcessInformation);
-  if (!tas)
+  if ((!tas)||(tas==RETVAL_SX_NOTINLIST))
     return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
         lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
         lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
