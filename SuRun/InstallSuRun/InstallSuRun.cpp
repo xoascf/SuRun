@@ -95,10 +95,10 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE64_FILE","SuRunExt32.dll"))
     {
       RunTmp("SuRun.exe /USERINST");
-      DelTmpFile("SuRun.exe");
-      DelTmpFile("SuRunExt.dll");
       DelTmpFile("SuRun32.bin");
       DelTmpFile("SuRunExt32.dll");
+      DelTmpFile("SuRun.exe");
+      DelTmpFile("SuRunExt.dll");
     }
   }else //Win32
   {
