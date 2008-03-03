@@ -128,6 +128,8 @@
 #define IDC_ALLOWTIME                   1028
 #define IDC_ICONHELP                    1028
 #define IDC_OWNERGROUP                  1029
+#define IDC_OWNGRPST                    1070
+#define IDC_OPTNST                      1071
 #define IDC_DELUSER                     1029
 #define IDC_SETENERGY                   1030
 #define IDC_WINUPD4ALL                  1031
