@@ -1203,6 +1203,8 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_RUNSETUP,1);
       CheckDlgButton(hwnd,IDC_KEEPREGISTRY,g_bKeepRegistry);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,1);
+      if (IsOwnerAdminGrp)
+        EnableWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),false);
       CheckDlgButton(hwnd,IDC_DELSURUNNERS,g_bDelSuRunners);
       CheckDlgButton(hwnd,IDC_SR2ADMIN,g_bSR2Admins);
       g_InstLog=GetDlgItem(hwnd,IDC_INSTLOG);
