@@ -1204,7 +1204,10 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_KEEPREGISTRY,g_bKeepRegistry);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,1);
       if (IsOwnerAdminGrp)
-        EnableWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),false);
+      {
+        ShowWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),SW_HIDE);
+        ShowWindow(GetDlgItem(hwnd,IDC_OWNGRPST),SW_HIDE);
+      }
       CheckDlgButton(hwnd,IDC_DELSURUNNERS,g_bDelSuRunners);
       CheckDlgButton(hwnd,IDC_SR2ADMIN,g_bSR2Admins);
       g_InstLog=GetDlgItem(hwnd,IDC_INSTLOG);
@@ -1249,6 +1252,8 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           ShowWindow(GetDlgItem(hwnd,IDC_RUNSETUP),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_OWNGRPST),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_OPTNST),SW_HIDE);
           ShowWindow(g_InstLog,SW_SHOW);
           //Disable Buttons
           EnableWindow(GetDlgItem(hwnd,IDOK),0);
@@ -1319,6 +1324,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_DELSURUNNERS),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_SR2ADMIN),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_OPTNST),SW_HIDE);
           ShowWindow(g_InstLog,SW_SHOW);
           //Disable Buttons
           EnableWindow(GetDlgItem(hwnd,IDIGNORE),0);
