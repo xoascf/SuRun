@@ -24,6 +24,7 @@ Deferred Whishlist:
     High Impact on Performance and Resources NetUseEnum/NetUseAdd
 * Intercept "rundll32.exe newdev.dll,": 
     needs CredUI hack for Windows XP/2k3; ok with 2k and Vista
+
 ==============================================================================
 SuRun...  Super User Run
                                                       by Kay Bruns (c) 2007,08
