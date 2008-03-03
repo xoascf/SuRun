@@ -112,6 +112,3 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
   }
 	return 0;
 }
-
-
-
