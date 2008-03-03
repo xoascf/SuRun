@@ -70,7 +70,6 @@ void RunTmp(LPSTR cmd)
   if (CreateProcess(NULL,tmp,0,0,FALSE,NORMAL_PRIORITY_CLASS,0,0,&si,&pi))
   {
     CloseHandle(pi.hThread);
-    WaitForSingleObject(pi.hProcess,INFINITE);
     CloseHandle(pi.hProcess);
   }
 }
@@ -81,8 +80,7 @@ void DelTmpFile(LPCSTR File)
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
   PathAppend(tmp,File);
-  if (!DeleteFile(tmp))
-    MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
+  MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
 }
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
