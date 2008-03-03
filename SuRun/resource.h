@@ -22,13 +22,8 @@
 #define IDS_SURUNINST                   19
 #define IDS_SURUNUNINST                 20
 #define IDS_SURUNREPAIR                 21
-#define IDS_UNINSTREBOOT                22
 #define IDS_RUNFAILED                   23
-#define IDS_INSTALLOK                   24
 #define IDS_STARTMENUDIR                25
-#define IDS_STARTMNUCFG                 26
-#define IDS_ASKUNINST                   27
-#define IDS_STARTMUNINST                28
 #define IDS_GRPDESC                     29
 #define IDS_DOMAINGROUPS                31
 #define IDS_ADDFILETOLIST               31
@@ -45,8 +40,6 @@
 #define IDS_SETUP2                      41
 #define IDS_SETUP3                      42
 #define IDS_ASKAUTO                     44
-#define IDS_MKALLSURUNERSADMIN          45
-#define IDS_DELSURUNERGRP               46
 #define IDS_STARTED                     47
 #define IDS_ASKSURUNNER1                48
 #define IDS_BUILTINADMIN1               49
