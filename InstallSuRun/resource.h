@@ -2,6 +2,7 @@
 // Microsoft Developer Studio generated include file.
 // Used by InstallSuRun.rc
 //
+#define IDI_MAINICON                    100
 
 // Next default values for new objects
 // 
