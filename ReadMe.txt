@@ -1,3 +1,7 @@
+Done
+---------------------
+* InstallSuRun was not compatible with older SuRun (<=1.0.3.0) versions
+
 ToDo for next release:
 ---------------------
 * Polish resources
