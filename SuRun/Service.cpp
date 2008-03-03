@@ -1298,10 +1298,25 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           EnableWindow(GetDlgItem(hwnd,IDOK),1);
           EnableWindow(GetDlgItem(hwnd,IDCANCEL),1);
           //Cancel->Close; OK->Logoff
-          SetDlgItemText(hwnd,IDCANCEL,CResStr(IDC_CLOSE));
-          SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
-          SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
-          SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
+          OSVERSIONINFO oie;
+          oie.dwOSVersionInfoSize=sizeof(oie);
+          GetVersionEx(&oie);
+          if ((oie.dwMajorVersion==5)&&(oie.dwMinorVersion==0))
+          {
+            //Win2k no WTSLogoffSession, just display Close
+            //ExitWindowsEx will not work here because we run as Admin
+            SetDlgItemText(hwnd,IDOK,CResStr(IDC_CLOSE));
+            ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
+            EnableWindow(GetDlgItem(hwnd,IDOK),1);
+            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
+          }else 
+          {
+            //WinXP++ display LogOff 
+            SetDlgItemText(hwnd,IDCANCEL,CResStr(IDC_CLOSE));
+            SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
+            SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
+            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
+          }
           return TRUE;
         }
       case MAKELPARAM(IDCANCEL,BN_CLICKED): //Close Dlg
@@ -1311,6 +1326,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         EndDialog(hwnd,IDCLOSE);
         return TRUE;
       case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
+        //ExitWindowsEx will not work here because we run as Admin
         WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
         EndDialog(hwnd,IDCONTINUE);
         return TRUE;
