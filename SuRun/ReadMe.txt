@@ -1,19 +1,6 @@
-Done:
----------------------
-* Control Panel Icon
-* Exec-Hooks do not allocate memory (calloc) anymore
-* Installation Dialog
-  * "Do not change SuRuns file associations"
-  * Run Setup after Install
-  * "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators."
-* Uninstallation Dialog
-  * Keep all SuRun Settings
-  * Delete "SuRunners"
-  * Make SuRunners Admins
-* One Installation Container for all SuRun versions
-
 ToDo for next release:
 ---------------------
+* Polish resources
 
 To be done in future:
 ---------------------
@@ -23,7 +10,7 @@ To be done in future:
 Deferred Whishlist:
 ---------------------
 * use MD5-Hash for "Always Yes" programs: 
-    High Impact on Performance; (I'm too lazy right now)
+    Impact on Performance; (I'm too lazy right now)
 * Console SuRun support: 
     Very difficult! Pipes need to be redirected.
 * Connect Network drives for admin process: 
@@ -148,6 +135,22 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.0.2.109 - 2008-03-02: (Internal Beta)
+----------------------------
+* New self made Control Panel Icon
+* The MIDL compiler sometimes did not work when SuRuns IAT-Hook was enabled.
+  Now the Exec-Hooks do not allocate memory (calloc) anymore and MIDL works.
+* Installation/Update is Dialog based with options:
+  * "Do not change SuRuns file associations" on Update
+  * Run Setup after Install on first Install
+  * Show "Set 'Administrators' instead of 'Object creator' as default owner 
+    for ojects created by administrators." when this was not set before.
+* Uninstallation is Dialog based with options
+  * Keep all SuRun Settings
+  * Delete "SuRunners"
+  * Make SuRunners Admins
+* One Installation Container for all SuRun versions "InstallSuRun.exe"
 
 SuRun 1.0.2.108 - 2008-02-24: (Internal Beta)
 ----------------------------
