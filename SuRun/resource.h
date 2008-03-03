@@ -52,6 +52,32 @@
 #define IDS_BUILTINADMIN1               49
 #define IDS_NOADD2USERS1                50
 #define IDS_SURUNNER_ERR1               51
+#define IDS_ADDUNINST                   52
+#define IDS_ADDAUTORUN                  53
+#define IDS_ADDASSOC                    54
+#define IDS_ADDCPL                      55
+#define IDS_REMUNINST                   56
+#define IDS_REMAUTORUN                  57
+#define IDS_REMASSOC                    58
+#define IDS_REMCPL                      59
+#define IDS_DELFILE                     60
+#define IDS_DELFILEBOOT                 61
+#define IDS_COPYFILE                    63
+#define IDS_DELSERVICE                  64
+#define IDS_DELREG                      65
+#define IDS_SR2ADMIN                    66
+#define IDS_DELSURUNNERS                67
+#define IDS_INSTFAILED                  68
+#define IDC_CLOSE                       69
+#define IDS_INSTSUCCESS                 70
+#define IDS_INSTSUCCESS2                71
+#define IDC_LOGOFF                      72
+#define IDC_INSTALL                     73
+#define IDS_STARTSVC                    74
+#define IDS_INSTSVC                     75
+#define IDC_UNINSTALL                   76
+#define IDS_UNINSTFAILED                77
+#define IDS_UNINSTSUCCESS               78
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
@@ -72,6 +98,7 @@
 #define IDD_UPDATE                      122
 #define IDD_INSTALL                     123
 #define IDD_INSTALL1                    124
+#define IDD_UNINSTALL                   124
 #define IDD_INSTALL2                    125
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
@@ -138,7 +165,10 @@
 #define IDC_RESTRICTNEW                 1054
 #define IDC_NOSETUPNEW                  1055
 #define IDC_KEEPREGISTRY                1055
+#define IDC_DELSURUNNERS                1056
 #define IDC_QUESTION                    1057
+#define IDC_SR2ADMIN                    1058
+#define IDC_INSTLOG                     1059
 
 // Next default values for new objects
 // 
@@ -146,7 +176,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        123
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1059
+#define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
