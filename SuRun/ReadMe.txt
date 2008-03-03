@@ -1,13 +1,19 @@
+Done:
 ---------------------
 * Control Panel Icon
-* VC6 MIDL compiler
+* Exec-Hooks do not allocate memory (calloc) anymore
 * Installation Dialog
   * "Do not change SuRuns file associations"
+  * Run Setup after Install
   * "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators."
+* Uninstallation Dialog
+  * Keep all SuRun Settings
+  * Delete "SuRunners"
+  * Make SuRunners Admins
+* One Installation Container for all SuRun versions
 
 ToDo for next release:
 ---------------------
-* Installation Container
 
 To be done in future:
 ---------------------
