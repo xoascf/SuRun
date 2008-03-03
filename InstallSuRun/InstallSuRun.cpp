@@ -61,12 +61,13 @@ void RunTmp(LPSTR cmd)
 {
   CHAR tmp[4096];
   GetTempPath(MAX_PATH,tmp);
+  SetCurrentDirectory(tmp);
   PathRemoveBackslash(tmp);
   PathAppend(tmp,cmd);
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb	= sizeof(si);
-  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
+  if (CreateProcess(NULL,tmp,0,0,FALSE,NORMAL_PRIORITY_CLASS,0,0,&si,&pi))
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
