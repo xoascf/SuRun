@@ -33,7 +33,7 @@
 #pragma comment(lib,"comctl32.lib")
 
 #ifdef _DEBUG
-//#define _DEBUGLOGON
+#define _DEBUGLOGON
 #endif _DEBUG
 
 //////////////////////////////////////////////////////////////////////////////
@@ -114,9 +114,12 @@ static void SetUserBitmap(HWND hwnd)
     return;
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
-  int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
-  if (n!=CB_ERR)
-    SendDlgItemMessage(hwnd,IDC_USER,CB_GETLBTEXT,n,(LPARAM)&User);
+  if(SendDlgItemMessage(hwnd,IDC_USER,CB_GETCOUNT,0,0))
+  {
+    int n=(int)SendDlgItemMessage(hwnd,IDC_USER,CB_GETCURSEL,0,0);
+    if (n!=CB_ERR)
+      SendDlgItemMessage(hwnd,IDC_USER,CB_GETLBTEXT,n,(LPARAM)&User);
+  }
   HBITMAP bm=p->Users.GetUserBitmap(User);
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
   DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
@@ -481,6 +484,7 @@ DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,true,false,UsrFlags);
+  p.Users.Add(User);
   return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -491,6 +495,7 @@ DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...)
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,_T("******"),true,false,UsrFlags);
+  p.Users.Add(User);
   return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -505,7 +510,7 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
-  BOOL l=Logon(User,Password,IDS_ASKINSTALL);
+  BOOL l=Logon(User,Password,IDS_ASKAUTO);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
@@ -523,7 +528,7 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 
-  l=Logon(User,Password,IDS_ASKINSTALL);
+  l=Logon(User,Password,IDS_ASKAUTO);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
@@ -541,7 +546,7 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
   
-  l=Logon(User,Password,IDS_ASKINSTALL);
+  l=Logon(User,Password,IDS_ASKAUTO);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
