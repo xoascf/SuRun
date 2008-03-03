@@ -79,10 +79,10 @@ public:
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
   int     GetCount(){return nUsers;};
+  void Add(LPWSTR UserName);
 private:
   int nUsers;
   USERDATA* User;
-  void Add(LPWSTR UserName);
   void AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
   void AddGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
   void AddAllUsers(BOOL bScanDomain);
