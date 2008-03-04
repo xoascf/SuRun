@@ -346,6 +346,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFOR
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
         cmd,rpi.dwProcessId,rpi.hProcess,
         rpi.dwThreadId,rpi.hThread);
+      ResumeThread(rpi.hThread);
     }
   }
   SetCurrentDirectory(CurDir);
