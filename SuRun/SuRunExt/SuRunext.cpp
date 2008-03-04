@@ -572,7 +572,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscat(tmp,pei->lpParameters);
   }
   static TCHAR CurDir[4096];
-  GetCurrentDirectory(countof(CurDir),CurDir);
+  if (pei->lpDirectory && (*pei->lpDirectory) )
+    _tcscpy(CurDir,pei->lpDirectory);
+  else
+    GetCurrentDirectory(countof(CurDir),CurDir);
   ResolveCommandLine(tmp,CurDir,tmp);
   free(g_LastFailedCmd);
   g_LastFailedCmd=0;
@@ -583,17 +586,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
-  //Check Directory
-  if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
-  {
-    DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
-      pei->lpDirectory,GetLastErrorNameStatic());
-    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
-  }
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
   //ToDo: Directly write to service pipe!
-//  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA 0 0 %s",tmp);
-  
   static PROCESS_INFORMATION rpi;
   zero(rpi);
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
@@ -604,9 +598,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   // Start the child process.
-  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+  if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi))
   {
-    SetCurrentDirectory(CurDir);
     CloseHandle(pi.hThread);
     DWORD ExitCode=ERROR_ACCESS_DENIED;
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
@@ -641,7 +634,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
-  SetCurrentDirectory(CurDir);
   return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
 }
 
