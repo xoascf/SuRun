@@ -2,10 +2,11 @@ Done
 ---------------------
 * InstallSuRun was not compatible with older SuRun (<=1.0.3.0) versions
 * LogonCurrentUser/CurrUserAck did not display User Picture
+* Hooks use 12k less stack space
+* FireFox Install/Update does work now
 
 ToDo for next release:
 ---------------------
-* FireFox Install/Update stil does not work
 * Polish resources
 
 To be done in future:
@@ -22,7 +23,7 @@ Deferred Whishlist:
 * Connect Network drives for admin process: 
     High Impact on Performance and Resources NetUseEnum/NetUseAdd
 * Intercept "rundll32.exe newdev.dll,": 
-    needs CredUI hack for Windows XP/2k3; ok with 2k and Vista
+    needs CredUI hack for XP/2k3; ok with 2k and Vista
 
 ==============================================================================
 SuRun...  Super User Run
