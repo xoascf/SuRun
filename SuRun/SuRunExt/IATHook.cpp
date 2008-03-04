@@ -383,11 +383,11 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
                            dwCreationFlags,lpProcessInformation);
   if(tas==RETVAL_OK)
     return SetLastError(NOERROR),TRUE;
-  if (tas==RETVAL_SX_NOTINLIST)
-    return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
-        lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
-        lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  return FALSE;
+  if(tas==RETVAL_CANCELLED)
+    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
+      lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+      lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
 }
 
 BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
@@ -400,11 +400,11 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
                            dwCreationFlags,lpProcessInformation);
   if(tas==RETVAL_OK)
     return SetLastError(NOERROR),TRUE;
-  if (tas==RETVAL_SX_NOTINLIST)
-    return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
-        lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
-        lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  return FALSE;
+  if(tas==RETVAL_CANCELLED)
+    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
+      lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+      lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
 }
 
 FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
