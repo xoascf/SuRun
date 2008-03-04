@@ -604,7 +604,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
   {
     SetCurrentDirectory(CurDir);
-    CloseHandle(pi.hThread );
+    CloseHandle(pi.hThread);
     DWORD ExitCode=ERROR_ACCESS_DENIED;
     if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
@@ -628,7 +628,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
         //return a valid PROCESS_INFORMATION!
         pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
-      rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
+      rpi.hThread=OpenThread(THREAD_SUSPEND_RESUME|SYNCHRONIZE,false,rpi.dwThreadId);
       ResumeThread(rpi.hThread);
       CloseHandle(rpi.hThread);
     }
