@@ -285,7 +285,10 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   EnterCriticalSection(&g_HookCs);
   static TCHAR CurDir[4096];
   zero(CurDir);
-  GetCurrentDirectory(countof(CurDir),CurDir);
+  if (lpCurDir && *lpCurDir)
+    _tcscpy(CurDir,lpCurDir);
+  else
+    GetCurrentDirectory(countof(CurDir),CurDir);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   static WCHAR cmd[4096];
   zero(cmd);
@@ -307,7 +310,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   {
     static WCHAR tmp[4096];
     zero(tmp);
-    ResolveCommandLine(cmd,lpCurDir,tmp);
+    ResolveCommandLine(cmd,CurDir,tmp);
     //Exit if ShellExecHook failed on "tmp"
     if(g_LastFailedCmd)
     {
@@ -335,7 +338,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   // Start the child process.
   DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   if (((lpCreateProcessW)hkCrProcW.orgFunc)
-    (NULL,cmd,NULL,NULL,FALSE,0,NULL,lpCurDir,&si,&pi))
+    (NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
@@ -360,7 +363,6 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
           DBGTrace1("ERROR: ResumeThread failed! %s",GetLastErrorNameStatic());
     }
   }
-  SetCurrentDirectory(CurDir);
   LeaveCriticalSection(&g_HookCs);
   return ExitCode;
 }
