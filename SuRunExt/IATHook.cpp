@@ -327,9 +327,10 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
       GetCurrentProcessId(),&rpi,tmp);
   }
   //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
-  STARTUPINFOW si;
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&si, sizeof(si));
+  static STARTUPINFOW si;
+  zero(si);
+  static PROCESS_INFORMATION pi;
+  zero(pi);
   si.cb = sizeof(si);
   // Start the child process.
   DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
