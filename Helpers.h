@@ -64,7 +64,7 @@ void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow);
 BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account);
 
 // SetAdminDenyUserAccess
-void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID=0);
+void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID=0,DWORD Permissions=SYNCHRONIZE);
 
 // GetUserAccessSD
 PSECURITY_DESCRIPTOR GetUserAccessSD();
