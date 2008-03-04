@@ -118,7 +118,7 @@ int Run()
     //Allow access to the Process and Thread to the Administrators and deny 
     //access for the current user
     SetAdminDenyUserAccess(pi.hThread);
-    SetAdminDenyUserAccess(pi.hProcess);
+    SetAdminDenyUserAccess(pi.hProcess,GetCurrentProcessId(),THREAD_SUSPEND_RESUME|SYNCHRONIZE);
     //Start the main thread
     if((g_RunData.RetPID==0)||(g_RunData.RetPtr==0))
       ResumeThread(pi.hThread);
