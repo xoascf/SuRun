@@ -618,7 +618,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
         if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
           pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
         rpi.hThread=OpenThread(THREAD_SUSPEND_RESUME|SYNCHRONIZE,false,rpi.dwThreadId);
-        ResumeThread(rpi.hThread);
+#ifdef _DEBUG
+        if(!rpi.hThread)
+          DBGTrace1("ERROR: OpenThread failed! %s",GetLastErrorNameStatic());
+#endif _DEBUG
+        if (ResumeThread(rpi.hThread)==-1)
+          DBGTrace1("ERROR: ResumeThread failed! %s",GetLastErrorNameStatic());
         CloseHandle(rpi.hThread);
       }else 
       {
