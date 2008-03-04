@@ -500,6 +500,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   return hr;
 }
 
+static CRITICAL_SECTION l_SxHkCs;
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
@@ -536,8 +537,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
     return S_FALSE;
   }
-  TCHAR tmp[4096];
-  TCHAR cmd[4096];
+  EnterCriticalSection(&l_SxHkCs);
+  static TCHAR tmp[4096];
+  static TCHAR cmd[4096];
   //check if this Programm has an Auto-SuRun-Entry in the List
   _tcscpy(tmp,pei->lpFile);
   PathQuoteSpaces(tmp);
@@ -552,16 +554,16 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       //AutoRun: get open command
       PathAppend(tmp,L"AutoRun.inf");
       if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,tmp)!=0)
-        return S_FALSE;
+        return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
       GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,countof(cmd)-1,tmp);
       if (!cmd[0])
-        return S_FALSE;
+        return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
       _tcscpy(tmp,cmd);
       bNoAutoRun=FALSE;
     }else
     {
       DBGTrace("SuRun ShellExtHook Error: invalid verb!");
-      return S_FALSE;
+      return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
     }
   }
   if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
@@ -569,8 +571,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscat(tmp,L" ");
     _tcscat(tmp,pei->lpParameters);
   }
-  TCHAR CurDir[4096];
-  PROCESS_INFORMATION rpi;
+  static TCHAR CurDir[4096];
   GetCurrentDirectory(countof(CurDir),CurDir);
   ResolveCommandLine(tmp,CurDir,tmp);
   free(g_LastFailedCmd);
@@ -581,18 +582,20 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   PathQuoteSpaces(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
-    return S_FALSE;
+    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
   //Check Directory
   if (pei->lpDirectory && (*pei->lpDirectory) && (!SetCurrentDirectory(pei->lpDirectory)))
   {
     DBGTrace2("SuRun ShellExtHook Error: SetCurrentDirectory(%s) failed: %s",
       pei->lpDirectory,GetLastErrorNameStatic());
-    return S_FALSE;
+    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
   }
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
   //ToDo: Directly write to service pipe!
 //  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA 0 0 %s",tmp);
   
+  static PROCESS_INFORMATION rpi;
+  zero(rpi);
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
     GetCurrentProcessId(),&rpi,tmp);
   DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
@@ -634,11 +637,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
+    LeaveCriticalSection(&l_SxHkCs);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   SetCurrentDirectory(CurDir);
-  return S_FALSE;
+  return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -804,6 +808,9 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
       hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
 #endif _DEBUG
+    EnterCriticalSection(&l_SxHkCs);
+    LeaveCriticalSection(&l_SxHkCs);
+    DeleteCriticalSection(&l_SxHkCs);
     //IAT-Hook
     UnloadHooks();
     return TRUE;
@@ -815,6 +822,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
+  InitializeCriticalSection(&l_SxHkCs);
   //Resources
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
