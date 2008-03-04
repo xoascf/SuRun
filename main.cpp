@@ -120,7 +120,8 @@ int Run()
     SetAdminDenyUserAccess(pi.hThread);
     SetAdminDenyUserAccess(pi.hProcess);
     //Start the main thread
-    ResumeThread(pi.hThread);
+    if((g_RunData.RetPID==0)||(g_RunData.RetPtr==0))
+      ResumeThread(pi.hThread);
     //Ok, we're done with the handles:
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
