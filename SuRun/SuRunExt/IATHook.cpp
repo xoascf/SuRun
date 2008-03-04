@@ -272,15 +272,15 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
                      DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
 {
   if (!GetUseIATHook)
-    return FALSE;
+    return RETVAL_SX_NOTINLIST;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   if(IsAdmin())
-    return FALSE;
+    return RETVAL_SX_NOTINLIST;
   {
     TCHAR User[UNLEN+GNLEN+2]={0};
     GetProcessUserName(GetCurrentProcessId(),User);
     if (!IsInSuRunners(User))
-      return FALSE;
+      return RETVAL_SX_NOTINLIST;
   }
   EnterCriticalSection(&g_HookCs);
   TCHAR CurDir[4096]={0};
@@ -312,14 +312,14 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
       free(g_LastFailedCmd);
       g_LastFailedCmd=0;
       if(bExitNow)
-        return LeaveCriticalSection(&g_HookCs),FALSE;  
+        return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
     }
     GetSystemWindowsDirectoryW(cmd,countof(cmd));
     PathAppendW(cmd,L"SuRun.exe");
     PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
-      return LeaveCriticalSection(&g_HookCs),FALSE;
+      return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
       GetCurrentProcessId(),&rpi,tmp);
   }
@@ -381,12 +381,12 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
 {
   DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
                            dwCreationFlags,lpProcessInformation);
-  if ((!tas)||(tas==RETVAL_SX_NOTINLIST))
+  if(tas==RETVAL_OK)
+    return SetLastError(NOERROR),TRUE;
+  if (tas==RETVAL_SX_NOTINLIST)
     return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
         lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
         lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  if(tas==RETVAL_OK)
-    return SetLastError(NOERROR),TRUE;
   return FALSE;
 }
 
@@ -398,12 +398,12 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 {
   DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
                            dwCreationFlags,lpProcessInformation);
-  if ((!tas)||(tas==RETVAL_SX_NOTINLIST))
+  if(tas==RETVAL_OK)
+    return SetLastError(NOERROR),TRUE;
+  if (tas==RETVAL_SX_NOTINLIST)
     return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
         lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
         lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  if(tas==RETVAL_OK)
-    return SetLastError(NOERROR),TRUE;
   return FALSE;
 }
 
