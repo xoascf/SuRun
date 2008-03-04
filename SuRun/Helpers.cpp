@@ -319,7 +319,7 @@ Cleanup:
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/)
+void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/,DWORD Permissions/*=SYNCHRONIZE*/)
 {
   DWORD dwRes;
   PACL pOldDACL=NULL, pNewDACL=NULL;
@@ -347,7 +347,7 @@ void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/)
   ea[0].grfAccessMode = GRANT_ACCESS;
   ea[0].Trustee.ptstrName  = (LPTSTR)AdminSID;
   // The ACE will deny the current User access to the object.
-  ea[1].grfAccessPermissions = SYNCHRONIZE;
+  ea[1].grfAccessPermissions = Permissions;
   ea[1].grfAccessMode = SET_ACCESS;
   ea[1].Trustee.ptstrName  = (LPTSTR)UserSID;
   // Create a new ACL that merges the new ACE
