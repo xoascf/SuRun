@@ -623,9 +623,15 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
-    if ((ExitCode==RETVAL_OK)&&(pei->fMask&SEE_MASK_NOCLOSEPROCESS))
-      //return a valid PROCESS_INFORMATION!
-      pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
+    if (ExitCode==RETVAL_OK)
+    {
+      if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
+        //return a valid PROCESS_INFORMATION!
+        pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
+      rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
+      ResumeThread(rpi.hThread);
+      CloseHandle(rpi.hThread);
+    }
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
