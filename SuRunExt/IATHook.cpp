@@ -283,10 +283,12 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
       return RETVAL_SX_NOTINLIST;
   }
   EnterCriticalSection(&g_HookCs);
-  TCHAR CurDir[4096]={0};
+  static TCHAR CurDir[4096];
+  zero(CurDir);
   GetCurrentDirectory(countof(CurDir),CurDir);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
-  WCHAR cmd[4096]={0};
+  static WCHAR cmd[4096];
+  zero(cmd);
   if(lpApp)
   {
     wcscat(cmd,lpApp);
@@ -303,7 +305,8 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   PROCESS_INFORMATION rpi={0};
   //ToDo: Directly write to service pipe!
   {
-    WCHAR tmp[4096]={0};
+    static WCHAR tmp[4096];
+    zero(tmp);
     ResolveCommandLine(cmd,lpCurDir,tmp);
     //Exit if ShellExecHook failed on "tmp"
     if(g_LastFailedCmd)
@@ -364,13 +367,16 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
 DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
                      DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
 {
-  WCHAR wApp[4096];
+  EnterCriticalSection(&g_HookCs);
+  static WCHAR wApp[4096];
   MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
-  WCHAR wCmd[4096];
+  static WCHAR wCmd[4096];
   MultiByteToWideChar(CP_ACP,0,lpCmd,-1,wCmd,(int)4096);
-  WCHAR wCurDir[4096];
+  static WCHAR wCurDir[4096];
   MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
-  return TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi);
+  DWORD dwRet=TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi);
+  LeaveCriticalSection(&g_HookCs);
+  return dwRet;
 }
 
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
