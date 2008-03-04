@@ -268,7 +268,8 @@ CRITICAL_SECTION g_HookCs;
 //For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
 extern LPTSTR g_LastFailedCmd; //defined in SuSunExt.cpp
 
-DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
+                     DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
 {
   if (!GetUseIATHook)
     return FALSE;
@@ -340,13 +341,14 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFOR
     {
       //return a valid PROCESS_INFORMATION!
       rpi.hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
-      rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
+      rpi.hThread=OpenThread(THREAD_SUSPEND_RESUME|SYNCHRONIZE,false,rpi.dwThreadId);
       if(lppi)
         memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
         cmd,rpi.dwProcessId,rpi.hProcess,
         rpi.dwThreadId,rpi.hThread);
-      ResumeThread(rpi.hThread);
+      if((dwCreationFlags&CREATE_SUSPENDED)==0)
+        ResumeThread(rpi.hThread);
     }
   }
   SetCurrentDirectory(CurDir);
@@ -354,7 +356,8 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,LPPROCESS_INFOR
   return ExitCode;
 }
 
-DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,LPPROCESS_INFORMATION lppi)
+DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
+                     DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
 {
   WCHAR wApp[4096];
   MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
@@ -362,7 +365,7 @@ DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,LPPROCESS_INFORMAT
   MultiByteToWideChar(CP_ACP,0,lpCmd,-1,wCmd,(int)4096);
   WCHAR wCurDir[4096];
   MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
-  return TestAutoSuRunW(wApp,wCmd,wCurDir,lppi);
+  return TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi);
 }
 
 BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
@@ -372,7 +375,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-                           lpProcessInformation);
+                           dwCreationFlags,lpProcessInformation);
   if ((!tas)||(tas==RETVAL_SX_NOTINLIST))
     return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
         lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
@@ -389,7 +392,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
   DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-                           lpProcessInformation);
+                           dwCreationFlags,lpProcessInformation);
   if ((!tas)||(tas==RETVAL_SX_NOTINLIST))
     return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
         lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
