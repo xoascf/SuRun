@@ -614,6 +614,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       {
         pei->hInstApp=(HINSTANCE)33;
         DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",cmd);
+        //return valid PROCESS_INFORMATION!
+        if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
+          pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
+        rpi.hThread=OpenThread(THREAD_SUSPEND_RESUME|SYNCHRONIZE,false,rpi.dwThreadId);
+        ResumeThread(rpi.hThread);
+        CloseHandle(rpi.hThread);
       }else 
       {
         pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
@@ -623,15 +629,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
-    if (ExitCode==RETVAL_OK)
-    {
-      if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
-        //return a valid PROCESS_INFORMATION!
-        pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
-      rpi.hThread=OpenThread(THREAD_SUSPEND_RESUME|SYNCHRONIZE,false,rpi.dwThreadId);
-      ResumeThread(rpi.hThread);
-      CloseHandle(rpi.hThread);
-    }
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
