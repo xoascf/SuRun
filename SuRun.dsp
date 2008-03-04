@@ -252,6 +252,10 @@ SOURCE=.\WinStaDesk.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
+SOURCE=.\res\app.manifest
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\ico10605.ico
 # End Source File
 # Begin Source File
@@ -287,10 +291,6 @@ SOURCE=.\res\Settings.ico
 SOURCE=.\res\Software.ico
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=.\res\app.manifest
-# End Source File
 # Begin Source File
 
 SOURCE=.\gpedit.txt
