@@ -33,7 +33,7 @@
 #pragma comment(lib,"comctl32.lib")
 
 #ifdef _DEBUG
-#define _DEBUGLOGON
+//#define _DEBUGLOGON
 #endif _DEBUG
 
 //////////////////////////////////////////////////////////////////////////////
