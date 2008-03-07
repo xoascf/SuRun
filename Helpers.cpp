@@ -530,11 +530,14 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
   }
   if (path[1]==':')
   {
+    TCHAR d[4096];
+    GetCurrentDirectory(countof(d),d);
     //if path=="d:" -> "cd d:"
     if (!SetCurrentDirectory(path))
       return false;
     //if path=="d:" -> "cd d:" -> "d:\documents"
     GetCurrentDirectory(4096,path);
+    SetCurrentDirectory(d);
     Combine(app,path,file,ext);
   }
   // d:\path\file.ext ->PathFileExists
