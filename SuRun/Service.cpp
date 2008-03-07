@@ -346,8 +346,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               {
                 CloseHandle(pi.hThread);
                 WaitForSingleObject(pi.hProcess,60000);
-                DWORD ex=0;
-                GetExitCodeProcess(pi.hProcess,&ex);
+                DWORD ex=STILL_ACTIVE;
+                while (ex==STILL_ACTIVE)
+                  GetExitCodeProcess(pi.hProcess,&ex);
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
                   ResumeClient(RETVAL_ACCESSDENIED);
