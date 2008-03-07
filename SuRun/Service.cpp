@@ -346,7 +346,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               {
                 CloseHandle(pi.hThread);
                 WaitForSingleObject(pi.hProcess,60000);
+                DWORD ex=0;
+                GetExitCodeProcess(pi.hProcess,&ex);
                 CloseHandle(pi.hProcess);
+                if (ex!=(~pi.dwProcessId))
+                  ResumeClient(RETVAL_ACCESSDENIED);
               }else
                 DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
             }else
@@ -1416,7 +1420,7 @@ bool HandleServiceStuff()
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
     SuRun(wcstol(cmd.argv(2),0,10));
-    ExitProcess(0);
+    ExitProcess(~GetCurrentProcessId());
     return true;
   }
   if (cmd.argc()==2)
