@@ -2,7 +2,7 @@ Done
 ---------------------
 * InstallSuRun was not compatible with older SuRun (<=1.0.3.0) versions
 * LogonCurrentUser/CurrUserAck did not display User Picture
-* Hooks use 12k less stack space
+* Hooks use 84k less stack space
 * FireFox Install/Update does work now
 
 ToDo for next release:
