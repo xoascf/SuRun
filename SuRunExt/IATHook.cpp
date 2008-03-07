@@ -348,19 +348,19 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     {
       //return a valid PROCESS_INFORMATION!
       rpi.hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
-      rpi.hThread=OpenThread(THREAD_SUSPEND_RESUME|SYNCHRONIZE,false,rpi.dwThreadId);
-#ifdef _DEBUG
-      if(!rpi.hThread)
-        DBGTrace1("ERROR: OpenThread failed! %s",GetLastErrorNameStatic());
-#endif _DEBUG
+      rpi.hThread=OpenThread(/*THREAD_SUSPEND_RESUME|*/SYNCHRONIZE,false,rpi.dwThreadId);
+//#ifdef _DEBUG
+//      if(!rpi.hThread)
+//        DBGTrace1("ERROR: OpenThread failed! %s",GetLastErrorNameStatic());
+//#endif _DEBUG
       if(lppi)
         memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
       DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
         cmd,rpi.dwProcessId,rpi.hProcess,
         rpi.dwThreadId,rpi.hThread);
-      if((dwCreationFlags&CREATE_SUSPENDED)==0)
-        if (ResumeThread(rpi.hThread)==-1)
-          DBGTrace1("ERROR: ResumeThread failed! %s",GetLastErrorNameStatic());
+//      if((dwCreationFlags&CREATE_SUSPENDED)==0)
+//        if (ResumeThread(rpi.hThread)==-1)
+//          DBGTrace1("ERROR: ResumeThread failed! %s",GetLastErrorNameStatic());
     }
   }
   LeaveCriticalSection(&g_HookCs);
