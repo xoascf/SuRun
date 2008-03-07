@@ -530,7 +530,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
   }
   if (path[1]==':')
   {
-    TCHAR d[4096];
+    static TCHAR d[4096];
     GetCurrentDirectory(countof(d),d);
     //if path=="d:" -> "cd d:"
     if (!SetCurrentDirectory(path))
@@ -566,8 +566,8 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
 BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
 {
   //Application
-  TCHAR app[4096]={0};
-  TCHAR args[4096]={0};
+  static TCHAR app[4096]={0};
+  static TCHAR args[4096]={0};
   _tcscpy(args,CmdLine);
   PathRemoveBlanks(args);
   //Clean up double spaces or unneeded quotes
@@ -592,10 +592,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   NetworkPathToUNCPath(app);
   BOOL fExist=PathFileExists(app);
   //Split path parts
-  TCHAR path[4096];
-  TCHAR file[4096+1];
-  TCHAR ext[4096+1];
-  TCHAR SysDir[4096+1];
+  static TCHAR path[4096];
+  static TCHAR file[4096+1];
+  static TCHAR ext[4096+1];
+  static TCHAR SysDir[4096+1];
   GetSystemDirectory(SysDir,4096);
   Split(app,path,file,ext);
   //Explorer(.exe)
