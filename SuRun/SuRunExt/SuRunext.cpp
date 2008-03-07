@@ -576,7 +576,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscpy(CurDir,pei->lpDirectory);
   else
     GetCurrentDirectory(countof(CurDir),CurDir);
+  
   ResolveCommandLine(tmp,CurDir,tmp);
+  SetCurrentDirectory(cmd);
   free(g_LastFailedCmd);
   g_LastFailedCmd=0;
 
