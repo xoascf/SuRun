@@ -328,7 +328,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
             if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
             {
-              PROCESS_INFORMATION pi={0};
               STARTUPINFO si={0};
               si.cb=sizeof(si);
               TCHAR cmd[4096]={0};
@@ -340,15 +339,19 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
               EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
               EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+              BYTE bRunCount=0;
+TryAgain:
+              PROCESS_INFORMATION pi={0};
               DWORD stTime=timeGetTime();
               if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
                           CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                           0,NULL,&si,&pi))
               {
+                bRunCount++;
                 CloseHandle(pi.hThread);
                 WaitForSingleObject(pi.hProcess,60000);
                 DWORD ex=STILL_ACTIVE;
-                while (ex==STILL_ACTIVE)
+//                while (ex==STILL_ACTIVE)
                   GetExitCodeProcess(pi.hProcess,&ex);
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
@@ -356,6 +359,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                   DBGTrace3("SuRun: Starting child process failed after %d ms. "
                     L"Expected return value :%X real return value %x",
                     timeGetTime()-stTime,~pi.dwProcessId,ex);
+                  //For YZshadow: Give it four tries
+                  if ((bRunCount<4)&&(ex==STATUS_ACCESS_VIOLATION))
+                  {
+                    goto TryAgain;
+                  }
                   ResumeClient(RETVAL_ACCESSDENIED);
                 }
               }else
