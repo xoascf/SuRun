@@ -18,16 +18,12 @@
 #include <aclapi.h>
 #include <userenv.h>
 #include "WinStaDesk.h"
+#include "ScreenSnap.h"
 #include "Helpers.h"
+#include "ResStr.h"
 #include "DBGTrace.h"
 
 #pragma comment(lib,"Userenv.lib")
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -291,6 +287,88 @@ void DenyUserAccessToDesktop(HDESK hDesk)
 	LocalFree((HLOCAL)pSD); 
 }
 
+//This class creates a new desktop with a darkened blurred image of the 
+//current dektop as background.
+class CRunOnNewDeskTop
+{
+public:
+  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCreateBkWnd);
+  ~CRunOnNewDeskTop();
+  bool IsValid();
+  void CleanUp();
+private:
+  bool    m_bOk;
+  HWINSTA m_hwinstaSave;
+  HWINSTA m_hwinstaUser;
+  HDESK   m_hdeskSave;
+  HDESK   m_hdeskUser;
+  HDESK   m_hDeskSwitch;
+  CBlurredScreen m_Screen;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// CStayOnDeskTop
+//
+// There's no way to keep a thread in a different process from calling 
+// SwitchDesktop(). 
+// Even worse: Microsoft suggests using SwitchDeskTop(OpenDesktop("Default"))
+// to detect if a screen saver or logon screen is active. 
+// Apparently ShedHlp.exe from Acronis TrueImage 11 uses this trick. So I'm
+// forced to use CStayOnDeskTop to switch back to SuRuns desktop.
+//////////////////////////////////////////////////////////////////////////////
+
+class CStayOnDeskTop
+{
+public:
+  CStayOnDeskTop(LPCTSTR DeskName)
+  {
+    m_DeskName=_tcsdup(DeskName);
+    m_Thread=CreateThread(0,0,ThreadProc,this,0,0);
+  }
+  ~CStayOnDeskTop()
+  {
+    LPTSTR s=m_DeskName;
+    m_DeskName=0;
+    free(s);
+    if(m_Thread)
+      WaitForSingleObject(m_Thread,INFINITE);
+    while (m_Thread)
+      Sleep(55);
+  }
+  static DWORD WINAPI ThreadProc(void* p)
+  {
+    CStayOnDeskTop* t=(CStayOnDeskTop*)p;
+    SetThreadPriority(t->m_Thread,THREAD_PRIORITY_IDLE);
+    LPTSTR DeskName=_tcsdup(t->m_DeskName);
+    while (t->m_DeskName)
+    {
+      HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
+      if (d!=0)
+      {
+        HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
+        if (i!=0)
+        {
+          TCHAR n[MAX_PATH]={0};
+          DWORD l=MAX_PATH;
+          if (GetUserObjectInformation(i,UOI_NAME,n,l,&l))
+            if (_tcsicmp(n,DeskName))
+              SwitchDesktop(d);
+          CloseDesktop(i);
+        }
+        CloseDesktop(d);
+      }
+      Sleep(10);
+    }
+    free(DeskName);
+    t->m_Thread=0;
+    return 0;
+  }
+private:
+  LPTSTR m_DeskName;
+  HANDLE m_Thread;
+};
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 // CRunOnNewDeskTop:
@@ -432,3 +510,35 @@ bool CRunOnNewDeskTop::IsValid()
 {
   return m_bOk;
 };
+
+
+CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
+CStayOnDeskTop* g_StayOnDesk=NULL;
+
+bool CreateSafeDesktop(LPTSTR WinSta,BOOL BlurDesk)
+{
+  DeleteSafeDesktop();
+  //Every "secure" Desktop has its own name:
+  CResStr DeskName(L"SRD_%04x",GetTickCount());
+  CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,BlurDesk);
+  if (!rond)
+    return false;
+  if (!rond->IsValid())
+  {
+    delete rond;
+    return false;
+  }
+  g_RunOnNewDesk=rond;
+  g_StayOnDesk=new CStayOnDeskTop(DeskName);
+  return true;
+}
+
+void DeleteSafeDesktop()
+{
+  if (g_StayOnDesk)
+    delete g_StayOnDesk;
+  g_StayOnDesk=NULL;
+  if (g_RunOnNewDesk)
+    delete g_RunOnNewDesk;
+  g_RunOnNewDesk=NULL;
+}
