@@ -340,6 +340,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
               EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
               EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+              DWORD stTime=timeGetTime();
               if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
                           CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                           0,NULL,&si,&pi))
@@ -351,7 +352,12 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
                   GetExitCodeProcess(pi.hProcess,&ex);
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
+                {
+                  DBGTrace3("SuRun: Starting child process failed after %d ms. "
+                    L"Expected return value :%X real return value %x",
+                    timeGetTime()-stTime,~pi.dwProcessId,ex);
                   ResumeClient(RETVAL_ACCESSDENIED);
+                }
               }else
                 DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
             }else
