@@ -361,9 +361,7 @@ TryAgain:
                     bRunCount,timeGetTime()-stTime,~pi.dwProcessId,ex);
                   //For YZshadow: Give it four tries
                   if ((bRunCount<4)&&(ex==STATUS_ACCESS_VIOLATION))
-                  {
                     goto TryAgain;
-                  }
                   ResumeClient(RETVAL_ACCESSDENIED);
                 }
               }else
@@ -435,42 +433,46 @@ DWORD PrepareSuRun()
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-  //Every "secure" Desktop has its own name:
-  CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Create the new desktop
-  CRunOnNewDeskTop crond(g_RunData.WinSta,DeskName,GetBlurDesk);
-  CStayOnDeskTop csod(DeskName);
-  if (crond.IsValid())
+  if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
   {
-    //secure desktop created...
-    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
-      return RETVAL_CANCELLED;
-    //Is User Restricted?
-    DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
-    if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
-      return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
-    DWORD l=0;
-    if (!PwOk)
+    __try
     {
-      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-      if (GetSavePW && (l&1))
-        SavePassword(g_RunData.UserName,g_RunPwd);
-    }else
-      l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-    if((l&1)==0)
-    {
-      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
+      //secure desktop created...
+      if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
+        return RETVAL_CANCELLED;
+      //Is User Restricted?
+      DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
+      if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
+        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+      DWORD l=0;
+      if (!PwOk)
+      {
+        l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
+        if (GetSavePW && (l&1))
+          SavePassword(g_RunData.UserName,g_RunPwd);
+      }else
+        l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
+      DeleteSafeDesktop();
+      if((l&1)==0)
+      {
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
+        if((l&2)!=0)
+          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
+        return RETVAL_CANCELLED;
+      }
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
       if((l&2)!=0)
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
-      return RETVAL_CANCELLED;
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
+      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
+      return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+    }__except(1)
+    {
+      DBGTrace("FATAL: Exception in PrepareSuRun()");
     }
-    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
-    if((l&2)!=0)
-      SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
-    SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
-    return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-  }else //FATAL: secure desktop could not be created!
-    SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    DeleteSafeDesktop();
+  }
+  SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return RETVAL_ACCESSDENIED;
 }
 
@@ -507,16 +509,6 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 
 BOOL Setup(LPCTSTR WinStaName)
 {
-  //Every "secure" Desktop has its own name:
-  CResStr DeskName(L"SRD_%04x",GetTickCount());
-  //Create the new desktop
-  CRunOnNewDeskTop crond(WinStaName,DeskName,GetBlurDesk);
-  CStayOnDeskTop csod(DeskName);
-  if (!crond.IsValid())    
-  {
-    SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-    return FALSE;
-  }
   //only Admins and SuRunners may setup SuRun
   if (g_CliIsAdmin)
     return RunSetup();
@@ -752,8 +744,20 @@ void SuRun(DWORD ProcessID)
   //Setup?
   if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
   {
+    //Create the new desktop
     ResumeClient(RETVAL_OK);
-    Setup(g_RunData.WinSta);
+    if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
+    {
+      __try
+      {
+        Setup(g_RunData.WinSta);
+      }__except(1)
+      {
+        DBGTrace("FATAL: Exception in SuRun()");
+      }
+      DeleteSafeDesktop();
+    }else
+      SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     return;
   }
   KillProcess(g_RunData.KillPID);
@@ -1435,6 +1439,7 @@ bool HandleServiceStuff()
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
     SuRun(wcstol(cmd.argv(2),0,10));
+    DeleteSafeDesktop();
     ExitProcess(~GetCurrentProcessId());
     return true;
   }
