@@ -356,9 +356,9 @@ TryAgain:
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
                 {
-                  DBGTrace3("SuRun: Starting child process failed after %d ms. "
+                  DBGTrace4("SuRun: Starting child process try %d failed after %d ms. "
                     L"Expected return value :%X real return value %x",
-                    timeGetTime()-stTime,~pi.dwProcessId,ex);
+                    bRunCount,timeGetTime()-stTime,~pi.dwProcessId,ex);
                   //For YZshadow: Give it four tries
                   if ((bRunCount<4)&&(ex==STATUS_ACCESS_VIOLATION))
                   {
