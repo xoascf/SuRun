@@ -753,7 +753,7 @@ void SuRun(DWORD ProcessID)
         Setup(g_RunData.WinSta);
       }__except(1)
       {
-        DBGTrace("FATAL: Exception in SuRun()");
+        DBGTrace("FATAL: Exception in Setup()");
       }
       DeleteSafeDesktop();
     }else
