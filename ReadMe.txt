@@ -3,6 +3,7 @@ Done
 * InstallSuRun was not compatible with older SuRun (<=1.0.3.0) versions
 * LogonCurrentUser/CurrUserAck did not display User Picture
 * Hooks use 84k less stack space
+* Safe Desktop uses less stack and seems to be YZshadow tolerant now
 * FireFox Install/Update does work now
 
 ToDo for next release:
