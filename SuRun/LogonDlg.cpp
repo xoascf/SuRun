@@ -55,14 +55,22 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
   EnablePrivilege(SE_TCB_NAME);//Win2k
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
+  bool bFirstTry=TRUE;
   if ((Password==NULL) || (*Password==NULL))
   {
     bEmptyPWAllowed=EmptyPWAllowed;
     AllowEmptyPW(TRUE);
   }
+SecondTry:
   if (!LogonUser(un,dn,Password,LOGON32_LOGON_NETWORK,0,&hToken))
     if (GetLastError()==ERROR_PRIVILEGE_NOT_HELD)
       hToken=SSPLogonUser(dn,un,Password);
+  //Windows sometimes reports an error if the user's password is empty, try again:
+  if (bFirstTry && (hToken==NULL)&&((Password==NULL) || (*Password==NULL)))
+  {
+    bFirstTry=FALSE;
+    goto SecondTry;
+  }
 //  DBGTrace4("GetUserToken(%s,%s,%s):%s",un,dn,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
   //Reset status of "use of empty passwords for network logon"
   if ((Password==NULL) || (*Password==NULL))
