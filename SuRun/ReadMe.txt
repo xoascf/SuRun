@@ -5,6 +5,7 @@ Done
 * Hooks use 84k less stack space
 * Safe Desktop uses less stack and seems to be YZshadow tolerant now
 * FireFox Install/Update does work now
+* Second try for empty passwords
 
 ToDo for next release:
 ---------------------
