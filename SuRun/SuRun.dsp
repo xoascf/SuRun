@@ -362,6 +362,10 @@ SOURCE=.\res\Windows.ico
 # End Group
 # Begin Source File
 
+SOURCE=.\ChangeLog.txt
+# End Source File
+# Begin Source File
+
 SOURCE=.\gpedit.txt
 # End Source File
 # Begin Source File
