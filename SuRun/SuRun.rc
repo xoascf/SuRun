@@ -1026,7 +1026,7 @@ BEGIN
     CONTROL         "No auto-restart for scheduled Automatic Windows Update installations",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,175,349,13
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,190,349,27
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
@@ -1268,7 +1268,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,171,10
     LTEXT           "For security the following group policy must be activated:",
                     IDC_OWNGRPST,18,60,203,8
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
     PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
@@ -1294,7 +1294,7 @@ BEGIN
                     18,44,176,10
     LTEXT           "For security the following group policy must be activated:",
                     IDC_OWNGRPST,18,60,203,8
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for ojects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
     PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
