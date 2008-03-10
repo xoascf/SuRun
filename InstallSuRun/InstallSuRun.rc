@@ -28,8 +28,8 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2,109
- PRODUCTVERSION 1,0,2,109
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -47,14 +47,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "InstallSuRun\0"
-            VALUE "FileVersion", "1, 0, 2, 109\0"
+            VALUE "FileVersion", "1, 1, 0, 0\0"
             VALUE "InternalName", "InstallSuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "InstallSuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuRun\0"
-            VALUE "ProductVersion", "1, 0, 2, 109\0"
+            VALUE "ProductVersion", "1, 1, 0, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -92,18 +92,24 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
-// EXE
+// EXE_FILE
 //
 
-SuRun.exe          EXE_FILE DISCARDABLE     "..\\ReleaseU\\SuRun.exe"
-SuRunExt.dll       EXE_FILE DISCARDABLE     "..\\ReleaseU\\SuRunExt.dll"
+SURUN.EXE               EXE_FILE DISCARDABLE    "..\\ReleaseU\\SuRun.exe"
+SURUNEXT.DLL            EXE_FILE DISCARDABLE    "..\\ReleaseU\\SuRunExt.dll"
 
-SuRun.exe          EXE64_FILE DISCARDABLE   "..\\ReleaseUx64\\SuRun.exe"
-SuRunExt.dll       EXE64_FILE DISCARDABLE   "..\\ReleaseUx64\\SuRunExt.dll"
-SuRun32.bin        EXE64_FILE DISCARDABLE   "..\\ReleaseUx64\\SuRun32.bin"
-SuRunExt32.dll     EXE64_FILE DISCARDABLE   "..\\ReleaseUx64\\SuRunExt32.dll"
+/////////////////////////////////////////////////////////////////////////////
+//
+// EXE64_FILE
+//
+
+SURUN.EXE               EXE64_FILE DISCARDABLE  "..\\ReleaseUx64\\SuRun.exe"
+SURUNEXT.DLL            EXE64_FILE DISCARDABLE  "..\\ReleaseUx64\\SuRunExt.dll"
+SURUN32.BIN             EXE64_FILE DISCARDABLE  "..\\ReleaseUx64\\SuRun32.bin"
+SURUNEXT32.DLL          EXE64_FILE DISCARDABLE  "..\\ReleaseUx64\\SuRunExt32.dll"
 
 /////////////////////////////////////////////////////////////////////////////
 //
