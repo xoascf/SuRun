@@ -72,7 +72,7 @@ Why not use the built in "Run As..." Windows command?
 ------------------------------------------------------------------------------
 
 *RunAs can (without any administrative rights) be abused by keyloggers and 
- Import Addrss Table Hookers to get the credentials of an Administrator.
+ Import Address Table Hookers to get the credentials of an Administrator.
 
 *Windows loads the registry and environment for the user that you run as.
  If a software is about to be installed, the installation program will see
