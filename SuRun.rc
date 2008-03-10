@@ -300,7 +300,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -325,7 +325,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
@@ -351,7 +351,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Remove >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to uninstall SuRun now?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
@@ -750,11 +750,11 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,106,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
                     25,SS_CENTERIMAGE
@@ -780,7 +780,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt installieren?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
@@ -806,7 +806,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Entfernen >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt entfernen?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
@@ -1260,7 +1260,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
@@ -1285,7 +1285,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
@@ -1311,7 +1311,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Remove >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    CONTROL         "",IDC_OPTNST,"Static",SS_SUNKEN,1,38,362,64
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to uninstall SuRun now?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
@@ -1336,8 +1336,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,2,109
- PRODUCTVERSION 1,0,2,109
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1355,14 +1355,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 0, 2, 109\0"
+            VALUE "FileVersion", "1, 1, 0, 0\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 0, 2, 109\0"
+            VALUE "ProductVersion", "1, 1, 0, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
