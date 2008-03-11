@@ -157,6 +157,11 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.1 - 2008-03-11:
+----------------------------
+* The IShellExecuteHook did not work properly because SuRun did not initialize 
+  to zero the static variables it uses.
+
 SuRun 1.1.0.0 - 2008-03-10: (changes to SuRun 1.0.2.9)
 ----------------------------
 * SuRuns start menu entries were removed. 'SuRun Settings' and 'Uninstall 
