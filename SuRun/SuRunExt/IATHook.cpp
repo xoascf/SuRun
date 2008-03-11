@@ -365,10 +365,13 @@ DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
 {
   EnterCriticalSection(&g_HookCs);
   static WCHAR wApp[4096];
+  zero(wApp);
   MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
   static WCHAR wCmd[4096];
+  zero(wCmd);
   MultiByteToWideChar(CP_ACP,0,lpCmd,-1,wCmd,(int)4096);
   static WCHAR wCurDir[4096];
+  zero(wCurDir);
   MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
   DWORD dwRet=TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi);
   LeaveCriticalSection(&g_HookCs);
