@@ -506,11 +506,11 @@ static CRITICAL_SECTION l_SxHkCs;
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-//  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-//    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-//    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-//    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,pei->lpClass,
-//    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,pei->lpClass,
+    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
@@ -539,7 +539,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   EnterCriticalSection(&l_SxHkCs);
   static TCHAR tmp[4096];
+  zero(tmp);
   static TCHAR cmd[4096];
+  zero(cmd);
   //check if this Programm has an Auto-SuRun-Entry in the List
   _tcscpy(tmp,pei->lpFile);
   PathQuoteSpaces(tmp);
@@ -572,6 +574,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
     _tcscat(tmp,pei->lpParameters);
   }
   static TCHAR CurDir[4096];
+  zero(CurDir);
   if (pei->lpDirectory && (*pei->lpDirectory) )
     _tcscpy(CurDir,pei->lpDirectory);
   else
