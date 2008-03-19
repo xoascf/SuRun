@@ -36,6 +36,17 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SeCEdit\Reg Valu
 
 *Richtlinien für Lokaler Computer
   Computerkonfiguration
+    Windows-Einstellungen
+      Sicherheitseinstellungen
+        Lokale Richtlinien
+          Zuweisen von Benutzerrechten
+
+  Laden und entfernen von Gerätetreibern:  Administratoren...
+  ->"SuRunners" hinzufügen
+  ->>???
+
+*Richtlinien für Lokaler Computer
+  Computerkonfiguration
     Administrative Vorlagen
       Windows Componenten
         Windows Update
