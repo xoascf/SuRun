@@ -157,6 +157,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.2 - 2008-03-19:
+----------------------------
+* In a domain SuRun could not be used without being logged in to the domain. 
+
 SuRun 1.1.0.1 - 2008-03-11:
 ----------------------------
 * The IShellExecuteHook did not work properly because SuRun did not initialize 
