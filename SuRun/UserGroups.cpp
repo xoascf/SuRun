@@ -31,6 +31,11 @@
 #include "LogonDlg.h"
 #include "DBGTrace.h"
 
+#ifdef DoDBGTrace
+#include <Sddl.h>
+#pragma comment(lib,"Advapi32.lib")
+#endif DoDBGTrace
+
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Netapi32.lib")
 
@@ -107,6 +112,33 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 //
 //  Checks if "DOMAIN\User" is a member of the group
 /////////////////////////////////////////////////////////////////////////////
+BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
+{	
+	DWORD result = 0;
+	NET_API_STATUS status;
+	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
+	DWORD num = 0;
+	DWORD total = 0;
+	DWORD_PTR resume = 0;
+	DWORD i;
+	do
+	{
+		status = NetLocalGroupGetMembers(NULL,Group,3,(LPBYTE*)&Members,MAX_PREFERRED_LENGTH,&num,&total,&resume);
+		if (((status==NERR_Success)||(status==ERROR_MORE_DATA))&&(result==0))
+		{
+			if (Members)
+				for(i = 0; (i<total); i++)
+					if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
+          {
+            NetApiBufferFree(Members);
+            return TRUE;
+          }
+		}
+	}while (status==ERROR_MORE_DATA);
+	NetApiBufferFree(Members);
+	return FALSE;
+}
+
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
   //try to find user in local group
@@ -124,14 +156,17 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
         if(wcsicmp(Users[i].lgrui0_name, Group)==0)
         {
           NetApiBufferFree(Users);
-//          DBGTrace2("SuRun: User %s is in Group %s",DomainAndName,Group);
           return TRUE;
         }
       NetApiBufferFree(Users);
       Users=0;
+    }else
+    {
+      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
+        Group,DomainAndName,GetErrorNameStatic(status));
+      return IsInGroupDirect(Group,DomainAndName);
     }
 	}
-//  DBGTrace2("SuRun: User %s is NOT in Group %s",DomainAndName,Group);
 	return FALSE;
 }
 
@@ -409,6 +444,13 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     }
     for(LOCALGROUP_MEMBERS_INFO_2* p=(LOCALGROUP_MEMBERS_INFO_2*)pBuff;dwRec>0;dwRec--,p++)
     {
+#ifdef DoDBGTrace
+      LPTSTR sSID=0;
+      ConvertSidToStringSid(p->lgrmi2_sid,&sSID);
+      DBGTrace4("Group %s Name: %s; Type: %d; SID: %s",
+        GroupName,p->lgrmi2_domainandname,p->lgrmi2_sidusage,sSID);
+      LocalFree(sSID);
+#endif DoDBGTrace
       switch (p->lgrmi2_sidusage)
       {
       case SidTypeUser:
@@ -423,13 +465,15 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
           LPTSTR dc=0;
           if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0))
             NetGetAnyDCName(0,dn,(BYTE**)&dc);
-          NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
+          NET_API_STATUS st=NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
           if (b)
           {
             if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)
               Add(p->lgrmi2_domainandname);
             NetApiBufferFree(b);
-          }
+          }else
+            //User not found: Domain Controller not present! Add user to list
+            Add(p->lgrmi2_domainandname);
           if(dc)
             NetApiBufferFree(dc);
         }
