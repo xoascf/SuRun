@@ -695,30 +695,30 @@ BEGIN
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOGEX 0, 0, 260, 160
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 160
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SuRun - Icon Help"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+CAPTION "SuRun - Icon Hilfe"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun wird nicht fragen und das Programm immer mit erhöhten Rechten starten",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun wird nicht fragen und das Programm NIE mit erhöhten Rechten starten",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON5,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",
                     IDC_STATIC,24,98,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,116,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON4,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm untersagt",
                     IDC_STATIC,24,116,226,16
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,138,262,1
