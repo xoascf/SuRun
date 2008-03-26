@@ -26,9 +26,9 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 // Dialog
 //
 
-IDD_SETUP1 DIALOGEX 0, 0, 378, 235
+IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "SuRun Options",IDC_EXTOPT2,75,2,297,44,WS_GROUP
@@ -43,11 +43,11 @@ BEGIN
                     WS_GROUP
     GROUPBOX        "Show in context menu:",IDC_STATIC,75,54,145,55,WS_GROUP
     CONTROL         "Control panel as administrator",IDC_CTRLASADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,83,67,123,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,83,67,131,10
     CONTROL         "'cmd <here>' as administrator",IDC_CMDASADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,83,81,106,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,83,81,131,10
     CONTROL         "'Explorer <here>' as administrator",IDC_EXPASADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,95,118,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,95,131,10
     GROUPBOX        "Show in system menu",IDC_STATIC,227,54,145,55,WS_GROUP
     CONTROL         "Restart as administrator",IDC_RESTARTADMIN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,235,68,95,10
@@ -566,9 +566,9 @@ BEGIN
     DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
 END
 
-IDD_SETUP1 DIALOGEX 0, 0, 378, 235
+IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "SuRun Optionen",IDC_EXTOPT2,75,2,297,44,WS_GROUP
@@ -584,16 +584,16 @@ BEGIN
     GROUPBOX        "Zeige im Kontext-Menü:",IDC_STATIC,75,54,145,55,
                     WS_GROUP
     CONTROL         "Systemsteuerung als Administrator",IDC_CTRLASADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,67,123,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,67,134,10
     CONTROL         "'cmd <hier>' als Administrator",IDC_CMDASADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,83,81,106,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,83,81,134,10
     CONTROL         "'Explorer <hier>' als Administrator",IDC_EXPASADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,95,118,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,95,134,10
     GROUPBOX        "Zeige im System-Menü",IDC_STATIC,227,54,145,55,WS_GROUP
     CONTROL         "Neustart als Administrator",IDC_RESTARTADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,235,68,95,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,235,68,107,10
     CONTROL         "Start als Administrator",IDC_STARTADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,235,82,83,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,235,82,110,10
     GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,3,115,370,
                     117,WS_GROUP
     CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
@@ -750,7 +750,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,106,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -758,9 +758,9 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
                     25,SS_CENTERIMAGE
-    CONTROL         "Verknüpungen mit SuRun beibehalten, wie sie sind",
+    CONTROL         "Verknüpfungen mit SuRun beibehalten, wie sie sind",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    18,44,176,10
+                    18,44,178,10
     LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
                     IDC_OWNGRPST,18,60,203,8
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
@@ -986,9 +986,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_SETUP1 DIALOGEX 0, 0, 378, 235
+IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "SuRun Options",IDC_EXTOPT2,75,2,297,44,WS_GROUP
@@ -1003,16 +1003,16 @@ BEGIN
                     WS_GROUP
     GROUPBOX        "Show in context menu:",IDC_STATIC,75,54,145,55,WS_GROUP
     CONTROL         "Control panel as administrator",IDC_CTRLASADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,83,67,123,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,83,67,131,10
     CONTROL         "'cmd <here>' as administrator",IDC_CMDASADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,83,81,106,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,83,81,131,10
     CONTROL         "'Explorer <here>' as administrator",IDC_EXPASADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,95,118,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,95,131,10
     GROUPBOX        "Show in system menu",IDC_STATIC,227,54,145,55,WS_GROUP
     CONTROL         "Restart as administrator",IDC_RESTARTADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,235,68,95,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,235,68,125,10
     CONTROL         "Start as administrator",IDC_STARTADMIN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,235,82,83,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,235,82,125,10
     GROUPBOX        "Convenience settings",IDC_EXTOPT,3,115,370,117,WS_GROUP
     CONTROL         "Allow 'SuRunners' to set (and show) the system time.",
                     IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
