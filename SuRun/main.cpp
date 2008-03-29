@@ -258,11 +258,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
     if(hPipe!=INVALID_HANDLE_VALUE)
       break;
+    if ((GetLastError()==ERROR_FILE_NOT_FOUND)||(GetLastError()==ERROR_ACCESS_DENIED))
+      return RETVAL_ACCESSDENIED;
     Sleep(250);
   }
   //No Pipe handle: fail!
   if (hPipe==INVALID_HANDLE_VALUE)
-    return RETVAL_ACCESSDENIED;
+    return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
   //For Vista! The Thread Desktop is not set per default...
   HDESK hDesk=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
   DWORD nWritten=0;
