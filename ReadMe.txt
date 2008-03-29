@@ -157,6 +157,19 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.3 - 2008-03-29:
+----------------------------
+* Quick Fix: When using Sandboxie and the IAT-Hook, starting a sandboxed 
+  program took about four minutes. 
+  Sandboxie starts the sandboxed program using CreateProcess(). 
+  SuRun intercepts that and tries to find out if the program needs admin 
+  rights. BUT: SuRun cannot communicate to the SuRun service because Sandboxie
+  does not permit that. So after 240 seconds SuRun gives up and Sandboxie 
+  finally starts the sandboxed app.
+  NOW SuRun checks if the SuRun service is running but when opening the pipe to
+  the SuRun service it gets a "file not found" error, then SuRun returns 
+  immediately.
+
 SuRun 1.1.0.2 - 2008-03-19:
 ----------------------------
 * In a domain SuRun could not be used without being logged in to the domain. 
