@@ -509,11 +509,18 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 
 BOOL Setup(LPCTSTR WinStaName)
 {
+  //check if user name may not run setup:
+  if (GetNoRunSetup(g_RunData.UserName))
+  {
+    if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
+      return FALSE;
+    return RunSetup();
+  }
   //only Admins and SuRunners may setup SuRun
   if (g_CliIsAdmin)
     return RunSetup();
-  if (GetNoRunSetup(g_RunData.UserName) 
-    ||(GetNoConvUser && (!IsInSuRunners(g_RunData.UserName))))
+  //If no users should become SuRunners, ask for Admin credentials
+  if (GetNoConvUser && (!IsInSuRunners(g_RunData.UserName)))
   {
     if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
