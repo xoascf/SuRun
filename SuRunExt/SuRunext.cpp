@@ -484,7 +484,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
       if (LOWORD(lpcmi->lpVerb)==0)
         _tcscat(cmd,L" cmd /D /T:4E /K cd /D ");
       else
-        _tcscat(cmd,L" explorer /e,");
+        _tcscat(cmd,L" explorer /e, ");
       PathQuoteSpaces(m_ClickFolderName);
       _tcscat(cmd,m_ClickFolderName);
     }
