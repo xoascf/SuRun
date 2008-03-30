@@ -609,7 +609,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
   {
     if (args[0]==0) 
-      wcscpy(args,L"/e,C:");
+      wcscpy(args,L"/e, C:");
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"explorer.exe");
   }else 
