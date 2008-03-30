@@ -157,10 +157,14 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.3 - 2008-03-29:
+SuRun 1.1.0.3 - 2008-03-30:
 ----------------------------
-* Quick Fix: When using Sandboxie and the IAT-Hook, starting a sandboxed 
+* QnD Fix: When using Sandboxie and the IAT-Hook, starting a sandboxed 
   program took about four minutes. 
+* FIX: "'Explorer here' as admin" did not open the folder, when it had spaces 
+  in the name
+* FIX: A user who was not allowed to change SuRun settings, could start the
+  control panel as admin and then change SuRuns settings.
 
 SuRun 1.1.0.2 - 2008-03-19:
 ----------------------------
