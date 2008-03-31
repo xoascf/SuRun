@@ -36,8 +36,9 @@ typedef struct
   DWORD KillPID;
   DWORD RetPID;
   DWORD_PTR RetPtr;
-  BOOL  bShlExHook;
+  bool  bShlExHook;
   bool  beQuiet;
+  bool  bRunAs;
 }RUNDATA;
 
 extern bool g_CliIsAdmin;
