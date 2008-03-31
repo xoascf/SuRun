@@ -7,6 +7,7 @@
 #define IDS_APPNAME                     3
 #define IDS_NODESK                      4
 #define IDS_SERVICE_NAME                5
+#define IDS_ASKRUNAS                    6
 #define IDS_UNINSTALLADMIN              7
 #define IDS_INSTALLADMIN                8
 #define IDS_LOGONFAILED                 9
@@ -128,8 +129,6 @@
 #define IDC_ALLOWTIME                   1028
 #define IDC_ICONHELP                    1028
 #define IDC_OWNERGROUP                  1029
-#define IDC_OWNGRPST                    1070
-#define IDC_OPTNST                      1071
 #define IDC_DELUSER                     1029
 #define IDC_SETENERGY                   1030
 #define IDC_WINUPD4ALL                  1031
@@ -164,6 +163,8 @@
 #define IDC_QUESTION                    1057
 #define IDC_SR2ADMIN                    1058
 #define IDC_INSTLOG                     1059
+#define IDC_OWNGRPST                    1070
+#define IDC_OPTNST                      1071
 
 // Next default values for new objects
 // 
