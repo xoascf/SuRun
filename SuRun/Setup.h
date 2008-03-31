@@ -205,10 +205,11 @@ void UpdLastRunTime(LPTSTR UserName);
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-#define FLAG_DONTASK    1 //SuRun will not ask if App can be executed
-#define FLAG_SHELLEXEC  2 //ShellExecute hook will execute App elevated
-#define FLAG_NORESTRICT 4 //Restricted SuRunner may execute App elevated
-#define FLAG_AUTOCANCEL 8 //SuRun will always answer "cancel"
+#define FLAG_DONTASK    0x01 //SuRun will not ask if App can be executed
+#define FLAG_SHELLEXEC  0x02 //ShellExecute hook will execute App elevated
+#define FLAG_NORESTRICT 0x04 //Restricted SuRunner may execute App elevated
+#define FLAG_AUTOCANCEL 0x08 //SuRun will always answer "cancel"
+#define FLAG_CANCEL_SX  0x10 //SuRun will answer "cancel" on ShellExec
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
 DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default);
