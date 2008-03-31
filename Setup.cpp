@@ -138,11 +138,15 @@ BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
     d&=~Flag;
     if (Flag==FLAG_DONTASK)
       d|=FLAG_AUTOCANCEL;
+    if (Flag==FLAG_SHELLEXEC)
+      d|=FLAG_CANCEL_SX;
   }
   else
   {
     if ((Flag==FLAG_DONTASK)&&(d&FLAG_AUTOCANCEL))
       d&=~FLAG_AUTOCANCEL;
+    else if ((Flag==FLAG_SHELLEXEC)&&(d&FLAG_CANCEL_SX))
+      d&=~FLAG_CANCEL_SX;
     else
       d|=Flag;
   }
@@ -406,7 +410,7 @@ static void UpdateWhiteListFlags(HWND hWL)
       0,0};
     ListView_SetItem(hWL,&item);
     item.iSubItem=1;
-    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)];
+    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)+(Flags&FLAG_CANCEL_SX?4:0)];
     ListView_SetItem(hWL,&item);
     item.iSubItem=2;
     item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
@@ -970,16 +974,6 @@ BOOL TestSetup()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
-  //Every "secure" Desktop has its own name:
-  //Create the new desktop
-  CRunOnNewDeskTop crond(L"WinSta0",L"Default",GetBlurDesk);
-  CStayOnDeskTop csod(L"Default");
-  if (!crond.IsValid())    
-  {
-    SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-    return FALSE;
-  }
-  
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!RunSetup())
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
