@@ -200,6 +200,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!_wcsicmp(c,L"/QUIET"))
     {
       g_RunData.beQuiet=TRUE;
+    }else if (!_wcsicmp(c,L"/RUNAS"))
+    {
+      g_RunData.bRunAs=TRUE;
     }else if (!_wcsicmp(c,L"/SETUP"))
     {
       bRunSetup=TRUE;
