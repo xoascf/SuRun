@@ -275,6 +275,14 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         //check if the requested App is in the ShellExecHook-Runlist
         if (g_RunData.bShlExHook)
         {
+          //check if the requested App is Flagged with AutoCancel
+          if (wlf&FLAG_CANCEL_SX)
+          {
+            //Access denied!
+            ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
+            DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            continue;
+          }
           //Only SuRunners will can use the hooks
           if (!IsInSuRunners(g_RunData.UserName))
           {
@@ -456,14 +464,27 @@ DWORD PrepareSuRun()
       DeleteSafeDesktop();
       if((l&1)==0)
       {
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
-        if((l&2)!=0)
-          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
+        //Cancel:
+        if(g_RunData.bShlExHook)
+        {
+          //ShellExecHook:
+          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_CANCEL_SX,(l&2)!=0);
+          if((l&2)!=0)
+            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,0);
+        }else
+        {
+          //SuRun cmdline:
+          SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
+          if((l&2)!=0)
+            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
+        }
         return RETVAL_CANCELLED;
       }
+      //Ok:
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
       if((l&2)!=0)
-        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,0);
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,
+          g_RunData.bShlExHook?FLAG_CANCEL_SX:FLAG_AUTOCANCEL,0);
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
       return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
     }__except(1)
