@@ -410,7 +410,7 @@ static void UpdateWhiteListFlags(HWND hWL)
       0,0};
     ListView_SetItem(hWL,&item);
     item.iSubItem=1;
-    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)+(Flags&FLAG_CANCEL_SX?4:0)];
+    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)+(Flags&FLAG_CANCEL_SX?5:0)];
     ListView_SetItem(hWL,&item);
     item.iSubItem=2;
     item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
