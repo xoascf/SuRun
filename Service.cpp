@@ -263,54 +263,57 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if(CheckCliProcess(rd)==2)
       {
-        DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
-        //check if the requested App is Flagged with AutoCancel
-        if (wlf&FLAG_AUTOCANCEL)
+        if (!g_RunData.bRunAs)
         {
-          //Access denied!
-          ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
-          DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-          continue;
-        }
-        //check if the requested App is in the ShellExecHook-Runlist
-        if (g_RunData.bShlExHook)
-        {
+          DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
           //check if the requested App is Flagged with AutoCancel
-          if (wlf&FLAG_CANCEL_SX)
+          if (wlf&FLAG_AUTOCANCEL)
           {
             //Access denied!
             ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
             DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-            continue;
+              continue;
           }
-          //Only SuRunners will can use the hooks
-          if (!IsInSuRunners(g_RunData.UserName))
+          //check if the requested App is in the ShellExecHook-Runlist
+          if (g_RunData.bShlExHook)
           {
-            ResumeClient(RETVAL_SX_NOTINLIST);
-            continue;
+            //check if the requested App is Flagged with AutoCancel
+            if (wlf&FLAG_CANCEL_SX)
+            {
+              //Access denied!
+              ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
+              DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+                continue;
+            }
+            //Only SuRunners will can use the hooks
+            if (!IsInSuRunners(g_RunData.UserName))
+            {
+              ResumeClient(RETVAL_SX_NOTINLIST);
+              continue;
+            }
+            if ((!(wlf&FLAG_SHELLEXEC))
+              //check for requireAdministrator Manifest and
+              //file names *setup*;*install*;*update*;*.msi;*.msc
+              && (!RequiresAdmin(g_RunData.cmdLine)))
+            {
+              ResumeClient(RETVAL_SX_NOTINLIST);
+              DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+                continue;
+            }
+            DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
-          if ((!(wlf&FLAG_SHELLEXEC))
-            //check for requireAdministrator Manifest and
-            //file names *setup*;*install*;*update*;*.msi;*.msc
-            && (!RequiresAdmin(g_RunData.cmdLine)))
+          if  (GetRestrictApps(g_RunData.UserName) 
+            && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
           {
-            ResumeClient(RETVAL_SX_NOTINLIST);
-            DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-            continue;
+            if (!(wlf&FLAG_NORESTRICT))
+            {
+              ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
+              DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+                continue;
+            }
+            DBGTrace2("Restriction WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
-          DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-        }
-        if  (GetRestrictApps(g_RunData.UserName) 
-         && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
-        {
-          if (!(wlf&FLAG_NORESTRICT))
-          {
-            ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
-            DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-            continue;
-          }
-          DBGTrace2("Restriction WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-        }
+        }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
@@ -645,13 +648,15 @@ DWORD StartAdminProcessTrampoline()
           bEmptyPWAllowed=EmptyPWAllowed;
           AllowEmptyPW(TRUE);
         }
-        //Add user to admins group
-        AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
+        if (!g_RunData.bRunAs)
+          //Add user to admins group
+          AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
         ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
         WaitForSingleObject(pi.hProcess,INFINITE);
-        //Remove user from Administrators group
-        AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
+        if (!g_RunData.bRunAs)
+          //Remove user from Administrators group
+          AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
         //Reset status of "use of empty passwords for network logon"
         if (g_RunPwd[0]==0)
           AllowEmptyPW(bEmptyPWAllowed);
@@ -769,43 +774,61 @@ void SuRun(DWORD ProcessID)
   RD.CliProcessId=ProcessID;
   if(CheckCliProcess(RD)!=1)
     return;
-  //Setup?
-  if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
+  DWORD RetVal=RETVAL_ACCESSDENIED;
+  //RunAs...
+  if (g_RunData.bRunAs)
   {
-    //Create the new desktop
-    ResumeClient(RETVAL_OK);
     if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
     {
-      __try
+      if (!Logon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
       {
-        Setup(g_RunData.WinSta);
-      }__except(1)
-      {
-        DBGTrace("FATAL: Exception in Setup()");
+        DeleteSafeDesktop();
+        ResumeClient(RETVAL_ACCESSDENIED);
+        return;
       }
+      RetVal=RETVAL_OK;
       DeleteSafeDesktop();
-    }else
-      SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-    return;
-  }
-  KillProcess(g_RunData.KillPID);
-  if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
+    }
+  }else //if (!g_RunData.bRunAs)
   {
-    //Just start the client process!
-    ResumeClient(DirectStartUserProcess());
-    return;
-  }
-  //Start execution
-  DWORD RetVal=PrepareSuRun();
-  if (RetVal!=RETVAL_OK)
-  {
-    if ( g_RunData.bShlExHook
-      &&(!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC)))
-      ResumeClient(RETVAL_SX_NOTINLIST);//let ShellExecute start the process!
-    else
-      ResumeClient(RetVal);
-    return;
-  }
+    //Setup?
+    if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
+    {
+      //Create the new desktop
+      ResumeClient(RETVAL_OK);
+      if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
+      {
+        __try
+        {
+          Setup(g_RunData.WinSta);
+        }__except(1)
+        {
+          DBGTrace("FATAL: Exception in Setup()");
+        }
+        DeleteSafeDesktop();
+      }else
+        SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      return;
+    }
+    KillProcess(g_RunData.KillPID);
+    if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
+    {
+      //Just start the client process!
+      ResumeClient(DirectStartUserProcess());
+      return;
+    }
+    //Start execution
+    RetVal=PrepareSuRun();
+    if (RetVal!=RETVAL_OK)
+    {
+      if ( g_RunData.bShlExHook
+        &&(!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC)))
+        ResumeClient(RETVAL_SX_NOTINLIST);//let ShellExecute start the process!
+      else
+        ResumeClient(RetVal);
+      return;
+    }
+  }//(g_RunData.bRunAs)
   //Secondary Logon service is required by CreateProcessWithLogonW
   if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
   {
