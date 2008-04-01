@@ -1548,6 +1548,7 @@ bool HandleServiceStuff()
         }
       }
 #endif _WIN64
+      GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
       bool TSA=FALSE;
       while (CheckServiceStatus()==SERVICE_RUNNING)
       {
