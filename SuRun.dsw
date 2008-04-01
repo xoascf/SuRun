@@ -1,0 +1,75 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "InstallSuRun"=.\InstallSuRun\InstallSuRun.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/SuRun/InstallSuRun", VLCDAAAA
+    .\installsurun
+    end source code control
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name SuRun
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "SuRun"=.\SuRun.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/SuRun", TSQCAAAA
+    .
+    end source code control
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name SuRunExt
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "SuRunExt"=.\SuRunExt\SuRunExt.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/SuRun/SuRunExt", IUQCAAAA
+    .\surunext
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+    begin source code control
+    "$/SuRun", TSQCAAAA
+    .
+    end source code control
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+
