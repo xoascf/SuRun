@@ -164,13 +164,13 @@
 #define IDC_NOSETUPNEW                  1055
 #define IDC_KEEPREGISTRY                1055
 #define IDC_DELSURUNNERS                1056
-#define IDC_TRAYSHOWADMIN               1056
 #define IDC_QUESTION                    1057
-#define IDC_TRAYBALLOON                 1057
 #define IDC_SR2ADMIN                    1058
 #define IDC_INSTLOG                     1059
 #define IDC_OWNGRPST                    1070
 #define IDC_OPTNST                      1071
+#define IDC_TRAYSHOWADMIN               1072
+#define IDC_TRAYBALLOON                 1073
 
 // Next default values for new objects
 // 
@@ -178,7 +178,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_CONTROL_VALUE         1074
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
