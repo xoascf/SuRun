@@ -140,6 +140,10 @@
 #define GetShowAutoRuns       (GetShExtSetting(ShowAutoRuns,1)!=0)
 #define SetShowAutoRuns(b)    SetShExtSetting(ShowAutoRuns,b,1)
 
+//Show App admin status in system tray
+#define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),0)
+#define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,0)
+
 //#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 //#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
   //...This is defined here but stored in HKLM\Security:
