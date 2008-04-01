@@ -6,12 +6,14 @@ ToDo for next release:
 ---
 * Setup->User settings->Add/Edit App:
   Separate Dialog with Path and Flags, File Dialog through "..." Button.
-* Setup->User settings: Stop signs in first two columns
 * replace Shells "RunAs..."
 ---
-* TrayShowAdmin->"SuRun /Sysmenuhook"(???)
----
 * Polish resources
+
+Done:
+---------------------
+* Setup->User settings: Stop signs in first two columns
+* TrayShowAdmin->"SuRun /Sysmenuhook"
 
 To be done in future:
 ---------------------
