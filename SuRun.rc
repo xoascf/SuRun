@@ -120,15 +120,16 @@ BEGIN
                     301,10
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Display an Icon in the taskbar notification area",IDC_STATIC,10,104,
-                    320,37
+    GROUPBOX        "Display an Icon in the taskbar notification area",
+                    IDC_STATIC,10,104,320,37
     CONTROL         "Display user status for the active program as icon in the taskbar notification area",
                     IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     20,115,301,10
     CONTROL         "Display balloon tips, for active programs, running with different user credentials",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,301,10
-    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,10,146,320,43
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,10,
+                    146,320,43
     CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     157,301,8
@@ -167,17 +168,17 @@ BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,16,16,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will without questioning NEVER start this program with elevated rights",
-                    IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
     LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
-                    IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
+                    IDC_STATIC,24,26,226,16
+    ICON            IDI_LISTICON,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
-                    IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+                    IDC_STATIC,24,44,226,16
+    ICON            IDI_LISTICON1,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
+                    IDC_STATIC,24,62,226,16
+    ICON            IDI_LISTICON6,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+    LTEXT           "SuRun will without questioning NEVER start this program (automagically) with elevated rights",
                     IDC_STATIC,24,80,226,16
     ICON            IDI_LISTICON5,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
     LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
@@ -468,6 +469,7 @@ BEGIN
     IDC_UNINSTALL           "SuRun is being removed"
     IDS_UNINSTFAILED        "Uninstallation failed!"
     IDS_UNINSTSUCCESS       "SuRun was uninstalled"
+    IDS_RUNAS               "Run as..."
 END
 
 #endif    // Polish resources
@@ -603,25 +605,25 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,235,67,107,10
     CONTROL         "Start als Administrator",IDC_STARTADMIN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,235,81,110,10
-    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,3,115,370,
-                    117,WS_GROUP
+    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,3,127,370,
+                    103,WS_GROUP
     CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
                     IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,130,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,139,349,9
     CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
                     IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,145,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,152,349,9
     CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
                     IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,160,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,165,349,9
     CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,175,349,13
+                    BS_MULTILINE | WS_TABSTOP,11,178,349,9
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,190,349,27
+                    BS_MULTILINE | WS_TABSTOP,11,191,349,25
     CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
-                    IDC_STATIC,6,220,365,8
+                    IDC_STATIC,6,219,365,8
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -720,18 +722,18 @@ BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun wird nicht fragen und das Programm immer mit erhöhten Rechten starten",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun wird nicht fragen und das Programm NIE mit erhöhten Rechten starten",
-                    IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",
-                    IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
+                    IDC_STATIC,24,26,226,16
+    ICON            IDI_LISTICON,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
-                    IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+                    IDC_STATIC,24,44,226,16
+    ICON            IDI_LISTICON1,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",
                     IDC_STATIC,24,80,226,16
+    ICON            IDI_LISTICON6,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+    LTEXT           "SuRun wird nicht fragen und das Programm NIE (automagisch) mit erhöhten Rechten starten",
+                    IDC_STATIC,24,26,226,16
     ICON            IDI_LISTICON5,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",
                     IDC_STATIC,24,98,226,16
@@ -988,6 +990,7 @@ BEGIN
     IDC_UNINSTALL           "SuRun wird entfernt"
     IDS_UNINSTFAILED        "Deinstallation fehlgeschlagen!"
     IDS_UNINSTSUCCESS       "SuRun wurde entfernt"
+    IDS_RUNAS               "Ausführen als..."
 END
 
 #endif    // German (Germany) resources
@@ -1102,15 +1105,16 @@ BEGIN
                     301,10
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Display an Icon in the taskbar notification area",IDC_STATIC,10,104,
-                    320,37
+    GROUPBOX        "Display an Icon in the taskbar notification area",
+                    IDC_STATIC,10,104,320,37
     CONTROL         "Display user status for the active program as icon in the taskbar notification area",
                     IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     20,115,301,10
     CONTROL         "Display balloon tips, for active programs, running with different user credentials",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,301,10
-    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,10,146,320,43
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,10,
+                    146,320,43
     CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     157,301,8
@@ -1141,30 +1145,30 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOGEX 0, 0, 260, 160
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 160
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Help"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,26,16,16,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will without questioning NEVER start this program with elevated rights",
-                    IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,44,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
-                    IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,16,16,SS_REALSIZEIMAGE
+                    IDC_STATIC,24,26,226,16
+    ICON            IDI_LISTICON,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
-                    IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,16,16,SS_REALSIZEIMAGE
+                    IDC_STATIC,24,44,226,16
+    ICON            IDI_LISTICON1,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
+                    IDC_STATIC,24,62,226,16
+    ICON            IDI_LISTICON6,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+    LTEXT           "SuRun will without questioning NEVER start this program (automagically) with elevated rights",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,98,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON5,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
     LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
                     IDC_STATIC,24,98,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,116,16,16,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON4,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
     LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
                     IDC_STATIC,24,116,226,16
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,138,262,1
@@ -1496,6 +1500,7 @@ BEGIN
     IDC_UNINSTALL           "SuRun is being removed"
     IDS_UNINSTFAILED        "Uninstallation failed!"
     IDS_UNINSTSUCCESS       "SuRun was uninstalled"
+    IDS_RUNAS               "Run as..."
 END
 
 #endif    // English (U.S.) resources
