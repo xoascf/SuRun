@@ -1,7 +1,3 @@
-Done:
-* zwei Einbahnstraﬂenschilder
-* /RUNAS
-
 ==============================================================================
 SuRun...  Super User Run
                                                       by Kay Bruns (c) 2007,08
