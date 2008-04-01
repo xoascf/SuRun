@@ -225,6 +225,10 @@ SOURCE=.\TrayMsgWnd.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrayShowAdmin.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\UserGroups.cpp
 # End Source File
 # Begin Source File
@@ -301,6 +305,10 @@ SOURCE=.\TrayMsgWnd.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrayShowAdmin.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\UserGroups.h
 # End Source File
 # Begin Source File
@@ -311,6 +319,10 @@ SOURCE=.\WinStaDesk.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=.\res\Admin.ico
+# End Source File
 # Begin Source File
 
 SOURCE=.\res\app.manifest
@@ -333,11 +345,19 @@ SOURCE=.\res\ico10607.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\NoAdmin.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\NoQuestion.ico
 # End Source File
 # Begin Source File
 
 SOURCE=.\res\NoRestrict.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\NoWindow.ico
 # End Source File
 # Begin Source File
 
