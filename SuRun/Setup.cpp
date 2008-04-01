@@ -853,9 +853,12 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
       SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
       if(IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_UNCHECKED)
+      {
         SetShowTrayAdmin(0);
-      else
+      }else
+      {
         SetShowTrayAdmin(1+(DWORD)(IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON)!=0));
+      }
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:
