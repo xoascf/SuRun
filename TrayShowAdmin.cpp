@@ -35,7 +35,7 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
     return -1;
   GetWindowThreadProcessId(wnd,&ProcId);
   GetProcessUserName(ProcId,User);
-  ...
+  //...
   if (!GetWindowText(wnd,WndTitle,MAX_PATH))
     _stprintf(WndTitle,_T("Process %d"),ProcId);
   HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,ProcId);
