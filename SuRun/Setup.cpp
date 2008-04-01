@@ -833,7 +833,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
-      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,GetShowTrayAdmin);
+      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,GetShowTrayAdmin!=0);
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,GetShowTrayAdmin==2);
       EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),GetShowTrayAdmin!=0);
       return TRUE;
@@ -852,7 +852,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
       SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
       SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
-      if(!IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN))
+      if(IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_UNCHECKED)
         SetShowTrayAdmin(0);
       else
         SetShowTrayAdmin(1+(DWORD)(IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON)!=0));
