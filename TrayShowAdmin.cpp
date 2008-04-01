@@ -35,6 +35,7 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
     return -1;
   GetWindowThreadProcessId(wnd,&ProcId);
   GetProcessUserName(ProcId,User);
+  ...
   if (!GetWindowText(wnd,WndTitle,MAX_PATH))
     _stprintf(WndTitle,_T("Process %d"),ProcId);
   HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,ProcId);
@@ -129,9 +130,9 @@ void DisplayMenu(HWND hWnd)
   POINT pt;
   GetCursorPos(&pt);
   HMENU hMenu=CreatePopupMenu();
-  MenuAdd(hMenu,CResStr(_T("SuRun %s"),GetVersionString()),(UINT)-1,0);
+  MenuAdd(hMenu,CResStr(_T("SuRun %s"),GetVersionString()),(UINT)-1,MFS_DEFAULT);
   AppendMenu(hMenu,MF_SEPARATOR,(UINT)-1,0);
-  MenuAdd(hMenu,CResStr(IDS_CPLNAME),MENU_SURUNSETUP,MFS_DEFAULT);
+  MenuAdd(hMenu,CResStr(IDS_CPLNAME),MENU_SURUNSETUP,0);
   switch (TrackPopupMenu(hMenu,TPM_RIGHTALIGN|TPM_RETURNCMD|TPM_NONOTIFY|TPM_VERNEGANIMATION,
     pt.x+1,pt.y+1,0,hWnd,NULL))
   {
@@ -156,9 +157,6 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       case WM_CONTEXTMENU:
         DisplayMenu(hwnd);
         return 0;
-      case WM_LBUTTONDBLCLK:
-        ShellExecute(0,_T("open"),_T("SuRun.exe"),_T("/SETUP"),0,SW_SHOWNORMAL);
-        break;
       };
     };
     break;
