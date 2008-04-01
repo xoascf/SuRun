@@ -129,7 +129,7 @@ void DisplayMenu(HWND hWnd)
   POINT pt;
   GetCursorPos(&pt);
   HMENU hMenu=CreatePopupMenu();
-  MenuAdd(hMenu,g_NotyData.szTip,(UINT)-1,0);
+  MenuAdd(hMenu,CResStr(_T("SuRun %s"),GetVersionString()),(UINT)-1,0);
   AppendMenu(hMenu,MF_SEPARATOR,(UINT)-1,0);
   MenuAdd(hMenu,CResStr(IDS_CPLNAME),MENU_SURUNSETUP,MFS_DEFAULT);
   switch (TrackPopupMenu(hMenu,TPM_RIGHTALIGN|TPM_RETURNCMD|TPM_NONOTIFY|TPM_VERNEGANIMATION,
