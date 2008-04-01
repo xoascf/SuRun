@@ -833,6 +833,9 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
+      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,GetShowTrayAdmin);
+      CheckDlgButton(hwnd,IDC_TRAYBALLOON,GetShowTrayAdmin==2);
+      EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),GetShowTrayAdmin!=0);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -849,12 +852,20 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
       SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
       SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
+      if(!IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN))
+        SetShowTrayAdmin(0);
+      else
+        SetShowTrayAdmin(1+(DWORD)(IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON)!=0));
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:
     {
       switch (wParam)
       {
+      case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
+          IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)!=0);
+        return TRUE;
       case MAKELPARAM(IDC_IATHOOK,BN_CLICKED):
       case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
         UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
