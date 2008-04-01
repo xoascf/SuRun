@@ -41,6 +41,7 @@
 #include "UserGroups.h"
 #include "ReqAdmin.h"
 #include "Helpers.h"
+#include "TrayShowAdmin.h"
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
@@ -261,7 +262,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
       //Disconnect client
       DisconnectNamedPipe(g_hPipe);
-      if(CheckCliProcess(rd)==2)
+      if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
         if (!g_RunData.bRunAs)
         {
@@ -1516,7 +1517,11 @@ bool HandleServiceStuff()
     {
       if (IsAdmin())
         return ExitProcess(0),true;
-      if ((!GetUseIATHook) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+      CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
+      if (GetLastError()==ERROR_ALREADY_EXISTS)
+        return ExitProcess(-1),true;
+      if ( (!GetUseIATHook) && (!GetShowTrayAdmin) 
+        && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
         return ExitProcess(0),true;
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
@@ -1543,8 +1548,26 @@ bool HandleServiceStuff()
         }
       }
 #endif _WIN64
+      bool TSA=FALSE;
       while (CheckServiceStatus()==SERVICE_RUNNING)
-      	Sleep(1000);
+      {
+        if (GetShowTrayAdmin)
+        {
+          if(!TSA)
+            InitTrayShowAdmin();
+          TSA=TRUE;
+          if (!ProcessTrayShowAdmin())
+            Sleep(333);
+        }else
+        {
+          if(TSA)
+            CloseTrayShowAdmin();
+          TSA=FALSE;
+          Sleep(1000);
+        }
+      }
+      if(TSA)
+        CloseTrayShowAdmin();
       UninstallSysMenuHook();
       ExitProcess(0);
       return true;
