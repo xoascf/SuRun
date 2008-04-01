@@ -73,6 +73,7 @@
 #define IDC_UNINSTALL                   76
 #define IDS_UNINSTFAILED                77
 #define IDS_UNINSTSUCCESS               78
+#define IDS_RUNAS                       79
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
