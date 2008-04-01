@@ -23,6 +23,7 @@
 #include <tchar.h>
 #include <lm.h>
 #include <commctrl.h>
+#include <shlwapi.h>
 #include "Setup.h"
 #include "Helpers.h"
 #include "BlowFish.h"
@@ -35,6 +36,7 @@
 
 #pragma comment(lib,"comctl32.lib")
 #pragma comment(lib,"Comdlg32.lib")
+#pragma comment(lib,"shlwapi.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -156,6 +158,89 @@ BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
 {
   return RegDelVal(HKLM,WHTLSTKEY(User),CmdLine);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Registry replace stuff
+// 
+//////////////////////////////////////////////////////////////////////////////
+void ReplaceRunAsWithSuRun(HKEY hKey=HKCR)
+{
+  TCHAR s[512];
+  DWORD i,nS;
+  for(i=0,nS=512;0==RegEnumKey(hKey,i,s,nS);nS=512,i++)
+  {
+    if (_tcsicmp(s,L"CLSID")==0)
+    {
+      HKEY h;
+      if(ERROR_SUCCESS==RegOpenKey(hKey,s,&h))
+        ReplaceRunAsWithSuRun(h);
+    }
+    else
+    {
+      TCHAR v[4096];
+      DWORD n=4096;
+      DWORD t=REG_SZ;
+      BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,(BYTE*)&v,&n);
+      //Preserve REG_EXPAND_SZ:
+      if (!bOk)
+      {
+        n=4096;
+        t=REG_EXPAND_SZ;
+        bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,(BYTE*)&v,&n);
+      }
+      if (bOk 
+        && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun")))
+      {
+        TCHAR cmd[4096];
+        GetSystemWindowsDirectory(cmd,4096);
+        PathAppend(cmd,L"SuRun.exe");
+        PathQuoteSpaces(cmd);
+        _tcscat(cmd,L" /RUNAS ");
+        _tcscat(cmd,v);
+        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,n);
+        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun\\command"),L"",t,
+          (BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
+        SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"",CResStr(IDS_RUNAS));
+      }
+    }
+  }
+}
+
+void ReplaceSuRunWithRunAs(HKEY hKey=HKCR)
+{
+  TCHAR s[512];
+  DWORD i,nS;
+  for(i=0,nS=512;0==RegEnumKey(hKey,i,s,nS);nS=512,i++)
+  {
+    if (_tcsicmp(s,L"CLSID")==0)
+    {
+      HKEY h;
+      if(ERROR_SUCCESS==RegOpenKey(hKey,s,&h))
+        ReplaceSuRunWithRunAs(h);
+    }
+    else
+    {
+      TCHAR v[4096];
+      DWORD n=4096;
+      DWORD t=REG_SZ;
+      BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),
+                         L"SuRunWasHere",t,(BYTE*)&v,&n);
+      //Preserve REG_EXPAND_SZ:
+      if (!bOk)
+      {
+        n=4096;
+        t=REG_EXPAND_SZ;
+        bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,&n);
+      }
+      if ( bOk
+        && RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere")
+        && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),CResStr(L"%s\\%s",s,L"shell\\runas")))
+        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,
+                  (BYTE*)&v,(DWORD)_tcslen(v)*sizeof(TCHAR));
+    }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
