@@ -23,6 +23,7 @@
 #define IDS_SURUNINST                   19
 #define IDS_SURUNUNINST                 20
 #define IDS_SURUNREPAIR                 21
+#define IDS_CPLNAME                     22
 #define IDS_RUNFAILED                   23
 #define IDS_STARTMENUDIR                25
 #define IDS_GRPDESC                     29
@@ -91,9 +92,12 @@
 #define IDD_SELUSER                     121
 #define IDD_UPDATE                      122
 #define IDD_INSTALL                     123
+#define IDI_NOADMIN                     123
 #define IDD_INSTALL1                    124
 #define IDD_UNINSTALL                   124
+#define IDI_NOWINDOW                    124
 #define IDD_INSTALL2                    125
+#define IDI_ADMIN                       125
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
@@ -160,7 +164,9 @@
 #define IDC_NOSETUPNEW                  1055
 #define IDC_KEEPREGISTRY                1055
 #define IDC_DELSURUNNERS                1056
+#define IDC_TRAYSHOWADMIN               1056
 #define IDC_QUESTION                    1057
+#define IDC_TRAYBALLOON                 1057
 #define IDC_SR2ADMIN                    1058
 #define IDC_INSTLOG                     1059
 #define IDC_OWNGRPST                    1070
@@ -170,7 +176,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        123
+#define _APS_NEXT_RESOURCE_VALUE        126
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1061
 #define _APS_NEXT_SYMED_VALUE           102
