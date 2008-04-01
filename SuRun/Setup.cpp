@@ -978,11 +978,6 @@ BOOL RunSetup()
   BOOL bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
                            0,MainSetupDlgProc)>=0;  
   g_SD=0;
-  //ToDo:
-  ...
-  //  if ( GetUseIATHook && GetShowTrayAdmin && GetRestartAsAdmin && GetStartAsAdmin)
-  //    ShellExecute("SuRun /SysmenuHook")
-
   return bRet;
 }
 
