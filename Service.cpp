@@ -558,14 +558,14 @@ BOOL Setup(LPCTSTR WinStaName)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  GetCliUserToken get User Token for g_RunData.CliProcessId
+//  GetProcessUserToken
 // 
 //////////////////////////////////////////////////////////////////////////////
-HANDLE GetCliUserToken()
+HANDLE GetProcessUserToken(DWORD ProcId)
 {
   HANDLE hToken=NULL;
   EnablePrivilege(SE_DEBUG_NAME);
-  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
   if (!hProc)
     return hToken;
   // Open impersonation token for Shell process
@@ -592,7 +592,7 @@ DWORD StartAdminProcessTrampoline()
   PathAppend(cmd,L"SuRun.exe");
   PathQuoteSpaces(cmd);
   DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=GetCliUserToken();
+  HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
   PROCESS_INFORMATION pi={0};
 #ifndef _DEBUG_SVC
   TCHAR UserName[MAX_PATH]={0};
@@ -702,10 +702,10 @@ DWORD StartAdminProcessTrampoline()
   return RetVal;
 }
 
-DWORD DirectStartUserProcess() 
+DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd) 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=GetCliUserToken();
+  HANDLE hUser=GetProcessUserToken(ProcId);
   TCHAR UserName[MAX_PATH]={0};
   PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
   if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
@@ -724,7 +724,7 @@ DWORD DirectStartUserProcess()
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      if (CreateProcessAsUser(hUser,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
+      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
             CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
       {
         CloseHandle(pi.hThread);
@@ -741,11 +741,11 @@ DWORD DirectStartUserProcess()
             SIZE_T n;
             if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
               DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-              g_RunData.cmdLine,GetLastErrorNameStatic());
+              cmd,GetLastErrorNameStatic());
             CloseHandle(hProcess);
           }else
             DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-            g_RunData.cmdLine,GetLastErrorNameStatic());
+            cmd,GetLastErrorNameStatic());
         }
       }else
         DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
@@ -807,6 +807,15 @@ void SuRun(DWORD ProcessID)
           DBGTrace("FATAL: Exception in Setup()");
         }
         DeleteSafeDesktop();
+        //Start Sysmenuhook...just in case
+        DWORD ProcId=0;
+        GetWindowThreadProcessId(GetShellWindow(),&ProcId);
+        TCHAR cmd[4096]={0};
+        GetSystemWindowsDirectory(cmd,4096);
+        PathAppend(cmd,L"SuRun.exe");
+        PathQuoteSpaces(cmd);
+        _tcscat(cmd,L" /SYSMENUHOOK");
+        DirectStartUserProcess(ProcId,cmd);
       }else
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
@@ -815,7 +824,7 @@ void SuRun(DWORD ProcessID)
     if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
     {
       //Just start the client process!
-      ResumeClient(DirectStartUserProcess());
+      ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine));
       return;
     }
     //Start execution
@@ -1515,7 +1524,7 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
-      if (IsAdmin())
+      if ((!GetShowTrayAdmin) && IsAdmin())
         return ExitProcess(0),true;
       CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
       if (GetLastError()==ERROR_ALREADY_EXISTS)
@@ -1566,6 +1575,11 @@ bool HandleServiceStuff()
           TSA=FALSE;
           Sleep(1000);
         }
+        if ((!GetShowTrayAdmin) && IsAdmin())
+          break;
+        if ( (!GetUseIATHook) && (!GetShowTrayAdmin) 
+          && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+          break;
       }
       if(TSA)
         CloseTrayShowAdmin();
