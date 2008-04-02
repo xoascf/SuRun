@@ -165,7 +165,7 @@ BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
 //  Registry replace stuff
 // 
 //////////////////////////////////////////////////////////////////////////////
-void ReplaceRunAsWithSuRun(HKEY hKey=HKCR)
+void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
 {
   TCHAR s[512];
   DWORD i,nS;
@@ -208,7 +208,7 @@ void ReplaceRunAsWithSuRun(HKEY hKey=HKCR)
   }
 }
 
-void ReplaceSuRunWithRunAs(HKEY hKey=HKCR)
+void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
 {
   TCHAR s[512];
   DWORD i,nS;
