@@ -41,7 +41,7 @@ typedef struct
     struct
     {
       HWND CurWnd;
-      DWORD CurProdId;
+      DWORD CurProcId;
       TCHAR CurWndText[MAX_PATH];
       TCHAR CurUserName[UNLEN+GNLEN+2];
       BOOL CurUserIsadmin;
