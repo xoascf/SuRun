@@ -33,7 +33,7 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
   if (!g_RunData.CurWnd)
     return -1;
   g_RunData.bTrayShowAdmin=true;
-  GetWindowThreadProcessId(wnd,&g_RunData.CurProdId);
+  GetWindowThreadProcessId(wnd,&g_RunData.CurProcId);
   g_RetVal=RETVAL_WAIT;
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if(hPipe==INVALID_HANDLE_VALUE)
@@ -46,6 +46,7 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
   if(g_RetVal!=RETVAL_OK)
     return -1;
   _tcscpy(User,g_RunData.CurUserName);
+  wnd=g_RunData.CurWnd;
   _tcscpy(WndTitle,g_RunData.CurWndText);
   return g_RunData.CurUserIsadmin;
 }
