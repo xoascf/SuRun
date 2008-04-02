@@ -29,25 +29,25 @@ NOTIFYICONDATA g_NotyData={0};
 
 static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
 {
-  DWORD ProcId=0;
-  wnd=GetForegroundWindow();
-  if (!wnd)
+  g_RunData.CurWnd=GetForegroundWindow();
+  if (!g_RunData.CurWnd)
     return -1;
-  GetWindowThreadProcessId(wnd,&ProcId);
-  GetProcessUserName(ProcId,User);
-  //...ToDo: IPC->Service!
-  if (!GetWindowText(wnd,WndTitle,MAX_PATH))
-    _stprintf(WndTitle,_T("Process %d"),ProcId);
-  HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,ProcId);
-  if (!h)
-    return TRUE;
-  HANDLE hTok=0;
-  if (!OpenProcessToken(h,TOKEN_DUPLICATE,&hTok))
-    return CloseHandle(h),TRUE;
-  CloseHandle(h);
-  BOOL bAdmin=IsAdmin(hTok);
-  CloseHandle(hTok);
-  return bAdmin;
+  g_RunData.bTrayShowAdmin=true;
+  GetWindowThreadProcessId(wnd,&g_RunData.CurProdId);
+  g_RetVal=RETVAL_WAIT;
+  HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+  if(hPipe==INVALID_HANDLE_VALUE)
+    return -1;
+  DWORD n=0;
+  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
+  CloseHandle(hPipe);
+  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<30);n++)
+    Sleep(10);
+  if(g_RetVal!=RETVAL_OK)
+    return -1;
+  _tcscpy(User,g_RunData.CurUserName);
+  _tcscpy(WndTitle,g_RunData.CurWndText);
+  return g_RunData.CurUserIsadmin;
 }
 
 static void DisplayIcon()
@@ -86,8 +86,9 @@ static void DisplayIcon()
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
   }else if (bIsFGAdm)
   {
-    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_ADMIN),
-                                        IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
+    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,
+                            MAKEINTRESOURCE(g_CliIsAdmin?IDI_ADMIN1:IDI_ADMIN),
+                            IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
     if (g_BallonTips && (_tcscmp(User,g_RunData.UserName) || (!g_CliIsAdmin)))
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
@@ -167,6 +168,13 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 void InitTrayShowAdmin()
 {
   g_hInstance=GetModuleHandle(0);
+  g_CliIsAdmin=FALSE;
+  HANDLE hTok=GetShellProcessToken();
+  if(hTok)
+  {
+    g_CliIsAdmin=IsAdmin(hTok)!=0;
+    CloseHandle(hTok);
+  }
   WNDCLASS WCLASS={0};
   WCLASS.hCursor      =LoadCursor(0,IDC_ARROW);
   WCLASS.lpszClassName=CLASSNAME;
