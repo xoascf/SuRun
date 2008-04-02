@@ -31,14 +31,29 @@ typedef struct
   TCHAR WinSta[MAX_PATH];
   TCHAR Desk[MAX_PATH];
   TCHAR UserName[UNLEN+UNLEN+2];
-  TCHAR cmdLine[4096];
-  TCHAR CurDir[4096];
+  union
+  {
+    struct
+    {
+      TCHAR cmdLine[4096];
+      TCHAR CurDir[4096];
+    };
+    struct
+    {
+      HWND CurWnd;
+      DWORD CurProdId;
+      TCHAR CurWndText[MAX_PATH];
+      TCHAR CurUserName[UNLEN+GNLEN+2];
+      BOOL CurUserIsadmin;
+    };
+  };
   DWORD KillPID;
   DWORD RetPID;
   DWORD_PTR RetPtr;
   bool  bShlExHook;
   bool  beQuiet;
   bool  bRunAs;
+  bool  bTrayShowAdmin;
 }RUNDATA;
 
 extern bool g_CliIsAdmin;
