@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "helpers.h"
 #include "SuRunExt/SuRunExt.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -221,6 +222,14 @@ BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flags=0);
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable);
 BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine);
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Registry replace stuff
+// 
+//////////////////////////////////////////////////////////////////////////////
+void ReplaceRunAsWithSuRun(HKEY hKey=HKCR);
+void ReplaceSuRunWithRunAs(HKEY hKey=HKCR);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
