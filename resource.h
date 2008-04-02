@@ -99,6 +99,8 @@
 #define IDI_NOWINDOW                    124
 #define IDD_INSTALL2                    125
 #define IDI_ADMIN                       125
+#define IDD_RUNASDLG                    125
+#define IDD_APPOPTIONS                  126
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
@@ -114,12 +116,20 @@
 #define IDC_WHTBK                       1005
 #define IDC_SECICON                     1006
 #define IDC_RADIO1                      1007
+#define IDC_NOASK1                      1007
 #define IDC_RADIO2                      1008
+#define IDC_NOASK2                      1008
 #define IDC_RADIO3                      1009
+#define IDC_AUTO1                       1009
 #define IDC_ASKTIMEOUT                  1010
+#define IDC_AUTO2                       1010
 #define IDC_BLURDESKTOP                 1011
+#define IDC_AUTO3                       1011
 #define IDC_SAVEPW                      1012
+#define IDC_RESTRICT1                   1012
 #define IDC_DORUNAS                     1013
+#define IDC_RESTRICT2                   1013
+#define IDC_NOASK3                      1015
 #define IDC_HINT                        1016
 #define IDC_HINT2                       1017
 #define IDC_HINTBK                      1018
@@ -144,6 +154,7 @@
 #define IDC_EXTOPT2                     1034
 #define IDC_BUTTON1                     1034
 #define IDC_ADDAPP                      1034
+#define IDC_SELFILE                     1034
 #define IDC_EDITAPP                     1035
 #define IDC_CTRLASADMIN                 1036
 #define IDC_ADDUSER                     1036
@@ -154,6 +165,7 @@
 #define IDC_RUNSETUP                    1041
 #define IDC_RESTRICTED                  1042
 #define IDC_EDIT1                       1045
+#define IDC_FILENAME                    1045
 #define IDC_USERLIST                    1046
 #define IDC_USERNAME                    1047
 #define IDC_ALLUSERS                    1048
@@ -178,7 +190,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        126
+#define _APS_NEXT_RESOURCE_VALUE        127
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1074
 #define _APS_NEXT_SYMED_VALUE           102
