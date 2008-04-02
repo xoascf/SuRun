@@ -1081,6 +1081,8 @@ void RemoveRegistry()
     DelRegKey(HKCR,MSIPTCH L" open");
     //Control Panel
     DelRegKey(HKCR,CPLREG);
+    //restore RunAs
+    ReplaceSuRunWithRunAs();
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_REMCPL));
