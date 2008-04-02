@@ -162,7 +162,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
 //  ResumeClient
 // 
 //////////////////////////////////////////////////////////////////////////////
-BOOL ResumeClient(int RetVal) 
+BOOL ResumeClient(int RetVal,bool bWriteRunData=false) 
 {
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.CliProcessId);
   if (!hProcess)
@@ -177,6 +177,8 @@ BOOL ResumeClient(int RetVal)
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
   }
+  if(bWriteRunData)
+    WriteProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n);
   CloseHandle(hProcess);
   if (sizeof(int)!=n)
   {
@@ -265,6 +267,24 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
+        if (g_RunData.bTrayShowAdmin)
+        {
+          //...ToDo: IPC->Service!
+          GetProcessUserName(g_RunData.CurProdId,g_RunData.CurUserName);
+          GetWindowText(g_RunData.CurWnd,g_RunData.CurWndText,MAX_PATH);
+          HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,g_RunData.CurProdId);
+          if (h)
+          {
+            HANDLE hTok=0;
+            if (OpenProcessToken(h,TOKEN_DUPLICATE,&hTok))
+            {
+              g_RunData.CurUserIsadmin=IsAdmin(hTok);
+              CloseHandle(hTok);
+            }
+            CloseHandle(h);
+          }
+          ResumeClient(RETVAL_OK,true);
+        }
         if (!g_RunData.bRunAs)
         {
           DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
@@ -838,7 +858,7 @@ void SuRun(DWORD ProcessID)
       if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
       {
         DeleteSafeDesktop();
-        ResumeClient(RETVAL_ACCESSDENIED);
+        ResumeClient(RETVAL_CANCELLED);
         return;
       }
       RetVal=RETVAL_OK;
@@ -1609,6 +1629,8 @@ bool HandleServiceStuff()
         }
       }
 #endif _WIN64
+      g_RunData.CliProcessId=GetCurrentProcessId();
+      g_RunData.CliThreadId=GetCurrentThreadId();
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
       bool TSA=FALSE;
       while (CheckServiceStatus()==SERVICE_RUNNING)
