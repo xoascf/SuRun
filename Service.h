@@ -33,12 +33,12 @@ typedef struct
   TCHAR UserName[UNLEN+UNLEN+2];
   union
   {
-    struct
+    struct //Normal
     {
       TCHAR cmdLine[4096];
       TCHAR CurDir[4096];
     };
-    struct
+    struct //TrayShowAdmin
     {
       DWORD CurProcId;
       TCHAR CurUserName[UNLEN+GNLEN+2];
@@ -48,6 +48,7 @@ typedef struct
   DWORD KillPID;
   DWORD RetPID;
   DWORD_PTR RetPtr;
+  bool  bNoSafeDesk; //only valid with /SETUP
   bool  bShlExHook;
   bool  beQuiet;
   bool  bRunAs;
