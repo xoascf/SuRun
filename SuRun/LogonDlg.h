@@ -25,6 +25,8 @@ BOOL PasswordOK(LPCTSTR User,LPCTSTR Password);
 
 BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...);
 
+BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...);
+
 BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...);
 BOOL LogonAdmin(int IDmsg,...);
 
