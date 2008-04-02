@@ -29,11 +29,11 @@ NOTIFYICONDATA g_NotyData={0};
 
 static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
 {
-  g_RunData.CurWnd=GetForegroundWindow();
-  if (!g_RunData.CurWnd)
+  wnd=GetForegroundWindow();
+  if (!wnd)
     return -1;
-  g_RunData.bTrayShowAdmin=true;
   GetWindowThreadProcessId(wnd,&g_RunData.CurProcId);
+  g_RunData.bTrayShowAdmin=true;
   g_RetVal=RETVAL_WAIT;
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if(hPipe==INVALID_HANDLE_VALUE)
@@ -46,8 +46,8 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
   if(g_RetVal!=RETVAL_OK)
     return -1;
   _tcscpy(User,g_RunData.CurUserName);
-  wnd=g_RunData.CurWnd;
-  _tcscpy(WndTitle,g_RunData.CurWndText);
+  if (!GetWindowText(wnd,WndTitle,MAX_PATH))
+    _stprintf(WndTitle,L"Process %d",g_RunData.CurProcId);
   return g_RunData.CurUserIsadmin;
 }
 
