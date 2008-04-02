@@ -41,8 +41,9 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
   DWORD n=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
   CloseHandle(hPipe);
-  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<30);n++)
-    Sleep(10);
+  Sleep(10);
+  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<3);n++)
+    Sleep(100);
   if(g_RetVal!=RETVAL_OK)
     return -1;
   _tcscpy(User,g_RunData.CurUserName);
