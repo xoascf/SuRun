@@ -835,7 +835,7 @@ void SuRun(DWORD ProcessID)
   {
     if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
     {
-      if (!Logon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
+      if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
       {
         DeleteSafeDesktop();
         ResumeClient(RETVAL_ACCESSDENIED);
