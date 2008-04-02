@@ -459,6 +459,17 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
+BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...)
+{
+  va_list va;
+  va_start(va,IDmsg);
+  CBigResStr S(IDmsg,va);
+  LOGONDLGPARAMS p(S,User,Password,false,false,false);
+  p.Users.SetUsualUsers(FALSE);
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
+                  0,DialogProc,(LPARAM)&p);
+}
+
 BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
 {
   va_list va;
@@ -518,7 +529,9 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
-  BOOL l=Logon(User,Password,IDS_ASKAUTO);
+  BOOL l=RunAsLogon(User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  ExitProcess(0);
+
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
