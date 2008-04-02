@@ -284,6 +284,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             CloseHandle(h);
           }
           ResumeClient(RETVAL_OK,true);
+          continue;
         }
         if (!g_RunData.bRunAs)
         {
