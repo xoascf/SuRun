@@ -611,6 +611,19 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_SAVEPW,GetSavePW);
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
+      
+      HKEY kra=0;
+      HKEY ksu=0;
+      if (0==RegOpenKey(HKCR,L"exefile\\shell\\runas\\command",&kra))
+        RegCloseKey(kra);
+      if (0==RegOpenKey(HKCR,L"exefile\\shell\\RunAsSuRun\\command",&ksu))
+        RegCloseKey(ksu);
+      UINT bCheck=BST_INDETERMINATE;
+      if((kra!=0)&&(ksu==0))
+        bCheck=BST_UNCHECKED;
+      else if((kra==0)&&(ksu!=0))
+        bCheck=BST_CHECKED;
+      CheckDlgButton(hwnd,IDC_DORUNAS,bCheck);
 
       CheckDlgButton(hwnd,IDC_CTRLASADMIN,GetCtrlAsAdmin);
       CheckDlgButton(hwnd,IDC_CMDASADMIN,GetCmdAsAdmin);
@@ -661,6 +674,16 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetWinUpd4All(IsDlgButtonChecked(hwnd,IDC_WINUPD4ALL));
       SetWinUpdBoot(IsDlgButtonChecked(hwnd,IDC_WINUPDBOOT));
       SetOwnerAdminGrp(IsDlgButtonChecked(hwnd,IDC_OWNERGROUP));
+
+      switch (IsDlgButtonChecked(hwnd,IDC_DORUNAS))
+      {
+      case BST_CHECKED:
+        ReplaceRunAsWithSuRun();
+        break;
+      case BST_UNCHECKED:
+        ReplaceSuRunWithRunAs();
+        break;
+      }
       return TRUE;
     }//WM_DESTROY
   }
