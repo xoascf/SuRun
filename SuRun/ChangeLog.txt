@@ -1,5 +1,9 @@
 ToDo for next release:
 ---------------------
+* Win2k: TSA-Icons->256 colors; 
+  "Run as..." does not really work: gray option out
+  Balloon tips not supported: gray option out
+
 * BUG report: Kaspersky and "SuRun /Setup"->User settings->Add/Edit App hangs
 * BUG report: RealVNC does not store settings
 ---
