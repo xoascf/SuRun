@@ -429,10 +429,10 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-// Save Flags for the selected User
+// Add/Edit file to users file list:
 // 
 //////////////////////////////////////////////////////////////////////////////
-static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
+static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 {
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
@@ -450,6 +450,90 @@ static BOOL GetFileName(HWND hwnd,LPTSTR FileName)
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
+  #undef ExpAdvReg
+}
+
+struct
+{
+  DWORD* Flags;
+  LPTSTR FileName;
+}g_AppOpt;
+
+INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    SetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName);
+    CheckDlgButton(hwnd,IDC_NOASK1,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_AUTOCANCEL))==0);
+    CheckDlgButton(hwnd,IDC_NOASK2,(*g_AppOpt.Flags&FLAG_DONTASK)!=0);
+    CheckDlgButton(hwnd,IDC_NOASK3,(*g_AppOpt.Flags&FLAG_AUTOCANCEL)!=0);
+
+    CheckDlgButton(hwnd,IDC_AUTO1,(*g_AppOpt.Flags&(FLAG_SHELLEXEC|FLAG_CANCEL_SX))==0);
+    CheckDlgButton(hwnd,IDC_AUTO2,(*g_AppOpt.Flags&FLAG_SHELLEXEC)!=0);
+    CheckDlgButton(hwnd,IDC_AUTO3,(*g_AppOpt.Flags&FLAG_CANCEL_SX)!=0);
+
+    if((!IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK))
+      &&(!IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK)))
+    {
+      EnableWindow(GetDlgItem(hwnd,IDC_AUTO1),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_AUTO2),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_AUTO3),0);
+    }
+
+    CheckDlgButton(hwnd,IDC_RESTRICT1,(*g_AppOpt.Flags&FLAG_NORESTRICT)!=0);
+    CheckDlgButton(hwnd,IDC_RESTRICT2,(*g_AppOpt.Flags&FLAG_NORESTRICT)==0);
+    if(!IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED))
+    {
+      EnableWindow(GetDlgItem(hwnd,IDC_RESTRICT1),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_RESTRICT2),0);
+    }
+    return TRUE;
+  case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
+    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_COMMAND:
+    switch (wParam)
+    {
+    case MAKELPARAM(IDC_SELFILE,BN_CLICKED):
+      GetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName,4096);
+      ChooseFile(hwnd,g_AppOpt.FileName);
+      SetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName);
+      break;
+    case MAKELPARAM(IDCANCEL,BN_CLICKED):
+      EndDialog(hwnd,IDCANCEL);
+      return TRUE;
+    case MAKELPARAM(IDOK,BN_CLICKED):
+      GetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName,4096);
+      *g_AppOpt.Flags=0;
+      if (IsDlgButtonChecked(hwnd,IDC_NOASK2))
+        *g_AppOpt.Flags|=FLAG_DONTASK;
+      if (IsDlgButtonChecked(hwnd,IDC_NOASK3))
+        *g_AppOpt.Flags|=FLAG_AUTOCANCEL;
+      if (IsDlgButtonChecked(hwnd,IDC_AUTO2))
+        *g_AppOpt.Flags|=FLAG_SHELLEXEC;
+      if (IsDlgButtonChecked(hwnd,IDC_AUTO3))
+        *g_AppOpt.Flags|=FLAG_CANCEL_SX;
+      if (IsDlgButtonChecked(hwnd,IDC_RESTRICT1))
+        *g_AppOpt.Flags|=FLAG_NORESTRICT;
+      EndDialog(hwnd,IDOK);
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+static BOOL GetFileName(HWND hwnd,DWORD& Flags,LPTSTR FileName)
+{
+  if (FileName[0]==0)
+  {
+    if(!ChooseFile(hwnd,FileName))
+      return FALSE;
+  }
+  g_AppOpt.FileName=FileName;
+  g_AppOpt.Flags=&Flags;
+  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_APPOPTIONS),hwnd,AppOptDlgProc)==IDOK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -766,10 +850,10 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             TCHAR CMD[4096];
             ListView_GetItemText(hWL,CurSel,3,cmd,4096);
             _tcscpy(CMD,cmd);
-            if (GetFileName(hwnd,CMD))
+            LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
+            DWORD f=GetWhiteListFlags(u,cmd,0);
+            if (GetFileName(hwnd,f,CMD))
             {
-              LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
-              DWORD f=GetWhiteListFlags(u,cmd,0);
               if (RemoveFromWhiteList(u,cmd))
               {
                 if (AddToWhiteList(u,CMD,f))
@@ -823,9 +907,10 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
         {
           TCHAR cmd[4096]={0};
-          if (GetFileName(hwnd,cmd))
+          DWORD f=0;
+          if (GetFileName(hwnd,f,cmd))
           {
-            if(AddToWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd,0))
+            if(AddToWhiteList(g_SD->Users.GetUserName(g_SD->CurUser),cmd,f))
             {
               HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
               LVITEM item={LVIF_IMAGE,0,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
@@ -1099,8 +1184,6 @@ BOOL TestSetup()
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
   if (!RunSetup())
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
-  
-  ExitProcess(0);
   
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
   if (!RunSetup())
