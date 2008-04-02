@@ -270,9 +270,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if (g_RunData.bTrayShowAdmin)
         {
           //...ToDo: IPC->Service!
-          GetProcessUserName(g_RunData.CurProdId,g_RunData.CurUserName);
+          GetProcessUserName(g_RunData.CurProcId,g_RunData.CurUserName);
           GetWindowText(g_RunData.CurWnd,g_RunData.CurWndText,MAX_PATH);
-          HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,g_RunData.CurProdId);
+          HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,g_RunData.CurProcId);
           if (h)
           {
             HANDLE hTok=0;
