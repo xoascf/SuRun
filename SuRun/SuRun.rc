@@ -1029,6 +1029,7 @@ IDI_LISTICON6           ICON    DISCARDABLE     "res\\AutoCancel.ico"
 IDI_NOADMIN             ICON    DISCARDABLE     "res\\NoAdmin.ico"
 IDI_NOWINDOW            ICON    DISCARDABLE     "res\\NoWindow.ico"
 IDI_ADMIN               ICON    DISCARDABLE     "res\\Admin.ico"
+IDI_ADMIN1              ICON    DISCARDABLE     "res\\ADMIN1.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
