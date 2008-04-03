@@ -19,6 +19,7 @@
 #include <lm.h>
 #include <commctrl.h>
 #include "Isadmin.h"
+#include "BlowFish.h"
 #include "ResStr.h"
 #include "DBGTrace.h"
 #include "UserGroups.h"
@@ -86,6 +87,40 @@ BOOL PasswordOK(LPCTSTR User,LPCTSTR Password)
   return bRet;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  Password cache
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+static BYTE KEYPASS[16]={0x4f,0xc9,0x4d,0x14,0x63,0xa9,0x4d,0xe2,0x96,0x47,0x2b,0x6a,0xd6,0x80,0xd3,0xc2};
+
+void LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
+{
+  if (!GetSavePW)
+    return;
+  CBlowFish bf;
+  bf.Initialize(KEYPASS,sizeof(KEYPASS));
+  if (GetRegAny(HKLM,RAPASSKEY(RunAsUser),UserName,REG_BINARY,(BYTE*)Password,&nBytes))
+    bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
+}
+
+void DeleteRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName)
+{
+  RegDelVal(HKLM,RAPASSKEY(RunAsUser),UserName);
+}
+
+void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
+{
+  if (!GetSavePW)
+    return;
+  CBlowFish bf;
+  TCHAR pw[PWLEN];
+  bf.Initialize(KEYPASS,sizeof(KEYPASS));
+  SetRegAny(HKLM,RAPASSKEY(RunAsUser),UserName,REG_BINARY,(BYTE*)pw,
+    bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Logon Dialog
@@ -102,6 +137,7 @@ typedef struct _LOGONDLGPARAMS
   USERLIST Users;
   int TimeOut;
   DWORD UsrFlags;
+  BOOL bRunAs;
   _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags)
   {
     Msg=M;
@@ -109,8 +145,9 @@ typedef struct _LOGONDLGPARAMS
     Password=Pwd;
     UserReadonly=RO;
     ForceAdminLogon=Adm;
-    UsrFlags=UFlags;
     TimeOut=40;//s
+    UsrFlags=UFlags;
+    bRunAs=FALSE;
   }
 }LOGONDLGPARAMS;
 
@@ -140,6 +177,23 @@ static void SetUserBitmap(HWND hwnd)
     SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_ICON|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_ICON,
       SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
+  }
+  //Password:
+  if (p->bRunAs)
+  {
+    TCHAR Pass[PWLEN+1]={0};
+    LoadRunAsPassword(p->User,User,Pass,PWLEN);
+    if(PasswordOK(User,Pass))
+    {
+      SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
+      EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),false);
+      CheckDlgButton(hwnd,IDC_STOREPASS,1);
+    }else
+    {
+      EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),1);
+      CheckDlgButton(hwnd,IDC_STOREPASS,0);
+    }
+    zero(Pass);
   }
 }
 
@@ -411,20 +465,33 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
             LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
-            GetDlgItemText(hwnd,IDC_USER,p->User,UNLEN+GNLEN+1);
-            GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),p->Password,PWLEN);
+            TCHAR User[UNLEN+GNLEN+2]={0};
+            TCHAR Pass[PWLEN+1]={0};
+            GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
+            GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),Pass,PWLEN);
             HANDLE hUser=GetUserToken(p->User,p->Password);
             if (hUser)
             {
               if ((p->ForceAdminLogon)&&(!IsAdmin(hUser)))
               {
+                zero(Pass);
                 CloseHandle(hUser);
-                SafeMsgBox(hwnd,CResStr(IDS_NOADMIN,p->User),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+                SafeMsgBox(hwnd,CResStr(IDS_NOADMIN,User),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
                 SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETSEL,0,-1);
                 SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
               }else
               {
+                if (p->bRunAs)
+                {
+                  if(IsDlgButtonChecked(hwnd,IDC_STOREPASS))
+                    SaveRunAsPassword(p->User,User,Pass);
+                  else
+                    DeleteRunAsPassword(p->User,User);
+                }
+                _tcscpy(p->User,User);
+                _tcscpy(p->Password,Pass);
                 CloseHandle(hUser);
+                zero(Pass);
                 EndDialog(hwnd,ExitCode);
               }
             }else
@@ -468,6 +535,7 @@ BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
   p.Users.SetUsualUsers(FALSE);
+  p.bRunAs=TRUE;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
                   0,DialogProc,(LPARAM)&p);
 }
