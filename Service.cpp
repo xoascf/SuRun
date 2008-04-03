@@ -1615,9 +1615,9 @@ bool HandleServiceStuff()
       g_RunData.CliProcessId=GetCurrentProcessId();
       g_RunData.CliThreadId=GetCurrentThreadId();
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
-      if ((!IsInSuRunners(g_RunData.UserName))||IsAdmin())
+      if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
         return ExitProcess(0),true;
-      if ( (!GetUseIATHook) && (!GetShowTrayAdmin) 
+      if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
         && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
         return ExitProcess(0),true;
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
@@ -1648,7 +1648,7 @@ bool HandleServiceStuff()
       bool TSA=FALSE;
       while (CheckServiceStatus()==SERVICE_RUNNING)
       {
-        if (GetShowTrayAdmin)
+        if (ShowTray(g_RunData.UserName))
         {
           if(!TSA)
             InitTrayShowAdmin();
@@ -1662,7 +1662,7 @@ bool HandleServiceStuff()
           TSA=FALSE;
           Sleep(1000);
         }
-        if ( (!GetUseIATHook) && (!GetShowTrayAdmin) 
+        if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName)) 
           && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
           break;
       }
