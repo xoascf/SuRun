@@ -1093,8 +1093,6 @@ void RemoveRegistry()
     DelRegKey(HKCR,MSIPTCH L" open");
     //Control Panel
     DelRegKey(HKCR,CPLREG);
-    //restore RunAs
-    ReplaceSuRunWithRunAs();
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_REMCPL));
@@ -1241,6 +1239,8 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     InstLog(CResStr(IDS_DELREG));
     //remove COM Object Settings
     DelRegKey(HKCR,L"CLSID\\" sGUID);
+    //restore RunAs
+    ReplaceSuRunWithRunAs();
   }
   //Remove SuRunners from Registry
   SetEnergy(false);
