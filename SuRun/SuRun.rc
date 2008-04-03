@@ -168,10 +168,10 @@ BEGIN
     PUSHBUTTON      "&Anuluj",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOGEX 0, 0, 260, 178
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 178
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Help"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
@@ -186,7 +186,7 @@ BEGIN
     LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
                     IDC_STATIC,24,62,226,16
     ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
+    LTEXT           "If the program requires elevated rights, SuRun asks to run the program as Administrator.",
                     IDC_STATIC,24,80,226,16
     ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will NEVER automagically be run with elevated rights",
@@ -425,29 +425,30 @@ BEGIN
     ICON            IDI_LISTICON2,IDC_STATIC,36,31,20,20,SS_REALSIZEIMAGE
     CONTROL         "ask if the program can be started with elevated rights",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,31,266,10
+                    WS_TABSTOP,50,31,300,10
     ICON            IDI_LISTICON3,IDC_STATIC,36,44,20,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and always start the program with elevated rights",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,44,266,10
+                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,44,300,10
     ICON            IDI_LISTICON6,IDC_STATIC,36,57,20,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and NEVER start the program with elevated rights",
-                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,57,266,10
+                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,57,300,10
     ICON            IDI_LISTICON1,IDC_STATIC,36,74,20,20,SS_REALSIZEIMAGE
-    CONTROL         "don't start the program automagically",IDC_AUTO1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,50,74,266,10
+    CONTROL         "ask only if the program requires to run with elevated rights. (Manifest, 'Install.exe' etc.)",
+                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,50,74,300,10
     ICON            IDI_LISTICON,IDC_STATIC,36,87,20,20,SS_REALSIZEIMAGE
     CONTROL         "start the program automagically with elevated rights",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,87,266,10
+                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,87,300,10
     ICON            IDI_LISTICON7,IDC_STATIC,36,100,20,20,SS_REALSIZEIMAGE
     CONTROL         "NEVER start the program automagically with elevated rights",
-                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,100,266,10
+                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,100,300,10
     ICON            IDI_LISTICON5,IDC_STATIC,36,117,20,20,SS_REALSIZEIMAGE
     CONTROL         "user is allowed to start the program with elevated rights",
                     IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,117,266,10
+                    WS_TABSTOP,50,117,300,10
     ICON            IDI_LISTICON4,IDC_STATIC,36,130,20,20,SS_REALSIZEIMAGE
     CONTROL         "user MUST NOT start the program with elevated rights",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,130,266,10
+                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,130,300,10
     DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
     PUSHBUTTON      "&Cancel",IDCANCEL,304,152,50,14
 END
@@ -842,7 +843,7 @@ BEGIN
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
                     IDC_STATIC,24,62,226,16
     ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es mit normalen Rechten gestartet",
+    LTEXT           "Nur wenn ein Programm erhöhte Rechte benötigt, fragt SuRun, ob es administrativ gestartet werden darf.",
                     IDC_STATIC,24,80,226,16
     ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es NIE automagisch mit erhöhten Rechten gestartet",
@@ -870,29 +871,30 @@ BEGIN
     ICON            IDI_LISTICON2,IDC_STATIC,36,31,20,20,SS_REALSIZEIMAGE
     CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,31,266,10
+                    WS_TABSTOP,50,31,300,10
     ICON            IDI_LISTICON3,IDC_STATIC,36,44,20,20,SS_REALSIZEIMAGE
     CONTROL         "nicht fragen und das Programm immer mit erhöhten Rechten starten",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,44,266,10
+                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,44,300,10
     ICON            IDI_LISTICON6,IDC_STATIC,36,57,20,20,SS_REALSIZEIMAGE
     CONTROL         "nicht fragen und das Programm NIE mit erhöhten Rechten starten",
-                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,57,266,10
+                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,57,300,10
     ICON            IDI_LISTICON1,IDC_STATIC,36,74,20,20,SS_REALSIZEIMAGE
-    CONTROL         "Programm nicht automagisch starten",IDC_AUTO1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,50,74,266,10
+    CONTROL         "nur fragen, falls das Programm erhöhte Rechte benötigt. (Manifest, 'Install.exe' etc.)",
+                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,50,74,300,10
     ICON            IDI_LISTICON,IDC_STATIC,36,87,20,20,SS_REALSIZEIMAGE
     CONTROL         "Programm automagisch mit erhöhten Rechten starten",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,87,266,10
+                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,87,300,10
     ICON            IDI_LISTICON7,IDC_STATIC,36,100,20,20,SS_REALSIZEIMAGE
     CONTROL         "Programm automagisch NIE mit erhöhten Rechten starten",
-                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,100,266,10
+                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,100,300,10
     ICON            IDI_LISTICON5,IDC_STATIC,36,117,20,20,SS_REALSIZEIMAGE
     CONTROL         "Benutzer darf dieses Programm mit erhöhten Rechten starten",
                     IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,117,266,10
+                    WS_TABSTOP,50,117,300,10
     ICON            IDI_LISTICON4,IDC_STATIC,36,130,20,20,SS_REALSIZEIMAGE
     CONTROL         "Benutzer darf dieses Programm NICHT mit erhöhten Rechten starten",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,130,266,10
+                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,130,300,10
     DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
     PUSHBUTTON      "&Abbrechen",IDCANCEL,304,152,50,14
 END
@@ -1326,7 +1328,7 @@ BEGIN
     LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
                     IDC_STATIC,24,62,226,16
     ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will be run with standard rights",
+    LTEXT           "If the program requires elevated rights, SuRun asks to run the program as Administrator.",
                     IDC_STATIC,24,80,226,16
     ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will NEVER automagically be run with elevated rights",
@@ -1354,29 +1356,30 @@ BEGIN
     ICON            IDI_LISTICON2,IDC_STATIC,36,31,20,20,SS_REALSIZEIMAGE
     CONTROL         "ask if the program can be started with elevated rights",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,31,266,10
+                    WS_TABSTOP,50,31,302,10
     ICON            IDI_LISTICON3,IDC_STATIC,36,44,20,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and always start the program with elevated rights",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,44,266,10
+                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,44,302,10
     ICON            IDI_LISTICON6,IDC_STATIC,36,57,20,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and NEVER start the program with elevated rights",
-                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,57,266,10
+                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,57,302,10
     ICON            IDI_LISTICON1,IDC_STATIC,36,74,20,20,SS_REALSIZEIMAGE
-    CONTROL         "don't start the program automagically",IDC_AUTO1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,50,74,266,10
+    CONTROL         "ask only if the program requires to run with elevated rights. (Manifest, 'Install.exe' etc.)",
+                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,50,74,302,10
     ICON            IDI_LISTICON,IDC_STATIC,36,87,20,20,SS_REALSIZEIMAGE
     CONTROL         "start the program automagically with elevated rights",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,87,266,10
+                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,87,302,10
     ICON            IDI_LISTICON7,IDC_STATIC,36,100,20,20,SS_REALSIZEIMAGE
     CONTROL         "NEVER start the program automagically with elevated rights",
-                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,100,266,10
+                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,100,302,10
     ICON            IDI_LISTICON5,IDC_STATIC,36,117,20,20,SS_REALSIZEIMAGE
     CONTROL         "user is allowed to start the program with elevated rights",
                     IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,117,266,10
+                    WS_TABSTOP,50,117,302,10
     ICON            IDI_LISTICON4,IDC_STATIC,36,130,20,20,SS_REALSIZEIMAGE
     CONTROL         "user MUST NOT start the program with elevated rights",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,130,266,10
+                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,130,302,10
     DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
     PUSHBUTTON      "&Cancel",IDCANCEL,304,152,50,14
 END
