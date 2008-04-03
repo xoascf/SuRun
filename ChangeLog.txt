@@ -3,6 +3,7 @@ Done:
 
 ToDo for next release:
 ---------------------
+* remove /UNSAFE Option
 * Win2k: TSA-Icons->256 colors; 
         "Run as..." does not really work: gray option out
 
