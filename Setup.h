@@ -30,6 +30,7 @@
 #define USERKEY(u)    CBigResStr(SVCKEY _T("\\%s\\Settings"),u)
 
 #define RAPASSKEY(u)  CBigResStr(SVCKEY _T("\\RunAs\\%s\\Cache"),u)
+#define USROPTKEY(u)  CBigResStr(_T("CLSID\\") sGUID _T("\\Options\\%s"),u)
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Macros for all Settings
@@ -145,6 +146,18 @@
 //Show App admin status in system tray
 #define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),0)
 #define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,0)
+
+
+//Show App admin status in system tray per user setting
+#define GetUsrOption(u,s,d)   GetRegInt(HKCR,USROPTKEY(u),s,d)
+#define SetUsrOption(u,s,v,d) if(GetUsrOption(u,s,d)!=v)\
+                                SetRegInt(HKLM,USROPTKEY(u),s,v)
+
+#define DelUsrOption(u,s)     RegDelVal(HKLM,USROPTKEY(u),s)
+
+#define GetUserTSA(u)         GetUsrOption(u,_T("ShowTrayAdmin"),-1)
+#define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,-1)
+#define DelUserTSA(u)         DelUsrOption(u,_T("ShowTrayAdmin"))
 
 //#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 //#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
