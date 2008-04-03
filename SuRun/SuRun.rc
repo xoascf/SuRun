@@ -738,11 +738,11 @@ BEGIN
     PUSHBUTTON      "Hin&zu...",IDC_ADDUSER,281,4,50,14
     PUSHBUTTON      "L&öschen",IDC_DELUSER,334,4,50,14
     CONTROL         "Benutzer darf SuRun Einstellungen verändern",
-                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,19,
-                    239,10
+                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,
+                    201,10
     CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
-                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
-                    30,239,10
+                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    30,201,10
     GROUPBOX        "Programmliste für den Benutzer (Änderungen werden sofort wirksam, auch wenn 'Abbrechen' gedrückt wird).",
                     IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
@@ -753,6 +753,11 @@ BEGIN
     PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Löschen",IDC_DELETE,273,216,50,14
     PUSHBUTTON      "&Hilfe",IDC_ICONHELP,326,216,50,14
+    CONTROL         "Benutzerstatus in Taskleiste anzeigen",
+                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    252,19,137,10
+    CONTROL         "Benutzerstatus Info als 'Balloon-Tips'",IDC_TRAYBALLOON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
