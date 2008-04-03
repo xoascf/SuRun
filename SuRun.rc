@@ -779,8 +779,8 @@ BEGIN
                     301,10
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Symbol im Infobereich der Taskleiste",IDC_STATIC,10,104,
-                    320,37
+    GROUPBOX        "Symbol im Infobereich der Taskleiste (Für alle Benutzer, auch nicht-SuRunner)",
+                    IDC_STATIC,10,104,320,37
     CONTROL         "Zeige Benutzerstatus für aktives Programm als Symbol im Infobereich der Taskleiste",
                     IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     20,115,301,10
