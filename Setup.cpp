@@ -559,20 +559,19 @@ static void SaveUserFlags()
 {
   if (g_SD->CurUser>=0)
   {
-    SetNoRunSetup(g_SD->Users.GetUserName(g_SD->CurUser),
-      IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
-    SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
-      IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
+    LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
+    SetNoRunSetup(0,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
+    SetRestrictApps(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
     switch (IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
     {
     case BST_INDETERMINATE:
-      DelUserTSA(g_SD->CurUser);
+      DelUserTSA(u);
       break;
     case BST_UNCHECKED:
-      SetUserTSA(g_SD->CurUser,0);
+      SetUserTSA(u,0);
       break;
     case BST_CHECKED:
-      SetUserTSA(g_SD->CurUser,1+(DWORD)(IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYBALLOON)!=0));
+      SetUserTSA(u,1+(DWORD)(IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYBALLOON)!=0));
       break;
     }
   }
@@ -1004,7 +1003,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
         if (!IsWin2k())
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
-            IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)!=0);
+            IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_CHECKED);
         return TRUE;
       }//switch (wParam)
       break;
