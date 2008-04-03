@@ -37,13 +37,15 @@ SuRun Changes:
 
 SuRun 1.1.0.3 - 2008-04-03: (small beta test)
 ----------------------------
-* NEW: Initialize blurred desktop before and close it after calling SwitchDesktop
+* NEW: Initialize desktop background before and close it after SwitchDesktop
 * NEW: Sparate icon for "never run automagically"
 * NEW: "Apply" Button in SuRun Settings
 * NEW: Every SuRunner can be configured to see the Tray Icon (Yes,No,Default)
 * NEW: RunAs Password manager for every user that uses RunAs
 * FIX: Win2k does not support Balloon tips so these Options are grayed in Win2k
 * FIX: Better help text for the "default automagic" Icon
+---
+SuRun 1.1.0.3 - 2008-04-02: (small beta test)
 ---
 * FIX: When using Sandboxie and the IAT-Hook, starting a sandboxed program 
   took about four minutes. 
