@@ -1609,11 +1609,14 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
-      if ((!GetShowTrayAdmin) && IsAdmin())
-        return ExitProcess(0),true;
       CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
       if (GetLastError()==ERROR_ALREADY_EXISTS)
         return ExitProcess(-1),true;
+      g_RunData.CliProcessId=GetCurrentProcessId();
+      g_RunData.CliThreadId=GetCurrentThreadId();
+      GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
+      if ((!IsInSuRunners(g_RunData.UserName))||IsAdmin())
+        return ExitProcess(0),true;
       if ( (!GetUseIATHook) && (!GetShowTrayAdmin) 
         && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
         return ExitProcess(0),true;
@@ -1642,9 +1645,6 @@ bool HandleServiceStuff()
         }
       }
 #endif _WIN64
-      g_RunData.CliProcessId=GetCurrentProcessId();
-      g_RunData.CliThreadId=GetCurrentThreadId();
-      GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
       bool TSA=FALSE;
       while (CheckServiceStatus()==SERVICE_RUNNING)
       {
@@ -1662,8 +1662,6 @@ bool HandleServiceStuff()
           TSA=FALSE;
           Sleep(1000);
         }
-        if ((!GetShowTrayAdmin) && IsAdmin())
-          break;
         if ( (!GetUseIATHook) && (!GetShowTrayAdmin) 
           && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
           break;
