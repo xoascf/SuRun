@@ -452,6 +452,9 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
     return;
   }
   //DenyUserAccessToDesktop(m_hDeskSwitch);
+  //Show Desktop Background
+  if (bCreateBkWnd)
+    m_Screen.Show();
   //Switch to the new Desktop
   if (!SwitchDesktop(m_hdeskUser))
   {
@@ -460,16 +463,10 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
     return;
   }
   m_bOk=TRUE;
-  //Show Desktop Background
-  if (bCreateBkWnd)
-    m_Screen.Show();
 }
 
 void CRunOnNewDeskTop::CleanUp()
 {
-  //Delete Backgroung Window
-  if(m_bOk)
-    m_Screen.Done();
   //Switch back to the interactive Desktop
   if(m_hDeskSwitch)
   {
@@ -480,6 +477,9 @@ void CRunOnNewDeskTop::CleanUp()
       DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
     m_hDeskSwitch=NULL;
   }
+  //Delete Background Window
+  if(m_bOk)
+    m_Screen.Done();
   //Set the previous Window Station
   if (m_hwinstaUser)
   {
