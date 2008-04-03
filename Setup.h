@@ -159,7 +159,8 @@
 #define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,-1)
 #define DelUserTSA(u)         DelUsrOption(u,_T("ShowTrayAdmin"))
 
-#define ShowTray(u)           (GetShowTrayAdmin!=0)&&(GetUserTSA(u)!=0)
+#define ShowTray(u)           ((GetShowTrayAdmin!=0)&&(GetUserTSA(u)!=0))\
+                            ||((int)GetUserTSA(u)>0)
 #define ShowBalloon(u)        ((GetShowTrayAdmin==2)&&(GetUserTSA(u)==-1))\
                               ||(GetUserTSA(u)==2)
 
