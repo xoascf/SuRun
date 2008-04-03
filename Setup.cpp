@@ -560,7 +560,7 @@ static void SaveUserFlags()
   if (g_SD->CurUser>=0)
   {
     LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
-    SetNoRunSetup(0,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
+    SetNoRunSetup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
     SetRestrictApps(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
     switch (IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
     {
@@ -636,20 +636,21 @@ static void UpdateUser(HWND hwnd)
   ListView_DeleteAllItems(hWL);
   if (n!=CB_ERR)
   {
+    LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
     bm=g_SD->Users.GetUserBitmap(n);
     EnableWindow(GetDlgItem(hwnd,IDC_USER),1);
     EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),1);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
-    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
+    CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(u));
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
-    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
+    CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(u));
     //TSA:
     //Win2k:no balloon tips
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),1);
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
     CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
     CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_INDETERMINATE);
-    switch(GetUserTSA(g_SD->Users.GetUserName(n)))
+    switch(GetUserTSA(u))
     {
     case 2:
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_CHECKED);
@@ -662,7 +663,7 @@ static void UpdateUser(HWND hwnd)
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
     }
     EnableWindow(hWL,true);
-    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
+    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,u);
     TCHAR cmd[4096];
     for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
     {
