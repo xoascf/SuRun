@@ -8,6 +8,7 @@ Done:
 
 ToDo for next release:
 ---------------------
+* RunAs Password manager HKLM\Security\SuRun\<RunAsUser>\User|Password
 * Win2k: TSA-Icons->256 colors; 
   "Run as..." does not really work: gray option out
   Balloon tips not supported: gray option out
