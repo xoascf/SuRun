@@ -648,6 +648,8 @@ static void UpdateUser(HWND hwnd)
     //Win2k:no balloon tips
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),1);
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
+    CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
+    CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_INDETERMINATE);
     switch(GetUserTSA(g_SD->Users.GetUserName(n)))
     {
     case 2:
