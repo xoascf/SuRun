@@ -245,6 +245,20 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  IsWin2k
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+bool IsWin2k()
+{
+  OSVERSIONINFO oie;
+  oie.dwOSVersionInfoSize=sizeof(oie);
+  GetVersionEx(&oie);
+  return (oie.dwMajorVersion==5)&&(oie.dwMinorVersion==0);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  Setup Dialog Data
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -549,6 +563,18 @@ static void SaveUserFlags()
       IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
     SetRestrictApps(g_SD->Users.GetUserName(g_SD->CurUser),
       IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
+    switch (IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
+    {
+    case BST_INDETERMINATE:
+      DelUserTSA(g_SD->CurUser);
+      break;
+    case BST_UNCHECKED:
+      SetUserTSA(g_SD->CurUser,0);
+      break;
+    case BST_CHECKED:
+      SetUserTSA(g_SD->CurUser,1+(DWORD)(IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYBALLOON)!=0));
+      break;
+    }
   }
 }
 
@@ -614,10 +640,26 @@ static void UpdateUser(HWND hwnd)
     bm=g_SD->Users.GetUserBitmap(n);
     EnableWindow(GetDlgItem(hwnd,IDC_USER),1);
     EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),1);
-    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),true);
+    EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
     CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(g_SD->Users.GetUserName(n)));
-    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),true);
+    EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
     CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(g_SD->Users.GetUserName(n)));
+    //TSA:
+    //Win2k:no balloon tips
+    EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),1);
+    EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
+    switch(GetUserTSA(g_SD->Users.GetUserName(n)))
+    {
+    case 2:
+      CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_CHECKED);
+    case 1:
+      if (!IsWin2k())
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),1);
+      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_CHECKED);
+      break;
+    case 0:
+      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
+    }
     EnableWindow(hWL,true);
     CBigResStr wlkey(_T("%s\\%s"),SVCKEY,g_SD->Users.GetUserName(n));
     TCHAR cmd[4096];
@@ -626,6 +668,7 @@ static void UpdateUser(HWND hwnd)
       LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
       ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
     }
+
     ListView_SortItemsEx(hWL,ListSortProc,hWL);
     UpdateWhiteListFlags(hWL);
 
@@ -638,6 +681,8 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),false);
     EnableWindow(hWL,false);
     EnableWindow(GetDlgItem(hwnd,IDC_ADDAPP),false);
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),false);
@@ -954,6 +999,11 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
+      case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
+        if (!IsWin2k())
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
+            IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)!=0);
+        return TRUE;
       }//switch (wParam)
       break;
     }//WM_COMMAND
@@ -1033,8 +1083,14 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,GetShowTrayAdmin!=0);
-      CheckDlgButton(hwnd,IDC_TRAYBALLOON,GetShowTrayAdmin==2);
-      EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),GetShowTrayAdmin!=0);
+      //Win2k:no balloon tips
+      if (IsWin2k())
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
+      else
+      {
+        CheckDlgButton(hwnd,IDC_TRAYBALLOON,GetShowTrayAdmin==2);
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),GetShowTrayAdmin!=0);
+      }
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -1066,8 +1122,9 @@ ApplyChanges:
       switch (wParam)
       {
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
-        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
-          IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)!=0);
+        if (!IsWin2k())
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
+            IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)!=0);
         return TRUE;
       case MAKELPARAM(IDC_IATHOOK,BN_CLICKED):
       case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
