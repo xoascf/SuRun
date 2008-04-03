@@ -420,6 +420,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               {
                 CloseHandle(hUser);
                 SafeMsgBox(hwnd,CResStr(IDS_NOADMIN,p->User),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+                SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETSEL,0,-1);
+                SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
               }else
               {
                 CloseHandle(hUser);
