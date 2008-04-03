@@ -734,12 +734,15 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW));
         return TRUE;
+      case MAKELPARAM(ID_APPLY,BN_CLICKED):
+        goto ApplyChanges;
       }//switch (wParam)
       break;
     }//WM_COMMAND
   case WM_DESTROY:
     if (g_SD->DlgExitCode==IDOK) //User pressed OK, save settings
     {
+ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW));
       SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
@@ -949,6 +952,8 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             ListView_GetSelectionMark(hWL)!=-1);
         }
         return TRUE;
+      case MAKELPARAM(ID_APPLY,BN_CLICKED):
+        goto ApplyChanges;
       }//switch (wParam)
       break;
     }//WM_COMMAND
@@ -1001,6 +1006,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     g_SD->HelpWnd=0;
     //if (g_SD->DlgExitCode==IDOK)
     {
+ApplyChanges:
       SaveUserFlags();
       return TRUE;
     }//WM_DESTROY
@@ -1038,6 +1044,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_DESTROY:
     if (g_SD->DlgExitCode==IDOK) //User pressed OK, save settings
     {
+ApplyChanges:
       SetUseIShExHook(IsDlgButtonChecked(hwnd,IDC_SHEXHOOK));
       SetUseIATHook(IsDlgButtonChecked(hwnd,IDC_IATHOOK));
       SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
@@ -1066,6 +1073,8 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
         UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
         return TRUE;
+      case MAKELPARAM(ID_APPLY,BN_CLICKED):
+        goto ApplyChanges;
       }
     }
   }
@@ -1148,6 +1157,11 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     {
       switch (wParam)
       {
+      case MAKELPARAM(ID_APPLY,BN_CLICKED):
+        SendMessage(
+          g_SD->hTabCtrl[TabCtrl_GetCurSel(GetDlgItem(hwnd,IDC_SETUP_TAB))],
+          WM_COMMAND,wParam,lParam);
+        break;
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         g_SD->DlgExitCode=IDCANCEL;
         EndDialog(hwnd,0);
