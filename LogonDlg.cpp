@@ -190,6 +190,7 @@ static void SetUserBitmap(HWND hwnd)
       CheckDlgButton(hwnd,IDC_STOREPASS,1);
     }else
     {
+      SetDlgItemText(hwnd,IDC_PASSWORD,_T(""));
       EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),1);
       CheckDlgButton(hwnd,IDC_STOREPASS,0);
     }
