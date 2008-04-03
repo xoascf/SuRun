@@ -462,14 +462,14 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           INT_PTR ExitCode=1+(IsDlgButtonChecked(hwnd,IDC_ALWAYSOK)<<1)
                             +(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2);
-          if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
+          LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+          if (p->bRunAs || IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
-            LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
             TCHAR User[UNLEN+GNLEN+2]={0};
             TCHAR Pass[PWLEN+1]={0};
             GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),Pass,PWLEN);
-            HANDLE hUser=GetUserToken(p->User,p->Password);
+            HANDLE hUser=GetUserToken(User,Pass);
             if (hUser)
             {
               if ((p->ForceAdminLogon)&&(!IsAdmin(hUser)))
