@@ -88,10 +88,10 @@ BEGIN
     PUSHBUTTON      "Add...",IDC_ADDUSER,281,4,50,14
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,86,19,216,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,86,19,258,10
     CONTROL         "The can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
-                    30,216,10
+                    30,258,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
                     IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
@@ -159,6 +159,7 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,395,252
+    PUSHBUTTON      "&Apply",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Zapisz",IDOK,279,256,50,14
     PUSHBUTTON      "&Anuluj",IDCANCEL,338,256,50,14
 END
@@ -734,10 +735,10 @@ BEGIN
     PUSHBUTTON      "L&öschen",IDC_DELUSER,334,4,50,14
     CONTROL         "Benutzer darf SuRun Einstellungen verändern",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,19,
-                    216,10
+                    239,10
     CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
-                    30,216,10
+                    30,239,10
     GROUPBOX        "Programmliste für den Benutzer (Änderungen werden sofort wirksam, auch wenn 'Abbrechen' gedrückt wird).",
                     IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
@@ -805,6 +806,7 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,395,252
+    PUSHBUTTON      "Ü&bernehmen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Speichern",IDOK,279,256,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
 END
@@ -1213,10 +1215,10 @@ BEGIN
     PUSHBUTTON      "Add...",IDC_ADDUSER,281,4,50,14
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,86,19,216,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,86,19,252,10
     CONTROL         "The can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,86,
-                    30,216,10
+                    30,252,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
                     IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
@@ -1284,6 +1286,7 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,395,252
+    PUSHBUTTON      "&Apply",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Save",IDOK,279,256,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
 END
