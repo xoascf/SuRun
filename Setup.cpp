@@ -258,7 +258,7 @@ typedef struct _SETUPDATA
   HWND HelpWnd;
   int DlgExitCode;
   HIMAGELIST ImgList;
-  int ImgIconIdx[7];
+  int ImgIconIdx[8];
   TCHAR NewUser[2*UNLEN+2];
   _SETUPDATA()
   {
@@ -271,7 +271,7 @@ typedef struct _SETUPDATA
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
     ImgList=ImageList_Create(16,16,ILC_COLOR8,7,1);
-    for (int i=0;i<7;i++)
+    for (int i=0;i<8;i++)
     {
       HICON icon=(HICON)LoadImage(GetModuleHandle(0),
         MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
@@ -579,7 +579,7 @@ static void UpdateWhiteListFlags(HWND hWL)
       0,0};
     ListView_SetItem(hWL,&item);
     item.iSubItem=1;
-    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)+(Flags&FLAG_CANCEL_SX?5:0)];
+    item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)+(Flags&FLAG_CANCEL_SX?6:0)];
     ListView_SetItem(hWL,&item);
     item.iSubItem=2;
     item.iImage=g_SD->ImgIconIdx[4+(Flags&FLAG_NORESTRICT?0:1)];
@@ -1149,14 +1149,13 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       switch (wParam)
       {
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
+        g_SD->DlgExitCode=IDCANCEL;
         EndDialog(hwnd,0);
         return TRUE;
       case MAKELPARAM(IDOK,BN_CLICKED):
-        {
-          g_SD->DlgExitCode=IDOK;
-          EndDialog(hwnd,1);
-          return TRUE;
-        }
+        g_SD->DlgExitCode=IDOK;
+        EndDialog(hwnd,1);
+        return TRUE;
       }//switch (wParam)
       break;
     }//WM_COMMAND
