@@ -151,9 +151,9 @@
 //Show App admin status in system tray per user setting
 #define GetUsrOption(u,s,d)   GetRegInt(HKCR,USROPTKEY(u),s,d)
 #define SetUsrOption(u,s,v,d) if(GetUsrOption(u,s,d)!=v)\
-                                SetRegInt(HKLM,USROPTKEY(u),s,v)
+                                SetRegInt(HKCR,USROPTKEY(u),s,v)
 
-#define DelUsrOption(u,s)     RegDelVal(HKLM,USROPTKEY(u),s)
+#define DelUsrOption(u,s)     RegDelVal(HKCR,USROPTKEY(u),s)
 
 #define GetUserTSA(u)         GetUsrOption(u,_T("ShowTrayAdmin"),-1)
 #define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,-1)
