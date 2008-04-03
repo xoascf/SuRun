@@ -11,7 +11,7 @@ Done:
 ToDo for next release:
 ---------------------
 * Win2k: TSA-Icons->256 colors; 
-  "Run as..." does not really work: gray option out
+        "Run as..." does not really work: gray option out
 
 * Warn if any Admin account has no password!
 ---
