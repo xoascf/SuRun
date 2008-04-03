@@ -26,9 +26,10 @@
 
 #define PASSWKEY      SVCKEY _T("\\Cache")
 #define TIMESKEY      SVCKEY _T("\\Times")
-#define WHTLSTKEY(u)  CBigResStr(_T("%s\\%s"),SVCKEY,u)
-#define USERKEY(u)    CBigResStr(_T("%s\\%s\\Settings"),SVCKEY,u)
+#define WHTLSTKEY(u)  CBigResStr(SVCKEY _T("\\%s"),u)
+#define USERKEY(u)    CBigResStr(SVCKEY _T("\\%s\\Settings"),u)
 
+#define RAPASSKEY(u)  CBigResStr(SVCKEY _T("\\RunAs\\%s\\Cache"),u)
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Macros for all Settings
