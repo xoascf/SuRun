@@ -10,10 +10,8 @@ ToDo for next release:
   Balloon tips not supported: gray option out
 * TSA: Only for special SuRunners: Selectable in User-Dialog
 * Apply Button in Setup?
-* Warn if any Admin account has no password!
 
-* BUG report: Kaspersky and "SuRun /Setup"->User settings->Add/Edit App hangs
-* BUG report: RealVNC does not store settings
+* Warn if any Admin account has no password!
 ---
 * Polish resources
 
