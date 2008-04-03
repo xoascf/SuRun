@@ -6,6 +6,7 @@
 #define IDS_ASKOK                       2
 #define IDS_APPNAME                     3
 #define IDS_NODESK                      4
+#define ID_APPLY                        4
 #define IDS_SERVICE_NAME                5
 #define IDS_ASKRUNAS                    6
 #define IDS_UNINSTALLADMIN              7
