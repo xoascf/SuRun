@@ -206,7 +206,7 @@ void InitTrayShowAdmin()
 
 BOOL ProcessTrayShowAdmin()
 {
-  g_BallonTips=GetShowTrayAdmin==2;
+  g_BallonTips=ShowBalloon(g_RunData.UserName);
   DisplayIcon();
   MSG msg={0};
   if(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
