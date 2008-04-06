@@ -392,7 +392,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Run as..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -659,7 +659,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Ausführen als.."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1052,8 +1052,9 @@ IDI_LISTICON6           ICON    DISCARDABLE     "res\\AutoCancel.ico"
 IDI_NOADMIN             ICON    DISCARDABLE     "res\\NoAdmin.ico"
 IDI_NOWINDOW            ICON    DISCARDABLE     "res\\NoWindow.ico"
 IDI_ADMIN               ICON    DISCARDABLE     "res\\Admin.ico"
-IDI_ADMIN1              ICON    DISCARDABLE     "res\\ADMIN1.ico"
+IDI_SHADMIN             ICON    DISCARDABLE     "res\\SHADMIN.ico"
 IDI_LISTICON7           ICON    DISCARDABLE     "res\\CancelWindows.ico"
+IDI_SRADMIN             ICON    DISCARDABLE     "res\\SrAdmin.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1575,7 +1576,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Run as..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
