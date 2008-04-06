@@ -180,12 +180,18 @@ private:
       SetCursor(LoadCursor(0,IDC_WAIT));
       return TRUE;
     case WM_TIMER:
-      KillTimer(hwnd,wParam);
-      BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
-      SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
-      if (a<255)
-        SetTimer(hwnd,wParam,10,0);
+      {
+        KillTimer(hwnd,wParam);
+        BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
+        SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
+        if (a<255)
+          SetTimer(hwnd,wParam,10,0);
+      }
       return TRUE;
+    case WM_MOUSEACTIVATE:
+      if (LOWORD(lParam)==HTCAPTION)
+        return MA_NOACTIVATEANDEAT;
+	    return MA_NOACTIVATE;
     }
     return DefWindowProc(m_hWnd,msg,wParam,lParam);
   }
