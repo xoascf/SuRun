@@ -78,11 +78,13 @@ public:
     m_dy=0;
     m_bm=0;
     m_blurbm=0;
-    m_Alpha=0;
+    timeBeginPeriod(1);
+    m_StartTime=0;
   }
   ~CBlurredScreen()
   {
     Done();
+    timeEndPeriod(1);
   }
   void Init()
   {
@@ -126,13 +128,11 @@ public:
     wc.lpszClassName=_T("ScreenWndClass");
     wc.hInstance=GetModuleHandle(0);
     RegisterClass(&wc);
-
     m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW,wc.lpszClassName,_T("ScreenWnd"),
       WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
     RedrawWindow(m_hWnd,0,0,RDW_UPDATENOW);
     MsgLoop();
-
     m_hWndTrans=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_LAYERED,
       wc.lpszClassName,_T("ScreenWnd"),
       WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
@@ -141,6 +141,7 @@ public:
     RedrawWindow(m_hWndTrans,0,0,RDW_UPDATENOW);
     MsgLoop();
     SetTimer(m_hWndTrans,1,10,0);
+    m_StartTime=timeGetTime();
   }
   void MsgLoop()
   {
@@ -179,13 +180,11 @@ private:
       SetCursor(LoadCursor(0,IDC_WAIT));
       return TRUE;
     case WM_TIMER:
-      if(m_Alpha<=245)  
-        m_Alpha+=10;
-      else
-        m_Alpha=255;
-      SetLayeredWindowAttributes(m_hWndTrans,0,m_Alpha,LWA_ALPHA);
-      if(m_Alpha==255)
-        KillTimer(hwnd,wParam);
+      KillTimer(hwnd,wParam);
+      BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
+      SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
+      if (a<255)
+        SetTimer(hwnd,wParam,10,0);
       return TRUE;
     }
     return DefWindowProc(m_hWnd,msg,wParam,lParam);
@@ -196,5 +195,5 @@ private:
   int m_dy;
   HBITMAP m_bm;
   HBITMAP m_blurbm;
-  BYTE m_Alpha;
+  DWORD m_StartTime;
 };
