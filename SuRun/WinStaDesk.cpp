@@ -542,3 +542,18 @@ void DeleteSafeDesktop()
     delete g_RunOnNewDesk;
   g_RunOnNewDesk=NULL;
 }
+
+//int TestBS()
+//{
+//  CBlurredScreen s;
+//  s.Init();
+//  s.Show();
+//  DWORD t=GetTickCount();
+//  while (GetTickCount()-t<2000)
+//    s.MsgLoop();
+//  s.Done();
+//  ExitProcess(0);
+//  return 1;
+//}
+//
+//int tbs=TestBS();
