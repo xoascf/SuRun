@@ -209,14 +209,14 @@ BOOL ProcessTrayShowAdmin()
 {
   g_BallonTips=ShowBalloon(g_RunData.UserName);
   DisplayIcon();
-  MSG msg={0};
-  if(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+  MSG msg;
+  int count=0;
+  while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<100))
   {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
-    return TRUE;
   }
-  return FALSE;
+  return count>0;
 }
 
 void CloseTrayShowAdmin()
