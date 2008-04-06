@@ -212,7 +212,7 @@ private:
         return MA_NOACTIVATEANDEAT;
 	    return MA_NOACTIVATE;
     }
-    return DefWindowProc(m_hWnd,msg,wParam,lParam);
+    return DefWindowProc(hwnd,msg,wParam,lParam);
   }
   HWND m_hWnd;
   HWND m_hWndTrans;
