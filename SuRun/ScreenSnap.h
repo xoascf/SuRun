@@ -124,24 +124,32 @@ public:
   void Show()
   {
     WNDCLASS wc={0};
+    OSVERSIONINFO oie;
+    oie.dwOSVersionInfoSize=sizeof(oie);
+    GetVersionEx(&oie);
+    bool bWin2k=(oie.dwMajorVersion==5)&&(oie.dwMinorVersion==0);
     wc.lpfnWndProc=CBlurredScreen::WindowProc;
     wc.lpszClassName=_T("ScreenWndClass");
     wc.hInstance=GetModuleHandle(0);
     RegisterClass(&wc);
-    m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW,wc.lpszClassName,_T("ScreenWnd"),
-      WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
+    m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW,wc.lpszClassName,
+      _T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
-    RedrawWindow(m_hWnd,0,0,RDW_UPDATENOW);
     MsgLoop();
-    m_hWndTrans=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_LAYERED,
-      wc.lpszClassName,_T("ScreenWnd"),
-      WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
-    SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
-    SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
-    RedrawWindow(m_hWndTrans,0,0,RDW_UPDATENOW);
-    MsgLoop();
-    SetTimer(m_hWndTrans,1,10,0);
-    m_StartTime=timeGetTime();
+    if(!bWin2k)
+    {
+      m_hWndTrans=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_LAYERED,
+        wc.lpszClassName,_T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
+      SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
+      SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
+      MsgLoop();
+      m_StartTime=timeGetTime();
+      SetTimer(m_hWndTrans,1,10,0);
+    }else
+    {
+      m_hWndTrans=m_hWnd;
+      m_hWnd=0;
+    }
   }
   void MsgLoop()
   {
@@ -184,6 +192,8 @@ private:
         KillTimer(hwnd,wParam);
         BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
         SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
+        RedrawWindow(m_hWnd,0,0,RDW_UPDATENOW);
+        MsgLoop();
         if (a<255)
           SetTimer(hwnd,wParam,10,0);
         else
