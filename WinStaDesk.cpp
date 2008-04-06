@@ -303,6 +303,7 @@ private:
   HDESK   m_hdeskSave;
   HDESK   m_hdeskUser;
   HDESK   m_hDeskSwitch;
+public:
   CBlurredScreen m_Screen;
 };
 
@@ -545,14 +546,11 @@ void DeleteSafeDesktop()
 
 //int TestBS()
 //{
-//  CBlurredScreen s;
-//  s.Init();
-//  s.Show();
+//  CreateSafeDesktop(_T("WinSta0"),true);
 //  DWORD t=GetTickCount();
-//  while (GetTickCount()-t<2000)
-//    s.MsgLoop();
-//  SafeMsgBox(0,0,0,0);
-//  s.Done();
+//  while (GetTickCount()-t<3000)
+//    g_RunOnNewDesk->m_Screen.MsgLoop();
+//  DeleteSafeDesktop();
 //  ExitProcess(0);
 //  return 1;
 //}
