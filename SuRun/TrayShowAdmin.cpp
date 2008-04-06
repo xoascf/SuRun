@@ -82,6 +82,7 @@ static void DisplayIcon()
   _tcscpy(g_User,User);
   memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
   _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
+  BOOL bDiffUser=_tcscmp(User,g_RunData.UserName);
   if (bIsFGAdm==-1)
   {
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),
@@ -89,16 +90,16 @@ static void DisplayIcon()
   }else if (bIsFGAdm)
   {
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,
-                            MAKEINTRESOURCE(g_CliIsAdmin?IDI_ADMIN1:IDI_ADMIN),
+      MAKEINTRESOURCE(bDiffUser?(g_CliIsAdmin?IDI_SHADMIN:IDI_ADMIN):IDI_SRADMIN),
                             IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
-    if (g_BallonTips && (_tcscmp(User,g_RunData.UserName) || (!g_CliIsAdmin)))
+    if (g_BallonTips && bDiffUser)
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
   }else
   {
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOADMIN),
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
-    if (g_BallonTips && (_tcscmp(User,g_RunData.UserName) || g_CliIsAdmin))
+    if (g_BallonTips && bDiffUser)
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
   }
