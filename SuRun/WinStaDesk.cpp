@@ -551,6 +551,7 @@ void DeleteSafeDesktop()
 //  DWORD t=GetTickCount();
 //  while (GetTickCount()-t<2000)
 //    s.MsgLoop();
+//  SafeMsgBox(0,0,0,0);
 //  s.Done();
 //  ExitProcess(0);
 //  return 1;
