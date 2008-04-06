@@ -325,10 +325,6 @@ SOURCE=.\res\Admin.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\res\ADMIN1.ico
-# End Source File
-# Begin Source File
-
 SOURCE=.\res\app.manifest
 # End Source File
 # Begin Source File
