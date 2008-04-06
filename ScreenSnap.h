@@ -101,18 +101,18 @@ public:
   }
   void Done()
   {
-    if(m_hWndTrans)
-    {
-      SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,0);
-      DestroyWindow(m_hWndTrans);
-    }
-    m_hWndTrans=0;
     if(m_hWnd)
     {
       SetWindowLongPtr(m_hWnd,GWLP_USERDATA,0);
       DestroyWindow(m_hWnd);
     }
     m_hWnd=0;
+    if(m_hWndTrans)
+    {
+      SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,0);
+      DestroyWindow(m_hWndTrans);
+    }
+    m_hWndTrans=0;
     if (m_bm)
       DeleteObject(m_bm);
     m_bm=0;
