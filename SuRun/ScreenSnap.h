@@ -186,6 +186,15 @@ private:
         SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
         if (a<255)
           SetTimer(hwnd,wParam,10,0);
+        else
+        {
+          if(m_hWnd)
+          {
+            SetWindowLongPtr(m_hWnd,GWLP_USERDATA,0);
+            DestroyWindow(m_hWnd);
+          }
+          m_hWnd=0;
+        }
       }
       return TRUE;
     case WM_MOUSEACTIVATE:
