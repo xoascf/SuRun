@@ -36,8 +36,14 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.3 - 2008-04-03: (small beta test)
+SuRun 1.1.0.3 - 2008-04-06: (small beta test)
 ----------------------------
+* Background Screen fades in
+* Changed Icons
+* Balloon Tops only if user name is different from logged on user
+---
+SuRun 1.1.0.3 - 2008-04-03: (small beta test)
+---
 * NEW: Initialize desktop background before and close it after SwitchDesktop
 * NEW: Sparate icon for "never run automagically"
 * NEW: "Apply" Button in SuRun Settings
