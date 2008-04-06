@@ -381,6 +381,14 @@ SOURCE=.\res\Restrict.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\SHADMIN.ico
+# End Source File
+# Begin Source File
+
+SOURCE=.\res\SrAdmin.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\SuRun.ico
 # End Source File
 # Begin Source File
