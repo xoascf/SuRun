@@ -45,7 +45,11 @@ typedef struct
       BOOL CurUserIsadmin;
     };
   };
-  DWORD KillPID;
+  union
+  {
+    DWORD KillPID;
+    int IconId;
+  };
   DWORD RetPID;
   DWORD_PTR RetPtr;
   bool  bNoSafeDesk; //only valid with /SETUP
