@@ -11,4 +11,4 @@
 //                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-void TrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Message);
+void TrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Message,int IconId);
