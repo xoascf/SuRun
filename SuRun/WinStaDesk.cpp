@@ -542,7 +542,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,BOOL BlurDesk)
 
 void DeleteSafeDesktop(bool bFade)
 {
-  if (g_RunOnNewDesk)
+  if (g_RunOnNewDesk && bFade)
     g_RunOnNewDesk->FadeOut();
   if (g_StayOnDesk)
     delete g_StayOnDesk;
