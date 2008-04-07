@@ -296,6 +296,7 @@ public:
   ~CRunOnNewDeskTop();
   bool IsValid();
   void CleanUp();
+  void FadeOut();
 private:
   bool    m_bOk;
   HWINSTA m_hwinstaSave;
@@ -466,6 +467,11 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
   m_bOk=TRUE;
 }
 
+void CRunOnNewDeskTop::FadeOut()
+{
+  m_Screen.FadeOut();
+}
+
 void CRunOnNewDeskTop::CleanUp()
 {
   //Switch back to the interactive Desktop
@@ -518,7 +524,7 @@ CStayOnDeskTop* g_StayOnDesk=NULL;
 
 bool CreateSafeDesktop(LPTSTR WinSta,BOOL BlurDesk)
 {
-  DeleteSafeDesktop();
+  DeleteSafeDesktop(false);
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,BlurDesk);
@@ -534,8 +540,10 @@ bool CreateSafeDesktop(LPTSTR WinSta,BOOL BlurDesk)
   return true;
 }
 
-void DeleteSafeDesktop()
+void DeleteSafeDesktop(bool bFade)
 {
+  if (g_RunOnNewDesk)
+    g_RunOnNewDesk->FadeOut();
   if (g_StayOnDesk)
     delete g_StayOnDesk;
   g_StayOnDesk=NULL;
