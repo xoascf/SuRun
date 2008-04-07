@@ -47,8 +47,8 @@ typedef struct
   };
   union
   {
-    DWORD KillPID;
-    int IconId;
+    DWORD KillPID; //SuRun->Service: Process Id to be killed
+    int IconId;    //Service->Tray Warning: ICON Resource Id
   };
   DWORD RetPID;
   DWORD_PTR RetPtr;
