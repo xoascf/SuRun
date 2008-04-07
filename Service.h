@@ -45,13 +45,20 @@ typedef struct
       BOOL CurUserIsadmin;
     };
   };
+  DWORD KillPID; //SuRun->Service: Process Id to be killed
   union
   {
-    DWORD KillPID; //SuRun->Service: Process Id to be killed
-    int IconId;    //Service->Tray Warning: ICON Resource Id
+    struct
+    {
+      DWORD RetPID;     //SuRun->Service: Return PROCESS_INFORMATION to this Porcess
+      DWORD_PTR RetPtr; //SuRun->Service: Return PROCESS_INFORMATION to this Address
+    };
+    struct
+    {
+      int IconId;       //Service->Tray Warning: ICON Resource Id
+      DWORD TimeOut;    //Service->Tray Window timeout
+    };
   };
-  DWORD RetPID;
-  DWORD_PTR RetPtr;
   bool  bNoSafeDesk; //only valid with /SETUP
   bool  bShlExHook;
   bool  beQuiet;
