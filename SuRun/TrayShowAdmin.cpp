@@ -90,7 +90,7 @@ static void DisplayIcon()
   }else if (bIsFGAdm)
   {
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,
-      MAKEINTRESOURCE(bDiffUser?(g_CliIsAdmin?IDI_SHADMIN:IDI_ADMIN):IDI_SRADMIN),
+      MAKEINTRESOURCE(bDiffUser?IDI_ADMIN:(g_CliIsAdmin?IDI_SHADMIN:IDI_SRADMIN)),
                             IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
     if (g_BallonTips && bDiffUser)
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
