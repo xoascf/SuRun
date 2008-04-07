@@ -169,7 +169,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   {
     //Started from services:
     //Show ToolTip "<Program> is running elevated"...
-    TrayMsgWnd(CResStr(IDS_APPNAME),CBigResStr(IDS_STARTED,g_RunData.cmdLine));
+    TrayMsgWnd(CResStr(IDS_APPNAME),g_RunData.cmdLine,g_RunData.IconId);
     return RETVAL_OK;
   }
   //ProcessId
