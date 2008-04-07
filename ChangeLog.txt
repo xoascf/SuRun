@@ -38,7 +38,8 @@ SuRun Changes:
 
 SuRun 1.1.0.3 - 2008-04-06: (small beta test)
 ----------------------------
-* Background Screen fades in
+* Background Screen fades in and out
+* SuRuns "Run as..." and Administrator authentification respect group policies.
 * Changed Icons
 * Balloon Tops only if user name is different from logged on user
 ---
