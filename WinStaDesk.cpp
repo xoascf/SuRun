@@ -556,9 +556,9 @@ void DeleteSafeDesktop(bool bFade)
 //{
 //  CreateSafeDesktop(_T("WinSta0"),true);
 //  DWORD t=GetTickCount();
-//  while (GetTickCount()-t<3000)
+//  while (GetTickCount()-t<600)
 //    g_RunOnNewDesk->m_Screen.MsgLoop();
-//  DeleteSafeDesktop();
+//  DeleteSafeDesktop(true);
 //  ExitProcess(0);
 //  return 1;
 //}
