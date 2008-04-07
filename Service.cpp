@@ -446,7 +446,7 @@ DWORD PrepareSuRun()
   //Do we have a Password for this user?
   if (GetSavePW &&(!PasswordExpired(g_RunData.UserName)))
       LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
-  BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd);
+  BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd,true);
 #ifdef _DEBUG
   if (!PwOk)
     DBGTrace2("Password (%s) for %s is NOT ok!",g_RunPwd,g_RunData.UserName);
@@ -485,7 +485,7 @@ DWORD PrepareSuRun()
           SavePassword(g_RunData.UserName,g_RunPwd);
       }else
         l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-      DeleteSafeDesktop();
+      DeleteSafeDesktop((l&1)==0);
       if((l&1)==0)
       {
         //Cancel:
@@ -515,7 +515,7 @@ DWORD PrepareSuRun()
     {
       DBGTrace("FATAL: Exception in PrepareSuRun()");
     }
-    DeleteSafeDesktop();
+    DeleteSafeDesktop(false);
   }
   SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return RETVAL_ACCESSDENIED;
@@ -664,23 +664,27 @@ DWORD StartAdminProcessTrampoline()
           TerminateProcess(pi.hProcess,0);
         //Enable use of empty passwords for network logon
         BOOL bEmptyPWAllowed=FALSE;
-        if (g_RunPwd[0]==0)
-        {
-          bEmptyPWAllowed=EmptyPWAllowed;
-          AllowEmptyPW(TRUE);
-        }
         if (!g_RunData.bRunAs)
+        {
+          if (g_RunPwd[0]==0)
+          {
+            bEmptyPWAllowed=EmptyPWAllowed;
+            AllowEmptyPW(TRUE);
+          }
           //Add user to admins group
           AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
+        }
         ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
         WaitForSingleObject(pi.hProcess,INFINITE);
         if (!g_RunData.bRunAs)
+        {
           //Remove user from Administrators group
           AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
-        //Reset status of "use of empty passwords for network logon"
-        if (g_RunPwd[0]==0)
-          AllowEmptyPW(bEmptyPWAllowed);
+          //Reset status of "use of empty passwords for network logon"
+          if (g_RunPwd[0]==0)
+            AllowEmptyPW(bEmptyPWAllowed);
+        }
         //Clear Password
         zero(g_RunPwd);
         GetExitCodeProcess(pi.hProcess,&RetVal);
@@ -856,12 +860,12 @@ void SuRun(DWORD ProcessID)
     {
       if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
       {
-        DeleteSafeDesktop();
+        DeleteSafeDesktop(true);
         ResumeClient(RETVAL_CANCELLED);
         return;
       }
       RetVal=RETVAL_OK;
-      DeleteSafeDesktop();
+      DeleteSafeDesktop(false);
     }
   }else //if (!g_RunData.bRunAs)
   {
@@ -886,7 +890,7 @@ void SuRun(DWORD ProcessID)
         {
           DBGTrace("FATAL: Exception in Setup()");
         }
-        DeleteSafeDesktop();
+        DeleteSafeDesktop(true);
         //Start Sysmenuhook...just in case
         TCHAR cmd[4096]={0};
         GetSystemWindowsDirectory(cmd,4096);
@@ -1585,7 +1589,7 @@ bool HandleServiceStuff()
   if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
   {
     SuRun(wcstol(cmd.argv(2),0,10));
-    DeleteSafeDesktop();
+    DeleteSafeDesktop(false);
     ExitProcess(~GetCurrentProcessId());
     return true;
   }
