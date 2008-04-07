@@ -287,7 +287,7 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
         rd.RetPID=0;
         rd.IconId=IconId;
         _tcscpy(rd.cmdLine,Text);
-        DWORD n=0;
+        DWORD_PTR n=0;
         if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
           TerminateProcess(pi.hProcess,0);
         ResumeThread(pi.hThread);
@@ -348,6 +348,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       {
         if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
         {
+          DBGTrace("Checking for empty password admins");
           ResumeClient(RETVAL_OK);
           USERLIST u;
           u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
@@ -355,10 +356,12 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           for (int i=0;i<u.GetCount();i++)
             if (PasswordOK(u.GetUserName(i),0,TRUE))
             {
+              DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
               _tcscat(un,u.GetUserName(i));
               _tcscat(un,_T("\n"));
             }
-          ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
+          if(un[0])
+            ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
           continue;
         }
         if (g_RunData.bTrayShowAdmin)
@@ -1710,6 +1713,8 @@ bool HandleServiceStuff()
         return ExitProcess(-1),true;
       g_RunData.CliProcessId=GetCurrentProcessId();
       g_RunData.CliThreadId=GetCurrentThreadId();
+      GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+      GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
