@@ -774,6 +774,7 @@ DWORD StartAdminProcessTrampoline()
             rd.RetPtr=0;
             rd.RetPID=0;
             rd.IconId=IDI_SHIELD;
+            rd.TimeOut=20000;
             _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,g_RunData.cmdLine));
             if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
               TerminateProcess(pi.hProcess,0);
