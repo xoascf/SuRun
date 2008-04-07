@@ -43,7 +43,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
+HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword)
 {
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
@@ -56,11 +56,15 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password)
   EnablePrivilege(SE_TCB_NAME);//Win2k
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
-  bool bFirstTry=TRUE;
-  if ((Password==NULL) || (*Password==NULL))
+  bool bFirstTry=FALSE;
+  if(AllowEmptyPassword)
   {
-    bEmptyPWAllowed=EmptyPWAllowed;
-    AllowEmptyPW(TRUE);
+    bFirstTry=TRUE;
+    if ((Password==NULL) || (*Password==NULL))
+    {
+      bEmptyPWAllowed=EmptyPWAllowed;
+      AllowEmptyPW(TRUE);
+    }
   }
 SecondTry:
   if (!LogonUser(un,dn,Password,LOGON32_LOGON_NETWORK,0,&hToken))
@@ -73,15 +77,18 @@ SecondTry:
     goto SecondTry;
   }
 //  DBGTrace4("GetUserToken(%s,%s,%s):%s",un,dn,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
-  //Reset status of "use of empty passwords for network logon"
-  if ((Password==NULL) || (*Password==NULL))
-    AllowEmptyPW(bEmptyPWAllowed);
+  if (AllowEmptyPassword)
+  {
+    //Reset status of "use of empty passwords for network logon"
+    if ((Password==NULL) || (*Password==NULL))
+      AllowEmptyPW(bEmptyPWAllowed);
+  }
   return hToken;
 }
 
-BOOL PasswordOK(LPCTSTR User,LPCTSTR Password)
+BOOL PasswordOK(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword)
 {
-  HANDLE hToken=GetUserToken(User,Password);
+  HANDLE hToken=GetUserToken(User,Password,AllowEmptyPassword);
   BOOL bRet=hToken!=0;
   CloseHandle(hToken);
   return bRet;
@@ -183,7 +190,7 @@ static void SetUserBitmap(HWND hwnd)
   {
     TCHAR Pass[PWLEN+1]={0};
     LoadRunAsPassword(p->User,User,Pass,PWLEN);
-    if(PasswordOK(User,Pass))
+    if(PasswordOK(User,Pass,false))
     {
       SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
       EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),false);
@@ -470,7 +477,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             TCHAR Pass[PWLEN+1]={0};
             GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),Pass,PWLEN);
-            HANDLE hUser=GetUserToken(User,Pass);
+            HANDLE hUser=GetUserToken(User,Pass,(!p->ForceAdminLogon)&&(!p->bRunAs));
             if (hUser)
             {
               if ((p->ForceAdminLogon)&&(!IsAdmin(hUser)))
