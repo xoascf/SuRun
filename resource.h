@@ -26,6 +26,7 @@
 #define IDS_SURUNREPAIR                 21
 #define IDS_CPLNAME                     22
 #define IDS_RUNFAILED                   23
+#define IDS_EMPTYPASS                   24
 #define IDS_STARTMENUDIR                25
 #define IDS_GRPDESC                     29
 #define IDS_DOMAINGROUPS                31
