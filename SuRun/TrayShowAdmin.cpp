@@ -6,7 +6,6 @@
 #include <SHLWAPI.H>
 #include <TCHAR.h>
 #include <stdio.h>
-#include <strsafe.h>
 #include "helpers.h"
 #include "IsAdmin.h"
 #include "service.h"
@@ -47,9 +46,9 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
     Sleep(100);
   if(g_RetVal!=RETVAL_OK)
     return -1;
-  StringCchCopy(User,UNLEN+DNLEN,g_RunData.CurUserName);
+  _tcscpy(User,g_RunData.CurUserName);
   if (!GetWindowText(wnd,WndTitle,MAX_PATH))
-    StringCchPrintf(WndTitle,MAX_PATH,L"Process %d",g_RunData.CurProcId);
+    _stprintf(WndTitle,L"Process %d",g_RunData.CurProcId);
   return g_RunData.CurUserIsadmin;
 }
 
@@ -80,9 +79,9 @@ static void DisplayIcon()
     return;
   g_FgWnd=FgWnd;
   g_ForegroundWndIsAdmin=bIsFGAdm;
-  StringCchCopy(g_User,2*MAX_PATH,User);
+  _tcscpy(g_User,User);
   memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
-  StringCchPrintf(g_NotyData.szTip,countof(g_NotyData.szTip),_T("SuRun %s"),GetVersionString());
+  _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
   BOOL bDiffUser=_tcscmp(User,g_RunData.UserName);
   if (bIsFGAdm==-1)
   {
@@ -94,15 +93,15 @@ static void DisplayIcon()
       MAKEINTRESOURCE(bDiffUser?IDI_ADMIN:(g_CliIsAdmin?IDI_SHADMIN:IDI_SRADMIN)),
                             IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
     if (g_BallonTips && bDiffUser)
-      StringCchPrintf(g_NotyData.szInfo,countof(g_NotyData.szInfo),_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
-    StringCchPrintf(g_NotyData.szTip,countof(g_NotyData.szTip),_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
+      _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
+    _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
   }else
   {
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOADMIN),
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
     if (g_BallonTips && bDiffUser)
-      StringCchPrintf(g_NotyData.szInfo,countof(g_NotyData.szInfo),_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
-    StringCchPrintf(g_NotyData.szTip,countof(g_NotyData.szTip),_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
+      _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
+    _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
   }
   Shell_NotifyIcon(NIM_MODIFY,&g_NotyData);
   DestroyIcon(OldIcon);
@@ -129,7 +128,7 @@ void DisplayMenu(HWND hWnd)
   {
     //Close Balloon
     memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
-    StringCchPrintf(g_NotyData.szTip,countof(g_NotyData.szTip),_T("SuRun %s"),GetVersionString());
+    _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
     Shell_NotifyIcon(NIM_MODIFY,&g_NotyData);
   }
   POINT pt;
@@ -192,10 +191,8 @@ void InitTrayShowAdmin()
   g_NotyData.hIcon = (HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
   
-  StringCchPrintf(g_NotyData.szTip,countof(g_NotyData.szTip),_T("SuRun %s"),
-    GetVersionString());
-  StringCchPrintf(g_NotyData.szInfoTitle,countof(g_NotyData.szInfoTitle),
-    _T("SuRun %s"),GetVersionString());
+  _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
+  _stprintf(g_NotyData.szInfoTitle,_T("SuRun %s"),GetVersionString());
   g_NotyData.dwInfoFlags=NIIF_INFO|NIIF_NOSOUND;
   g_NotyData.uID   = 1;
   g_NotyData.uFlags= NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE;
