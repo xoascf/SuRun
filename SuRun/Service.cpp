@@ -222,6 +222,85 @@ VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
     SetServiceStatus(g_hSS,&g_ss);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  GetProcessUserToken
+// 
+//////////////////////////////////////////////////////////////////////////////
+HANDLE GetProcessUserToken(DWORD ProcId)
+{
+  HANDLE hToken=NULL;
+  EnablePrivilege(SE_DEBUG_NAME);
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
+  if (!hProc)
+    return hToken;
+  // Open impersonation token for Shell process
+  OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+    |TOKEN_ASSIGN_PRIMARY,&hToken);
+  CloseHandle(hProc);
+  if(!hToken)
+    return hToken;
+  HANDLE hUser=0;
+  DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+    TokenPrimary,&hUser); 
+  return CloseHandle(hToken),hUser;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  ShowTrayWarning
+// 
+//////////////////////////////////////////////////////////////////////////////
+void ShowTrayWarning(LPCTSTR Text,int IconId) 
+{
+  TCHAR cmd[4096]={0};
+  GetSystemWindowsDirectory(cmd,4096);
+  PathAppend(cmd,L"SuRun.exe");
+  HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
+  PROCESS_INFORMATION pi={0};
+  TCHAR UserName[MAX_PATH]={0};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
+  if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
+  {
+    void* Env=0;
+    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    {
+      STARTUPINFO si={0};
+      si.cb	= sizeof(si);
+      //Do not inherit Desktop from calling process, use Tokens Desktop
+      TCHAR WinstaDesk[MAX_PATH];
+      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      si.lpDesktop = WinstaDesk;
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      //Show ToolTip "<Program> is running elevated"...
+      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+      {
+        //Tell SuRun to Say something:
+        RUNDATA rd=g_RunData;
+        rd.CliProcessId=0;
+        rd.CliThreadId=pi.dwThreadId;
+        rd.RetPtr=0;
+        rd.RetPID=0;
+        rd.IconId=IconId;
+        _tcscpy(rd.cmdLine,Text);
+        DWORD n=0;
+        if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
+          TerminateProcess(pi.hProcess,0);
+        ResumeThread(pi.hThread);
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+      }
+      DestroyEnvironmentBlock(Env);
+    }
+    UnloadUserProfile(hUser,ProfInf.hProfile);
+  }
+  CloseHandle(hUser);
+}
+
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
 #ifdef _DEBUG_ENU
@@ -267,6 +346,21 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
+        if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
+        {
+          ResumeClient(RETVAL_OK);
+          USERLIST u;
+          u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
+          TCHAR un[4096]={0};
+          for (int i=0;i<u.GetCount();i++)
+            if (PasswordOK(u.GetUserName(i),0,TRUE))
+            {
+              _tcscat(un,u.GetUserName(i));
+              _tcscat(un,_T("\n"));
+            }
+          ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
+          continue;
+        }
         if (g_RunData.bTrayShowAdmin)
         {
           GetProcessUserName(g_RunData.CurProcId,g_RunData.CurUserName);
@@ -578,30 +672,6 @@ BOOL Setup(LPCTSTR WinStaName)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  GetProcessUserToken
-// 
-//////////////////////////////////////////////////////////////////////////////
-HANDLE GetProcessUserToken(DWORD ProcId)
-{
-  HANDLE hToken=NULL;
-  EnablePrivilege(SE_DEBUG_NAME);
-  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
-  if (!hProc)
-    return hToken;
-  // Open impersonation token for Shell process
-  OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-    |TOKEN_ASSIGN_PRIMARY,&hToken);
-  CloseHandle(hProc);
-  if(!hToken)
-    return hToken;
-  HANDLE hUser=0;
-  DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
-    TokenPrimary,&hUser); 
-  return CloseHandle(hToken),hUser;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 //  StartAdminProcessTrampoline
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -700,6 +770,8 @@ DWORD StartAdminProcessTrampoline()
             rd.CliThreadId=pi.dwThreadId;
             rd.RetPtr=0;
             rd.RetPID=0;
+            rd.IconId=IDI_SHIELD;
+            _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,g_RunData.cmdLine));
             if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
               TerminateProcess(pi.hProcess,0);
             ResumeThread(pi.hThread);
@@ -1575,6 +1647,25 @@ BOOL UserUninstall()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+// CheckForEmptyAdminPasswords
+// 
+//////////////////////////////////////////////////////////////////////////////
+static void CheckForEmptyAdminPasswords()
+{
+  _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
+  HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+  if(hPipe==INVALID_HANDLE_VALUE)
+    return;
+  DWORD n=0;
+  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
+  CloseHandle(hPipe);
+  Sleep(10);
+  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<3);n++)
+    Sleep(100);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 // HandleServiceStuff: called on App Entry before WinMain()
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -1619,11 +1710,6 @@ bool HandleServiceStuff()
       g_RunData.CliProcessId=GetCurrentProcessId();
       g_RunData.CliThreadId=GetCurrentThreadId();
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
-      if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
-        return ExitProcess(0),true;
-      if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
-        && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
-        return ExitProcess(0),true;
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
@@ -1633,6 +1719,12 @@ bool HandleServiceStuff()
       if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
         while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
             Sleep(1000);
+      CheckForEmptyAdminPasswords();
+      if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
+        return ExitProcess(0),true;
+      if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
+        && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+        return ExitProcess(0),true;
       InstallSysMenuHook();
 #ifdef _WIN64
       {
