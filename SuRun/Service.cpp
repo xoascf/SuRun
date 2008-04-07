@@ -1662,6 +1662,7 @@ static void CheckForEmptyAdminPasswords()
   Sleep(10);
   for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<3);n++)
     Sleep(100);
+  zero(g_RunData.cmdLine);
 }
 
 //////////////////////////////////////////////////////////////////////////////
