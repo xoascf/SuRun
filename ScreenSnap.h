@@ -166,16 +166,14 @@ public:
     if (m_hWndTrans && m_hWnd)
     {
       KillTimer(m_hWndTrans,1);
-      BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
-      DWORD StopTime=timeGetTime()+512;
+      BYTE a0=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
+      BYTE a=a0;
+      DWORD m_StartTime=timeGetTime();
       while (a)
       {
-        if((int)(StopTime-timeGetTime())>0)
-          a=(BYTE)(StopTime-timeGetTime())/2;
-        else 
-          a=0;
+        a=a0-(BYTE)min(a0,(timeGetTime()-m_StartTime)/2);
         SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
-        Sleep(10);
+        MsgLoop();
       }
     }
   }
