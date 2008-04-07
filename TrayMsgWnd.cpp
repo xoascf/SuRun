@@ -29,7 +29,7 @@
 class CTrayMsgWnd
 {
 public:
-	CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text);
+	CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId);
 	~CTrayMsgWnd();
   bool MsgLoop();
   HWND m_hWnd;
@@ -85,10 +85,10 @@ private:
 //
 /////////////////////////////////////////////////////////////////////////////
 
-CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text)
+CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId)
 {
   LoadLibrary(_T("Shell32.dll"));//Load Shell Window Classes
-  m_Icon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_SHIELD),IMAGE_ICON,16,16,0);
+  m_Icon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IconId),IMAGE_ICON,16,16,0);
 
   WM_SRTRMSGWNDCLOSED=RegisterWindowMessage(_T("WM_SRTRMSGWNDCLOSED"));
   WM_SRTRMSGWNDGETPOS=RegisterWindowMessage(_T("WM_SRTRMSGWNDGETPOS"));
@@ -250,11 +250,11 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
 //Public Message Functions:
 //
 /////////////////////////////////////////////////////////////////////////////
-void TrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Message)
+void TrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Message,int IconId)
 {
   if (!GetShowAutoRuns)
     return;
-  CTrayMsgWnd* w=new CTrayMsgWnd(DlgTitle,Message);
+  CTrayMsgWnd* w=new CTrayMsgWnd(DlgTitle,Message,IconId);
   int prio=GetThreadPriority(GetCurrentThread());
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
   while (w->MsgLoop())
