@@ -161,6 +161,24 @@ public:
       DispatchMessage(&msg);
     }
   }
+  void FadeOut()
+  {
+    if (m_hWndTrans && m_hWnd)
+    {
+      KillTimer(m_hWndTrans,1);
+      BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
+      DWORD StopTime=timeGetTime()+512;
+      while (a)
+      {
+        if((int)(StopTime-timeGetTime())>0)
+          a=(BYTE)(StopTime-timeGetTime())/2;
+        else 
+          a=0;
+        SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
+        Sleep(10);
+      }
+    }
+  }
 private:
   static LRESULT CALLBACK WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
@@ -192,19 +210,8 @@ private:
         KillTimer(hwnd,wParam);
         BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
         SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
-        RedrawWindow(m_hWnd,0,0,RDW_UPDATENOW);
-        MsgLoop();
         if (a<255)
           SetTimer(hwnd,wParam,10,0);
-        else
-        {
-          if(m_hWnd)
-          {
-            SetWindowLongPtr(m_hWnd,GWLP_USERDATA,0);
-            DestroyWindow(m_hWnd);
-          }
-          m_hWnd=0;
-        }
       }
       return TRUE;
     case WM_MOUSEACTIVATE:
