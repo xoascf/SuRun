@@ -382,8 +382,10 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,0,0);
       }
       CheckDlgButton(hwnd,IDC_SHELLEXECOK,(p->UsrFlags&FLAG_SHELLEXEC)?1:0);
+      //FLAG_CANCEL_SX: if this is set this dialog will not show up
+      //FLAG_AUTOCANCEL: if this is set this dialog will not show up
+      CheckDlgButton(hwnd,IDC_ALWAYSOK,(p->UsrFlags&FLAG_DONTASK)?1:0);
       
-      CheckDlgButton(hwnd,IDC_ALWAYSOK,(p->UsrFlags&(FLAG_DONTASK|FLAG_AUTOCANCEL|FLAG_CANCEL_SX))?1:0);
       if((!GetUseIShExHook) && (!GetUseIATHook))
         EnableWindow(GetDlgItem(hwnd,IDC_SHELLEXECOK),0);
       SetUserBitmap(hwnd);
