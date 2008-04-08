@@ -367,6 +367,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         {
           DBGTrace("Checking for empty password admins");
           ResumeClient(RETVAL_OK);
+          if (GetRestrictApps(g_RunData.UserName))
+            continue;
           USERLIST u;
           u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
           TCHAR un[4096]={0};
@@ -1657,8 +1659,6 @@ BOOL UserUninstall()
 static void CheckForEmptyAdminPasswords()
 {
   if ((!IsInSuRunners(g_RunData.UserName))&&(!IsAdmin()))
-    return;
-  if (GetRestrictApps(g_RunData.UserName))
     return;
   _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
