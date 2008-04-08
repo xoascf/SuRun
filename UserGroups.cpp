@@ -162,8 +162,8 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
       Users=0;
     }else
     {
-      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
-        Group,DomainAndName,GetErrorNameStatic(status));
+//      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
+//        Group,DomainAndName,GetErrorNameStatic(status));
       return IsInGroupDirect(Group,DomainAndName);
     }
 	}
@@ -445,11 +445,11 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     for(LOCALGROUP_MEMBERS_INFO_2* p=(LOCALGROUP_MEMBERS_INFO_2*)pBuff;dwRec>0;dwRec--,p++)
     {
 #ifdef DoDBGTrace
-      LPTSTR sSID=0;
-      ConvertSidToStringSid(p->lgrmi2_sid,&sSID);
-      DBGTrace4("Group %s Name: %s; Type: %d; SID: %s",
-        GroupName,p->lgrmi2_domainandname,p->lgrmi2_sidusage,sSID);
-      LocalFree(sSID);
+//      LPTSTR sSID=0;
+//      ConvertSidToStringSid(p->lgrmi2_sid,&sSID);
+//      DBGTrace4("Group %s Name: %s; Type: %d; SID: %s",
+//        GroupName,p->lgrmi2_domainandname,p->lgrmi2_sidusage,sSID);
+//      LocalFree(sSID);
 #endif DoDBGTrace
       switch (p->lgrmi2_sidusage)
       {
