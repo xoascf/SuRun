@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-#define _DEBUGSETUP
+//#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -740,6 +740,9 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
       SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,GetPwTimeOut,0);
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
+      CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
+      EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),GetBlurDesk);
+      
       CheckDlgButton(hwnd,IDC_SAVEPW,GetSavePW);
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
       
@@ -783,6 +786,9 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       switch (wParam)
       {
+      case MAKELPARAM(IDC_BLURDESKTOP,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
+        return TRUE;
       case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW));
         return TRUE;
@@ -796,6 +802,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
 ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
+      SetFadeDesk(IsDlgButtonChecked(hwnd,IDC_FADEDESKTOP));
       SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW));
       SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
       SetAdminNoPassWarn(ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_WARNADMIN)));
