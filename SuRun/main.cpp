@@ -100,7 +100,6 @@ int Run()
   PathRemoveFileSpec(dn);
   //To start control Panel and other Explorer children we need to tell 
   //Explorer to start a new Process:
-  DWORD sp=GetSeparateProcess;
   SetSeparateProcess(1);
   //Create the process suspended to revoke access for the current user 
   //before it starts runnung
@@ -109,7 +108,7 @@ int Run()
     g_RunData.CurDir,&si,&pi))
   {
     //Clear sensitive Data
-    return zero(g_RunPwd),SetSeparateProcess(sp),RETVAL_ACCESSDENIED;
+    return zero(g_RunPwd),RETVAL_ACCESSDENIED;
   }
   //Clear sensitive Data
   zero(g_RunPwd);
@@ -140,7 +139,6 @@ int Run()
         g_RunData.cmdLine,GetLastErrorNameStatic());
   }
   zero(g_RunData);
-  SetSeparateProcess(sp);
   return RETVAL_OK;
 }
 
@@ -170,6 +168,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     TrayMsgWnd(CResStr(IDS_APPNAME),g_RunData.cmdLine,g_RunData.IconId,g_RunData.TimeOut);
     return RETVAL_OK;
   }
+  DWORD sp=GetSeparateProcess;
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //ThreadId
@@ -305,6 +304,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case RETVAL_CANCELLED:
     return RETVAL_CANCELLED;
   case RETVAL_OK:
+    SetSeparateProcess(sp);
     return RETVAL_OK;
   }
   return RETVAL_ACCESSDENIED;
