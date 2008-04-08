@@ -76,6 +76,11 @@
 #define IDS_UNINSTFAILED                77
 #define IDS_UNINSTSUCCESS               78
 #define IDS_RUNAS                       79
+#define IDS_WARNADMIN                   80
+#define IDS_WARNADMIN2                  81
+#define IDS_WARNADMIN3                  82
+#define IDS_WARNADMIN4                  83
+#define IDS_WARNADMIN5                  84
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
@@ -192,14 +197,15 @@
 #define IDC_TRAYSHOWADMIN               1072
 #define IDC_TRAYBALLOON                 1073
 #define IDC_STOREPASS                   1074
+#define IDC_WARNADMIN                   1075
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1075
+#define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
