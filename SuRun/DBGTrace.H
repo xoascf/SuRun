@@ -18,7 +18,7 @@
 #pragma comment(lib,"winmm")
 
 
-//#define DoDBGTrace
+#define DoDBGTrace
 
 #ifdef _DEBUG 
 #define DoDBGTrace
