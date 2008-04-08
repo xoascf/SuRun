@@ -49,6 +49,7 @@ SuRun 1.1.0.3 - 2008-04-09:
 * NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
 * NEW: Initialise desktop background before and close it after SwitchDesktop
 * NEW: "Apply" Button in SuRun Settings
+* CHG: SuRuns IAT-Hook is turned ON by default
 * FIX: The Explorer Option "launch folder windows in a separate process" is now 
        set and restored
 * FIX: SuRuns "Run as..." and Administrator authentication respect the 
