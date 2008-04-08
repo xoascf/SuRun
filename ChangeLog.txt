@@ -38,29 +38,29 @@ SuRun Changes:
 
 SuRun 1.1.0.3 - 2008-04-09:
 ----------------------------
-* NEW: Setup Option to replace Windows "Run as..." in context menu
+* NEW: SuRun can replace Windows "Run as..." in context menu
 * NEW: User file list rules: "never start automatically"/"never start elevated"
 * NEW: Option to show a user status icon and balloon tips in the notification 
-  area when the current application does not run as the logged on user
+       area when the current application does not run as the logged on user
 * NEW: SuRun warns non restricted SuRunners and Administrators after login if 
-  any Administrators have empty passwords
+       any Administrators have empty passwords
 * NEW: Blurred background screen fades in and out
 * NEW: User file list rules: "never start automatically"/"never start elevated"
 * NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
 * NEW: Initialise desktop background before and close it after SwitchDesktop
 * NEW: "Apply" Button in SuRun Settings
 * FIX: The Explorer Option "launch folder windows in a separate process" is now 
-  set and restored
+       set and restored
 * FIX: SuRuns "Run as..." and Administrator authentication respect the 
-  "Accounts: Limit local account use of blank passwords to console logon only"
-  group policy.
+       "Accounts: Limit local account use of blank passwords to console logon 
+       only" group policy.
 * FIX: When using Sandboxie and the IAT-Hook, starting a sandboxed program 
-  took about four minutes. SuRun now sees a blocked communication with the 
-  server and exits immediately.
+       took about four minutes. SuRun now sees a blocked communication with 
+       the server and exits immediately.
 * FIX: "'Explorer here' as admin" did not open the folder, when it had spaces 
-  in the name
+       in the name
 * FIX: A user who was not allowed to change SuRun settings, could start the
-  control panel as admin and then change SuRuns settings.
+       control panel as admin and then change SuRuns settings.
 
 SuRun 1.1.0.2 - 2008-03-19:
 ----------------------------
