@@ -366,8 +366,23 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         }
         if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
         {
-          if (GetRestrictApps(g_RunData.UserName))
+          switch(GetAdminNoPassWarn)
           {
+          case APW_ALL:
+            break;
+          case APW_NR_SR_ADMIN:
+            if (IsInSuRunners(g_RunData.UserName)
+              &&(!GetRestrictApps(g_RunData.UserName))
+              &&(!GetNoRunSetup(g_RunData.UserName)))
+              break;
+          case APW_SURUN_ADMIN:
+            if (IsInSuRunners(g_RunData.UserName))
+              break;
+          case APW_ADMIN:
+            if (g_CliIsAdmin)
+              break;
+          case APW_NONE:
+          default:
             ResumeClient(RETVAL_OK);
             continue;
           }
@@ -1661,8 +1676,6 @@ BOOL UserUninstall()
 //////////////////////////////////////////////////////////////////////////////
 static void CheckForEmptyAdminPasswords()
 {
-  if ((!IsInSuRunners(g_RunData.UserName))&&(!IsAdmin()))
-    return;
   _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if(hPipe==INVALID_HANDLE_VALUE)
