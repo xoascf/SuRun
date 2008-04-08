@@ -77,6 +77,16 @@
                             DelRegKey(HKLM,TIMESKEY); \
                           }
 
+//Show warning if Admin has no password to:
+#define APW_ALL         0
+#define APW_SURUN_ADMIN 1
+#define APW_NR_SR_ADMIN 2
+#define APW_ADMIN       3
+#define APW_NONE        4
+
+#define GetAdminNoPassWarn    GetOption(L"AdminNoPassWarn",2)
+#define SetAdminNoPassWarn(v) SetOption(L"AdminNoPassWarn",v,2)
+
 //////////////////////////////////////////////////////////////////////////////
 //Settings for every user; saved to "HKLM\SECURITY\SuRun\<ComputerName>\<UserName>":
 //////////////////////////////////////////////////////////////////////////////
