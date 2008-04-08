@@ -1656,8 +1656,9 @@ BOOL UserUninstall()
 //////////////////////////////////////////////////////////////////////////////
 static void CheckForEmptyAdminPasswords()
 {
-  if (((!IsInSuRunners(g_RunData.UserName))||GetRestrictApps(g_RunData.UserName))
-    &&(!IsAdmin()))
+  if ((!IsInSuRunners(g_RunData.UserName))&&(!IsAdmin()))
+    return;
+  if(GetRestrictApps(g_RunData.UserName))
     return;
   _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
