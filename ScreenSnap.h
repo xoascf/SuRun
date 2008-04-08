@@ -96,7 +96,6 @@ public:
     (HBITMAP)SelectObject(MemDC,m_bm);
     BitBlt(MemDC,0,0,m_dx,m_dy,dc,0,0,SRCCOPY);
     DeleteDC(MemDC);
-    m_blurbm=Blur(m_bm,m_dx,m_dy);
     ReleaseDC(0,dc);
   }
   void Done()
@@ -132,24 +131,28 @@ public:
     wc.lpszClassName=_T("ScreenWndClass");
     wc.hInstance=GetModuleHandle(0);
     RegisterClass(&wc);
+    m_blurbm=Blur(m_bm,m_dx,m_dy);
     m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW,wc.lpszClassName,
       _T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
-    MsgLoop();
     if((!bWin2k)&& bFadeIn)
     {
+      MsgLoop();
       m_hWndTrans=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_LAYERED,
         wc.lpszClassName,_T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
       SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
-      MsgLoop();
       m_StartTime=timeGetTime();
       SetTimer(m_hWndTrans,1,10,0);
     }else
     {
       m_hWndTrans=m_hWnd;
       m_hWnd=0;
+      if (m_bm)
+        DeleteObject(m_bm);
+      m_bm=0;
     }
+    MsgLoop();
   }
   void MsgLoop()
   {
