@@ -36,41 +36,31 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.3 - 2008-04-08: (small beta test)
+SuRun 1.1.0.3 - 2008-04-09:
 ----------------------------
-* SuRun warns SuRunners and Administrators after login if any Administrators 
-  have empty passwords
-* Background Screen fades in and out
-* SuRuns "Run as..." and Administrator authentification respect group policies.
----
-SuRun 1.1.0.3 - 2008-04-06: (small beta test)
----
-* Background Screen fades in
-* Changed Icons
-* Balloon Tops only if user name is different from logged on user
----
-SuRun 1.1.0.3 - 2008-04-03: (small beta test)
----
-* NEW: Initialize desktop background before and close it after SwitchDesktop
-* NEW: Sparate icon for "never run automagically"
+* NEW: Setup Option to replace Windows "Run as..." in context menu
+* NEW: User file list rules: "never start automatically"/"never start elevated"
+* NEW: Option to show a user status icon and balloon tips in the notification 
+  area when the current application does not run as the logged on user
+* NEW: SuRun warns non restricted SuRunners and Administrators after login if 
+  any Administrators have empty passwords
+* NEW: Blurred background screen fades in and out
+* NEW: User file list rules: "never start automatically"/"never start elevated"
+* NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
+* NEW: Initialise desktop background before and close it after SwitchDesktop
 * NEW: "Apply" Button in SuRun Settings
-* NEW: Every SuRunner can be configured to see the Tray Icon (Yes,No,Default)
-* NEW: RunAs Password manager for every user that uses RunAs
-* FIX: Win2k does not support Balloon tips so these Options are grayed in Win2k
-* FIX: Better help text for the "default automagic" Icon
----
-SuRun 1.1.0.3 - 2008-04-02: (small beta test)
----
+* FIX: The Explorer Option "launch folder windows in a separate process" is now 
+  set and restored
+* FIX: SuRuns "Run as..." and Administrator authentication respect the 
+  "Accounts: Limit local account use of blank passwords to console logon only"
+  group policy.
 * FIX: When using Sandboxie and the IAT-Hook, starting a sandboxed program 
-  took about four minutes. 
+  took about four minutes. SuRun now sees a blocked communication with the 
+  server and exits immediately.
 * FIX: "'Explorer here' as admin" did not open the folder, when it had spaces 
   in the name
 * FIX: A user who was not allowed to change SuRun settings, could start the
   control panel as admin and then change SuRuns settings.
-* NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
-* NEW: Setup Option to replace Windows "Run as..."
-* NEW: User file list rules: "never start automatically"/"never start elevated"
-* Option to show a user status icon and balloon tips in the notification area
 
 SuRun 1.1.0.2 - 2008-03-19:
 ----------------------------
@@ -78,7 +68,7 @@ SuRun 1.1.0.2 - 2008-03-19:
 
 SuRun 1.1.0.1 - 2008-03-11:
 ----------------------------
-* The IShellExecuteHook did not work properly because SuRun did not initialize 
+* The IShellExecuteHook did not work properly because SuRun did not initialise 
   to zero the static variables it uses.
 
 SuRun 1.1.0.0 - 2008-03-10: (changes to SuRun 1.0.2.9)
