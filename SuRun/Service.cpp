@@ -1740,6 +1740,11 @@ bool HandleServiceStuff()
       GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
       GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
+      //To start control Panel and other Explorer children we need to tell 
+      //Explorer to start a new Process, because the Shell updates the state 
+      //from the registry and this cant' be forced to be done "now", the
+      //"SeparateProcess" registry value must be set early an remain set
+      SetSeparateProcess(1);
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
