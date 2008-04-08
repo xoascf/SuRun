@@ -336,7 +336,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   zero(pi);
   si.cb = sizeof(si);
   // Start the child process.
-  DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
+  //DBGTrace1("IATHook AutoSuRun(%s) test",cmd);
   if (((lpCreateProcessW)hkCrProcW.orgFunc)
     (NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi))
   {
@@ -478,16 +478,16 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
   if (hLibModule==l_hInst)
   {
 #ifdef _DEBUG
-    char fmod[MAX_PATH]={0};
-    {
-      GetModuleFileNameA(0,fmod,MAX_PATH);
-      PathStripPathA(fmod);
-      strcat(fmod,": ");
-      char* p=&fmod[strlen(fmod)];
-      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-      PathStripPathA(p);
-    }
-    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
+//    char fmod[MAX_PATH]={0};
+//    {
+//      GetModuleFileNameA(0,fmod,MAX_PATH);
+//      PathStripPathA(fmod);
+//      strcat(fmod,": ");
+//      char* p=&fmod[strlen(fmod)];
+//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//      PathStripPathA(p);
+//    }
+//    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif _DEBUG
     SetLastError(NOERROR);
     return true;
@@ -510,16 +510,16 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
     return;
   }
 #ifdef _DEBUG
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hLibModule,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif _DEBUG
   SetLastError(NOERROR);
   ExitThread(dwExitCode);
