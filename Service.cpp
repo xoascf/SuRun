@@ -180,9 +180,11 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
   if (sizeof(int)!=n)
     DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(int),n);
   if(bWriteRunData)
+  {
     WriteProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n);
-  if (sizeof(RUNDATA)!=n)
-    DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
+    if (sizeof(RUNDATA)!=n)
+      DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
+  }
   CloseHandle(hProcess);
   return TRUE;
 }
