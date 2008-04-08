@@ -365,7 +365,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         }
         if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
         {
-          DBGTrace("Checking for empty password admins");
           if (GetRestrictApps(g_RunData.UserName))
           {
             ResumeClient(RETVAL_OK);
@@ -1667,6 +1666,7 @@ static void CheckForEmptyAdminPasswords()
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if(hPipe==INVALID_HANDLE_VALUE)
     return;
+  g_RetVal=RETVAL_WAIT;
   DWORD n=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
   CloseHandle(hPipe);
