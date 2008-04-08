@@ -346,6 +346,23 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
+        if (g_RunData.bTrayShowAdmin)
+        {
+          GetProcessUserName(g_RunData.CurProcId,g_RunData.CurUserName);
+          HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,g_RunData.CurProcId);
+          if (h)
+          {
+            HANDLE hTok=0;
+            if (OpenProcessToken(h,TOKEN_DUPLICATE,&hTok))
+            {
+              g_RunData.CurUserIsadmin=IsAdmin(hTok);
+              CloseHandle(hTok);
+            }
+            CloseHandle(h);
+          }
+          ResumeClient(RETVAL_OK,true);
+          continue;
+        }
         if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
         {
           DBGTrace("Checking for empty password admins");
@@ -362,23 +379,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             }
           if(un[0])
             ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
-          continue;
-        }
-        if (g_RunData.bTrayShowAdmin)
-        {
-          GetProcessUserName(g_RunData.CurProcId,g_RunData.CurUserName);
-          HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,g_RunData.CurProcId);
-          if (h)
-          {
-            HANDLE hTok=0;
-            if (OpenProcessToken(h,TOKEN_DUPLICATE,&hTok))
-            {
-              g_RunData.CurUserIsadmin=IsAdmin(hTok);
-              CloseHandle(hTok);
-            }
-            CloseHandle(h);
-          }
-          ResumeClient(RETVAL_OK,true);
           continue;
         }
         if (!g_RunData.bRunAs)
@@ -1658,7 +1658,7 @@ static void CheckForEmptyAdminPasswords()
 {
   if ((!IsInSuRunners(g_RunData.UserName))&&(!IsAdmin()))
     return;
-  if(GetRestrictApps(g_RunData.UserName))
+  if (GetRestrictApps(g_RunData.UserName))
     return;
   _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
