@@ -375,10 +375,12 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               &&(!GetRestrictApps(g_RunData.UserName))
               &&(!GetNoRunSetup(g_RunData.UserName)))
               break;
+            goto ChkAdmin;
           case APW_SURUN_ADMIN:
             if (IsInSuRunners(g_RunData.UserName))
               break;
           case APW_ADMIN:
+ChkAdmin:
             if (g_CliIsAdmin)
               break;
           case APW_NONE:
