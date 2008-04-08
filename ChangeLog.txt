@@ -49,8 +49,6 @@ SuRun 1.1.0.3 - 2008-04-09:
 * NEW: Initialise desktop background before and close it after SwitchDesktop
 * NEW: "Apply" Button in SuRun Settings
 * CHG: SuRuns IAT-Hook is turned ON by default
-* FIX: The Explorer Option "launch folder windows in a separate process" is now 
-       set and restored
 * FIX: SuRuns "Run as..." and Administrator authentication respect the 
        "Accounts: Limit local account use of blank passwords to console logon 
        only" group policy.
