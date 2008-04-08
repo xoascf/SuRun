@@ -382,7 +382,6 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
 {
   m_hDeskSwitch=NULL;
   m_hwinstaUser=NULL;
-  m_bOk=TRUE;
   m_bOk=FALSE;
   //Get current WindowStation and Desktop
   m_hwinstaSave=GetProcessWindowStation();
