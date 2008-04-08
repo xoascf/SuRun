@@ -741,7 +741,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,GetPwTimeOut,0);
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
-      EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),GetBlurDesk);
+      EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&&GetBlurDesk);
       
       CheckDlgButton(hwnd,IDC_SAVEPW,GetSavePW);
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
@@ -787,7 +787,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       switch (wParam)
       {
       case MAKELPARAM(IDC_BLURDESKTOP,BN_CLICKED):
-        EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
+        EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&& IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
         return TRUE;
       case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW));
