@@ -113,7 +113,6 @@ int Run()
   }
   //Clear sensitive Data
   zero(g_RunPwd);
-  SetSeparateProcess(sp);
   //Allow access to the Process and Thread to the Administrators and deny 
   //access for the current user
   SetAdminDenyUserAccess(pi.hThread);
@@ -141,6 +140,7 @@ int Run()
         g_RunData.cmdLine,GetLastErrorNameStatic());
   }
   zero(g_RunData);
+  SetSeparateProcess(sp);
   return RETVAL_OK;
 }
 
