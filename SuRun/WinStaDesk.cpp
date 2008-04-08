@@ -292,7 +292,7 @@ void DenyUserAccessToDesktop(HDESK hDesk)
 class CRunOnNewDeskTop
 {
 public:
-  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCreateBkWnd);
+  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCreateBkWnd,bool bFadeIn);
   ~CRunOnNewDeskTop();
   bool IsValid();
   void CleanUp();
@@ -378,7 +378,7 @@ private:
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCreateBkWnd)
+CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCreateBkWnd,bool bFadeIn)
 {
   m_hDeskSwitch=NULL;
   m_hwinstaUser=NULL;
@@ -455,7 +455,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,BOOL bCre
   //DenyUserAccessToDesktop(m_hDeskSwitch);
   //Show Desktop Background
   if (bCreateBkWnd)
-    m_Screen.Show();
+    m_Screen.Show(bFadeIn);
   //Switch to the new Desktop
   if (!SwitchDesktop(m_hdeskUser))
   {
@@ -521,12 +521,12 @@ bool CRunOnNewDeskTop::IsValid()
 CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
 CStayOnDeskTop* g_StayOnDesk=NULL;
 
-bool CreateSafeDesktop(LPTSTR WinSta,BOOL BlurDesk)
+bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade)
 {
   DeleteSafeDesktop(false);
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
-  CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,BlurDesk);
+  CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,BlurDesk,bFade);
   if (!rond)
     return false;
   if (!rond->IsValid())
