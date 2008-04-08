@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -755,6 +755,11 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       else if((kra==0)&&(ksu!=0))
         bCheck=BST_CHECKED;
       CheckDlgButton(hwnd,IDC_DORUNAS,bCheck);
+      
+      HWND cb=GetDlgItem(hwnd,IDC_WARNADMIN);
+      for (int i=0;i<5;i++)
+        ComboBox_InsertString(cb,i,CResStr(IDS_WARNADMIN+i));
+      ComboBox_SetCurSel(cb,GetAdminNoPassWarn);
 
       CheckDlgButton(hwnd,IDC_CTRLASADMIN,GetCtrlAsAdmin);
       CheckDlgButton(hwnd,IDC_CMDASADMIN,GetCmdAsAdmin);
@@ -793,6 +798,7 @@ ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW));
       SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
+      SetAdminNoPassWarn(ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_WARNADMIN)));
       
       SetCtrlAsAdmin(IsDlgButtonChecked(hwnd,IDC_CTRLASADMIN));
       SetCmdAsAdmin(IsDlgButtonChecked(hwnd,IDC_CMDASADMIN));
