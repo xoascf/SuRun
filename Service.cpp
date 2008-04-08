@@ -394,8 +394,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           {
             //Access denied!
             ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
-            DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-              continue;
+            //DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist
           if (g_RunData.bShlExHook)
@@ -405,8 +405,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             {
               //Access denied!
               ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
-              DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-                continue;
+              //DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
+              continue;
             }
             //Only SuRunners will can use the hooks
             if (!IsInSuRunners(g_RunData.UserName))
@@ -420,10 +420,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               && (!RequiresAdmin(g_RunData.cmdLine)))
             {
               ResumeClient(RETVAL_SX_NOTINLIST);
-              DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-                continue;
+              //DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+              continue;
             }
-            DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            //DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
           if  (GetRestrictApps(g_RunData.UserName) 
             && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
@@ -431,10 +431,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             if (!(wlf&FLAG_NORESTRICT))
             {
               ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
-              DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-                continue;
+              //DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+              continue;
             }
-            DBGTrace2("Restriction WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            //DBGTrace2("Restriction WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
@@ -550,8 +550,8 @@ DWORD PrepareSuRun()
       LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
   BOOL PwOk=PasswordOK(g_RunData.UserName,g_RunPwd,true);
 #ifdef _DEBUG
-  if (!PwOk)
-    DBGTrace2("Password (%s) for %s is NOT ok!",g_RunPwd,g_RunData.UserName);
+//  if (!PwOk)
+//    DBGTrace2("Password (%s) for %s is NOT ok!",g_RunPwd,g_RunData.UserName);
 #endif _DEBUG
   BOOL bIsSuRunner=IsInSuRunners(g_RunData.UserName);
   if ((!PwOk)||(!bIsSuRunner))
