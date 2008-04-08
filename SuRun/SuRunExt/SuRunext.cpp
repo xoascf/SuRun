@@ -506,11 +506,11 @@ static CRITICAL_SECTION l_SxHkCs;
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,pei->lpClass,
-    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+//  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+//    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+//    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+//    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,pei->lpClass,
+//    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
@@ -597,7 +597,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   zero(rpi);
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
     GetCurrentProcessId(),&rpi,tmp);
-  DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
+  //DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
