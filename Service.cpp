@@ -585,7 +585,7 @@ DWORD PrepareSuRun()
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   //Create the new desktop
-  if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
+  if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
   {
     __try
     {
@@ -604,7 +604,7 @@ DWORD PrepareSuRun()
           SavePassword(g_RunData.UserName,g_RunPwd);
       }else
         l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
-      DeleteSafeDesktop((l&1)==0);
+      DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
       if((l&1)==0)
       {
         //Cancel:
@@ -954,11 +954,11 @@ void SuRun(DWORD ProcessID)
   //RunAs...
   if (g_RunData.bRunAs)
   {
-    if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
+    if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
     {
       if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
       {
-        DeleteSafeDesktop(true);
+        DeleteSafeDesktop(GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
         return;
       }
@@ -979,7 +979,7 @@ void SuRun(DWORD ProcessID)
         SetAccessToWinDesk(hTok,g_RunData.WinSta,g_RunData.Desk,true);
         SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
       }
-      if (g_RunData.bNoSafeDesk || CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk))
+      if (g_RunData.bNoSafeDesk || CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
       {
         __try
         {
@@ -988,7 +988,7 @@ void SuRun(DWORD ProcessID)
         {
           DBGTrace("FATAL: Exception in Setup()");
         }
-        DeleteSafeDesktop(true);
+        DeleteSafeDesktop(GetFadeDesk);
         //Start Sysmenuhook...just in case
         TCHAR cmd[4096]={0};
         GetSystemWindowsDirectory(cmd,4096);
