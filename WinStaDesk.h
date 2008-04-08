@@ -30,5 +30,5 @@ BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName);
 void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk);
 void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant);
 
-bool CreateSafeDesktop(LPTSTR WinSta,BOOL BlurDesk);
+bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade);
 void DeleteSafeDesktop(bool bFade);
