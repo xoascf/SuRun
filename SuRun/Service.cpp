@@ -366,9 +366,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
         {
           DBGTrace("Checking for empty password admins");
-          ResumeClient(RETVAL_OK);
           if (GetRestrictApps(g_RunData.UserName))
+          {
+            ResumeClient(RETVAL_OK);
             continue;
+          }
           USERLIST u;
           u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
           TCHAR un[4096]={0};
@@ -381,6 +383,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             }
           if(un[0])
             ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
+          ResumeClient(RETVAL_OK);
           continue;
         }
         if (!g_RunData.bRunAs)
@@ -1668,7 +1671,7 @@ static void CheckForEmptyAdminPasswords()
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
   CloseHandle(hPipe);
   Sleep(10);
-  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<3);n++)
+  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<30);n++)
     Sleep(100);
   zero(g_RunData.cmdLine);
 }
