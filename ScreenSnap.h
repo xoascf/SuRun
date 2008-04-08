@@ -121,7 +121,7 @@ public:
     m_blurbm=0;
     UnregisterClass(_T("ScreenWndClass"),GetModuleHandle(0));
   }
-  void Show()
+  void Show(bool bFadeIn)
   {
     WNDCLASS wc={0};
     OSVERSIONINFO oie;
@@ -136,7 +136,7 @@ public:
       _T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
     MsgLoop();
-    if(!bWin2k)
+    if((!bWin2k)&& bFadeIn)
     {
       m_hWndTrans=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_LAYERED,
         wc.lpszClassName,_T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
