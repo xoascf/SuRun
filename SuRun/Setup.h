@@ -204,6 +204,14 @@
 #define SetEnergy(b)  SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
                     _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b)
 
+#define GetSeparateProcess GetRegInt(HKCU,\
+                    _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),\
+                    _T("SeparateProcess"),0)
+
+#define SetSeparateProcess(b) SetRegInt(HKCU,\
+                    _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),\
+                    _T("SeparateProcess"),b)
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Password cache
