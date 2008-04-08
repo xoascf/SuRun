@@ -34,7 +34,9 @@ BEGIN
     GROUPBOX        "SuRun Options",IDC_EXTOPT2,75,2,297,71,WS_GROUP
     CONTROL         "Pokazuj pulpit u¿ytkownika jako t³o (gorsza wy&dajnoœæ)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,83,15,242,11
+                    WS_TABSTOP,83,14,195,11
+    CONTROL         "Fade in",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,281,14,59,11
     CONTROL         "&Store &Passwords, for a period of",IDC_SAVEPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,27,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,26,18,12,ES_CENTER | ES_AUTOHSCROLL | 
@@ -725,7 +727,9 @@ BEGIN
     GROUPBOX        "SuRun Optionen",IDC_EXTOPT2,75,2,297,70,WS_GROUP
     CONTROL         "Zeige abgedunkelten Benutzer-&Desktop als Hintergrund (langsam)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,83,13,242,9
+                    WS_TABSTOP,83,13,223,9
+    CONTROL         "Einblenden",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,310,13,59,9
     CONTROL         "&Passworte speichern und nach",IDC_SAVEPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,26,116,9
     EDITTEXT        IDC_ASKTIMEOUT,202,24,18,12,ES_CENTER | ES_AUTOHSCROLL | 
@@ -1253,7 +1257,9 @@ BEGIN
     GROUPBOX        "SuRun Options",IDC_EXTOPT2,75,2,297,69,WS_GROUP
     CONTROL         "Show blurred user &desktop as background (slow)",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,83,13,242,11
+                    WS_TABSTOP,83,13,171,11
+    CONTROL         "Fade in",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,256,13,59,11
     CONTROL         "&Store &Passwords, for a period of",IDC_SAVEPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,26,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,25,18,12,ES_CENTER | ES_AUTOHSCROLL | 
