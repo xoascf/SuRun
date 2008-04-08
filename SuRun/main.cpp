@@ -22,6 +22,7 @@
 #include "Helpers.h"
 #include "ResStr.h"
 #include "Service.h"
+#include "Setup.h"
 #include "TrayMsgWnd.h"
 #include "DBGTrace.h"
 #include "UserGroups.h"
@@ -99,9 +100,8 @@ int Run()
   PathRemoveFileSpec(dn);
   //To start control Panel and other Explorer children we need to tell 
   //Explorer to start a new Process:
-  SetRegInt(HKEY_CURRENT_USER,
-    L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-    L"SeparateProcess",1);
+  DWORD sp=GetSeparateProcess;
+  SetSeparateProcess(1);
   //Create the process suspended to revoke access for the current user 
   //before it starts runnung
   if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
@@ -109,41 +109,39 @@ int Run()
     g_RunData.CurDir,&si,&pi))
   {
     //Clear sensitive Data
-    zero(g_RunPwd);
-    return RETVAL_ACCESSDENIED;
-  }else
-  {
-    //Clear sensitive Data
-    zero(g_RunPwd);
-    //Allow access to the Process and Thread to the Administrators and deny 
-    //access for the current user
-    SetAdminDenyUserAccess(pi.hThread);
-    SetAdminDenyUserAccess(pi.hProcess);
-    //Start the main thread
-    ResumeThread(pi.hThread);
-    //Ok, we're done with the handles:
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
-    //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-    if((g_RunData.RetPID)&&(g_RunData.RetPtr))
-    {
-      pi.hThread=0;
-      pi.hProcess=0;
-      HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
-      if (hProcess)
-      {
-        SIZE_T n;
-        if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-          DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-            g_RunData.cmdLine,GetLastErrorNameStatic());
-        CloseHandle(hProcess);
-      }else
-        DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-          g_RunData.cmdLine,GetLastErrorNameStatic());
-    }
-    zero(g_RunData);
-    return RETVAL_OK;
+    return zero(g_RunPwd),SetSeparateProcess(sp),RETVAL_ACCESSDENIED;
   }
+  //Clear sensitive Data
+  zero(g_RunPwd);
+  SetSeparateProcess(sp);
+  //Allow access to the Process and Thread to the Administrators and deny 
+  //access for the current user
+  SetAdminDenyUserAccess(pi.hThread);
+  SetAdminDenyUserAccess(pi.hProcess);
+  //Start the main thread
+  ResumeThread(pi.hThread);
+  //Ok, we're done with the handles:
+  CloseHandle(pi.hThread);
+  CloseHandle(pi.hProcess);
+  //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+  if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+  {
+    pi.hThread=0;
+    pi.hProcess=0;
+    HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+    if (hProcess)
+    {
+      SIZE_T n;
+      if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+        DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+          g_RunData.cmdLine,GetLastErrorNameStatic());
+      CloseHandle(hProcess);
+    }else
+      DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+        g_RunData.cmdLine,GetLastErrorNameStatic());
+  }
+  zero(g_RunData);
+  return RETVAL_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////
