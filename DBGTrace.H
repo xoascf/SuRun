@@ -15,8 +15,6 @@
 #include <stdio.h>
 #include <TCHAR.h>
 #include <mmsystem.h>
-#include <strsafe.h>
-#include "helpers.h"
 #pragma comment(lib,"winmm")
 
 
@@ -73,7 +71,7 @@ public:
 #ifdef DoDBGTrace
     va_list args;
     va_start(args, logTitle);
-    StringCchVPrintf(m_logTitle,countof(m_logTitle),logTitle,args);
+    _vstprintf(m_logTitle,logTitle,args);
     va_end(args);
     TRACEx(_T("%s init.\n"),(LPCTSTR)m_logTitle);
     m_StartTime=timeGetTime();
