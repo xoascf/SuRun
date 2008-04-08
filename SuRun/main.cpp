@@ -98,9 +98,6 @@ int Run()
   PathStripPath(un);
   _tcscpy(dn,g_RunData.UserName);
   PathRemoveFileSpec(dn);
-  //To start control Panel and other Explorer children we need to tell 
-  //Explorer to start a new Process:
-  SetSeparateProcess(1);
   //Create the process suspended to revoke access for the current user 
   //before it starts runnung
   if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
@@ -168,7 +165,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     TrayMsgWnd(CResStr(IDS_APPNAME),g_RunData.cmdLine,g_RunData.IconId,g_RunData.TimeOut);
     return RETVAL_OK;
   }
-  DWORD sp=GetSeparateProcess;
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //ThreadId
@@ -255,6 +251,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Lets go:
   g_RetVal=RETVAL_WAIT;
   HANDLE hPipe=INVALID_HANDLE_VALUE;
+  //To start control Panel and other Explorer children we need to tell 
+  //Explorer to start a new Process:
+  BOOL sp=bRunSetup || GetSeparateProcess;
+  if (!sp)
+    SetSeparateProcess(1);
   //retry if the pipe is busy: (max 240s)
   for(int i=0;i<720;i++)
   {
@@ -281,6 +282,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   CloseDesktop(hDesk);
   if (bRunSetup)
     return RETVAL_OK;
+  if (!sp)
+    SetSeparateProcess(0);
   switch(g_RetVal)
   {
   case RETVAL_WAIT:
@@ -304,7 +307,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case RETVAL_CANCELLED:
     return RETVAL_CANCELLED;
   case RETVAL_OK:
-    SetSeparateProcess(sp);
     return RETVAL_OK;
   }
   return RETVAL_ACCESSDENIED;
