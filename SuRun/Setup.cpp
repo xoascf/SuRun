@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -850,7 +850,6 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       //Program list icons:
       HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
-      SetWindowLongPtr(hWL,GWL_STYLE,GetWindowLongPtr(hWL,GWL_STYLE)|LBS_NOTIFY);
       SendMessage(hWL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,
         LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
       ListView_SetImageList(hWL,g_SD->ImgList,LVSIL_SMALL);
@@ -904,9 +903,9 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         }
         return TRUE;
       //Edit Button
-      case MAKELPARAM(IDC_WHITELIST,LBN_DBLCLK):
       case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
         {
+EditApp:
           HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           int CurSel=(int)ListView_GetSelectionMark(hWL);
           if (CurSel>=0)
@@ -1028,7 +1027,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       switch (wParam)
       {
-      //Program List Notofications
+      //Program List Notifications
       case IDC_WHITELIST:
         if (lParam) switch(((LPNMHDR)lParam)->code)
         {
@@ -1040,8 +1039,10 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_WHITELIST))!=-1);
           return TRUE;
         //Mouse Click: Toggle Flags
-        case NM_CLICK:
         case NM_DBLCLK:
+          if(((LPNMITEMACTIVATE)lParam)->iSubItem>2)
+            goto EditApp;
+        case NM_CLICK:
           {
             LPNMITEMACTIVATE p=(LPNMITEMACTIVATE)lParam;
             int Flag=0;
