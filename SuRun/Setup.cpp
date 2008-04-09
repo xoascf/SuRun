@@ -850,6 +850,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       //Program list icons:
       HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+      SetWindowLongPtr(hWL,GWL_STYLE,GetWindowLongPtr(hWL,GWL_STYLE)|LBS_NOTIFY);
       SendMessage(hWL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,
         LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
       ListView_SetImageList(hWL,g_SD->ImgList,LVSIL_SMALL);
