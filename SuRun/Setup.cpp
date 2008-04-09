@@ -903,6 +903,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         }
         return TRUE;
       //Edit Button
+      case MAKELPARAM(IDC_WHITELIST,LBN_DBLCLK):
       case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
         {
           HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
