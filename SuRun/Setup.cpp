@@ -1100,15 +1100,19 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
-      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,GetShowTrayAdmin!=0);
-      //Win2k:no balloon tips
+
+      HWND cb=GetDlgItem(hwnd,IDC_TRAYSHOWADMIN);
+      DWORD tsa=GetShowTrayAdmin;
+      ComboBox_InsertString(cb,0,CResStr(IDS_WARNADMIN5));//No users
+      ComboBox_InsertString(cb,1,CResStr(IDS_WARNADMIN)); //"All users"
+      ComboBox_InsertString(cb,2,CResStr(IDS_WARNADMIN4));//"Administrators"
+      ComboBox_SetCurSel(cb,tsa & (~TSA_TIPS));
+      CheckDlgButton(hwnd,IDC_TRAYBALLOON,tsa|TSA_TIPS);
       if (IsWin2k())
+        //Win2k:no balloon tips
         EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
       else
-      {
-        CheckDlgButton(hwnd,IDC_TRAYBALLOON,GetShowTrayAdmin==2);
-        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),GetShowTrayAdmin!=0);
-      }
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),(tsa&(~TSA_TIPS))!=0);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -1126,23 +1130,21 @@ ApplyChanges:
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
       SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
       SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
-      if(IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_UNCHECKED)
-      {
-        SetShowTrayAdmin(0);
-      }else
-      {
-        SetShowTrayAdmin(1+(DWORD)(IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON)!=0));
-      }
+
+      DWORD tsa=ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN));
+      if (IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON))
+        tsa|=TSA_TIPS;
+      SetShowTrayAdmin(tsa);
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:
     {
       switch (wParam)
       {
-      case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
+      case MAKELPARAM(IDC_TRAYSHOWADMIN,CBN_SELCHANGE):
         if (!IsWin2k())
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
-            IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)!=0);
+            ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN))>0);
         return TRUE;
       case MAKELPARAM(IDC_IATHOOK,BN_CLICKED):
       case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
