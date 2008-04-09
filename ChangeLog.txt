@@ -1,9 +1,7 @@
 Done:
 ---------------------
-* If you set "launch folder windows in a separate process" to 1 and run "SuRun 
-  Explorer" no Explorer with standard rights can be launched. 
-  Set this option to 0!
-* remove /UNSAFE Option
+* Double click in user list for "Edit"
+* Options for TSA to show for "all Users/Admins/No users"
 
 ToDo for next release:
 ---------------------
