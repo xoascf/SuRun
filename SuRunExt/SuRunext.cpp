@@ -404,6 +404,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   }else
   {
     FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    FORMATETC fe1 = {g_CF_ShellIdList, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
     STGMEDIUM m;
     if ((SUCCEEDED(pDataObj->GetData(&fe,&m)))
       &&(DragQueryFile((HDROP)m.hGlobal,(UINT)-1,NULL,0)==1)) 
@@ -412,6 +413,16 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
       DragQueryFile((HDROP)m.hGlobal, 0, path, countof(path));
       if (PathIsDirectory(path))
         _tcscpy(m_ClickFolderName,path);
+      ReleaseStgMedium(&m);
+    }else if (SUCCEEDED(pDataObj->GetData(&fe1,&m)))
+    {
+      TCHAR s[4096]={0};
+      if (((LPIDA)m.hGlobal)->cidl==1)
+      {
+        LPCITEMIDLIST pidlItem0=(LPCITEMIDLIST)(((LPBYTE)m.hGlobal)+((LPIDA)m.hGlobal)->aoffset[1]);
+        if(SHGetPathFromIDList(pidlItem0,s))
+          _tcscpy(m_ClickFolderName,s);
+      }
       ReleaseStgMedium(&m);
     }
   } 
