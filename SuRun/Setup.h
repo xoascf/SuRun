@@ -13,7 +13,10 @@
 
 #pragma once
 
+#include <tchar.h>
 #include "helpers.h"
+#include "IsAdmin.h"
+#include "resstr.h"
 #include "SuRunExt/SuRunExt.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -157,6 +160,11 @@
 #define SetShowAutoRuns(b)    SetShExtSetting(ShowAutoRuns,b,1)
 
 //Show App admin status in system tray
+#define TSA_NONE  0 //No TSA
+#define TSA_ALL   1 //TSA for all
+#define TSA_ADMIN 2 //TSA for admins
+#define TSA_TIPS  8 //show balloon tips
+
 #define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),0)
 #define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,0)
 
@@ -172,10 +180,43 @@
 #define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,-1)
 #define DelUserTSA(u)         DelUsrOption(u,_T("ShowTrayAdmin"))
 
-#define ShowTray(u)           ((GetShowTrayAdmin!=0)&&(GetUserTSA(u)!=0))\
-                            ||((int)GetUserTSA(u)>0)
-#define ShowBalloon(u)        ((GetShowTrayAdmin==2)&&(GetUserTSA(u)==-1))\
-                              ||(GetUserTSA(u)==2)
+inline bool ShowTray(LPCTSTR u)
+{
+  int utsa=(int)GetUserTSA(u);
+  if (utsa>0)
+    return true;
+  if (utsa==0)
+    return false;
+  switch (GetShowTrayAdmin & (~TSA_TIPS))
+  {
+  case TSA_NONE:
+    return false;
+  case TSA_ALL:
+    return true;
+  case TSA_ADMIN:
+    return IsAdmin()!=0;
+  }
+  return false;
+}
+
+inline bool ShowBalloon(LPCTSTR u)
+{
+  if (GetUserTSA(u)==2)
+    return true;
+  DWORD tsa=GetShowTrayAdmin;
+  if((tsa & TSA_TIPS)==0)
+    return false;
+  switch (tsa & (~TSA_TIPS))
+  {
+  case TSA_NONE:
+    return false;
+  case TSA_ALL:
+    return true;
+  case TSA_ADMIN:
+    return IsAdmin()!=0;
+  }
+  return false;
+}
 
 //#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
 //#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
