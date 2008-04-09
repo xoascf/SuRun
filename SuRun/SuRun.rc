@@ -832,9 +832,6 @@ BEGIN
                     IDC_STATIC,14,86,312,8
     GROUPBOX        "Symbol im Infobereich der Taskleiste (Für alle Benutzer, auch nicht-SuRunner)",
                     IDC_STATIC,10,104,320,37
-    CONTROL         "Zeige Benutzerstatus für aktives Programm als Symbol im Infobereich der Taskleiste",
-                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    20,115,301,10
     CONTROL         "Zeige Info, für aktive Programme, die nicht als angemeldeter Benutzer laufen",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,301,10
@@ -856,6 +853,10 @@ BEGIN
     CONTROL         "Neue SuRunner dürfen nur festgelegte Programme mit SuRun starten",
                     IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     218,301,10
+    LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",
+                    IDC_STATIC,20,116,189,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,219,114,99,30,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 395, 274
@@ -1046,6 +1047,41 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Dialog Info
+//
+
+IDD_SETUP1 DLGINIT
+BEGIN
+    IDC_WARNADMIN, 0x403, 14, 0
+0x6c41, 0x656c, 0x4220, 0x6e65, 0x7475, 0x657a, 0x0072, 
+    IDC_WARNADMIN, 0x403, 29, 0
+0x7553, 0x7552, 0x6e6e, 0x7265, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 
+0x7369, 0x7274, 0x7461, 0x726f, 0x6e65, "\000" 
+    IDC_WARNADMIN, 0x403, 47, 0
+0x6e75, 0x6562, 0x6373, 0x7268, 0x6ee4, 0x746b, 0x2065, 0x7553, 0x7552, 
+0x6e6e, 0x7265, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 0x7369, 0x7274, 
+0x7461, 0x726f, 0x6e65, 0x2820, 0x292a, "\000" 
+    IDC_WARNADMIN, 0x403, 16, 0
+0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x6572, 0x006e, 
+    IDC_WARNADMIN, 0x403, 10, 0
+0x694e, 0x6d65, 0x6e61, 0x6564, 0x006e, 
+    0
+END
+
+IDD_SETUP3 DLGINIT
+BEGIN
+    IDC_TRAYSHOWADMIN, 0x403, 10, 0
+0x694e, 0x6d65, 0x6e61, 0x6564, 0x006d, 
+    IDC_TRAYSHOWADMIN, 0x403, 16, 0
+0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x6572, 0x006e, 
+    IDC_TRAYSHOWADMIN, 0x403, 16, 0
+0x6c41, 0x656c, 0x206e, 0x6542, 0x756e, 0x7a74, 0x7265, 0x006e, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // 24
 //
 
@@ -1101,30 +1137,6 @@ IDI_ADMIN               ICON    DISCARDABLE     "res\\Admin.ico"
 IDI_SHADMIN             ICON    DISCARDABLE     "res\\SHADMIN.ico"
 IDI_LISTICON7           ICON    DISCARDABLE     "res\\CancelWindows.ico"
 IDI_SRADMIN             ICON    DISCARDABLE     "res\\SrAdmin.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog Info
-//
-
-IDD_SETUP1 DLGINIT
-BEGIN
-    IDC_WARNADMIN, 0x403, 14, 0
-0x6c41, 0x656c, 0x4220, 0x6e65, 0x7475, 0x657a, 0x0072, 
-    IDC_WARNADMIN, 0x403, 29, 0
-0x7553, 0x7552, 0x6e6e, 0x7265, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 
-0x7369, 0x7274, 0x7461, 0x726f, 0x6e65, "\000" 
-    IDC_WARNADMIN, 0x403, 47, 0
-0x6e75, 0x6562, 0x6373, 0x7268, 0x6ee4, 0x746b, 0x2065, 0x7553, 0x7552, 
-0x6e6e, 0x7265, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 0x7369, 0x7274, 
-0x7461, 0x726f, 0x6e65, 0x2820, 0x292a, "\000" 
-    IDC_WARNADMIN, 0x403, 16, 0
-0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x6572, 0x006e, 
-    IDC_WARNADMIN, 0x403, 10, 0
-0x694e, 0x6d65, 0x6e61, 0x6564, 0x006e, 
-    0
-END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1358,9 +1370,6 @@ BEGIN
                     IDC_STATIC,14,86,312,8
     GROUPBOX        "Display an Icon in the taskbar notification area",
                     IDC_STATIC,10,104,320,37
-    CONTROL         "Display user status for the active program as icon in the taskbar notification area",
-                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    20,115,301,10
     CONTROL         "Display balloon tips, for active programs, running with different user credentials",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,301,10
@@ -1382,6 +1391,10 @@ BEGIN
     CONTROL         "New SuRunners can only run predefined programs with elevated rights",
                     IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     218,301,10
+    LTEXT           "Display user status for the active program in the taskbar 'tray'",
+                    IDC_STATIC,20,116,191,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,219,114,99,30,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 395, 274
@@ -1683,6 +1696,41 @@ BEGIN
 END
 
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SETUP1 DLGINIT
+BEGIN
+    IDC_WARNADMIN, 0x403, 10, 0
+0x6c41, 0x206c, 0x7375, 0x7265, 0x0073, 
+    IDC_WARNADMIN, 0x403, 29, 0
+0x7553, 0x7552, 0x6e6e, 0x7265, 0x2073, 0x6e61, 0x2064, 0x6441, 0x696d, 
+0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
+    IDC_WARNADMIN, 0x403, 46, 0
+0x6e75, 0x6572, 0x7473, 0x6972, 0x7463, 0x6465, 0x5320, 0x5275, 0x6e75, 
+0x656e, 0x7372, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 0x7369, 0x7274, 
+0x7461, 0x726f, 0x2073, 0x2a28, 0x0029, 
+    IDC_WARNADMIN, 0x403, 15, 0
+0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
+    IDC_WARNADMIN, 0x403, 9, 0
+0x6f4e, 0x7520, 0x6573, 0x7372, "\000" 
+    0
+END
+
+IDD_SETUP3 DLGINIT
+BEGIN
+    IDC_TRAYSHOWADMIN, 0x403, 9, 0
+0x6f4e, 0x7520, 0x6573, 0x7372, "\000" 
+    IDC_TRAYSHOWADMIN, 0x403, 15, 0
+0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
+    IDC_TRAYSHOWADMIN, 0x403, 10, 0
+0x6c41, 0x206c, 0x7375, 0x7265, 0x0073, 
+    0
+END
+
+
 #ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1727,30 +1775,6 @@ BEGIN
 END
 
 #endif    // !_MAC
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog Info
-//
-
-IDD_SETUP1 DLGINIT
-BEGIN
-    IDC_WARNADMIN, 0x403, 10, 0
-0x6c41, 0x206c, 0x7375, 0x7265, 0x0073, 
-    IDC_WARNADMIN, 0x403, 29, 0
-0x7553, 0x7552, 0x6e6e, 0x7265, 0x2073, 0x6e61, 0x2064, 0x6441, 0x696d, 
-0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
-    IDC_WARNADMIN, 0x403, 46, 0
-0x6e75, 0x6572, 0x7473, 0x6972, 0x7463, 0x6465, 0x5320, 0x5275, 0x6e75, 
-0x656e, 0x7372, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 0x7369, 0x7274, 
-0x7461, 0x726f, 0x2073, 0x2a28, 0x0029, 
-    IDC_WARNADMIN, 0x403, 15, 0
-0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
-    IDC_WARNADMIN, 0x403, 9, 0
-0x6f4e, 0x7520, 0x6573, 0x7372, "\000" 
-    0
-END
 
 
 /////////////////////////////////////////////////////////////////////////////
