@@ -424,6 +424,9 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCre
   //Set Interactive Desktop as current Desktop to get the Desktop Bitmap
   if (!SetThreadDesktop(m_hDeskSwitch))
     DBGTrace1("CRunOnNewDeskTop::SetThreadDesktop(m_hDeskSwitch) failed!: %s",GetLastErrorNameStatic());
+  //Create Background Bitmap
+  if (bCreateBkWnd)
+    m_Screen.Init();
   //Create a new Desktop and set as the Threads Desktop
   LenD=MAX_PATH;
   GetUserObjectInformation(m_hdeskSave,UOI_NAME,dtn,LenD,&LenD);
@@ -443,9 +446,6 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCre
     }
     LocalFree(saDesktop.lpSecurityDescriptor);
   }
-  //Create Background Bitmap
-  if (bCreateBkWnd)
-    m_Screen.Init();
   if (!SetThreadDesktop(m_hdeskUser))
   {
     DBGTrace("CRunOnNewDeskTop::SetThreadDesktop failed!");
