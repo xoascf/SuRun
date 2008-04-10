@@ -187,7 +187,10 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName)
 /////////////////////////////////////////////////////////////////////////////
 BOOL IsInSuRunners(LPCWSTR DomainAndName)
 {
-  return IsInGroup(SURUNNERSGROUP,DomainAndName);
+  if (IsInGroup(SURUNNERSGROUP,DomainAndName))
+    return TRUE;
+  DelUsrSettings(DomainAndName);
+  return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
