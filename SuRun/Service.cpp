@@ -1604,8 +1604,8 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           //Settings
           g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
-          g_bDelSuRunners=IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS)!=0;
-          g_bSR2Admins=IsDlgButtonChecked(hwnd,IDC_SR2ADMIN)!=0;
+          g_bDelSuRunners=(!g_bKeepRegistry) && IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS)!=0;
+          g_bSR2Admins=g_bDelSuRunners && IsDlgButtonChecked(hwnd,IDC_SR2ADMIN)!=0;
           //Hide Checkboxes, show Listbox
           ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_DELSURUNNERS),SW_HIDE);
