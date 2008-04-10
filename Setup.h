@@ -101,7 +101,7 @@
                                   SetRegInt(HKLM,USERKEY(u),s,v)
 
 #define DelUsrSettings(u)       DelRegKey(HKLM,WHTLSTKEY(u));\
-                                DelRegKey(HKLM,USROPTKEY(u))
+                                DelRegKey(HKCR,USROPTKEY(u))
 
 //SuRunner is not allowed to run Setup
 #define GetNoRunSetup(u)      (GetUsrSetting(u,_T("AdminOnlySetup"),0)!=0)
