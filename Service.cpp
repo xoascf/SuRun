@@ -989,13 +989,13 @@ void SuRun(DWORD ProcessID)
           DBGTrace("FATAL: Exception in Setup()");
         }
         DeleteSafeDesktop(GetFadeDesk);
-        //Start Sysmenuhook...just in case
-        TCHAR cmd[4096]={0};
-        GetSystemWindowsDirectory(cmd,4096);
-        PathAppend(cmd,L"SuRun.exe");
-        PathQuoteSpaces(cmd);
-        _tcscat(cmd,L" /SYSMENUHOOK");
-        DirectStartUserProcess(GetShellProcessId(g_RunData.SessionID),cmd);
+//        //Start Sysmenuhook...just in case
+//        TCHAR cmd[4096]={0};
+//        GetSystemWindowsDirectory(cmd,4096);
+//        PathAppend(cmd,L"SuRun.exe");
+//        PathQuoteSpaces(cmd);
+//        _tcscat(cmd,L" /SYSMENUHOOK");
+//        DirectStartUserProcess(GetShellProcessId(g_RunData.SessionID),cmd);
       }else
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       if(g_RunData.bNoSafeDesk)
