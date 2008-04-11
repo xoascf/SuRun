@@ -157,6 +157,11 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.4 - 2008-04-11:
+----------------------------
+* FIX: (!!!) The "[Meaning: Explorer My Computer\Control Panel]" display
+       screwed up the command line causing SuRun to not work in many cases!
+
 SuRun 1.1.0.3 - 2008-04-11:
 ----------------------------
 * NEW: "SuRun Settings" appears in the control panels category view in
