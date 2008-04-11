@@ -119,10 +119,6 @@ SOURCE=.\resource.h
 
 SOURCE=..\res\SuRun.ico
 # End Source File
-# Begin Source File
-
-SOURCE=..\ReleaseUx64\SuRun32.bin
-# End Source File
 # End Group
 # End Target
 # End Project
