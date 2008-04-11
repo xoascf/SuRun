@@ -157,6 +157,42 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.3 - 2008-04-11:
+----------------------------
+* NEW: "SuRun Settings" appears in the control panels category view in
+       "Performance and Maintenance"
+* NEW: SuRun displays "[Meaning: Explorer My Computer\Control Panel]" for shell 
+       names like "Explorer ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\
+       ::{21EC2020-3AEA-1069-A2DD-08002B30309D}"
+* NEW: SuRun can replace Windows "Run as..." in context menu
+* NEW: User file list rules: "never start automatically"/"never start elevated"
+* NEW: Option to show a user status icon and balloon tips in the notification 
+       area when the current application does not run as the logged on user
+* NEW: SuRun warns non restricted SuRunners and Administrators after login if 
+       any Administrators have empty passwords
+* NEW: Blurred background screen fades in and out
+* NEW: User file list rules: "never start automatically"/"never start elevated"
+* NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
+* NEW: Initialise desktop background before and close it after SwitchDesktop
+* NEW: "Apply" Button in SuRun Settings
+* CHG: SuRuns IAT-Hook is turned ON by default
+* CHG: If Admin credentials are required, SuRun does not include Domain Admin 
+       accounts in the drop down list
+* CHG: Double click in user list does "Edit" the command line
+* FIX: Scenario: Restircted SuRunner, changed password, SuRun asks to autorun 
+       a predefined app with elevated rights, User presses 'Cancel'. Then the
+       app was flagged "never start automagically".
+* FIX: SuRuns "Run as..." and Administrator authentication respect the 
+       "Accounts: Limit local account use of blank passwords to console logon 
+       only" group policy.
+* FIX: When using Sandboxie and the IAT-Hook, starting a sandboxed program 
+       took about four minutes. SuRun now sees a blocked communication with 
+       the server and exits immediately.
+* FIX: "'Explorer here' as admin" did not open the folder, when it had spaces 
+       in the name
+* FIX: A user who was not allowed to change SuRun settings, could start the
+       control panel as admin and then change SuRuns settings.
+
 SuRun 1.1.0.3 - 2008-03-30:
 ----------------------------
 * QnD Fix: When using Sandboxie and the IAT-Hook, starting a sandboxed 
