@@ -171,7 +171,6 @@ SuRun 1.1.0.3 - 2008-04-11:
 * NEW: SuRun warns non restricted SuRunners and Administrators after login if 
        any Administrators have empty passwords
 * NEW: Blurred background screen fades in and out
-* NEW: User file list rules: "never start automatically"/"never start elevated"
 * NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
 * NEW: Initialise desktop background before and close it after SwitchDesktop
 * NEW: "Apply" Button in SuRun Settings
