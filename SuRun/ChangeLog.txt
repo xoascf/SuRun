@@ -7,9 +7,6 @@ ToDo for next release:
 
 To be done in future:
 ---------------------
-* comment shell names like "Explorer ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\
-  ::{21EC2020-3AEA-1069-A2DD-08002B30309D}" with their human readable name 
-  like "Control Panel"
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
 * use MD5-Hash for "Always Yes" programs
@@ -33,6 +30,9 @@ SuRun 1.1.0.3 - 2008-04-09:
 ----------------------------
 * NEW: "SuRuns Settings" appears in the control panels category view in
        "Performance and Maintenance"
+* NEW: SuRun displays "[Meaning: Explorer My Computer\Control Panel]" for shell 
+       names like "Explorer ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\
+       ::{21EC2020-3AEA-1069-A2DD-08002B30309D}"
 * NEW: SuRun can replace Windows "Run as..." in context menu
 * NEW: User file list rules: "never start automatically"/"never start elevated"
 * NEW: Option to show a user status icon and balloon tips in the notification 
