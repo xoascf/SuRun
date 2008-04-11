@@ -595,7 +595,7 @@ BEGIN
     IDS_SHNAME6             "Fonts"
     IDS_SHNAME7             "Administrative Tools"
     IDS_SHNAME8             "My Documents"
-    IDS_BEAUTIFIED          "%s\n[Meaning: %s]"
+    IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
 END
 
 #endif    // Polish resources
@@ -1258,7 +1258,7 @@ BEGIN
     IDS_SHNAME6             "Schriftarten"
     IDS_SHNAME7             "Verwaltung"
     IDS_SHNAME8             "Eigene Dateien"
-    IDS_BEAUTIFIED          "%s\n[Bedeutung: %s]"
+    IDS_BEAUTIFIED          "%s\r\n[Bedeutung: %s]"
 END
 
 #endif    // German (Germany) resources
@@ -1906,7 +1906,7 @@ BEGIN
     IDS_SHNAME6             "Fonts"
     IDS_SHNAME7             "Administrative Tools"
     IDS_SHNAME8             "My Documents"
-    IDS_BEAUTIFIED          "%s\n[Meaning: %s]"
+    IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
 END
 
 #endif    // English (U.S.) resources
