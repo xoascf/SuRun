@@ -1167,6 +1167,8 @@ void InstallRegistry()
   GetSystemWindowsDirectory(SuRunExe,4096);
   PathAppend(SuRunExe,L"SuRunExt.dll");
   SetRegStr(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl",SuRunExe);
+  //Add SuRun CPL to "Performance and Maintenance"
+  SetRegInt(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Extended Properties\\{305CA226-D286-468e-B848-2B2E8E697B74} 2",SuRunExe,5);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1205,6 +1207,10 @@ void RemoveRegistry()
   //Control Panel Applet
   InstLog(CResStr(IDS_REMCPL));
   RegDelVal(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl");
+  TCHAR CPL[4096];
+  GetSystemWindowsDirectory(CPL,4096);
+  PathAppend(CPL,L"SuRunExt.dll");
+  RegDelVal(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Extended Properties\\{305CA226-D286-468e-B848-2B2E8E697B74} 2",CPL);
   //AutoRun, System Menu Hook
   InstLog(CResStr(IDS_REMAUTORUN));
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
