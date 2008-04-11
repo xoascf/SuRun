@@ -81,6 +81,15 @@
 #define IDS_WARNADMIN3                  82
 #define IDS_WARNADMIN4                  83
 #define IDS_WARNADMIN5                  84
+#define IDS_SHNAME1                     85
+#define IDS_SHNAME2                     86
+#define IDS_SHNAME3                     87
+#define IDS_SHNAME4                     88
+#define IDS_SHNAME5                     89
+#define IDS_SHNAME6                     90
+#define IDS_SHNAME7                     91
+#define IDS_SHNAME8                     92
+#define IDS_BEAUTIFIED                  93
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
