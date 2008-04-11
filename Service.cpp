@@ -556,6 +556,85 @@ void KillProcess(DWORD PID)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  BeautifyCmdLine: replace shell namespace object names
+// 
+//////////////////////////////////////////////////////////////////////////////
+LPCTSTR GetShellName(LPCTSTR clsid,LPCTSTR DefName)
+{
+  static TCHAR s[MAX_PATH];
+  zero(s);
+  GetRegStr(HKCR,CResStr(L"CLSID\\%s",clsid),L"LocalizedString",s,MAX_PATH);
+  if(s[0]=='@')
+  {
+    LPTSTR c=_tcsrchr(s,',');
+    if(c)
+    {
+      *c=0;
+      c++;
+      int i=_ttoi(c);
+      HINSTANCE h=LoadLibrary(&s[1]);
+      LoadString(h,(DWORD)-i,s,MAX_PATH);
+      FreeLibrary(h);
+    }
+  }
+  if (!s[0])
+    GetRegStr(HKCR,CResStr(L"CLSID\\%s",clsid),L"",s,MAX_PATH);
+  if (!s[0])
+    _tcscpy(s,DefName);
+  return s;
+}
+
+LPCTSTR BeautifyCmdLine(LPTSTR cmd)
+{
+  typedef struct {
+    int nId;
+    LPCTSTR clsid;
+  }ShName;
+  ShName shn[]=
+  {
+    {IDS_SHNAME1,_T("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}")},
+    {IDS_SHNAME2,_T("::{208D2C60-3AEA-1069-A2D7-08002B30309D}")},
+    {IDS_SHNAME3,_T("::{7007ACC7-3202-11D1-AAD2-00805FC1270E}")},
+    {IDS_SHNAME4,_T("::{21EC2020-3AEA-1069-A2DD-08002B30309D}")},
+    {IDS_SHNAME5,_T("::{645FF040-5081-101B-9F08-00AA002F954E}")},
+    {IDS_SHNAME6,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524152}")},
+    {IDS_SHNAME7,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524153}")},
+    {IDS_SHNAME8,_T("::{450D8FBA-AD25-11D0-98A8-0800361B1103}")}
+  };
+  TCHAR c1[4096]={0};
+  _tcscpy(c1,cmd);
+  for (int i=0;i<countof(shn);i++)
+  {
+    LPTSTR c=_tcsstr(c1,shn[i].clsid);
+    if(c)
+    {
+      *c=0;
+      TCHAR c2[4096];
+      _stprintf(c2,L"%s%s%s",
+        c1,
+        GetShellName(&shn[i].clsid[2],CResStr(shn[i].nId)),
+        &c[_tcslen(shn[i].clsid)]);
+      _tcscpy(c1,c2);
+    }
+  }
+  if (c1[0])
+    _tcscpy(cmd,CBigResStr(IDS_BEAUTIFIED,cmd,c1));
+  return cmd;
+}
+
+//int tx()
+//{
+//  TCHAR cmd[4096]={0};
+//  _tcscpy(cmd,L"C:\\Windows\\Exploer.exe /e, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{208D2C60-3AEA-1069-A2D7-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{871C5380-42A0-1069-A2EA-08002B30309D}");
+//  DBGTrace1("%s",BeautifyCmdLine(cmd));
+//
+//  ::ExitProcess(0);
+//  return 0;
+//}
+//int xtx=tx();
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -599,11 +678,13 @@ DWORD PrepareSuRun()
       DWORD l=0;
       if (!PwOk)
       {
-        l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
+        l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+            BeautifyCmdLine(g_RunData.cmdLine));
         if (GetSavePW && (l&1))
           SavePassword(g_RunData.UserName,g_RunPwd);
       }else
-        l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,g_RunData.cmdLine);
+        l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+            BeautifyCmdLine(g_RunData.cmdLine));
       DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
       if((l&1)==0)
       {
@@ -962,7 +1043,7 @@ void SuRun(DWORD ProcessID)
   {
     if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
     {
-      if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,g_RunData.cmdLine))
+      if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
       {
         DeleteSafeDesktop(GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
