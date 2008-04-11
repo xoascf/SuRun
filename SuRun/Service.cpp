@@ -604,11 +604,13 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
   static TCHAR c1[4096];
   zero(c1);
   _tcscpy(c1,cmd);
+  bool bOk=false;
   for (int i=0;i<countof(shn);i++)
   {
     LPTSTR c=_tcsstr(c1,shn[i].clsid);
     if(c)
     {
+      bOk=TRUE;
       *c=0;
       TCHAR c2[4096];
       _stprintf(c2,L"%s%s%s",
@@ -618,7 +620,7 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
       _tcscpy(c1,c2);
     }
   }
-  if (c1[0])
+  if (bOk)
     _tcscpy(c1,CBigResStr(IDS_BEAUTIFIED,cmd,c1));
   return c1;
 }
