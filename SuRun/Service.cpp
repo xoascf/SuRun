@@ -601,7 +601,8 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
     {IDS_SHNAME7,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524153}")},
     {IDS_SHNAME8,_T("::{450D8FBA-AD25-11D0-98A8-0800361B1103}")}
   };
-  TCHAR c1[4096]={0};
+  static TCHAR c1[4096];
+  zero(c1);
   _tcscpy(c1,cmd);
   for (int i=0;i<countof(shn);i++)
   {
@@ -618,8 +619,8 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
     }
   }
   if (c1[0])
-    _tcscpy(cmd,CBigResStr(IDS_BEAUTIFIED,cmd,c1));
-  return cmd;
+    _tcscpy(c1,CBigResStr(IDS_BEAUTIFIED,cmd,c1));
+  return c1;
 }
 
 //int tx()
