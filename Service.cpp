@@ -1699,9 +1699,16 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDIGNORE,BN_CLICKED): //Remove SuRun:
         {
           //Settings
-          g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
-          g_bDelSuRunners=(!g_bKeepRegistry) && IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS)!=0;
-          g_bSR2Admins=g_bDelSuRunners && IsDlgButtonChecked(hwnd,IDC_SR2ADMIN)!=0;
+          g_bKeepRegistry=(IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0);
+          if (GetDlgItem(hwnd,IDC_DELSURUNNERS)) //Uninstall:
+          {
+            g_bDelSuRunners=(!g_bKeepRegistry) && (IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS)!=0);
+            g_bSR2Admins=g_bDelSuRunners && (IsDlgButtonChecked(hwnd,IDC_SR2ADMIN)!=0);
+          }else //Update:
+          {
+            g_bDelSuRunners=FALSE;
+            g_bSR2Admins=FALSE;
+          }
           //Hide Checkboxes, show Listbox
           ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_DELSURUNNERS),SW_HIDE);
