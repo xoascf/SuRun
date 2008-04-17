@@ -219,28 +219,26 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       KillProcessNice(g_RunData.KillPID);
     }
   }
+  bool bShellIsadmin=FALSE;
+  HANDLE hTok=GetShellProcessToken();
+  if(hTok)
+  {
+    bShellIsadmin=IsAdmin(hTok)!=0;
+    CloseHandle(hTok);
+  }
   //Convert Command Line
   if (!bRunSetup)
   {
     //If shell is Admin but User is SuRunner, the Shell must be restarted
-    if (IsInSuRunners(g_RunData.UserName))
+    if (IsInSuRunners(g_RunData.UserName) && bShellIsadmin)
     {
       //Complain if shell user is an admin!
-      HANDLE hTok=GetShellProcessToken();
-      if(hTok)
-      {
-        BOOL bAdmin=IsAdmin(hTok);
-        CloseHandle(hTok);
-        if (bAdmin)
-        {
-          SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
-          return RETVAL_ACCESSDENIED;
-        }
-        
-      }
+      SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+      return RETVAL_ACCESSDENIED;
     }  
     ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
-  }
+  }else
+    g_RunData.bNoSafeDesk=bShellIsadmin;
   //Usage
   if (!g_RunData.cmdLine[0])
   {
