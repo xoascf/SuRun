@@ -517,11 +517,18 @@ static CRITICAL_SECTION l_SxHkCs;
 //////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
+#ifdef DoDBGTrace
+  TCHAR Class[MAX_PATH]={0};
+  DWORD nc=MAX_PATH;
+  if(pei->fMask&SEE_MASK_CLASSKEY)
+    RegQueryInfoKey(pei->hkeyClass,Class,&nc,0,0,0,0,0,0,0,0,0);
   DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
     L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
     pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,pei->lpClass,
+    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
+    (pei->fMask&SEE_MASK_CLASSKEY)?Class:pei->lpClass,
     pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+#endif DoDBGTrace
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
     return S_FALSE;
