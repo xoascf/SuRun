@@ -2,6 +2,7 @@
 // Microsoft Developer Studio generated include file.
 // Used by SuRun.rc
 //
+#define IDC_STATIC      (-1)
 #define IDS_USAGE                       1
 #define IDS_ASKOK                       2
 #define IDS_APPNAME                     3
