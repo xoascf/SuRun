@@ -297,6 +297,8 @@ public:
   bool IsValid();
   void CleanUp();
   void FadeOut();
+  void SwitchToOwnDesk();
+  void SwitchToUserDesk();
   HWND GetDeskWnd(){return m_Screen.hWnd();};
 private:
   bool    m_bOk;
@@ -308,6 +310,8 @@ private:
 public:
   CBlurredScreen m_Screen;
 };
+
+CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -346,20 +350,16 @@ public:
     LPTSTR DeskName=_tcsdup(t->m_DeskName);
     while (t->m_DeskName)
     {
-      HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
-      if (d!=0)
+      HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
+      if (i!=0)
       {
-        HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
-        if (i!=0)
-        {
-          TCHAR n[MAX_PATH]={0};
-          DWORD l=MAX_PATH;
-          if (GetUserObjectInformation(i,UOI_NAME,n,l,&l))
-            if (_tcsicmp(n,DeskName))
-              SwitchDesktop(d);
-          CloseDesktop(i);
-        }
-        CloseDesktop(d);
+        TCHAR n[MAX_PATH]={0};
+        DWORD l=MAX_PATH;
+        if (g_RunOnNewDesk
+          && GetUserObjectInformation(i,UOI_NAME,n,l,&l)
+          && _tcsicmp(n,DeskName))
+          g_RunOnNewDesk->SwitchToOwnDesk();
+        CloseDesktop(i);
       }
       Sleep(10);
     }
@@ -371,6 +371,8 @@ private:
   LPTSTR m_DeskName;
   HANDLE m_Thread;
 };
+
+CStayOnDeskTop* g_StayOnDesk=NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -457,14 +459,21 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCre
   //Show Desktop Background
   if (bCreateBkWnd)
     m_Screen.Show(bFadeIn);
+  m_bOk=TRUE;
+}
+
+void CRunOnNewDeskTop::SwitchToOwnDesk()
+{
   //Switch to the new Desktop
   if (!SwitchDesktop(m_hdeskUser))
-  {
     DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
-    CleanUp();
-    return;
-  }
-  m_bOk=TRUE;
+}
+
+void CRunOnNewDeskTop::SwitchToUserDesk()
+{
+  //Switch to the new Desktop
+  if (!SwitchDesktop(m_hDeskSwitch))
+    DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
 }
 
 void CRunOnNewDeskTop::FadeOut()
@@ -478,8 +487,7 @@ void CRunOnNewDeskTop::CleanUp()
   if(m_hDeskSwitch)
   {
     //GrantUserAccessToDesktop(m_hDeskSwitch);
-    if (!SwitchDesktop(m_hDeskSwitch))
-      DBGTrace1("CRunOnNewDeskTop: SwitchDesktop failed: %s",GetLastErrorNameStatic());
+    SwitchToUserDesk();
     if (!CloseDesktop(m_hDeskSwitch))
       DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
     m_hDeskSwitch=NULL;
@@ -519,9 +527,6 @@ bool CRunOnNewDeskTop::IsValid()
 };
 
 
-CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
-CStayOnDeskTop* g_StayOnDesk=NULL;
-
 bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade)
 {
   DeleteSafeDesktop(false);
@@ -538,13 +543,6 @@ bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade)
   g_RunOnNewDesk=rond;
   g_StayOnDesk=new CStayOnDeskTop(DeskName);
   return true;
-}
-
-HWND GetSafeDeskWnd()
-{
-  if (g_RunOnNewDesk)
-    g_RunOnNewDesk->GetDeskWnd();
-  return 0;
 }
 
 void DeleteSafeDesktop(bool bFade)
