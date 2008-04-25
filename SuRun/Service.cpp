@@ -672,7 +672,7 @@ DWORD PrepareSuRun()
     __try
     {
       //secure desktop created...
-      if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,GetSafeDeskWnd()))
+      if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
         return RETVAL_CANCELLED;
       //Is User Restricted?
       DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
