@@ -1170,6 +1170,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   {
   case WM_INITDIALOG:
     {
+      if (!g_RunData.bNoSafeDesk)
+        SetWindowPos(hwnd,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
+      SetActiveWindow(hwnd);
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,32,32,0));
@@ -1260,7 +1263,7 @@ BOOL RunSetup()
   SETUPDATA sd;
   g_SD=&sd;
   BOOL bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
-                           GetSafeDeskWnd(),MainSetupDlgProc)>=0;  
+                           0,MainSetupDlgProc)>=0;  
   g_SD=0;
   return bRet;
 }
