@@ -31,6 +31,7 @@
 #include "UserGroups.h"
 #include "lsa_laar.h"
 #include "DBGTrace.h"
+#include "WinStaDesk.h"
 #include "Resource.h"
 #include "Service.h"
 
@@ -1259,7 +1260,7 @@ BOOL RunSetup()
   SETUPDATA sd;
   g_SD=&sd;
   BOOL bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
-                           0,MainSetupDlgProc)>=0;  
+                           GetSafeDeskWnd(),MainSetupDlgProc)>=0;  
   g_SD=0;
   return bRet;
 }
