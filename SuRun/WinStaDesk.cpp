@@ -297,6 +297,7 @@ public:
   bool IsValid();
   void CleanUp();
   void FadeOut();
+  HWND GetDeskWnd(){return m_Screen.hWnd();};
 private:
   bool    m_bOk;
   HWINSTA m_hwinstaSave;
@@ -537,6 +538,13 @@ bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade)
   g_RunOnNewDesk=rond;
   g_StayOnDesk=new CStayOnDeskTop(DeskName);
   return true;
+}
+
+HWND GetSafeDeskWnd()
+{
+  if (g_RunOnNewDesk)
+    g_RunOnNewDesk->GetDeskWnd();
+  return 0;
 }
 
 void DeleteSafeDesktop(bool bFade)
