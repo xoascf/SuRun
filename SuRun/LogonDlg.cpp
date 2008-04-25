@@ -26,6 +26,7 @@
 #include "sspi_auth.h"
 #include "Helpers.h"
 #include "Setup.h"
+#include "WinStaDesk.h"
 #include "Resource.h"
 
 #pragma comment(lib,"shlwapi.lib")
@@ -538,7 +539,7 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
   p.Users.SetUsualUsers(FALSE);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
-                  0,DialogProc,(LPARAM)&p);
+                  GetSafeDeskWnd(),DialogProc,(LPARAM)&p);
 }
 
 BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...)
@@ -550,7 +551,7 @@ BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...)
   p.Users.SetUsualUsers(FALSE);
   p.bRunAs=TRUE;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
-                  0,DialogProc,(LPARAM)&p);
+                  GetSafeDeskWnd(),DialogProc,(LPARAM)&p);
 }
 
 BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
@@ -561,7 +562,7 @@ BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,Password,false,true,false);
   p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,FALSE);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
-                  0,DialogProc,(LPARAM)&p);
+                  GetSafeDeskWnd(),DialogProc,(LPARAM)&p);
 }
 
 BOOL LogonAdmin(int IDmsg,...)
@@ -573,8 +574,8 @@ BOOL LogonAdmin(int IDmsg,...)
   TCHAR P[PWLEN]={0};
   LOGONDLGPARAMS p(S,U,P,false,true,false);
   p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,FALSE);
-  BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),
-                    MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
+  BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
+                    GetSafeDeskWnd(),DialogProc,(LPARAM)&p);
   zero(U);
   zero(P);
   return bRet;
@@ -588,7 +589,7 @@ DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,Password,true,false,UsrFlags);
   p.Users.Add(User);
   return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
-                  0,DialogProc,(LPARAM)&p);
+                  GetSafeDeskWnd(),DialogProc,(LPARAM)&p);
 }
 
 DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...)
@@ -599,7 +600,7 @@ DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,_T("******"),true,false,UsrFlags);
   p.Users.Add(User);
   return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
-                  0,DialogProc,(LPARAM)&p);
+                  GetSafeDeskWnd(),DialogProc,(LPARAM)&p);
 }
 
 #ifdef _DEBUGLOGON
