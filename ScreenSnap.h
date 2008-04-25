@@ -133,16 +133,20 @@ public:
     wc.hInstance=GetModuleHandle(0);
     RegisterClass(&wc);
     m_blurbm=Blur(m_bm,m_dx,m_dy);
-    m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW,wc.lpszClassName,
-      _T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,0,0,wc.hInstance,0);
+    m_hWnd=CreateWindowEx(WS_EX_NOACTIVATE,wc.lpszClassName,
+      _T("ScreenWnd"),WS_VISIBLE|WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
+      m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
+    RedrawWindow(m_hWnd,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
     if((!bWin2k)&& bFadeIn)
     {
       MsgLoop();
-      m_hWndTrans=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_LAYERED,
-        wc.lpszClassName,_T("ScreenWnd"),WS_VISIBLE|WS_POPUP,0,0,m_dx,m_dy,m_hWnd,0,wc.hInstance,0);
+      m_hWndTrans=CreateWindowEx(WS_EX_NOACTIVATE|WS_EX_LAYERED,
+        wc.lpszClassName,_T("ScreenWnd"),WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
+        m_dx,m_dy,m_hWnd,0,wc.hInstance,0);
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
       SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
+      RedrawWindow(m_hWndTrans,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
       m_StartTime=timeGetTime();
       SetTimer(m_hWndTrans,1,10,0);
     }else
@@ -172,8 +176,6 @@ public:
       KillTimer(m_hWndTrans,1);
       BYTE a0=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
       BYTE a=a0;
-      if ((GetWindowLong(m_hWndTrans,GWL_EXSTYLE)&WS_EX_LAYERED)==0)
-        SetWindowLong(m_hWndTrans,GWL_EXSTYLE,WS_EX_TOOLWINDOW|WS_EX_LAYERED);
       DWORD m_StartTime=timeGetTime();
       while (a)
       {
@@ -216,8 +218,6 @@ private:
         SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
         if (a<255)
           SetTimer(hwnd,wParam,10,0);
-        else
-          SetWindowLong(m_hWndTrans,GWL_EXSTYLE,WS_EX_TOOLWINDOW);
       }
       return TRUE;
     case WM_MOUSEACTIVATE:
