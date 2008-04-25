@@ -237,6 +237,10 @@ SOURCE=.\SysMenuHook.cpp
 
 SOURCE=..\UserGroups.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\WinStaDesk.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
