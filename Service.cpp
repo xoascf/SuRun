@@ -43,6 +43,7 @@
 #include "ReqAdmin.h"
 #include "Helpers.h"
 #include "TrayShowAdmin.h"
+#include "WatchDog.h"
 #include "DBGTrace.h"
 #include "Resource.h"
 #include "SuRunExt/SuRunExt.h"
@@ -667,7 +668,7 @@ DWORD PrepareSuRun()
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   //Create the new desktop
-  if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
+  if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
   {
     __try
     {
@@ -1044,7 +1045,7 @@ void SuRun(DWORD ProcessID)
   //RunAs...
   if (g_RunData.bRunAs)
   {
-    if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
+    if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
     {
       if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
       {
@@ -1062,7 +1063,7 @@ void SuRun(DWORD ProcessID)
     {
       //Create the new desktop
       ResumeClient(RETVAL_OK);
-      if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
+      if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
         __try
         {
@@ -1912,6 +1913,16 @@ bool HandleServiceStuff()
     if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
     {
       UserInstall();
+      ExitProcess(0);
+      return true;
+    }
+  }
+  if (cmd.argc()==4)
+  {
+    //WatchDog
+    if (_tcsicmp(cmd.argv(1),_T("/WATCHDOG"))==0)
+    {
+      DoWatchDog(cmd.argv(2),cmd.argv(3));
       ExitProcess(0);
       return true;
     }
