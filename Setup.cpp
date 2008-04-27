@@ -1170,6 +1170,11 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   {
   case WM_INITDIALOG:
     {
+      if (g_WatchDogEvent)
+      {
+        SetEvent(g_WatchDogEvent);
+        SetTimer(hwnd,1265142,500,0);
+      }
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,32,32,0));
@@ -1231,6 +1236,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       }
       break;
     }//WM_NOTIFY
+  case WM_TIMER:
+    if ((wParam==1265142)&& g_WatchDogEvent)
+      SetEvent(g_WatchDogEvent);
   case WM_COMMAND:
     {
       switch (wParam)
@@ -1239,6 +1247,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
         SendMessage(
           g_SD->hTabCtrl[TabCtrl_GetCurSel(GetDlgItem(hwnd,IDC_SETUP_TAB))],
           WM_COMMAND,wParam,lParam);
+#ifdef _DEBUG 
+        Sleep(5000); //Show Watchdog!
+#endif _DEBUG 
         break;
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         g_SD->DlgExitCode=IDCANCEL;
