@@ -24,11 +24,16 @@
 #pragma once
 // WindowStation Desktop Names:
 
+//Call SetEvent(g_WatchDogEvent) in a WM_TIMER for a period of less than two 
+//seconds on the Safe desktop to prevent the watchdog process from displaying 
+//it's dialog on the input desktop
+extern HANDLE g_WatchDogEvent;
+
 BOOL GetWinStaName(LPTSTR WinSta,DWORD ccWinSta);
 BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName);
 
 void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk);
 void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant);
 
-bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade);
+bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade);
 void DeleteSafeDesktop(bool bFade);
