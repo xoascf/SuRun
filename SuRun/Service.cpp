@@ -1062,14 +1062,7 @@ void SuRun(DWORD ProcessID)
     {
       //Create the new desktop
       ResumeClient(RETVAL_OK);
-      HANDLE hTok=0;
-      if (g_RunData.bNoSafeDesk)
-      {
-        OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hTok);
-        SetAccessToWinDesk(hTok,g_RunData.WinSta,g_RunData.Desk,true);
-        SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-      }
-      if (g_RunData.bNoSafeDesk || CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
+      if (CreateSafeDesktop(g_RunData.WinSta,GetBlurDesk,GetFadeDesk))
       {
         __try
         {
@@ -1088,11 +1081,6 @@ void SuRun(DWORD ProcessID)
 //        DirectStartUserProcess(GetShellProcessId(g_RunData.SessionID),cmd);
       }else
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      if(g_RunData.bNoSafeDesk)
-      {
-        SetAccessToWinDesk(hTok,g_RunData.WinSta,g_RunData.Desk,false);
-        CloseHandle(hTok);
-      }
       return;
     }
     KillProcess(g_RunData.KillPID);
