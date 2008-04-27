@@ -16,13 +16,16 @@
 #include <windows.h>
 #include <tchar.h>
 #include <aclapi.h>
+#include <shlwapi.h>
 #include <userenv.h>
 #include "WinStaDesk.h"
 #include "ScreenSnap.h"
+#include "Setup.h"
 #include "Helpers.h"
 #include "ResStr.h"
 #include "DBGTrace.h"
 
+#pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Userenv.lib")
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78,7 +81,7 @@ BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName)
 
 void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk)
 {
-	HWINSTA hws = OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED);
+  HWINSTA hws = WinSta?OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED):0;
 	if (!hws)
   {
     DBGTrace2("OpenWindowStation(%s) failed: %s",WinSta,GetLastErrorNameStatic());
@@ -87,17 +90,17 @@ void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk)
     SetProcessWindowStation(hws);
     if (!CloseWindowStation(hws))
       DBGTrace1("CloseWindowStation failed: %s",GetLastErrorNameStatic());
-    HDESK hd = OpenDesktop(Desk,0,0,MAXIMUM_ALLOWED);
-    if (!hd)
-    {
-      DBGTrace2("OpenDesktop(%s) failed: %s",Desk,GetLastErrorNameStatic());
-    }else
-    {
-      if (!SetThreadDesktop(hd))
-        DBGTrace1("SetThreadDesktop failed: %s",GetLastErrorNameStatic());
-      if (!CloseDesktop(hd))
-        DBGTrace1("CloseDesktop failed: %s",GetLastErrorNameStatic());
-    }
+  }
+  HDESK hd = OpenDesktop(Desk,0,0,MAXIMUM_ALLOWED);
+  if (!hd)
+  {
+    DBGTrace2("OpenDesktop(%s) failed: %s",Desk,GetLastErrorNameStatic());
+  }else
+  {
+    if (!SetThreadDesktop(hd))
+      DBGTrace1("SetThreadDesktop failed: %s",GetLastErrorNameStatic());
+    if (!CloseDesktop(hd))
+      DBGTrace1("CloseDesktop failed: %s",GetLastErrorNameStatic());
   }
 }
 
@@ -125,50 +128,54 @@ void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant)
     return;
   }
 	void* psidLogonSession = it->Sid;
-	HWINSTA hws = OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED);
-	if (!hws)
+  HWINSTA hws = WinSta?OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED):0;
+	if (WinSta && (!hws))
   {
     DBGTrace2("OpenWindowStation(%s) failed: %s",WinSta,GetLastErrorNameStatic());
   }else
 	{
-    PSECURITY_DESCRIPTOR pSD = NULL;
-		PACL pOldDACL=NULL, pNewDACL=NULL;
-		// get the existing DACL, with enough extra space for adding a couple more aces
-    GetSecurityInfo(hws,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,0,0,&pOldDACL,0,&pSD);
-    // Initialize an EXPLICIT_ACCESS structure for an ACE.
-    EXPLICIT_ACCESS ea[2]={0};
-    // grant the logon session all access to winsta0
-    ea[1].grfAccessPermissions = WINSTA_ALL_ACCESS;
-    ea[1].grfAccessMode = bGrant?SET_ACCESS:REVOKE_ACCESS;
-    ea[1].grfInheritance= NO_INHERITANCE;
-    ea[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
-    ea[1].Trustee.TrusteeType = TRUSTEE_IS_USER;
-    ea[1].Trustee.ptstrName  = (LPTSTR)psidLogonSession;
-    // grant the logon session all access to any new desktops created in winsta0
-		// by adding an inherit-only ace
-    ea[0].grfAccessPermissions = DESKTOP_ALL_ACCESS;
-    ea[0].grfAccessMode = bGrant?SET_ACCESS:REVOKE_ACCESS;
-    ea[0].grfInheritance= SUB_CONTAINERS_AND_OBJECTS_INHERIT|INHERIT_ONLY;
-    ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
-    ea[0].Trustee.TrusteeType = TRUSTEE_IS_USER;
-    ea[0].Trustee.ptstrName  = (LPTSTR)psidLogonSession;
-    // Create a new ACL that merges the new ACE into the existing DACL.
-    DWORD err=SetEntriesInAcl(2,ea,pOldDACL,&pNewDACL);
-    if (err!=ERROR_SUCCESS)
+    HWINSTA hwss=NULL;
+    if(hws)
     {
-      DBGTrace1("SetEntriesInAcl failed:%s",GetErrorNameStatic(err));
-    }else
-    {
-      // apply changes
-      err=SetSecurityInfo(hws,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,0,0,pNewDACL,0);
-      if ( err )
-        DBGTrace1("SetSecurityInfo failed %s",GetErrorNameStatic(err));
+      PSECURITY_DESCRIPTOR pSD = NULL;
+		  PACL pOldDACL=NULL, pNewDACL=NULL;
+      // get the existing DACL, with enough extra space for adding a couple more aces
+      GetSecurityInfo(hws,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,0,0,&pOldDACL,0,&pSD);
+      // Initialize an EXPLICIT_ACCESS structure for an ACE.
+      EXPLICIT_ACCESS ea[2]={0};
+      // grant the logon session all access to winsta0
+      ea[1].grfAccessPermissions = WINSTA_ALL_ACCESS;
+      ea[1].grfAccessMode = bGrant?SET_ACCESS:REVOKE_ACCESS;
+      ea[1].grfInheritance= NO_INHERITANCE;
+      ea[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+      ea[1].Trustee.TrusteeType = TRUSTEE_IS_USER;
+      ea[1].Trustee.ptstrName  = (LPTSTR)psidLogonSession;
+      // grant the logon session all access to any new desktops created in winsta0
+      // by adding an inherit-only ace
+      ea[0].grfAccessPermissions = DESKTOP_ALL_ACCESS;
+      ea[0].grfAccessMode = bGrant?SET_ACCESS:REVOKE_ACCESS;
+      ea[0].grfInheritance= SUB_CONTAINERS_AND_OBJECTS_INHERIT|INHERIT_ONLY;
+      ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+      ea[0].Trustee.TrusteeType = TRUSTEE_IS_USER;
+      ea[0].Trustee.ptstrName  = (LPTSTR)psidLogonSession;
+      // Create a new ACL that merges the new ACE into the existing DACL.
+      DWORD err=SetEntriesInAcl(2,ea,pOldDACL,&pNewDACL);
+      if (err!=ERROR_SUCCESS)
+      {
+        DBGTrace1("SetEntriesInAcl failed:%s",GetErrorNameStatic(err));
+      }else
+      {
+        // apply changes
+        err=SetSecurityInfo(hws,SE_WINDOW_OBJECT,DACL_SECURITY_INFORMATION,0,0,pNewDACL,0);
+        if ( err )
+          DBGTrace1("SetSecurityInfo failed %s",GetErrorNameStatic(err));
+      }
+      LocalFree((HLOCAL)pNewDACL); 
+      LocalFree((HLOCAL)pSD); 
+      //We need to set hws to our WindowsStation to make Desk accessible to us 
+      hwss=GetProcessWindowStation();
+      SetProcessWindowStation(hws);
     }
-    LocalFree((HLOCAL)pNewDACL); 
-		LocalFree((HLOCAL)pSD); 
-    //We need to set hws to our WindowsStation to make Desk accessible to us 
-    HWINSTA hwss=GetProcessWindowStation();
-    SetProcessWindowStation(hws);
 	  HDESK hd = OpenDesktop(Desk,0,0,MAXIMUM_ALLOWED);
 	  if (!hd)
     {
@@ -204,8 +211,10 @@ void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant)
 		  LocalFree((HLOCAL)pSD); 
       CloseDesktop(hd);
 	  }
-    SetProcessWindowStation(hwss);
-    CloseWindowStation(hws);
+    if(hwss)
+      SetProcessWindowStation(hwss);
+    if(hws)
+      CloseWindowStation(hws);
 	}
 }
 
@@ -325,6 +334,9 @@ CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
 // forced to use CStayOnDeskTop to switch back to SuRuns desktop.
 //////////////////////////////////////////////////////////////////////////////
 
+//if g_StayOnDeskEvent is SET, CStayOnDeskTop will keep switching to the safe desktop
+HANDLE g_StayOnDeskEvent=NULL;
+
 class CStayOnDeskTop
 {
 public:
@@ -350,16 +362,20 @@ public:
     LPTSTR DeskName=_tcsdup(t->m_DeskName);
     while (t->m_DeskName)
     {
-      HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
-      if (i!=0)
+      if ((g_StayOnDeskEvent==NULL)
+        ||(WaitForSingleObject(g_StayOnDeskEvent,0)==WAIT_OBJECT_0))
       {
-        TCHAR n[MAX_PATH]={0};
-        DWORD l=MAX_PATH;
-        if (g_RunOnNewDesk
-          && GetUserObjectInformation(i,UOI_NAME,n,l,&l)
-          && _tcsicmp(n,DeskName))
-          g_RunOnNewDesk->SwitchToOwnDesk();
-        CloseDesktop(i);
+        HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
+        if (i!=0)
+        {
+          TCHAR n[MAX_PATH]={0};
+          DWORD l=MAX_PATH;
+          if (g_RunOnNewDesk
+            && GetUserObjectInformation(i,UOI_NAME,n,l,&l)
+            && _tcsicmp(n,DeskName))
+            g_RunOnNewDesk->SwitchToOwnDesk();
+          CloseDesktop(i);
+        }
       }
       Sleep(10);
     }
@@ -527,11 +543,39 @@ bool CRunOnNewDeskTop::IsValid()
 };
 
 
-bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade)
+HANDLE g_WatchDogEvent=NULL;
+HANDLE g_WatchDogProcess=NULL;
+
+bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
 {
   DeleteSafeDesktop(false);
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
+  //Start watchdog process:
+  g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
+  g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
+  if (g_WatchDogEvent && g_StayOnDeskEvent)
+  {
+    TCHAR SuRunExe[4096];
+    GetSystemWindowsDirectory(SuRunExe,4096);
+    PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
+    _tcscat(SuRunExe,L" ");
+    _tcscat(SuRunExe,DeskName);
+    _tcscat(SuRunExe,L" ");
+    _tcscat(SuRunExe,UserDesk);
+    PROCESS_INFORMATION pi={0};
+    STARTUPINFO si={0};
+    si.cb	= sizeof(si);
+    TCHAR WinstaDesk[MAX_PATH];
+    _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
+    si.lpDesktop = WinstaDesk;
+    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
+    {
+      CloseHandle(pi.hThread);
+      g_WatchDogProcess=pi.hProcess;
+    }
+  }else
+    DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,BlurDesk,bFade);
   if (!rond)
     return false;
@@ -547,6 +591,12 @@ bool CreateSafeDesktop(LPTSTR WinSta,bool BlurDesk,bool bFade)
 
 void DeleteSafeDesktop(bool bFade)
 {
+  if(g_WatchDogProcess)
+  {
+    TerminateProcess(g_WatchDogProcess,0);
+    CloseHandle(g_WatchDogProcess);
+    g_WatchDogProcess=0;
+  }
   if (g_RunOnNewDesk && bFade)
     g_RunOnNewDesk->FadeOut();
   if (g_StayOnDesk)
@@ -555,6 +605,16 @@ void DeleteSafeDesktop(bool bFade)
   if (g_RunOnNewDesk)
     delete g_RunOnNewDesk;
   g_RunOnNewDesk=NULL;
+  if(g_StayOnDeskEvent)
+  {
+    CloseHandle(g_StayOnDeskEvent);
+    g_StayOnDeskEvent=NULL;
+  }
+  if(g_WatchDogEvent)
+  {
+    CloseHandle(g_WatchDogEvent);
+    g_WatchDogEvent=NULL;
+  }
 }
 
 //int TestBS()
