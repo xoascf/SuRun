@@ -2,7 +2,6 @@
 // Microsoft Developer Studio generated include file.
 // Used by SuRun.rc
 //
-#define IDC_STATIC      (-1)
 #define IDS_USAGE                       1
 #define IDS_ASKOK                       2
 #define IDS_APPNAME                     3
@@ -29,6 +28,8 @@
 #define IDS_RUNFAILED                   23
 #define IDS_EMPTYPASS                   24
 #define IDS_STARTMENUDIR                25
+#define IDS_SURUNSTUCK                  26
+#define IDS_SWITCHBACK                  27
 #define IDS_GRPDESC                     29
 #define IDS_DOMAINGROUPS                31
 #define IDS_ADDFILETOLIST               31
@@ -209,12 +210,13 @@
 #define IDC_TRAYBALLOON                 1073
 #define IDC_STOREPASS                   1074
 #define IDC_WARNADMIN                   1075
+#define IDC_STATIC                      -1
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1077
 #define _APS_NEXT_SYMED_VALUE           102
