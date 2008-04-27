@@ -162,8 +162,11 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
 
 CTrayMsgWnd::~CTrayMsgWnd()
 {
+  if (IsWindow(m_hWnd))
+    DestroyWindow(m_hWnd);
   DeleteObject(m_hFont);
   DestroyIcon(m_Icon);
+  DeleteObject(m_bkBrush);
 }
 
 bool CTrayMsgWnd::MsgLoop()
