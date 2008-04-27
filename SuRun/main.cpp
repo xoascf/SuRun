@@ -193,10 +193,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!_wcsicmp(c,L"/QUIET"))
     {
       g_RunData.beQuiet=TRUE;
-    }/*else if (!_wcsicmp(c,L"/UNSAFE"))
-    {
-      g_RunData.bNoSafeDesk=TRUE;
-    }*/if (!_wcsicmp(c,L"/RUNAS"))
+    }if (!_wcsicmp(c,L"/RUNAS"))
     {
       g_RunData.bRunAs=TRUE;
     }else if (!_wcsicmp(c,L"/SETUP"))
@@ -237,8 +234,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       return RETVAL_ACCESSDENIED;
     }  
     ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
-  }else
-    g_RunData.bNoSafeDesk=bShellIsadmin;
+  }
   //Usage
   if (!g_RunData.cmdLine[0])
   {
