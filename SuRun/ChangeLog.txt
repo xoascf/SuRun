@@ -1,3 +1,9 @@
+Done:
+----
+* Admins again see Setup on Safe Desktop (Logoff!)
+* Removed Blurred Desktop flicker
+* SuRun Settings could show behind Safe Desktop background
+
 To be done in future:
 ---------------------
 * make context menu entries dynamically with ShellExt 
