@@ -14,7 +14,6 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <tchar.h>
-#include <strsafe.h>
 #include "TrayMsgWnd.h"
 #include "Helpers.h"
 #include "Setup.h"
