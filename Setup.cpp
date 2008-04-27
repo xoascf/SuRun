@@ -1170,9 +1170,6 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   {
   case WM_INITDIALOG:
     {
-      if (!g_RunData.bNoSafeDesk)
-        SetWindowPos(hwnd,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
-      SetActiveWindow(hwnd);
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,32,32,0));
@@ -1205,8 +1202,8 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       }
       ShowWindow(g_SD->hTabCtrl[0],TRUE);
       //...
-      SetFocus(hTab);
       UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
+      SetFocus(hTab);
       return FALSE;
     }//WM_INITDIALOG
   case WM_NCDESTROY:
