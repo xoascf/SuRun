@@ -233,6 +233,10 @@ SOURCE=.\UserGroups.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\WatchDog.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\WinStaDesk.cpp
 # End Source File
 # End Group
@@ -310,6 +314,10 @@ SOURCE=.\TrayShowAdmin.h
 # Begin Source File
 
 SOURCE=.\UserGroups.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\WatchDog.h
 # End Source File
 # Begin Source File
 
