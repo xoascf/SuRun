@@ -227,6 +227,10 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
     if ((WaitForSingleObject(WatchDogEvent,2000)==WAIT_TIMEOUT)
       && ShowWatchDogDlg(WatchDogEvent))
     {
+      //Switch to SuRuns desktop
+      HDESK d=OpenDesktop(SafeDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
+      SwitchDesktop(d);
+      CloseDesktop(d);
       //Tell CStayOnDesk, not to switch to the safe desktop
       ResetEvent(StayOnDeskEvent);
       //Set Access to the user Desktop
@@ -240,7 +244,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
       SetUseIATHook(0);
       SetUseIShExHook(0);
       //Switch to the user desktop
-      HDESK d=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
+      d=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
       SwitchDesktop(d);
       CloseDesktop(d);
       //Show Window
