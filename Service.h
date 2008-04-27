@@ -59,7 +59,6 @@ typedef struct
       DWORD TimeOut;    //Service->Tray Window timeout
     };
   };
-  bool  bNoSafeDesk; //only valid with /SETUP
   bool  bShlExHook;
   bool  beQuiet;
   bool  bRunAs;
