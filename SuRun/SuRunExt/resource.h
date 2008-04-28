@@ -9,6 +9,7 @@
 #define IDS_SURUNCMD                    5
 #define IDS_SURUNEXP                    6
 #define IDS_STRING7                     7
+#define IDS_RESTARTSHELL                7
 #define IDS_CPLNAME                     8
 #define IDS_MENURESTART                 13
 #define IDS_MENUSTART                   18
