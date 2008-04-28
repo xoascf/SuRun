@@ -23,7 +23,6 @@
 #pragma once
 #include <WINDOWS.h>
 #include <TCHAR.h>
-#include <strsafe.h>
 
 //Globals: (for better speed!)
 static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
