@@ -115,6 +115,13 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     TCHAR PID[10];
     if (msg->wParam==WM_SYSMH0)
     {
+      //Are we inside the Shell Process?
+      DWORD ShellID=0;
+      GetWindowThreadProcessId(GetShellWindow(),&ShellID);
+      if ((GetCurrentProcessId()==ShellID)
+        &&(SafeMsgBox(0,CResStr(l_hInst,IDS_RESTARTSHELL,GetCommandLine()),
+                      L"SuRun",MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
+        return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
       _tcscat(cmd,_T("/KILL "));
       _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
       _tcscat(cmd,_T(" "));
