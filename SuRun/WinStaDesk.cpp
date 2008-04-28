@@ -483,6 +483,7 @@ void CRunOnNewDeskTop::SwitchToOwnDesk()
   //Switch to the new Desktop
   if (!SwitchDesktop(m_hdeskUser))
     DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
+  m_Screen.FadeIn();
 }
 
 void CRunOnNewDeskTop::SwitchToUserDesk()
