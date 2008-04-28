@@ -147,8 +147,6 @@ public:
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
       SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
       RedrawWindow(m_hWndTrans,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
-      m_StartTime=timeGetTime();
-      SetTimer(m_hWndTrans,1,10,0);
     }else
     {
       m_hWndTrans=m_hWnd;
@@ -167,6 +165,14 @@ public:
     {
       TranslateMessage(&msg);
       DispatchMessage(&msg);
+    }
+  }
+  void FadeIn()
+  {
+    if (m_hWndTrans && m_hWnd && m_bm && (m_StartTime==0))
+    {
+      m_StartTime=timeGetTime();
+      SetTimer(m_hWndTrans,1,10,0);
     }
   }
   void FadeOut()
