@@ -34,6 +34,7 @@ BEGIN
     IDS_SURUN               "Panel sterowania jako administrator"
     IDS_SURUNCMD            "'SuRun cmd' here"
     IDS_SURUNEXP            "'SuRun Explorer' here"
+    IDS_RESTARTSHELL        "Do you really want to restart the Windows Shell\n(%s) with elevated rights??"
     IDS_CPLNAME             "SuRun Settings"
     IDS_MENURESTART         "Uruchom ponownie jako administrator"
 END
@@ -78,6 +79,7 @@ BEGIN
     IDS_SURUN               "Systemsteuerung als Administrator"
     IDS_SURUNCMD            "'SuRun cmd' hier"
     IDS_SURUNEXP            "'SuRun Explorer' hier"
+    IDS_RESTARTSHELL        "Wollen Sie wirklich die Windows Shell (%s)\nmit gehobenen Rechten neu starten?"
     IDS_CPLNAME             "SuRun Einstellungen"
     IDS_MENURESTART         "Neustart als Administrator"
 END
@@ -185,6 +187,7 @@ BEGIN
     IDS_SURUN               "Control panel as administrator"
     IDS_SURUNCMD            "'SuRun cmd' here"
     IDS_SURUNEXP            "'SuRun Explorer' here"
+    IDS_RESTARTSHELL        "Do you really want to restart the Windows Shell\n(%s) with elevated rights??"
     IDS_CPLNAME             "SuRun Settings"
     IDS_MENURESTART         "Restart as administrator"
 END
