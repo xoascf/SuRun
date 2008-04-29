@@ -159,6 +159,13 @@ Changes:
 
 SuRun 1.1.0.6 - 2008-04-29:
 ----------------------------
+* Added WatchDog: If SuRun stops responding while the safe desktop is active, a
+    Window is shown that allows to switch back to the users desktop. Then on
+    the users desktop a window is shown that allows switching back to the safe 
+    desktop.
+    This is needed, if a Host Intrusion Detection System (HIPS) blocks SuRun 
+    and urges the user to allow/deny the action, SuRun is trying. The HIPS 
+    usually asks the user on his desktop and this caused a deadlock.
 * SuRun asks, if a user tries to restart the Windows Shell.
 * IAT-Hook is again off by default because of incompatibilities with self 
   checking software. (E.G. Access 2003 and Outlook 2003)
