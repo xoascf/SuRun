@@ -544,12 +544,20 @@ bool CRunOnNewDeskTop::IsValid()
 };
 
 
+LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
+{
+  DeleteSafeDesktop(0);
+  return EXCEPTION_EXECUTE_HANDLER;
+}
+
 HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
 
 bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
 {
   DeleteSafeDesktop(false);
+  if (IsLocalSystem())
+    SetUnhandledExceptionFilter(ExceptionFilter);
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Start watchdog process:
@@ -616,6 +624,8 @@ void DeleteSafeDesktop(bool bFade)
     CloseHandle(g_WatchDogEvent);
     g_WatchDogEvent=NULL;
   }
+  if (IsLocalSystem())
+    SetUnhandledExceptionFilter(NULL);
 }
 
 //int TestBS()
