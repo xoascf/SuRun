@@ -139,10 +139,11 @@ int Run()
   return RETVAL_OK;
 }
 
-//LONG ExceptionFilter(STRUCT _EXCEPTION_POINTERS *ExceptionInfo )
-//{
-//  return EXCEPTION_EXECUTE_HANDLER;
-//}
+LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
+{
+  DeleteSafeDesktop(0);
+  return EXCEPTION_EXECUTE_HANDLER;
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -152,7 +153,7 @@ int Run()
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-  //SetUnhandledExceptionFilter()
+  SetUnhandledExceptionFilter(ExceptionFilter);
   if(HandleServiceStuff())
     return 0;
   //After the User presses OK, the service starts a clean SuRun exe with the 
