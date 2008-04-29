@@ -157,9 +157,16 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.6 - 2008-04-29:
+----------------------------
+* SuRun asks, if a user tries to restart the Windows Shell.
+* IAT-Hook is again off by default because of incompatibilities with self 
+  checking software. (E.G. Access 2003 and Outlook 2003)
+* Removed Blurred Desktop flicker
+
 SuRun 1.1.0.5 - 2008-04-23:
 ----------------------------
-* Administrators see SuRuns Setup Dialog on their desktop
+* was a mistake!
 
 SuRun 1.1.0.4 - 2008-04-11:
 ----------------------------
