@@ -178,6 +178,8 @@ LRESULT CALLBACK CWDMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_MOVING:
 	  *((RECT*)lParam)=m_wr;
     return TRUE;
+  case WM_QUERYENDSESSION://Block LogOff!
+    return (lParam&ENDSESSION_LOGOFF)?FALSE:TRUE;
   case WM_LBUTTONDOWN:
     m_Clicked=TRUE;
     //fall through
