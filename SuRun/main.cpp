@@ -142,7 +142,6 @@ int Run()
 LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
 {
   DeleteSafeDesktop(0);
-  SafeMsgBox(0,L"GPF in SuRun",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
   return EXCEPTION_EXECUTE_HANDLER;
 }
 
