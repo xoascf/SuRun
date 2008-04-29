@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <lm.h>
-#include <strsafe.h>
 #include "WinStaDesk.h"
 #include "IsAdmin.h"
 #include "Helpers.h"
@@ -95,9 +94,9 @@ int Run()
   si.cb = sizeof(STARTUPINFO);
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
-  StringCchCopy(un,2*UNLEN,g_RunData.UserName);
+  _tcscpy(un,g_RunData.UserName);
   PathStripPath(un);
-  StringCchCopy(dn,2*UNLEN,g_RunData.UserName);
+  _tcscpy(dn,g_RunData.UserName);
   PathRemoveFileSpec(dn);
   //Create the process suspended to revoke access for the current user 
   //before it starts runnung
@@ -201,7 +200,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     }else if (!_wcsicmp(c,L"/SETUP"))
     {
       bRunSetup=TRUE;
-      StringCchCopyW(g_RunData.cmdLine,4096,L"/SETUP");
+      wcscpy(g_RunData.cmdLine,L"/SETUP");
       break;
     }else if (!_wcsicmp(c,L"/TESTAA"))
     {
