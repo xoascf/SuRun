@@ -18,7 +18,6 @@
 #include <aclapi.h>
 #include <shlwapi.h>
 #include <userenv.h>
-#include <strsafe.h>
 #include "WinStaDesk.h"
 #include "ScreenSnap.h"
 #include "Setup.h"
@@ -569,15 +568,15 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     TCHAR SuRunExe[4096];
     GetSystemWindowsDirectory(SuRunExe,4096);
     PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
-    StringCchCat(SuRunExe,4096,L" ");
-    StringCchCat(SuRunExe,4096,DeskName);
-    StringCchCat(SuRunExe,4096,L" ");
-    StringCchCat(SuRunExe,4096,UserDesk);
+    _tcscat(SuRunExe,L" ");
+    _tcscat(SuRunExe,DeskName);
+    _tcscat(SuRunExe,L" ");
+    _tcscat(SuRunExe,UserDesk);
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb	= sizeof(si);
     TCHAR WinstaDesk[MAX_PATH];
-    StringCchPrintf(WinstaDesk,MAX_PATH,_T("%s\\%s"),WinSta,UserDesk);
+    _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
     si.lpDesktop = WinstaDesk;
     if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
     {
