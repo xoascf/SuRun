@@ -139,6 +139,12 @@ int Run()
   return RETVAL_OK;
 }
 
+//LONG ExceptionFilter(STRUCT _EXCEPTION_POINTERS *ExceptionInfo )
+//{
+//  return EXCEPTION_EXECUTE_HANDLER;
+//}
+
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // WinMain
@@ -146,6 +152,7 @@ int Run()
 //////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  //SetUnhandledExceptionFilter()
   if(HandleServiceStuff())
     return 0;
   //After the User presses OK, the service starts a clean SuRun exe with the 
