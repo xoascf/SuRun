@@ -1876,8 +1876,8 @@ bool HandleServiceStuff()
           if(!TSA)
             InitTrayShowAdmin();
           TSA=TRUE;
-          ProcessTrayShowAdmin();
-          Sleep(333);
+          if (!ProcessTrayShowAdmin())
+            Sleep(333);
         }else
         {
           if(TSA)
