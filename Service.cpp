@@ -1824,7 +1824,11 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
+#ifdef _WIN64
+      CreateMutex(NULL,true,_T("SuRun64_SysMenuHookIsRunning"));
+#else _WIN64
       CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
+#endif _WIN64
       if (GetLastError()==ERROR_ALREADY_EXISTS)
         return ExitProcess(-1),true;
       g_RunData.CliProcessId=GetCurrentProcessId();
