@@ -201,6 +201,42 @@ END
 /////////////////////////////////////////////////////////////////////////////
 
 
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Netherlands) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
+#ifdef _WIN32
+LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILENOTFOUND        "File not found: SuRun.exe"
+    IDS_ERR                 "SuRunExt.dll error"
+    IDS_TOOLTIP             "Launch control panel with administrative rights"
+    IDS_SURUN               "Control panel as administrator"
+    IDS_SURUNCMD            "'SuRun cmd' here"
+    IDS_SURUNEXP            "'SuRun Explorer' here"
+    IDS_RESTARTSHELL        "Do you really want to restart the Windows Shell\n(%s) with elevated rights??"
+    IDS_CPLNAME             "SuRun Settings"
+    IDS_MENURESTART         "Restart as administrator"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUSTART           "Start as administrator"
+END
+
+#endif    // Dutch (Netherlands) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
