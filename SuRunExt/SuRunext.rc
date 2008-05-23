@@ -217,20 +217,20 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_FILENOTFOUND        "File not found: SuRun.exe"
-    IDS_ERR                 "SuRunExt.dll error"
-    IDS_TOOLTIP             "Launch control panel with administrative rights"
-    IDS_SURUN               "Control panel as administrator"
-    IDS_SURUNCMD            "'SuRun cmd' here"
-    IDS_SURUNEXP            "'SuRun Explorer' here"
-    IDS_RESTARTSHELL        "Do you really want to restart the Windows Shell\n(%s) with elevated rights??"
-    IDS_CPLNAME             "SuRun Settings"
-    IDS_MENURESTART         "Restart as administrator"
+    IDS_FILENOTFOUND        "Bestand niet gevonden: SuRun.exe"
+    IDS_ERR                 "SuRunExt.dll fout"
+    IDS_TOOLTIP             "Configuratiescherm starten als Administrator"
+    IDS_SURUN               "Configuratiescherm als Administrator"
+    IDS_SURUNCMD            "'SuRun cmd' hier"
+    IDS_SURUNEXP            "'SuRun Explorer' hier"
+    IDS_RESTARTSHELL        "Wilt u echt de Windows Shell (%s)\nopnieuw starten met Administrator rechten??"
+    IDS_CPLNAME             "SuRun instellingen"
+    IDS_MENURESTART         "Opnieuw starten als Administrator"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_MENUSTART           "Start as administrator"
+    IDS_MENUSTART           "Start als Administrator"
 END
 
 #endif    // Dutch (Netherlands) resources
