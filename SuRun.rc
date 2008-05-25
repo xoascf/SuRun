@@ -2085,32 +2085,32 @@ END
 
 IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 178
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SuRun - Ikoon Help"
+CAPTION "SuRun - Verklaring symbolen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun start zonder meer het programma met verhoogde rechten",
+    LTEXT           "SuRun start het programma ALTIJD met verhoogde rechten",
                     IDC_STATIC,24,8,226,16
     ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun vraagt toestemming om het programma met verhoogde rechten te starten",
+    LTEXT           "SuRun vraagt toestemming om dit programma met verhoogde rechten te starten",
                     IDC_STATIC,24,26,226,16
     ICON            IDI_LISTICON6,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun start dit programma NOOIT met verhoogde rechten",
                     IDC_STATIC,24,44,226,16
     ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Als de Windows omgeving dit programma uitvoert, wordt het automatisch met verhoogde rechten gestart",
+    LTEXT           "Windows mag dit programma automatisch met verhoogde rechten starten",
                     IDC_STATIC,24,62,226,16
     ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Als het programma verhoogde rechten nodig heeft, stelt SuRun voor het als Administrator te starten.",
+    LTEXT           "Als dit programma verhoogde rechten nodig heeft, stelt SuRun voor het als Administrator te starten.",
                     IDC_STATIC,24,80,226,16
     ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Als de Windows omgeving dit programma uitvoert, wordt het NOOIT automatisch met verhoogde rechten gestart",
+    LTEXT           "Windows mag dit programma NIET automatisch met verhoogde rechten starten",
                     IDC_STATIC,24,98,226,16
     ICON            IDI_LISTICON5,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Als de gebruiker alleen bepaalde programma's met verhoogde rechten mag starten, is dat voor dit programm toegestaan",
+    LTEXT           "De gebruiker mag dit programma met verhoogde rechten starten",
                     IDC_STATIC,24,116,226,16
     ICON            IDI_LISTICON4,IDC_STATIC,8,134,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Als de gebruiker alleen bepaalde programma's met verhoogde rechten mag starten, is dat voor dit programm NIET toegestaan",
+    LTEXT           "De gebruiker mag dit programma NIET met verhoogde rechten starten",
                     IDC_STATIC,24,134,226,16
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,156,262,1
     DEFPUSHBUTTON   "Sluiten",IDCANCEL,105,160,50,14
@@ -2127,31 +2127,31 @@ BEGIN
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     ICON            IDI_LISTICON2,IDC_STATIC,18,31,20,20,SS_REALSIZEIMAGE
-    CONTROL         "vraag of het programma met verhoogde rechten mag worden gestart",
+    CONTROL         "vragen om dit programma met verhoogde rechten te starten",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,32,31,329,10
     ICON            IDI_LISTICON3,IDC_STATIC,18,44,20,20,SS_REALSIZEIMAGE
-    CONTROL         "het programma ALTIJD met verhoogde rechten starten",
+    CONTROL         "dit programma ALTIJD met verhoogde rechten starten",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,32,44,329,10
     ICON            IDI_LISTICON6,IDC_STATIC,18,57,20,20,SS_REALSIZEIMAGE
-    CONTROL         "het programma NOOIT met verhoogde rechten starten",
+    CONTROL         "dit programma NOOIT met verhoogde rechten starten",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,32,57,329,10
     ICON            IDI_LISTICON1,IDC_STATIC,18,74,20,20,SS_REALSIZEIMAGE
-    CONTROL         "alleen vragen als het programma verhoogde rechten nodig heeft. (Manifest, 'Install.exe' etc.)",
+    CONTROL         "vragen als het programma verhoogde rechten nodig heeft. (Manifest, 'Install.exe' etc.)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,32,74,329,10
     ICON            IDI_LISTICON,IDC_STATIC,18,87,20,20,SS_REALSIZEIMAGE
-    CONTROL         "start het programma automatisch met verhoogde rechten",
+    CONTROL         "het programma automatisch met verhoogde rechten starten",
                     IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,32,87,329,10
     ICON            IDI_LISTICON7,IDC_STATIC,18,100,20,20,SS_REALSIZEIMAGE
     CONTROL         "het programma NOOIT met verhoogde rechten starten",
                     IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,32,100,329,10
     ICON            IDI_LISTICON5,IDC_STATIC,18,117,20,20,SS_REALSIZEIMAGE
-    CONTROL         "de gebruiker is toegestaan het programma met verhoogde rechten te starten",
+    CONTROL         "de gebruiker mag het programma met verhoogde rechten starten",
                     IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,32,117,329,10
     ICON            IDI_LISTICON4,IDC_STATIC,18,130,20,20,SS_REALSIZEIMAGE
-    CONTROL         "de gebruiker is NIET toegestaan het programma met verhoogde rechten te starten",
+    CONTROL         "de gebruiker mag het programma NIET met verhoogde rechten starten",
                     IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,32,130,329,10
     DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
     PUSHBUTTON      "&Annuleren",IDCANCEL,304,152,50,14
@@ -2251,7 +2251,7 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Gebruiker toevoegen aan SuRunners groep"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Selecteer een gebruiker die toegevoegd moet worden aan de groep 'SuRunners':",
+    LTEXT           "Selecteer een gebruiker die aan de groep 'SuRunners' moet worden toegevoegd:",
                     IDC_STATIC,7,4,233,8
     CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
