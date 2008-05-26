@@ -420,7 +420,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   PROC p=DoHookFn(f,(char*)lpProcName);
   SetLastError(NOERROR);
   if(!p)
-    p=((lpGetProcAddress)hkGetPAdr.orgFunc)(hModule,lpProcName);;
+    p=((lpGetProcAddress)hkGetPAdr.orgFunc)(hModule,lpProcName);
   return p;
 }
 
