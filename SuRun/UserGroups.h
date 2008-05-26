@@ -40,6 +40,9 @@ void DeleteSuRunnersGroup();
 // Get the name of a well known group
 BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName);
 
+// rename User
+DWORD ChangeUserName(LPWSTR oldName,LPWSTR newName);
+
 // put/remove User "DomainAndName" in/from Group
 DWORD AlterGroupMember(LPCWSTR Group,LPCWSTR DomainAndName, BOOL bAdd);
 // put/remove User "DomainAndName" in/from Group GetGroupName("Rid")
