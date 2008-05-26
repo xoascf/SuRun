@@ -157,8 +157,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.6 - 2008-04-29:
-----------------------------
+SuRun 1.1.0.6 - 2008-05-26:
+---------------------------
+* Win64 "SuRun /SYSMEUHOOK" did not start SuRun32.bin (Mutex)
+* Dutch language resources, thanks to Stephan Paternotte
 * Added WatchDog: If SuRun stops responding while the safe desktop is active, a
     Window is shown that allows to switch back to the users desktop. Then on
     the users desktop a window is shown that allows switching back to the safe 
