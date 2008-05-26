@@ -2005,11 +2005,10 @@ BEGIN
     CONTROL         "Alleen bepaalde programma's met SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
-    CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,
-                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
-    CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",
-                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    252,30,137,10
+    CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
+                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+    CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     GROUPBOX        "Programmalijst voor de gebruiker (Wijzigingen zijn direct van toepassing, ook bij 'Annuleren').",
                     IDS_GRPDESC,6,46,378,187
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
@@ -2041,8 +2040,7 @@ BEGIN
                     301,10
     CTEXT           "LET OP: Wijzigingen komen van kracht bij de volgende Windows-aanmelding.",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Systeemvak-ikoon",
-                    IDC_STATIC,10,104,320,37
+    GROUPBOX        "Systeemvak-ikoon",IDC_STATIC,10,104,320,37
     CONTROL         "Toon informatie voor programma's die met verhoogde gebruikersrechten draaien",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
                     127,301,10
@@ -2162,13 +2160,13 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Toestemming vereist"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
     ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Meld u aan als systeembeheerder.",
-                    IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
+    LTEXT           "Meld u aan als systeembeheerder.",IDC_DLGQUESTION,51,7,
+                    205,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,46
     LTEXT           "Kies 'Annuleren' indien u niet zeker weet wat dit inhoudt!",
@@ -2187,7 +2185,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Wachtwoord vereist"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -2219,7 +2217,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Toestemming vereist"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -2271,7 +2269,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -2297,7 +2295,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -2332,12 +2330,12 @@ BEGIN
     LTEXT           "Wilt u SuRun deïnstalleren?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
     CONTROL         "SuRun instellingen behouden",IDC_KEEPREGISTRY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,50,108,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,50,308,10
     CONTROL         "Gebruikersgroep 'SuRunners' opheffen",IDC_DELSURUNNERS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,64,105,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,64,308,10
     CONTROL         "Voeg gebruikers in de groep 'SuRunners' toe aan Administrators",
                     IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    207,10
+                    308,10
     PUSHBUTTON      "&Annuleren",IDCANCEL,215,105,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -2349,7 +2347,7 @@ STYLE DS_ABSALIGN | DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND |
     DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Uitvoeren als..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
