@@ -84,6 +84,29 @@ BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName)
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// rename User
+//
+/////////////////////////////////////////////////////////////////////////////
+DWORD ChangeUserName(LPWSTR oldName,LPWSTR newName)
+{
+  TCHAR dn[2*UNLEN+2]={0};
+  _tcscpy(dn,_T("\\\\"));
+  _tcscat(dn,oldName);
+  PathRemoveFileSpec(dn);
+  TCHAR on[2*UNLEN+2]={0};
+  _tcscpy(on,oldName);
+  PathStripPath(on);
+  TCHAR nn[2*UNLEN+2]={0};
+  _tcscpy(nn,newName);
+  PathStripPath(nn);
+  USER_INFO_0 ui={0};
+  ui.usri0_name=nn;
+  DWORD dwErr=0;
+  return NetUserSetInfo(dn,on,0,(LPBYTE)&ui,&dwErr);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // AlterGroupMembership
 //
 //  Adds or removes "DOMAIN\User" from the local group "Group"
