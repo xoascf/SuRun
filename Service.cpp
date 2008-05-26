@@ -844,8 +844,6 @@ DWORD StartAdminProcessTrampoline()
         rd.CliProcessId=pi.dwProcessId;
         rd.CliThreadId=pi.dwThreadId;
         rd.KillPID=0;
-        CBigResStr newName(L"%s_sra",g_RunData.UserName);
-        _tcscpy(rd.UserName,newName);
         if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
           TerminateProcess(pi.hProcess,0);
         else if (!WriteProcessMemory(pi.hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
@@ -861,7 +859,6 @@ DWORD StartAdminProcessTrampoline()
           }
           //Add user to admins group
           AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
-          ChangeUserName(g_RunData.UserName,newName);
         }
         ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
@@ -870,7 +867,6 @@ DWORD StartAdminProcessTrampoline()
         {
           //Remove user from Administrators group
           AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
-          ChangeUserName(newName,g_RunData.UserName);
           //Reset status of "use of empty passwords for network logon"
           if (g_RunPwd[0]==0)
             AllowEmptyPW(bEmptyPWAllowed);
