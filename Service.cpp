@@ -1188,8 +1188,12 @@ void InstallRegistry()
   CResStr MenuStr(IDS_MENUSTR);
   CBigResStr DefCmd(L"%s \"%%1\" %%*",SuRunExe);
   //UnInstall
-  SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User run (SuRun)");
+  SetRegStr(HKLM,UNINSTL,L"DisplayName",L"Super User Run (SuRun)");
   SetRegStr(HKLM,UNINSTL,L"UninstallString",CBigResStr(L"%s /UNINSTALL",SuRunExe,SuRunExe));
+  SetRegStr(HKLM,UNINSTL,L"DisplayVersion",GetVersionString());
+  SetRegStr(HKLM,UNINSTL,L"Publisher",L"Kay Bruns");
+  SetRegStr(HKLM,UNINSTL,L"URLInfoAbout",L"http://kay-bruns.de/surun");
+  SetRegStr(HKLM,UNINSTL,L"DisplayIcon",SuRunExe);
   //AutoRun, System Menu Hook
   InstLog(CResStr(IDS_ADDAUTORUN));
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
