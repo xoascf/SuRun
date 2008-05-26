@@ -23,7 +23,6 @@
 #include <TCHAR.h>
 #include <shlwapi.h>
 #include <lm.h>
-#include <strsafe.h>
 #include "Helpers.h"
 #include "ResStr.h"
 #include "UserGroups.h"
@@ -91,14 +90,14 @@ BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName)
 DWORD ChangeUserName(LPWSTR oldName,LPWSTR newName)
 {
   TCHAR dn[2*UNLEN+2]={0};
-  StringCchCopy(dn,2*UNLEN,_T("\\\\"));
-  StringCchCat(dn,2*UNLEN,oldName);
+  _tcscpy(dn,_T("\\\\"));
+  _tcscat(dn,oldName);
   PathRemoveFileSpec(dn);
   TCHAR on[2*UNLEN+2]={0};
-  StringCchCopy(on,2*UNLEN,oldName);
+  _tcscpy(on,oldName);
   PathStripPath(on);
   TCHAR nn[2*UNLEN+2]={0};
-  StringCchCopy(nn,2*UNLEN,newName);
+  _tcscpy(nn,newName);
   PathStripPath(nn);
   USER_INFO_0 ui={0};
   ui.usri0_name=nn;
@@ -230,9 +229,9 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
   CResStr sCaption(IDS_APPNAME);
   if(bHimSelf)
   {
-    StringCchCat(sCaption,256,L" (");
-    StringCchCat(sCaption,256,UserName);
-    StringCchCat(sCaption,256,L")");
+    _tcscat(sCaption,L" (");
+    _tcscat(sCaption,UserName);
+    _tcscat(sCaption,L")");
   }
   //Is User member of Administrators?
   if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
@@ -332,12 +331,12 @@ HBITMAP USERLIST::GetUserBitmap(int nUser)
 HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
 {
   TCHAR un[2*UNLEN+2];
-  StringCchCopy(un,2*UNLEN,UserName);
+  _tcscpy(un,UserName);
   PathStripPath(un);
   for (int i=0;i<nUsers;i++) 
   {
     TCHAR UN[2*UNLEN+2]={0};
-    StringCchCopy(UN,2*UNLEN,User[i].UserName);
+    _tcscpy(UN,User[i].UserName);
     PathStripPath(UN);
     if (_tcsicmp(un,UN)==0)
       return User[i].UserBitmap;
@@ -399,7 +398,7 @@ void USERLIST::Add(LPWSTR UserName)
   if (j>=nUsers)
     User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
 //  DBGTrace1("-->AddUser: %s",UserName);
-  StringCchCopyW(User[j].UserName,2*UNLEN,UserName);
+  wcscpy(User[j].UserName,UserName);
   User[j].UserBitmap=LoadUserBitmap(UserName);
   nUsers++;
   return;
@@ -415,14 +414,14 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
   if(bScanDomain)
   {
     TCHAR dn[2*UNLEN+2]={0};
-    StringCchCopy(dn,2*UNLEN,GroupName);
+    _tcscpy(dn,GroupName);
     PathRemoveFileSpec(dn);
     LPTSTR dc=0;
     if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0)
       && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)) 
     {
       TCHAR gn[2*UNLEN+2]={0};
-      StringCchCopy(gn,2*UNLEN,GroupName);
+      _tcscpy(gn,GroupName);
       PathStripPath(gn);
       DWORD_PTR i=0;
       DWORD res=ERROR_MORE_DATA;
@@ -484,9 +483,9 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
         {
           TCHAR un[2*UNLEN+2]={0};
           TCHAR dn[2*UNLEN+2]={0};
-          StringCchCopy(un,2*UNLEN,p->lgrmi2_domainandname);
+          _tcscpy(un,p->lgrmi2_domainandname);
           PathStripPath(un);
-          StringCchCopy(dn,2*UNLEN,p->lgrmi2_domainandname);
+          _tcscpy(dn,p->lgrmi2_domainandname);
           PathRemoveFileSpec(dn);
           USER_INFO_2* b=0;
           LPTSTR dc=0;
