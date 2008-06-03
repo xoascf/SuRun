@@ -1,6 +1,9 @@
 
 ToDo
 ---------------------
+* "Show Warning for Admins with empty passwords" does not work with predefined 
+  Admin on XP Home
+* Windows Update Notifications do not seem to work any more for SuRunners
 * Eclipse (JAVA) and SuRuns IAT Hook conflict
 * "*" at the end of a command means "anything from here matches"
 * Switchable Easy/Expert Settings
