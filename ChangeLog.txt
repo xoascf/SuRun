@@ -5,7 +5,6 @@ ToDo
   Admin on XP Home
 * Don't show "Restart as Admin" in shell
 * Don't try to start automagically elevated "AsInvoker" Apps
-* Windows Update Notifications do not seem to work any more for SuRunners
 * TSA sometimes slows down the system
 * Eclipse (JAVA) and SuRuns IAT Hook conflict
 * "*" at the end of a command means "anything from here matches"
