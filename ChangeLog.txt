@@ -3,6 +3,8 @@ ToDo
 ---------------------
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
+* Don't show "Restart as Admin" in shell
+* Don't try to start automagically elevated "AsInvoker" Apps
 * Windows Update Notifications do not seem to work any more for SuRunners
 * TSA sometimes slows down the system
 * Eclipse (JAVA) and SuRuns IAT Hook conflict
