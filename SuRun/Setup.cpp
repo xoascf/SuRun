@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -464,6 +464,8 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   BOOL bRet=GetOpenFileName(&ofn);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
+  if (PathFileExists(FileName))
+    PathQuoteSpaces(FileName);
   return bRet;
   #undef ExpAdvReg
 }
@@ -521,6 +523,20 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     case MAKELPARAM(IDOK,BN_CLICKED):
       GetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName,4096);
+      //Test drive:
+      STARTUPINFO si={0};
+      si.cb	= sizeof(si);
+      PROCESS_INFORMATION pi={0};
+      if (CreateProcess(NULL,g_AppOpt.FileName,NULL,NULL,FALSE,
+        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+      {
+        TerminateProcess(pi.hProcess,0);
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+      }else
+        if (SafeMsgBox(hwnd,CBigResStr(IDS_APPOK),CResStr(IDS_APPNAME),
+          MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDNO)
+          return TRUE;
       *g_AppOpt.Flags=0;
       if (IsDlgButtonChecked(hwnd,IDC_NOASK2))
         *g_AppOpt.Flags|=FLAG_DONTASK;
