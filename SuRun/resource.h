@@ -30,6 +30,7 @@
 #define IDS_STARTMENUDIR                25
 #define IDS_SURUNSTUCK                  26
 #define IDS_SWITCHBACK                  27
+#define IDS_APPOK                       28
 #define IDS_GRPDESC                     29
 #define IDS_DOMAINGROUPS                31
 #define IDS_ADDFILETOLIST               31
