@@ -24,7 +24,6 @@
 #include <lm.h>
 #include <commctrl.h>
 #include <shlwapi.h>
-#include <strsafe.h>
 #include "Setup.h"
 #include "Helpers.h"
 #include "BlowFish.h"
@@ -199,8 +198,8 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
         GetSystemWindowsDirectory(cmd,4096);
         PathAppend(cmd,L"SuRun.exe");
         PathQuoteSpaces(cmd);
-        StringCchCat(cmd,4096,L" /RUNAS ");
-        StringCchCat(cmd,4096,v);
+        _tcscat(cmd,L" /RUNAS ");
+        _tcscat(cmd,v);
         SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,n);
         SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun\\command"),L"",t,
           (BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
@@ -931,7 +930,7 @@ EditApp:
             TCHAR cmd[4096];
             TCHAR CMD[4096];
             ListView_GetItemText(hWL,CurSel,3,cmd,4096);
-            StringCchCopy(CMD,4096,cmd);
+            _tcscpy(CMD,cmd);
             LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
             DWORD f=GetWhiteListFlags(u,cmd,0);
             if (GetFileName(hwnd,f,CMD))
@@ -1201,7 +1200,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       {
         TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
         GetWindowText(hwnd,WndText,MAX_PATH);
-        StringCchPrintf(newText,MAX_PATH,WndText,GetVersionString());
+        _stprintf(newText,WndText,GetVersionString());
         SetWindowText(hwnd,newText);
       }
       //Tab Control
