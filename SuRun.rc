@@ -541,6 +541,7 @@ BEGIN
     IDS_STARTMENUDIR        "SuRun"
     IDS_SURUNSTUCK          "SuRun is not responding!\n\nThis can be caused by a host intrusion protection system (HIPS)\nthat ist trying to tell you something.\n\nClick here to switch back to your desktop."
     IDS_SWITCHBACK          "Click here to switch\nback to SuRuns Desktop."
+    IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Cz³onkowie tej grupy mog¹ u¿ywaæ SuRun."
     IDS_ADDFILETOLIST       "Enter file name and command line"
 END
@@ -1206,6 +1207,7 @@ BEGIN
     IDS_STARTMENUDIR        "SuRun"
     IDS_SURUNSTUCK          "SuRun reagiert nicht!\n\nDas kann von einem Host Intrusion Protection System (HIPS)\nverursacht werden, das Ihnen etwas mitteilen will.\n\nKlicken Sie hier, um auf Ihren Desktop umzuschalten."
     IDS_SWITCHBACK          "Klicken Sie hier, um auf SuRuns\nDesktop zurückzuschalten."
+    IDS_APPOK               "Die Kommandozeile scheint nicht zu funktionieren.\n\nSind Sie sicher, dass der Befehl ok so it?\n(Anführungszeichen korrekt gesetzt?)"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
     IDS_ADDFILETOLIST       "Geben Sie Dateinamen und Kommandozeilenparameter an"
 END
@@ -1856,6 +1858,7 @@ BEGIN
     IDS_STARTMENUDIR        "SuRun"
     IDS_SURUNSTUCK          "SuRun is not responding!\n\nThis can be caused by a host intrusion protection system (HIPS)\nthat ist trying to tell you something.\n\nClick here to switch back to your desktop."
     IDS_SWITCHBACK          "Click here to switch\nback to SuRuns Desktop."
+    IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Members of this group can use SuRun."
     IDS_ADDFILETOLIST       "Enter file name and command line"
 END
@@ -2321,7 +2324,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Deïnstalleren"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Deïnstalleren >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -2330,12 +2333,12 @@ BEGIN
     LTEXT           "Wilt u SuRun deïnstalleren?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
     CONTROL         "SuRun instellingen behouden",IDC_KEEPREGISTRY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,17,50,308,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,18,50,108,10
     CONTROL         "Gebruikersgroep 'SuRunners' opheffen",IDC_DELSURUNNERS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,64,308,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,64,105,10
     CONTROL         "Voeg gebruikers in de groep 'SuRunners' toe aan Administrators",
                     IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    308,10
+                    207,10
     PUSHBUTTON      "&Annuleren",IDCANCEL,215,105,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -2460,6 +2463,7 @@ BEGIN
     IDS_STARTMENUDIR        "SuRun"
     IDS_SURUNSTUCK          "SuRun reageert niet!\n\nMogelijk wil een ""host intrusion protection system"" (HIPS) \nu hiervan melding maken.\n\nKlik hier om terug te schakelen naar het bureaublad."
     IDS_SWITCHBACK          "Klik hier om terug te schakelen\nnaar SuRuns bureaublad."
+    IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Leden van deze groep kunnen SuRun gebruiken."
     IDS_ADDFILETOLIST       "Voer bestandsnaam en opdracht in"
 END
