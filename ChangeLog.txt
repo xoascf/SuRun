@@ -1,20 +1,20 @@
-Done:
+Done, to be tested:
 ---------------------
 * Automatic quotes when adding files to the users program list
 * Setup does a test run of added/edited commands
+* Don't show "Restart as Admin" in shell
+* Don't try to start automagically elevated "AsInvoker" Apps
 
 ToDo
 ---------------------
-* "Show Warning for Admins with empty passwords" does not work with predefined 
-  Admin on XP Home
-* Don't show "Restart as Admin" in shell
-* Don't try to start automagically elevated "AsInvoker" Apps
-* TSA sometimes slows down the system
-* Eclipse (JAVA) and SuRuns IAT Hook conflict
 * "*" at the end of a command means "anything from here matches"
 * Switchable Easy/Expert Settings
 * Configurable "Do not display messages" Option
 * "Require user password for SuRun Setings" Option
+* "Show Warning for Admins with empty passwords" does not work with predefined 
+  Admin on XP Home
+* TSA sometimes slows down the system
+* Eclipse (JAVA) and SuRuns IAT Hook conflict
 
 To be done in future:
 ---------------------
