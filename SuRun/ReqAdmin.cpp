@@ -29,7 +29,7 @@ BOOL RequiresAdmin(xml_node& document)
   {
     TCHAR name[4096];
     _tcscpy(name,xn.name());
-    LPTSTR p=_tcschr(name,':');
+    LPTSTR p=_tcschr(name,':'); //p point to name after ":" is any
     if (p)
       p++;
     else
@@ -46,6 +46,12 @@ BOOL RequiresAdmin(xml_node& document)
         xml_node x1 = xn.first_element_by_attribute(name,_T("level"),_T("requireAdministrator"));
         if (!x1.empty())
           bReqAdmin=TRUE;
+        else
+        {
+          x1 = xn.first_element_by_name(name);
+          if (!x1.empty())
+            bReqAdmin=2;
+        }
       }
     }
   }
@@ -112,7 +118,10 @@ BOOL RequiresAdmin(LPCTSTR FileName)
     {
       bReqAdmin=FALSE;
       InfoDBGTrace1("RequiresAdmin(%s) EnumResourceNames failed",FName);
-    }else if(!bReqAdmin)
+    }else if(bReqAdmin==2)
+      //requestedExecutionLevel present, but Admin not required
+      return FALSE;
+    else if(!bReqAdmin)
     {
       TCHAR s[4096];
       _stprintf(s,_T("%s.%s"),FName,_T("manifest"));
@@ -120,6 +129,9 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       if (xml.parse_file(s))
       {
         bReqAdmin=RequiresAdmin(xml.document());
+        if(bReqAdmin==2)
+          //requestedExecutionLevel present, but Admin not required
+          return FALSE;
         if(bReqAdmin)
           InfoDBGTrace1("RequiresAdmin(%s) external Manifest OK",FName);
       }else
