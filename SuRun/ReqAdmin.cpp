@@ -3,19 +3,20 @@
 #include <windows.h>
 #include <tchar.h>
 #include <shlwapi.h>
-//Define this in any implementation, before "pugxml.h", to be notified of API campatibility.
-#define PUGAPI_VARIANT 0x58475550	//The Pug XML library variant we are using in this implementation.
-#define PUGAPI_VERSION_MAJOR 1		//The Pug XML library major version we are using in this implementation.
-#define PUGAPI_VERSION_MINOR 2		//The Pug XML library minor version we are using in this implementation.
-//Include the Pug XML library.
-#include "pugxml.h"
-#include <strsafe.h>
 #include "DBGTrace.h"
 #pragma comment(lib,"shlwapi.lib")
 
 #define InfoDBGTrace(msg)                             {(void)0;}
 #define InfoDBGTrace1(msg,d1)                         {(void)0;}
 #define InfoDBGTrace2(msg,d1,d2)                      {(void)0;}
+
+//Define this in any implementation, before "pugxml.h", to be notified of API campatibility.
+#define PUGAPI_VARIANT 0x58475550	//The Pug XML library variant we are using in this implementation.
+#define PUGAPI_VERSION_MAJOR 1		//The Pug XML library major version we are using in this implementation.
+#define PUGAPI_VERSION_MINOR 2		//The Pug XML library minor version we are using in this implementation.
+//Include the Pug XML library.
+#include "pugxml.h"
+
 
 using namespace std;
 using namespace pug;
@@ -27,21 +28,21 @@ BOOL RequiresAdmin(xml_node& document)
   if (!xn.empty())
   {
     TCHAR name[4096];
-    StringCchCopy(name,4096,xn.name());
+    _tcscpy(name,xn.name());
     LPTSTR p=_tcschr(name,':'); //p point to name after ":" is any
     if (p)
       p++;
     else
       p=name;
-    StringCchCopy(p,256,_T("security"));
+    _tcscpy(p,_T("security"));
     xn = xn.first_element_by_name(name);
     if (!xn.empty())
     {
-      StringCchCopy(p,256,_T("requestedPrivileges"));
+      _tcscpy(p,_T("requestedPrivileges"));
       xn = xn.first_element_by_name(name);
       if (!xn.empty())
       {
-        StringCchCopy(p,256,_T("requestedExecutionLevel"));
+        _tcscpy(p,_T("requestedExecutionLevel"));
         xml_node x1 = xn.first_element_by_attribute(name,_T("level"),_T("requireAdministrator"));
         if (!x1.empty())
           bReqAdmin=TRUE;
@@ -102,7 +103,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
 BOOL RequiresAdmin(LPCTSTR FileName)
 {
   TCHAR FName[4096];
-  StringCchCopy(FName,4096,FileName);
+  _tcscpy(FName,FileName);
   PathRemoveArgs(FName);
   PathUnquoteSpaces(FName);
   BOOL bReqAdmin=FALSE;
@@ -123,7 +124,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
     else if(!bReqAdmin)
     {
       TCHAR s[4096];
-      StringCchPrintf(s,4096,_T("%s.%s"),FName,_T("manifest"));
+      _stprintf(s,_T("%s.%s"),FName,_T("manifest"));
       xml_parser xml;
       if (xml.parse_file(s))
       {
@@ -144,9 +145,9 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       TCHAR file[4096];
       TCHAR ext[4096];
       //Get File, Ext
-      StringCchCopy(file,4096,FName);
+      _tcscpy(file,FName);
       _tcsupr(file);
-      StringCchCopy(ext,4096,PathFindExtension(file));
+      _tcscpy(ext,PathFindExtension(file));
       PathRemoveExtension(file);
       PathStripPath(file);
       InfoDBGTrace1("RequiresAdmin(%s) Extension match???",ext);
