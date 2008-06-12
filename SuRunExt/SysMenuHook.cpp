@@ -60,6 +60,17 @@ extern HINSTANCE l_hInst; //the local Dll instance
 extern UINT      WM_SYSMH0;
 extern UINT      WM_SYSMH1;
 
+BOOL g_IsShell=-1;
+BOOL IsShell()
+{
+  if (g_IsShell!=-1)
+    return g_IsShell;
+  DWORD ShellID=0;
+  GetWindowThreadProcessId(GetShellWindow(),&ShellID);
+  g_IsShell=GetCurrentProcessId()==ShellID;
+  return g_IsShell;
+}
+
 LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if(nCode>=0)
@@ -84,7 +95,8 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         && IsMenu((HMENU)wps->wParam) 
         && (!IsAdmin()))
       {
-        if( GetRestartAsAdmin
+        if( GetRestartAsAdmin 
+        && (!IsShell())
         && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1))
           AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART));
         if( GetStartAsAdmin
@@ -112,20 +124,18 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
     _tcscat(cmd,_T(" "));
-    TCHAR PID[10];
-    if (msg->wParam==WM_SYSMH0)
-    {
-      //Are we inside the Shell Process?
-      DWORD ShellID=0;
-      GetWindowThreadProcessId(GetShellWindow(),&ShellID);
-      if ((GetCurrentProcessId()==ShellID)
-        &&(SafeMsgBox(0,CResStr(l_hInst,IDS_RESTARTSHELL,GetCommandLine()),
-                      L"SuRun",MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
-        return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
-      _tcscat(cmd,_T("/KILL "));
-      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
-      _tcscat(cmd,_T(" "));
-    }
+//    TCHAR PID[10];
+//    if (msg->wParam==WM_SYSMH0)
+//    {
+//      //Are we inside the Shell Process?
+//      if (IsShell()
+//        &&(SafeMsgBox(0,CResStr(l_hInst,IDS_RESTARTSHELL,GetCommandLine()),
+//                      L"SuRun",MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
+//        return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
+//      _tcscat(cmd,_T("/KILL "));
+//      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
+//      _tcscat(cmd,_T(" "));
+//    }
     _tcscat(cmd,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
