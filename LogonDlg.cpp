@@ -302,7 +302,8 @@ void SetWindowSizes(HWND hDlg)
   if (dx>0) 
   {
     MoveWnd(hDlg,-dx/2,0,dx,0);
-    for (int i=0;i<countof(SX_Ctrls);i++)
+    int i;
+    for (i=0;i<countof(SX_Ctrls);i++)
       MoveDlgCtrl(hDlg,SX_Ctrls[i],0,0,dx,0);
     for (i=0;i<countof(MX_Ctrls);i++)
       MoveDlgCtrl(hDlg,MX_Ctrls[i],dx,0,0,0);
@@ -312,7 +313,8 @@ void SetWindowSizes(HWND hDlg)
   if (dy>0)
   {
     MoveWnd(hDlg,0,-dy/2,0,dy);
-    for (int i=0;i<countof(SY_Ctrls);i++)
+    int i;
+    for (i=0;i<countof(SY_Ctrls);i++)
       MoveDlgCtrl(hDlg,SY_Ctrls[i],0,0,0,dy);
     for (i=0;i<countof(MY_Ctrls);i++)
       MoveDlgCtrl(hDlg,MY_Ctrls[i],0,dy,0,0);
