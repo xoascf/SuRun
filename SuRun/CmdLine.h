@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <TCHAR.h>
 #include <SHLWAPI.H>
-#include <strsafe.h>
 #pragma comment(lib,"ShlWapi.lib")
 
 class CCmdLine
