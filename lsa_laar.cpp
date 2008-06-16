@@ -22,7 +22,6 @@
 #include <windows.h>
 #include <ntsecapi.h>
 #include <TCHAR.h>
-#include <strsafe.h>
 #include "lsa_laar.h"
 
 class LsaUnicodeString: public _LSA_UNICODE_STRING
