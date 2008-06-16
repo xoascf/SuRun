@@ -152,7 +152,8 @@ BOOL AccountPrivilege(LPTSTR Account,LPTSTR Privilege,PrivOp op)
         sid = malloc( sidlen ); // max SID length (we hope)
         InitializeSid( sid, GetSidIdentifierAuthority( s ),
           (BYTE) 1 + ssac );
-        for (DWORD d = 0; d < (DWORD)ssac; ++ d )
+        DWORD d;
+        for (d = 0; d < (DWORD)ssac; ++ d )
           *GetSidSubAuthority( sid, d ) = *GetSidSubAuthority( s, d );
         *GetSidSubAuthority( sid, d ) = sidList->RelativeId;
         switch (op)
