@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <shlwapi.h>
+#include <strsafe.h>
 #include "DBGTrace.h"
 #pragma comment(lib,"shlwapi.lib")
 
@@ -28,21 +29,21 @@ BOOL RequiresAdmin(xml_node& document)
   if (!xn.empty())
   {
     TCHAR name[4096];
-    _tcscpy(name,xn.name());
+    StringCchCopy(name,4096,xn.name());
     LPTSTR p=_tcschr(name,':'); //p point to name after ":" is any
     if (p)
       p++;
     else
       p=name;
-    _tcscpy(p,_T("security"));
+    StringCchCopy(p,256,_T("security"));
     xn = xn.first_element_by_name(name);
     if (!xn.empty())
     {
-      _tcscpy(p,_T("requestedPrivileges"));
+      StringCchCopy(p,256,_T("requestedPrivileges"));
       xn = xn.first_element_by_name(name);
       if (!xn.empty())
       {
-        _tcscpy(p,_T("requestedExecutionLevel"));
+        StringCchCopy(p,256,_T("requestedExecutionLevel"));
         xml_node x1 = xn.first_element_by_attribute(name,_T("level"),_T("requireAdministrator"));
         if (!x1.empty())
           bReqAdmin=TRUE;
@@ -103,7 +104,7 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
 BOOL RequiresAdmin(LPCTSTR FileName)
 {
   TCHAR FName[4096];
-  _tcscpy(FName,FileName);
+  StringCchCopy(FName,4096,FileName);
   PathRemoveArgs(FName);
   PathUnquoteSpaces(FName);
   BOOL bReqAdmin=FALSE;
@@ -124,7 +125,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
     else if(!bReqAdmin)
     {
       TCHAR s[4096];
-      _stprintf(s,_T("%s.%s"),FName,_T("manifest"));
+      StringCchPrintf(s,4096,_T("%s.%s"),FName,_T("manifest"));
       xml_parser xml;
       if (xml.parse_file(s))
       {
@@ -145,9 +146,9 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       TCHAR file[4096];
       TCHAR ext[4096];
       //Get File, Ext
-      _tcscpy(file,FName);
+      StringCchCopy(file,4096,FName);
       _tcsupr(file);
-      _tcscpy(ext,PathFindExtension(file));
+      StringCchCopy(ext,4096,PathFindExtension(file));
       PathRemoveExtension(file);
       PathStripPath(file);
       InfoDBGTrace1("RequiresAdmin(%s) Extension match???",ext);
