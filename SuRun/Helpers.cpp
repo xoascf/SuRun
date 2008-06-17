@@ -20,6 +20,7 @@
 #include <ShlGuid.h>
 #include <lm.h>
 #include <MMSYSTEM.H>
+#include <strsafe.h>
 
 #include "Helpers.h"
 #include "DBGTRace.h"
@@ -489,7 +490,7 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
   DWORD dwErr=WNetGetUniversalName(path,UNIVERSAL_NAME_INFO_LEVEL,puni,&cb);
   if (dwErr!=NO_ERROR)
     return FALSE;
-  _tcscpy(path,puni->lpUniversalName);
+  StringCchCopy(path,4096,puni->lpUniversalName);
   return TRUE;
 }
 
@@ -502,7 +503,7 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
 //Combine path parts
 void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
-  _tcscpy(Dst,path);
+  StringCchCopy(Dst,4096,path);
   PathAppend(Dst,file);
   PathAddExtension(Dst,ext);
 }
@@ -511,12 +512,12 @@ void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
 void Split(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
   //Get Path
-  _tcscpy(path,app);
+  StringCchCopy(path,4096,app);
   PathRemoveFileSpec(path);
   //Get File, Ext
-  _tcscpy(file,app);
+  StringCchCopy(file,4096,app);
   PathStripPath(file);
-  _tcscpy(ext,PathFindExtension(file));
+  StringCchCopy(ext,4096,PathFindExtension(file));
   PathRemoveExtension(file);
 }
 
@@ -526,7 +527,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
   if (path[0]=='.')
   {
     //relative path: make it absolute
-    _tcscpy(app,CurDir);
+    StringCchCopy(app,4096,CurDir);
     PathAppend(app,path);
     PathCanonicalize(path,app);
     Combine(app,path,file,ext);
@@ -538,19 +539,19 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
       return PathFileExists(app)
         && (!PathIsDirectory(app));
     //Root of current drive
-    _tcscpy(path,CurDir);
+    StringCchCopy(path,4096,CurDir);
     PathStripToRoot(path);
     Combine(app,path,file,ext);
   }
   if (path[0]==0)
   {
-    _tcscpy(path,app);
+    StringCchCopy(path,4096,app);
     LPCTSTR d[2]={CurDir,0};
     // file.ext ->search in current dir and %path%
     if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
     {
       //Done!
-      _tcscpy(app,path);
+      StringCchCopy(app,4096,path);
       PathRemoveFileSpec(path);
       return TRUE;
     }
@@ -558,12 +559,12 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
     //Not found! Try all Extensions for Executables
     // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
     {
-      _stprintf(path,L"%s%s",file,ExeExts[i]);
+      StringCchPrintf(path,4096,L"%s%s",file,ExeExts[i]);
       if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
       {
         //Done!
-        _tcscpy(app,path);
-        _tcscpy(ext,ExeExts[i]);
+        StringCchCopy(app,4096,path);
+        StringCchCopy(ext,4096,ExeExts[i]);
         PathRemoveFileSpec(path);
         return TRUE;
       }
@@ -594,7 +595,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
     if ((PathFileExists(app))&&(!PathIsDirectory(app)))
     {
       //Done!
-      _tcscpy(ext,ExeExts[i]);
+      StringCchCopy(ext,4096,ExeExts[i]);
       return TRUE;
     }
   }
@@ -613,7 +614,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   zero(app);
   static TCHAR args[4096]={0};
   zero(args);
-  _tcscpy(args,CmdLine);
+  StringCchCopy(args,4096,CmdLine);
   PathRemoveBlanks(args);
   //Clean up double spaces or unneeded quotes
   LPTSTR p=&args[0];
@@ -625,13 +626,13 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathRemoveBlanks(p);
     PathUnquoteSpaces(p);
     PathQuoteSpaces(p);
-    _tcscat(app,p);
+    StringCchCat(app,4096,p);
     if (p1 && *p1)
-        _tcscat(app,_T(" "));
+        StringCchCat(app,4096,_T(" "));
     p=p1;
   }
   //Save parameters
-  _tcscpy(args,PathGetArgs(app));
+  StringCchCopy(args,4096,PathGetArgs(app));
   PathRemoveArgs(app);
   PathUnquoteSpaces(app);
   NetworkPathToUNCPath(app);
@@ -651,7 +652,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
   {
     if (args[0]==0) 
-      wcscpy(args,L"/e, C:");
+      StringCchCopyW(args,4096,L"/e, C:");
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"explorer.exe");
   }else 
@@ -661,7 +662,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
     if (!PathFileExists(app))
-      wcscpy(app,L"msconfig");
+      StringCchCopyW(app,4096,L"msconfig");
     zero(args);
   }else
   //Control Panel special folder files:
@@ -674,10 +675,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathAppend(app,L"explorer.exe");
     if (LOBYTE(LOWORD(GetVersion()))<6)
       //2k/XP: Control Panel is beneath "my computer"!
-      wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+      StringCchCopyW(args,4096,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
     else
       //Vista: Control Panel is beneath desktop!
-      wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+      StringCchCopyW(args,4096,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
   }else if (((!_wcsicmp(app,L"ncpa.cpl")) && (args[0]==0))
     ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"ncpa")) && (!_wcsicmp(ext,L".cpl"))))
   {
@@ -685,16 +686,16 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathAppend(app,L"explorer.exe");
     if (LOBYTE(LOWORD(GetVersion()))<6)
       //2k/XP: Control Panel is beneath "my computer"!
-      wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+      StringCchCopyW(args,4096,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
     else
       //Vista: Control Panel is beneath desktop!
-      wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+      StringCchCopyW(args,4096,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
   }else 
   //*.reg files
   if (!_wcsicmp(ext, L".reg")) 
   {
     PathQuoteSpaces(app);
-    wcscpy(args,app);
+    StringCchCopyW(args,4096,app);
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"regedit.exe");
   }else
@@ -703,10 +704,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   {
     PathQuoteSpaces(app);
     if (args[0] && app[0])
-      wcscat(app,L",");
-    wcscat(app,args);
-    wcscpy(args,L"shell32.dll,Control_RunDLLAsUser ");
-    wcscat(args,app);
+      StringCchCatW(app,4096,L",");
+    StringCchCatW(app,4096,args);
+    StringCchCopyW(args,4096,L"shell32.dll,Control_RunDLLAsUser ");
+    StringCchCatW(args,4096,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"rundll32.exe");
   }else 
@@ -716,13 +717,13 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathQuoteSpaces(app);
     if (args[0] && app[0])
     {
-      wcscat(app,L" ");
-      wcscat(app,args);
-      wcscpy(args,app);
+      StringCchCatW(app,4096,L" ");
+      StringCchCatW(app,4096,args);
+      StringCchCopyW(args,4096,app);
     }else
     {
-      wcscpy(args,L"/i ");
-      wcscat(args,app);
+      StringCchCopyW(args,4096,L"/i ");
+      StringCchCatW(args,4096,app);
     }
     GetSystemDirectory(app,4096);
     PathAppend(app,L"msiexec.exe");
@@ -734,32 +735,32 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     {
       GetSystemDirectory(path,4096);
       PathAppend(path,app);
-      wcscpy(app,path);
+      StringCchCopyW(app,4096,path);
       zero(path);
     }
     PathQuoteSpaces(app);
     if (args[0] && app[0])
-      wcscat(app,L" ");
-    wcscat(app,args);
-    wcscpy(args,app);
+      StringCchCatW(app,4096,L" ");
+    StringCchCatW(app,4096,args);
+    StringCchCopyW(args,4096,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"mmc.exe");
   }else
   //Try to fully qualify the executable:
   if (!QualifyPath(app,path,file,ext,CurDir))
   {
-    _tcscpy(app,CmdLine);
+    StringCchCopy(app,4096,CmdLine);
     PathRemoveArgs(app);
     PathUnquoteSpaces(app);
     NetworkPathToUNCPath(app);
     Split(app,path,file,ext);
   }
-  wcscpy(cmd,app);
+  StringCchCopyW(cmd,4096,app);
   fExist=PathFileExists(app);
   PathQuoteSpaces(cmd);
   if (args[0] && app[0])
-    wcscat(cmd,L" ");
-  wcscat(cmd,args);
+    StringCchCatW(cmd,4096,L" ");
+  StringCchCatW(cmd,4096,args);
   return fExist;
 }
 
@@ -773,16 +774,16 @@ BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname,int iIcon)
 {
   //Save parameters
   TCHAR args[4096]={0};
-  _tcscpy(args,PathGetArgs(fname));
+  StringCchCopy(args,4096,PathGetArgs(fname));
   //Application
   TCHAR app[4096]={0};
-  _tcscpy(app,fname);
+  StringCchCopy(app,4096,fname);
   PathRemoveArgs(app);
   PathUnquoteSpaces(app);
   NetworkPathToUNCPath(app);
   //Get Path
   TCHAR path[4096];
-  _tcscpy(path,app);
+  StringCchCopy(path,4096,app);
   PathRemoveFileSpec(path);
   if (!PathFileExists(app))
     return false;
@@ -826,14 +827,14 @@ bool DeleteDirectory(LPCTSTR DIR)
   bool bRet=true;
   WIN32_FIND_DATA fd={0};
   TCHAR s[4096];
-  _tcscpy(s,DIR);
+  StringCchCopy(s,4096,DIR);
   PathAppend(s,_T("*.*"));
   HANDLE hFind=FindFirstFile(s,&fd);
   if (hFind != INVALID_HANDLE_VALUE)
   {
     do
     {
-      _tcscpy(s,DIR);
+      StringCchCopy(s,4096,DIR);
       PathAppend(s,fd.cFileName);
       if (PathIsDirectory(s))
       {
@@ -870,14 +871,14 @@ bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain/*=0*/)
     return FALSE;
   if(Domain==0)
   {
-    _tcscpy(User, dName);
+    StringCchCopy(User,DNLEN+UNLEN,dName);
     if(_tcslen(User))
-      _tcscat(User, TEXT("\\"));
-    _tcscat(User,uName);
+      StringCchCat(User,DNLEN+UNLEN,TEXT("\\"));
+    StringCchCat(User,DNLEN+UNLEN,uName);
   }else
   {
-    _tcscpy(User, uName);
-    _tcscpy(Domain, dName);
+    StringCchCopy(User,DNLEN+UNLEN,uName);
+    StringCchCopy(Domain,DNLEN+UNLEN,dName);
   }
   return TRUE;
 }
@@ -1004,7 +1005,7 @@ LPCTSTR GetVersionString()
     VerQueryValue(VerInfo,_T("\\"),(void**)&Ver,&cbVer);
     if (cbVer)
     {
-      _stprintf(verstr,_T("%d.%d.%d.%d"),
+      StringCchPrintf(verstr,20,_T("%d.%d.%d.%d"),
         Ver->dwProductVersionMS>>16 & 0x0000FFFF,
         Ver->dwProductVersionMS     & 0x0000FFFF,
         Ver->dwProductVersionLS>>16 & 0x0000FFFF,
@@ -1032,7 +1033,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   PathUnquoteSpaces(PicDir);
   PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
   TCHAR Pic[UNLEN+1];
-  _tcscpy(Pic,UserName);
+  StringCchCopy(Pic,UNLEN,UserName);
   PathStripPath(Pic);
   PathAppend(PicDir,Pic);
   PathAddExtension(PicDir,_T(".bmp"));
