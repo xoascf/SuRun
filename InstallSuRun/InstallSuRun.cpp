@@ -15,6 +15,7 @@
 #include <windows.h>
 #include <shlwapi.h>
 #include <stdio.h>
+#include <strsafe.h>
 #pragma comment(lib,"shlwapi.lib")
 
 typedef UINT (WINAPI* GETSYSWOW64DIRA)(LPSTR, UINT);
