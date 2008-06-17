@@ -24,6 +24,7 @@
 #include <initguid.h>
 #include <shlwapi.h>
 #include <lmcons.h>
+#include <strsafe.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -412,7 +413,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
       TCHAR path[4096];
       DragQueryFile((HDROP)m.hGlobal, 0, path, countof(path));
       if (PathIsDirectory(path))
-        _tcscpy(m_ClickFolderName,path);
+        StringCchCopy(m_ClickFolderName,4096,path);
       ReleaseStgMedium(&m);
     }else if (SUCCEEDED(pDataObj->GetData(&fe1,&m)))
     {
@@ -421,7 +422,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
       {
         LPCITEMIDLIST pidlItem0=(LPCITEMIDLIST)(((LPBYTE)m.hGlobal)+((LPIDA)m.hGlobal)->aoffset[1]);
         if(SHGetPathFromIDList(pidlItem0,s))
-          _tcscpy(m_ClickFolderName,s);
+          StringCchCopy(m_ClickFolderName,4096,s);
       }
       ReleaseStgMedium(&m);
     }
@@ -471,7 +472,7 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
 {
   CResStr s(l_hInst,IDS_TOOLTIP);
   if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(s)))
-    wcscpy((LPWSTR)pszName,s);
+    StringCchCopyW((LPWSTR)pszName,cchMax,s);
   return NOERROR;
 }
 
@@ -489,15 +490,15 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
     if (m_pDeskClicked)
-      _tcscat(cmd,L" control");
+      StringCchCat(cmd,4096,L" control");
     else
     {
       if (LOWORD(lpcmi->lpVerb)==0)
-        _tcscat(cmd,L" cmd /D /T:4E /K cd /D ");
+        StringCchCat(cmd,4096,L" cmd /D /T:4E /K cd /D ");
       else
-        _tcscat(cmd,L" explorer /e, ");
+        StringCchCat(cmd,4096,L" explorer /e, ");
       PathQuoteSpaces(m_ClickFolderName);
-      _tcscat(cmd,m_ClickFolderName);
+      StringCchCat(cmd,4096,m_ClickFolderName);
     }
     // Start the child process.
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
@@ -557,7 +558,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   static TCHAR cmd[4096];
   zero(cmd);
   //check if this Programm has an Auto-SuRun-Entry in the List
-  _tcscpy(tmp,pei->lpFile);
+  StringCchCopy(tmp,4096,pei->lpFile);
   PathQuoteSpaces(tmp);
   //Verb must be "open" or empty
   BOOL bNoAutoRun=TRUE;
@@ -574,7 +575,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,countof(cmd)-1,tmp);
       if (!cmd[0])
         return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
-      _tcscpy(tmp,cmd);
+      StringCchCopy(tmp,4096,cmd);
       bNoAutoRun=FALSE;
     }else
     {
@@ -584,13 +585,13 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }
   if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
   {
-    _tcscat(tmp,L" ");
-    _tcscat(tmp,pei->lpParameters);
+    StringCchCat(tmp,4096,L" ");
+    StringCchCat(tmp,4096,pei->lpParameters);
   }
   static TCHAR CurDir[4096];
   zero(CurDir);
   if (pei->lpDirectory && (*pei->lpDirectory) )
-    _tcscpy(CurDir,pei->lpDirectory);
+    StringCchCopy(CurDir,4096,pei->lpDirectory);
   else
     GetCurrentDirectory(countof(CurDir),CurDir);
   
@@ -609,8 +610,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   //ToDo: Directly write to service pipe!
   static PROCESS_INFORMATION rpi;
   zero(rpi);
-  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
-    GetCurrentProcessId(),&rpi,tmp);
+  StringCchPrintf(&cmd[wcslen(cmd)],4096-wcslen(cmd),
+    L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&rpi,tmp);
   //DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
