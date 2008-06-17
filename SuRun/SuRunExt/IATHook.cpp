@@ -286,7 +286,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   static TCHAR CurDir[4096];
   zero(CurDir);
   if (lpCurDir && *lpCurDir)
-    _tcscpy(CurDir,lpCurDir);
+    StringCchCopy(CurDir,4096,lpCurDir);
   else
     GetCurrentDirectory(countof(CurDir),CurDir);
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
@@ -294,17 +294,17 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   zero(cmd);
   if(lpApp)
   {
-    wcscat(cmd,lpApp);
+    StringCchCatW(cmd,4096,lpApp);
     PathQuoteSpacesW(cmd);
     if (parms)
       //lpApplicationName and the first token of lpCommandLine are the same
       //we need to check this:
       parms=PathGetArgsW(lpCmd);
     if (parms)
-      wcscat(cmd,L" ");
+      StringCchCatW(cmd,4096,L" ");
   }
   if (parms)
-    wcscat(cmd,parms);
+    StringCchCatW(cmd,4096,parms);
   PROCESS_INFORMATION rpi={0};
   //ToDo: Directly write to service pipe!
   {
@@ -326,8 +326,8 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
       return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
-    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
-      GetCurrentProcessId(),&rpi,tmp);
+    StringCchPrintf(&cmd[wcslen(cmd)],4096-wcslen(cmd),
+      L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&rpi,tmp);
   }
   //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
   static STARTUPINFOW si;
