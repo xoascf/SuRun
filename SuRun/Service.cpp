@@ -32,6 +32,7 @@
 #include <Psapi.h>
 #include <Tlhelp32.h>
 #include <Wtsapi32.h>
+#include <strsafe.h>
 #include "Setup.h"
 #include "Service.h"
 #include "IsAdmin.h"
@@ -271,7 +272,7 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
       TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      StringCchPrintf(WinstaDesk,MAX_PATH,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
@@ -288,7 +289,7 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
         rd.RetPtr=0;
         rd.RetPID=0;
         rd.IconId=IconId;
-        _tcscpy(rd.cmdLine,Text);
+        StringCchCopy(rd.cmdLine,4096,Text);
         DWORD_PTR n=0;
         if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
           TerminateProcess(pi.hProcess,0);
@@ -396,8 +397,8 @@ ChkAdmin:
             if (PasswordOK(u.GetUserName(i),0,TRUE))
             {
               DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
-              _tcscat(un,u.GetUserName(i));
-              _tcscat(un,_T("\n"));
+              StringCchCat(un,4096,u.GetUserName(i));
+              StringCchCat(un,4096,_T("\n"));
             }
           if(un[0])
             ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
@@ -486,9 +487,9 @@ ChkAdmin:
               GetSystemWindowsDirectory(cmd,4096);
               PathAppend(cmd,L"SuRun.exe");
               PathQuoteSpaces(cmd);
-              _tcscat(cmd,L" /AskPID ");
+              StringCchCat(cmd,4096,L" /AskPID ");
               TCHAR PID[10];
-              _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
+              StringCchCat(cmd,10,_itot(g_RunData.CliProcessId,PID,10));
               EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
               EnablePrivilege(SE_INCREASE_QUOTA_NAME);
               BYTE bRunCount=0;
@@ -581,7 +582,7 @@ LPCTSTR GetShellName(LPCTSTR clsid,LPCTSTR DefName)
   if (!s[0])
     GetRegStr(HKCR,CResStr(L"CLSID\\%s",clsid),L"",s,MAX_PATH);
   if (!s[0])
-    _tcscpy(s,DefName);
+    StringCchCopy(s,MAX_PATH,DefName);
   return s;
 }
 
@@ -604,7 +605,7 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
   };
   static TCHAR c1[4096];
   zero(c1);
-  _tcscpy(c1,cmd);
+  StringCchCopy(c1,4096,cmd);
   bool bOk=false;
   for (int i=0;i<countof(shn);i++)
   {
@@ -614,22 +615,22 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
       bOk=TRUE;
       *c=0;
       TCHAR c2[4096];
-      _stprintf(c2,L"%s%s%s",
+      StringCchPrintf(c2,4096,L"%s%s%s",
         c1,
         GetShellName(&shn[i].clsid[2],CResStr(shn[i].nId)),
         &c[_tcslen(shn[i].clsid)]);
-      _tcscpy(c1,c2);
+      StringCchCopy(c1,4096,c2);
     }
   }
   if (bOk)
-    _tcscpy(c1,CBigResStr(IDS_BEAUTIFIED,cmd,c1));
+    StringCchCopy(c1,4096,CBigResStr(IDS_BEAUTIFIED,cmd,c1));
   return c1;
 }
 
 //int tx()
 //{
 //  TCHAR cmd[4096]={0};
-//  _tcscpy(cmd,L"C:\\Windows\\Exploer.exe /e, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{208D2C60-3AEA-1069-A2D7-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{871C5380-42A0-1069-A2EA-08002B30309D}");
+//  StringCchCopy(cmd,4096,L"C:\\Windows\\Exploer.exe /e, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{208D2C60-3AEA-1069-A2D7-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{871C5380-42A0-1069-A2EA-08002B30309D}");
 //  DBGTrace1("%s",BeautifyCmdLine(cmd));
 //
 //  ::ExitProcess(0);
@@ -813,7 +814,7 @@ DWORD StartAdminProcessTrampoline()
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
       TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      StringCchPrintf(WinstaDesk,MAX_PATH,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
@@ -888,7 +889,7 @@ DWORD StartAdminProcessTrampoline()
             rd.RetPID=0;
             rd.IconId=IDI_SHIELD;
             rd.TimeOut=20000;
-            _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
+            StringCchCopy(rd.cmdLine,4096,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
             if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
               TerminateProcess(pi.hProcess,0);
             ResumeThread(pi.hThread);
@@ -931,7 +932,7 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
       TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      StringCchPrintf(WinstaDesk,MAX_PATH,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
@@ -993,7 +994,7 @@ DWORD GetShellProcessId(DWORD SessionID)
     if (pwtspi[Process].SessionId!=g_RunData.SessionID)
       continue;
     TCHAR PName[MAX_PATH]={0};
-    _tcscpy(PName,pwtspi[Process].pProcessName);
+    StringCchCopy(PName,MAX_PATH,pwtspi[Process].pProcessName);
     PathStripPath(PName);
     if (_tcsicmp(Shell,PName)==0)
       return WTSFreeMemory(pwtspi), pwtspi[Process].ProcessId;
@@ -1078,7 +1079,7 @@ void SuRun(DWORD ProcessID)
 //        GetSystemWindowsDirectory(cmd,4096);
 //        PathAppend(cmd,L"SuRun.exe");
 //        PathQuoteSpaces(cmd);
-//        _tcscat(cmd,L" /SYSMENUHOOK");
+//        StringCchCat(cmd,4096,L" /SYSMENUHOOK");
 //        DirectStartUserProcess(GetShellProcessId(g_RunData.SessionID),cmd);
       }else
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
@@ -1329,7 +1330,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
     GetSystemWindowsDirectory(SvcFile,4096);
     PathAppend(SvcFile,_T("SuRun.exe"));
     PathQuoteSpaces(SvcFile);
-    _stprintf(cmdLine,_T("%s /QUIET %s %s"),SvcFile,ModName,cmd);
+    StringCchPrintf(cmdLine,4096,_T("%s /QUIET %s %s"),SvcFile,ModName,cmd);
     STARTUPINFO si={0};
     PROCESS_INFORMATION pi;
     si.cb = sizeof(si);
@@ -1345,7 +1346,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
       WaitFor(CheckServiceStatus()==WaitStat);
     }
   }
-  _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
+  StringCchPrintf(cmdLine,4096,_T("%s %s"),ModName,cmd);
   if (!RunAsAdmin(cmdLine,nResId))
     return FALSE;
   WaitFor(CheckServiceStatus()==WaitStat);
@@ -1358,7 +1359,7 @@ void DelFile(LPCTSTR File)
   {
     CBigResStr tmp(_T("%s.tmp"),File);
     while (_trename(File,tmp))
-      _tcscat(tmp,L".tmp");
+      StringCchCat(tmp,4096,L".tmp");
     InstLog(CBigResStr(IDS_DELFILEBOOT,(LPCTSTR)tmp));
     MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
   }
@@ -1483,7 +1484,7 @@ BOOL InstallService()
   GetSystemWindowsDirectory(SvcFile,4096);
   PathAppend(SvcFile,_T("SuRun.exe"));
   PathQuoteSpaces(SvcFile);
-  _tcscat(SvcFile,_T(" /ServiceRun"));
+  StringCchCat(SvcFile,4096,_T(" /ServiceRun"));
   SC_HANDLE hdlServ = CreateService(hdlSCM,SvcName,SvcName,STANDARD_RIGHTS_REQUIRED,
                           SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,
                           SERVICE_ERROR_NORMAL,SvcFile,0,0,0,0,0);
@@ -1526,7 +1527,7 @@ BOOL InstallService()
 //    GetSystemWindowsDirectory(file,4096);
 //    PathAppend(file,L"SuRun.exe");
 //    PathQuoteSpaces(file);
-//    _tcscat(file,L" /UNINSTALL");
+//    StringCchCat(file,4096,L" /UNINSTALL");
 //    CreateLink(file,lnk,1);
 //    CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
@@ -1554,7 +1555,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
         TCHAR WndText[MAX_PATH]={0},newText[MAX_PATH]={0};
         GetWindowText(hwnd,WndText,MAX_PATH);
-        _stprintf(newText,WndText,GetVersionString());
+        StringCchPrintf(newText,MAX_PATH,WndText,GetVersionString());
         SetWindowText(hwnd,newText);
       }
       SendDlgItemMessage(hwnd,IDC_QUESTION,WM_SETFONT,
@@ -1774,7 +1775,7 @@ BOOL UserUninstall()
 //////////////////////////////////////////////////////////////////////////////
 static void CheckForEmptyAdminPasswords()
 {
-  _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
+  StringCchCopy(g_RunData.cmdLine,4096,_T("/CHECKFOREMPTYADMINPASSWORDS"));
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if(hPipe==INVALID_HANDLE_VALUE)
     return;
