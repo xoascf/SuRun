@@ -14,6 +14,7 @@
 #pragma once
 
 #include <tchar.h>
+#include <strsafe.h>
 #include "helpers.h"
 #include "IsAdmin.h"
 #include "resstr.h"
