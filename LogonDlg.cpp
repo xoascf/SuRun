@@ -18,6 +18,7 @@
 #include <shlwapi.h>
 #include <lm.h>
 #include <commctrl.h>
+#include <strsafe.h>
 #include "Isadmin.h"
 #include "BlowFish.h"
 #include "ResStr.h"
@@ -48,9 +49,9 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword)
 {
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(un,User);
+  StringCchCopy(un,2*UNLEN,User);
   PathStripPath(un);
-  _tcscpy(dn,User);
+  StringCchCopy(dn,2*UNLEN,User);
   PathRemoveFileSpec(dn);
   HANDLE hToken=NULL;
   EnablePrivilege(SE_CHANGE_NOTIFY_NAME);
@@ -510,8 +511,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                   else
                     DeleteRunAsPassword(p->User,User);
                 }
-                _tcscpy(p->User,User);
-                _tcscpy(p->Password,Pass);
+                StringCchCopy(p->User,2*UNLEN,User);
+                StringCchCopy(p->Password,PWLEN,Pass);
                 CloseHandle(hUser);
                 zero(Pass);
                 EndDialog(hwnd,ExitCode);
