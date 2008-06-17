@@ -19,6 +19,7 @@
 #include <tchar.h>
 #include <Psapi.h>
 #include <shlwapi.h>
+#include <strsafe.h>
 
 #include "SysMenuHook.h"
 #include "../DBGTrace.H"
@@ -123,7 +124,7 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     GetSystemWindowsDirectory(cmd, 4096);
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
-    _tcscat(cmd,_T(" "));
+    StringCchCat(cmd,4096,_T(" "));
 //    TCHAR PID[10];
 //    if (msg->wParam==WM_SYSMH0)
 //    {
@@ -132,11 +133,11 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
 //        &&(SafeMsgBox(0,CResStr(l_hInst,IDS_RESTARTSHELL,GetCommandLine()),
 //                      L"SuRun",MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
 //        return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
-//      _tcscat(cmd,_T("/KILL "));
-//      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
-//      _tcscat(cmd,_T(" "));
+//      StringCchCat(cmd,4096,_T("/KILL "));
+//      StringCchCat(cmd,4096,_itot(GetCurrentProcessId(),PID,10));
+//      StringCchCat(cmd,4096,_T(" "));
 //    }
-    _tcscat(cmd,GetCommandLine());
+    StringCchCat(cmd,4096,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
       CloseHandle(pi.hProcess);
