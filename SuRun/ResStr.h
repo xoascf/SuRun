@@ -38,7 +38,7 @@ public:
     LoadString(m_hInst,nID,S,_S-1);
     va_list va;
     va_start(va,nID);
-    _vstprintf(m_str,S,va);
+    StringCchVPrintf(m_str,_S,S,va);
     va_end(va);
   }
   CResourceString(HINSTANCE hInst,int nID,...)
@@ -48,7 +48,7 @@ public:
     LoadString(m_hInst,nID,S,_S-1);
     va_list va;
     va_start(va,nID);
-    _vstprintf(m_str,S,va);
+    StringCchVPrintf(m_str,_S,S,va);
     va_end(va);
   }
   CResourceString(LPCTSTR s,...)
@@ -56,7 +56,7 @@ public:
     m_hInst=GetModuleHandle(0);
     va_list va;
     va_start(va,s);
-    _vstprintf(m_str,s,va);
+    StringCchVPrintf(m_str,_S,s,va);
     va_end(va);
   }
   CResourceString(int nID,va_list va)
@@ -64,14 +64,14 @@ public:
     m_hInst=GetModuleHandle(0);
     TCHAR S[_S];
     LoadString(m_hInst,nID,S,_S-1);
-    _vstprintf(m_str,S,va);
+    StringCchVPrintf(m_str,_S,S,va);
   }
   CResourceString(HINSTANCE hInst,va_list va)
   {
     m_hInst=hInst;
     TCHAR S[_S];
     LoadString(hInst,nID,S,_S-1);
-    _vstprintf(m_str,S,va);
+    StringCchVPrintf(m_str,_S,S,va);
   }
   const LPCTSTR operator =(int nID)
   {
