@@ -39,7 +39,7 @@ SuRun Changes:
 
 SuRun 1.1.0.6 refresh - 2008-05-26:
 -----------------------------------
-* Win64 "SuRun /SYSMEUHOOK" did not start SuRun32.bin (Mutex)
+* Win64 "SuRun /SYSMENUHOOK" did not start SuRun32.bin (Mutex)
 * Dutch language resources, thanks to Stephan Paternotte
 
 SuRun 1.1.0.6 - 2008-04-29:
