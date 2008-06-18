@@ -30,6 +30,7 @@
 #if defined(PUGOPT_MEMFIL) | defined(PUGOPT_NONSEG)
 #	include <assert.h>
 #endif
+#include <strsafe.h>
 
 
 #ifndef HIWORD
