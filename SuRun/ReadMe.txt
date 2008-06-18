@@ -159,7 +159,7 @@ Changes:
 
 SuRun 1.1.0.6 - 2008-05-26:
 ---------------------------
-* Win64 "SuRun /SYSMEUHOOK" did not start SuRun32.bin (Mutex)
+* Win64 "SuRun /SYSMENUHOOK" did not start SuRun32.bin (Mutex)
 * Dutch language resources, thanks to Stephan Paternotte
 * Added WatchDog: If SuRun stops responding while the safe desktop is active, a
     Window is shown that allows to switch back to the users desktop. Then on
