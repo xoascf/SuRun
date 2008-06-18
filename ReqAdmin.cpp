@@ -3,6 +3,12 @@
 #include <windows.h>
 #include <tchar.h>
 #include <shlwapi.h>
+//Define this in any implementation, before "pugxml.h", to be notified of API campatibility.
+#define PUGAPI_VARIANT 0x58475550	//The Pug XML library variant we are using in this implementation.
+#define PUGAPI_VERSION_MAJOR 1		//The Pug XML library major version we are using in this implementation.
+#define PUGAPI_VERSION_MINOR 2		//The Pug XML library minor version we are using in this implementation.
+//Include the Pug XML library.
+#include "pugxml.h"
 #include <strsafe.h>
 #include "DBGTrace.h"
 #pragma comment(lib,"shlwapi.lib")
@@ -10,14 +16,6 @@
 #define InfoDBGTrace(msg)                             {(void)0;}
 #define InfoDBGTrace1(msg,d1)                         {(void)0;}
 #define InfoDBGTrace2(msg,d1,d2)                      {(void)0;}
-
-//Define this in any implementation, before "pugxml.h", to be notified of API campatibility.
-#define PUGAPI_VARIANT 0x58475550	//The Pug XML library variant we are using in this implementation.
-#define PUGAPI_VERSION_MAJOR 1		//The Pug XML library major version we are using in this implementation.
-#define PUGAPI_VERSION_MINOR 2		//The Pug XML library minor version we are using in this implementation.
-//Include the Pug XML library.
-#include "pugxml.h"
-
 
 using namespace std;
 using namespace pug;
