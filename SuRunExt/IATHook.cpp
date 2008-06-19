@@ -140,6 +140,18 @@ PROC DoHookFn(char* DllName,char* ImpName)
   return false;
 }
 
+PROC GetOrgFn(char* DllName,char* ImpName)
+{
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
+    return 0;
+  if(*DllName && *ImpName)
+    for(int i=0;i<countof(hdt);i++)
+      if (stricmp(hdt[i]->DllName,DllName)==0)
+        if (stricmp(hdt[i]->FuncName,ImpName)==0)
+          return hdt[i]->orgFunc;
+  return false;
+}
+
 DWORD HookIAT(HMODULE hMod)
 {
   DWORD nHooked=0;
@@ -417,7 +429,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
   PathStripPathA(f);
-  PROC p=DoHookFn(f,(char*)lpProcName);
+  PROC p=GetOrgFn/*DoHookFn*/(f,(char*)lpProcName);
   SetLastError(NOERROR);
   if(!p)
     p=((lpGetProcAddress)hkGetPAdr.orgFunc)(hModule,lpProcName);
