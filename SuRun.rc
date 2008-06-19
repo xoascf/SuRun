@@ -95,7 +95,7 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
-    CONTROL         "The can only run predefined programs with elevated rights",
+    CONTROL         "User can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
@@ -1354,7 +1354,7 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
-    CONTROL         "The can only run predefined programs with elevated rights",
+    CONTROL         "User can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
