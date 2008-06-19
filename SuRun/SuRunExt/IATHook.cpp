@@ -429,7 +429,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
   PathStripPathA(f);
-  PROC p=GetOrgFn/*DoHookFn*/(f,(char*)lpProcName);
+  PROC p=DoHookFn(f,(char*)lpProcName);
   SetLastError(NOERROR);
   if(!p)
     p=((lpGetProcAddress)hkGetPAdr.orgFunc)(hModule,lpProcName);
