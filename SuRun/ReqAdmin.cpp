@@ -60,7 +60,7 @@ BOOL RequiresAdmin(xml_node& document)
 
 BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lParam)
 {
-  BOOL bContinue=TRUE;
+  BOOL bAbort=FALSE;
   *((BOOL*)lParam)=FALSE;
   HRSRC hr=FindResource(hExe,rName,RT_MANIFEST);
   DWORD siz=SizeofResource(hExe,hr);
@@ -92,12 +92,12 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
   {
     xml_parser xml; //Construct.
     if (xml.parse(Manifest))
-      bContinue=!RequiresAdmin(xml.document());
+      bAbort=RequiresAdmin(xml.document());
   }
   free(Manifest);
-  if (!bContinue)
-    *((BOOL*)lParam)=TRUE;
-  return bContinue;
+  if (bAbort)
+    *((BOOL*)lParam)=bAbort;
+  return bAbort!=1;
 }
 
 BOOL RequiresAdmin(LPCTSTR FileName)
