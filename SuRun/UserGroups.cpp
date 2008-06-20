@@ -380,7 +380,8 @@ void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
 
 void USERLIST::Add(LPWSTR UserName)
 {
-  for(int j=0;j<nUsers;j++)
+  int j=0;
+  for(;j<nUsers;j++)
   {
     int cr=_tcsicmp(User[j].UserName,UserName);
     if (cr==0)
