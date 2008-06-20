@@ -23,6 +23,7 @@
 #include <ntsecapi.h>
 #include <TCHAR.h>
 #include "lsa_laar.h"
+#pragma warning(disable : 4996)
 
 class LsaUnicodeString: public _LSA_UNICODE_STRING
 {
