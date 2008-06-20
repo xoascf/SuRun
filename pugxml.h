@@ -317,7 +317,8 @@ inline static bool strwnorm(TCHAR** s)
 	memset(norm,0,sizeof(TCHAR)*(n+1)); //Zero it.
 	long j = 1;
 	norm[0] = (*s)[0];
-	for(long i=1; i<n; ++i) //For each character, starting at offset 1.
+  long i=1;
+	for(; i<n; ++i) //For each character, starting at offset 1.
 	{
 		if((*s)[i] < _T('!')) //Whitespace-like.
 		{
@@ -1814,7 +1815,11 @@ inline static void outer_xml(std::basic_ostream<TCHAR,std::char_traits<TCHAR> > 
 //<summary>Abstract iterator class for interating over a node's members.</summary>
 //<remarks>Used as base class for 'xml_node_iterator' and 'xml_attribute_iterator'.</remarks>
 template <class _Ty,class _Diff,class _Pointer,class _Reference>
+#if _MSC_VER>1200
+class xml_iterator : public std::_Ranit<_Ty,_Diff,class _Pointer,class _Reference>
+#else
 class xml_iterator : public std::_Ranit<_Ty,_Diff>
+#endif
 {
 protected:
 	xml_node_struct* _vref; //A pointer to the node over which to iterate.
@@ -2384,7 +2389,9 @@ public:
 	bool has_siblings() { return (!empty() && siblings() > 0); } //Node has one or more siblings.
 	bool has_name() { return (!empty() && _root->name != 0); } //Node has a name.
 #ifndef _WIN64 //"const stdstring& name" is "const TCHAR* name" in Win64
+#if _MSC_VER<=1200
 	bool has_name(const stdstring& name) { return has_name(name.c_str()); } //Node is named 'name'.
+#endif
 #endif  _WIN64
 	bool has_attribute(const stdstring& name) { return has_attribute(name.c_str()); } //Node has an attribute named 'name'.
 #ifdef PUGOPT_NONSEG
@@ -3439,7 +3446,8 @@ public:
 		{
 			xml_node_struct* p = _root->child[i]; //Keep a pointer to this node so we can free it.
 			--n;
-			for(unsigned int j=i; j<n; ++j) //Shift everything left from this point on.
+      unsigned int j=i;
+			for(; j<n; ++j) //Shift everything left from this point on.
 				_root->child[j] = _root->child[j+1];
 			_root->child[j] = NULL; //Mark the last element null.
 			--_root->children; //One less children.
