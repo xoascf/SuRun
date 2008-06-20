@@ -1815,7 +1815,7 @@ inline static void outer_xml(std::basic_ostream<TCHAR,std::char_traits<TCHAR> > 
 //<summary>Abstract iterator class for interating over a node's members.</summary>
 //<remarks>Used as base class for 'xml_node_iterator' and 'xml_attribute_iterator'.</remarks>
 template <class _Ty,class _Diff,class _Pointer,class _Reference>
-#if _MSC_VER>1200
+#if _MSC_VER>1300
 class xml_iterator : public std::_Ranit<_Ty,_Diff,class _Pointer,class _Reference>
 #else
 class xml_iterator : public std::_Ranit<_Ty,_Diff>
