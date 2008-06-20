@@ -20,6 +20,7 @@
 #include <stdarg.h>
 
 #include <lmerr.h>
+#pragma warning(disable : 4996)
 
 void GetErrorName(int ErrorCode,LPTSTR s)
 {
