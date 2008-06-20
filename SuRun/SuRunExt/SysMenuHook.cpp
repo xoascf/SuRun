@@ -31,7 +31,7 @@
 
 #pragma comment(lib,"PSAPI")
 #pragma comment(lib,"shlwapi")
-#ifndef _WIN64
+/*#ifndef _WIN64
 #pragma comment(linker,"/DELAYLOAD:user32.dll")
 #pragma comment(linker,"/DELAYLOAD:gdi32.dll")
 #pragma comment(linker,"/DELAYLOAD:netapi32.dll")
@@ -40,7 +40,7 @@
 #pragma comment(linker,"/DELAYLOAD:psapi.dll")
 #pragma comment(linker,"/DELAYLOAD:shlwapi.dll")
 #pragma comment(lib,"Delayimp")
-#endif _WIN64
+#endif _WIN64*/
 
 //////////////////////////////////////////////////////////////////////////////
 //
