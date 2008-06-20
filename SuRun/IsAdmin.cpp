@@ -22,6 +22,7 @@
 
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"advapi32.lib")
+#pragma warning(disable : 4996)
 //////////////////////////////////////////////////////////////////////////////
 // 
 // IsAdmin  
