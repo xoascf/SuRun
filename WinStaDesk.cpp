@@ -301,7 +301,7 @@ void DenyUserAccessToDesktop(HDESK hDesk)
 class CRunOnNewDeskTop
 {
 public:
-  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCreateBkWnd,bool bFadeIn);
+  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,LPCTSTR UserDesk,bool bCreateBkWnd,bool bFadeIn);
   ~CRunOnNewDeskTop();
   bool IsValid();
   void CleanUp();
@@ -316,6 +316,7 @@ private:
   HDESK   m_hdeskSave;
   HDESK   m_hdeskUser;
   HDESK   m_hDeskSwitch;
+  HDESK   m_hDeskSwitchUser;
 public:
   CBlurredScreen m_Screen;
 };
@@ -397,9 +398,11 @@ CStayOnDeskTop* g_StayOnDesk=NULL;
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCreateBkWnd,bool bFadeIn)
+CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
+                                   LPCTSTR UserDesk,bool bCreateBkWnd,bool bFadeIn)
 {
   m_hDeskSwitch=NULL;
+  m_hDeskSwitchUser=NULL;
   m_hwinstaUser=NULL;
   m_bOk=FALSE;
   //Get current WindowStation and Desktop
@@ -433,15 +436,26 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,bool bCre
     if (!SetProcessWindowStation(m_hwinstaUser))
       DBGTrace1("CRunOnNewDeskTop::SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
   }
+  //Set Access to the user Desktop
+  {
+    HANDLE hTok=0;
+    OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hTok);
+    SetAccessToWinDesk(hTok,0,UserDesk,true);
+    //Switch to the user desktop
+    m_hDeskSwitchUser=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
+    SetAccessToWinDesk(hTok,0,UserDesk,false);
+    CloseHandle(hTok);
+    hTok=0;
+  }
   //Get interactive Desktop
   m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP/*DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL*/);
-  if (!m_hDeskSwitch)
+  if ((!m_hDeskSwitch)&&(!m_hDeskSwitchUser))
   {
     DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
     return;
   }
   //Set Interactive Desktop as current Desktop to get the Desktop Bitmap
-  if (!SetThreadDesktop(m_hDeskSwitch))
+  if (!SetThreadDesktop(m_hDeskSwitch?m_hDeskSwitch:m_hDeskSwitchUser))
     DBGTrace1("CRunOnNewDeskTop::SetThreadDesktop(m_hDeskSwitch) failed!: %s",GetLastErrorNameStatic());
   //Create Background Bitmap
   if (bCreateBkWnd)
@@ -488,9 +502,20 @@ void CRunOnNewDeskTop::SwitchToOwnDesk()
 
 void CRunOnNewDeskTop::SwitchToUserDesk()
 {
-  //Switch to the new Desktop
-  if (!SwitchDesktop(m_hDeskSwitch))
-    DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
+  for(;;)
+  {
+    //Switch to the new Desktop
+    if (!SwitchDesktop(m_hDeskSwitch?m_hDeskSwitch:m_hDeskSwitchUser))
+    {
+      DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
+      if (!SwitchDesktop(m_hDeskSwitchUser))
+        DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic())
+      else
+        return;
+    }else
+      return;
+    Sleep(100);
+  }
 }
 
 void CRunOnNewDeskTop::FadeOut()
@@ -500,14 +525,21 @@ void CRunOnNewDeskTop::FadeOut()
 
 void CRunOnNewDeskTop::CleanUp()
 {
+  //GrantUserAccessToDesktop(m_hDeskSwitch);
+  SwitchToUserDesk();
   //Switch back to the interactive Desktop
   if(m_hDeskSwitch)
   {
-    //GrantUserAccessToDesktop(m_hDeskSwitch);
-    SwitchToUserDesk();
     if (!CloseDesktop(m_hDeskSwitch))
       DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
     m_hDeskSwitch=NULL;
+  }
+  //Switch back to the interactive Desktop
+  if(m_hDeskSwitchUser)
+  {
+    if (!CloseDesktop(m_hDeskSwitchUser))
+      DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
+    m_hDeskSwitchUser=NULL;
   }
   //Delete Background Window
   if(m_bOk)
@@ -585,7 +617,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     }
   }else
     DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
-  CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,BlurDesk,bFade);
+  CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   if (!rond)
     return false;
   if (!rond->IsValid())
