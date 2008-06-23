@@ -4,11 +4,12 @@ Done, to be tested:
 * Setup does a test run of added/edited commands
 * Don't show "Restart as Admin" in shell
 * Don't try to start automagically elevated "AsInvoker" Apps
+* SwitchDesktop back to user desktop failed after LockWindowStation
 
 ToDo
 ---------------------
+* LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
 * "*" at the end of a command means "anything from here matches"
-* SwitchDesktop back to user fails after user logged off (AutoRun)
 * Switchable Easy/Expert Settings
 * Configurable "Do not display messages" Option
 * "Require user password for SuRun Setings" Option
