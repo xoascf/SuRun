@@ -8,6 +8,7 @@ Done, to be tested:
 ToDo
 ---------------------
 * "*" at the end of a command means "anything from here matches"
+* SwitchDesktop back to user fails after user logged off (AutoRun)
 * Switchable Easy/Expert Settings
 * Configurable "Do not display messages" Option
 * "Require user password for SuRun Setings" Option
