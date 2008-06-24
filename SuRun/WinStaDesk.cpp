@@ -619,11 +619,11 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   if (!rond)
-    return false;
+    return DeleteSafeDesktop(false),false;
   if (!rond->IsValid())
   {
     delete rond;
-    return false;
+    return DeleteSafeDesktop(false),false;
   }
   g_RunOnNewDesk=rond;
   g_StayOnDesk=new CStayOnDeskTop(DeskName);
