@@ -5,6 +5,7 @@ Done, to be tested:
 * Don't show "Restart as Admin" in shell
 * Don't try to start automagically elevated "AsInvoker" Apps
 * SwitchDesktop back to user desktop failed after LockWindowStation
+* The "Could not create safe Desktop" message caused the WatchDog showing up
 
 ToDo
 ---------------------
