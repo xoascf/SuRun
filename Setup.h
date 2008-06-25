@@ -54,8 +54,8 @@
 #define GetBlurDesk       (GetOption(_T("BlurDesktop"),1)!=0)
 #define SetBlurDesk(b)    SetOption(_T("BlurDesktop"),b,1)
 
-#define GetFadeDesk       (GetOption(_T("FadeDesktop"),1)!=0)
-#define SetFadeDesk(b)    SetOption(_T("FadeDesktop"),b,1)
+#define GetFadeDesk       (GetOption(_T("FadeDesktop"),0)!=0)
+#define SetFadeDesk(b)    SetOption(_T("FadeDesktop"),b,0)
 
 //Minutes to wait until "Is that OK?" is asked again
 #define GetPwTimeOut      min(60,max(0,(int)GetOption(_T("AskTimeOut"),0)))
