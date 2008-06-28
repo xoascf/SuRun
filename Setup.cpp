@@ -1254,7 +1254,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     }//WM_NOTIFY
   case WM_TIMER:
     if ((wParam==1265142)&& g_WatchDogEvent)
-      return SetEvent(g_WatchDogEvent),FALSE;
+      SetEvent(g_WatchDogEvent);
     return TRUE;
   case WM_COMMAND:
     {
@@ -1267,7 +1267,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
 #ifdef _DEBUG 
         Sleep(5000); //Show Watchdog!
 #endif _DEBUG 
-        break;
+        return TRUE;
       case MAKELPARAM(IDCANCEL,BN_CLICKED):
         g_SD->DlgExitCode=IDCANCEL;
         EndDialog(hwnd,0);
