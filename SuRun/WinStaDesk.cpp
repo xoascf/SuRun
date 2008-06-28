@@ -511,19 +511,25 @@ void CRunOnNewDeskTop::SwitchToOwnDesk()
 
 void CRunOnNewDeskTop::SwitchToUserDesk()
 {
-  for(;;)
+  for(;m_hDeskSwitch && m_hDeskSwitchUser;Sleep(100))
   {
     //Switch to the new Desktop
-    if (!SwitchDesktop(m_hDeskSwitch?m_hDeskSwitch:m_hDeskSwitchUser))
+    if (m_hDeskSwitch)
     {
-      DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
-      if (!SwitchDesktop(m_hDeskSwitchUser))
-        DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic())
-      else
+      if (SwitchDesktop(m_hDeskSwitch))
         return;
-    }else
-      return;
-    Sleep(100);
+      if (GetLastError()==ERROR_INVALID_HANDLE)
+        m_hDeskSwitch=0;
+      DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
+    }
+    if (m_hDeskSwitchUser)
+    {
+      if (!SwitchDesktop(m_hDeskSwitchUser))
+        return;
+      if (GetLastError()==ERROR_INVALID_HANDLE)
+        m_hDeskSwitchUser=0;
+      DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
+    }
   }
 }
 
