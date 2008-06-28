@@ -361,27 +361,27 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef DoDBGTrace
-  TCHAR Path[4096]={0};
-  if (pIDFolder)
-    SHGetPathFromIDList(pIDFolder,Path);
-  TCHAR FileClass[4096]={0};
-  if(hRegKey)
-    GetRegStr(hRegKey,0,L"",FileClass,4096);
-  TCHAR File[4096]={0};
-  if(pDataObj)
-  {
-    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-    STGMEDIUM stm;
-    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-    {
-      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
-      ReleaseStgMedium(&stm);
-    }
-  }
-  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-  if(pDataObj)
-    PrintDataObj(pDataObj);
+//  TCHAR Path[4096]={0};
+//  if (pIDFolder)
+//    SHGetPathFromIDList(pIDFolder,Path);
+//  TCHAR FileClass[4096]={0};
+//  if(hRegKey)
+//    GetRegStr(hRegKey,0,L"",FileClass,4096);
+//  TCHAR File[4096]={0};
+//  if(pDataObj)
+//  {
+//    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+//    STGMEDIUM stm;
+//    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+//    {
+//      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+//        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
+//      ReleaseStgMedium(&stm);
+//    }
+//  }
+//  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+//  if(pDataObj)
+//    PrintDataObj(pDataObj);
 #endif DoDBGTrace
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
@@ -518,12 +518,12 @@ static CRITICAL_SECTION l_SxHkCs;
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
 #ifdef DoDBGTrace
-  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
-    pei->lpClass,
-    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+//  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+//    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+//    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+//    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
+//    pei->lpClass,
+//    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
 #endif DoDBGTrace
   //Admins don't need the ShellExec Hook!
   if (IsAdmin())
