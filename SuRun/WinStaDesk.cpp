@@ -350,25 +350,27 @@ class CStayOnDeskTop
 public:
   CStayOnDeskTop(LPCTSTR DeskName)
   {
-    m_DeskName=_tcsdup(DeskName);
+    _tcscpy(m_DeskName,DeskName);
+    m_CloseEvent=CreateEvent(0,1,1,0);
     m_Thread=CreateThread(0,0,ThreadProc,this,0,0);
+    while (WaitForSingleObject(m_CloseEvent,0)==WAIT_OBJECT_0)
+      Sleep(10);
   }
   ~CStayOnDeskTop()
   {
-    LPTSTR s=m_DeskName;
-    m_DeskName=0;
-    free(s);
-    if(m_Thread)
-      WaitForSingleObject(m_Thread,INFINITE);
-    while (m_Thread)
-      Sleep(55);
+    SetEvent(m_CloseEvent);
+    WaitForSingleObject(m_Thread,INFINITE);
+    CloseHandle(m_Thread);
   }
   static DWORD WINAPI ThreadProc(void* p)
   {
+    SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
     CStayOnDeskTop* t=(CStayOnDeskTop*)p;
-    SetThreadPriority(t->m_Thread,THREAD_PRIORITY_IDLE);
-    LPTSTR DeskName=_tcsdup(t->m_DeskName);
-    while (t->m_DeskName)
+    TCHAR DeskName[256];
+    _tcscpy(DeskName,t->m_DeskName);
+    HANDLE e=t->m_CloseEvent;
+    ResetEvent(e);
+    while (WaitForSingleObject(e,10)==WAIT_TIMEOUT)
     {
       if ((g_StayOnDeskEvent==NULL)
         ||(WaitForSingleObject(g_StayOnDeskEvent,0)==WAIT_OBJECT_0))
@@ -378,21 +380,19 @@ public:
         {
           TCHAR n[MAX_PATH]={0};
           DWORD l=MAX_PATH;
-          if (g_RunOnNewDesk
-            && GetUserObjectInformation(i,UOI_NAME,n,l,&l)
-            && _tcsicmp(n,DeskName))
+          if (GetUserObjectInformation(i,UOI_NAME,n,l,&l)
+            && _tcsicmp(n,DeskName)
+            && g_RunOnNewDesk)
             g_RunOnNewDesk->SwitchToOwnDesk();
           CloseDesktop(i);
         }
       }
-      Sleep(10);
     }
-    free(DeskName);
-    t->m_Thread=0;
     return 0;
   }
 private:
-  LPTSTR m_DeskName;
+  TCHAR m_DeskName[256];
+  HANDLE m_CloseEvent;
   HANDLE m_Thread;
 };
 
@@ -443,33 +443,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
     if (!SetProcessWindowStation(m_hwinstaUser))
       DBGTrace1("CRunOnNewDeskTop::SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
   }
-  //Set Access to the user Desktop
-  {
-    HANDLE hTok=0;
-    OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hTok);
-    //SetAccessToWinDesk(hTok,0,UserDesk,true);
-    //Switch to the user desktop
-    m_hDeskSwitchUser=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
-    if (!m_hDeskSwitchUser)
-      DBGTrace1("CRunOnNewDeskTop::OpenDesktop failed: %s",GetLastErrorNameStatic());
-    //SetAccessToWinDesk(hTok,0,UserDesk,false);
-    CloseHandle(hTok);
-    hTok=0;
-  }
-  //Get interactive Desktop
-  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP/*DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL*/);
-  if ((!m_hDeskSwitch)&&(!m_hDeskSwitchUser))
-  {
-    DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
-    return;
-  }
-  //Set Interactive Desktop as current Desktop to get the Desktop Bitmap
-  if (!SetThreadDesktop(m_hDeskSwitch?m_hDeskSwitch:m_hDeskSwitchUser))
-    DBGTrace1("CRunOnNewDeskTop::SetThreadDesktop(m_hDeskSwitch) failed!: %s",GetLastErrorNameStatic());
-  //Create Background Bitmap
-  if (bCreateBkWnd)
-    m_Screen.Init();
-  //Create a new Desktop and set as the Threads Desktop
+  //Create a new Desktop and 
   LenD=MAX_PATH;
   GetUserObjectInformation(m_hdeskSave,UOI_NAME,dtn,LenD,&LenD);
   if ((dtn[0]==TCHAR('\0')) || _tcsicmp(dtn,DeskName))
@@ -488,13 +462,30 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
     }
     LocalFree(saDesktop.lpSecurityDescriptor);
   }
+  //Open a handle to the user Desktop
+  m_hDeskSwitchUser=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
+  if (!m_hDeskSwitchUser)
+    DBGTrace1("CRunOnNewDeskTop::OpenDesktop failed: %s",GetLastErrorNameStatic());
+  //Get interactive Desktop
+  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP/*DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL*/);
+  if ((!m_hDeskSwitch)&&(!m_hDeskSwitchUser))
+  {
+    DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
+    return;
+  }
+  //Set Interactive Desktop as current Desktop to get the Desktop Bitmap
+  if (!SetThreadDesktop(m_hDeskSwitch?m_hDeskSwitch:m_hDeskSwitchUser))
+    DBGTrace1("CRunOnNewDeskTop::SetThreadDesktop(m_hDeskSwitch) failed!: %s",GetLastErrorNameStatic());
+  //Create Background Bitmap
+  if (bCreateBkWnd)
+    m_Screen.Init();
+  //set m_hdeskUser as the Threads Desktop
   if (!SetThreadDesktop(m_hdeskUser))
   {
     DBGTrace("CRunOnNewDeskTop::SetThreadDesktop failed!");
     CleanUp();
     return;
   }
-  //DenyUserAccessToDesktop(m_hDeskSwitch);
   //Show Desktop Background
   if (bCreateBkWnd)
     m_Screen.Show(bFadeIn);
