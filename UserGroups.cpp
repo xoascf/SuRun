@@ -380,7 +380,6 @@ void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
 
 void USERLIST::Add(LPWSTR UserName)
 {
-  DBGTrace3("USERLIST::Add(%s),[n=%d,ptr=%x]...1",UserName,nUsers,User);
   int j=0;
   for(;j<nUsers;j++)
   {
@@ -391,26 +390,18 @@ void USERLIST::Add(LPWSTR UserName)
     {
       if (j<nUsers)
       {
-        User=(USERDATA*)(User?realloc(User,(nUsers+1)*sizeof(USERDATA)):malloc((nUsers+1)*sizeof(USERDATA)));
+        User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
         memmove(&User[j+1],&User[j],(nUsers-j)*sizeof(User[0]));
       }
       break;
     }
   }
-  DBGTrace3("USERLIST::Add(%s),[n=%d,ptr=%x]...2",UserName,nUsers,User);
   if (j>=nUsers)
-    User=(USERDATA*)(User?realloc(User,(nUsers+1)*sizeof(USERDATA)):malloc((nUsers+1)*sizeof(USERDATA)));
+    User=User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
 //  DBGTrace1("-->AddUser: %s",UserName);
-  DBGTrace3("USERLIST::Add(%s),[n=%d,ptr=%x]...3",UserName,nUsers,User);
-  if (User)
-  {
-    wcscpy(User[j].UserName,UserName);
-    DBGTrace3("USERLIST::Add(%s),[n=%d,ptr=%x]...4",UserName,nUsers,User);
-    User[j].UserBitmap=LoadUserBitmap(UserName);
-    DBGTrace3("USERLIST::Add(%s),[n=%d,ptr=%x]...5",UserName,nUsers,User);
-    nUsers++;
-  }
-  DBGTrace3("USERLIST::Add(%s),[n=%d,ptr=%x]...6",UserName,nUsers,User);
+  wcscpy(User[j].UserName,UserName);
+  User[j].UserBitmap=LoadUserBitmap(UserName);
+  nUsers++;
   return;
 }
 
