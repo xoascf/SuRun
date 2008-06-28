@@ -456,7 +456,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         else if (p->TimeOut<10)
           SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CANCEL,p->TimeOut));
       }else if ((wParam==1265142)&& g_WatchDogEvent)
-        SetEvent(g_WatchDogEvent);
+        return SetEvent(g_WatchDogEvent),FALSE;
       return TRUE;
     }
   case WM_COMMAND:
