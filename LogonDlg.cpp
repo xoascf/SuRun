@@ -604,12 +604,13 @@ DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...)
 
 DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...)
 {
+  DBGTrace("AskCurrentUserOk...Start");
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,_T("******"),true,false,UsrFlags);
   p.Users.Add(User);
-  DBGTrace("AskCurrentUserOk...");
+  DBGTrace("AskCurrentUserOk...Dlg");
   return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
                   0,DialogProc,(LPARAM)&p);
 }
