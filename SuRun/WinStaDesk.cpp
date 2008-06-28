@@ -383,7 +383,11 @@ public:
           if (GetUserObjectInformation(i,UOI_NAME,n,l,&l)
             && _tcsicmp(n,DeskName)
             && g_RunOnNewDesk)
-            g_RunOnNewDesk->SwitchToOwnDesk();
+          {
+            HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
+            SwitchDesktop(d);
+            CloseDesktop(d);
+          }
           CloseDesktop(i);
         }
       }
@@ -638,6 +642,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   }
   g_RunOnNewDesk=rond;
   g_StayOnDesk=new CStayOnDeskTop(DeskName);
+//  rond->SwitchToOwnDesk();
   ResumeThread(pi.hThread);
   CloseHandle(pi.hThread);
   return true;
