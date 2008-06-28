@@ -81,26 +81,33 @@ BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName)
 
 void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk)
 {
-  HWINSTA hws = WinSta?OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED):0;
-	if (!hws)
+  if (WinSta)
   {
-    DBGTrace2("OpenWindowStation(%s) failed: %s",WinSta,GetLastErrorNameStatic());
-  }else
-  {
-    SetProcessWindowStation(hws);
-    if (!CloseWindowStation(hws))
-      DBGTrace1("CloseWindowStation failed: %s",GetLastErrorNameStatic());
+    HWINSTA hws = WinSta?OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED):0;
+    if (!hws)
+    {
+      DBGTrace2("OpenWindowStation(%s) failed: %s",WinSta,GetLastErrorNameStatic());
+    }else
+    {
+      if (!SetProcessWindowStation(hws))
+        DBGTrace1("SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
+      if (!CloseWindowStation(hws))
+        DBGTrace1("CloseWindowStation failed: %s",GetLastErrorNameStatic());
+    }
   }
-  HDESK hd = OpenDesktop(Desk,0,0,MAXIMUM_ALLOWED);
-  if (!hd)
+  if (Desk)
   {
-    DBGTrace2("OpenDesktop(%s) failed: %s",Desk,GetLastErrorNameStatic());
-  }else
-  {
-    if (!SetThreadDesktop(hd))
-      DBGTrace1("SetThreadDesktop failed: %s",GetLastErrorNameStatic());
-    if (!CloseDesktop(hd))
-      DBGTrace1("CloseDesktop failed: %s",GetLastErrorNameStatic());
+    HDESK hd = OpenDesktop(Desk,0,0,MAXIMUM_ALLOWED);
+    if (!hd)
+    {
+      DBGTrace2("OpenDesktop(%s) failed: %s",Desk,GetLastErrorNameStatic());
+    }else
+    {
+      if (!SetThreadDesktop(hd))
+        DBGTrace1("SetThreadDesktop failed: %s",GetLastErrorNameStatic());
+      if (!CloseDesktop(hd))
+        DBGTrace1("CloseDesktop failed: %s",GetLastErrorNameStatic());
+    }
   }
 }
 
@@ -440,10 +447,12 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
   {
     HANDLE hTok=0;
     OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hTok);
-    SetAccessToWinDesk(hTok,0,UserDesk,true);
+    //SetAccessToWinDesk(hTok,0,UserDesk,true);
     //Switch to the user desktop
     m_hDeskSwitchUser=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
-    SetAccessToWinDesk(hTok,0,UserDesk,false);
+    if (!m_hDeskSwitchUser)
+      DBGTrace1("CRunOnNewDeskTop::OpenDesktop failed: %s",GetLastErrorNameStatic());
+    //SetAccessToWinDesk(hTok,0,UserDesk,false);
     CloseHandle(hTok);
     hTok=0;
   }
@@ -595,6 +604,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   //Start watchdog process:
   g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
   g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
+  PROCESS_INFORMATION pi={0};
   if (g_WatchDogEvent && g_StayOnDeskEvent)
   {
     TCHAR SuRunExe[4096];
@@ -604,29 +614,35 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     _tcscat(SuRunExe,DeskName);
     _tcscat(SuRunExe,L" ");
     _tcscat(SuRunExe,UserDesk);
-    PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb	= sizeof(si);
     TCHAR WinstaDesk[MAX_PATH];
     _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
     si.lpDesktop = WinstaDesk;
-    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
+    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,
+      CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,NULL,NULL,&si,&pi))
     {
-      CloseHandle(pi.hThread);
       g_WatchDogProcess=pi.hProcess;
     }
   }else
     DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   if (!rond)
-    return DeleteSafeDesktop(false),false;
+  {
+    CloseHandle(pi.hThread);
+    DeleteSafeDesktop(false);
+    return false;
+  }
   if (!rond->IsValid())
   {
     delete rond;
+    CloseHandle(pi.hThread);
     return DeleteSafeDesktop(false),false;
   }
   g_RunOnNewDesk=rond;
   g_StayOnDesk=new CStayOnDeskTop(DeskName);
+  ResumeThread(pi.hThread);
+  CloseHandle(pi.hThread);
   return true;
 }
 
