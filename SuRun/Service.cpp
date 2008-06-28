@@ -684,14 +684,17 @@ DWORD PrepareSuRun()
     DWORD l=0;
     if (!PwOk)
     {
+      DBGTrace("PrepareSuRun...Logon");
       l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
           BeautifyCmdLine(g_RunData.cmdLine));
       if (GetSavePW && (l&1))
         SavePassword(g_RunData.UserName,g_RunPwd);
-      DBGTrace("PrepareSuRun...");
     }else
+    {
+      DBGTrace("PrepareSuRun...AskOk");
       l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
-          BeautifyCmdLine(g_RunData.cmdLine));
+        BeautifyCmdLine(g_RunData.cmdLine));
+    }
     DBGTrace("PrepareSuRun...DSD");
     DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
     DBGTrace("PrepareSuRun...");
