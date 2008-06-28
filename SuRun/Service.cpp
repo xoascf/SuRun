@@ -675,29 +675,23 @@ DWORD PrepareSuRun()
     //secure desktop created...
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
       return RETVAL_CANCELLED;
-    DBGTrace("PrepareSuRun...");
     //Is User Restricted?
     DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
     if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
       return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
-    DBGTrace("PrepareSuRun...");
     DWORD l=0;
     if (!PwOk)
     {
-      DBGTrace("PrepareSuRun...Logon");
       l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
           BeautifyCmdLine(g_RunData.cmdLine));
       if (GetSavePW && (l&1))
         SavePassword(g_RunData.UserName,g_RunPwd);
     }else
     {
-      DBGTrace("PrepareSuRun...AskOk");
       l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
         BeautifyCmdLine(g_RunData.cmdLine));
     }
-    DBGTrace("PrepareSuRun...DSD");
     DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
-    DBGTrace("PrepareSuRun...");
     if((l&1)==0)
     {
       if (!GetNoRunSetup(g_RunData.UserName))
