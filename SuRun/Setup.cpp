@@ -1254,7 +1254,8 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     }//WM_NOTIFY
   case WM_TIMER:
     if ((wParam==1265142)&& g_WatchDogEvent)
-      SetEvent(g_WatchDogEvent);
+      return SetEvent(g_WatchDogEvent),FALSE;
+    return TRUE;
   case WM_COMMAND:
     {
       switch (wParam)
