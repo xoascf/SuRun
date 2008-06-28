@@ -727,8 +727,7 @@ DWORD PrepareSuRun()
     }
     DeleteSafeDesktop(false);
   }
-  SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-  return RETVAL_ACCESSDENIED;
+  return RETVAL_NODESKTOP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1055,6 +1054,11 @@ void SuRun(DWORD ProcessID)
       }
       RetVal=RETVAL_OK;
       DeleteSafeDesktop(false);
+    }else
+    {
+      ResumeClient(RETVAL_CANCELLED);
+      SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      return;
     }
   }else //if (!g_RunData.bRunAs)
   {
@@ -1073,13 +1077,6 @@ void SuRun(DWORD ProcessID)
           DBGTrace("FATAL: Exception in Setup()");
         }
         DeleteSafeDesktop(GetFadeDesk);
-//        //Start Sysmenuhook...just in case
-//        TCHAR cmd[4096]={0};
-//        GetSystemWindowsDirectory(cmd,4096);
-//        PathAppend(cmd,L"SuRun.exe");
-//        PathQuoteSpaces(cmd);
-//        _tcscat(cmd,L" /SYSMENUHOOK");
-//        DirectStartUserProcess(GetShellProcessId(g_RunData.SessionID),cmd);
       }else
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
@@ -1095,6 +1092,12 @@ void SuRun(DWORD ProcessID)
     RetVal=PrepareSuRun();
     if (RetVal!=RETVAL_OK)
     {
+      if (RetVal==RETVAL_NODESKTOP)
+      {
+        ResumeClient(RETVAL_CANCELLED);
+        SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+        return;
+      }
       if ( g_RunData.bShlExHook
         &&(!IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC)))
         ResumeClient(RETVAL_SX_NOTINLIST);//let ShellExecute start the process!
