@@ -329,7 +329,6 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-      DBGTrace("WM_INITDIALOG...");
       if (g_WatchDogEvent)
       {
         SetEvent(g_WatchDogEvent);
@@ -400,7 +399,6 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetUserBitmap(hwnd);
       SetWindowSizes(hwnd);
       SetTimer(hwnd,2,1000,0);
-      DBGTrace("~WM_INITDIALOG...");
       return FALSE;
     }//WM_INITDIALOG
   case WM_DESTROY:
