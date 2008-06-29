@@ -501,8 +501,8 @@ TryAgain:
                 bRunCount++;
                 CloseHandle(pi.hThread);
                 WaitForSingleObject(pi.hProcess,60000);
-                DWORD ex=STILL_ACTIVE;
-//                while (ex==STILL_ACTIVE)
+                DWORD ex=STILL_ACTIVE;//==103L
+                while (ex==STILL_ACTIVE)
                   GetExitCodeProcess(pi.hProcess,&ex);
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
@@ -1345,7 +1345,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
     {
       CloseHandle(pi.hThread);
       DWORD ExitCode=-1;
-      if (WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+      if (WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
         GetExitCodeProcess(pi.hProcess,&ExitCode);
       CloseHandle(pi.hProcess);
       if (ExitCode!=RETVAL_OK)
