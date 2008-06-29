@@ -23,6 +23,7 @@
 #include <TCHAR.h>
 #include <shlwapi.h>
 #include <lm.h>
+#include <malloc.h>
 #include "Helpers.h"
 #include "ResStr.h"
 #include "UserGroups.h"
@@ -378,6 +379,19 @@ void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
     SetGroupUsers(GroupName,bScanDomain);
 }
 
+static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
+{
+  void* p=User;
+  if (p==0)
+    p=malloc(nUsers*sizeof(USERDATA)+16384);
+  else if (_msize(p)<nUsers*sizeof(USERDATA))
+    p=realloc(User,nUsers*sizeof(USERDATA)+16384);
+  if (!p)
+    DBGTrace2("realloc(%x,%d) failed!",User,nUsers*sizeof(USERDATA));
+  return (USERDATA*)p;
+}
+
+
 void USERLIST::Add(LPWSTR UserName)
 {
   int j=0;
@@ -390,14 +404,16 @@ void USERLIST::Add(LPWSTR UserName)
     {
       if (j<nUsers)
       {
-        User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
+        User=UsrRealloc(User,nUsers+1);
+        if (!User)
+          return;
         memmove(&User[j+1],&User[j],(nUsers-j)*sizeof(User[0]));
       }
       break;
     }
   }
   if (j>=nUsers)
-    User=User=(USERDATA*)realloc(User,(nUsers+1)*sizeof(USERDATA));
+    User=UsrRealloc(User,nUsers+1);
 //  DBGTrace1("-->AddUser: %s",UserName);
   wcscpy(User[j].UserName,UserName);
   User[j].UserBitmap=LoadUserBitmap(UserName);
