@@ -217,14 +217,14 @@ DWORD HookIAT(HMODULE hMod)
     char* DllName=RelPtr(char*,hMod,pID->Name);
     if(DoHookDll(DllName))
     {
-      //PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
+      PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
-      for(;(pThunk->u1.Function)/*&&(pOrgThunk->u1.Function)*/;/*pOrgThunk++,*/pThunk++)
-        //if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )==0)
+      for(;(pThunk->u1.Function)&&(pOrgThunk->u1.Function);pOrgThunk++,pThunk++)
+        if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )==0)
         {
-          //PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
-          //PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
-          PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
+          PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
+          //PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
           if (newFunc && (pThunk->u1.Function!=(DWORD_PTR)newFunc))
           {
             __try
