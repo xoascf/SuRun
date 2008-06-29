@@ -128,7 +128,7 @@ BOOL DoHookDll(char* DllName)
 }
 
 //returns newFunc if DllName->ImpName is one to be hooked up
-PROC DoHookFn(char* DllName,char* ImpName)
+PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
 {
   if(IsBadReadPtr(DllName,4)||IsBadReadPtr(ImpName,4))
     return 0;
@@ -136,7 +136,11 @@ PROC DoHookFn(char* DllName,char* ImpName)
     for(int i=0;i<countof(hdt);i++)
       if (stricmp(hdt[i]->DllName,DllName)==0)
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
+        {
+          if(orgFunc)
+            *orgFunc=hdt[i]->orgFunc;
           return hdt[i]->newFunc;
+        }
   return false;
 }
 
@@ -201,15 +205,15 @@ DWORD HookIAT(HMODULE hMod)
     return nHooked;
   PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
 #ifdef DoDBGTrace
-//  char fmod[MAX_PATH]={0};
-//  {
-//    GetModuleFileNameA(0,fmod,MAX_PATH);
-//    PathStripPathA(fmod);
-//    strcat(fmod,": ");
-//    char* p=&fmod[strlen(fmod)];
-//    GetModuleFileNameA(hMod,p,MAX_PATH);
-//    PathStripPathA(p);
-//  }
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hMod,p,MAX_PATH);
+    PathStripPathA(p);
+  }
 //  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
@@ -223,9 +227,10 @@ DWORD HookIAT(HMODULE hMod)
         if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )==0)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
-          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
+          PROC orgFunc = 0;
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&orgFunc);
           //PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
-          if (newFunc && (pThunk->u1.Function!=(DWORD_PTR)newFunc))
+          if (newFunc && (pThunk->u1.Function==(DWORD_PTR)orgFunc))
           {
             __try
             {
@@ -233,12 +238,13 @@ DWORD HookIAT(HMODULE hMod)
               if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
               {
                 DWORD oldProt=PAGE_READWRITE;
-                if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize,PAGE_EXECUTE_READWRITE,&oldProt))
+                if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize,PAGE_EXECUTE_WRITECOPY,&oldProt))
                 {
-#ifdef DoDBGTrace
-//                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (->%x) newProt:%x; oldProt:%x\n",
-//                  fmod,DllName,pBN->Name,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x MBI:(%X,%X,%X)\n",
+//                  fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt,
+//                  mbi.AllocationProtect,mbi.State,mbi.Type);
+//#endif DoDBGTrace
                   pThunk->u1.Function = (DWORD_PTR)newFunc;
                   VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
                   FlushInstructionCache(GetCurrentProcess(),mbi.BaseAddress, mbi.RegionSize);
@@ -416,18 +422,18 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-                           dwCreationFlags,lpProcessInformation);
-  if(tas==RETVAL_OK)
-    return SetLastError(NOERROR),TRUE;
-  if(tas==RETVAL_CANCELLED)
-    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-#ifdef DoDBGTrace
-  if (!hkCrProcA.orgFunc)
-    DBGTrace("IATHook FATAL Warning! hkCrProcA.orgFunc==0!");
-  if (hkCrProcA.newFunc==hkCrProcA.orgFunc)
-    DBGTrace("IATHook FATAL Warning! hkCrProcA.newFunc==hkCrProcA.orgFunc!");
-#endif DoDBGTrace
+//  DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+//                           dwCreationFlags,lpProcessInformation);
+//  if(tas==RETVAL_OK)
+//    return SetLastError(NOERROR),TRUE;
+//  if(tas==RETVAL_CANCELLED)
+//    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+//#ifdef DoDBGTrace
+//  if (!hkCrProcA.orgFunc)
+//    DBGTrace("IATHook FATAL Warning! hkCrProcA.orgFunc==0!");
+//  if (hkCrProcA.newFunc==hkCrProcA.orgFunc)
+//    DBGTrace("IATHook FATAL Warning! hkCrProcA.newFunc==hkCrProcA.orgFunc!");
+//#endif DoDBGTrace
   return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -439,18 +445,18 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-  DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-                           dwCreationFlags,lpProcessInformation);
-  if(tas==RETVAL_OK)
-    return SetLastError(NOERROR),TRUE;
-  if(tas==RETVAL_CANCELLED)
-    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-#ifdef DoDBGTrace
-  if (!hkCrProcW.orgFunc)
-    DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
-  if (hkCrProcW.newFunc==hkCrProcW.orgFunc)
-    DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
-#endif DoDBGTrace
+//  DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+//                           dwCreationFlags,lpProcessInformation);
+//  if(tas==RETVAL_OK)
+//    return SetLastError(NOERROR),TRUE;
+//  if(tas==RETVAL_CANCELLED)
+//    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+//#ifdef DoDBGTrace
+//  if (!hkCrProcW.orgFunc)
+//    DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
+//  if (hkCrProcW.newFunc==hkCrProcW.orgFunc)
+//    DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
+//#endif DoDBGTrace
   return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -461,7 +467,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
   PathStripPathA(f);
-  PROC p=DoHookFn(f,(char*)lpProcName);
+  PROC p=DoHookFn(f,(char*)lpProcName,NULL);
   SetLastError(NOERROR);
   if(!p)
   {
@@ -627,7 +633,7 @@ DWORD WINAPI InitHookProc(void* p)
 {
   if (g_IATInit)
     return 0;
-  Sleep(10);
+//  Sleep(10);
   InitializeCriticalSection(&g_HookCs);
   g_IATInit=TRUE;
   if (!GetUseIATHook)
@@ -640,8 +646,8 @@ DWORD WINAPI InitHookProc(void* p)
 
 void LoadHooks()
 {
-  CreateThread(0,0,InitHookProc,0,0,0);
-  //InitHookProc(0);
+//  CreateThread(0,0,InitHookProc,0,0,0);
+  InitHookProc(0);
 }
 
 void UnloadHooks()
