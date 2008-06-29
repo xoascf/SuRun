@@ -20,7 +20,6 @@
 #include "SuRunExt/SuRunExt.h"
 
 #define WATCHDOG_EVENT_NAME   _T("SURUN_WATCHDOG_EVENT")
-#define STAYONDESK_EVENT_NAME _T("SURUN_STAYONDESK_EVENT")
 
 //////////////////////////////////////////////////////////////////////////////
 // 
