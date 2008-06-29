@@ -236,7 +236,7 @@ HANDLE GetProcessUserToken(DWORD ProcId)
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
   if (!hProc)
     return hToken;
-  // Open impersonation token for Shell process
+  // Open impersonation token for process
   OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
     |TOKEN_ASSIGN_PRIMARY,&hToken);
   CloseHandle(hProc);
@@ -260,9 +260,8 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
   PathAppend(cmd,L"SuRun.exe");
   HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
   PROCESS_INFORMATION pi={0};
-  TCHAR UserName[MAX_PATH]={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
-  if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
+  if(LoadUserProfile(hUser,&ProfInf))
   {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hUser,FALSE))
@@ -722,7 +721,8 @@ DWORD PrepareSuRun()
         g_RunData.bShlExHook?FLAG_CANCEL_SX:FLAG_AUTOCANCEL,0);
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     }
-    return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+    UpdLastRunTime(g_RunData.UserName);
+    return RETVAL_OK;
   }__except(1)
   {
     DBGTrace("FATAL: Exception in PrepareSuRun()");
@@ -801,9 +801,8 @@ DWORD StartAdminProcessTrampoline()
   HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
   PROCESS_INFORMATION pi={0};
 #ifndef _DEBUG_SVC
-  TCHAR UserName[MAX_PATH]={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
-  if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
+  if(LoadUserProfile(hUser,&ProfInf))
   {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hUser,FALSE))
@@ -919,9 +918,8 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   HANDLE hUser=GetProcessUserToken(ProcId);
-  TCHAR UserName[MAX_PATH]={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,UserName};
-  if(GetTokenUserName(hUser,UserName) && LoadUserProfile(hUser,&ProfInf))
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
+  if(LoadUserProfile(hUser,&ProfInf))
   {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hUser,FALSE))
@@ -1135,7 +1133,13 @@ void SuRun(DWORD ProcessID)
     }
   }
   //copy the password to the client
-  RetVal=StartAdminProcessTrampoline();
+  __try
+  {
+    RetVal=StartAdminProcessTrampoline();
+  }__except(1)
+  {
+    DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
+  }
   //Clear Password
   zero(g_RunPwd);
   ResumeClient(RetVal);
