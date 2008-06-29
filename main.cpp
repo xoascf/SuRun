@@ -31,27 +31,27 @@
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
 
-//#ifndef _WIN64
-//#pragma comment(linker,"/DELAYLOAD:advapi32.dll")
-//#ifdef _SR32
-//#pragma comment(linker,"/DELAYLOAD:surunext32.dll")
-//#else _SR32
-//#pragma comment(linker,"/DELAYLOAD:surunext.dll")
-//#endif _SR32
-//#pragma comment(linker,"/DELAYLOAD:mpr.dll")
-//#pragma comment(linker,"/DELAYLOAD:version.dll")
-//#pragma comment(linker,"/DELAYLOAD:comctl32.dll")
-//#pragma comment(linker,"/DELAYLOAD:userenv.dll")
-//#pragma comment(linker,"/DELAYLOAD:comdlg32.dll")
-//#pragma comment(linker,"/DELAYLOAD:gdi32.dll")
-//#pragma comment(linker,"/DELAYLOAD:user32.dll")
-//#pragma comment(linker,"/DELAYLOAD:shell32.dll")
-//#pragma comment(linker,"/DELAYLOAD:shlwapi.dll")
-//#pragma comment(linker,"/DELAYLOAD:ole32.dll")
-//#pragma comment(linker,"/DELAYLOAD:netapi32.dll")
-//#pragma comment(linker,"/DELAYLOAD:psapi.dll")
-//#pragma comment(lib,"Delayimp")
-//#endif _WIN64
+#ifndef _WIN64
+#pragma comment(linker,"/DELAYLOAD:advapi32.dll")
+#ifdef _SR32
+#pragma comment(linker,"/DELAYLOAD:surunext32.dll")
+#else _SR32
+#pragma comment(linker,"/DELAYLOAD:surunext.dll")
+#endif _SR32
+#pragma comment(linker,"/DELAYLOAD:mpr.dll")
+#pragma comment(linker,"/DELAYLOAD:version.dll")
+#pragma comment(linker,"/DELAYLOAD:comctl32.dll")
+#pragma comment(linker,"/DELAYLOAD:userenv.dll")
+#pragma comment(linker,"/DELAYLOAD:comdlg32.dll")
+#pragma comment(linker,"/DELAYLOAD:gdi32.dll")
+#pragma comment(linker,"/DELAYLOAD:user32.dll")
+#pragma comment(linker,"/DELAYLOAD:shell32.dll")
+#pragma comment(linker,"/DELAYLOAD:shlwapi.dll")
+#pragma comment(linker,"/DELAYLOAD:ole32.dll")
+#pragma comment(linker,"/DELAYLOAD:netapi32.dll")
+#pragma comment(linker,"/DELAYLOAD:psapi.dll")
+#pragma comment(lib,"Delayimp")
+#endif _WIN64
 
 //////////////////////////////////////////////////////////////////////////////
 // 
