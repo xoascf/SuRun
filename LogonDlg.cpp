@@ -329,11 +329,6 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-      if (g_WatchDogEvent)
-      {
-        SetEvent(g_WatchDogEvent);
-        SetTimer(hwnd,1265142,500,0);
-      }
       LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
       SetWindowLongPtr(hwnd,GWLP_USERDATA,lParam);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
@@ -455,8 +450,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           EndDialog(hwnd,0);
         else if (p->TimeOut<10)
           SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CANCEL,p->TimeOut));
-      }else if ((wParam==1265142)&& g_WatchDogEvent)
-        SetEvent(g_WatchDogEvent);
+      }
       return TRUE;
     }
   case WM_COMMAND:
