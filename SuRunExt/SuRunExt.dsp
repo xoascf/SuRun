@@ -45,8 +45,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "UNICODE" /D "_UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
-# SUBTRACT CPP /Fr
+# ADD CPP /nologo /MD /W3 /GX /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
+# SUBTRACT CPP /WX /Fr
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
@@ -56,8 +56,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib /nologo /dll /machine:I386
-# ADD LINK32 /nologo /dll /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
-# SUBTRACT LINK32 /pdb:none /map /debug
+# ADD LINK32 /nologo /dll /debug /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
+# SUBTRACT LINK32 /pdb:none /map
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 Unicode Debug"
 
@@ -101,7 +101,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /FD /EHsc /Wp64 /c
+# ADD CPP /nologo /MD /W3 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /FD /EHsc /Wp64 /c
+# SUBTRACT CPP /WX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
@@ -130,7 +131,8 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /D "_SR32" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE" /D "UNICODE" /D "_USRDLL" /D "SuRunEXT_EXPORTS" /D "_SR32" /YX /FD /c
+# SUBTRACT CPP /WX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
