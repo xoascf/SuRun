@@ -807,21 +807,24 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
-#ifdef _DEBUG
-//    DBGTrace5("DLL_PROCESS_DETACH(hInst=%x) %d:%s[%s], Admin=%d",
-//      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
-#endif _DEBUG
+#ifdef DoDBGTrace
+    DBGTrace5("Detach(hInst=%x) %d:%s[%s], Admin=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
+#endif DoDBGTrace
     EnterCriticalSection(&l_SxHkCs);
     LeaveCriticalSection(&l_SxHkCs);
     DeleteCriticalSection(&l_SxHkCs);
     //IAT-Hook
-    UnloadHooks();
+    //UnloadHooks();
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
     return TRUE;
   //Process Attach:
   DisableThreadLibraryCalls(hInstDLL);
+#ifdef DoDBGTrace
+  HINSTANCE lhi=l_hInst;
+#endif DoDBGTrace
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
@@ -841,16 +844,16 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     PathAppend(fSuRunExe,L"SuRun.exe");
     PathQuoteSpaces(fSuRunExe);
     BOOL bSetHook=(!bAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
-//    DBGTrace6("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d, SetHook=%d",
-//      hInstDLL,PID,fMod,GetCommandLine(),bAdmin,bSetHook);
+    DBGTrace7("Attach(hInst=%x,old %x) %d:%s[%s], Admin=%d, SetHook=%d",
+      hInstDLL,lhi,PID,fMod,GetCommandLine(),bAdmin,bSetHook);
     if(bSetHook)
       LoadHooks();
   }
-#ifdef _DEBUG
-//  else
-//    DBGTrace5("DLL_PROCESS_ATTACH(hInst=%x) %d:%s[%s], Admin=%d",
-//      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
-#endif _DEBUG
+#ifdef DoDBGTrace
+  else
+    DBGTrace5("Attach(hInst=%x) %d:%s[%s], Admin=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
+#endif DoDBGTrace
   //DevInst
 //  if(!bAdmin)
 //  {
