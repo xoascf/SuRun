@@ -230,7 +230,7 @@ DWORD HookIAT(HMODULE hMod)
           PROC orgFunc = 0;
           PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&orgFunc);
           //PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
-          if (newFunc && (pThunk->u1.Function==(DWORD_PTR)orgFunc))
+          if (newFunc && orgFunc && (pThunk->u1.Function==(DWORD_PTR)orgFunc))
           {
             __try
             {
