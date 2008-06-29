@@ -171,8 +171,8 @@ public:
   {
     if (m_hWndTrans && m_hWnd && m_bm && (m_StartTime==0))
     {
-      m_StartTime=timeGetTime();
-      SetTimer(m_hWndTrans,1,10,0);
+      m_StartTime=timeGetTime()+500;
+      SetTimer(m_hWndTrans,1,500,0);
     }
   }
   void FadeOut()
