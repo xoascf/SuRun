@@ -422,18 +422,18 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-//  DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-//                           dwCreationFlags,lpProcessInformation);
-//  if(tas==RETVAL_OK)
-//    return SetLastError(NOERROR),TRUE;
-//  if(tas==RETVAL_CANCELLED)
-//    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-//#ifdef DoDBGTrace
-//  if (!hkCrProcA.orgFunc)
-//    DBGTrace("IATHook FATAL Warning! hkCrProcA.orgFunc==0!");
-//  if (hkCrProcA.newFunc==hkCrProcA.orgFunc)
-//    DBGTrace("IATHook FATAL Warning! hkCrProcA.newFunc==hkCrProcA.orgFunc!");
-//#endif DoDBGTrace
+  DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+                           dwCreationFlags,lpProcessInformation);
+  if(tas==RETVAL_OK)
+    return SetLastError(NOERROR),TRUE;
+  if(tas==RETVAL_CANCELLED)
+    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+#ifdef DoDBGTrace
+  if (!hkCrProcA.orgFunc)
+    DBGTrace("IATHook FATAL Warning! hkCrProcA.orgFunc==0!");
+  if (hkCrProcA.newFunc==hkCrProcA.orgFunc)
+    DBGTrace("IATHook FATAL Warning! hkCrProcA.newFunc==hkCrProcA.orgFunc!");
+#endif DoDBGTrace
   return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -445,18 +445,18 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
-//  DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-//                           dwCreationFlags,lpProcessInformation);
-//  if(tas==RETVAL_OK)
-//    return SetLastError(NOERROR),TRUE;
-//  if(tas==RETVAL_CANCELLED)
-//    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-//#ifdef DoDBGTrace
-//  if (!hkCrProcW.orgFunc)
-//    DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
-//  if (hkCrProcW.newFunc==hkCrProcW.orgFunc)
-//    DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
-//#endif DoDBGTrace
+  DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+                           dwCreationFlags,lpProcessInformation);
+  if(tas==RETVAL_OK)
+    return SetLastError(NOERROR),TRUE;
+  if(tas==RETVAL_CANCELLED)
+    return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+#ifdef DoDBGTrace
+  if (!hkCrProcW.orgFunc)
+    DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
+  if (hkCrProcW.newFunc==hkCrProcW.orgFunc)
+    DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
+#endif DoDBGTrace
   return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
