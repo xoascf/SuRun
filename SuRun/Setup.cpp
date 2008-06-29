@@ -885,7 +885,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
   case WM_PAINT:
     // The List Control is (to for some to me unknow reason) NOT displayed if
-    // a user app switches to the user desktop and CStayOnDesktop switches back.
+    // a user app switches to the user desktop and WatchDog switches back.
     RedrawWindow(GetDlgItem(hwnd,IDC_WHITELIST),0,0,RDW_ERASE|RDW_INVALIDATE|RDW_FRAME);
     break;
   case WM_TIMER:
@@ -1186,11 +1186,6 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   {
   case WM_INITDIALOG:
     {
-      if (g_WatchDogEvent)
-      {
-        SetEvent(g_WatchDogEvent);
-        SetTimer(hwnd,1265142,500,0);
-      }
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,32,32,0));
@@ -1252,10 +1247,6 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       }
       break;
     }//WM_NOTIFY
-  case WM_TIMER:
-    if ((wParam==1265142)&& g_WatchDogEvent)
-      SetEvent(g_WatchDogEvent);
-    return TRUE;
   case WM_COMMAND:
     {
       switch (wParam)
