@@ -331,82 +331,6 @@ public:
 CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
 
 //////////////////////////////////////////////////////////////////////////////
-//
-// CStayOnDeskTop
-//
-// There's no way to keep a thread in a different process from calling 
-// SwitchDesktop(). 
-// Even worse: Microsoft suggests using SwitchDeskTop(OpenDesktop("Default"))
-// to detect if a screen saver or logon screen is active. 
-// Apparently ShedHlp.exe from Acronis TrueImage 11 uses this trick. So I'm
-// forced to use CStayOnDeskTop to switch back to SuRuns desktop.
-//////////////////////////////////////////////////////////////////////////////
-
-//if g_StayOnDeskEvent is SET, CStayOnDeskTop will keep switching to the safe desktop
-HANDLE g_StayOnDeskEvent=NULL;
-
-class CStayOnDeskTop
-{
-public:
-  CStayOnDeskTop(LPCTSTR DeskName)
-  {
-    _tcscpy(m_DeskName,DeskName);
-    m_CloseEvent=CreateEvent(0,1,1,0);
-    m_Thread=CreateThread(0,0,ThreadProc,this,0,0);
-    while (WaitForSingleObject(m_CloseEvent,0)==WAIT_OBJECT_0)
-      Sleep(10);
-  }
-  ~CStayOnDeskTop()
-  {
-    SetEvent(m_CloseEvent);
-    WaitForSingleObject(m_Thread,INFINITE);
-    CloseHandle(m_Thread);
-  }
-  static DWORD WINAPI ThreadProc(void* p)
-  {
-    SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
-    CStayOnDeskTop* t=(CStayOnDeskTop*)p;
-    TCHAR DeskName[256];
-    _tcscpy(DeskName,t->m_DeskName);
-    HANDLE e=t->m_CloseEvent;
-    ResetEvent(e);
-    while (WaitForSingleObject(e,10)==WAIT_TIMEOUT)
-    {
-      if ((g_StayOnDeskEvent==NULL)
-        ||(WaitForSingleObject(g_StayOnDeskEvent,0)==WAIT_OBJECT_0))
-      {
-        HDESK i=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP);
-        if (i!=0)
-        {
-          TCHAR n[MAX_PATH]={0};
-          DWORD l=MAX_PATH;
-          if (GetUserObjectInformation(i,UOI_NAME,n,l,&l)
-            && _tcsicmp(n,DeskName)
-            && g_RunOnNewDesk)
-          {
-            //g_RunOnNewDesk->SwitchToOwnDesk();
-            HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
-            if (d)
-            {
-              SwitchDesktop(d);
-              CloseDesktop(d);
-            }
-          }
-          CloseDesktop(i);
-        }
-      }
-    }
-    return 0;
-  }
-private:
-  TCHAR m_DeskName[256];
-  HANDLE m_CloseEvent;
-  HANDLE m_Thread;
-};
-
-CStayOnDeskTop* g_StayOnDesk=NULL;
-
-//////////////////////////////////////////////////////////////////////////////
 // 
 // CRunOnNewDeskTop:
 //   create and Switch to Desktop, switch back when Object is deleted
@@ -599,6 +523,18 @@ LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
 
 HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
+HANDLE g_WatchDogThread=NULL;
+
+static DWORD WINAPI WDEventProc(void* p)
+{
+  SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
+  while (g_WatchDogEvent)
+  {
+    SetEvent(g_WatchDogEvent);
+    Sleep(10);
+  }
+  return 0;
+}
 
 bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
 {
@@ -618,8 +554,8 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   //Start watchdog process:
   PROCESS_INFORMATION pi={0};
   g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
-  g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
-  if (g_WatchDogEvent && g_StayOnDeskEvent)
+  g_WatchDogThread=CreateThread(0,0,WDEventProc,0,0,0);
+  if (g_WatchDogEvent)
   {
     TCHAR SuRunExe[4096];
     GetSystemWindowsDirectory(SuRunExe,4096);
@@ -645,8 +581,6 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
   }
-  //Start StayOnDesktop
-  g_StayOnDesk=new CStayOnDeskTop(DeskName);
   return true;
 }
 
@@ -660,18 +594,15 @@ void DeleteSafeDesktop(bool bFade)
   g_WatchDogProcess=0;
   if (g_RunOnNewDesk && bFade)
     g_RunOnNewDesk->FadeOut();
-  if (g_StayOnDesk)
-    delete g_StayOnDesk;
-  g_StayOnDesk=NULL;
   if (g_RunOnNewDesk)
     delete g_RunOnNewDesk;
   g_RunOnNewDesk=NULL;
-  if(g_StayOnDeskEvent)
-    CloseHandle(g_StayOnDeskEvent);
-  g_StayOnDeskEvent=NULL;
   if(g_WatchDogEvent)
     CloseHandle(g_WatchDogEvent);
   g_WatchDogEvent=NULL;
+  if(g_WatchDogThread)
+    WaitForSingleObject(g_WatchDogThread,INFINITE);
+  g_WatchDogThread=NULL;
   if (IsLocalSystem())
     SetUnhandledExceptionFilter(NULL);
 }
