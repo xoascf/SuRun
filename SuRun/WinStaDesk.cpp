@@ -592,6 +592,7 @@ bool CRunOnNewDeskTop::IsValid()
 
 LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
 {
+  DBGTrace("FATAL: Exception in SuRun!");
   DeleteSafeDesktop(0);
   return EXCEPTION_EXECUTE_HANDLER;
 }
@@ -606,54 +607,46 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     SetUnhandledExceptionFilter(ExceptionFilter);
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
-  //Start watchdog process:
-  PROCESS_INFORMATION pi={0};
-//  g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
-//  g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
-//  if (g_WatchDogEvent && g_StayOnDeskEvent)
-//  {
-//    TCHAR SuRunExe[4096];
-//    GetSystemWindowsDirectory(SuRunExe,4096);
-//    PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
-//    _tcscat(SuRunExe,L" ");
-//    _tcscat(SuRunExe,DeskName);
-//    _tcscat(SuRunExe,L" ");
-//    _tcscat(SuRunExe,UserDesk);
-//    STARTUPINFO si={0};
-//    si.cb	= sizeof(si);
-//    TCHAR WinstaDesk[MAX_PATH];
-//    _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
-//    si.lpDesktop = WinstaDesk;
-//    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,
-//      CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,NULL,NULL,&si,&pi))
-//    {
-//      g_WatchDogProcess=pi.hProcess;
-//    }
-//  }else
-//    DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
+  //Create Desktop
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
+  g_RunOnNewDesk=rond;
   if (!rond)
   {
-    if (pi.hThread)
-      CloseHandle(pi.hThread);
     DeleteSafeDesktop(false);
     return false;
   }
-  if (!rond->IsValid())
+  //Start watchdog process:
+  PROCESS_INFORMATION pi={0};
+  g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
+  g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
+  if (g_WatchDogEvent && g_StayOnDeskEvent)
   {
-    delete rond;
-    if (pi.hThread)
-      CloseHandle(pi.hThread);
-    return DeleteSafeDesktop(false),false;
-  }
-  g_RunOnNewDesk=rond;
-//  g_StayOnDesk=new CStayOnDeskTop(DeskName);
+    TCHAR SuRunExe[4096];
+    GetSystemWindowsDirectory(SuRunExe,4096);
+    PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
+    _tcscat(SuRunExe,L" ");
+    _tcscat(SuRunExe,DeskName);
+    _tcscat(SuRunExe,L" ");
+    _tcscat(SuRunExe,UserDesk);
+    STARTUPINFO si={0};
+    si.cb	= sizeof(si);
+    TCHAR WinstaDesk[MAX_PATH];
+    _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
+    si.lpDesktop = WinstaDesk;
+    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,CREATE_SUSPENDED,NULL,NULL,&si,&pi))
+      g_WatchDogProcess=pi.hProcess;
+    else
+      DBGTrace("CreateSafeDesktop error could not create WatchDog Process");
+  }else
+    DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
   rond->SwitchToOwnDesk();
   if (pi.hThread)
   {
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
   }
+  //Start StayOnDesktop
+  g_StayOnDesk=new CStayOnDeskTop(DeskName);
   return true;
 }
 
@@ -663,8 +656,8 @@ void DeleteSafeDesktop(bool bFade)
   {
     TerminateProcess(g_WatchDogProcess,0);
     CloseHandle(g_WatchDogProcess);
-    g_WatchDogProcess=0;
   }
+  g_WatchDogProcess=0;
   if (g_RunOnNewDesk && bFade)
     g_RunOnNewDesk->FadeOut();
   if (g_StayOnDesk)
@@ -674,15 +667,11 @@ void DeleteSafeDesktop(bool bFade)
     delete g_RunOnNewDesk;
   g_RunOnNewDesk=NULL;
   if(g_StayOnDeskEvent)
-  {
     CloseHandle(g_StayOnDeskEvent);
-    g_StayOnDeskEvent=NULL;
-  }
+  g_StayOnDeskEvent=NULL;
   if(g_WatchDogEvent)
-  {
     CloseHandle(g_WatchDogEvent);
-    g_WatchDogEvent=NULL;
-  }
+  g_WatchDogEvent=NULL;
   if (IsLocalSystem())
     SetUnhandledExceptionFilter(NULL);
 }
