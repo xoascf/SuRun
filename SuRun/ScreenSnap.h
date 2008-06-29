@@ -171,7 +171,7 @@ public:
   {
     if (m_hWndTrans && m_hWnd && m_bm && (m_StartTime==0))
     {
-      m_StartTime=timeGetTime()+500;
+      m_StartTime=timeGetTime()+490;
       SetTimer(m_hWndTrans,1,500,0);
     }
   }
