@@ -234,6 +234,7 @@ DWORD HookIAT(HMODULE hMod)
             }
             __except(1)
             {
+              DBGTrace("FATAL: Exception in HookIAT");
             }
           }
         }
