@@ -368,7 +368,6 @@ public:
     CStayOnDeskTop* t=(CStayOnDeskTop*)p;
     TCHAR DeskName[256];
     _tcscpy(DeskName,t->m_DeskName);
-    SetProcWinStaDesk(0,DeskName);
     HANDLE e=t->m_CloseEvent;
     ResetEvent(e);
     while (WaitForSingleObject(e,10)==WAIT_TIMEOUT)
@@ -385,13 +384,13 @@ public:
             && _tcsicmp(n,DeskName)
             && g_RunOnNewDesk)
           {
-            g_RunOnNewDesk->SwitchToOwnDesk();
-//            HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
-//            if (d)
-//            {
-//              SwitchDesktop(d);
-//              CloseDesktop(d);
-//            }
+            //g_RunOnNewDesk->SwitchToOwnDesk();
+            HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
+            if (d)
+            {
+              SwitchDesktop(d);
+              CloseDesktop(d);
+            }
           }
           CloseDesktop(i);
         }
@@ -452,7 +451,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
     if (!SetProcessWindowStation(m_hwinstaUser))
       DBGTrace1("CRunOnNewDeskTop::SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
   }
-  //Create a new Desktop and 
+  //Create a new Desktop 
   LenD=MAX_PATH;
   GetUserObjectInformation(m_hdeskSave,UOI_NAME,dtn,LenD,&LenD);
   if ((dtn[0]==TCHAR('\0')) || _tcsicmp(dtn,DeskName))
@@ -608,48 +607,53 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   //Every "secure" Desktop has its own name:
   CResStr DeskName(L"SRD_%04x",GetTickCount());
   //Start watchdog process:
-  g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
-  g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
   PROCESS_INFORMATION pi={0};
-  if (g_WatchDogEvent && g_StayOnDeskEvent)
-  {
-    TCHAR SuRunExe[4096];
-    GetSystemWindowsDirectory(SuRunExe,4096);
-    PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
-    _tcscat(SuRunExe,L" ");
-    _tcscat(SuRunExe,DeskName);
-    _tcscat(SuRunExe,L" ");
-    _tcscat(SuRunExe,UserDesk);
-    STARTUPINFO si={0};
-    si.cb	= sizeof(si);
-    TCHAR WinstaDesk[MAX_PATH];
-    _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
-    si.lpDesktop = WinstaDesk;
-    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,
-      CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,NULL,NULL,&si,&pi))
-    {
-      g_WatchDogProcess=pi.hProcess;
-    }
-  }else
-    DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
+//  g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
+//  g_StayOnDeskEvent=CreateEvent(0,1,1,STAYONDESK_EVENT_NAME);
+//  if (g_WatchDogEvent && g_StayOnDeskEvent)
+//  {
+//    TCHAR SuRunExe[4096];
+//    GetSystemWindowsDirectory(SuRunExe,4096);
+//    PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
+//    _tcscat(SuRunExe,L" ");
+//    _tcscat(SuRunExe,DeskName);
+//    _tcscat(SuRunExe,L" ");
+//    _tcscat(SuRunExe,UserDesk);
+//    STARTUPINFO si={0};
+//    si.cb	= sizeof(si);
+//    TCHAR WinstaDesk[MAX_PATH];
+//    _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
+//    si.lpDesktop = WinstaDesk;
+//    if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,
+//      CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,NULL,NULL,&si,&pi))
+//    {
+//      g_WatchDogProcess=pi.hProcess;
+//    }
+//  }else
+//    DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   if (!rond)
   {
-    CloseHandle(pi.hThread);
+    if (pi.hThread)
+      CloseHandle(pi.hThread);
     DeleteSafeDesktop(false);
     return false;
   }
   if (!rond->IsValid())
   {
     delete rond;
-    CloseHandle(pi.hThread);
+    if (pi.hThread)
+      CloseHandle(pi.hThread);
     return DeleteSafeDesktop(false),false;
   }
   g_RunOnNewDesk=rond;
-  g_StayOnDesk=new CStayOnDeskTop(DeskName);
-  //rond->SwitchToOwnDesk();
-  ResumeThread(pi.hThread);
-  CloseHandle(pi.hThread);
+//  g_StayOnDesk=new CStayOnDeskTop(DeskName);
+  rond->SwitchToOwnDesk();
+  if (pi.hThread)
+  {
+    ResumeThread(pi.hThread);
+    CloseHandle(pi.hThread);
+  }
   return true;
 }
 
@@ -685,7 +689,7 @@ void DeleteSafeDesktop(bool bFade)
 
 //int TestBS()
 //{
-//  CreateSafeDesktop(_T("WinSta0"),true);
+//  CreateSafeDesktop(_T("WinSta0"),_T("Default"),true,true);
 //  DWORD t=GetTickCount();
 //  while (GetTickCount()-t<600)
 //    g_RunOnNewDesk->m_Screen.MsgLoop();
