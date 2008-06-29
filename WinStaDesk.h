@@ -27,7 +27,7 @@
 //Call SetEvent(g_WatchDogEvent) in a WM_TIMER for a period of less than two 
 //seconds on the Safe desktop to prevent the watchdog process from displaying 
 //it's dialog on the input desktop
-extern HANDLE g_WatchDogEvent;
+//extern HANDLE g_WatchDogEvent;
 
 BOOL GetWinStaName(LPTSTR WinSta,DWORD ccWinSta);
 BOOL GetDesktopName(LPTSTR DeskName,DWORD ccDeskName);
