@@ -234,11 +234,11 @@ DWORD HookIAT(HMODULE hMod)
           {
             __try
             {
-              MEMORY_BASIC_INFORMATION mbi;
-              if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
+              //MEMORY_BASIC_INFORMATION mbi;
+              //if (VirtualQuery(&pThunk->u1.Function, &mbi, sizeof(MEMORY_BASIC_INFORMATION))!=0)
               {
                 DWORD oldProt=PAGE_READWRITE;
-                if(VirtualProtect(mbi.BaseAddress, mbi.RegionSize,PAGE_EXECUTE_WRITECOPY,&oldProt))
+                if(VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function),PAGE_EXECUTE_WRITECOPY,&oldProt))
                 {
 //#ifdef DoDBGTrace
 //                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x MBI:(%X,%X,%X)\n",
@@ -246,8 +246,8 @@ DWORD HookIAT(HMODULE hMod)
 //                  mbi.AllocationProtect,mbi.State,mbi.Type);
 //#endif DoDBGTrace
                   pThunk->u1.Function = (DWORD_PTR)newFunc;
-                  VirtualProtect(mbi.BaseAddress, mbi.RegionSize, oldProt, &oldProt);
-                  FlushInstructionCache(GetCurrentProcess(),mbi.BaseAddress, mbi.RegionSize);
+                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
+                  VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
                   nHooked++;
                 }
               }
