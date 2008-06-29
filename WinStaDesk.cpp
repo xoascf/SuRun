@@ -610,7 +610,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   //Create Desktop
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   g_RunOnNewDesk=rond;
-  if (!rond)
+  if ((!g_RunOnNewDesk)||(!g_RunOnNewDesk->IsValid()))
   {
     DeleteSafeDesktop(false);
     return false;
