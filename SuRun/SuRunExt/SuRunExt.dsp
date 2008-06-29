@@ -56,8 +56,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib /nologo /dll /machine:I386
-# ADD LINK32 /nologo /dll /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
-# SUBTRACT LINK32 /pdb:none /map /debug
+# ADD LINK32 /nologo /dll /debug /machine:I386 /out:"../ReleaseU/SuRunExt.dll" /IGNORE:4089
+# SUBTRACT LINK32 /pdb:none /map
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 Unicode Debug"
 
