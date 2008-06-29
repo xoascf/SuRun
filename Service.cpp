@@ -762,7 +762,7 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL Setup(LPCTSTR WinStaName)
+BOOL Setup()
 {
   //check if user name may not run setup:
   if (GetNoRunSetup(g_RunData.UserName))
@@ -1070,7 +1070,7 @@ void SuRun(DWORD ProcessID)
       {
         __try
         {
-          Setup(g_RunData.WinSta);
+          Setup();
         }__except(1)
         {
           DBGTrace("FATAL: Exception in Setup()");
