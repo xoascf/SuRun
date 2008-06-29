@@ -368,6 +368,7 @@ public:
     CStayOnDeskTop* t=(CStayOnDeskTop*)p;
     TCHAR DeskName[256];
     _tcscpy(DeskName,t->m_DeskName);
+    SetProcWinStaDesk(0,DeskName);
     HANDLE e=t->m_CloseEvent;
     ResetEvent(e);
     while (WaitForSingleObject(e,10)==WAIT_TIMEOUT)
@@ -385,8 +386,11 @@ public:
             && g_RunOnNewDesk)
           {
             HDESK d=OpenDesktop(DeskName,0,FALSE,DESKTOP_SWITCHDESKTOP);
-            SwitchDesktop(d);
-            CloseDesktop(d);
+            if (d)
+            {
+              SwitchDesktop(d);
+              CloseDesktop(d);
+            }
           }
           CloseDesktop(i);
         }
