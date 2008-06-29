@@ -89,8 +89,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
-# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /debug /machine:I386 /IGNORE:4089
-# SUBTRACT LINK32 /pdb:none /map /nodefaultlib
+# ADD LINK32 gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /machine:I386 /IGNORE:4089
+# SUBTRACT LINK32 /pdb:none /map /debug /nodefaultlib
 # Begin Special Build Tool
 OutDir=.\ReleaseU
 SOURCE="$(InputPath)"
