@@ -7,6 +7,8 @@ Done, to be tested:
 * SwitchDesktop back to user desktop failed after LockWindowStation
 * The "Could not create safe Desktop" message caused the WatchDog showing up
 * Fading blurred desktop in is now OFF by default
+* Safe Desktop is now created before the screenshot is done
+* CStayOnDesktop caused GPFs in Vista, WatchDog handles SwitchDesktop issues
 
 ToDo
 ---------------------
