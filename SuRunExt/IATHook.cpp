@@ -69,6 +69,8 @@ FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
 BOOL WINAPI FreeLib(HMODULE);
 VOID WINAPI FreeLibAndExitThread(HMODULE,DWORD);
 
+static lpGetProcAddress orgGPA=NULL;
+
 typedef std::list<HMODULE> ModList;
 
 ModList g_ModList;
@@ -86,7 +88,16 @@ public:
     DllName=Dll;
     FuncName=Func;
     newFunc=nFunc;
-    orgFunc=GetProcAddress(GetModuleHandleA(DllName),FuncName);
+    orgFunc=0;
+  }
+  PROC OrgFunc()
+  {
+    if (orgFunc)
+      return orgFunc;
+    if (!orgGPA)
+      orgGPA=GetProcAddr;
+    orgFunc=orgGPA(GetModuleHandleA(DllName),FuncName);
+    return orgFunc;
   }
 }; 
 
@@ -104,6 +115,7 @@ static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreatePr
 
 static CHookDescriptor* hdt[]=
 {
+  //Functions, that if present in the IAT, will be hooked
   &hkLdLibA,
   &hkLdLibW, 
   &hkLdLibXA, 
@@ -111,6 +123,13 @@ static CHookDescriptor* hdt[]=
   &hkGetPAdr, 
   &hkFreeLib, 
   &hkFrLibXT, 
+  &hkCrProcA, 
+  &hkCrProcW
+};
+
+static CHookDescriptor* need_hdt[]=
+{
+  //Functions, that if present in the IAT, need to be hooked
   &hkCrProcA, 
   &hkCrProcW
 };
@@ -130,7 +149,7 @@ BOOL DoHookDll(char* DllName)
 //returns newFunc if DllName->ImpName is one to be hooked up
 PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
 {
-  if(IsBadReadPtr(DllName,4)||IsBadReadPtr(ImpName,4))
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
   if(*DllName && *ImpName)
     for(int i=0;i<countof(hdt);i++)
@@ -138,7 +157,7 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
         {
           if(orgFunc)
-            *orgFunc=hdt[i]->orgFunc;
+            *orgFunc=hdt[i]->OrgFunc();
           return hdt[i]->newFunc;
         }
   return false;
@@ -146,25 +165,38 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
 
 PROC DoHookFn(char* DllName,PROC orgFunc)
 {
-  if(IsBadReadPtr(DllName,4)||IsBadReadPtr(orgFunc,4))
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(orgFunc,1))
     return 0;
   if(*DllName)
     for(int i=0;i<countof(hdt);i++)
       if (stricmp(hdt[i]->DllName,DllName)==0)
-        if (hdt[i]->orgFunc==orgFunc)
+        if (hdt[i]->OrgFunc()==orgFunc)
           return hdt[i]->newFunc;
   return false;
 }
 
 PROC GetOrgFn(char* DllName,char* ImpName)
 {
-  if(IsBadReadPtr(DllName,4)||IsBadReadPtr(ImpName,4))
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
   if(*DllName && *ImpName)
     for(int i=0;i<countof(hdt);i++)
       if (stricmp(hdt[i]->DllName,DllName)==0)
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
-          return hdt[i]->orgFunc;
+          return hdt[i]->OrgFunc();
+  return false;
+}
+
+//Detect if a module is using CreateProcess, if yes, it needs to be hooked
+bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
+{
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1)||IsBadReadPtr(ImpName,1))
+    return 0;
+  if(*DllName && *ImpName)
+    for(int i=0;i<countof(need_hdt);i++)
+      if (stricmp(need_hdt[i]->DllName,DllName)==0)
+        if (stricmp(need_hdt[i]->FuncName,ImpName)==0)
+          return need_hdt[i]->OrgFunc()==orgFunc;
   return false;
 }
 
@@ -265,6 +297,61 @@ DWORD HookIAT(HMODULE hMod)
   return nHooked;
 }
 
+bool NeedsHook(HMODULE hMod)
+{
+  //Detect if a module is using CreateProcess, if yes, it needs to be hooked
+  if(hMod==l_hInst)
+    return false;
+  {
+    char f0[MAX_PATH]={0};
+    char f1[MAX_PATH]={0};
+    GetModuleFileNameA(hMod,f0,MAX_PATH);
+    GetModuleFileNameA(l_hInst,f0,MAX_PATH);
+    if (stricmp(f0,f1)==0)
+      return false;
+  }
+  // check "MZ" and DOS Header size
+  if(IsBadReadPtr(hMod,sizeof(IMAGE_DOS_HEADER))
+    || (((PIMAGE_DOS_HEADER)hMod)->e_magic!=IMAGE_DOS_SIGNATURE))
+    return false;
+  // check "PE" and DOS Header size
+  PIMAGE_NT_HEADERS pNTH = RelPtr(PIMAGE_NT_HEADERS,hMod,((PIMAGE_DOS_HEADER)hMod)->e_lfanew);
+  if(IsBadReadPtr(pNTH, sizeof(IMAGE_NT_HEADERS)) ||(pNTH->Signature != IMAGE_NT_SIGNATURE))
+    return false;
+  //the right header?
+#ifdef _WIN64
+  if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64)
+    return false;
+#else _WIN64
+  if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_I386)
+    return false;
+#endif _WIN64
+  if(pNTH->FileHeader.SizeOfOptionalHeader!=sizeof(IMAGE_OPTIONAL_HEADER))
+    return false;
+  //parse IAT
+  DWORD_PTR va=pNTH->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+  if(va==0) 
+    return false;
+  PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
+  for(;pID->Name;pID++) 
+  {
+    char* DllName=RelPtr(char*,hMod,pID->Name);
+    if(DoHookDll(DllName))
+    {
+      PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
+      PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
+      for(;(pThunk->u1.Function)&&(pOrgThunk->u1.Function);pOrgThunk++,pThunk++)
+        if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )==0)
+        {
+          PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
+          if(NeedHookFn(DllName,(char*)pBN->Name,(void*)pThunk->u1.Function))
+            return TRUE;
+        }
+    }//if(DoHookDll(DllName))
+  }//for(;pID->Name;pID++) 
+  return false;
+}
+
 DWORD HookModules()
 {
   if (!GetUseIATHook)
@@ -289,7 +376,10 @@ DWORD HookModules()
     std::set_difference(hMod,hMod+n,g_ModList.begin(),g_ModList.end(),std::back_inserter(newMods));
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
-      nHooked+=HookIAT(*it);
+    {
+      if (NeedsHook(*it))
+        nHooked+=HookIAT(*it);
+    }
     //merge new hModules to list
     g_ModList.merge(newMods);
     free(hMod);
@@ -372,12 +462,12 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   si.cb = sizeof(si);
   // Start the child process.
 #ifdef DoDBGTrace
-  if (!hkCrProcW.orgFunc)
+  if (!hkCrProcW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
-  if (hkCrProcW.newFunc==hkCrProcW.orgFunc)
+  if (hkCrProcW.newFunc==hkCrProcW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
 #endif DoDBGTrace
-  if (((lpCreateProcessW)hkCrProcW.orgFunc)
+  if (((lpCreateProcessW)hkCrProcW.OrgFunc())
     (NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi))
   {
     CloseHandle(pi.hThread);
@@ -431,12 +521,12 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
   if(tas==RETVAL_CANCELLED)
     return SetLastError(ERROR_ACCESS_DENIED),FALSE;
 #ifdef DoDBGTrace
-  if (!hkCrProcA.orgFunc)
+  if (!hkCrProcA.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkCrProcA.orgFunc==0!");
-  if (hkCrProcA.newFunc==hkCrProcA.orgFunc)
+  if (hkCrProcA.newFunc==hkCrProcA.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkCrProcA.newFunc==hkCrProcA.orgFunc!");
 #endif DoDBGTrace
-  return ((lpCreateProcessA)hkCrProcA.orgFunc)(lpApplicationName,lpCommandLine,
+  return ((lpCreateProcessA)hkCrProcA.OrgFunc())(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
 }
@@ -454,12 +544,12 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   if(tas==RETVAL_CANCELLED)
     return SetLastError(ERROR_ACCESS_DENIED),FALSE;
 #ifdef DoDBGTrace
-  if (!hkCrProcW.orgFunc)
+  if (!hkCrProcW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
-  if (hkCrProcW.newFunc==hkCrProcW.orgFunc)
+  if (hkCrProcW.newFunc==hkCrProcW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
 #endif DoDBGTrace
-  return ((lpCreateProcessW)hkCrProcW.orgFunc)(lpApplicationName,lpCommandLine,
+  return ((lpCreateProcessW)hkCrProcW.OrgFunc())(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
 }
@@ -474,12 +564,12 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
   if(!p)
   {
 #ifdef DoDBGTrace
-  if (!hkGetPAdr.orgFunc)
+  if (!hkGetPAdr.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkGetPAdr.orgFunc==0!");
-  if (hkGetPAdr.newFunc==hkGetPAdr.orgFunc)
+  if (hkGetPAdr.newFunc==hkGetPAdr.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkGetPAdr.newFunc==hkGetPAdr.orgFunc!");
 #endif DoDBGTrace
-    p=((lpGetProcAddress)hkGetPAdr.orgFunc)(hModule,lpProcName);
+    p=((lpGetProcAddress)hkGetPAdr.OrgFunc())(hModule,lpProcName);
   }
 #ifdef DoDBGTrace
   else
@@ -497,12 +587,12 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
 #ifdef DoDBGTrace
-  if (!hkLdLibA.orgFunc)
+  if (!hkLdLibA.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibA.orgFunc==0!");
-  if (hkLdLibA.newFunc==hkLdLibA.orgFunc)
+  if (hkLdLibA.newFunc==hkLdLibA.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibA.newFunc==hkLdLibA.orgFunc!");
 #endif DoDBGTrace
-  HMODULE hMOD=((lpLoadLibraryA)hkLdLibA.orgFunc)(lpLibFileName);
+  HMODULE hMOD=((lpLoadLibraryA)hkLdLibA.OrgFunc())(lpLibFileName);
   DWORD dwe=GetLastError();
   if(hMOD)
     HookModules();
@@ -515,12 +605,12 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
   EnterCriticalSection(&g_HookCs);
 #ifdef DoDBGTrace
-  if (!hkLdLibW.orgFunc)
+  if (!hkLdLibW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibW.orgFunc==0!");
-  if (hkLdLibW.newFunc==hkLdLibW.orgFunc)
+  if (hkLdLibW.newFunc==hkLdLibW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibW.newFunc==hkLdLibW.orgFunc!");
 #endif DoDBGTrace
-  HMODULE hMOD=((lpLoadLibraryW)hkLdLibW.orgFunc)(lpLibFileName);
+  HMODULE hMOD=((lpLoadLibraryW)hkLdLibW.OrgFunc())(lpLibFileName);
   DWORD dwe=GetLastError();
   if(hMOD)
     HookModules();
@@ -533,12 +623,12 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
 #ifdef DoDBGTrace
-  if (!hkLdLibXA.orgFunc)
+  if (!hkLdLibXA.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibXA.orgFunc==0!");
-  if (hkLdLibXA.newFunc==hkLdLibXA.orgFunc)
+  if (hkLdLibXA.newFunc==hkLdLibXA.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibXA.newFunc==hkLdLibXA.orgFunc!");
 #endif DoDBGTrace
-  HMODULE hMOD=((lpLoadLibraryExA)hkLdLibXA.orgFunc)(lpLibFileName,hFile,dwFlags);
+  HMODULE hMOD=((lpLoadLibraryExA)hkLdLibXA.OrgFunc())(lpLibFileName,hFile,dwFlags);
   DWORD dwe=GetLastError();
   if(hMOD)
     HookModules();
@@ -551,13 +641,13 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
   EnterCriticalSection(&g_HookCs);
 #ifdef DoDBGTrace
-  if (!hkLdLibXW.orgFunc)
+  if (!hkLdLibXW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibXW.orgFunc==0!");
-  if (hkLdLibXW.newFunc==hkLdLibXW.orgFunc)
+  if (hkLdLibXW.newFunc==hkLdLibXW.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkLdLibXW.newFunc==hkLdLibXW.orgFunc!");
 #endif DoDBGTrace
   DWORD dwe=GetLastError();
-  HMODULE hMOD=((lpLoadLibraryExW)hkLdLibXW.orgFunc)(lpLibFileName,hFile,dwFlags);
+  HMODULE hMOD=((lpLoadLibraryExW)hkLdLibXW.OrgFunc())(lpLibFileName,hFile,dwFlags);
   if(hMOD)
     HookModules();
   LeaveCriticalSection(&g_HookCs);
@@ -588,12 +678,12 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
   SetLastError(NOERROR);
   EnterCriticalSection(&g_HookCs);
 #ifdef DoDBGTrace
-  if (!hkFreeLib.orgFunc)
+  if (!hkFreeLib.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkFreeLib.orgFunc==0!");
-  if (hkFreeLib.newFunc==hkFreeLib.orgFunc)
+  if (hkFreeLib.newFunc==hkFreeLib.OrgFunc())
     DBGTrace("IATHook FATAL Warning! hkFreeLib.newFunc==hkFreeLib.orgFunc!");
 #endif DoDBGTrace
-  BOOL bRet=((lpFreeLibrary)hkFreeLib.orgFunc)(hLibModule);
+  BOOL bRet=((lpFreeLibrary)hkFreeLib.OrgFunc())(hLibModule);
   LeaveCriticalSection(&g_HookCs);
   return bRet;
 }
@@ -604,14 +694,14 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
   if (hLibModule!=l_hInst)
   {
 #ifdef DoDBGTrace
-    if (!hkFrLibXT.orgFunc)
+    if (!hkFrLibXT.OrgFunc())
       DBGTrace("IATHook FATAL Warning! hkFrLibXT.orgFunc==0!");
-    if (hkFrLibXT.newFunc==hkFrLibXT.orgFunc)
+    if (hkFrLibXT.newFunc==hkFrLibXT.OrgFunc())
       DBGTrace("IATHook FATAL Warning! hkFrLibXT.newFunc==hkFrLibXT.orgFunc!");
 #endif DoDBGTrace
     EnterCriticalSection(&g_HookCs);
     LeaveCriticalSection(&g_HookCs);
-    ((lpFreeLibraryAndExitThread)hkFrLibXT.orgFunc)(hLibModule,dwExitCode);
+    ((lpFreeLibraryAndExitThread)hkFrLibXT.OrgFunc())(hLibModule,dwExitCode);
     return;
   }
 #ifdef DoDBGTrace
@@ -641,6 +731,7 @@ DWORD WINAPI InitHookProc(void* p)
   if (!GetUseIATHook)
     return 0;
   EnterCriticalSection(&g_HookCs);
+  orgGPA=GetProcAddress;
   HookModules();
   LeaveCriticalSection(&g_HookCs);
   return 0;
