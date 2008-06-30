@@ -648,7 +648,7 @@ DWORD WINAPI InitHookProc(void* p)
 
 void LoadHooks()
 {
-//  CreateThread(0,0,InitHookProc,0,0,0);
+//  CloseHandle(CreateThread(0,0,InitHookProc,0,0,0));
   InitHookProc(0);
 }
 
