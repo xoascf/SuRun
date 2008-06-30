@@ -113,9 +113,16 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
 
+//Functions that, if present in the IAT, cause the module to be hooked
+static CHookDescriptor* need_hdt[]=
+{
+  &hkCrProcA, 
+  &hkCrProcW
+};
+
+//Functions that will be hooked
 static CHookDescriptor* hdt[]=
 {
-  //Functions, that if present in the IAT, will be hooked
   &hkLdLibA,
   &hkLdLibW, 
   &hkLdLibXA, 
@@ -123,13 +130,6 @@ static CHookDescriptor* hdt[]=
   &hkGetPAdr, 
   &hkFreeLib, 
   &hkFrLibXT, 
-  &hkCrProcA, 
-  &hkCrProcW
-};
-
-static CHookDescriptor* need_hdt[]=
-{
-  //Functions, that if present in the IAT, need to be hooked
   &hkCrProcA, 
   &hkCrProcW
 };
@@ -343,9 +343,7 @@ DWORD HookModules()
     std::set_difference(hMod,hMod+n,g_ModList.begin(),g_ModList.end(),std::back_inserter(newMods));
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
-    {
       nHooked+=Hook(*it);
-    }
     //merge new hModules to list
     g_ModList.merge(newMods);
     free(hMod);
