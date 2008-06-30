@@ -867,7 +867,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 //      TCHAR UserName[UNLEN+UNLEN+2]={0};
 //      GetProcessUserName(PID,UserName);
 //      if(GetInstallDevs(UserName))
-//        CreateThread(0,0,NewDevProc,0,0,0);
+//        CloseHandle(CreateThread(0,0,NewDevProc,0,0,0));
 //    }
 //  }
   return TRUE;
