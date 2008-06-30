@@ -323,7 +323,6 @@ private:
   HDESK   m_hdeskSave;
   HDESK   m_hdeskUser;
   HDESK   m_hDeskSwitch;
-  HDESK   m_hDeskSwitchUser;
 public:
   CBlurredScreen m_Screen;
 };
@@ -341,7 +340,6 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
                                    LPCTSTR UserDesk,bool bCreateBkWnd,bool bFadeIn)
 {
   m_hDeskSwitch=NULL;
-  m_hDeskSwitchUser=NULL;
   m_hwinstaUser=NULL;
   m_bOk=FALSE;
   //Get current WindowStation and Desktop
@@ -395,18 +393,14 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
     LocalFree(saDesktop.lpSecurityDescriptor);
   }
   //Open a handle to the user Desktop
-  m_hDeskSwitchUser=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
-  if (!m_hDeskSwitchUser)
-    DBGTrace1("CRunOnNewDeskTop::OpenDesktop failed: %s",GetLastErrorNameStatic());
-  //Get interactive Desktop
-  m_hDeskSwitch=OpenInputDesktop(0,FALSE,DESKTOP_SWITCHDESKTOP/*DESKTOP_ALL_ACCESS|WRITE_DAC|READ_CONTROL*/);
-  if ((!m_hDeskSwitch)&&(!m_hDeskSwitchUser))
+  m_hDeskSwitch=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
+  if (!m_hDeskSwitch)
   {
     DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
     return;
   }
   //Set Interactive Desktop as current Desktop to get the Desktop Bitmap
-  if (!SetThreadDesktop(m_hDeskSwitch?m_hDeskSwitch:m_hDeskSwitchUser))
+  if (!SetThreadDesktop(m_hDeskSwitch))
     DBGTrace1("CRunOnNewDeskTop::SetThreadDesktop(m_hDeskSwitch) failed!: %s",GetLastErrorNameStatic());
   //Create Background Bitmap
   if (bCreateBkWnd)
@@ -434,25 +428,14 @@ void CRunOnNewDeskTop::SwitchToOwnDesk()
 
 void CRunOnNewDeskTop::SwitchToUserDesk()
 {
-  for(;m_hDeskSwitch && m_hDeskSwitchUser;Sleep(100))
+  for(;m_hDeskSwitch;Sleep(100))
   {
     //Switch to the new Desktop
-    if (m_hDeskSwitch)
-    {
-      if (SwitchDesktop(m_hDeskSwitch))
-        return;
-      if (GetLastError()==ERROR_INVALID_HANDLE)
-        m_hDeskSwitch=0;
-      DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
-    }
-    if (m_hDeskSwitchUser)
-    {
-      if (!SwitchDesktop(m_hDeskSwitchUser))
-        return;
-      if (GetLastError()==ERROR_INVALID_HANDLE)
-        m_hDeskSwitchUser=0;
-      DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
-    }
+    if (SwitchDesktop(m_hDeskSwitch))
+      return;
+    if (GetLastError()==ERROR_INVALID_HANDLE)
+      m_hDeskSwitch=0;
+    DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
   }
 }
 
@@ -464,20 +447,13 @@ void CRunOnNewDeskTop::FadeOut()
 void CRunOnNewDeskTop::CleanUp()
 {
   //GrantUserAccessToDesktop(m_hDeskSwitch);
-  SwitchToUserDesk();
   //Switch back to the interactive Desktop
+  SwitchToUserDesk();
   if(m_hDeskSwitch)
   {
     if (!CloseDesktop(m_hDeskSwitch))
       DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
     m_hDeskSwitch=NULL;
-  }
-  //Switch back to the interactive Desktop
-  if(m_hDeskSwitchUser)
-  {
-    if (!CloseDesktop(m_hDeskSwitchUser))
-      DBGTrace1("CRunOnNewDeskTop: CloseDesktop failed: %s",GetLastErrorNameStatic());
-    m_hDeskSwitchUser=NULL;
   }
   //Delete Background Window
   if(m_bOk)
