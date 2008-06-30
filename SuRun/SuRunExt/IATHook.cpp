@@ -200,42 +200,9 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
   return false;
 }
 
-DWORD HookIAT(HMODULE hMod)
+DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 {
   DWORD nHooked=0;
-  if(hMod==l_hInst)
-    return nHooked;
-  {
-    char f0[MAX_PATH]={0};
-    char f1[MAX_PATH]={0};
-    GetModuleFileNameA(hMod,f0,MAX_PATH);
-    GetModuleFileNameA(l_hInst,f0,MAX_PATH);
-    if (stricmp(f0,f1)==0)
-      return nHooked;
-  }
-  // check "MZ" and DOS Header size
-  if(IsBadReadPtr(hMod,sizeof(IMAGE_DOS_HEADER))
-    || (((PIMAGE_DOS_HEADER)hMod)->e_magic!=IMAGE_DOS_SIGNATURE))
-    return nHooked;
-  // check "PE" and DOS Header size
-  PIMAGE_NT_HEADERS pNTH = RelPtr(PIMAGE_NT_HEADERS,hMod,((PIMAGE_DOS_HEADER)hMod)->e_lfanew);
-  if(IsBadReadPtr(pNTH, sizeof(IMAGE_NT_HEADERS)) ||(pNTH->Signature != IMAGE_NT_SIGNATURE))
-    return nHooked;
-  //the right header?
-#ifdef _WIN64
-  if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64)
-    return nHooked;
-#else _WIN64
-  if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_I386)
-    return nHooked;
-#endif _WIN64
-  if(pNTH->FileHeader.SizeOfOptionalHeader!=sizeof(IMAGE_OPTIONAL_HEADER))
-    return nHooked;
-  //patch IAT
-  DWORD_PTR va=pNTH->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-  if(va==0) 
-    return nHooked;
-  PIMAGE_IMPORT_DESCRIPTOR pID = RelPtr(PIMAGE_IMPORT_DESCRIPTOR,hMod,va);
 #ifdef DoDBGTrace
   char fmod[MAX_PATH]={0};
   {
@@ -297,37 +264,37 @@ DWORD HookIAT(HMODULE hMod)
   return nHooked;
 }
 
-bool NeedsHook(HMODULE hMod)
+DWORD Hook(HMODULE hMod)
 {
   //Detect if a module is using CreateProcess, if yes, it needs to be hooked
   if(hMod==l_hInst)
-    return false;
+    return 0;
   {
     char f0[MAX_PATH]={0};
     char f1[MAX_PATH]={0};
     GetModuleFileNameA(hMod,f0,MAX_PATH);
     GetModuleFileNameA(l_hInst,f0,MAX_PATH);
     if (stricmp(f0,f1)==0)
-      return false;
+      return 0;
   }
   // check "MZ" and DOS Header size
   if(IsBadReadPtr(hMod,sizeof(IMAGE_DOS_HEADER))
     || (((PIMAGE_DOS_HEADER)hMod)->e_magic!=IMAGE_DOS_SIGNATURE))
-    return false;
+    return 0;
   // check "PE" and DOS Header size
   PIMAGE_NT_HEADERS pNTH = RelPtr(PIMAGE_NT_HEADERS,hMod,((PIMAGE_DOS_HEADER)hMod)->e_lfanew);
   if(IsBadReadPtr(pNTH, sizeof(IMAGE_NT_HEADERS)) ||(pNTH->Signature != IMAGE_NT_SIGNATURE))
-    return false;
+    return 0;
   //the right header?
 #ifdef _WIN64
   if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64)
-    return false;
+    return 0;
 #else _WIN64
   if(pNTH->FileHeader.Machine!=IMAGE_FILE_MACHINE_I386)
-    return false;
+    return 0;
 #endif _WIN64
   if(pNTH->FileHeader.SizeOfOptionalHeader!=sizeof(IMAGE_OPTIONAL_HEADER))
-    return false;
+    return 0;
   //parse IAT
   DWORD_PTR va=pNTH->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
   if(va==0) 
@@ -345,7 +312,7 @@ bool NeedsHook(HMODULE hMod)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           if(NeedHookFn(DllName,(char*)pBN->Name,(void*)pThunk->u1.Function))
-            return TRUE;
+            return HookIAT(hMod,pID);
         }
     }//if(DoHookDll(DllName))
   }//for(;pID->Name;pID++) 
@@ -377,8 +344,7 @@ DWORD HookModules()
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
     {
-      if (NeedsHook(*it))
-        nHooked+=HookIAT(*it);
+      nHooked+=Hook(*it);
     }
     //merge new hModules to list
     g_ModList.merge(newMods);
