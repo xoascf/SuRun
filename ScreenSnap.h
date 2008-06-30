@@ -78,6 +78,7 @@ public:
     m_dy=0;
     m_bm=0;
     m_blurbm=0;
+    m_Thread=NULL;
     timeBeginPeriod(1);
     m_StartTime=0;
   }
@@ -101,6 +102,12 @@ public:
   }
   void Done()
   {
+    if(m_Thread)
+    {
+      WaitForSingleObject(m_Thread,INFINITE);
+      CloseHandle(m_Thread);
+    }
+    m_Thread=NULL;
     if(m_hWnd)
     {
       SetWindowLongPtr(m_hWnd,GWLP_USERDATA,0);
@@ -132,7 +139,6 @@ public:
     wc.lpszClassName=_T("ScreenWndClass");
     wc.hInstance=GetModuleHandle(0);
     RegisterClass(&wc);
-    m_blurbm=Blur(m_bm,m_dx,m_dy);
     m_hWnd=CreateWindowEx(WS_EX_NOACTIVATE,wc.lpszClassName,
       _T("ScreenWnd"),WS_VISIBLE|WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
       m_dx,m_dy,0,0,wc.hInstance,0);
@@ -147,12 +153,16 @@ public:
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
       SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
       RedrawWindow(m_hWndTrans,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
+      m_Thread=CreateThread(0,0,BlurProc,this,0,0);
     }else
     {
       m_hWndTrans=m_hWnd;
       m_hWnd=0;
       if (m_bm)
+      {
+        m_blurbm=Blur(m_bm,m_dx,m_dy);
         DeleteObject(m_bm);
+      }
       m_bm=0;
     }
     MsgLoop();
@@ -171,13 +181,13 @@ public:
   {
     if (m_hWndTrans && m_hWnd && m_bm && (m_StartTime==0))
     {
-      m_StartTime=timeGetTime()+490;
-      SetTimer(m_hWndTrans,1,500,0);
+      m_StartTime=timeGetTime();
+      SetTimer(m_hWndTrans,1,10,0);
     }
   }
   void FadeOut()
   {
-    if (m_hWndTrans && m_hWnd)
+    if (m_hWndTrans && m_hWnd && m_blurbm)
     {
       KillTimer(m_hWndTrans,1);
       BYTE a0=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
@@ -192,11 +202,17 @@ public:
     }
   }
 private:
+  static DWORD WINAPI BlurProc(void* p)
+  {
+    CBlurredScreen* bs=(CBlurredScreen*)p;  
+    bs->m_blurbm=Blur(bs->m_bm,bs->m_dx,bs->m_dy);
+    return 0;
+  }
   static LRESULT CALLBACK WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
-    CBlurredScreen* sw=(CBlurredScreen*)GetWindowLongPtr(hWnd,GWLP_USERDATA);
-    if (sw)
-      return sw->WndProc(hWnd,msg,wParam,lParam);
+    CBlurredScreen* bs=(CBlurredScreen*)GetWindowLongPtr(hWnd,GWLP_USERDATA);
+    if (bs)
+      return bs->WndProc(hWnd,msg,wParam,lParam);
     return DefWindowProc(hWnd,msg,wParam,lParam);
   }
   LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
@@ -207,10 +223,14 @@ private:
       {
         PAINTSTRUCT ps;
         HDC hdc= BeginPaint(hwnd, &ps);
-        HDC MemDC=CreateCompatibleDC(hdc);
-        SelectObject(MemDC,(hwnd==m_hWnd)?m_bm:m_blurbm);
-        BitBlt(hdc,0,0,m_dx,m_dy,MemDC,0,0,SRCCOPY);
-        DeleteDC(MemDC);
+        HBITMAP bm=(hwnd==m_hWnd)?m_bm:m_blurbm;
+        if(bm)
+        {
+          HDC MemDC=CreateCompatibleDC(hdc);
+          SelectObject(MemDC,bm);
+          BitBlt(hdc,0,0,m_dx,m_dy,MemDC,0,0,SRCCOPY);
+          DeleteDC(MemDC);
+        }
         EndPaint(hwnd, &ps);
         return 0;
       }
@@ -218,8 +238,13 @@ private:
       SetCursor(LoadCursor(0,IDC_WAIT));
       return TRUE;
     case WM_TIMER:
+      KillTimer(hwnd,wParam);
+      if (!m_blurbm)
       {
-        KillTimer(hwnd,wParam);
+        m_StartTime=timeGetTime();
+        SetTimer(hwnd,wParam,10,0);
+      }else
+      {
         BYTE a=(BYTE)min(255,(timeGetTime()-m_StartTime)/2);
         SetLayeredWindowAttributes(m_hWndTrans,0,a,LWA_ALPHA);
         if (a<255)
@@ -240,4 +265,5 @@ private:
   HBITMAP m_bm;
   HBITMAP m_blurbm;
   DWORD m_StartTime;
+  HANDLE m_Thread;
 };
