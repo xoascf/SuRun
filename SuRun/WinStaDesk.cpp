@@ -531,7 +531,7 @@ static DWORD WINAPI WDEventProc(void* p)
   while (g_WatchDogEvent)
   {
     SetEvent(g_WatchDogEvent);
-    Sleep(10);
+    Sleep(100);
   }
   return 0;
 }
