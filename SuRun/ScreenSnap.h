@@ -151,7 +151,6 @@ public:
         wc.lpszClassName,_T("ScreenWnd"),WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
         m_dx,m_dy,m_hWnd,0,wc.hInstance,0);
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
-      SetLayeredWindowAttributes(m_hWndTrans,0,0,LWA_ALPHA);
       m_Thread=CreateThread(0,0,BlurProc,this,0,0);
     }else
     {
@@ -205,6 +204,7 @@ private:
   {
     CBlurredScreen* bs=(CBlurredScreen*)p;  
     bs->m_blurbm=Blur(bs->m_bm,bs->m_dx,bs->m_dy);
+    SetLayeredWindowAttributes(bs->m_hWndTrans,0,0,LWA_ALPHA);
     RedrawWindow(bs->m_hWndTrans,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
     return 0;
   }
