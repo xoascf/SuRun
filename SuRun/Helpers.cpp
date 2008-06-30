@@ -445,13 +445,13 @@ PSECURITY_DESCRIPTOR GetUserAccessSD()
   pSDret=(PSECURITY_DESCRIPTOR)LocalAlloc(LPTR,SDlen);
   if(!MakeSelfRelativeSD(pSD,pSDret,&SDlen))
     goto Cleanup;
-  LocalFree(pUserSID);
+  free(pUserSID);
   LocalFree(pACL);
   LocalFree(pSD);
   return pSDret;
 Cleanup:
   if (pUserSID) 
-    LocalFree(pUserSID);
+    free(pUserSID);
   if (pACL) 
     LocalFree(pACL);
   if (pSD) 
