@@ -144,6 +144,7 @@ typedef struct _LOGONDLGPARAMS
   BOOL ForceAdminLogon;
   USERLIST Users;
   int TimeOut;
+  int MaxTimeOut;
   DWORD UsrFlags;
   BOOL bRunAs;
   _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags)
@@ -153,7 +154,8 @@ typedef struct _LOGONDLGPARAMS
     Password=Pwd;
     UserReadonly=RO;
     ForceAdminLogon=Adm;
-    TimeOut=40;//s
+    MaxTimeOut=40;//s
+    TimeOut=MaxTimeOut;
     UsrFlags=UFlags;
     bRunAs=FALSE;
   }
@@ -388,7 +390,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       //FLAG_CANCEL_SX: if this is set this dialog will not show up
       //FLAG_AUTOCANCEL: if this is set this dialog will not show up
       CheckDlgButton(hwnd,IDC_ALWAYSOK,(p->UsrFlags&FLAG_DONTASK)?1:0);
-      
+      SendDlgItemMessage(hwnd,IDC_AUTOCANCEL,PBM_SETRANGE,0,MAKELPARAM(0,p->MaxTimeOut));
+      SendDlgItemMessage(hwnd,IDC_AUTOCANCEL,PBM_SETPOS,0,0);
       if((!GetUseIShExHook) && (!GetUseIATHook))
         EnableWindow(GetDlgItem(hwnd,IDC_SHELLEXECOK),0);
       SetUserBitmap(hwnd);
@@ -446,7 +449,9 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
         LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
         p->TimeOut--;
-        if (p->TimeOut<0)
+        SendDlgItemMessage(hwnd,IDC_AUTOCANCEL,PBM_SETPOS,
+                           min(p->MaxTimeOut-p->TimeOut,p->MaxTimeOut),0);
+        if (p->TimeOut<=0)
           EndDialog(hwnd,0);
         else if (p->TimeOut<10)
           SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CANCEL,p->TimeOut));
