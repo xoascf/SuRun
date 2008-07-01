@@ -12,6 +12,7 @@ Done, to be tested:
 * IATHook scans module for "CreateProcess" before hooking it
 * IATHook uses InterlockedExchangePointer for better stability
 * Eclipse (JAVA) and SuRuns IAT Hook conflict
+* "Cancel" count down progress bar/static
 
 ToDo
 ---------------------
@@ -33,7 +34,6 @@ To be done in future:
 Deferred Whishlist:
 ---------------------
 * White list command line editor in "SuRun settings" with auto quotes
-* "Cancel" count down progress bar/static
 * Console SuRun support
 * Connect Network drives for admin process: 
 * Intercept "rundll32.exe newdev.dll,": 
