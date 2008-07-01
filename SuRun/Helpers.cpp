@@ -1076,3 +1076,33 @@ bool CTimeOut::TimedOut()
 {
   return Rest()==0;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// strwldcmp
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool strwldcmp(LPCTSTR s, LPCTSTR pattern) 
+{
+  while (*s && *pattern)
+  {
+    if ((*s==*pattern)||(*pattern=='?'))
+    {
+      s++;
+      pattern++;
+    }
+    if (*pattern=='*') 
+    {
+      pattern++;
+      while(*s)
+      {
+        if (strwldcmp(s,pattern))
+          return true;
+        s++;
+      }
+      return false;
+    }
+  }
+  return (*s==0) && (*pattern==0);
+}
