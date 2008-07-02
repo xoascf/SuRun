@@ -35,6 +35,8 @@
 #pragma comment(lib,"PSAPI.lib")
 
 extern HINSTANCE l_hInst;
+extern TCHAR     l_User[514];  //the Process user Name
+extern BOOL      l_IsAdmin;  //the Process user is an Admin
 
 //Function Prototypes:
 typedef HMODULE (WINAPI* lpLoadLibraryA)(LPCSTR);
@@ -363,12 +365,10 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   if (!GetUseIATHook)
     return RETVAL_SX_NOTINLIST;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
-  if(IsAdmin())
+  if(l_IsAdmin)
     return RETVAL_SX_NOTINLIST;
   {
-    TCHAR User[UNLEN+GNLEN+2]={0};
-    GetProcessUserName(GetCurrentProcessId(),User);
-    if (!IsInSuRunners(User))
+    if (!IsInSuRunners(l_User))
       return RETVAL_SX_NOTINLIST;
   }
   EnterCriticalSection(&g_HookCs);
