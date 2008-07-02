@@ -887,7 +887,7 @@ DWORD StartAdminProcessTrampoline()
         zero(g_RunPwd);
         GetExitCodeProcess(pi.hProcess,&RetVal);
         CloseHandle(pi.hProcess);
-        if (g_RunData.bShlExHook)
+        if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
         {
           //Show ToolTip "<Program> is running elevated"...
           if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
