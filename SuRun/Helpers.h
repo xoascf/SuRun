@@ -111,3 +111,9 @@ protected:
   DWORD m_EndTime;
 };
 
+// strwldcmp returns true if s matches pattern case insensitive
+// pattern may contain '*' and '?' as wildcards
+// '?' any "one" character in s match
+// '*' any "zero or more" characters in s match
+// e.G. strwldcmp("Test me","t*S*") strwldcmp("Test me","t?S*e") would match
+bool strwldcmp(LPCTSTR s, LPCTSTR pattern) ;
