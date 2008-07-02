@@ -93,6 +93,7 @@
 #define IDS_SHNAME7                     91
 #define IDS_SHNAME8                     92
 #define IDS_BEAUTIFIED                  93
+#define IDS_PW4SETUP                    94
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
@@ -212,6 +213,8 @@
 #define IDC_STOREPASS                   1074
 #define IDC_WARNADMIN                   1075
 #define IDC_AUTOCANCEL                  1077
+#define IDC_HIDESURUN                   1078
+#define IDC_REQPW4SETUP                 1079
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -220,7 +223,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1078
+#define _APS_NEXT_CONTROL_VALUE         1080
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
