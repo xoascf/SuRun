@@ -19,10 +19,10 @@ Done, to be tested:
 
 ToDo
 ---------------------
-* LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
-* Switchable Easy/Expert Settings
 * Configurable "Do not display messages" Option
 * "Require user password for SuRun Setings" Option
+* LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
+* Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
 * TSA sometimes slows down the system
