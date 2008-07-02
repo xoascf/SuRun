@@ -1079,22 +1079,34 @@ bool CTimeOut::TimedOut()
 
 /////////////////////////////////////////////////////////////////////////////
 // 
-// strwldcmp
+// strwldcmp returns true if s matches pattern case insensitive
+// pattern may contain '*' and '?' as wildcards
+// '?' any "one" character in s match
+// '*' any "zero or more" characters in s match
+// e.G. strwldcmp("Test me","t*S*") strwldcmp("Test me","t?S*e") would match
 //
 /////////////////////////////////////////////////////////////////////////////
 
 bool strwldcmp(LPCTSTR s, LPCTSTR pattern) 
 {
-  while (*s && *pattern)
+  if ((!s) || (!pattern))
+    return false;
+  while (*pattern)
   {
-    if ((*s==*pattern)||(*pattern=='?'))
+    if (*s==0)
+      return (*pattern=='*')&&(pattern[1]==0);
+    //ignore case; skip, if pattern is '?'
+    if ((toupper(*s)==toupper(*pattern))||(*pattern=='?'))
     {
       s++;
       pattern++;
-    }
-    if (*pattern=='*') 
+    }else if (*pattern=='*') 
     {
       pattern++;
+      //nothing after '*', ok for any string
+      if (*pattern==0)
+        return true;
+      //pattern contains something after '*', string needs to have a match
       while(*s)
       {
         if (strwldcmp(s,pattern))
@@ -1102,7 +1114,8 @@ bool strwldcmp(LPCTSTR s, LPCTSTR pattern)
         s++;
       }
       return false;
-    }
+    }else
+      return false;
   }
-  return (*s==0) && (*pattern==0);
+  return *s==0;
 }
