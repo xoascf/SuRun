@@ -24,6 +24,7 @@
 BOOL PasswordOK(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword);
 
 BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...);
+DWORD ValidateCurrentUser(LPTSTR User,int IDmsg,...);
 
 BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...);
 
