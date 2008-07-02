@@ -95,19 +95,24 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
+    CONTROL         "The user must enter his Password for ""SuRun Settings""",
+                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    30,202,10
     CONTROL         "User can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
-                    30,202,10
+                    41,202,10
+    CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
+                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
-                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
-                    IDS_GRPDESC,6,46,378,187
+                    IDS_GRPDESC,6,58,378,175
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,57,373,155
+                    WS_BORDER | WS_TABSTOP,8,69,373,143
     PUSHBUTTON      "&Add...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Edit...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
@@ -609,6 +614,7 @@ BEGIN
     IDS_SHNAME7             "Administrative Tools"
     IDS_SHNAME8             "My Documents"
     IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
+    IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
 END
 
 #endif    // Polish resources
@@ -821,20 +827,25 @@ BEGIN
     CONTROL         "Benutzer darf SuRun Einstellungen verändern",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,
                     201,10
+    CONTROL         "Benutzerpasswort abfragen für SuRun Einstellungen",
+                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    30,202,10
     CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
-                    30,201,10
+                    41,201,10
+    CONTROL         "SuRun vor Benutzer verbergen",IDC_HIDESURUN,"Button",
+                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
     CONTROL         "Benutzerstatus in Taskleiste anzeigen",
                     IDC_TRAYSHOWADMIN,"Button",BS_AUTO3STATE | WS_TABSTOP,
-                    252,19,137,10
+                    252,30,137,10
     CONTROL         "Benutzerstatus Info als 'Balloon-Tips'",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Programmliste für den Benutzer (Änderungen werden sofort wirksam, auch wenn 'Abbrechen' gedrückt wird).",
-                    IDS_GRPDESC,6,46,378,187
+                    IDS_GRPDESC,6,58,378,175
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,57,373,155
+                    WS_BORDER | WS_TABSTOP,8,69,373,143
     PUSHBUTTON      "H&inzu...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Löschen",IDC_DELETE,273,216,50,14
@@ -1285,6 +1296,7 @@ BEGIN
     IDS_SHNAME7             "Verwaltung"
     IDS_SHNAME8             "Eigene Dateien"
     IDS_BEAUTIFIED          "%s\r\n[Bedeutung: %s]"
+    IDS_PW4SETUP            "Zum Ändern der SuRun Einstellungen müssen Sie Ihr Kennwort eingeben."
 END
 
 #endif    // German (Germany) resources
@@ -1374,19 +1386,24 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
+    CONTROL         "The user must enter his Password for ""SuRun Settings""",
+                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    30,202,10
     CONTROL         "User can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
-                    30,202,10
+                    41,202,10
+    CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
+                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
-                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
-                    IDS_GRPDESC,6,46,378,187
+                    IDS_GRPDESC,6,57,378,176
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,57,373,155
+                    WS_BORDER | WS_TABSTOP,8,68,373,144
     PUSHBUTTON      "&Add...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Edit...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
@@ -1946,6 +1963,7 @@ BEGIN
     IDS_SHNAME7             "Administrative Tools"
     IDS_SHNAME8             "My Documents"
     IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
+    IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
 END
 
 #endif    // English (U.S.) resources
@@ -2035,19 +2053,24 @@ BEGIN
     PUSHBUTTON      "Verwijderen",IDC_DELUSER,334,4,50,14
     CONTROL         "Gebruiker kan SuRun instellingen wijzigen",IDC_RUNSETUP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
+    CONTROL         "The user must enter his Password for ""SuRun Settings""",
+                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    30,202,10
     CONTROL         "Alleen bepaalde programma's met SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
-                    30,202,10
-    CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
+                    41,202,10
+    CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
                     BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+    CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
+                    BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
     CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Programmalijst voor de gebruiker (Wijzigingen zijn direct van toepassing, ook bij 'Annuleren').",
-                    IDS_GRPDESC,6,46,378,187
+                    IDS_GRPDESC,6,58,378,175
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,57,373,155
+                    WS_BORDER | WS_TABSTOP,8,68,373,144
     PUSHBUTTON      "&Toevoegen...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Bewerken...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Verwijderen",IDC_DELETE,273,216,50,14
@@ -2561,6 +2584,7 @@ BEGIN
     IDS_SHNAME7             "Systeembeheer"
     IDS_SHNAME8             "Mijn Documenten"
     IDS_BEAUTIFIED          "%s\r\n[Betekenis: %s]"
+    IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
 END
 
 #endif    // Dutch (Netherlands) resources
