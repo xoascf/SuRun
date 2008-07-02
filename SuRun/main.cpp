@@ -164,6 +164,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   LPTSTR Args=PathGetArgs(GetCommandLine());
   //Parse direct commands:
   bool bRunSetup=FALSE;
+  if (GetHideFromUser(g_RunData.UserName))
+    g_RunData.beQuiet=TRUE;
   while (Args[0]=='/')
   {
     LPTSTR c=Args;
