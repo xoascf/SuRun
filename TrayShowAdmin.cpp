@@ -161,8 +161,13 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       case WM_CONTEXTMENU:
         DisplayMenu(hwnd);
         return 0;
-      };
-    };
+      }
+    }
+    break;
+  case WM_QUERYENDSESSION:
+    {
+      //ToDo: Warn, if SuRun processes are still running.
+    }
     break;
   }
   return DefWindowProc(hwnd , message, wParam, lParam);
