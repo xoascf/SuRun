@@ -599,6 +599,8 @@ static void SaveUserFlags()
     LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
     SetNoRunSetup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
     SetRestrictApps(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
+    SetHideFromUser(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HIDESURUN)!=0);
+    SetReqPw4Setup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_REQPW4SETUP)!=0);
     switch (IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
     {
     case BST_INDETERMINATE:
@@ -680,7 +682,17 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
     CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(u));
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
+    EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),1);
     CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(u));
+    CheckDlgButton(hwnd,IDC_HIDESURUN,GetHideFromUser(u));
+    if(GetNoRunSetup(u))
+    {
+      EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
+      CheckDlgButton(hwnd,IDC_REQPW4SETUP,0);
+    }else
+    {
+      CheckDlgButton(hwnd,IDC_REQPW4SETUP,GetReqPw4Setup(u));
+    }
     //TSA:
     //Win2k:no balloon tips
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),1);
@@ -698,6 +710,13 @@ static void UpdateUser(HWND hwnd)
       break;
     case 0:
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
+    }
+    if(GetHideFromUser(u))
+    {
+      EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
+      CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_INDETERMINATE);
     }
     EnableWindow(hWL,true);
     HKEY Key;
@@ -726,6 +745,8 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),false);
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),false);
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),false);
     EnableWindow(hWL,false);
@@ -1058,6 +1079,13 @@ EditApp:
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
+      case MAKELPARAM(IDC_HIDESURUN,IDC_RUNSETUP):
+        EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),IsDlgButtonChecked(hwnd,IDC_RUNSETUP));
+        return TRUE;
+      case MAKELPARAM(IDC_HIDESURUN,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0);
+        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0);
+        return TRUE;
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
         if (!IsWin2k())
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
