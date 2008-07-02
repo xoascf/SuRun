@@ -654,6 +654,8 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
   switch (uMsg) 
   { 
   case CPL_INIT:
+    if (GetHideFromUser(l_User))
+      return FALSE;
     return TRUE; 
   case CPL_GETCOUNT:
     //Non SuRunners don't need the Shell Extension!
@@ -662,6 +664,8 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
     return 1; 
   case CPL_INQUIRE:
     {
+      if (GetHideFromUser(l_User))
+        return 1;
       LPCPLINFO cpli=(LPCPLINFO)lParam2; 
       cpli->lData = 0; 
       cpli->idIcon = IDI_MAINICON;
@@ -671,6 +675,8 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
     }
   case CPL_DBLCLK:    // application icon double-clicked 
     {
+      if (GetHideFromUser(l_User))
+        return 1;
       TCHAR fSuRunExe[4096];
       GetSystemWindowsDirectory(fSuRunExe,4096);
       PathAppend(fSuRunExe,L"SuRun.exe");
