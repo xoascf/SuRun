@@ -701,10 +701,10 @@ static void UpdateUser(HWND hwnd)
     }
     EnableWindow(hWL,true);
     HKEY Key;
-    if(RegOpenKeyEx(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,u),0,KEY_READ,&Key)==ERROR_SUCCESS)
+    if(RegOpenKeyEx(HKLM,WHTLSTKEY(u),0,KEY_READ,&Key)==ERROR_SUCCESS)
     {
       TCHAR cmd[4096];
-      DWORD ccMax;
+      DWORD ccMax=countof(cmd);
       for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
       {
         ccMax=countof(cmd);
