@@ -1112,6 +1112,7 @@ EditApp:
           EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
           EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
         }
+        UpdateWhiteListFlags(GetDlgItem(hwnd,IDC_WHITELIST));
         return TRUE;
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
         if (!IsWin2k())
