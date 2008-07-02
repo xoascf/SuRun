@@ -62,6 +62,8 @@ DWORD g_LoadAppInit32DLLs = 0;
 #pragma comment(linker, "/section:.SHDATA,RWS")
 
 HINSTANCE   l_hInst     = NULL;
+TCHAR       l_User[514] = {0};
+BOOL        l_IsAdmin   = FALSE;
 
 UINT        WM_SYSMH0   = 0;
 UINT        WM_SYSMH1   = 0;
@@ -385,15 +387,11 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 #endif DoDBGTrace
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
-  {
-    //Non SuRunners don't need the Shell Extension!
-    TCHAR User[UNLEN+GNLEN+2]={0};
-    GetProcessUserName(GetCurrentProcessId(),User);
-    if (!IsInSuRunners(User))
-      return NOERROR;
-  }
+  //Non SuRunners don't need the Shell Extension!
+  if ((!IsInSuRunners(l_User))||GetHideFromUser(l_User))
+    return NOERROR;
   //Non Admins don't need the Shell Extension!
-  if (IsAdmin())
+  if (l_IsAdmin)
     return NOERROR;
   if (pDataObj==0)
   {
@@ -526,15 +524,11 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 //    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
 #endif DoDBGTrace
   //Admins don't need the ShellExec Hook!
-  if (IsAdmin())
+  if (l_IsAdmin)
     return S_FALSE;
-  {
-    //Non SuRunners don't need the ShellExec Hook!
-    TCHAR User[UNLEN+GNLEN+2]={0};
-    GetProcessUserName(GetCurrentProcessId(),User);
-    if (!IsInSuRunners(User))
-      return S_FALSE;
-  }
+  //Non SuRunners don't need the ShellExec Hook!
+  if ((!IsInSuRunners(l_User)))
+    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
@@ -662,6 +656,9 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
   case CPL_INIT:
     return TRUE; 
   case CPL_GETCOUNT:
+    //Non SuRunners don't need the Shell Extension!
+    if (GetHideFromUser(l_User))
+      return 0;
     return 1; 
   case CPL_INQUIRE:
     {
@@ -802,14 +799,14 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   TCHAR fMod[MAX_PATH];
   GetModuleFileName(0,fMod,MAX_PATH);
-  BOOL bAdmin=IsAdmin();
+  l_IsAdmin=IsAdmin();
   DWORD PID=GetCurrentProcessId();
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
 #ifdef DoDBGTrace
     DBGTrace5("Detach(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
+      hInstDLL,PID,fMod,GetCommandLine(),l_IsAdmin);
 #endif DoDBGTrace
     EnterCriticalSection(&l_SxHkCs);
     LeaveCriticalSection(&l_SxHkCs);
@@ -822,6 +819,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   //Process Attach:
   DisableThreadLibraryCalls(hInstDLL);
+  GetProcessUserName(GetCurrentProcessId(),l_User);
 #ifdef DoDBGTrace
   HINSTANCE lhi=l_hInst;
 #endif DoDBGTrace
@@ -836,26 +834,26 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   //IAT Hook:
-  if ((!bAdmin) && GetUseIATHook)
+  if ((!l_IsAdmin) && GetUseIATHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[4096];
     GetSystemWindowsDirectory(fSuRunExe,4096);
     PathAppend(fSuRunExe,L"SuRun.exe");
     PathQuoteSpaces(fSuRunExe);
-    BOOL bSetHook=(!bAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
+    BOOL bSetHook=(!l_IsAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
     DBGTrace7("Attach(hInst=%x,old %x) %d:%s[%s], Admin=%d, SetHook=%d",
-      hInstDLL,lhi,PID,fMod,GetCommandLine(),bAdmin,bSetHook);
+      hInstDLL,lhi,PID,fMod,GetCommandLine(),l_IsAdmin,bSetHook);
     if(bSetHook)
       LoadHooks();
   }
 #ifdef DoDBGTrace
   else
     DBGTrace5("Attach(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),bAdmin);
+      hInstDLL,PID,fMod,GetCommandLine(),l_IsAdmin);
 #endif DoDBGTrace
   //DevInst
-//  if(!bAdmin)
+//  if(!l_IsAdmin)
 //  {
 //    TCHAR f[4096];
 //    GetSystemDirectory(f,4096);
@@ -864,9 +862,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 //    LPTSTR args=PathGetArgs(GetCommandLine());
 //    if((_tcsicmp(f,fMod)==0) &&(_tcsnicmp(L"newdev.dll,",args,11)==0))
 //    {
-//      TCHAR UserName[UNLEN+UNLEN+2]={0};
-//      GetProcessUserName(PID,UserName);
-//      if(GetInstallDevs(UserName))
+//      if(GetInstallDevs(l_User))
 //        CloseHandle(CreateThread(0,0,NewDevProc,0,0,0));
 //    }
 //  }
