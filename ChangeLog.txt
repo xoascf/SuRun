@@ -4,20 +4,22 @@ Done, to be tested:
 * Setup does a test run of added/edited commands
 * Don't show "Restart as Admin" in shell
 * Don't try to start automagically elevated "AsInvoker" Apps
-* SwitchDesktop back to user desktop failed after LockWindowStation
+* When installing applications that require to reboot and to run a "Setup" when
+  logging on, SuRun asked to start that setup as Admin but then it did not 
+  switch back to the user's desktop
 * The "Could not create safe Desktop" message caused the WatchDog showing up
-* Safe Desktop is now created before the screenshot is made
+* Safe Desktop is now created before the screenshot is made to save resources
 * The WatchDog process now handles SwitchDesktop issues
-* SuRun now uses a separate thread to create and fade in the blurred screen
-* IATHook scans module for "CreateProcess" before hooking it
+* SuRun uses a separate thread to create and fade in the blurred screen
+* IATHook scans DLLs for "CreateProcess" before hooking them
 * IATHook uses InterlockedExchangePointer for better stability
-* Eclipse (JAVA) and SuRuns IAT Hook conflict
-* "Cancel" count down progress bar/static
+* Eclipse (JAVA) and SuRuns IAT Hook do not conflict anymore
+* When asking to elevate a process, a "Cancel" count down progress bar is shown
+* Wildcards "*" and "?" are supported for applications
 
 ToDo
 ---------------------
 * LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
-* "*" at the end of a command means "anything from here matches"
 * Switchable Easy/Expert Settings
 * Configurable "Do not display messages" Option
 * "Require user password for SuRun Setings" Option
