@@ -108,9 +108,34 @@ void UpdLastRunTime(LPTSTR UserName)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
+DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
+{
+  HKEY Key;
+  if(!RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KEY_READ,&Key)==ERROR_SUCCESS)
+    return Default;
+  DWORD sizd=sizeof(DWORD);
+  DWORD d;
+  if (RegQueryValueEx(Key,CmdLine,0,0,(BYTE*)&d,&sizd)==ERROR_SUCCESS)
+    return RegCloseKey(Key),d;
+  TCHAR cmd[4096];
+  DWORD ccMax=countof(cmd);
+  for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
+  {
+    ccMax=countof(cmd);
+    if(strwldcmp(CmdLine,cmd))
+    {
+      sizd=sizeof(DWORD);
+      if (RegQueryValueEx(Key,cmd,0,0,(BYTE*)&d,&sizd)==ERROR_SUCCESS)
+        return RegCloseKey(Key),d;
+    }
+  }
+  RegCloseKey(Key);
+  return Default;
+}
+
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
-  return (GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,0)&Flag)==Flag;
+  return (GetWhiteListFlags(User,CmdLine,0)&Flag)==Flag;
 }
 
 BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flags/*=0*/)
@@ -118,11 +143,6 @@ BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flags/*=0*/)
   CBigResStr key(_T("%s\\%s"),SVCKEY,User);
   DWORD d=GetRegInt(HKLM,key,CmdLine,-1);
   return (d==Flags)||SetRegInt(HKLM,key,CmdLine,Flags);
-}
-
-DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
-{
-  return GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,Default);
 }
 
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable)
@@ -680,12 +700,18 @@ static void UpdateUser(HWND hwnd)
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
     }
     EnableWindow(hWL,true);
-    CBigResStr wlkey(_T("%s\\%s"),SVCKEY,u);
-    TCHAR cmd[4096];
-    for (int i=0;RegEnumValName(HKLM,wlkey,i,cmd,4096);i++)
+    HKEY Key;
+    if(RegOpenKeyEx(HKLM,CBigResStr(_T("%s\\%s"),SVCKEY,u),0,KEY_READ,&Key)==ERROR_SUCCESS)
     {
-      LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
-      ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
+      TCHAR cmd[4096];
+      DWORD ccMax;
+      for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
+      {
+        ccMax=countof(cmd);
+        LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,g_SD->ImgIconIdx[0],0,0};
+        ListView_SetItemText(hWL,ListView_InsertItem(hWL,&item),3,cmd);
+      }
+      RegCloseKey(Key);
     }
 
     ListView_SortItemsEx(hWL,ListSortProc,hWL);
