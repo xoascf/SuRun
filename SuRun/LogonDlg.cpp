@@ -550,6 +550,18 @@ BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
+DWORD ValidateCurrentUser(LPTSTR User,int IDmsg,...)
+{
+  va_list va;
+  va_start(va,IDmsg);
+  CBigResStr S(IDmsg,va);
+  TCHAR P[PWLEN]={0};
+  LOGONDLGPARAMS p(S,User,P,true,false,0);
+  p.Users.Add(User);
+  return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
+                  0,DialogProc,(LPARAM)&p);
+}
+
 BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...)
 {
   va_list va;
