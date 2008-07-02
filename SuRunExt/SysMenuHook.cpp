@@ -46,6 +46,9 @@ HHOOK       g_hookMenu  = NULL;
 #pragma comment(linker, "/section:.SHDATA,RWS")
 
 extern HINSTANCE l_hInst; //the local Dll instance
+extern TCHAR     l_User[514];  //the Process user Name
+extern BOOL      l_IsAdmin;  //the Process user is an Admin
+
 
 extern UINT      WM_SYSMH0;
 extern UINT      WM_SYSMH1;
@@ -83,7 +86,8 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu((HMENU)wps->wParam) 
-        && (!IsAdmin()))
+        && (!l_IsAdmin)
+        && (!GetHideFromUser(l_User)))
       {
         if( GetRestartAsAdmin 
         && (!IsShell())
