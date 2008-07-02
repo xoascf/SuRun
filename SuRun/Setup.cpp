@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -715,8 +715,15 @@ static void UpdateUser(HWND hwnd)
     {
       EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),0);
       EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),0);
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_INDETERMINATE);
+      CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_REQPW4SETUP,BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
+      CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
     }
     EnableWindow(hWL,true);
     HKEY Key;
@@ -1083,12 +1090,27 @@ EditApp:
         EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),IsDlgButtonChecked(hwnd,IDC_RUNSETUP));
         return TRUE;
       case MAKELPARAM(IDC_HIDESURUN,BN_CLICKED):
+        if(IsDlgButtonChecked(hwnd,IDC_HIDESURUN))
         {
-          EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0);
-          BOOL bBal=(IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0)
-            &&(!IsWin2k())
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),0);
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
+          EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
+          EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),0);
+          EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),0);
+          CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
+          CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_INDETERMINATE);
+          CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
+          CheckDlgButton(hwnd,IDC_REQPW4SETUP,BST_UNCHECKED);
+          CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
+          CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
+        }else
+        {
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),1);
+          BOOL bBal=(!IsWin2k())
             &&(IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_CHECKED);
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bBal);
+          EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
+          EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
         }
         return TRUE;
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
