@@ -183,8 +183,16 @@
 #define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,-1)
 #define DelUserTSA(u)         DelUsrOption(u,_T("ShowTrayAdmin"))
 
+#define GetHideFromUser(u)    GetUsrOption(u,_T("HideFromUser"),0)
+#define SetHideFromUser(u,h)  SetUsrOption(u,_T("HideFromUser"),h,0)
+
+#define GetReqPw4Setup(u)    GetUsrOption(u,_T("ReqPw4Setup"),0)
+#define SetReqPw4Setup(u,b)  SetUsrOption(u,_T("ReqPw4Setup"),b,0)
+
 inline bool ShowTray(LPCTSTR u)
 {
+  if (GetHideFromUser(u))
+    return false;
   int utsa=(int)GetUserTSA(u);
   if (utsa>0)
     return true;
@@ -204,6 +212,8 @@ inline bool ShowTray(LPCTSTR u)
 
 inline bool ShowBalloon(LPCTSTR u)
 {
+  if (GetHideFromUser(u))
+    return false;
   if (GetUserTSA(u)==2)
     return true;
   DWORD tsa=GetShowTrayAdmin;
