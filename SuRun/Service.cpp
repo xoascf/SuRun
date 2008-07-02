@@ -255,6 +255,8 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //////////////////////////////////////////////////////////////////////////////
 void ShowTrayWarning(LPCTSTR Text,int IconId) 
 {
+  if (GetHideFromUser(g_RunData.UserName))
+    return;
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
   PathAppend(cmd,L"SuRun.exe");
@@ -666,6 +668,8 @@ DWORD PrepareSuRun()
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+  if (GetHideFromUser(g_RunData.UserName))
+    return RETVAL_CANCELLED;
   //Create the new desktop
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
     return RETVAL_NODESKTOP;
@@ -764,10 +768,19 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 
 BOOL Setup()
 {
+  if (GetHideFromUser(g_RunData.UserName))
+    return FALSE;
   //check if user name may not run setup:
   if (GetNoRunSetup(g_RunData.UserName))
   {
     if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
+      return FALSE;
+    return RunSetup();
+  }
+  //check if user name may not run setup:
+  if (GetReqPw4Setup(g_RunData.UserName))
+  {
+    if(!ValidateCurrentUser(g_RunData.UserName,IDS_PW4SETUP))
       return FALSE;
     return RunSetup();
   }
