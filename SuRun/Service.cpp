@@ -768,6 +768,7 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 
 BOOL Setup()
 {
+  //check if SuRun is hidden for user name
   if (GetHideFromUser(g_RunData.UserName))
     return FALSE;
   //check if user name may not run setup:
@@ -777,7 +778,7 @@ BOOL Setup()
       return FALSE;
     return RunSetup();
   }
-  //check if user name may not run setup:
+  //check if user name needs to enter the password:
   if (GetReqPw4Setup(g_RunData.UserName))
   {
     if(!ValidateCurrentUser(g_RunData.UserName,IDS_PW4SETUP))
