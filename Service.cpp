@@ -502,10 +502,11 @@ TryAgain:
               {
                 bRunCount++;
                 CloseHandle(pi.hThread);
-                WaitForSingleObject(pi.hProcess,60000);
-                DWORD ex=STILL_ACTIVE;//==103L
-                while (ex==STILL_ACTIVE)
+                for (DWORD ex=STILL_ACTIVE;ex==STILL_ACTIVE;)
+                {
+                  WaitForSingleObject(pi.hProcess,60000);
                   GetExitCodeProcess(pi.hProcess,&ex);
+                }
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
                 {
@@ -768,9 +769,6 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 
 BOOL Setup()
 {
-  //check if SuRun is hidden for user name
-  if (GetHideFromUser(g_RunData.UserName))
-    return FALSE;
   //check if user name may not run setup:
   if (GetNoRunSetup(g_RunData.UserName))
   {
@@ -1080,6 +1078,9 @@ void SuRun(DWORD ProcessID)
     {
       //Create the new desktop
       ResumeClient(RETVAL_OK);
+      //check if SuRun is hidden for user name
+      if (GetHideFromUser(g_RunData.UserName))
+        return;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
         __try
