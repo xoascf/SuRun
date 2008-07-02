@@ -95,14 +95,14 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
-    CONTROL         "The user must enter his Password for ""SuRun Settings""",
+    CONTROL         "Require user password for SuRun Settings",
                     IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "User can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,202,10
     CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
-                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
@@ -827,14 +827,14 @@ BEGIN
     CONTROL         "Benutzer darf SuRun Einstellungen verändern",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,
                     201,10
-    CONTROL         "Benutzerpasswort abfragen für SuRun Einstellungen",
+    CONTROL         "Benutzerpasswort für SuRun Einstellungen erforderlich",
                     IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "Benutzer darf nur festgelegte Programme mit SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,201,10
     CONTROL         "SuRun vor Benutzer verbergen",IDC_HIDESURUN,"Button",
-                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Benutzerstatus in Taskleiste anzeigen",
                     IDC_TRAYSHOWADMIN,"Button",BS_AUTO3STATE | WS_TABSTOP,
                     252,30,137,10
@@ -1386,14 +1386,14 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELUSER,334,4,50,14
     CONTROL         "The user can change SuRun settings",IDC_RUNSETUP,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
-    CONTROL         "The user must enter his Password for ""SuRun Settings""",
+    CONTROL         "Require user password for SuRun Settings",
                     IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "User can only run predefined programs with elevated rights",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,202,10
     CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
-                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
@@ -2053,14 +2053,14 @@ BEGIN
     PUSHBUTTON      "Verwijderen",IDC_DELUSER,334,4,50,14
     CONTROL         "Gebruiker kan SuRun instellingen wijzigen",IDC_RUNSETUP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
-    CONTROL         "The user must enter his Password for ""SuRun Settings""",
+    CONTROL         "Require user password for SuRun Settings",
                     IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "Alleen bepaalde programma's met SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,202,10
     CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
-                    BS_AUTO3STATE | WS_TABSTOP,252,19,137,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
                     BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
     CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
