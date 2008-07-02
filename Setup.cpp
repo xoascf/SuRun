@@ -1079,12 +1079,17 @@ EditApp:
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
-      case MAKELPARAM(IDC_HIDESURUN,IDC_RUNSETUP):
+      case MAKELPARAM(IDC_RUNSETUP,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),IsDlgButtonChecked(hwnd,IDC_RUNSETUP));
         return TRUE;
       case MAKELPARAM(IDC_HIDESURUN,BN_CLICKED):
-        EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0);
-        EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0);
+        {
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0);
+          BOOL bBal=(IsDlgButtonChecked(hwnd,IDC_HIDESURUN)==0)
+            &&(!IsWin2k())
+            &&(IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_CHECKED);
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bBal);
+        }
         return TRUE;
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
         if (!IsWin2k())
