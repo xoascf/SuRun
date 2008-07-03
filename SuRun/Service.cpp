@@ -349,25 +349,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
-        if (g_RunData.bTrayShowAdmin)
+        if ((_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)&&(g_RunData.KillPID==0xFFFFFFFF))
         {
-          GetProcessUserName(g_RunData.CurProcId,g_RunData.CurUserName);
-          HANDLE h=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,g_RunData.CurProcId);
-          if (h)
-          {
-            HANDLE hTok=0;
-            if (OpenProcessToken(h,TOKEN_DUPLICATE,&hTok))
-            {
-              g_RunData.CurUserIsadmin=IsAdmin(hTok);
-              CloseHandle(hTok);
-            }
-            CloseHandle(h);
-          }
-          ResumeClient(RETVAL_OK,true);
-          continue;
-        }
-        if (_tcsicmp(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"))==0)
-        {
+          CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)g_RunData.CliProcessId,0,0));
           switch(GetAdminNoPassWarn)
           {
           case APW_ALL:
@@ -393,16 +377,14 @@ ChkAdmin:
           USERLIST u;
           u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
           TCHAR un[4096]={0};
-          for (int i=0;i<u.GetCount();i++)
-            if (PasswordOK(u.GetUserName(i),0,TRUE))
-            {
-              DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
-              _tcscat(un,u.GetUserName(i));
-              _tcscat(un,_T("\n"));
-            }
+          for (int i=0;i<u.GetCount();i++) if (PasswordOK(u.GetUserName(i),0,TRUE))
+          {
+            DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
+            _tcscat(un,u.GetUserName(i));
+            _tcscat(un,_T("\n"));
+          }
           if(un[0])
             ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
-          ResumeClient(RETVAL_OK);
           continue;
         }
         if (!g_RunData.bRunAs)
@@ -1817,27 +1799,6 @@ BOOL UserUninstall()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-// CheckForEmptyAdminPasswords
-// 
-//////////////////////////////////////////////////////////////////////////////
-static void CheckForEmptyAdminPasswords()
-{
-  _tcscpy(g_RunData.cmdLine,_T("/CHECKFOREMPTYADMINPASSWORDS"));
-  HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
-  if(hPipe==INVALID_HANDLE_VALUE)
-    return;
-  g_RetVal=RETVAL_WAIT;
-  DWORD n=0;
-  WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
-  CloseHandle(hPipe);
-  Sleep(10);
-  for(n=0;(g_RetVal==RETVAL_WAIT)&&(n<30);n++)
-    Sleep(100);
-  zero(g_RunData.cmdLine);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 // HandleServiceStuff: called on App Entry before WinMain()
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -1902,7 +1863,6 @@ bool HandleServiceStuff()
       if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
         while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
             Sleep(1000);
-      CheckForEmptyAdminPasswords();
       if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
         return ExitProcess(0),true;
       if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
