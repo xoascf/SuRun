@@ -199,6 +199,10 @@ SOURCE=.\lsa_laar.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\LSALogon.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
@@ -272,6 +276,10 @@ SOURCE=.\LogonDlg.h
 # Begin Source File
 
 SOURCE=.\lsa_laar.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\LSALogon.h
 # End Source File
 # Begin Source File
 
