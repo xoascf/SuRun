@@ -72,7 +72,8 @@ MSV1_0_INTERACTIVE_LOGON* GetLogonRequest(LPWSTR domain,LPWSTR user,LPWSTR pass,
   return pRequest;
 }
 
-HANDLE AdminLogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,LPWSTR Password)
+HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
+                LPWSTR Password,bool bNoAdmin)
 {
   EnablePrivilege(SE_TCB_NAME);
   HANDLE hLSA;
@@ -125,7 +126,7 @@ HANDLE AdminLogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,LPWSTR Password)
     ptg=(PTOKEN_GROUPS)malloc(sizeof(DWORD)+3*sizeof(SID_AND_ATTRIBUTES));
     if (ptg==NULL)
       __leave;
-    ptg->GroupCount=3;
+    ptg->GroupCount=bNoAdmin?2:3;
     ptg->Groups[0].Sid=LogonSID;
     ptg->Groups[0].Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED
       |SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_LOGON_ID;
