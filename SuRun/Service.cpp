@@ -956,7 +956,7 @@ DWORD LSAStartAdminProcessTrampoline()
       //Reset status of "use of empty passwords for network logon"
       if ((!g_RunData.bRunAs)&&(g_RunPwd[0]==0))
           AllowEmptyPW(bEmptyPWAllowed);
-      if (CreateProcessAsUser(hAdmin,NULL,cmd,NULL,NULL,FALSE,
+      if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
         CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
         CloseHandle(pi.hThread);
