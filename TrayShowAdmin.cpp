@@ -12,6 +12,7 @@
 #include "setup.h"
 #include "resstr.h"
 #include "resource.h"
+#include "DBGTrace.h"
 
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -43,32 +44,38 @@ DWORD WINAPI TSAThreadProc(void* p)
   HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,0,(DWORD)p);
   if (!hProc)
     return 0;
+  DWORD PID=0;
   g_TSAThreadRunning=TRUE;
   WriteProcessMemory(hProc,&g_TSAThreadRunning,&g_TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
+  EnablePrivilege(SE_DEBUG_NAME);
   for(;;)
   {
     SIZE_T s;
     if ((WaitForSingleObject(hProc,333)==WAIT_OBJECT_0)
-     ||(!ReadProcessMemory(hProc,&g_TSAPID,&g_TSAData,sizeof(DWORD),&s))
+     ||(!ReadProcessMemory(hProc,&g_TSAPID,&g_TSAData.CurProcId,sizeof(DWORD),&s))
      ||(sizeof(DWORD)!=s))
       return CloseHandle(hProc),0;
-    if (g_TSAData.CurProcId!=g_TSAPID)
+    if (g_TSAData.CurProcId!=PID)
     {
       HANDLE h = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_TSAData.CurProcId);
       if(h)
       {
         HANDLE hTok=0;
-        if (OpenProcessToken(hProc,TOKEN_QUERY|TOKEN_DUPLICATE,&hTok))
+        if (OpenProcessToken(h,TOKEN_QUERY|TOKEN_DUPLICATE,&hTok))
         {
           GetTokenUserName(hTok,g_TSAData.CurUserName);
           g_TSAData.CurUserIsadmin=IsAdmin(hTok);
           CloseHandle(hTok);
           if(WriteProcessMemory(hProc,&g_TSAData,&g_TSAData,sizeof(g_TSAData),&s)
             && (s==sizeof(g_TSAData)))
-            g_TSAPID=g_TSAData.CurProcId;
-        }
+            PID=g_TSAData.CurProcId;
+          else
+            DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
+        }else
+          DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
         CloseHandle(h);
-      }
+      }else
+        DBGTrace2("OpenProcess(%d) failed: %s",g_TSAData.CurProcId,GetLastErrorNameStatic());
     }
   }
 }
