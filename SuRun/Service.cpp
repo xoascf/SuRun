@@ -960,8 +960,7 @@ DWORD LSAStartAdminProcessTrampoline()
       si.lpDesktop = WinstaDesk;
       //Get Admin User Token and Job object token
       HANDLE hJob=0;
-      HANDLE hAdmin=0;
-      GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,&hJob,!g_RunData.bRunAs);
+      HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,&hJob,g_RunData.bRunAs);
       //Clear Password
       zero(g_RunPwd);
       //CreateProcessAsUser will only work from an NT System Account since the
@@ -971,7 +970,8 @@ DWORD LSAStartAdminProcessTrampoline()
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
         CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
-        AssignProcessToJobObject(hJob,pi.hProcess);
+        if(hJob)
+          AssignProcessToJobObject(hJob,pi.hProcess);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         RetVal=RETVAL_OK;
