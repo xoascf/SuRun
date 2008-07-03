@@ -38,7 +38,7 @@ struct
 DWORD g_TSAPID=0;
 BOOL g_TSAThreadRunning=FALSE;
 
-//Called from Service!
+//TSAThreadProc is called from Service!
 DWORD WINAPI TSAThreadProc(void* p)
 {
   HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,0,(DWORD)p);
@@ -110,6 +110,8 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
     return -1;
   GetWindowThreadProcessId(wnd,&g_TSAPID);
   _tcscpy(User,g_TSAData.CurUserName);
+  if (g_TSAData.CurProcId!=g_TSAPID)
+    return -1;
   if (!InternalGetWindowText(wnd,WndTitle,MAX_PATH))
     _stprintf(WndTitle,L"Process %d",g_TSAData.CurProcId);
   return g_TSAData.CurUserIsadmin;
@@ -281,6 +283,10 @@ BOOL ProcessTrayShowAdmin()
   int count=0;
   while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<100))
   {
+    if (msg.message==WM_QUERYENDSESSION)
+    {
+      //ToDo: If processes started by SuRun in this session are still open, warn user, close them
+    }
     TranslateMessage(&msg);
     DispatchMessage(&msg);
   }
