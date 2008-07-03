@@ -118,25 +118,18 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     PathAppend(cmd, _T("SuRun.exe"));
     PathQuoteSpaces(cmd);
     _tcscat(cmd,_T(" "));
-//    TCHAR PID[10];
-//    if (msg->wParam==WM_SYSMH0)
-//    {
-//      //Are we inside the Shell Process?
-//      if (IsShell()
-//        &&(SafeMsgBox(0,CResStr(l_hInst,IDS_RESTARTSHELL,GetCommandLine()),
-//                      L"SuRun",MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO))
-//        return CallNextHookEx(g_hookMenu, nCode, wParam, lParam);
-//      _tcscat(cmd,_T("/KILL "));
-//      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
-//      _tcscat(cmd,_T(" "));
-//    }
+    if (msg->wParam==WM_SYSMH0)
+    {
+      TCHAR PID[10];
+      _tcscat(cmd,_T("/KILL "));
+      _tcscat(cmd,_itot(GetCurrentProcessId(),PID,10));
+      _tcscat(cmd,_T(" "));
+    }
     _tcscat(cmd,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
       CloseHandle(pi.hProcess);
       CloseHandle(pi.hThread);
-      if (msg->wParam==WM_SYSMH0)
-        ::ExitProcess(0);
     }else
       SafeMsgBox(msg->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
     //We processed the Message: Stop calling other hooks!
