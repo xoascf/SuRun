@@ -5,19 +5,23 @@ Done, to be tested:
 * Don't show "Restart as Admin" in shell
 * Don't try to start automagically elevated "AsInvoker" Apps
 * When installing applications that require to reboot and to run a "Setup" when
-  logging on, SuRun asked to start that setup as Admin but then it did not 
-  switch back to the user's desktop
+  logging on, SURUN asked to start that setup as Admin but then it DID NOT 
+  SWITCH BACK TO THE USER'S DESKTOP
 * The "Could not create safe Desktop" message caused the WatchDog showing up
 * Safe Desktop is now created before the screenshot is made to save resources
 * The WatchDog process now handles SwitchDesktop issues
 * SuRun uses a separate thread to create and fade in the blurred screen
-* IATHook scans DLLs for "CreateProcess" before hooking them
+* IATHook only hooks modules that actually use "CreateProcess"
 * IATHook uses InterlockedExchangePointer for better stability
 * Eclipse (JAVA) and SuRuns IAT Hook do not conflict anymore
 * When asking to elevate a process, a "Cancel" count down progress bar is shown
-* Wildcards "*" and "?" are supported for applications
-* Option "Hide SuRun from user"
-* Option "Require user password for SuRun Settings"
+* Wildcards "*" and "?" are supported for commands in the users program list
+* Setup Option "Hide SuRun from user"
+* Setup Option "Require user password for SuRun Settings"
+* "Restart as Admin" Processes are killed only after the user chooses "OK"
+* "Restart as Admin" Processes are killed the way TaskManager closes 
+  Applications by sending WM_CLOSE to the top level widows of a process, 
+  giving the process 5 seconds time to close and then terminating the process.
 
 ToDo
 ---------------------
@@ -26,6 +30,24 @@ ToDo
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
 * TSA sometimes slows down the system
+* Wizard button to add common Windows Apps to the AutoMagic list 
+  Network Settings
+    %WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
+  Computer Management
+    %WinDir%\system32\mmc.exe *%WinDir%\compmgmt.msc*
+  GPEdit.msc
+    %WinDir%\mmc.exe *%WinDir%\system32\gpedit.msc*
+  SecPol.msc
+    %WinDir%\mmc.exe *%WinDir%\system32\secpol.msc*
+  Sysdm.cpl
+    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL SYSDM.CPL*
+    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL *%WinDir%\system32\SYSDM.CPL*
+  Safely Remove Hardware
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL hotplug.dll*
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL *%WinDir%\system32\hotplug.dll*
+  Add/Remove Programs
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL appwiz.cpl*
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL *%WinDir%\system32\appwiz.cpl*
 
 To be done in future:
 ---------------------
