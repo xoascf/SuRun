@@ -546,15 +546,37 @@ TryAgain:
 //  KillProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  KillProcessNice
+// 
+//////////////////////////////////////////////////////////////////////////////
+// callback function for window enumeration
+static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
+{
+  DWORD dwID ;
+  GetWindowThreadProcessId(hwnd, &dwID) ;
+  if(dwID==(DWORD)lParam)
+    PostMessage(hwnd,WM_CLOSE,0,0) ;
+  return TRUE ;
+}
+
 void KillProcess(DWORD PID)
 {
   if (!PID)
     return;
-  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE,TRUE,PID);
   if(!hProcess)
     return;
-  TerminateProcess(hProcess,0);
+  //Messages work on the same WinSta/Desk only
+  SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
+  //Post WM_CLOSE to all Windows of PID
+  EnumWindows(CloseAppEnum,(LPARAM)PID);
+  //Give the Process time to close
+  if (WaitForSingleObject(hProcess,2500)!=WAIT_OBJECT_0)
+    TerminateProcess(hProcess,1);
   CloseHandle(hProcess);
+  //The service will call TerminateProcess()...
 }
 
 //////////////////////////////////////////////////////////////////////////////
