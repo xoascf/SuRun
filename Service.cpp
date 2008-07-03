@@ -560,7 +560,7 @@ static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
 {
   // no top level window, or invisible?
   if ((GetWindow(hwnd,GW_OWNER))||(!IsWindowVisible(hwnd)))
-        return TRUE;
+    return TRUE;
   TCHAR s[4096]={0};
   if ((!InternalGetWindowText(hwnd,s,countof(s)))||(s[0]==0))
     return TRUE;
@@ -955,7 +955,13 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,
 {
   //JobObject for SessionId
   if (!g_Jobs[SessionID])
+  {
     g_Jobs[SessionID]=CreateJobObject(0,0);
+    if(!g_Jobs[SessionID])
+      DBGTrace1("CreateJobObject failed %s",GetLastErrorNameStatic())
+    else
+      DBGTrace2("%x==CreateJobObject(%d) OK",g_Jobs[SessionID],SessionID);
+  }
   hJob=g_Jobs[SessionID];
   //Admin Token for SessionId
   HANDLE hUser=0;
@@ -1020,10 +1026,16 @@ DWORD LSAStartAdminProcessTrampoline()
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
         if(hJob)
-          AssignProcessToJobObject(hJob,pi.hProcess);
+        {
+          if(!AssignProcessToJobObject(hJob,pi.hProcess))
+            DBGTrace1("AssignProcessToJobObject failed %s",GetLastErrorNameStatic())
+          else
+            DBGTrace2("AssignProcessToJobObject(%x,%d) OK",hJob,pi.dwProcessId);
+        }
+        ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         RetVal=RETVAL_OK;
