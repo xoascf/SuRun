@@ -911,6 +911,32 @@ DWORD StartAdminProcessTrampoline()
   return RetVal;
 }
 
+HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,
+                    LPHANDLE hJob,bool bNoAdmin)
+{
+  TCHAR un[2*UNLEN+2]={0};
+  TCHAR dn[2*UNLEN+2]={0};
+  _tcscpy(un,UserName);
+  PathStripPath(un);
+  _tcscpy(dn,UserName);
+  PathRemoveFileSpec(dn);
+  //Enable use of empty passwords for network logon
+  BOOL bEmptyPWAllowed=FALSE;
+  if ((!bNoAdmin) &&(g_RunPwd[0]==0))
+  {
+    bEmptyPWAllowed=EmptyPWAllowed;
+    AllowEmptyPW(TRUE);
+  }
+  HANDLE hAdmin=LSALogon(SessionID,un,dn,Password,bNoAdmin);
+  //Clear Password
+  zero(g_RunPwd);
+  //Reset status of "use of empty passwords for network logon"
+  if ((!bNoAdmin) && (g_RunPwd[0]==0))
+      AllowEmptyPW(bEmptyPWAllowed);
+  //ToDo: JobObject for SessionId!!!
+  return hAdmin;
+}
+
 DWORD LSAStartAdminProcessTrampoline() 
 {
   TCHAR cmd[4096]={0};
@@ -932,33 +958,20 @@ DWORD LSAStartAdminProcessTrampoline()
       TCHAR WinstaDesk[MAX_PATH];
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
+      //Get Admin User Token and Job object token
+      HANDLE hJob=0;
+      HANDLE hAdmin=0;
+      GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,&hJob,!g_RunData.bRunAs);
+      //Clear Password
+      zero(g_RunPwd);
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      //Disable AppInitHooks
-      TCHAR un[2*UNLEN+2]={0};
-      TCHAR dn[2*UNLEN+2]={0};
-      _tcscpy(un,g_RunData.UserName);
-      PathStripPath(un);
-      _tcscpy(dn,g_RunData.UserName);
-      PathRemoveFileSpec(dn);
-      //Enable use of empty passwords for network logon
-      BOOL bEmptyPWAllowed=FALSE;
-      if ((!g_RunData.bRunAs)&&(g_RunPwd[0]==0))
-      {
-        bEmptyPWAllowed=EmptyPWAllowed;
-        AllowEmptyPW(TRUE);
-      }
-      HANDLE hAdmin=AdminLogon(g_RunData.SessionID,un,dn,g_RunPwd);
-      //Clear Password
-      zero(g_RunPwd);
-      //Reset status of "use of empty passwords for network logon"
-      if ((!g_RunData.bRunAs)&&(g_RunPwd[0]==0))
-          AllowEmptyPW(bEmptyPWAllowed);
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
         CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
+        AssignProcessToJobObject(hJob,pi.hProcess);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         RetVal=RETVAL_OK;
