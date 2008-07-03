@@ -87,6 +87,8 @@
 static SERVICE_STATUS_HANDLE g_hSS=0;
 static SERVICE_STATUS g_ss= {0};
 static HANDLE g_hPipe=INVALID_HANDLE_VALUE;
+static HANDLE g_Jobs[256]={0};
+static HANDLE g_User[256]={0};
 
 CResStr SvcName(IDS_SERVICE_NAME);
 
@@ -195,7 +197,15 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
+typedef struct tagWTSSESSION_NOTIFICATION
+{
+    DWORD cbSize;
+    DWORD dwSessionId;
+} WTSSESSION_NOTIFICATION, *PWTSSESSION_NOTIFICATION;
+
+#define WTS_SESSION_LOGOFF                 0x6
+
+DWORD WINAPI SvcCtrlHndlr(DWORD dwControl,DWORD EvType,LPVOID lpEvData,LPVOID Cxt)
 {
   //service control handler
   if(dwControl==SERVICE_CONTROL_STOP)
@@ -217,10 +227,27 @@ VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
     }
     //As g_hPipe is now INVALID_HANDLE_VALUE, the Service will exit
     CloseHandle(hPipe);
-    return;
-  } 
+    return NO_ERROR;
+  }else
+  if((dwControl==SERVICE_CONTROL_SESSIONCHANGE)&&(EvType==WTS_SESSION_LOGOFF))
+  {
+    WTSSESSION_NOTIFICATION* wtsn=(WTSSESSION_NOTIFICATION*)lpEvData;
+    if (g_Jobs[wtsn->dwSessionId])
+    {
+      TerminateJobObject(g_Jobs[wtsn->dwSessionId],0);
+      CloseHandle(g_Jobs[wtsn->dwSessionId]);
+      g_Jobs[wtsn->dwSessionId]=0;
+    }
+    if (g_User[wtsn->dwSessionId])
+    {
+      CloseHandle(g_User[wtsn->dwSessionId]);
+      g_User[wtsn->dwSessionId]=0;
+    }
+    return NO_ERROR;
+  }
   if (g_hSS!=(SERVICE_STATUS_HANDLE)0) 
     SetServiceStatus(g_hSS,&g_ss);
+  return ERROR_CALL_NOT_IMPLEMENTED;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -316,7 +343,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_ss.dwServiceType      = SERVICE_WIN32_OWN_PROCESS; 
   g_ss.dwControlsAccepted = SERVICE_ACCEPT_STOP; 
   g_ss.dwCurrentState     = SERVICE_START_PENDING; 
-  g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
+  g_hSS                   = RegisterServiceCtrlHandlerEx(SvcName,SvcCtrlHndlr,0); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
   //Create Pipe:
@@ -501,6 +528,18 @@ TryAgain:
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
+  int i;
+  for (i=0;i<countof(g_Jobs);i++) if (g_Jobs[i])
+  {
+    TerminateJobObject(g_Jobs[i],0);
+    CloseHandle(g_Jobs[i]);
+    g_Jobs[i]=0;
+  }
+  for (i=0;i<countof(g_User);i++) if (g_User[i])
+  {
+    CloseHandle(g_User[i]);
+    g_User[i]=0;
+  }
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
   g_ss.dwCheckPoint       = 0;
@@ -912,29 +951,42 @@ DWORD StartAdminProcessTrampoline()
 }
 
 HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,
-                    LPHANDLE hJob,bool bNoAdmin)
+                    HANDLE& hJob,bool bNoAdmin)
 {
-  TCHAR un[2*UNLEN+2]={0};
-  TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(un,UserName);
-  PathStripPath(un);
-  _tcscpy(dn,UserName);
-  PathRemoveFileSpec(dn);
-  //Enable use of empty passwords for network logon
-  BOOL bEmptyPWAllowed=FALSE;
-  if ((!bNoAdmin) &&(g_RunPwd[0]==0))
+  //JobObject for SessionId
+  if (!g_Jobs[SessionID])
+    g_Jobs[SessionID]=CreateJobObject(0,0);
+  hJob=g_Jobs[SessionID];
+  //Admin Token for SessionId
+  HANDLE hUser=0;
+  if ((!bNoAdmin)&&(g_User[SessionID]))
   {
-    bEmptyPWAllowed=EmptyPWAllowed;
-    AllowEmptyPW(TRUE);
-  }
-  HANDLE hAdmin=LSALogon(SessionID,un,dn,Password,bNoAdmin);
-  //Clear Password
-  zero(g_RunPwd);
-  //Reset status of "use of empty passwords for network logon"
-  if ((!bNoAdmin) && (g_RunPwd[0]==0))
+    hUser=g_User[SessionID];
+  }else
+  {
+    TCHAR un[2*UNLEN+2]={0};
+    TCHAR dn[2*UNLEN+2]={0};
+    _tcscpy(un,UserName);
+    PathStripPath(un);
+    _tcscpy(dn,UserName);
+    PathRemoveFileSpec(dn);
+    //Enable use of empty passwords for network logon
+    BOOL bEmptyPWAllowed=FALSE;
+    if ((!bNoAdmin) &&(g_RunPwd[0]==0))
+    {
+      bEmptyPWAllowed=EmptyPWAllowed;
+      AllowEmptyPW(TRUE);
+    }
+    hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
+    //Clear Password
+    zero(g_RunPwd);
+    //Reset status of "use of empty passwords for network logon"
+    if ((!bNoAdmin) && (g_RunPwd[0]==0))
       AllowEmptyPW(bEmptyPWAllowed);
-  //ToDo: JobObject for SessionId!!!
-  return hAdmin;
+    if (!bNoAdmin)
+      g_User[SessionID]=hUser;
+  }
+  return hUser;
 }
 
 DWORD LSAStartAdminProcessTrampoline() 
@@ -960,7 +1012,7 @@ DWORD LSAStartAdminProcessTrampoline()
       si.lpDesktop = WinstaDesk;
       //Get Admin User Token and Job object token
       HANDLE hJob=0;
-      HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,&hJob,g_RunData.bRunAs);
+      HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,hJob,g_RunData.bRunAs);
       //Clear Password
       zero(g_RunPwd);
       //CreateProcessAsUser will only work from an NT System Account since the
