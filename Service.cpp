@@ -39,6 +39,7 @@
 #include "WinStaDesk.h"
 #include "ResStr.h"
 #include "LogonDlg.h"
+#include "LSALogon.h"
 #include "UserGroups.h"
 #include "ReqAdmin.h"
 #include "Helpers.h"
@@ -74,8 +75,6 @@
   #else  _WIN64
     #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
   #endif _WIN64
-
-//#define _DEBUG_SVC
 
 #endif _DEBUG
 
@@ -441,19 +440,7 @@ ChkAdmin:
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         HANDLE hProc=0;
-#ifndef _DEBUG_SVC
         if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
-#else _DEBUG_SVC
-        {
-          HANDLE hProc1=OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_RunData.CliProcessId);
-          if (hProc1)
-          {
-            OpenProcessToken(hProc1,TOKEN_ALL_ACCESS,&hProc);
-            CloseHandle(hProc1);
-          }
-        }
-        if (hProc)
-#endif _DEBUG_SVC
         {
           HANDLE hRun=0;
           if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
@@ -818,14 +805,12 @@ DWORD StartAdminProcessTrampoline()
   DWORD RetVal=RETVAL_ACCESSDENIED;
   HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
   PROCESS_INFORMATION pi={0};
-#ifndef _DEBUG_SVC
   PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
   if(LoadUserProfile(hUser,&ProfInf))
   {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hUser,FALSE))
     {
-#endif _DEBUG_SVC
       STARTUPINFO si={0};
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
@@ -847,12 +832,8 @@ DWORD StartAdminProcessTrampoline()
       SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),_T(""));
       int LdAID32=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
 #endif _WIN64
-#ifndef _DEBUG_SVC
       if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
         CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-#else _DEBUG_SVC
-      if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
-#endif _DEBUG_SVC
       {
         //Put g_RunData an g_RunPassword in!:
         SIZE_T n;
@@ -922,12 +903,115 @@ DWORD StartAdminProcessTrampoline()
       SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),LdAID32);
       SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32);
 #endif _WIN64
-#ifndef _DEBUG_SVC
       DestroyEnvironmentBlock(Env);
     }
     UnloadUserProfile(hUser,ProfInf.hProfile);
   }
-#endif _DEBUG_SVC
+  CloseHandle(hUser);
+  return RetVal;
+}
+
+DWORD LSAStartAdminProcessTrampoline() 
+{
+  TCHAR cmd[4096]={0};
+  GetSystemWindowsDirectory(cmd,4096);
+  PathAppend(cmd,L"SuRun.exe");
+  PathQuoteSpaces(cmd);
+  DWORD RetVal=RETVAL_ACCESSDENIED;
+  HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
+  PROCESS_INFORMATION pi={0};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
+  if(LoadUserProfile(hUser,&ProfInf))
+  {
+    void* Env=0;
+    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    {
+      STARTUPINFO si={0};
+      si.cb	= sizeof(si);
+      //Do not inherit Desktop from calling process, use Tokens Desktop
+      TCHAR WinstaDesk[MAX_PATH];
+      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+      si.lpDesktop = WinstaDesk;
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      //Disable AppInitHooks
+      TCHAR un[2*UNLEN+2]={0};
+      TCHAR dn[2*UNLEN+2]={0};
+      _tcscpy(un,g_RunData.UserName);
+      PathStripPath(un);
+      _tcscpy(dn,g_RunData.UserName);
+      PathRemoveFileSpec(dn);
+      //Enable use of empty passwords for network logon
+      BOOL bEmptyPWAllowed=FALSE;
+      if ((!g_RunData.bRunAs)&&(g_RunPwd[0]==0))
+      {
+        bEmptyPWAllowed=EmptyPWAllowed;
+        AllowEmptyPW(TRUE);
+      }
+      HANDLE hAdmin=AdminLogon(g_RunData.SessionID,un,dn,g_RunPwd);
+      //Clear Password
+      zero(g_RunPwd);
+      //Reset status of "use of empty passwords for network logon"
+      if ((!g_RunData.bRunAs)&&(g_RunPwd[0]==0))
+          AllowEmptyPW(bEmptyPWAllowed);
+      if (CreateProcessAsUser(hAdmin,NULL,cmd,NULL,NULL,FALSE,
+        CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+      {
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+        RetVal=RETVAL_OK;
+        //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+        if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+        {
+          pi.hThread=0;
+          pi.hProcess=0;
+          HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+          if (hProcess)
+          {
+            SIZE_T n;
+            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+              DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+              cmd,GetLastErrorNameStatic());
+            CloseHandle(hProcess);
+          }else
+            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+            cmd,GetLastErrorNameStatic());
+        }
+        if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
+        {
+          //Show ToolTip "<Program> is running elevated"...
+          if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+            CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+          {
+            //Tell SuRun to Say something:
+            SIZE_T n;
+            //Since it's the same process, g_RunData and g_RunPwd have the same address!
+            RUNDATA rd=g_RunData;
+            rd.KillPID=0;
+            rd.CliProcessId=0;
+            rd.CliThreadId=pi.dwThreadId;
+            rd.RetPtr=0;
+            rd.RetPID=0;
+            rd.IconId=IDI_SHIELD;
+            rd.TimeOut=20000;
+            _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
+            if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
+              TerminateProcess(pi.hProcess,0);
+            else
+              ResumeThread(pi.hThread);
+            CloseHandle(pi.hThread);
+            CloseHandle(pi.hProcess);
+          }
+        }
+      }else
+        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+      CloseHandle(hAdmin);
+      DestroyEnvironmentBlock(Env);
+    }
+    UnloadUserProfile(hUser,ProfInf.hProfile);
+  }
   CloseHandle(hUser);
   return RetVal;
 }
@@ -1047,10 +1131,8 @@ DWORD GetShellProcessId(DWORD SessionID)
 void SuRun(DWORD ProcessID)
 {
   //This is called from a separate process created by the service
-#ifndef _DEBUG_SVC
   if (!IsLocalSystem())
     return;
-#endif _DEBUG_SVC
   zero(g_RunData);
   zero(g_RunPwd);
   RUNDATA RD={0};
@@ -1157,7 +1239,7 @@ void SuRun(DWORD ProcessID)
   __try
   {
     KillProcess(g_RunData.KillPID);
-    RetVal=StartAdminProcessTrampoline();
+    RetVal=LSAStartAdminProcessTrampoline();
   }__except(1)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
