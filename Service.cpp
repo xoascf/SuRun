@@ -231,10 +231,14 @@ DWORD WINAPI SvcCtrlHndlr(DWORD dwControl,DWORD EvType,LPVOID lpEvData,LPVOID Cx
   }else
   if((dwControl==SERVICE_CONTROL_SESSIONCHANGE)&&(EvType==WTS_SESSION_LOGOFF))
   {
+    DBGTrace("WTS_SESSION_LOGOFF");
     WTSSESSION_NOTIFICATION* wtsn=(WTSSESSION_NOTIFICATION*)lpEvData;
     if (g_Jobs[wtsn->dwSessionId])
     {
-      TerminateJobObject(g_Jobs[wtsn->dwSessionId],0);
+      if (!TerminateJobObject(g_Jobs[wtsn->dwSessionId],0))
+        DBGTrace2("TerminateJobObject(%x) failed %s",g_Jobs[wtsn->dwSessionId],GetLastErrorNameStatic())
+      else
+        DBGTrace1("TerminateJobObject(%x) OK",g_Jobs[wtsn->dwSessionId]);
       CloseHandle(g_Jobs[wtsn->dwSessionId]);
       g_Jobs[wtsn->dwSessionId]=0;
     }
@@ -531,7 +535,10 @@ TryAgain:
   int i;
   for (i=0;i<countof(g_Jobs);i++) if (g_Jobs[i])
   {
-    TerminateJobObject(g_Jobs[i],0);
+    if (!TerminateJobObject(g_Jobs[i],0))
+      DBGTrace2("TerminateJobObject(%x) failed %s",g_Jobs[i],GetLastErrorNameStatic())
+    else
+      DBGTrace1("TerminateJobObject(%x) OK",g_Jobs[i]);
     CloseHandle(g_Jobs[i]);
     g_Jobs[i]=0;
   }
