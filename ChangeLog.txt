@@ -22,7 +22,7 @@ Done, to be tested:
 * "Restart as Admin" Processes are killed the way TaskManager closes 
   Applications by sending WM_CLOSE to the top level widows of a process, 
   giving the process 5 seconds time to close and then terminating the process.
-* TrayShowAdmin uses a separate Thread
+* Tray Icon uses a separate Thread
 
 ToDo
 ---------------------
