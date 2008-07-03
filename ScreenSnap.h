@@ -103,7 +103,8 @@ public:
   {
     if(m_Thread)
     {
-      WaitForSingleObject(m_Thread,INFINITE);
+      if(WaitForSingleObject(m_Thread,2000)!=WAIT_OBJECT_0)
+        TerminateThread(m_Thread,0);
       CloseHandle(m_Thread);
     }
     m_Thread=NULL;
@@ -182,7 +183,8 @@ public:
   {
     if (m_Thread && m_hWndTrans && m_hWnd)
     {
-      WaitForSingleObject(m_Thread,INFINITE);
+      if(WaitForSingleObject(m_Thread,2000)!=WAIT_OBJECT_0)
+        TerminateThread(m_Thread,0);
       DWORD StartTime=timeGetTime();
       BYTE a=255;
       while (a)
