@@ -41,7 +41,7 @@ BOOL g_TSAThreadRunning=FALSE;
 //TSAThreadProc is called from Service!
 DWORD WINAPI TSAThreadProc(void* p)
 {
-  HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,0,(DWORD)p);
+  HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,0,(DWORD)(DWORD_PTR)p);
   if (!hProc)
     return 0;
   DWORD PID=0;
