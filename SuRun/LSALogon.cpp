@@ -19,7 +19,7 @@
 
 void InitString(PLSA_STRING LsaString,LPSTR String)
 {
-  DWORD StringLength;
+  size_t StringLength;
   if (String == NULL)
   {
     LsaString->Buffer = NULL;
