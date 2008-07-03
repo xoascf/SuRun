@@ -110,7 +110,7 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
     return -1;
   GetWindowThreadProcessId(wnd,&g_TSAPID);
   _tcscpy(User,g_TSAData.CurUserName);
-  if (g_TSAData.CurProcId!=g_TSAPID)
+  if (!g_TSAData.CurProcId)
     return -1;
   if (!InternalGetWindowText(wnd,WndTitle,MAX_PATH))
     _stprintf(WndTitle,L"Process %d",g_TSAData.CurProcId);
