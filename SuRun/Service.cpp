@@ -573,8 +573,8 @@ void KillProcess(DWORD PID)
   //Post WM_CLOSE to all Windows of PID
   EnumWindows(CloseAppEnum,(LPARAM)PID);
   //Give the Process time to close
-  if (WaitForSingleObject(hProcess,2500)!=WAIT_OBJECT_0)
-    TerminateProcess(hProcess,1);
+  WaitForSingleObject(hProcess,5000);
+  TerminateProcess(hProcess,1);
   CloseHandle(hProcess);
   //The service will call TerminateProcess()...
 }
@@ -1117,10 +1117,10 @@ void SuRun(DWORD ProcessID)
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
     }
-    KillProcess(g_RunData.KillPID);
     if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
     {
       //Just start the client process!
+      KillProcess(g_RunData.KillPID);
       ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine));
       return;
     }
@@ -1172,6 +1172,7 @@ void SuRun(DWORD ProcessID)
   //copy the password to the client
   __try
   {
+    KillProcess(g_RunData.KillPID);
     RetVal=StartAdminProcessTrampoline();
   }__except(1)
   {
