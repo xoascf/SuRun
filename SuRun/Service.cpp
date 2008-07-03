@@ -546,18 +546,23 @@ TryAgain:
 //  KillProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  KillProcessNice
-// 
-//////////////////////////////////////////////////////////////////////////////
+
 // callback function for window enumeration
 static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
 {
-  DWORD dwID ;
+  DWORD dwID;
   GetWindowThreadProcessId(hwnd, &dwID) ;
   if(dwID==(DWORD)lParam)
+  {
+    HWND pw=GetParent(hwnd);
+    if (pw)
+    {
+      GetWindowThreadProcessId(pw, &dwID);
+      if(dwID==(DWORD)lParam)
+        return true;
+    }
     PostMessage(hwnd,WM_CLOSE,0,0) ;
+  }
   return TRUE ;
 }
 
@@ -565,7 +570,7 @@ void KillProcess(DWORD PID)
 {
   if (!PID)
     return;
-  HANDLE hProcess=OpenProcess(SYNCHRONIZE,TRUE,PID);
+  HANDLE hProcess=OpenProcess(SYNCHRONIZE|PROCESS_TERMINATE,TRUE,PID);
   if(!hProcess)
     return;
   //Messages work on the same WinSta/Desk only
