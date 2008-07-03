@@ -32,20 +32,8 @@ typedef struct
   TCHAR WinSta[MAX_PATH];
   TCHAR Desk[MAX_PATH];
   TCHAR UserName[UNLEN+UNLEN+2];
-  union
-  {
-    struct //Normal
-    {
-      TCHAR cmdLine[4096];
-      TCHAR CurDir[4096];
-    };
-    struct //TrayShowAdmin
-    {
-      DWORD CurProcId;
-      TCHAR CurUserName[UNLEN+GNLEN+2];
-      BOOL CurUserIsadmin;
-    };
-  };
+  TCHAR cmdLine[4096];
+  TCHAR CurDir[4096];
   DWORD KillPID; //SuRun->Service: Process Id to be killed
   union
   {
@@ -63,7 +51,6 @@ typedef struct
   bool  bShlExHook;
   bool  beQuiet;
   bool  bRunAs;
-  bool  bTrayShowAdmin;
 }RUNDATA;
 
 extern bool g_CliIsAdmin;
