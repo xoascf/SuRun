@@ -1,3 +1,4 @@
 #pragma once
 
-HANDLE AdminLogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,LPWSTR Password);
+HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
+                LPWSTR Password,bool bNoAdmin);
