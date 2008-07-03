@@ -22,6 +22,7 @@ Done, to be tested:
 * "Restart as Admin" Processes are killed the way TaskManager closes 
   Applications by sending WM_CLOSE to the top level widows of a process, 
   giving the process 5 seconds time to close and then terminating the process.
+* TrayShowAdmin uses a separate Thread
 
 ToDo
 ---------------------
@@ -29,7 +30,6 @@ ToDo
 * Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
-* TSA sometimes slows down the system
 * Wizard button to add common Windows Apps to the AutoMagic list 
   Network Settings
     %WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
