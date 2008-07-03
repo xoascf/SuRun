@@ -33,36 +33,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  KillProcessNice
-// 
-//////////////////////////////////////////////////////////////////////////////
-// callback function for window enumeration
-static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
-{
-  DWORD dwID ;
-  GetWindowThreadProcessId(hwnd, &dwID) ;
-  if(dwID==(DWORD)lParam)
-    PostMessage(hwnd,WM_CLOSE,0,0) ;
-  return TRUE ;
-}
-
-void KillProcessNice(DWORD PID)
-{
-  if (!PID)
-    return;
-  HANDLE hProcess=OpenProcess(SYNCHRONIZE,TRUE,PID);
-  if(!hProcess)
-    return;
-  //Post WM_CLOSE to all Windows of PID
-  EnumWindows(CloseAppEnum,(LPARAM)PID);
-  //Give the Process time to close
-  WaitForSingleObject(hProcess,2500);
-  CloseHandle(hProcess);
-  //The service will call TerminateProcess()...
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 //  Run()...the Trampoline
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -195,7 +165,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     {
       g_RunData.KillPID=wcstol(Args,0,10);
       Args=PathGetArgs(Args);
-      KillProcessNice(g_RunData.KillPID);
     }
   }
   bool bShellIsadmin=FALSE;
