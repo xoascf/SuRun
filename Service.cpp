@@ -383,7 +383,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       {
         if ((_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)&&(g_RunData.KillPID==0xFFFFFFFF))
         {
-          CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)g_RunData.CliProcessId,0,0));
+          CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
           switch(GetAdminNoPassWarn)
           {
           case APW_ALL:
