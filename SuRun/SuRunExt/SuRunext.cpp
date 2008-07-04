@@ -695,43 +695,38 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
 VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
 {
   //Terminate all Processes that have the same logon SID and 
-#ifdef DoDBGTrace
-  CTimeLog l(L"SuRunLogoffUser IsAdmin: %d; IsLocalSystem: %d",IsAdmin(),IsLocalSystem());
-#endif DoDBGTrace
   //"SuRun" as the Token source name
   PSID LogonSID=GetLogonSid(Info->hToken);
-  if((!LogonSID)||(!IsValidSid(LogonSID)))
-  {
-    DBGTrace("SHIT: GetLogonSid(Info->hToken) failed!");
-    return;
-  }
   TOKEN_SOURCE Logonsrc;
   DWORD n=0;
   if(!GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n))
-  {
-    DBGTrace1("GetTokenInformation(LogOffUser) failed: %s",GetLastErrorNameStatic());
     return;
-  }
 #ifdef DoDBGTrace
   WCHAR sn[9]={0};
   MultiByteToWideChar(CP_UTF8,0,Logonsrc.SourceName,8,sn,8);
   DBGTrace3("TokenSource(LogOffUser) 0x%08x%08x: %s\n",
     Logonsrc.SourceIdentifier.HighPart,Logonsrc.SourceIdentifier.LowPart,sn);
 #endif DoDBGTrace
-  n=512;
-  DWORD* PID=0;
-  DWORD s=n*sizeof(DWORD);
-  while (s>=n*sizeof(DWORD))
+
+  HKEY Key;
+  if(RegOpenKeyEx(HKLM,PIDSKEY,0,KEY_ALL_ACCESS,&Key)!=ERROR_SUCCESS)
   {
-    free(PID);
-    n<<=1;
-    PID=(DWORD*)malloc(n*sizeof(DWORD));
-    EnumProcesses(PID,n*sizeof(DWORD),&s);
+    DBGTrace("nothing to do!");
+    return;
   }
-  for (DWORD i=0;i<n;i++) if (PID[i])
+  TCHAR sPID[10];
+  DWORD nsPID=countof(sPID);
+  DWORD PID=0;
+  DWORD nPID=sizeof(DWORD);
+  for (int i=0;(RegEnumValue(Key,i,sPID,&nsPID,0,0,(BYTE*)&PID,&nPID)==ERROR_SUCCESS);i++) if (PID)
   {
-    HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID[i]);
-    if (hp)
+    HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID);
+    if (!hp)
+    {
+      DBGTrace2("OpenProcess(%d) failed: %s",PID,GetLastErrorNameStatic());
+      RegDeleteValue(Key,sPID);
+      i--;
+    }else
     {
 #ifdef DoDBGTrace
       DWORD d;
@@ -739,7 +734,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       TCHAR f[MAX_PATH];
       EnumProcessModules(hp,&hMod,sizeof(hMod),&d);
       GetModuleFileNameEx(hp,hMod,f,MAX_PATH);
-      DBGTrace2("-----------SuRunLogoffUser: PID:%d \"%s\"",PID[i],f);
+      DBGTrace2("-----------SuRunLogoffUser: PID:%d \"%s\"",PID,f);
 #endif  DoDBGTrace
       HANDLE ht=0;
       if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
@@ -749,7 +744,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
         {
 #ifdef DoDBGTrace
           MultiByteToWideChar(CP_UTF8,0,tsrc.SourceName,8,sn,8);
-          DBGTrace4("TokenSource(PID:%d) 0x%x%x: %s\n",PID[i],
+          DBGTrace4("TokenSource(PID:%d) 0x%x%x: %s\n",PID,
             tsrc.SourceIdentifier.HighPart,tsrc.SourceIdentifier.LowPart,sn);
 #endif DoDBGTrace
           PSID tSID=GetLogonSid(ht);
@@ -761,9 +756,11 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
               &&(strcmp(tsrc.SourceName,"SuRun")==0))
             {
               TerminateProcess(hp,0);
-              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" KILLED",PID[i],f);
+              RegDeleteValue(Key,sPID);
+              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" KILLED",PID,f);
+              i--;
             }else
-              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" was NOT killed",PID[i],f);
+              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" was NOT killed",PID,f);
           }else if (tSID)
             DBGTrace1("EqualSid(%s) mismatch",f);
           free(tSID);
@@ -773,10 +770,9 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       }else
         DBGTrace2("OpenProcessToken(%s) failed: %s",f,GetLastErrorNameStatic());
       CloseHandle(hp);
-    }else
-      DBGTrace2("OpenProcess(%d) failed: %s",PID[i],GetLastErrorNameStatic());
+    }
   }
-  free(PID);
+  RegCloseKey(Key);
   free(LogonSID);
 	return;
 }
