@@ -26,6 +26,7 @@
 #include <lmcons.h>
 #include <Winwlx.h>
 #include <psapi.h>
+#include <wtsapi32.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -33,6 +34,7 @@
 #pragma comment(lib,"ShFolder.Lib")
 #pragma comment(lib,"Shlwapi.lib")
 #pragma comment(lib,"PSAPI.lib")
+#pragma comment(lib,"WTSApi32.lib")
 
 #include "../Setup.h"
 #include "../Service.h"
@@ -691,6 +693,42 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
   return 0; 
 } 
 
+int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
+{
+  HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID);
+  if (!hp)
+    return -1;
+  HANDLE ht=0;
+  int RetVal=0;
+  if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
+  {
+    TOKEN_SOURCE tsrc;
+    DWORD n=0;
+    if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
+    {
+      PSID tSID=GetLogonSid(ht);
+      if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
+      {
+        if ((memcmp(&SrcId,&tsrc.SourceIdentifier,sizeof(LUID))==0)
+          &&(strcmp(tsrc.SourceName,"SuRun")==0))
+        {
+          TerminateProcess(hp,0);
+          DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
+          RetVal=1;
+        }else
+          DBGTrace1("SuRunLogoffUser: PID:%d was NOT killed",PID);
+      }else
+        DBGTrace1("Sid(%d) mismatch",PID);
+      free(tSID);
+    }else
+      DBGTrace2("GetTokenInformation(%d) failed: %s",PID,GetLastErrorNameStatic());
+    CloseHandle(ht);
+  }else
+    DBGTrace2("OpenProcessToken(%d) failed: %s",PID,GetLastErrorNameStatic());
+  CloseHandle(hp);
+  return RetVal;
+}
+
 //Winlogon Logoff event
 VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
 {
@@ -707,54 +745,37 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   //Get list of SuRun PIDs from registry to kill the user processes
   //(Enumprocesses does not work from WinLogon-LogOff)
   //ToDo: Kill children of these processes!!!!!
-  HKEY Key;
-  if(RegOpenKeyEx(HKLM,PIDSKEY,0,KEY_ALL_ACCESS,&Key)!=ERROR_SUCCESS)
-    return;
-  TCHAR sPID[32];
-  DWORD nsPID=countof(sPID);
-  DWORD PID=0;
-  DWORD nPID=sizeof(DWORD);
-  for (int i=0;(RegEnumValue(Key,i,sPID,&nsPID,0,0,(BYTE*)&PID,&nPID)==ERROR_SUCCESS);i++) if (PID)
+//  HKEY Key;
+//  if(RegOpenKeyEx(HKLM,PIDSKEY,0,KEY_ALL_ACCESS,&Key)!=ERROR_SUCCESS)
+//    return;
+//  TCHAR sPID[32];
+//  DWORD nsPID=countof(sPID);
+//  DWORD PID=0;
+//  DWORD nPID=sizeof(DWORD);
+//  for (int i=0;(RegEnumValue(Key,i,sPID,&nsPID,0,0,(BYTE*)&PID,&nPID)==ERROR_SUCCESS);) if (PID)
+//  {
+//    nsPID=countof(sPID);
+//    nPID=sizeof(DWORD);
+//    if(KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,PID)==0)
+//    {
+//      //OpenProcess failed or Process Killed
+//      RegDeleteValue(Key,sPID);
+//    }else
+//      i++;
+//  }
+//  RegCloseKey(Key);
+  WTS_PROCESS_INFO* ppi=0;
+  n=0;
+  if(WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&ppi,&n))
   {
-    nsPID=countof(sPID);
-    nPID=sizeof(DWORD);
-    HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID);
-    if (!hp)
+    for (DWORD i=0;i<n;i++)
     {
-      RegDeleteValue(Key,sPID);
-      i--;
-    }else
-    {
-      HANDLE ht=0;
-      if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
-      {
-        TOKEN_SOURCE tsrc;
-        if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
-        {
-          PSID tSID=GetLogonSid(ht);
-          if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
-          {
-            if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
-              &&(strcmp(tsrc.SourceName,"SuRun")==0))
-            {
-              TerminateProcess(hp,0);
-              RegDeleteValue(Key,sPID);
-              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" KILLED",PID,f);
-              i--;
-            }else
-              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" was NOT killed",PID,f);
-          }else
-            DBGTrace1("Sid(%s) mismatch",f);
-          free(tSID);
-        }else
-          DBGTrace2("GetTokenInformation(%f) failed: %s",f,GetLastErrorNameStatic());
-        CloseHandle(ht);
-      }else
-        DBGTrace2("OpenProcessToken(%s) failed: %s",f,GetLastErrorNameStatic());
-      CloseHandle(hp);
+      DBGTrace2("SuRunLogoffUser trying PID:%d \"%s\"",
+        ppi[i].ProcessId,ppi[i].pProcessName);
+      KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,ppi[i].ProcessId);
     }
+    WTSFreeMemory(ppi);
   }
-  RegCloseKey(Key);
   free(LogonSID);
 	return;
 }
