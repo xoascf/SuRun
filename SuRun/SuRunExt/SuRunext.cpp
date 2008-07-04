@@ -713,9 +713,9 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     return;
   }
 #ifdef DoDBGTrace
-  char sn[9]={0};
-  memmove(&sn,&Logonsrc.SourceName,8);
-  TRACExA("TokenSource(LogOffUser) 0x%08x%08x: %s\n",
+  WCHAR sn[9]={0};
+  MultiByteToWideChar(CP_UTF8,0,Logonsrc.SourceName,8,sn,8);
+  DBGTrace3("TokenSource(LogOffUser) 0x%08x%08x: %s\n",
     Logonsrc.SourceIdentifier.HighPart,Logonsrc.SourceIdentifier.LowPart,sn);
 #endif DoDBGTrace
   n=512;
@@ -728,8 +728,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     PID=(DWORD*)malloc(n*sizeof(DWORD));
     EnumProcesses(PID,n*sizeof(DWORD),&s);
   }
-  n=s/sizeof(DWORD);
-  for (DWORD i=0;i<n;i++)
+  for (DWORD i=0;i<n;i++) if (PID[i])
   {
     HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID[i]);
     if (hp)
@@ -740,7 +739,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       TCHAR f[MAX_PATH];
       EnumProcessModules(hp,&hMod,sizeof(hMod),&d);
       GetModuleFileNameEx(hp,hMod,f,MAX_PATH);
-      DBGTrace2("SuRunLogoffUser: PID:%d \"%s\"",PID[i],f);
+      DBGTrace2("-----------SuRunLogoffUser: PID:%d \"%s\"",PID[i],f);
 #endif  DoDBGTrace
       HANDLE ht=0;
       if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
@@ -749,8 +748,8 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
         if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
         {
 #ifdef DoDBGTrace
-          memmove(&sn,&tsrc.SourceName,8);
-          TRACExA("TokenSource(PID:%d) 0x%x%x: %s\n",PID[i],
+          MultiByteToWideChar(CP_UTF8,0,tsrc.SourceName,8,sn,8);
+          DBGTrace4("TokenSource(PID:%d) 0x%x%x: %s\n",PID[i],
             tsrc.SourceIdentifier.HighPart,tsrc.SourceIdentifier.LowPart,sn);
 #endif DoDBGTrace
           PSID tSID=GetLogonSid(ht);
