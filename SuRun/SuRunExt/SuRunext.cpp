@@ -32,6 +32,7 @@
 #pragma comment(lib,"Shell32.lib")
 #pragma comment(lib,"ShFolder.Lib")
 #pragma comment(lib,"Shlwapi.lib")
+#pragma comment(lib,"PSAPI.lib")
 
 #include "../Setup.h"
 #include "../Service.h"
@@ -701,7 +702,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
   n=512;
   DWORD* PID=0;
-  DWORD s=0;
+  DWORD s=n*sizeof(DWORD);
   while (s<=n*sizeof(DWORD))
   {
     free(PID);
