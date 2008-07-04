@@ -186,6 +186,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       __leave;
     if (LOBYTE(LOWORD(GetVersion()))>=6)
     {
+      //Vista UAC: Get the elevated token!
       TOKEN_ELEVATION_TYPE et;
       DWORD dwSize=sizeof(et);
       if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenElevationType,
