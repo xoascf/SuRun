@@ -746,7 +746,7 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
         if ((memcmp(&SrcId,&tsrc.SourceIdentifier,sizeof(LUID))==0)
           &&(strcmp(tsrc.SourceName,"SuRun")==0))
         {
-          KillProcess(PID,hp);
+          TerminateProcess(PID,0);//KillProcess(PID,hp);
           DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
           RetVal=1;
         }else
