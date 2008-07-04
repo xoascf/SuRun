@@ -1332,7 +1332,7 @@ void InstallRegistry()
   SetRegStr(HKLM,UNINSTL,L"URLInfoAbout",L"http://kay-bruns.de/surun");
   SetRegStr(HKLM,UNINSTL,L"DisplayIcon",SuRunExe);
   //WinLogon Notification
-  SetRegInt(HKLM,WINLOGONKEY,L"Asynchronous",1);
+  SetRegInt(HKLM,WINLOGONKEY,L"Asynchronous",0);
   SetRegStr(HKLM,WINLOGONKEY,L"DllName",L"SuRunExt.dll");
   SetRegInt(HKLM,WINLOGONKEY,L"Impersonate",0);
   SetRegStr(HKLM,WINLOGONKEY,L"Logoff",L"SuRunLogoffUser");
