@@ -1751,8 +1751,12 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
         //ExitWindowsEx will not work here because we run as Admin
         if (LOBYTE(LOWORD(GetVersion()))<6)
+        {
           //2k/XP Reboot required for WinLogon Notification
-          ExitWindowsEx(EWX_REBOOT|EWX_FORCE,SHTDN_REASON_MINOR_RECONFIG);
+          //ExitWindowsEx(EWX_REBOOT|EWX_FORCE,SHTDN_REASON_MINOR_RECONFIG);
+          EnablePrivilege(SE_SHUTDOWN_NAME);
+          InitiateSystemShutdown(0,0,0,true,true);
+        }
         else
           //Vista++ no WinLogon Notification, just LogOff
           WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
