@@ -14,9 +14,6 @@
 #pragma once
 #include <shlobj.h>
 
-#define AppInit32 _T("SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows")
-#define AppInit   _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows")
-
 extern "C"
 {
 __declspec(dllexport) void RemoveShellExt();
