@@ -68,7 +68,7 @@
 #define IDS_SR2ADMIN                    66
 #define IDS_DELSURUNNERS                67
 #define IDS_INSTFAILED                  68
-#define IDC_CLOSE                       69
+#define IDS_CLOSE                       69
 #define IDS_INSTSUCCESS                 70
 #define IDS_INSTSUCCESS2                71
 #define IDC_LOGOFF                      72
@@ -94,6 +94,8 @@
 #define IDS_SHNAME8                     92
 #define IDS_BEAUTIFIED                  93
 #define IDS_PW4SETUP                    94
+#define IDS_REBOOT                      95
+#define IDS_INSTSUCCESS3                96
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
