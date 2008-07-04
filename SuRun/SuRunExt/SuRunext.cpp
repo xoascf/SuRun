@@ -775,10 +775,10 @@ __declspec(dllexport) void InstallShellExt()
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
   //WinLogon Notification
-  SetRegInt(HKCR,WINLOGONKEY,L"Asynchronous",0);
-  SetRegStr(HKCR,WINLOGONKEY,L"DLLName",L"SuRunExt.dll");
-  SetRegInt(HKCR,WINLOGONKEY,L"Impersonate",0);
-  SetRegStr(HKCR,WINLOGONKEY,L"Logoff",L"SuRunLogoffUser");
+  SetRegInt(HKLM,WINLOGONKEY,L"Asynchronous",0);
+  SetRegStr(HKLM,WINLOGONKEY,L"DLLName",L"SuRunExt.dll");
+  SetRegInt(HKLM,WINLOGONKEY,L"Impersonate",0);
+  SetRegStr(HKLM,WINLOGONKEY,L"Logoff",L"SuRunLogoffUser");
 }
 
 __declspec(dllexport) void RemoveShellExt()
@@ -802,7 +802,7 @@ __declspec(dllexport) void RemoveShellExt()
   //self Approval
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
   //WinLogon Notification
-  DelRegKey(HKCR,WINLOGONKEY);
+  DelRegKey(HKLM,WINLOGONKEY);
 }
 
 //////////////////////////////////////////////////////////////////////////////
