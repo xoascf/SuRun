@@ -58,13 +58,20 @@ void TRACEx(LPCTSTR s,...)
   int len=0;
   va_list va;
   va_start(va,s);
-  if (_vstprintf(&S[len],s,va)>=1024)
+  if (_vstprintf(&S[len],s,va)>=4096)
     DebugBreak();
   va_end(va);
-  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+");
+  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
   if(f)
   {
-    fwrite(S,sizeof(TCHAR),_tcslen(S),f);
+    int len=_tcslen(S);
+#ifdef UNICODE
+    char m[4096]={0};
+    WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
+    fwrite(&m,1,len,f);
+#else UNICODE
+    fwrite(&S,1,len,f);
+#endif UNICODE
     fclose(f);
   }
   OutputDebugString(S);
@@ -79,10 +86,10 @@ void TRACExA(LPCSTR s,...)
   if (vsprintf(&S[len],s,va)>=1024)
     DebugBreak();
   va_end(va);
-  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+");
+  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
   if(f)
   {
-    fwrite(S,sizeof(char),strlen(S),f);
+    fwrite(&S,sizeof(char),strlen(S),f);
     fclose(f);
   }
   OutputDebugStringA(S);
