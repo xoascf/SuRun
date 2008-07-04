@@ -134,7 +134,6 @@
 
 #define UseIShExHook    L"UseIShExHook"    //install IShellExecuteHook
 #define UseIATHook      L"UseIATHook"      //install IAT Hook
-#define UseAppInit      L"UseAppInit"      //use AppInit_DLLs
 #define UseRemoteThread L"UseRemoteThread" //use CreateRemoteThread
 
 #define ShowAutoRuns    L"ShowAutoRuns"    //use Show Message in Tray
@@ -233,12 +232,6 @@ inline bool ShowBalloon(LPCTSTR u)
   }
   return false;
 }
-
-//#define GetUseRmteThread      (GetShExtSetting(UseRemoteThread,0)!=0)
-//#define SetUseRmteThread(b)    SetShExtSetting(UseRemoteThread,b,0)
-  //...This is defined here but stored in HKLM\Security:
-//#define GetUseAppInit         (GetOption(UseAppInit,0)!=0)
-//#define SetUseAppInit(b)       SetOption(UseAppInit,b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //  Windows Policy Stuff
