@@ -202,27 +202,29 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
     {
       TCHAR v[4096];
       DWORD n=4096;
-      DWORD t=REG_SZ;
-      BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,(BYTE*)&v,&n);
-      //Preserve REG_EXPAND_SZ:
-      if (!bOk)
-      {
-        n=4096;
-        t=REG_EXPAND_SZ;
-        bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,(BYTE*)&v,&n);
-      }
+      DWORD t=0;
+      BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",&t,(BYTE*)&v,&n);
       if (bOk 
+        && ((t==REG_SZ)||(t==REG_EXPAND_SZ))
         && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun")))
       {
+        //Preserve original command:
+        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,n);
+        //Set command
         TCHAR cmd[4096];
         GetSystemWindowsDirectory(cmd,4096);
         PathAppend(cmd,L"SuRun.exe");
         PathQuoteSpaces(cmd);
         _tcscat(cmd,L" /RUNAS ");
         _tcscat(cmd,v);
-        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,n);
         SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun\\command"),L"",t,
           (BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
+        //Preserve original command name:
+        n=4096;
+        zero(v);
+        GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"",&t,(BYTE*)&v,&n);
+        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"orgname",t,(BYTE*)&v,n);
+        //Set SuRun command name
         SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"",CResStr(IDS_RUNAS));
       }
     }
@@ -245,21 +247,29 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
     {
       TCHAR v[4096];
       DWORD n=4096;
-      DWORD t=REG_SZ;
+      DWORD t=0;
       BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),
-                         L"SuRunWasHere",t,(BYTE*)&v,&n);
-      //Preserve REG_EXPAND_SZ:
-      if (!bOk)
-      {
-        n=4096;
-        t=REG_EXPAND_SZ;
-        bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,&n);
-      }
+                         L"SuRunWasHere",&t,(BYTE*)&v,&n);
       if ( bOk
+        && ((t==REG_SZ)||(t==REG_EXPAND_SZ))
         && RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere")
         && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),CResStr(L"%s\\%s",s,L"shell\\runas")))
+      {
+        //Restore original command
         SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,
-                  (BYTE*)&v,(DWORD)_tcslen(v)*sizeof(TCHAR));
+          (BYTE*)&v,(DWORD)_tcslen(v)*sizeof(TCHAR));
+        //Restore  original command name:
+        n=4096;
+        zero(v);
+        if(GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"orgname",&t,(BYTE*)&v,&n))
+        {
+          if (v[0])
+            SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"",t,(BYTE*)&v,n);
+          else
+            RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),0);
+          RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"orgname");
+        }
+      }
     }
   }
 }
