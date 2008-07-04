@@ -753,7 +753,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     WTSFreeMemory(ppi);
   }else
   {
-    //Win2k: if WTSEnumerateProcesses does not, try ToolHelp 
+    //Win2k: if WTSEnumerateProcesses does not work, try ToolHelp32
     HANDLE h=CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
     if(h!=INVALID_HANDLE_VALUE)
     {
