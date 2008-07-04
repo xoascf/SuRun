@@ -30,7 +30,6 @@
 #include <ntsecapi.h>
 #include <USERENV.H>
 #include <Psapi.h>
-#include <Tlhelp32.h>
 #include <Wtsapi32.h>
 #include "Setup.h"
 #include "Service.h"
@@ -193,14 +192,6 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
 //  The Service:
 // 
 //////////////////////////////////////////////////////////////////////////////
-
-typedef struct tagWTSSESSION_NOTIFICATION
-{
-    DWORD cbSize;
-    DWORD dwSessionId;
-} WTSSESSION_NOTIFICATION, *PWTSSESSION_NOTIFICATION;
-
-#define WTS_SESSION_LOGOFF                 0x6
 
 DWORD WINAPI SvcCtrlHndlr(DWORD dwControl,DWORD EvType,LPVOID lpEvData,LPVOID Cxt)
 {
@@ -1092,59 +1083,6 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
   }
   CloseHandle(hUser);
   return RetVal;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  GetShellProcessId
-// 
-//////////////////////////////////////////////////////////////////////////////
-DWORD GetShellProcessId(DWORD SessionID)
-{
-  //Get the Shells Name
-  TCHAR Shell[MAX_PATH];
-  if (!GetRegStr(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Microsoft\\Windows NT\\")
-    _T("CurrentVersion\\Winlogon"),_T("Shell"),Shell,MAX_PATH))
-    return 0;
-  PathRemoveArgs(Shell);
-  PathStripPath(Shell);
-  //Terminal Services:
-  DWORD nProcesses=0;
-  WTS_PROCESS_INFO* pwtspi=0;
-  WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&pwtspi,&nProcesses);
-  for (DWORD Process=0;Process<nProcesses;Process++) 
-  {
-    if (pwtspi[Process].SessionId!=g_RunData.SessionID)
-      continue;
-    TCHAR PName[MAX_PATH]={0};
-    _tcscpy(PName,pwtspi[Process].pProcessName);
-    PathStripPath(PName);
-    if (_tcsicmp(Shell,PName)==0)
-      return WTSFreeMemory(pwtspi), pwtspi[Process].ProcessId;
-  }
-  WTSFreeMemory(pwtspi);
-  //ToolHelp
-  HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
-  if (hSnap==INVALID_HANDLE_VALUE)
-    return 0; 
-  DWORD dwRet=0;
-  PROCESSENTRY32 pe={0};
-  pe.dwSize = sizeof(PROCESSENTRY32);
-  bool bFirst=true;
-  while((bFirst?Process32First(hSnap,&pe):Process32Next(hSnap,&pe)))
-  {
-    bFirst=false;
-    PathStripPath(pe.szExeFile);
-    if(_tcsicmp(Shell,pe.szExeFile)!=0) 
-      continue;
-    ULONG s=-2;
-    if ((!ProcessIdToSessionId(pe.th32ProcessID,&s))||(s!=SessionID))
-      continue;
-    dwRet=pe.th32ProcessID;
-    break;
-  }
-  CloseHandle(hSnap);
-  return dwRet;
 }
 
 //////////////////////////////////////////////////////////////////////////////
