@@ -27,6 +27,7 @@ Done, to be tested:
 ToDo
 ---------------------
 * LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
+* Ask to reboot on Win2k3-- after install
 * Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
