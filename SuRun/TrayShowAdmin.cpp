@@ -283,10 +283,6 @@ BOOL ProcessTrayShowAdmin()
   int count=0;
   while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<100))
   {
-    if (msg.message==WM_QUERYENDSESSION)
-    {
-      //ToDo: If processes started by SuRun in this session are still open, warn user, close them
-    }
     TranslateMessage(&msg);
     DispatchMessage(&msg);
   }
