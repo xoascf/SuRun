@@ -55,6 +55,18 @@ BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DW
   return FALSE;
 }
 
+BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes)
+{
+  HKEY Key;
+  if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
+  {
+    BOOL bRet=RegQueryValueEx(Key,ValName,NULL,Type,RetVal,nBytes)==ERROR_SUCCESS;
+    RegCloseKey(Key);
+    return bRet;
+  }
+  return FALSE;
+}
+
 BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes)
 {
   HKEY Key;
