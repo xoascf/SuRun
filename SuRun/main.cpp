@@ -32,64 +32,6 @@
 #pragma comment(lib,"netapi32.lib")
 
 //////////////////////////////////////////////////////////////////////////////
-// 
-//  Run()...the Trampoline
-// 
-//////////////////////////////////////////////////////////////////////////////
-int Run()
-{
-  PROCESS_INFORMATION pi={0};
-  STARTUPINFO si={0};
-  si.cb = sizeof(STARTUPINFO);
-  TCHAR un[2*UNLEN+2]={0};
-  TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(un,g_RunData.UserName);
-  PathStripPath(un);
-  _tcscpy(dn,g_RunData.UserName);
-  PathRemoveFileSpec(dn);
-  //Create the process suspended to revoke access for the current user 
-  //before it starts runnung
-  if(!CreateProcessWithLogonW(un,dn,g_RunPwd,LOGON_WITH_PROFILE,NULL,
-    g_RunData.cmdLine,CREATE_UNICODE_ENVIRONMENT|CREATE_SUSPENDED,NULL,
-    g_RunData.CurDir,&si,&pi))
-  {
-    //Clear sensitive Data
-    return zero(g_RunPwd),RETVAL_ACCESSDENIED;
-  }
-  //Clear sensitive Data
-  zero(g_RunPwd);
-  //Allow access to the Process and Thread to the Administrators and deny 
-  //access for the current user
-  SetAdminDenyUserAccess(pi.hThread);
-  SetAdminDenyUserAccess(pi.hProcess);
-  //Start the main thread
-  ResumeThread(pi.hThread);
-  //Ok, we're done with the handles:
-  CloseHandle(pi.hThread);
-  CloseHandle(pi.hProcess);
-  //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-  if((g_RunData.RetPID)&&(g_RunData.RetPtr))
-  {
-    pi.hThread=0;
-    pi.hProcess=0;
-    HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
-    if (hProcess)
-    {
-      SIZE_T n;
-      if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-        DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-          g_RunData.cmdLine,GetLastErrorNameStatic());
-      CloseHandle(hProcess);
-    }else
-      DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-        g_RunData.cmdLine,GetLastErrorNameStatic());
-  }
-  zero(g_RunData);
-  return RETVAL_OK;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
 //
 // WinMain
 //
@@ -98,16 +40,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 {
   if(HandleServiceStuff())
     return 0;
-  //After the User presses OK, the service starts a clean SuRun exe with the 
-  //Clients user token, it fills g_RunData and g_RunPwd
-  //We must Do this for two reasons:
-  //1. CreateProcessWithLogonW does not work directly from the service
-  //2. IAT-Hookers may have infect the Client-SuRun.exe and intercept
-  //   CreateProcessWithLogonW. If SuRun.exe is directly started from the 
-  //   service, no common injection methods will work.
-  if (g_RunData.CliProcessId==GetCurrentProcessId())
-    //Started from services:
-    return Run();
   if (g_RunData.CliThreadId==GetCurrentThreadId())
   {
     //Started from services:
