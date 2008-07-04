@@ -697,6 +697,11 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   //Terminate all Processes that have the same logon SID and 
   //"SuRun" as the Token source name
   PSID LogonSID=GetLogonSid(Info->hToken);
+  if((!LogonSID)||(!IsValidSid(LogonSID)))
+  {
+    DBGTrace("SHIT: GetLogonSid(Info->hToken) failed!");
+    return;
+  }
   TOKEN_SOURCE Logonsrc;
   DWORD n=0;
   GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
@@ -720,7 +725,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
       {
         PSID tSID=GetLogonSid(ht);
-        if (EqualSid(LogonSID,tSID))
+        if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
         {
           TOKEN_SOURCE tsrc;
           GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n);
