@@ -58,12 +58,6 @@
 
 UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 
-DWORD g_LoadAppInitDLLs = 0;
-
-#ifdef _Win64
-DWORD g_LoadAppInit32DLLs = 0;
-#endif _Win64
-
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHDATA,RWS")
 
