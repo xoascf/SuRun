@@ -26,6 +26,7 @@ Done, to be tested:
 * SuRun uses LSALogonUser instead of CreateProcessWithLogonW. Processes started
   by SuRun will be terminated by a WinLogon Notification handler in 
   SuRunExt.dll when the user logs off.
+* SuRun seems to work in Windows Vista side by side with UAC
 
 ToDo
 ---------------------
