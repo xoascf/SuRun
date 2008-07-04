@@ -16,6 +16,36 @@
 #define STATUS_UNSUCCESSFUL             ((NTSTATUS)0xC0000001L)
 #endif
 
+#if !defined (TokenElevationType)
+typedef enum _TOKEN_INFORMATION_CLASS_1 
+{
+    TokenElevationType = TokenOrigin+1,
+    TokenLinkedToken,
+    TokenElevation,
+    TokenHasRestrictions,
+    TokenAccessInformation,
+    TokenVirtualizationAllowed,
+    TokenVirtualizationEnabled,
+    TokenIntegrityLevel,
+    TokenUIAccess,
+    TokenMandatoryPolicy,
+    TokenLogonSid,
+} TOKEN_INFORMATION_CLASS_1, *PTOKEN_INFORMATION_CLASS_1;
+
+typedef enum _TOKEN_ELEVATION_TYPE 
+{
+    TokenElevationTypeDefault = 1,
+    TokenElevationTypeFull,
+    TokenElevationTypeLimited,
+} TOKEN_ELEVATION_TYPE, *PTOKEN_ELEVATION_TYPE;
+
+typedef struct _TOKEN_LINKED_TOKEN 
+{
+  HANDLE LinkedToken;
+} TOKEN_LINKED_TOKEN,*PTOKEN_LINKED_TOKEN;
+
+#endif TokenElevationType
+
 #define LSASTR(s,S) LSA_STRING s; InitString(&s,S);
 
 void InitString(PLSA_STRING LsaString,LPSTR String)
@@ -154,6 +184,27 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       &ProfLen,&LogonLuid,&hUser,&Quotas,&SubStatus);
     if (Status!=ERROR_SUCCESS)
       __leave;
+    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    {
+      TOKEN_ELEVATION_TYPE et;
+      DWORD dwSize=sizeof(et);
+      if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenElevationType,
+                              &et,dwSize,&dwSize)
+        &&(et==TokenElevationTypeLimited))
+      {
+        TOKEN_LINKED_TOKEN lt = {0}; 
+        HANDLE hAdmin=0;
+        dwSize = sizeof(lt); 
+        if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
+                                &lt,dwSize,&dwSize)
+          && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
+            SecurityImpersonation,TokenPrimary,&hAdmin)) 
+        {
+          CloseHandle(hUser);
+          hUser=hAdmin;
+        }
+      }
+    }
   } // try
   __finally
   {
