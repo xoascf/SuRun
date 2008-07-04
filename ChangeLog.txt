@@ -1,33 +1,37 @@
 Done, to be tested:
 ---------------------
-* Automatic quotes when adding files to the users program list
-* Setup does a test run of added/edited commands
-* Don't show "Restart as Admin" in shell
-* Don't try to start automagically elevated "AsInvoker" Apps
-* When installing applications that require to reboot and to run a "Setup" when
-  logging on, SURUN asked to start that setup as Admin but then it DID NOT 
-  SWITCH BACK TO THE USER'S DESKTOP
-* The "Could not create safe Desktop" message caused the WatchDog showing up
-* Safe Desktop is now created before the screenshot is made to save resources
-* The WatchDog process now handles SwitchDesktop issues
-* SuRun uses a separate thread to create and fade in the blurred screen
-* IATHook only hooks modules that actually use "CreateProcess"
-* IATHook uses InterlockedExchangePointer for better stability
-* Eclipse (JAVA) and SuRuns IAT Hook do not conflict anymore
-* When asking to elevate a process, a "Cancel" count down progress bar is shown
-* Wildcards "*" and "?" are supported for commands in the users program list
-* Setup Option "Hide SuRun from user"
-* Setup Option "Require user password for SuRun Settings"
-* "Restart as Admin" Processes are killed only after the user chooses "OK"
-* "Restart as Admin" Processes are killed the way TaskManager closes 
-  Applications by sending WM_CLOSE to the top level widows of a process, 
-  giving the process 5 seconds time to close and then terminating the process.
-* Tray Icon uses a separate Thread
 * SuRun uses LSALogonUser instead of CreateProcessWithLogonW. Processes started
   by SuRun will be terminated by a WinLogon Notification handler in 
   SuRunExt.dll when the user logs off.
-* SuRun seems to work in Windows Vista side by side with UAC
+  SuRun does not need to put SuRunners into the Admin group anymore for 
+  starting elevated Processes. SuRun does not need to use a helper process to 
+  start the elevated process anymore.
+* SuRun seems to work in Windows Vista side by side with UAC enabled
+* Wildcards "*" and "?" are supported for commands in the users program list
+* When adding files to the users program list, SuRun adds automatic quotes.
+* Setup does a test run of added/edited commands
 * SuRuns "Replace RunAs" now preserves the original "RunAs" display name
+* New Setup Option "Hide SuRun from user"
+* New Setup Option "Require user password for SuRun Settings"
+* When asking to elevate a process, a "Cancel" count down progress bar is shown
+* SuRun does not show "Restart as Admin" in system menu of the shell process
+* SuRun does not try to start automagically elevated "AsInvoker" Apps
+* "Restart as Admin" Processes are killed only AFTER the user chooses "OK"
+* "Restart as Admin" Processes are killed the way TaskManager closes 
+  Applications by sending WM_CLOSE to the top level widows of the process, 
+  giving the process 5 seconds time to close and then terminating the process.
+* When SuRun "Failed to create the safe Desktop" the WatchDog was shown on the 
+  users desktop
+* Safe Desktop is now created before the screenshot is made to save resources
+* The WatchDog process now handles SwitchDesktop issues
+* SuRun uses a separate thread to create and fade in the blurred screen
+* When installing applications that require to reboot and to run a "Setup" on
+  logon (XP SP3 is an example), SURUN asked to start that setup as Admin but 
+  then it DID NOT SWITCH BACK TO THE USER'S DESKTOP 
+* IATHook only hooks modules that actually use "CreateProcess"
+* IATHook uses InterlockedExchangePointer for better stability
+* Eclipse (JAVA) and SuRuns IAT Hook seem not to conflict anymore
+* The SuRun service uses uses a separate Thread to serve the Tray Icons
 
 ToDo
 ---------------------
