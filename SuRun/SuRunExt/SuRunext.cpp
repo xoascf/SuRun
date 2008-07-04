@@ -26,6 +26,7 @@
 #include <lmcons.h>
 #include <Winwlx.h>
 #include <psapi.h>
+#include <tlhelp32.h>
 #include <wtsapi32.h>
 
 #pragma comment(lib,"User32.lib")
@@ -741,7 +742,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   //EnumProcesses does not work here! need to call WTSEnumerateProcesses
   n=0;
   WTS_PROCESS_INFO* ppi=0;
-  if(WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&ppi,&n))
+  if(WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&ppi,&n) && n)
   {
     for (DWORD i=0;i<n;i++)
     {
@@ -750,6 +751,24 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,ppi[i].ProcessId);
     }
     WTSFreeMemory(ppi);
+  }else
+  {
+    HANDLE h=CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
+    if(h!=INVALID_HANDLE_VALUE)
+    {
+      PROCESSENTRY32 pe32={0};
+      pe32.dwSize=sizeof(pe32);
+      if (Process32First(h, &pe32)) 
+      { 
+        do
+        {
+          DBGTrace2("SuRunLogoffUser trying PID:%d \"%s\"",
+            pe32.th32ProcessID,pe32.szExeFile);
+          KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,pe32.th32ProcessID);
+        }while (Process32Next(h, &pe32)); 
+      } 
+      CloseHandle(h);
+    }
   }
   free(LogonSID);
 	return;
