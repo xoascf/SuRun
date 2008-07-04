@@ -731,9 +731,6 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   n=s/sizeof(DWORD);
   for (DWORD i=0;i<n;i++)
   {
-#ifdef DoDBGTrace
-    DBGTrace1("SuRunLogoffUser(PID:%d)...",PID[i]);
-#endif DoDBGTrace
     HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID[i]);
     if (hp)
     {
@@ -741,9 +738,9 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       DWORD d;
       HMODULE hMod;
       TCHAR f[MAX_PATH];
-      if(EnumProcessModules(hp,&hMod,sizeof(hMod),&d)
-        &&(GetModuleFileNameEx(hp,hMod,f,MAX_PATH)==0))
-        DBGTrace2("SuRunLogoffUser: PID:%d \"&s\"",PID[i],f);
+      EnumProcessModules(hp,&hMod,sizeof(hMod),&d);
+      GetModuleFileNameEx(hp,hMod,f,MAX_PATH);
+      DBGTrace2("SuRunLogoffUser: PID:%d \"%s\"",PID[i],f);
 #endif  DoDBGTrace
       HANDLE ht=0;
       if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
@@ -764,7 +761,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
             if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
               &&(strcmp(tsrc.SourceName,"SuRun")==0))
               TerminateProcess(hp,0);
-          }else
+          }else if (tSID)
             DBGTrace1("EqualSid(%s) mismatch",f);
           free(tSID);
         }else
