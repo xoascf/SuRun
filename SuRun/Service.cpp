@@ -1687,7 +1687,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             InstLog(CResStr(IDS_INSTFAILED));
             SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTFAILED));
             //Make IDOK->Close, hide IDCANCEL
-            SetDlgItemText(hwnd,IDOK,CResStr(IDC_CLOSE));
+            SetDlgItemText(hwnd,IDOK,CResStr(IDS_CLOSE));
             ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
             EnableWindow(GetDlgItem(hwnd,IDOK),1);
             SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
@@ -1713,29 +1713,32 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTSUCCESS));
           //Show "need logoff"
           InstLog(_T(" "));
-          InstLog(CResStr(IDS_INSTSUCCESS2));
+          if (LOBYTE(LOWORD(GetVersion()))<6)
+            InstLog(CResStr(IDS_INSTSUCCESS3))
+          else
+            InstLog(CResStr(IDS_INSTSUCCESS2));
           //Enable OK, CANCEL
           EnableWindow(GetDlgItem(hwnd,IDOK),1);
           EnableWindow(GetDlgItem(hwnd,IDCANCEL),1);
           //Cancel->Close; OK->Logoff
           OSVERSIONINFO oie;
           oie.dwOSVersionInfoSize=sizeof(oie);
-          GetVersionEx(&oie);
-          if ((oie.dwMajorVersion==5)&&(oie.dwMinorVersion==0))
+          if (LOBYTE(LOWORD(GetVersion()))<6)
           {
-            //Win2k no WTSLogoffSession, just display Close
-            //ExitWindowsEx will not work here because we run as Admin
-            SetDlgItemText(hwnd,IDOK,CResStr(IDC_CLOSE));
+            //2k/XP Reboot required for WinLogon Notification
+            SetDlgItemText(hwnd,IDOK,CResStr(IDS_REBOOT));
             ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
             EnableWindow(GetDlgItem(hwnd,IDOK),1);
-            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
+            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
+            SetFocus(GetDlgItem(hwnd,IDOK));
           }else 
           {
-            //WinXP++ display LogOff 
-            SetDlgItemText(hwnd,IDCANCEL,CResStr(IDC_CLOSE));
+            //Vista++ display LogOff 
+            SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CLOSE));
             SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
             SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
             SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
+            SetFocus(GetDlgItem(hwnd,IDOK));
           }
           return TRUE;
         }
@@ -1747,7 +1750,12 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
         //ExitWindowsEx will not work here because we run as Admin
-        WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
+        if (LOBYTE(LOWORD(GetVersion()))<6)
+          //2k/XP Reboot required for WinLogon Notification
+          ExitWindowsEx(EWX_REBOOT|EWX_FORCE,SHTDN_REASON_MINOR_RECONFIG);
+        else
+          //Vista++ no WinLogon Notification, just LogOff
+          WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
         EndDialog(hwnd,IDCONTINUE);
         return TRUE;
       case MAKELPARAM(IDIGNORE,BN_CLICKED): //Remove SuRun:
@@ -1775,7 +1783,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           //Show some Progress
           SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDC_UNINSTALL));
           //Make IDIGNORE->Close, hide IDCANCEL
-          SetDlgItemText(hwnd,IDIGNORE,CResStr(IDC_CLOSE));
+          SetDlgItemText(hwnd,IDIGNORE,CResStr(IDS_CLOSE));
           SetWindowLongPtr(GetDlgItem(hwnd,IDIGNORE),GWL_ID,IDCLOSE);
           ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
           MsgLoop();
