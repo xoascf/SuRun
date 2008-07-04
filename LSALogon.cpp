@@ -2,6 +2,7 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <ntsecapi.h>
+#include <tchar.h>
 #include "Helpers.h"
 
 #pragma comment(lib,"Advapi32.lib")
@@ -107,6 +108,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       DWORD n=0;
       //Copy TokenSource from the Shell Process of SessionID:
       GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n);
+      strcpy(tsrc.SourceName,"SuRun");
       //Copy Logon SID from the Shell Process of SessionID:
       LogonSID=GetLogonSid(hShell);
       CloseHandle(hShell);
