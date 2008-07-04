@@ -760,7 +760,11 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
           {
             if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
               &&(strcmp(tsrc.SourceName,"SuRun")==0))
+            {
               TerminateProcess(hp,0);
+              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" KILLED",PID[i],f);
+            }else
+              DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" was NOT killed",PID[i],f);
           }else if (tSID)
             DBGTrace1("EqualSid(%s) mismatch",f);
           free(tSID);
