@@ -61,6 +61,12 @@ void TRACEx(LPCTSTR s,...)
   if (_vstprintf(&S[len],s,va)>=1024)
     DebugBreak();
   va_end(va);
+  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+");
+  if(f)
+  {
+    fwrite(S,sizeof(TCHAR),_tcslen(S),f);
+    fclose(f);
+  }
   OutputDebugString(S);
 }
 
@@ -73,6 +79,12 @@ void TRACExA(LPCSTR s,...)
   if (vsprintf(&S[len],s,va)>=1024)
     DebugBreak();
   va_end(va);
+  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+");
+  if(f)
+  {
+    fwrite(S,sizeof(char),strlen(S),f);
+    fclose(f);
+  }
   OutputDebugStringA(S);
 }
 
