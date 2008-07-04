@@ -585,7 +585,7 @@ BEGIN
     IDS_SR2ADMIN            "Putting '%s' to the local administrators group"
     IDS_DELSURUNNERS        "Deleting local group 'SuRunners'"
     IDS_INSTFAILED          "Installation failed!"
-    IDC_CLOSE               "&Close"
+    IDS_CLOSE               "&Close"
     IDS_INSTSUCCESS         "SuRun was installed successfully"
     IDS_INSTSUCCESS2        "You must logoff before using SuRun"
     IDC_LOGOFF              "&Log off"
@@ -615,6 +615,12 @@ BEGIN
     IDS_SHNAME8             "My Documents"
     IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
     IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
+    IDS_REBOOT              "&Reboot"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_INSTSUCCESS3        "The system must be restarted!"
 END
 
 #endif    // Polish resources
@@ -1267,7 +1273,7 @@ BEGIN
     IDS_SR2ADMIN            "Mache '%s' zum Administrator"
     IDS_DELSURUNNERS        "Lösche 'SuRunners' Gruppe"
     IDS_INSTFAILED          "Installation fehlgeschlagen!"
-    IDC_CLOSE               "&Schließen"
+    IDS_CLOSE               "&Schließen"
     IDS_INSTSUCCESS         "SuRun wurde erfogreich installiert"
     IDS_INSTSUCCESS2        "Sie müssen sich abmelden, bevor Sie SuRun benutzen"
     IDC_LOGOFF              "&Abmelden"
@@ -1297,6 +1303,12 @@ BEGIN
     IDS_SHNAME8             "Eigene Dateien"
     IDS_BEAUTIFIED          "%s\r\n[Bedeutung: %s]"
     IDS_PW4SETUP            "Zum Ändern der SuRun Einstellungen müssen Sie Ihr Kennwort eingeben."
+    IDS_REBOOT              "&Neustart"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_INSTSUCCESS3        "Das System muss neu gestartet werden!"
 END
 
 #endif    // German (Germany) resources
@@ -1934,7 +1946,7 @@ BEGIN
     IDS_SR2ADMIN            "Putting '%s' to the local administrators group"
     IDS_DELSURUNNERS        "Deleting local group 'SuRunners'"
     IDS_INSTFAILED          "Installation failed!"
-    IDC_CLOSE               "&Close"
+    IDS_CLOSE               "&Close"
     IDS_INSTSUCCESS         "SuRun was installed successfully"
     IDS_INSTSUCCESS2        "You must logoff before using SuRun"
     IDC_LOGOFF              "&Log off"
@@ -1964,6 +1976,12 @@ BEGIN
     IDS_SHNAME8             "My Documents"
     IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
     IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
+    IDS_REBOOT              "&Reboot"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_INSTSUCCESS3        "The system must be restarted!"
 END
 
 #endif    // English (U.S.) resources
@@ -2555,7 +2573,7 @@ BEGIN
     IDS_SR2ADMIN            "Toevoegen '%s' aan de Administrators groep"
     IDS_DELSURUNNERS        "Verwijderen gebruikersgroep 'SuRunners'"
     IDS_INSTFAILED          "Installatie mislukt!"
-    IDC_CLOSE               "&Sluiten"
+    IDS_CLOSE               "&Sluiten"
     IDS_INSTSUCCESS         "Installatie voltooid"
     IDS_INSTSUCCESS2        "U moet opnieuw aanmelden om SuRun te gebruiken"
     IDC_LOGOFF              "&Afmelden"
@@ -2585,6 +2603,12 @@ BEGIN
     IDS_SHNAME8             "Mijn Documenten"
     IDS_BEAUTIFIED          "%s\r\n[Betekenis: %s]"
     IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
+    IDS_REBOOT              "&Reboot"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_INSTSUCCESS3        "The system must be restarted!"
 END
 
 #endif    // Dutch (Netherlands) resources
