@@ -36,6 +36,8 @@
 
 #define RAPASSKEY(u)  CBigResStr(SVCKEY _T("\\RunAs\\%s\\Cache"),u)
 #define USROPTKEY(u)  CBigResStr(_T("CLSID\\") sGUID _T("\\Options\\%s"),u)
+
+#define WINLOGONKEY L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify\\SuRun"
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Macros for all Settings
