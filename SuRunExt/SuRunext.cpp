@@ -710,7 +710,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     DBGTrace1("GetTokenInformation(LogOffUser) failed: %s",GetLastErrorNameStatic());
     return;
   }
-  DBGTrace3("TokenSource(LogOffUser) 0x%x%x: %s",
+  TRACExA("TokenSource(LogOffUser) 0x%x%x: %s\n",
     Logonsrc.SourceIdentifier.HighPart,Logonsrc.SourceIdentifier.LowPart,
     Logonsrc.SourceName);
   n=512;
@@ -734,13 +734,13 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       {
         PSID tSID=GetLogonSid(ht);
         if (!tSID)
-          DBGTrace("GetLogonSid(PID:%d) failed!");
+          DBGTrace1("GetLogonSid(PID:%d) failed!",PID[i]);
         if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
         {
           TOKEN_SOURCE tsrc;
           if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
           {
-            DBGTrace4("TokenSource(PID:%d) 0x%x%x: %s",PID[i],
+            TRACExA("TokenSource(PID:%d) 0x%x%x: %s\n",PID[i],
               tsrc.SourceIdentifier.HighPart,tsrc.SourceIdentifier.LowPart,
               tsrc.SourceName);
             if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
