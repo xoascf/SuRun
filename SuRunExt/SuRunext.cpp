@@ -704,7 +704,14 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   }
   TOKEN_SOURCE Logonsrc;
   DWORD n=0;
-  GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
+  if(!GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n))
+  {
+    DBGTrace1("GetTokenInformation(LogOffUser) failed: %s",GetLastErrorNameStatic());
+    return;
+  }
+  DBGTrace3("TokenSource(LogOffUser) 0x%x%x: %s",
+    Logonsrc.SourceIdentifier.HighPart,Logonsrc.SourceIdentifier.LowPart,
+    Logonsrc.SourceName);
   n=512;
   DWORD* PID=0;
   DWORD s=n*sizeof(DWORD);
@@ -725,19 +732,29 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
       {
         PSID tSID=GetLogonSid(ht);
+        if (!tSID)
+          DBGTrace("GetLogonSid(PID:%d) failed!");
         if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
         {
           TOKEN_SOURCE tsrc;
-          GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n);
-          if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
-            &&(strcmp(tsrc.SourceName,"SuRun")==0))
-            TerminateProcess(hp,0);
+          if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
+          {
+            DBGTrace4("TokenSource(PID:%d) 0x%x%x: %s",PID[i],
+              tsrc.SourceIdentifier.HighPart,tsrc.SourceIdentifier.LowPart,
+              tsrc.SourceName);
+            if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
+              &&(strcmp(tsrc.SourceName,"SuRun")==0))
+              TerminateProcess(hp,0);
+          }else
+            DBGTrace2("GetTokenInformation(PID:%d) failed: %s",PID[i],GetLastErrorNameStatic());
         }
         free(tSID);
         CloseHandle(ht);
-      }
+      }else
+        DBGTrace2("OpenProcessToken(PID:%d) failed: %s",PID[i],GetLastErrorNameStatic());
       CloseHandle(hp);
-    }
+    }else
+      DBGTrace2("OpenProcess(%d) failed: %s",PID[i],GetLastErrorNameStatic());
   }
   free(PID);
   free(LogonSID);
