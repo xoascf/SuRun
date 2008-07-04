@@ -695,6 +695,9 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
 VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
 {
   //Terminate all Processes that have the same logon SID and 
+#ifdef DoDBGTrace
+  CTimeLog l(L"SuRunLogoffUser IsAdmin: %d; IsLocalSystem: %d",IsAdmin(),IsLocalSystem());
+#endif DoDBGTrace
   //"SuRun" as the Token source name
   PSID LogonSID=GetLogonSid(Info->hToken);
   TOKEN_SOURCE Logonsrc;
@@ -714,12 +717,16 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     DBGTrace("nothing to do!");
     return;
   }
-  TCHAR sPID[10];
+//  n=0;
+//  RegQueryInfoKey(Key,0,0,0,0,0,0,&n,0,0,0,0);
+  TCHAR sPID[32];
   DWORD nsPID=countof(sPID);
   DWORD PID=0;
   DWORD nPID=sizeof(DWORD);
   for (int i=0;(RegEnumValue(Key,i,sPID,&nsPID,0,0,(BYTE*)&PID,&nPID)==ERROR_SUCCESS);i++) if (PID)
   {
+    nsPID=countof(sPID);
+    nPID=sizeof(DWORD);
     HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID);
     if (!hp)
     {
