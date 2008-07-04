@@ -552,7 +552,6 @@ void KillProcess(DWORD PID)
   if ((!g_bKilledOne) || (WaitForSingleObject(hProcess,5000)!=WAIT_OBJECT_0))
     TerminateProcess(hProcess,0);
   CloseHandle(hProcess);
-  //The service will call TerminateProcess()...
 }
 
 //////////////////////////////////////////////////////////////////////////////
