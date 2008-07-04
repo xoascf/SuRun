@@ -61,19 +61,19 @@ void TRACEx(LPCTSTR s,...)
   if (_vstprintf(&S[len],s,va)>=4096)
     DebugBreak();
   va_end(va);
-//  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
-//  if(f)
-//  {
-//    int len=_tcslen(S);
-//#ifdef UNICODE
-//    char m[4096]={0};
-//    WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
-//    fwrite(&m,1,len,f);
-//#else UNICODE
-//    fwrite(&S,1,len,f);
-//#endif UNICODE
-//    fclose(f);
-//  }
+  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
+  if(f)
+  {
+    int len=_tcslen(S);
+#ifdef UNICODE
+    char m[4096]={0};
+    WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
+    fwrite(&m,1,len,f);
+#else UNICODE
+    fwrite(&S,1,len,f);
+#endif UNICODE
+    fclose(f);
+  }
   OutputDebugString(S);
 }
 
@@ -86,12 +86,12 @@ void TRACExA(LPCSTR s,...)
   if (vsprintf(&S[len],s,va)>=1024)
     DebugBreak();
   va_end(va);
-//  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
-//  if(f)
-//  {
-//    fwrite(&S,sizeof(char),strlen(S),f);
-//    fclose(f);
-//  }
+  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
+  if(f)
+  {
+    fwrite(&S,sizeof(char),strlen(S),f);
+    fclose(f);
+  }
   OutputDebugStringA(S);
 }
 
