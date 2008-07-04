@@ -704,21 +704,12 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   DWORD n=0;
   if(!GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n))
     return;
-#ifdef DoDBGTrace
-  WCHAR sn[9]={0};
-  MultiByteToWideChar(CP_UTF8,0,Logonsrc.SourceName,8,sn,8);
-  DBGTrace3("TokenSource(LogOffUser) 0x%08x%08x: %s\n",
-    Logonsrc.SourceIdentifier.HighPart,Logonsrc.SourceIdentifier.LowPart,sn);
-#endif DoDBGTrace
-
+  //Get list of SuRun PIDs from registry to kill the user processes
+  //(Enumprocesses does not work from WinLogon-LogOff)
+  //ToDo: Kill children of these processes!!!!!
   HKEY Key;
   if(RegOpenKeyEx(HKLM,PIDSKEY,0,KEY_ALL_ACCESS,&Key)!=ERROR_SUCCESS)
-  {
-    DBGTrace("nothing to do!");
     return;
-  }
-//  n=0;
-//  RegQueryInfoKey(Key,0,0,0,0,0,0,&n,0,0,0,0);
   TCHAR sPID[32];
   DWORD nsPID=countof(sPID);
   DWORD PID=0;
@@ -730,33 +721,17 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID);
     if (!hp)
     {
-      DBGTrace2("OpenProcess(%d) failed: %s",PID,GetLastErrorNameStatic());
       RegDeleteValue(Key,sPID);
       i--;
     }else
     {
-#ifdef DoDBGTrace
-      DWORD d;
-      HMODULE hMod;
-      TCHAR f[MAX_PATH];
-      EnumProcessModules(hp,&hMod,sizeof(hMod),&d);
-      GetModuleFileNameEx(hp,hMod,f,MAX_PATH);
-      DBGTrace2("-----------SuRunLogoffUser: PID:%d \"%s\"",PID,f);
-#endif  DoDBGTrace
       HANDLE ht=0;
       if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
       {
         TOKEN_SOURCE tsrc;
         if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
         {
-#ifdef DoDBGTrace
-          MultiByteToWideChar(CP_UTF8,0,tsrc.SourceName,8,sn,8);
-          DBGTrace4("TokenSource(PID:%d) 0x%x%x: %s\n",PID,
-            tsrc.SourceIdentifier.HighPart,tsrc.SourceIdentifier.LowPart,sn);
-#endif DoDBGTrace
           PSID tSID=GetLogonSid(ht);
-          if (!tSID)
-            DBGTrace1("GetLogonSid(%s) failed!",f);
           if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
           {
             if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
@@ -768,8 +743,8 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
               i--;
             }else
               DBGTrace2("SuRunLogoffUser: PID:%d \"%s\" was NOT killed",PID,f);
-          }else if (tSID)
-            DBGTrace1("EqualSid(%s) mismatch",f);
+          }else
+            DBGTrace1("Sid(%s) mismatch",f);
           free(tSID);
         }else
           DBGTrace2("GetTokenInformation(%f) failed: %s",f,GetLastErrorNameStatic());
