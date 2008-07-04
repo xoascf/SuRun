@@ -111,7 +111,7 @@ void UpdLastRunTime(LPTSTR UserName)
 DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
 {
   HKEY Key;
-  if(!RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KEY_READ,&Key)==ERROR_SUCCESS)
+  if(RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KEY_READ,&Key)!=ERROR_SUCCESS)
     return Default;
   DWORD sizd=sizeof(DWORD);
   DWORD d;
