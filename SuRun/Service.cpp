@@ -526,6 +526,7 @@ TryAgain:
 //////////////////////////////////////////////////////////////////////////////
 
 // callback function for window enumeration
+BOOL g_bKilledOne=FALSE;
 static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
 {
   // no top level window, or invisible?
@@ -537,7 +538,10 @@ static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
   DWORD dwID;
   GetWindowThreadProcessId(hwnd, &dwID) ;
   if(dwID==(DWORD)lParam)
+  {
     PostMessage(hwnd,WM_CLOSE,0,0) ;
+    g_bKilledOne=TRUE;
+  }
   return TRUE ;
 }
 
@@ -551,9 +555,10 @@ void KillProcess(DWORD PID)
   //Messages work on the same WinSta/Desk only
   SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
   //Post WM_CLOSE to all Windows of PID
+  g_bKilledOne=FALSE;
   EnumWindows(CloseAppEnum,(LPARAM)PID);
   //Give the Process time to close
-  if (WaitForSingleObject(hProcess,5000)!=WAIT_OBJECT_0)
+  if ((!g_bKilledOne) || (WaitForSingleObject(hProcess,5000)!=WAIT_OBJECT_0))
     TerminateProcess(hProcess,0);
   CloseHandle(hProcess);
   //The service will call TerminateProcess()...
