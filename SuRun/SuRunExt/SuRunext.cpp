@@ -703,7 +703,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   n=512;
   DWORD* PID=0;
   DWORD s=n*sizeof(DWORD);
-  while (s<=n*sizeof(DWORD))
+  while (s>=n*sizeof(DWORD))
   {
     free(PID);
     n<<=1;
