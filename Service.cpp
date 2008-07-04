@@ -94,9 +94,6 @@ TCHAR g_RunPwd[PWLEN]={0};
 int g_RetVal=0;
 bool g_CliIsAdmin=FALSE;
 
-//HANDLE g_Jobs[256];
-//HANDLE g_User[256];
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 // CheckCliProcess:
@@ -228,26 +225,6 @@ DWORD WINAPI SvcCtrlHndlr(DWORD dwControl,DWORD EvType,LPVOID lpEvData,LPVOID Cx
     //As g_hPipe is now INVALID_HANDLE_VALUE, the Service will exit
     CloseHandle(hPipe);
     return NO_ERROR;
-  }else
-  if((dwControl==SERVICE_CONTROL_SESSIONCHANGE)&&(EvType==WTS_SESSION_LOGOFF))
-  {
-    WTSSESSION_NOTIFICATION* wtsn=(WTSSESSION_NOTIFICATION*)lpEvData;
-    DBGTrace("WTS_SESSION_LOGOFF");
-//    if (g_Jobs[wtsn->dwSessionId])
-//    {
-//      if (!TerminateJobObject(g_Jobs[wtsn->dwSessionId],0))
-//        DBGTrace2("TerminateJobObject(%x) failed %s",g_Jobs[wtsn->dwSessionId],GetLastErrorNameStatic())
-//      else
-//        DBGTrace1("TerminateJobObject(%x) OK",g_Jobs[wtsn->dwSessionId]);
-//      CloseHandle(g_Jobs[wtsn->dwSessionId]);
-//      g_Jobs[wtsn->dwSessionId]=0;
-//    }
-//    if (g_User[wtsn->dwSessionId])
-//    {
-//      CloseHandle(g_User[wtsn->dwSessionId]);
-//      g_User[wtsn->dwSessionId]=0;
-//    }
-    return NO_ERROR;
   }
   if (g_hSS!=(SERVICE_STATUS_HANDLE)0) 
     SetServiceStatus(g_hSS,&g_ss);
@@ -340,8 +317,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
   zero(g_RunPwd);
-//  zero(g_Jobs);
-//  zero(g_User);
   //service main
   argc;//unused
   argv;//unused
@@ -499,10 +474,11 @@ TryAgain:
               PROCESS_INFORMATION pi={0};
               DWORD stTime=timeGetTime();
               if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
-                          CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
-                          0,NULL,&si,&pi))
+                    CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS|CREATE_SUSPENDED,
+                    0,NULL,&si,&pi))
               {
                 bRunCount++;
+                ResumeThread(pi.hThread);
                 CloseHandle(pi.hThread);
                 for (DWORD ex=STILL_ACTIVE;ex==STILL_ACTIVE;)
                 {
@@ -534,22 +510,6 @@ TryAgain:
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
-//  int i;
-//  for (i=0;i<countof(g_Jobs);i++) if (g_Jobs[i])
-//  {
-//    DBGTrace2("TerminateJobObject(%d,%x)?",i,g_Jobs[i]);
-//    if (!TerminateJobObject(g_Jobs[i],0))
-//      DBGTrace2("TerminateJobObject(%x) failed %s",g_Jobs[i],GetLastErrorNameStatic())
-//    else
-//      DBGTrace1("TerminateJobObject(%x) OK",g_Jobs[i]);
-//    CloseHandle(g_Jobs[i]);
-//    g_Jobs[i]=0;
-//  }
-//  for (i=0;i<countof(g_User);i++) if (g_User[i])
-//  {
-//    CloseHandle(g_User[i]);
-//    g_User[i]=0;
-//  }
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
   g_ss.dwCheckPoint       = 0;
@@ -960,52 +920,33 @@ DWORD StartAdminProcessTrampoline()
   return RetVal;
 }
 
-HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,
-                    HANDLE& hJob,bool bNoAdmin)
+HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdmin)
 {
-  //JobObject for SessionId
-//  if (g_Jobs[SessionID]==0)
-//  {
-//    g_Jobs[SessionID]=CreateJobObject(0,0);
-//    if(!g_Jobs[SessionID])
-//      DBGTrace1("CreateJobObject failed %s",GetLastErrorNameStatic())
-//    else
-//      DBGTrace2("%x==CreateJobObject(%d) OK",g_Jobs[SessionID],SessionID);
-//  }
-//  hJob=g_Jobs[SessionID];
   //Admin Token for SessionId
   HANDLE hUser=0;
-//  if ((!bNoAdmin)&&(g_User[SessionID]))
-//  {
-//    hUser=g_User[SessionID];
-//  }else
+  TCHAR un[2*UNLEN+2]={0};
+  TCHAR dn[2*UNLEN+2]={0};
+  _tcscpy(un,UserName);
+  PathStripPath(un);
+  _tcscpy(dn,UserName);
+  PathRemoveFileSpec(dn);
+  //Enable use of empty passwords for network logon
+  BOOL bEmptyPWAllowed=FALSE;
+  if ((!bNoAdmin) &&(g_RunPwd[0]==0))
   {
-    TCHAR un[2*UNLEN+2]={0};
-    TCHAR dn[2*UNLEN+2]={0};
-    _tcscpy(un,UserName);
-    PathStripPath(un);
-    _tcscpy(dn,UserName);
-    PathRemoveFileSpec(dn);
-    //Enable use of empty passwords for network logon
-    BOOL bEmptyPWAllowed=FALSE;
-    if ((!bNoAdmin) &&(g_RunPwd[0]==0))
-    {
-      bEmptyPWAllowed=EmptyPWAllowed;
-      AllowEmptyPW(TRUE);
-    }
-    hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
-    //Clear Password
-    zero(g_RunPwd);
-    //Reset status of "use of empty passwords for network logon"
-    if ((!bNoAdmin) && (g_RunPwd[0]==0))
-      AllowEmptyPW(bEmptyPWAllowed);
-//    if (!bNoAdmin)
-//      g_User[SessionID]=hUser;
+    bEmptyPWAllowed=EmptyPWAllowed;
+    AllowEmptyPW(TRUE);
   }
+  hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
+  //Clear Password
+  zero(g_RunPwd);
+  //Reset status of "use of empty passwords for network logon"
+  if ((!bNoAdmin) && (g_RunPwd[0]==0))
+    AllowEmptyPW(bEmptyPWAllowed);
   return hUser;
 }
 
-DWORD LSAStartAdminProcessTrampoline() 
+DWORD LSAStartAdminProcess() 
 {
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
@@ -1027,8 +968,7 @@ DWORD LSAStartAdminProcessTrampoline()
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
       //Get Admin User Token and Job object token
-      HANDLE hJob=0;
-      HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,hJob,g_RunData.bRunAs);
+      HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
       //Clear Password
       zero(g_RunPwd);
       //CreateProcessAsUser will only work from an NT System Account since the
@@ -1036,16 +976,8 @@ DWORD LSAStartAdminProcessTrampoline()
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+        CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
-        if(hJob)
-        {
-          if(!AssignProcessToJobObject(hJob,pi.hProcess))
-            DBGTrace1("AssignProcessToJobObject failed %s",GetLastErrorNameStatic())
-          else
-            DBGTrace2("AssignProcessToJobObject(%x,%d) OK",hJob,pi.dwProcessId);
-        }
-        ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         RetVal=RETVAL_OK;
@@ -1326,8 +1258,8 @@ void SuRun(DWORD ProcessID)
   __try
   {
     KillProcess(g_RunData.KillPID);
-    RetVal=StartAdminProcessTrampoline();
-//    RetVal=LSAStartAdminProcessTrampoline();
+//    RetVal=StartAdminProcessTrampoline();
+    RetVal=LSAStartAdminProcess();
   }__except(1)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
@@ -1708,27 +1640,6 @@ BOOL InstallService()
     InstallRegistry();
     //"SuRunners" Group
     CreateSuRunnersGroup();
-//    //Install Start menu Links
-//    CoInitialize(0);
-//    TCHAR lnk[4096]={0};
-//    TCHAR file[4096]={0};
-//    GetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
-//      L"Common Programs",file,4096);
-//    ExpandEnvironmentStrings(file,lnk,4096);
-//    PathAppend(lnk,CResStr(IDS_STARTMENUDIR));
-//    CreateDirectory(lnk,0); 
-//    PathAppend(lnk,CResStr(IDS_STARTMNUCFG));
-//    GetSystemWindowsDirectory(file,4096);
-//    PathAppend(file,L"SuRun.exe /SETUP");
-//    CreateLink(file,lnk,2);
-//    PathRemoveFileSpec(lnk);
-//    PathAppend(lnk,CResStr(IDS_STARTMUNINST));
-//    GetSystemWindowsDirectory(file,4096);
-//    PathAppend(file,L"SuRun.exe");
-//    PathQuoteSpaces(file);
-//    _tcscat(file,L" /UNINSTALL");
-//    CreateLink(file,lnk,1);
-//    CoUninitialize();
     WaitFor(CheckServiceStatus()==SERVICE_RUNNING);
   }
   return bRet;
