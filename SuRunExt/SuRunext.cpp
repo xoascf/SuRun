@@ -708,7 +708,9 @@ static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
   GetWindowThreadProcessId(hwnd, &dwID) ;
   if(dwID==(DWORD)lParam)
   {
-    PostMessage(hwnd,WM_CLOSE,0,0) ;
+    DWORD r;
+    SendMessageTimeout(hwnd,WM_QUERYENDSESSION,0,ENDSESSION_LOGOFF,SMTO_ABORTIFHUNG,5000,&r);
+    PostMessage(hwnd,WM_ENDSESSION,0,ENDSESSION_LOGOFF) ;
     g_bKilledOne=TRUE;
   }
   return TRUE ;
