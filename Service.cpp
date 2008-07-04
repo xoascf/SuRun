@@ -798,124 +798,9 @@ BOOL Setup()
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  StartAdminProcessTrampoline
+//  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-DWORD StartAdminProcessTrampoline() 
-{
-  TCHAR cmd[4096]={0};
-  GetSystemWindowsDirectory(cmd,4096);
-  PathAppend(cmd,L"SuRun.exe");
-  PathQuoteSpaces(cmd);
-  DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
-  PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
-  {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-    {
-      STARTUPINFO si={0};
-      si.cb	= sizeof(si);
-      //Do not inherit Desktop from calling process, use Tokens Desktop
-      TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
-      si.lpDesktop = WinstaDesk;
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      //Disable AppInitHooks
-      TCHAR s[2048]={0};
-      int LdAID=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
-      GetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s,2048);
-      SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),_T(""));
-#ifdef _WIN64
-      TCHAR s32[2048]={0};
-      GetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32,2048);
-      SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),_T(""));
-      int LdAID32=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
-#endif _WIN64
-      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-      {
-        //Put g_RunData an g_RunPassword in!:
-        SIZE_T n;
-        //Since it's the same process, g_RunData and g_RunPwd have the same address!
-        RUNDATA rd=g_RunData;
-        rd.CliProcessId=pi.dwProcessId;
-        rd.CliThreadId=pi.dwThreadId;
-        rd.KillPID=0;
-        if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
-          TerminateProcess(pi.hProcess,0);
-        else if (!WriteProcessMemory(pi.hProcess,&g_RunPwd,&g_RunPwd,PWLEN,&n))
-          TerminateProcess(pi.hProcess,0);
-        //Enable use of empty passwords for network logon
-        BOOL bEmptyPWAllowed=FALSE;
-        if (!g_RunData.bRunAs)
-        {
-          if (g_RunPwd[0]==0)
-          {
-            bEmptyPWAllowed=EmptyPWAllowed;
-            AllowEmptyPW(TRUE);
-          }
-          //Add user to admins group
-          AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,1);
-        }
-        ResumeThread(pi.hThread);
-        CloseHandle(pi.hThread);
-        WaitForSingleObject(pi.hProcess,INFINITE);
-        if (!g_RunData.bRunAs)
-        {
-          //Remove user from Administrators group
-          AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName,0);
-          //Reset status of "use of empty passwords for network logon"
-          if (g_RunPwd[0]==0)
-            AllowEmptyPW(bEmptyPWAllowed);
-        }
-        //Clear Password
-        zero(g_RunPwd);
-        GetExitCodeProcess(pi.hProcess,&RetVal);
-        CloseHandle(pi.hProcess);
-        if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
-        {
-          //Show ToolTip "<Program> is running elevated"...
-          if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-            CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-          {
-            //Tell SuRun to Say something:
-            rd.CliProcessId=0;
-            rd.CliThreadId=pi.dwThreadId;
-            rd.RetPtr=0;
-            rd.RetPID=0;
-            rd.IconId=IDI_SHIELD;
-            rd.TimeOut=20000;
-            _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
-            if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
-              TerminateProcess(pi.hProcess,0);
-            ResumeThread(pi.hThread);
-            CloseHandle(pi.hThread);
-            CloseHandle(pi.hProcess);
-          }
-        }
-      }else
-        DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
-      //Enable AppInitHooks
-      SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),LdAID);
-      SetRegStr(HKLM,AppInit,_T("AppInit_DLLs"),s);
-#ifdef _WIN64
-      SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),LdAID32);
-      SetRegStr(HKLM,AppInit32,_T("AppInit_DLLs"),s32);
-#endif _WIN64
-      DestroyEnvironmentBlock(Env);
-    }
-    UnloadUserProfile(hUser,ProfInf.hProfile);
-  }
-  CloseHandle(hUser);
-  return RetVal;
-}
-
 HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdmin)
 {
   //Admin Token for SessionId
@@ -1201,7 +1086,6 @@ void SuRun(DWORD ProcessID)
   __try
   {
     KillProcess(g_RunData.KillPID);
-//    RetVal=StartAdminProcessTrampoline();
     RetVal=LSAStartAdminProcess();
   }__except(1)
   {
