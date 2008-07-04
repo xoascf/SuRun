@@ -70,7 +70,7 @@ void TRACEx(LPCTSTR s,...)
   FILE* f=fopen(tmp,"a+t");
   if(f)
   {
-    size_t len=_tcslen(S);
+    int len=(int)_tcslen(S);
 #ifdef UNICODE
     char m[4096]={0};
     WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
