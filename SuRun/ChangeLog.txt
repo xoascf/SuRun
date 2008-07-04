@@ -27,10 +27,11 @@ Done, to be tested:
   by SuRun will be terminated by a WinLogon Notification handler in 
   SuRunExt.dll when the user logs off.
 * SuRun seems to work in Windows Vista side by side with UAC
+* SuRuns "Replace RunAs" now preserves the original "RunAs" display name
 
 ToDo
 ---------------------
-* "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
+* "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
