@@ -695,7 +695,7 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
 VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
 {
   //Terminate all Processes that have the same logon SID and 
-  CTimeLog l(L"SuRunLogoffUser");
+  CTimeLog l(L"SuRunLogoffUser IsAdmin: %d; IsLocalSystem: %d",IsAdmin(),IsLocalSystem());
   //"SuRun" as the Token source name
   PSID LogonSID=GetLogonSid(Info->hToken);
   if((!LogonSID)||(!IsValidSid(LogonSID)))
