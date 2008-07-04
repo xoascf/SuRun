@@ -7,3 +7,5 @@ EXPORTS
    DllCanUnloadNow   PRIVATE
    DllGetClassObject PRIVATE
    CPlApplet         PRIVATE
+   CPlApplet         PRIVATE
+   SuRunLogoffUser
