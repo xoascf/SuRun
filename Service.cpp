@@ -1326,6 +1326,11 @@ void InstallRegistry()
   SetRegStr(HKLM,UNINSTL,L"Publisher",L"Kay Bruns");
   SetRegStr(HKLM,UNINSTL,L"URLInfoAbout",L"http://kay-bruns.de/surun");
   SetRegStr(HKLM,UNINSTL,L"DisplayIcon",SuRunExe);
+  //WinLogon Notification
+  SetRegInt(HKLM,WINLOGONKEY,L"Asynchronous",0);
+  SetRegStr(HKLM,WINLOGONKEY,L"DllName",L"SuRunExt.dll");
+  SetRegInt(HKLM,WINLOGONKEY,L"Impersonate",0);
+  SetRegStr(HKLM,WINLOGONKEY,L"Logoff",L"SuRunLogoffUser");
   //AutoRun, System Menu Hook
   InstLog(CResStr(IDS_ADDAUTORUN));
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
@@ -1423,6 +1428,8 @@ void RemoveRegistry()
   //AutoRun, System Menu Hook
   InstLog(CResStr(IDS_REMAUTORUN));
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
+  //WinLogon Notification
+  DelRegKey(HKLM,WINLOGONKEY);
   //UnInstall
   InstLog(CResStr(IDS_REMUNINST));
   DelRegKey(HKLM,UNINSTL);
