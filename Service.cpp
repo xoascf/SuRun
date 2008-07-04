@@ -985,9 +985,9 @@ DWORD LSAStartAdminProcess()
       {
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
-        //Store PID in registry so WinLogon-LogOff can kill the process
-        //(Enumprocesses does not work from WinLogon-LogOff)
-        SetRegInt(HKLM,PIDSKEY,CResStr(L"%d",pi.dwProcessId),pi.dwProcessId);
+//        //Store PID in registry so WinLogon-LogOff can kill the process
+//        //(Enumprocesses does not work from WinLogon-LogOff)
+//        SetRegInt(HKLM,PIDSKEY,CResStr(L"%d",pi.dwProcessId),pi.dwProcessId);
         RetVal=RETVAL_OK;
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         if((g_RunData.RetPID)&&(g_RunData.RetPtr))
