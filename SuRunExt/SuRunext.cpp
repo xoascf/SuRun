@@ -24,6 +24,8 @@
 #include <initguid.h>
 #include <shlwapi.h>
 #include <lmcons.h>
+#include <Winwlx.h>
+#include <psapi.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -688,6 +690,54 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
   return 0; 
 } 
 
+//Winlogon Logoff event
+VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
+{
+  //Terminate all Processes that have the same logon SID and 
+  //"SuRun" as the Token source name
+  PSID LogonSID=GetLogonSid(Info->hToken);
+  TOKEN_SOURCE Logonsrc;
+  DWORD n=0;
+  GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
+  n=512;
+  DWORD* PID=0;
+  DWORD s=0;
+  while (s<=n*sizeof(DWORD))
+  {
+    free(PID);
+    n<<=1;
+    PID=(DWORD*)malloc(n*sizeof(DWORD));
+    EnumProcesses(PID,n*sizeof(DWORD),&s);
+  }
+  n=s/sizeof(DWORD);
+  for (DWORD i=0;i<n;i++)
+  {
+    HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID[i]);
+    if (hp)
+    {
+      HANDLE ht=0;
+      if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
+      {
+        PSID tSID=GetLogonSid(ht);
+        if (EqualSid(LogonSID,tSID))
+        {
+          TOKEN_SOURCE tsrc;
+          GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n);
+          if ((memcmp(&Logonsrc.SourceIdentifier,&tsrc.SourceIdentifier,sizeof(LUID))==0)
+            &&(strcmp(tsrc.SourceName,"SuRun")==0))
+            TerminateProcess(hp,0);
+        }
+        free(tSID);
+        CloseHandle(ht);
+      }
+      CloseHandle(hp);
+    }
+  }
+  free(PID);
+  free(LogonSID);
+	return;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // Install/Uninstall
@@ -724,6 +774,11 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
+  //WinLogon Notification
+  SetRegInt(HKCR,WINLOGONKEY,L"Asynchronous",0);
+  SetRegStr(HKCR,WINLOGONKEY,L"DLLName",L"SuRunExt.dll");
+  SetRegInt(HKCR,WINLOGONKEY,L"Impersonate",0);
+  SetRegStr(HKCR,WINLOGONKEY,L"Logoff",L"SuRunLogoffUser");
 }
 
 __declspec(dllexport) void RemoveShellExt()
@@ -746,6 +801,8 @@ __declspec(dllexport) void RemoveShellExt()
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
   //self Approval
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
+  //WinLogon Notification
+  DelRegKey(HKCR,WINLOGONKEY);
 }
 
 //////////////////////////////////////////////////////////////////////////////
