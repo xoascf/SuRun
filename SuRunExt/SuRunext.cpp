@@ -733,39 +733,14 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
 VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
 {
   //Terminate all Processes that have the same logon SID and 
-#ifdef DoDBGTrace
-  CTimeLog l(L"SuRunLogoffUser IsAdmin: %d; IsLocalSystem: %d",IsAdmin(),IsLocalSystem());
-#endif DoDBGTrace
   //"SuRun" as the Token source name
   PSID LogonSID=GetLogonSid(Info->hToken);
   TOKEN_SOURCE Logonsrc;
   DWORD n=0;
-  if(!GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n))
-    return;
-  //Get list of SuRun PIDs from registry to kill the user processes
-  //(Enumprocesses does not work from WinLogon-LogOff)
-  //ToDo: Kill children of these processes!!!!!
-//  HKEY Key;
-//  if(RegOpenKeyEx(HKLM,PIDSKEY,0,KEY_ALL_ACCESS,&Key)!=ERROR_SUCCESS)
-//    return;
-//  TCHAR sPID[32];
-//  DWORD nsPID=countof(sPID);
-//  DWORD PID=0;
-//  DWORD nPID=sizeof(DWORD);
-//  for (int i=0;(RegEnumValue(Key,i,sPID,&nsPID,0,0,(BYTE*)&PID,&nPID)==ERROR_SUCCESS);) if (PID)
-//  {
-//    nsPID=countof(sPID);
-//    nPID=sizeof(DWORD);
-//    if(KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,PID)==0)
-//    {
-//      //OpenProcess failed or Process Killed
-//      RegDeleteValue(Key,sPID);
-//    }else
-//      i++;
-//  }
-//  RegCloseKey(Key);
-  WTS_PROCESS_INFO* ppi=0;
+  GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
+  //EnumProcesses does not work here! need to call WTSEnumerateProcesses
   n=0;
+  WTS_PROCESS_INFO* ppi=0;
   if(WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&ppi,&n))
   {
     for (DWORD i=0;i<n;i++)
