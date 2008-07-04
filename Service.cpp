@@ -985,6 +985,7 @@ DWORD LSAStartAdminProcess()
       {
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
+        SetRegInt(HKLM,PIDSKEY,CResStr(L"%d",pi.dwProcessId),pi.dwProcessId);
         RetVal=RETVAL_OK;
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         if((g_RunData.RetPID)&&(g_RunData.RetPtr))
