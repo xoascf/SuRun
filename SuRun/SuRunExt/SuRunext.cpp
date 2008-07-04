@@ -688,6 +688,43 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
   return 0; 
 } 
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  KillProcess
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+// callback function for window enumeration
+BOOL g_bKilledOne=FALSE;
+static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
+{
+  // no top level window, or invisible?
+  if ((GetWindow(hwnd,GW_OWNER))||(!IsWindowVisible(hwnd)))
+    return TRUE;
+  TCHAR s[4096]={0};
+  if ((!InternalGetWindowText(hwnd,s,countof(s)))||(s[0]==0))
+    return TRUE;
+  DWORD dwID;
+  GetWindowThreadProcessId(hwnd, &dwID) ;
+  if(dwID==(DWORD)lParam)
+  {
+    PostMessage(hwnd,WM_CLOSE,0,0) ;
+    g_bKilledOne=TRUE;
+  }
+  return TRUE ;
+}
+
+void KillProcess(DWORD PID,HANDLE hProcess)
+{
+  //Post WM_CLOSE to all Windows of PID
+  g_bKilledOne=FALSE;
+  EnumWindows(CloseAppEnum,(LPARAM)PID);
+  //Give the Process time to close
+  if ((!g_bKilledOne) || (WaitForSingleObject(hProcess,5000)!=WAIT_OBJECT_0))
+    TerminateProcess(hProcess,0);
+  CloseHandle(hProcess);
+}
+
 int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
 {
   HANDLE hp=OpenProcess(PROCESS_ALL_ACCESS,0,PID);
@@ -707,7 +744,7 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
         if ((memcmp(&SrcId,&tsrc.SourceIdentifier,sizeof(LUID))==0)
           &&(strcmp(tsrc.SourceName,"SuRun")==0))
         {
-          TerminateProcess(hp,0);
+          KillProcess(PID,hp);
           DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
           RetVal=1;
         }else
