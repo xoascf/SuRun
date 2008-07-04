@@ -14,12 +14,14 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <TCHAR.h>
+#include <ShlWapi.h>
 #include "DBGTrace.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 
 #include <lmerr.h>
+#pragma comment(lib,"Shlwapi.lib")
 #pragma warning(disable : 4996)
 
 void GetErrorName(int ErrorCode,LPTSTR s)
@@ -61,10 +63,14 @@ void TRACEx(LPCTSTR s,...)
   if (_vstprintf(&S[len],s,va)>=4096)
     DebugBreak();
   va_end(va);
-  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
+  char tmp[MAX_PATH];
+  GetTempPathA(MAX_PATH,tmp);
+  PathRemoveBackslashA(tmp);
+  PathAppendA(tmp,"SuRunLog.log");
+  FILE* f=fopen(tmp,"a+t");
   if(f)
   {
-    int len=_tcslen(S);
+    size_t len=_tcslen(S);
 #ifdef UNICODE
     char m[4096]={0};
     WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
@@ -86,7 +92,11 @@ void TRACExA(LPCSTR s,...)
   if (vsprintf(&S[len],s,va)>=1024)
     DebugBreak();
   va_end(va);
-  FILE* f=fopen("G:\\TEMP\\SuRunLog.log","a+t");
+  char tmp[MAX_PATH];
+  GetTempPathA(MAX_PATH,tmp);
+  PathRemoveBackslashA(tmp);
+  PathAppendA(tmp,"SuRunLog.log");
+  FILE* f=fopen(tmp,"a+t");
   if(f)
   {
     fwrite(&S,sizeof(char),strlen(S),f);
