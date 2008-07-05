@@ -111,7 +111,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         && (GetMenuState(hmenu,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
         {
           for (i=0;i<GetMenuItemCount(hmenu)&&(GetMenuItemID(hmenu,i)!=SC_CLOSE);i++);
-          InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENURESTART));
+          InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENUSTART));
         }
         if (i)
           InsertMenu(hmenu,i+1,MF_SEPARATOR|MF_BYPOSITION,0,0);
