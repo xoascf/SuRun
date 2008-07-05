@@ -69,13 +69,23 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
   if(nCode>=0)
   {
     #define wps ((CWPSTRUCT*)lParam)
+    #define hmenu (HMENU)wps->wParam
     switch(wps->message)
     {
     case WM_MENUSELECT:
       if((wps->lParam==NULL)&&(HIWORD(wps->wParam)==0xFFFF))
       {
-        RemoveMenu(GetSystemMenu(wps->hwnd,FALSE),WM_SYSMH0,MF_BYCOMMAND);
-        RemoveMenu(GetSystemMenu(wps->hwnd,FALSE),WM_SYSMH1,MF_BYCOMMAND);
+        HMENU m=GetSystemMenu(wps->hwnd,FALSE);
+        if ( RemoveMenu(m,WM_SYSMH0,MF_BYCOMMAND)
+          || RemoveMenu(m,WM_SYSMH1,MF_BYCOMMAND))
+        {
+          for (int i=0;i<GetMenuItemCount(m);i++) if (GetMenuItemID(m,i)==SC_CLOSE)
+          {
+            if(i)
+              RemoveMenu(m,i-1,MF_BYPOSITION);
+            break;
+          }
+        }
       }
       break;
     case WM_CONTEXTMENU:
@@ -85,20 +95,30 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       break;
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
-        && IsMenu((HMENU)wps->wParam) 
+        && IsMenu(hmenu) 
         && (!l_IsAdmin)
         && (!GetHideFromUser(l_User)))
       {
+        int i=0;
         if( GetRestartAsAdmin 
         && (!IsShell())
-        && (GetMenuState((HMENU)wps->wParam,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1))
-          AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART));
+        && (GetMenuState(hmenu,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1))
+        {
+          for (i=0;i<GetMenuItemCount(hmenu)&&(GetMenuItemID(hmenu,i)!=SC_CLOSE);i++);
+          InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART));
+        }
         if( GetStartAsAdmin
-        && (GetMenuState((HMENU)wps->wParam,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
-          AppendMenu((HMENU)wps->wParam,MF_STRING,WM_SYSMH1,CResStr(l_hInst,IDS_MENUSTART));
+        && (GetMenuState(hmenu,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
+        {
+          for (i=0;i<GetMenuItemCount(hmenu)&&(GetMenuItemID(hmenu,i)!=SC_CLOSE);i++);
+          InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENURESTART));
+        }
+        if (i)
+          InsertMenu(hmenu,i,MF_SEPARATOR|MF_BYPOSITION,0,0);
       }
       break;
     }
+    #undef hmenu
     #undef wps
   }
   return CallNextHookEx(g_hookShell, nCode, wParam, lParam);
