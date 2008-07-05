@@ -858,6 +858,12 @@ DWORD LSAStartAdminProcess()
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
         CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
       {
+        //Allow access to the Process and Thread to the Administrators and deny 
+        //access for the current user
+        SetAdminDenyUserAccess(pi.hThread,g_RunData.CliProcessId);
+        SetAdminDenyUserAccess(pi.hProcess,g_RunData.CliProcessId);
+        //Start the main thread
+        ResumeThread(pi.hThread);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         RetVal=RETVAL_OK;
