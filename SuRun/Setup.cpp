@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-#define _DEBUGSETUP
+//#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -1191,6 +1191,7 @@ ApplyChanges:
   return FALSE;
 }
 
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 // Dialog Proc for third Tab-Control
@@ -1265,6 +1266,63 @@ ApplyChanges:
     }
   }
   return FALSE;
+}
+
+void SetSimpleSettings(int nSel)
+{
+  HWND h=g_SD->hTabCtrl[nSel];
+  switch(nSel)
+  {
+  case 0:
+    CheckDlgButton(h,IDC_BLURDESKTOP,1);
+    CheckDlgButton(h,IDC_FADEDESKTOP,1);
+    CheckDlgButton(h,IDC_SAVEPW,1);
+    SetDlgItemInt(h,IDC_ASKTIMEOUT,0,0);
+    CheckDlgButton(h,IDC_DORUNAS,1);
+    ComboBox_SetCurSel(GetDlgItem(h,IDC_WARNADMIN),APW_ADMIN);
+    CheckDlgButton(h,IDC_CTRLASADMIN,1);
+    CheckDlgButton(h,IDC_CMDASADMIN,0);
+    CheckDlgButton(h,IDC_EXPASADMIN,1);
+    CheckDlgButton(h,IDC_RESTARTADMIN,1);
+    CheckDlgButton(h,IDC_STARTADMIN,0);
+    CheckDlgButton(h,IDC_ALLOWTIME,1);
+    CheckDlgButton(h,IDC_SETENERGY,1);
+    CheckDlgButton(h,IDC_WINUPD4ALL,1);
+    CheckDlgButton(h,IDC_WINUPDBOOT,1);
+    CheckDlgButton(h,IDC_OWNERGROUP,1);
+    EnableWindow(GetDlgItem(h,IDC_FADEDESKTOP),!IsWin2k());
+    EnableWindow(GetDlgItem(h,IDC_ASKTIMEOUT),1);
+    break;
+  case 1:
+    EnableWindow(GetDlgItem(h,IDC_RUNSETUP),1);
+    EnableWindow(GetDlgItem(h,IDC_REQPW4SETUP),1);
+    EnableWindow(GetDlgItem(h,IDC_RESTRICTED),1);
+    EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
+    EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
+    EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),0);
+    CheckDlgButton(h,IDC_RUNSETUP,1);
+    CheckDlgButton(h,IDC_REQPW4SETUP,0);
+    CheckDlgButton(h,IDC_RESTRICTED,0);
+    CheckDlgButton(h,IDC_HIDESURUN,0);
+    CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
+    CheckDlgButton(h,IDC_TRAYBALLOON,1);
+    UpdateWhiteListFlags(GetDlgItem(h,IDC_WHITELIST));
+    break;
+  case 2:
+    CheckDlgButton(h,IDC_SHEXHOOK,1);
+    CheckDlgButton(h,IDC_IATHOOK,1);
+    CheckDlgButton(h,IDC_SHOWTRAY,1);
+    CheckDlgButton(h,IDC_NOCONVADMIN,0);
+    CheckDlgButton(h,IDC_NOCONVUSER,0);
+    CheckDlgButton(h,IDC_RESTRICTNEW,0);
+    CheckDlgButton(h,IDC_NOSETUPNEW,0);
+    ComboBox_SetCurSel(GetDlgItem(h,IDC_TRAYSHOWADMIN),TSA_ADMIN);
+    CheckDlgButton(h,IDC_TRAYBALLOON,1);
+    EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
+    UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
+    break;
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1343,6 +1401,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     {
       switch (wParam)
       {
+      case MAKELPARAM(IDC_SIMPLESETUP,BN_CLICKED):
+        SetSimpleSettings(TabCtrl_GetCurSel(GetDlgItem(hwnd,IDC_SETUP_TAB)));
+        break;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         SendMessage(
           g_SD->hTabCtrl[TabCtrl_GetCurSel(GetDlgItem(hwnd,IDC_SETUP_TAB))],
