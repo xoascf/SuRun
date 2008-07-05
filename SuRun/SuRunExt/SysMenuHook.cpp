@@ -114,7 +114,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
           InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENURESTART));
         }
         if (i)
-          InsertMenu(hmenu,i,MF_SEPARATOR|MF_BYPOSITION,0,0);
+          InsertMenu(hmenu,i+1,MF_SEPARATOR|MF_BYPOSITION,0,0);
       }
       break;
     }
