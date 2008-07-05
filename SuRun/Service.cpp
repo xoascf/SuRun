@@ -1060,33 +1060,6 @@ void SuRun(DWORD ProcessID)
       return;
     }
   }//(g_RunData.bRunAs)
-  //Secondary Logon service is required by CreateProcessWithLogonW
-  if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
-  {
-    //Start/Resume secondary logon
-    SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT);
-    if (hdlSCM!=0) 
-    {
-      SC_HANDLE hdlServ = OpenService(hdlSCM,_T("seclogon"),SERVICE_START|SERVICE_PAUSE_CONTINUE);
-      if(hdlServ)
-      {
-        if (!StartService(hdlServ,0,0))
-        {
-          SERVICE_STATUS ss;
-          ControlService(hdlServ,SERVICE_CONTROL_CONTINUE,&ss);
-        }
-        CloseServiceHandle(hdlServ);
-      }
-      CloseServiceHandle(hdlSCM);
-    }
-    if(CheckServiceStatus(_T("seclogon"))!=SERVICE_RUNNING)
-    {
-      zero(g_RunPwd);
-      ResumeClient(RETVAL_CANCELLED);
-      SafeMsgBox(0,CBigResStr(IDS_NOSECLOGON),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-      return;
-    }
-  }
   //copy the password to the client
   __try
   {
