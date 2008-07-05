@@ -7,6 +7,9 @@ Done, to be tested:
   starting elevated Processes. SuRun does not need to use a helper process to 
   start the elevated process anymore.
 * SuRun seems to work in Windows Vista side by side with UAC enabled
+* SuRun Settigs have a "Set recommended options for home users" Button. 
+  Clicking this button causes SuRun to set all Options in the currently visible 
+  Settings page to be set to "usual home user" settings
 * Wildcards "*" and "?" are supported for commands in the users program list
 * When adding files to the users program list, SuRun adds automatic quotes.
 * Setup does a test run of added/edited commands
@@ -36,12 +39,11 @@ Done, to be tested:
 ToDo
 ---------------------
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
-* Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
-* Wizard button to add common Windows Apps to the AutoMagic list 
+* "Add Standard App" button to add common Windows Apps to the AutoMagic list 
   Network Settings
-    %WinDir%\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
+    %WinDir%\explorer.exe *::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
   Computer Management
     %WinDir%\system32\mmc.exe *%WinDir%\compmgmt.msc*
   GPEdit.msc
@@ -49,14 +51,11 @@ ToDo
   SecPol.msc
     %WinDir%\mmc.exe *%WinDir%\system32\secpol.msc*
   Sysdm.cpl
-    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL SYSDM.CPL*
-    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL *%WinDir%\system32\SYSDM.CPL*
+    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL*SYSDM.CPL*
   Safely Remove Hardware
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL hotplug.dll*
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL *%WinDir%\system32\hotplug.dll*
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*hotplug.dll*
   Add/Remove Programs
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL appwiz.cpl*
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL *%WinDir%\system32\appwiz.cpl*
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*appwiz.cpl*
 
 To be done in future:
 ---------------------
