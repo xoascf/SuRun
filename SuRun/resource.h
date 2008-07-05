@@ -40,7 +40,6 @@
 #define IDS_NOADD2USERS                 34
 #define IDS_NOREMADMINS                 35
 #define IDS_ADMINSHELL                  36
-#define IDS_NOSECLOGON                  37
 #define IDS_NOADMIN2                    38
 #define IDS_RUNRESTRICTED               39
 #define IDS_SETUP1                      40
