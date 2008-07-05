@@ -75,6 +75,8 @@ UINT GetMenuItemType(HMENU m,int pos)
 
 int FindSCClose(HMENU m)
 {
+  //return position of SC_CLOSE in menu.
+  //Insert Separator before SC_CLOSE if no separator precedes it
   for (int i=0;i<GetMenuItemCount(m)&&(GetMenuItemID(m,i)!=SC_CLOSE);i++);
   if(i && ((GetMenuItemType(m,i-1)&MFT_SEPARATOR)==0))
     InsertMenu(m,i++,MF_SEPARATOR|MF_BYPOSITION,WM_SYSMH0,0);
@@ -93,6 +95,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       if((wps->lParam==NULL)&&(HIWORD(wps->wParam)==0xFFFF))
       {
         HMENU m=GetSystemMenu(wps->hwnd,FALSE);
+        //Two menu items and two separators can be in Sysmenu, remove them:
         RemoveMenu(m,WM_SYSMH0,MF_BYCOMMAND);
         RemoveMenu(m,WM_SYSMH0,MF_BYCOMMAND);
         RemoveMenu(m,WM_SYSMH1,MF_BYCOMMAND);
