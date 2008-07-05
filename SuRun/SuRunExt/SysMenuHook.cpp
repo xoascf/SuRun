@@ -68,7 +68,7 @@ UINT GetMenuItemType(HMENU m,int pos)
 {
   MENUITEMINFO mii={0};
   mii.cbSize=sizeof(mii);
-  mii.fMask=MIIM_FTYPE|MIIM_ID;
+  mii.fMask=MIIM_FTYPE;
   GetMenuItemInfo(m,pos,TRUE,&mii);
   return mii.fType;
 }
@@ -76,7 +76,7 @@ UINT GetMenuItemType(HMENU m,int pos)
 int FindSCClose(HMENU m)
 {
   for (int i=0;i<GetMenuItemCount(m)&&(GetMenuItemID(m,i)!=SC_CLOSE);i++);
-  if(i && ((GetMenuItemType(m,i)&MF_SEPARATOR)==0))
+  if(i && ((GetMenuItemType(m,i-1)&MFT_SEPARATOR)==0))
     InsertMenu(m,i++,MF_SEPARATOR|MF_BYPOSITION,WM_SYSMH0,0);
   return i;
 }
