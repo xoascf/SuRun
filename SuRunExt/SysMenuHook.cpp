@@ -64,6 +64,23 @@ BOOL IsShell()
   return g_IsShell;
 }
 
+UINT GetMenuItemType(HMENU m,int pos)
+{
+  MENUITEMINFO mii={0};
+  mii.cbSize=sizeof(mii);
+  mii.fMask=MIIM_FTYPE|MIIM_ID;
+  GetMenuItemInfo(m,pos,TRUE,&mii);
+  return mii.fType;
+}
+
+int FindSCClose(HMENU m)
+{
+  for (int i=0;i<GetMenuItemCount(m)&&(GetMenuItemID(m,i)!=SC_CLOSE);i++);
+  if(i && ((GetMenuItemType(m,i)&MF_SEPARATOR)==0))
+    InsertMenu(m,i++,MF_SEPARATOR|MF_BYPOSITION,WM_SYSMH0,0);
+  return i;
+}
+
 LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if(nCode>=0)
@@ -76,16 +93,10 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       if((wps->lParam==NULL)&&(HIWORD(wps->wParam)==0xFFFF))
       {
         HMENU m=GetSystemMenu(wps->hwnd,FALSE);
-        if ( RemoveMenu(m,WM_SYSMH0,MF_BYCOMMAND)
-          || RemoveMenu(m,WM_SYSMH1,MF_BYCOMMAND))
-        {
-          for (int i=0;i<GetMenuItemCount(m);i++) if (GetMenuItemID(m,i)==SC_CLOSE)
-          {
-            if(i)
-              RemoveMenu(m,i-1,MF_BYPOSITION);
-            break;
-          }
-        }
+        RemoveMenu(m,WM_SYSMH0,MF_BYCOMMAND);
+        RemoveMenu(m,WM_SYSMH0,MF_BYCOMMAND);
+        RemoveMenu(m,WM_SYSMH1,MF_BYCOMMAND);
+        RemoveMenu(m,WM_SYSMH1,MF_BYCOMMAND);
       }
       break;
     case WM_CONTEXTMENU:
@@ -104,17 +115,18 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         && (!IsShell())
         && (GetMenuState(hmenu,WM_SYSMH0,MF_BYCOMMAND)==(UINT)-1))
         {
-          for (i=0;i<GetMenuItemCount(hmenu)&&(GetMenuItemID(hmenu,i)!=SC_CLOSE);i++);
-          InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART));
+          i=FindSCClose(hmenu);
+          InsertMenu(hmenu,i++,MF_BYPOSITION,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART));
         }
         if( GetStartAsAdmin
         && (GetMenuState(hmenu,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
         {
-          for (i=0;i<GetMenuItemCount(hmenu)&&(GetMenuItemID(hmenu,i)!=SC_CLOSE);i++);
-          InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENUSTART));
+          if (i==0)
+            i=FindSCClose(hmenu);
+          InsertMenu(hmenu,i++,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENUSTART));
         }
         if (i)
-          InsertMenu(hmenu,i+1,MF_SEPARATOR|MF_BYPOSITION,0,0);
+          InsertMenu(hmenu,i,MF_SEPARATOR|MF_BYPOSITION,WM_SYSMH1,0);
       }
       break;
     }
