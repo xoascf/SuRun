@@ -824,10 +824,6 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
 
 DWORD LSAStartAdminProcess() 
 {
-  TCHAR cmd[4096]={0};
-  GetSystemWindowsDirectory(cmd,4096);
-  PathAppend(cmd,L"SuRun.exe");
-  PathQuoteSpaces(cmd);
   DWORD RetVal=RETVAL_ACCESSDENIED;
   HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
   PROCESS_INFORMATION pi={0};
@@ -874,14 +870,18 @@ DWORD LSAStartAdminProcess()
             SIZE_T n;
             if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
               DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-              cmd,GetLastErrorNameStatic());
+              g_RunData.cmdLine,GetLastErrorNameStatic());
             CloseHandle(hProcess);
           }else
             DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-            cmd,GetLastErrorNameStatic());
+            g_RunData.cmdLine,GetLastErrorNameStatic());
         }
         if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
         {
+          TCHAR cmd[4096]={0};
+          GetSystemWindowsDirectory(cmd,4096);
+          PathAppend(cmd,L"SuRun.exe");
+          PathQuoteSpaces(cmd);
           //Show ToolTip "<Program> is running elevated"...
           if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
             CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
@@ -1269,6 +1269,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   GetProcessUserName(GetCurrentProcessId(),User);
   if (IsInSuRunners(User) && (CheckServiceStatus()==SERVICE_RUNNING))
   {
+    DBGTrace2("RunThisAsAdmin %s is SuRunner: starting %s with SuRun",User,cmd);
     TCHAR SvcFile[4096];
     GetSystemWindowsDirectory(SvcFile,4096);
     PathAppend(SvcFile,_T("SuRun.exe"));
@@ -1287,7 +1288,9 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
       if (ExitCode!=RETVAL_OK)
         return FALSE;
       WaitFor(CheckServiceStatus()==WaitStat);
-    }
+    }else
+      DBGTrace2("RunThisAsAdmin CreateProcess(%s) failed: %s",
+                cmd,GetLastErrorNameStatic());
   }
   _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
   if (!RunAsAdmin(cmdLine,nResId))
@@ -1688,7 +1691,10 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 BOOL UserInstall()
 {
   if (!IsAdmin())
+  {
+    DBGTrace("UserUninstall: No Admin! starting SuRun /USERINST as Admin");
     return RunThisAsAdmin(_T("/USERINST"),SERVICE_RUNNING,IDS_INSTALLADMIN);
+  }
   return DialogBox(GetModuleHandle(0),
       MAKEINTRESOURCE((CheckServiceStatus()!=0)?IDD_UPDATE:IDD_INSTALL),
       0,InstallDlgProc)!=IDCANCEL;
