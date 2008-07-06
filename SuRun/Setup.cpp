@@ -114,24 +114,29 @@ DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
   if(RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KEY_READ,&Key)!=ERROR_SUCCESS)
     return Default;
   DWORD sizd=sizeof(DWORD);
-  DWORD d;
-  if (RegQueryValueEx(Key,CmdLine,0,0,(BYTE*)&d,&sizd)==ERROR_SUCCESS)
+  DWORD d=Default;
+  DWORD t=REG_DWORD;
+  if ((RegQueryValueEx(Key,CmdLine,0,&t,(BYTE*)&d,&sizd)==ERROR_SUCCESS)
+    &&(t==REG_DWORD))
     return RegCloseKey(Key),d;
   TCHAR cmd[4096];
   DWORD ccMax=countof(cmd);
-  for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
+  sizd=sizeof(DWORD);
+  for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,&t,(BYTE*)&d,&sizd)==ERROR_SUCCESS);i++)
   {
+    if((t==REG_DWORD) && strwldcmp(CmdLine,cmd))
+      return RegCloseKey(Key),d;
     ccMax=countof(cmd);
-    if(strwldcmp(CmdLine,cmd))
-    {
-      sizd=sizeof(DWORD);
-      if (RegQueryValueEx(Key,cmd,0,0,(BYTE*)&d,&sizd)==ERROR_SUCCESS)
-        return RegCloseKey(Key),d;
-    }
+    sizd=sizeof(DWORD);
   }
   RegCloseKey(Key);
   return Default;
 }
+
+//DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
+//{
+//  return GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,Default);
+//}
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
