@@ -151,8 +151,7 @@ BOOL AccountPrivilege(LPTSTR Account,LPTSTR Privilege,PrivOp op)
         UCHAR ssac=*GetSidSubAuthorityCount( s );
         DWORD sidlen = GetSidLengthRequired((BYTE) 1 + ssac);
         sid = malloc( sidlen ); // max SID length (we hope)
-        InitializeSid( sid, GetSidIdentifierAuthority( s ),
-          (BYTE) 1 + ssac );
+        InitializeSid( sid, GetSidIdentifierAuthority( s ),(BYTE) 1 + ssac );
         DWORD d;
         for (d = 0; d < (DWORD)ssac; ++ d )
           *GetSidSubAuthority( sid, d ) = *GetSidSubAuthority( s, d );
@@ -194,4 +193,64 @@ CleanUp:
     LsaFreeMemory(Rights);
   SetLastError(RetLastErr);
   return (RetLastErr!=NOERROR)?FALSE:RetVal;
+}
+
+LPTSTR EnumAccountPrivilege(LPTSTR Account)
+{
+  DWORD RetLastErr=NOERROR;
+	LsaUnicodeString acct=Account;
+	NTSTATUS nts;
+	LSA_HANDLE hPol;
+  PSID sid=0;
+	PLSA_REFERENCED_DOMAIN_LIST refDomList = NULL;
+	PLSA_TRANSLATED_SID sidList = NULL;
+  PLSA_UNICODE_STRING Rights=0;
+	// open the policy object on the target computer
+	static SECURITY_QUALITY_OF_SERVICE sqos =
+		{ sizeof SECURITY_QUALITY_OF_SERVICE, SecurityImpersonation, SECURITY_DYNAMIC_TRACKING, FALSE };
+	static LSA_OBJECT_ATTRIBUTES lsaOA =
+		{ sizeof LSA_OBJECT_ATTRIBUTES, NULL, NULL, 0, NULL, &sqos };
+	RET_ERR(LsaOpenPolicy(0,&lsaOA,GENERIC_READ|GENERIC_EXECUTE|POLICY_LOOKUP_NAMES,&hPol));
+	// translate the account name to a RID plus associated domain SID
+	nts = LsaLookupNames(hPol,1,acct,&refDomList,&sidList );
+	if ( nts == STATUS_SOME_NOT_MAPPED )
+		nts = 0;
+	RET_ERR(nts );
+	// build list of complete SIDs here
+	switch ( sidList->Use )
+	{
+		case SidTypeAlias:
+		case SidTypeUser:
+		case SidTypeGroup:
+		case SidTypeWellKnownGroup:
+      {
+        PSID s= refDomList->Domains[sidList->DomainIndex].Sid;
+        UCHAR ssac=*GetSidSubAuthorityCount( s );
+        DWORD sidlen = GetSidLengthRequired((BYTE) 1 + ssac);
+        sid = malloc( sidlen ); // max SID length (we hope)
+        InitializeSid( sid, GetSidIdentifierAuthority( s ),(BYTE) 1 + ssac );
+        DWORD d;
+        for (d = 0; d < (DWORD)ssac; ++ d )
+          *GetSidSubAuthority( sid, d ) = *GetSidSubAuthority( s, d );
+        *GetSidSubAuthority( sid, d ) = sidList->RelativeId;
+        DWORD nRights=0;
+        RET_ERR(LsaEnumerateAccountRights(hPol,sid,&Rights,&nRights));
+        for (DWORD r=0;r<nRights;r++)
+        {
+          //ToDo:...
+        }
+      }
+	}
+CleanUp:
+	LsaClose( hPol );
+	if ( sid != NULL )
+		free( sid );
+  if(refDomList)
+    LsaFreeMemory(refDomList);
+  if (sidList)
+    LsaFreeMemory(sidList);
+  if(Rights)
+    LsaFreeMemory(Rights);
+  SetLastError(RetLastErr);
+  return 0;//ToDo: s;
 }
