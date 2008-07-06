@@ -40,6 +40,7 @@ Done, to be tested:
 ToDo
 ---------------------
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
+* WinX64: SuRun32 can't read HKCR\CLSID
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
 * "Add Standard App" button to add common Windows Apps to the AutoMagic list 
