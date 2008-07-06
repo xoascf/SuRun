@@ -31,7 +31,6 @@
 
 #define PASSWKEY      SVCKEY _T("\\Cache")
 #define TIMESKEY      SVCKEY _T("\\Times")
-#define PIDSKEY       SVCKEY _T("\\PIDS")
 #define WHTLSTKEY(u)  CBigResStr(SVCKEY _T("\\%s"),u)
 #define USERKEY(u)    CBigResStr(SVCKEY _T("\\%s\\Settings"),u)
 
