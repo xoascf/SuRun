@@ -193,7 +193,7 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD WINAPI SvcCtrlHndlr(DWORD dwControl,DWORD EvType,LPVOID lpEvData,LPVOID Cxt)
+VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
 {
   //service control handler
   if(dwControl==SERVICE_CONTROL_STOP)
@@ -215,11 +215,10 @@ DWORD WINAPI SvcCtrlHndlr(DWORD dwControl,DWORD EvType,LPVOID lpEvData,LPVOID Cx
     }
     //As g_hPipe is now INVALID_HANDLE_VALUE, the Service will exit
     CloseHandle(hPipe);
-    return NO_ERROR;
-  }
+    return;
+  } 
   if (g_hSS!=(SERVICE_STATUS_HANDLE)0) 
     SetServiceStatus(g_hSS,&g_ss);
-  return ERROR_CALL_NOT_IMPLEMENTED;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -315,7 +314,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_ss.dwServiceType      = SERVICE_WIN32_OWN_PROCESS; 
   g_ss.dwControlsAccepted = SERVICE_ACCEPT_STOP; 
   g_ss.dwCurrentState     = SERVICE_START_PENDING; 
-  g_hSS                   = RegisterServiceCtrlHandlerEx(SvcName,SvcCtrlHndlr,0); 
+  g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
   //Create Pipe:
@@ -465,17 +464,14 @@ TryAgain:
               PROCESS_INFORMATION pi={0};
               DWORD stTime=timeGetTime();
               if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
-                    CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS|CREATE_SUSPENDED,
+                    CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                     0,NULL,&si,&pi))
               {
                 bRunCount++;
-                ResumeThread(pi.hThread);
                 CloseHandle(pi.hThread);
-                for (DWORD ex=STILL_ACTIVE;ex==STILL_ACTIVE;)
-                {
-                  WaitForSingleObject(pi.hProcess,60000);
-                  GetExitCodeProcess(pi.hProcess,&ex);
-                }
+                WaitForSingleObject(pi.hProcess,INFINITE);
+                DWORD ex=0;
+                GetExitCodeProcess(pi.hProcess,&ex);
                 CloseHandle(pi.hProcess);
                 if (ex!=(~pi.dwProcessId))
                 {
