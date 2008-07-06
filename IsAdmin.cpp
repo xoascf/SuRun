@@ -19,6 +19,7 @@
 #include "IsAdmin.h"
 #include "Helpers.h"
 #include "LogonDlg.h"
+#include "DBGTrace.H"
 
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -217,6 +218,7 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
   //Admin...
   if (IsAdmin())
   {
+    DBGTrace1("RunAsAdmin(%s) User is already admin! Just calling CreateProcess",cmdline);
     PROCESS_INFORMATION pi={0};
     STARTUPINFO si={0};
     si.cb	= sizeof(si);
@@ -229,6 +231,7 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
   //Vista!
   if (IsSplitAdmin())
   {
+    DBGTrace1("RunAsAdmin(%s) User is Split Admin! Just calling ShellExecuteEx(runas)",cmdline);
     TCHAR cmd[4096]={0};
     LPTSTR p=PathGetArgs(cmdline);
     _tcscpy(cmd,cmdline);
