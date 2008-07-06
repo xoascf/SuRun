@@ -49,7 +49,7 @@ BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DW
     DWORD dwType=Type;
     BOOL bRet=(RegQueryValueEx(Key,ValName,NULL,&dwType,RetVal,nBytes)==ERROR_SUCCESS)
             &&(dwType==Type);
-      RegCloseKey(Key);
+    RegCloseKey(Key);
     return bRet;
   }
   return FALSE;
