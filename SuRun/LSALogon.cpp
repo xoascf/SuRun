@@ -4,6 +4,7 @@
 #include <ntsecapi.h>
 #include <tchar.h>
 #include "Helpers.h"
+#include "DBGTrace.h"
 
 #pragma comment(lib,"Advapi32.lib")
 #pragma comment(lib,"Kernel32.lib")
@@ -86,7 +87,7 @@ MSV1_0_INTERACTIVE_LOGON* GetLogonRequest(LPWSTR domain,LPWSTR user,LPWSTR pass,
   const DWORD cbPass   = _stringLenInBytes(pass);
   *pcbRequest=cbHeader+cbDom+cbUser+cbPass;
   MSV1_0_INTERACTIVE_LOGON* pRequest =
-    (MSV1_0_INTERACTIVE_LOGON*)LocalAlloc(LMEM_FIXED, *pcbRequest);
+    (MSV1_0_INTERACTIVE_LOGON*)malloc(*pcbRequest);
   if (!pRequest) 
     return 0;
   pRequest->MessageType = MsV1_0InteractiveLogon;
@@ -146,10 +147,11 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
     }else
       __leave;
     // Initialize Admin SID
-    SID_IDENTIFIER_AUTHORITY SystemSidAuthority = SECURITY_NT_AUTHORITY;
-    if (!AllocateAndInitializeSid(&SystemSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
+    SID_IDENTIFIER_AUTHORITY sidAuth = SECURITY_NT_AUTHORITY;
+    if (!AllocateAndInitializeSid(&sidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,
       DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
       __leave;
+    //Local SID
     SID_IDENTIFIER_AUTHORITY IdentifierAuthority=SECURITY_LOCAL_SID_AUTHORITY;
     if (!AllocateAndInitializeSid(&IdentifierAuthority,1,SECURITY_LOCAL_RID,
       0,0,0,0,0,0,0,&LocalSid))
@@ -161,13 +163,13 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
     ptg->GroupCount=bNoAdmin?2:3;
     ptg->Groups[0].Sid=LogonSID;
     ptg->Groups[0].Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED
-      |SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_LOGON_ID;
+                              |SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_LOGON_ID;
     ptg->Groups[1].Sid=LocalSid;
-    ptg->Groups[1].Attributes=
-      SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT;
+    ptg->Groups[1].Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED
+                              |SE_GROUP_ENABLED_BY_DEFAULT;
     ptg->Groups[2].Sid=AdminSID;
-    ptg->Groups[2].Attributes=
-      SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT;
+    ptg->Groups[2].Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED
+                              |SE_GROUP_ENABLED_BY_DEFAULT;
     //AuthInfo
     AuthInfo=GetLogonRequest(Domain,UserName,Password,&AuthInfoSize);
     if (!AuthInfo)
@@ -215,7 +217,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
     if (AuthInfo)
     {
       ZeroMemory(AuthInfo,AuthInfoSize); // sensitive buffer
-      LocalFree(AuthInfo);
+      free(AuthInfo);
     }
     if (pProf)
       LsaFreeReturnBuffer(pProf);
@@ -227,5 +229,168 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       free(LogonSID);
   } // finally
   LsaDeregisterLogonProcess(hLSA);
+  return hUser;
+}
+
+typedef struct _OBJECT_ATTRIBUTES
+{
+     ULONG Length;
+     PVOID RootDirectory;
+     PUNICODE_STRING ObjectName;
+     ULONG Attributes;
+     PVOID SecurityDescriptor;
+     PVOID SecurityQualityOfService;
+} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
+
+typedef UINT (WINAPI * ZwCrTok)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES,
+			  TOKEN_TYPE,PLUID,PLARGE_INTEGER,PTOKEN_USER,PTOKEN_GROUPS,PTOKEN_PRIVILEGES,
+			  PTOKEN_OWNER,PTOKEN_PRIMARY_GROUP,PTOKEN_DEFAULT_DACL,PTOKEN_SOURCE);
+
+ZwCrTok ZwCreateToken=NULL;
+
+//Caller free
+LPVOID GetFromToken(HANDLE hToken, TOKEN_INFORMATION_CLASS tic)
+{
+  DWORD dw;
+  BOOL bRet = FALSE;
+  LPVOID lpData = NULL;
+  __try
+  {
+    bRet=GetTokenInformation(hToken,tic,0,0,&dw);
+    if((bRet==FALSE) && (GetLastError()!=ERROR_INSUFFICIENT_BUFFER)) 
+      return NULL;
+    lpData=(LPVOID)malloc(dw);
+    bRet=GetTokenInformation(hToken, tic, lpData, dw, &dw);
+  }
+  __finally
+  {
+    if(!bRet)
+    {
+      if(lpData) 
+        free(lpData);
+      lpData = NULL;
+    }
+    return lpData;
+  }
+}
+
+//Caller free
+PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
+{
+  if(!pSrcTG) 
+    return NULL;
+  PTOKEN_GROUPS pDstTG = NULL;
+  DWORD dwTGlen=sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*(pSrcTG->GroupCount+1);
+  for(DWORD i=0;i<pSrcTG->GroupCount;i++)
+    dwTGlen+=GetLengthSid(pSrcTG->Groups[i].Sid);
+  dwTGlen+=GetLengthSid(pAdd->Sid);
+  pDstTG=(PTOKEN_GROUPS)malloc(dwTGlen);
+
+  pDstTG->GroupCount=pSrcTG->GroupCount+1;
+  SID_AND_ATTRIBUTES* pSA=(SID_AND_ATTRIBUTES*)pDstTG->Groups;
+  LPBYTE pBase=(LPBYTE)pDstTG+sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*pDstTG->GroupCount;
+  for(i=0;i<pSrcTG->GroupCount;i++)
+  {
+    pDstTG->Groups[i].Attributes=pSrcTG->Groups[i].Attributes;
+    memmove(pBase,pSrcTG->Groups[i].Sid,GetLengthSid(pSrcTG->Groups[i].Sid));
+    pDstTG->Groups[i].Sid=(PSID)pBase;
+    pBase+=GetLengthSid(pSrcTG->Groups[i].Sid);
+  }
+  pDstTG->Groups[i].Attributes=pAdd->Attributes;
+  memmove(pBase,pAdd->Sid,GetLengthSid(pAdd->Sid));
+  pDstTG->Groups[i].Sid=(PSID)pBase;
+  return pDstTG;
+}
+
+HANDLE GetAdminToken(DWORD SessionID) 
+{
+  if(!EnablePrivilege(SE_CREATE_TOKEN_NAME))
+    return FALSE;
+  HANDLE hUser= NULL;
+  HANDLE hShell= NULL;
+  PSID LogonSID = NULL;
+  PSID AdminSID = NULL;
+  PTOKEN_GROUPS ptg = NULL;
+  PTOKEN_PRIVILEGES lpPrivToken = NULL; //(GetFromToken(hShell, TokenPrivileges)),
+  PTOKEN_PRIMARY_GROUP lpPriGrp = NULL; //(GetFromToken(hShell, TokenPrimaryGroup)), 
+  PTOKEN_DEFAULT_DACL  lpDaclToken = NULL;      //(GetFromToken(hShell, TokenDefaultDacl)),
+  __try
+  {
+    HANDLE hShell=GetSessionUserToken(SessionID);
+    if(!hShell) 
+      __leave;
+    //Copy Logon SID from the Shell Process of SessionID:
+    LogonSID=GetLogonSid(hShell);
+    if(!LogonSID)
+      __leave;
+    TOKEN_USER userToken = {{LogonSID, 0}};
+    //Copy TokenSource from the Shell Process of SessionID:
+    TOKEN_SOURCE tsrc = {0};
+    DWORD n;
+    GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n);
+    strcpy(tsrc.SourceName,"SuRun");
+    //Get Token statistics
+    TOKEN_STATISTICS tstat;
+    GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);
+    //Initialize TOKEN_GROUPS
+    ptg=(PTOKEN_GROUPS)(GetFromToken(hShell, TokenGroups));
+    if (ptg==NULL)
+      __leave;
+    // Initialize Admin SID
+    SID_IDENTIFIER_AUTHORITY sidAuth= SECURITY_NT_AUTHORITY;
+    if (!AllocateAndInitializeSid(&sidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,
+      DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+      __leave;
+    //copy Admin Sid to token groups
+    SID_AND_ATTRIBUTES sia;
+    sia.Sid=AdminSID;
+    sia.Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT;
+    PTOKEN_GROUPS p = AddTokenGroups(ptg,&sia);
+    if (!p)
+      __leave;
+    free(ptg);
+    ptg=p;
+    //Set Token ToDo: OwnerToken haut nicht hin!
+    TOKEN_OWNER OwnerToken = {LogonSID};
+    //Privileges
+    lpPrivToken = (PTOKEN_PRIVILEGES)(GetFromToken(hShell, TokenPrivileges));
+    lpPriGrp = (PTOKEN_PRIMARY_GROUP)(GetFromToken(hShell, TokenPrimaryGroup)); 
+
+    //ToDo: EnumAccountPrivilege; merge Privileges of User and Admin
+    
+    //ToDo: merge Dacl of User and Admin
+    lpDaclToken = (PTOKEN_DEFAULT_DACL)(GetFromToken(hShell, TokenDefaultDacl));
+    //
+    SECURITY_QUALITY_OF_SERVICE sqos = {sizeof(sqos), SecurityAnonymous, SECURITY_STATIC_TRACKING, FALSE};
+    OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, &sqos};
+    if (!ZwCreateToken)
+    	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
+    if (!ZwCreateToken)
+      __leave;
+    NTSTATUS ntStatus = ZwCreateToken(&hUser,TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
+      &tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,ptg, 
+      lpPrivToken, &OwnerToken, lpPriGrp, lpDaclToken, &tsrc);
+
+    //0xc000005a invalid owner
+    if(ntStatus != STATUS_SUCCESS)
+      DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
+  }
+  __finally
+  {
+    if(hShell)
+      CloseHandle(hShell);
+    if(LogonSID)
+      free(LogonSID);
+    if(AdminSID)
+      FreeSid(AdminSID);
+    if(ptg) 
+      free(ptg);
+    if(lpPrivToken) 
+      free(lpPrivToken);
+    if(lpPriGrp) 
+      free(lpPriGrp);
+    if(lpDaclToken) 
+      free(lpDaclToken);
+  }
   return hUser;
 }
