@@ -51,6 +51,8 @@ SuRun 1.1.9.0 - 2008-07-05: (beta)
 
 ToDo
 ---------------------
+* Option to Hide from all non SuRunners
+* Option to turn off RequiresAdmin()
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * Move Message Windows with WM_SETTINGCHANGE
 * "Show Warning for Admins with empty passwords" does not work with predefined 
