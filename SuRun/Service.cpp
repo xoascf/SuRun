@@ -279,7 +279,7 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //////////////////////////////////////////////////////////////////////////////
 void ShowTrayWarning(LPCTSTR Text,int IconId) 
 {
-  if (GetHideFromUser(g_RunData.UserName))
+  if (HideSuRun(g_RunData.UserName))
     return;
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
@@ -679,7 +679,7 @@ DWORD PrepareSuRun()
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-  if (GetHideFromUser(g_RunData.UserName))
+  if (HideSuRun(g_RunData.UserName))
     return RETVAL_CANCELLED;
   //Create the new desktop
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
@@ -887,7 +887,7 @@ DWORD LSAStartAdminProcess()
               DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
               g_RunData.cmdLine,GetLastErrorNameStatic());
           }
-          if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
+          if ((g_RunData.bShlExHook)&&(!HideSuRun(g_RunData.UserName)))
           {
             TCHAR cmd[4096]={0};
             GetSystemWindowsDirectory(cmd,4096);
@@ -1028,7 +1028,7 @@ void SuRun(DWORD ProcessID)
       //Create the new desktop
       ResumeClient(RETVAL_OK);
       //check if SuRun is hidden for user name
-      if (GetHideFromUser(g_RunData.UserName))
+      if (HideSuRun(g_RunData.UserName))
         return;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
