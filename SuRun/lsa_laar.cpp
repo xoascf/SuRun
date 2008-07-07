@@ -195,7 +195,7 @@ CleanUp:
   return (RetLastErr!=NOERROR)?FALSE:RetVal;
 }
 
-LPTSTR EnumAccountPrivilege(LPTSTR Account)
+LPWSTR GetAccountPrivileges(LPWSTR Account)
 {
   DWORD RetLastErr=NOERROR;
 	LsaUnicodeString acct=Account;
@@ -205,6 +205,7 @@ LPTSTR EnumAccountPrivilege(LPTSTR Account)
 	PLSA_REFERENCED_DOMAIN_LIST refDomList = NULL;
 	PLSA_TRANSLATED_SID sidList = NULL;
   PLSA_UNICODE_STRING Rights=0;
+  LPWSTR sRet=0;
 	// open the policy object on the target computer
 	static SECURITY_QUALITY_OF_SERVICE sqos =
 		{ sizeof SECURITY_QUALITY_OF_SERVICE, SecurityImpersonation, SECURITY_DYNAMIC_TRACKING, FALSE };
@@ -235,9 +236,18 @@ LPTSTR EnumAccountPrivilege(LPTSTR Account)
         *GetSidSubAuthority( sid, d ) = sidList->RelativeId;
         DWORD nRights=0;
         RET_ERR(LsaEnumerateAccountRights(hPol,sid,&Rights,&nRights));
-        for (DWORD r=0;r<nRights;r++)
+        DWORD sLen=0;
+        DWORD r;
+        for (r=0;r<nRights;r++)
+          sLen+=Rights[r].Length+sizeof(WCHAR);
+        sRet=(LPWSTR)calloc(sLen+sizeof(WCHAR),1);
+        if (!sRet)
+          goto CleanUp;
+        BYTE* S=(BYTE*)sRet;
+        for (r=0;r<nRights;r++)
         {
-          //ToDo:...
+          memmove(S,Rights[r].Buffer,Rights[r].Length);
+          S+=Rights[r].Length+sizeof(WCHAR);
         }
       }
 	}
@@ -252,5 +262,5 @@ CleanUp:
   if(Rights)
     LsaFreeMemory(Rights);
   SetLastError(RetLastErr);
-  return 0;//ToDo: s;
+  return sRet;
 }
