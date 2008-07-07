@@ -217,6 +217,7 @@
 #define IDC_HIDESURUN                   1078
 #define IDC_REQPW4SETUP                 1079
 #define IDC_SIMPLESETUP                 1080
+#define IDC_ASKPW                       1081
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -225,7 +226,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1081
+#define _APS_NEXT_CONTROL_VALUE         1082
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
