@@ -102,9 +102,14 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         RemoveMenu(m,WM_SYSMH1,MF_BYCOMMAND);
       }
       break;
+    //Load the System menu for the Window, if we don't, we'll get a default 
+    //system menu on the first click.
+    case WM_SYSCOMMAND:
+      if ((wps->wParam==SC_MOUSEMENU)||(SC_KEYMENU==wps->wParam))
+        GetSystemMenu((HWND)wps->wParam,FALSE);
+      break;
+    case WM_NCRBUTTONDOWN:
     case WM_CONTEXTMENU:
-      //Load the System menu for the Window, if we don't, we'll get a default 
-      //system menu on the first click.
       GetSystemMenu((HWND)wps->wParam,FALSE);
       break;
     case WM_INITMENUPOPUP:
