@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -1196,8 +1196,10 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_SHOWTRAY,GetShowAutoRuns);
       CheckDlgButton(hwnd,IDC_NOCONVADMIN,GetNoConvAdmin);
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
+      CheckDlgButton(hwnd,IDC_HIDESURUN,GetDefHideSuRun);
       CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
+      CheckDlgButton(hwnd,IDC_REQADMIN,GetTestReqAdmin);
 
       HWND cb=GetDlgItem(hwnd,IDC_TRAYSHOWADMIN);
       DWORD tsa=GetShowTrayAdmin;
@@ -1226,9 +1228,10 @@ ApplyChanges:
       SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
       SetNoConvAdmin(IsDlgButtonChecked(hwnd,IDC_NOCONVADMIN));
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
+      SetDefHideSuRun(IsDlgButtonChecked(hwnd,IDC_HIDESURUN));
       SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
       SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
-
+      SetTestReqAdmin(IsDlgButtonChecked(hwnd,IDC_REQADMIN));
       DWORD tsa=ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN));
       if (IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON))
         tsa|=TSA_TIPS;
@@ -1302,8 +1305,10 @@ void SetSimpleSettings(int nSel)
     CheckDlgButton(h,IDC_SHOWTRAY,1);
     CheckDlgButton(h,IDC_NOCONVADMIN,0);
     CheckDlgButton(h,IDC_NOCONVUSER,0);
+    CheckDlgButton(h,IDC_HIDESURUN,0);
     CheckDlgButton(h,IDC_RESTRICTNEW,0);
     CheckDlgButton(h,IDC_NOSETUPNEW,0);
+    CheckDlgButton(h,IDC_REQADMIN,1);
     ComboBox_SetCurSel(GetDlgItem(h,IDC_TRAYSHOWADMIN),TSA_ADMIN);
     CheckDlgButton(h,IDC_TRAYBALLOON,1);
     EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
