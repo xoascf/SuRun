@@ -320,8 +320,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
-  if (EnablePrivilege(SE_CREATE_TOKEN_NAME))
-    g_bUsePasswords=FALSE;
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -997,6 +995,8 @@ void SuRun(DWORD ProcessID)
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
     return;
+  if (EnablePrivilege(SE_CREATE_TOKEN_NAME))
+    g_bUsePasswords=FALSE;
   zero(g_RunData);
   zero(g_RunPwd);
   RUNDATA RD={0};
