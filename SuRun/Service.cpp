@@ -1941,7 +1941,9 @@ bool HandleServiceStuff()
     if(_tcsicmp(fn,wd))
     {
       DBGTrace2("Running from \"%s\" and NOT from WinDir(\"%s\")",fn,wd);
-      UserInstall();
+      //Only call UserInstall with empty command line
+      if (cmd.argc()==1)
+        UserInstall();
       ExitProcess(0);
       return true;
     }
