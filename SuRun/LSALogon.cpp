@@ -450,6 +450,28 @@ HANDLE GetAdminToken(DWORD SessionID)
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
+    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    {
+      //Vista UAC: Get the elevated token!
+      TOKEN_ELEVATION_TYPE et;
+      DWORD dwSize=sizeof(et);
+      if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenElevationType,
+                              &et,dwSize,&dwSize)
+        &&(et==TokenElevationTypeLimited))
+      {
+        TOKEN_LINKED_TOKEN lt = {0}; 
+        HANDLE hAdmin=0;
+        dwSize = sizeof(lt); 
+        if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
+                                &lt,dwSize,&dwSize)
+          && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
+            SecurityImpersonation,TokenPrimary,&hAdmin)) 
+        {
+          CloseHandle(hUser);
+          hUser=hAdmin;
+        }
+      }
+    }
   }
   __finally
   {
