@@ -20,6 +20,7 @@ typedef enum {
 }PrivOp;
 
 BOOL AccountPrivilege(LPTSTR Account,LPTSTR Privilege,PrivOp op);
+LPWSTR GetAccountPrivileges(LPWSTR Account);
 
 #define AddAcctPrivilege(a,p) AccountPrivilege(a,p,AddPrivilege)
 #define DelAcctPrivilege(a,p) AccountPrivilege(a,p,DelPrivilege)
