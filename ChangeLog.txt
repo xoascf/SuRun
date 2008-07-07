@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* SuRun does not require or store passwords if SeCreateTokenPrivilege is held
 * Empty Admin Password Warning did not show on NonAdmin/NonSuRunners 
   without Tray Icon
 * Settings Page 2 "Show Ballon Tips" was grayed out after "Set recommended 
@@ -46,14 +47,6 @@ SuRun 1.1.9.0 - 2008-07-05: (beta)
 
 ToDo
 ---------------------
-* zwCreateToken; 
-  VISTA ChangeServiceConfig2 SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO(=6)
-  typedef struct _SERVICE_REQUIRED_PRIVILEGES_INFO 
-  {
-    LPTSTR pmszRequiredPrivileges;
-  } SERVICE_REQUIRED_PRIVILEGES_INFO, *SERVICE_REQUIRED_PRIVILEGES_INFO;
-  XP/2k: AddAcctPrivilege(SE_CREATE_TOKEN_NAME)
-
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * WinX64: SuRun32 can't read HKCR\CLSID
 * "Show Warning for Admins with empty passwords" does not work with predefined 
