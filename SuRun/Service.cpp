@@ -320,7 +320,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
-  g_bUsePasswords=FALSE==EnablePrivilege(SE_CREATE_TOKEN_NAME);
+  if (EnablePrivilege(SE_CREATE_TOKEN_NAME))
+    g_bUsePasswords=FALSE;
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
