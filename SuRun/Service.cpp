@@ -345,7 +345,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
-  DWORD CrssPid=GetCsrssPid();
+  HANDLE hRunCsrss=GetProcessUserToken(GetCsrssPid());
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -466,29 +466,11 @@ ChkAdmin:
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
-        HANDLE hRun=0;
-        HANDLE hProc=0;
-        if(CrssPid)
-        {
-          hRun=GetProcessUserToken(CrssPid);
-          if (!hRun)
-          {
-            CrssPid=GetCsrssPid();
-            hRun=GetProcessUserToken(CrssPid);
-          }
-        }
-        if ((!hRun)&& OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
-        {
-          if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
-            SecurityIdentification,TokenPrimary,&hRun))
-          CloseHandle(hProc);
-          hProc=0;
-        }
-        if (hRun)
+        if (hRunCsrss)
         {
           DWORD SessionID=0;
           ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
-          if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
+          if(SetTokenInformation(hRunCsrss,TokenSessionId,&SessionID,sizeof(DWORD)))
           {
             STARTUPINFO si={0};
             si.cb=sizeof(si);
@@ -505,7 +487,7 @@ ChkAdmin:
 TryAgain:
             PROCESS_INFORMATION pi={0};
             DWORD stTime=timeGetTime();
-            if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
+            if (CreateProcessAsUser(hRunCsrss,NULL,cmd,NULL,NULL,FALSE,
                   CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                   0,NULL,&si,&pi))
             {
@@ -529,13 +511,13 @@ TryAgain:
               DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
           }else
             DBGTrace2("SetTokenInformation(TokenSessionId(%d)) failed %s",SessionID,GetLastErrorNameStatic());
-          CloseHandle(hRun);
         }
       }
       zero(rd);
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
+  CloseHandle(hRunCsrss);
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
   g_ss.dwCheckPoint       = 0;
