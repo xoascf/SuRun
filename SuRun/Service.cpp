@@ -30,6 +30,7 @@
 #include <ntsecapi.h>
 #include <USERENV.H>
 #include <Psapi.h>
+#include <Tlhelp32.h>
 #include <Wtsapi32.h>
 #include "Setup.h"
 #include "Service.h"
@@ -190,6 +191,30 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
   return TRUE;
 }
 
+DWORD GetCsrssPid()
+{
+  HANDLE hProcessSnap = INVALID_HANDLE_VALUE;
+  PROCESSENTRY32 pe32={0};
+  DWORD dwRet=0;
+  hProcessSnap =CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if(hProcessSnap == INVALID_HANDLE_VALUE)
+    return 0;
+  pe32.dwSize = sizeof(PROCESSENTRY32);
+  if(Process32First(hProcessSnap, &pe32))
+  {
+    do
+    {
+      if(_tcsicmp(L"csrss.exe",pe32.szExeFile)==0)
+      {
+        dwRet=pe32.th32ProcessID;
+        break;
+      }
+    }while (Process32Next(hProcessSnap,&pe32));
+  }
+  CloseHandle(hProcessSnap);
+  return dwRet;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  The Service:
@@ -320,6 +345,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
+  DWORD CrssPid=GetCsrssPid();
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -440,60 +466,63 @@ ChkAdmin:
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
+        HANDLE hRun=0;
         HANDLE hProc=0;
-        if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
+        if(CrssPid)
+          hRun=GetProcessUserToken(CrssPid);
+        else if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
         {
-          HANDLE hRun=0;
           if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
             SecurityIdentification,TokenPrimary,&hRun))
-          {
-            DWORD SessionID=0;
-            ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
-            if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
-            {
-              STARTUPINFO si={0};
-              si.cb=sizeof(si);
-              TCHAR cmd[4096]={0};
-              GetSystemWindowsDirectory(cmd,4096);
-              PathAppend(cmd,L"SuRun.exe");
-              PathQuoteSpaces(cmd);
-              _tcscat(cmd,L" /AskPID ");
-              TCHAR PID[10];
-              _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
-              EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-              EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-              BYTE bRunCount=0;
-TryAgain:
-              PROCESS_INFORMATION pi={0};
-              DWORD stTime=timeGetTime();
-              if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
-                    CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
-                    0,NULL,&si,&pi))
-              {
-                bRunCount++;
-                CloseHandle(pi.hThread);
-                WaitForSingleObject(pi.hProcess,INFINITE);
-                DWORD ex=0;
-                GetExitCodeProcess(pi.hProcess,&ex);
-                CloseHandle(pi.hProcess);
-                if (ex!=(~pi.dwProcessId))
-                {
-                  DBGTrace4("SuRun: Starting child process try %d failed after %d ms. "
-                    L"Expected return value :%X real return value %x",
-                    bRunCount,timeGetTime()-stTime,~pi.dwProcessId,ex);
-                  //For YZshadow: Give it four tries
-                  if ((bRunCount<4)&&(ex==STATUS_ACCESS_VIOLATION))
-                    goto TryAgain;
-                  ResumeClient(RETVAL_ACCESSDENIED);
-                }
-              }else
-                DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
-            }else
-              DBGTrace2("SetTokenInformation(TokenSessionId(%d)) failed %s",SessionID,GetLastErrorNameStatic());
-            CloseHandle(hRun);
-          }else
-            DBGTrace1("DuplicateTokenEx() failed %s",GetLastErrorNameStatic());
           CloseHandle(hProc);
+          hProc=0;
+        }
+        if (hRun)
+        {
+          DWORD SessionID=0;
+          ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
+          if(SetTokenInformation(hRun,TokenSessionId,&SessionID,sizeof(DWORD)))
+          {
+            STARTUPINFO si={0};
+            si.cb=sizeof(si);
+            TCHAR cmd[4096]={0};
+            GetSystemWindowsDirectory(cmd,4096);
+            PathAppend(cmd,L"SuRun.exe");
+            PathQuoteSpaces(cmd);
+            _tcscat(cmd,L" /AskPID ");
+            TCHAR PID[10];
+            _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
+            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+            EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+            BYTE bRunCount=0;
+TryAgain:
+            PROCESS_INFORMATION pi={0};
+            DWORD stTime=timeGetTime();
+            if (CreateProcessAsUser(hRun,NULL,cmd,NULL,NULL,FALSE,
+                  CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
+                  0,NULL,&si,&pi))
+            {
+              bRunCount++;
+              CloseHandle(pi.hThread);
+              WaitForSingleObject(pi.hProcess,INFINITE);
+              DWORD ex=0;
+              GetExitCodeProcess(pi.hProcess,&ex);
+              CloseHandle(pi.hProcess);
+              if (ex!=(~pi.dwProcessId))
+              {
+                DBGTrace4("SuRun: Starting child process try %d failed after %d ms. "
+                  L"Expected return value :%X real return value %x",
+                  bRunCount,timeGetTime()-stTime,~pi.dwProcessId,ex);
+                //For YZshadow: Give it four tries
+                if ((bRunCount<4)&&(ex==STATUS_ACCESS_VIOLATION))
+                  goto TryAgain;
+                ResumeClient(RETVAL_ACCESSDENIED);
+              }
+            }else
+              DBGTrace2("CreateProcessAsUser(%s) failed %s",cmd,GetLastErrorNameStatic());
+          }else
+            DBGTrace2("SetTokenInformation(TokenSessionId(%d)) failed %s",SessionID,GetLastErrorNameStatic());
+          CloseHandle(hRun);
         }
       }
       zero(rd);
@@ -855,6 +884,7 @@ DWORD LSAStartAdminProcess()
       zero(g_RunPwd);
       if (hAdmin)
       {
+        SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
         //CreateProcessAsUser will only work from an NT System Account since the
         //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
         EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
