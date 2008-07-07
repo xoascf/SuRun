@@ -1304,7 +1304,7 @@ void SetSimpleSettings(int nSel)
     EnableWindow(GetDlgItem(h,IDC_RESTRICTED),1);
     EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
-    EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),0);
+    EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
     CheckDlgButton(h,IDC_RUNSETUP,1);
     CheckDlgButton(h,IDC_REQPW4SETUP,0);
     CheckDlgButton(h,IDC_RESTRICTED,0);
