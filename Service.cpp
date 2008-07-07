@@ -344,6 +344,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
     return; 
+  //Steal token from csrss.exe to get SeCreateTokenPrivilege in Vista
   HANDLE hRunCsrss=GetProcessUserToken(GetCsrssPid());
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
