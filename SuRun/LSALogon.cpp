@@ -408,7 +408,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     //copy Admin Sid to token groups
     SID_AND_ATTRIBUTES sia;
     sia.Sid=AdminSID;
-    sia.Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT;
+    sia.Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_OWNER;
     PTOKEN_GROUPS p = AddTokenGroups(ptg,&sia);
     if (!p)
       __leave;
