@@ -79,6 +79,8 @@
 #define SetNoSetupNew(b)  SetOption(_T("NewRunnerDenySetup"),b,0)
 
 //Save or not Passwords in the registry
+#define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
+
 #define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
 #define SetSavePW(b)      SetOption(_T("SavePasswords"),b,1); \
                           if (!b) \
