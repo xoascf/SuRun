@@ -80,7 +80,7 @@ DWORD WINAPI TSAThreadProc(void* p)
   }
 }
 
-static BOOL StartTSAThread()
+BOOL StartTSAThread()
 {
   if (g_TSAThreadRunning)
     return TRUE;
