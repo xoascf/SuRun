@@ -807,10 +807,9 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
       EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&&GetBlurDesk);
       
-      CheckDlgButton(hwnd,IDC_ASKPW,!GetSavePW);
-      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),!GetSavePW);
-      if (GetSavePW)
-        SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0);
+      BOOL bAsk=(!GetSavePW)||(GetPwTimeOut!=0);
+      CheckDlgButton(hwnd,IDC_ASKPW,bAsk);
+      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),bAsk);
       HKEY kra=0;
       HKEY ksu=0;
       if (0==RegOpenKey(HKCR,L"exefile\\shell\\runas\\command",&kra))
@@ -856,8 +855,6 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(IDC_ASKPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_ASKPW));
-        if (!IsDlgButtonChecked(hwnd,IDC_ASKPW))
-          SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0);
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
@@ -870,11 +867,12 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetFadeDesk(IsDlgButtonChecked(hwnd,IDC_FADEDESKTOP));
-      SetSavePW((DWORD)!IsDlgButtonChecked(hwnd,IDC_ASKPW));
       if(IsDlgButtonChecked(hwnd,IDC_ASKPW))
         SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0));
       else
         SetPwTimeOut(0);
+      DWORD bSave=(!IsDlgButtonChecked(hwnd,IDC_ASKPW))|| (GetPwTimeOut!=0);
+      SetSavePW(bSave);
       SetAdminNoPassWarn(ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_WARNADMIN)));
       
       SetCtrlAsAdmin(IsDlgButtonChecked(hwnd,IDC_CTRLASADMIN));
