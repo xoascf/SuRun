@@ -47,31 +47,10 @@
 
 static BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
 
-void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
-{
-  if (!GetSavePW)
-    return;
-  CBlowFish bf;
-  bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  if (GetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
-    bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
-}
-
 void DeletePassword(LPTSTR UserName)
 {
-  RegDelVal(HKLM,PASSWKEY,UserName);
+  RegDelVal(HKLM,PASSWKEY,UserName);//for Historical reasons!
   RegDelVal(HKLM,TIMESKEY,UserName);
-}
-
-void SavePassword(LPTSTR UserName,LPTSTR Password)
-{
-  if (!GetSavePW)
-    return;
-  CBlowFish bf;
-  TCHAR pw[PWLEN];
-  bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)pw,
-    bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -90,7 +69,6 @@ BOOL PasswordExpired(LPTSTR UserName)
   __int64 pwto=ft2min*GetPwTimeOut;
   if ((pwto==0) || ((ft-GetRegInt64(HKLM,TIMESKEY,UserName,0))<pwto))
     return FALSE;
-  DBGTrace1("Password for %s Expired!",UserName);
   DeletePassword(UserName);
   return TRUE;
 }
@@ -829,9 +807,10 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
       EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&&GetBlurDesk);
       
-      CheckDlgButton(hwnd,IDC_SAVEPW,GetSavePW);
-      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),GetSavePW);
-      
+      CheckDlgButton(hwnd,IDC_ASKPW,!GetSavePW);
+      EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),!GetSavePW);
+      if (GetSavePW)
+        SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0);
       HKEY kra=0;
       HKEY ksu=0;
       if (0==RegOpenKey(HKCR,L"exefile\\shell\\runas\\command",&kra))
@@ -875,8 +854,10 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_BLURDESKTOP,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&& IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
         return TRUE;
-      case MAKELPARAM(IDC_SAVEPW,BN_CLICKED):
-        EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_SAVEPW));
+      case MAKELPARAM(IDC_ASKPW,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_ASKPW));
+        if (!IsDlgButtonChecked(hwnd,IDC_ASKPW))
+          SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0);
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
@@ -889,8 +870,11 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetFadeDesk(IsDlgButtonChecked(hwnd,IDC_FADEDESKTOP));
-      SetSavePW(IsDlgButtonChecked(hwnd,IDC_SAVEPW));
-      SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,1));
+      SetSavePW((DWORD)!IsDlgButtonChecked(hwnd,IDC_ASKPW));
+      if(IsDlgButtonChecked(hwnd,IDC_ASKPW))
+        SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0));
+      else
+        SetPwTimeOut(0);
       SetAdminNoPassWarn(ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_WARNADMIN)));
       
       SetCtrlAsAdmin(IsDlgButtonChecked(hwnd,IDC_CTRLASADMIN));
@@ -1281,7 +1265,7 @@ void SetSimpleSettings(int nSel)
   case 0:
     CheckDlgButton(h,IDC_BLURDESKTOP,1);
     CheckDlgButton(h,IDC_FADEDESKTOP,1);
-    CheckDlgButton(h,IDC_SAVEPW,1);
+    CheckDlgButton(h,IDC_ASKPW,0);
     SetDlgItemInt(h,IDC_ASKTIMEOUT,0,0);
     CheckDlgButton(h,IDC_DORUNAS,1);
     ComboBox_SetCurSel(GetDlgItem(h,IDC_WARNADMIN),APW_ADMIN);
@@ -1296,7 +1280,7 @@ void SetSimpleSettings(int nSel)
     CheckDlgButton(h,IDC_WINUPDBOOT,1);
     CheckDlgButton(h,IDC_OWNERGROUP,1);
     EnableWindow(GetDlgItem(h,IDC_FADEDESKTOP),!IsWin2k());
-    EnableWindow(GetDlgItem(h,IDC_ASKTIMEOUT),1);
+    EnableWindow(GetDlgItem(h,IDC_ASKTIMEOUT),0);
     break;
   case 1:
     EnableWindow(GetDlgItem(h,IDC_RUNSETUP),1);
