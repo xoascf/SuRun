@@ -16,6 +16,7 @@ SuRun 1.1.9.1 - 2008-07-07: (beta)
 * FIX: In Windows x64 SuRun32 could not read SuRuns Settings (since SuRun 1.0!)
 * FIX: SuRun created an endless loop of "SuRun /USERINST" processes when it 
   was run in the Ceedo sandbox.
+* FIX: SuRuns System menu entries did not always show on the first click.
 
 SuRun 1.1.9.0 - 2008-07-05: (beta)
 ---------------------------
