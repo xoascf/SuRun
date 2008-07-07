@@ -61,8 +61,6 @@ extern RUNDATA g_RunData;
 
 //The service copies the users password via WriteProcessMemory to g_RunPwd of 
 //SuRun.exe that was started by the user
-extern TCHAR g_RunPwd[PWLEN];
-
 #define RETVAL_NODESKTOP   -2
 #define RETVAL_WAIT        -1
 #define RETVAL_OK           0
