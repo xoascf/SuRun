@@ -78,6 +78,10 @@
 #define GetNoSetupNew     (GetOption(_T("NewRunnerDenySetup"),0)!=0)
 #define SetNoSetupNew(b)  SetOption(_T("NewRunnerDenySetup"),b,0)
 
+//Test Manifest and file name of started files
+#define GetTestReqAdmin    (GetOption(_T("TestReqAdmin"),1)!=0)
+#define SetTestReqAdmin(b) SetOption(_T("TestReqAdmin"),b,1)
+
 //Save or not Passwords in the registry
 #define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
 
@@ -125,6 +129,10 @@
 #define GetShExtSetting(s,d)    GetRegInt(HKCR,L"CLSID\\" sGUID,s,d)
 #define SetShExtSetting(s,v,d)  if (GetShExtSetting(s,d)!=v)\
                                   SetRegInt(HKCR,L"CLSID\\" sGUID,s,v)
+
+//Hide SuRun from non SuRunners
+#define GetDefHideSuRun    (GetShExtSetting(_T("HideSuRunFromNonSuRunners"),0)!=0)
+#define SetDefHideSuRun(b) SetShExtSetting(_T("HideSuRunFromNonSuRunners"),b,0)
 
 //the following settings are stored in: HKCR\\CLSID\\sGUID
 #define ControlAsAdmin  L"ControlAsAdmin"  //"Control Panel As Admin" on Desktop Menu
@@ -189,12 +197,14 @@
 #define GetHideFromUser(u)    GetUsrOption(u,_T("HideFromUser"),0)
 #define SetHideFromUser(u,h)  SetUsrOption(u,_T("HideFromUser"),h,0)
 
+#define HideSuRun(u)          GetUsrOption(u,_T("HideFromUser"),GetDefHideSuRun)
+
 #define GetReqPw4Setup(u)    GetUsrOption(u,_T("ReqPw4Setup"),0)
 #define SetReqPw4Setup(u,b)  SetUsrOption(u,_T("ReqPw4Setup"),b,0)
 
 inline bool ShowTray(LPCTSTR u)
 {
-  if (GetHideFromUser(u))
+  if (HideSuRun(u))
     return false;
   int utsa=(int)GetUserTSA(u);
   if (utsa>0)
@@ -215,7 +225,7 @@ inline bool ShowTray(LPCTSTR u)
 
 inline bool ShowBalloon(LPCTSTR u)
 {
-  if (GetHideFromUser(u))
+  if (HideSuRun(u))
     return false;
   if (GetUserTSA(u)==2)
     return true;
