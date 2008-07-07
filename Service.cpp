@@ -38,6 +38,7 @@
 #include "WinStaDesk.h"
 #include "ResStr.h"
 #include "LogonDlg.h"
+#include "LSA_laar.h"
 #include "LSALogon.h"
 #include "UserGroups.h"
 #include "ReqAdmin.h"
@@ -1443,9 +1444,24 @@ BOOL InstallService()
   hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START|SERVICE_CHANGE_CONFIG );
   if (LOBYTE(LOWORD(GetVersion()))>=6)
   {
+    TCHAR* ReqPriv[]=
+    {
+      SE_ASSIGNPRIMARYTOKEN_NAME
+      SE_CREATE_GLOBAL_NAME
+      SE_CREATE_TOKEN_NAME
+      SE_CREATE_PERMANENT_NAME
+      SE_CHANGE_NOTIFY_NAME
+      SE_DEBUG_NAME
+      SE_IMPERSONATE_NAME
+      SE_INCREASE_QUOTA_NAME
+      SE_TCB_NAME
+      TEXT("\0")
+    };
     //Vista:
-    ChangeServiceConfig2(hdlServ,6/*SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO*/,
-      ...)
+    if (!ChangeServiceConfig2(hdlServ,6/*SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO*/,ReqPriv))
+      DBGTrace1("ChangeServiceConfig2 failed: %s",GetLastErrorNameStatic())
+    else
+      DBGTrace("ChangeServiceConfig2 OK");
   }else
   {
     //2k/XP/2k3
@@ -1456,7 +1472,15 @@ BOOL InstallService()
                                  0,0,0,0,0,0,0,&SystemSID))
     {
       GetSIDUserName(SystemSID,un);
+      AddAcctPrivilege(un,SE_ASSIGNPRIMARYTOKEN_NAME);
+      AddAcctPrivilege(un,SE_CREATE_GLOBAL_NAME);
       AddAcctPrivilege(un,SE_CREATE_TOKEN_NAME);
+      AddAcctPrivilege(un,SE_CREATE_PERMANENT_NAME);
+      AddAcctPrivilege(un,SE_CHANGE_NOTIFY_NAME);
+      AddAcctPrivilege(un,SE_DEBUG_NAME);
+      AddAcctPrivilege(un,SE_IMPERSONATE_NAME);
+      AddAcctPrivilege(un,SE_INCREASE_QUOTA_NAME);
+      AddAcctPrivilege(un,SE_TCB_NAME);
       FreeSid(SystemSID);
     }
   }
