@@ -89,7 +89,7 @@ void UpdLastRunTime(LPTSTR UserName)
 DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
 {
   HKEY Key;
-  if(RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KEY_READ,&Key)!=ERROR_SUCCESS)
+  if(RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KSAM(KEY_READ),&Key)!=ERROR_SUCCESS)
     return Default;
   DWORD sizd=sizeof(DWORD);
   DWORD d=Default;
@@ -178,7 +178,7 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
     if (_tcsicmp(s,L"CLSID")==0)
     {
       HKEY h;
-      if(ERROR_SUCCESS==RegOpenKey(hKey,s,&h))
+      if(ERROR_SUCCESS==RegOpenKeyEx(hKey,s,0,KSAM(KEY_ALL_ACCESS),&h))
         ReplaceRunAsWithSuRun(h);
     }
     else
@@ -223,7 +223,7 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
     if (_tcsicmp(s,L"CLSID")==0)
     {
       HKEY h;
-      if(ERROR_SUCCESS==RegOpenKey(hKey,s,&h))
+      if(ERROR_SUCCESS==RegOpenKeyEx(hKey,s,0,KSAM(KEY_ALL_ACCESS),&h))
         ReplaceSuRunWithRunAs(h);
     }
     else
@@ -720,7 +720,7 @@ static void UpdateUser(HWND hwnd)
     }
     EnableWindow(hWL,true);
     HKEY Key;
-    if(RegOpenKeyEx(HKLM,WHTLSTKEY(u),0,KEY_READ,&Key)==ERROR_SUCCESS)
+    if(RegOpenKeyEx(HKLM,WHTLSTKEY(u),0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
     {
       TCHAR cmd[4096];
       DWORD ccMax=countof(cmd);
@@ -812,9 +812,9 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),bAsk);
       HKEY kra=0;
       HKEY ksu=0;
-      if (0==RegOpenKey(HKCR,L"exefile\\shell\\runas\\command",&kra))
+      if (0==RegOpenKeyEx(HKCR,L"exefile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra))
         RegCloseKey(kra);
-      if (0==RegOpenKey(HKCR,L"exefile\\shell\\RunAsSuRun\\command",&ksu))
+      if (0==RegOpenKeyEx(HKCR,L"exefile\\shell\\RunAsSuRun\\command",0,KSAM(KEY_READ),&ksu))
         RegCloseKey(ksu);
       UINT bCheck=BST_INDETERMINATE;
       if((kra!=0)&&(ksu==0))
@@ -868,8 +868,9 @@ ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetFadeDesk(IsDlgButtonChecked(hwnd,IDC_FADEDESKTOP));
       if(IsDlgButtonChecked(hwnd,IDC_ASKPW))
+      {
         SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0));
-      else
+      }else
         SetPwTimeOut(0);
       DWORD bSave=(!IsDlgButtonChecked(hwnd,IDC_ASKPW))|| (GetPwTimeOut!=0);
       SetSavePW(bSave);
