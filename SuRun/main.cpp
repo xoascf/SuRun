@@ -63,63 +63,65 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
-  //cmdLine
-  LPTSTR args=_tcsdup(PathGetArgs(GetCommandLine()));
-  LPTSTR Args=args;
-  //Parse direct commands:
   bool bRunSetup=FALSE;
-  if (HideSuRun(g_RunData.UserName))
-    g_RunData.beQuiet=TRUE;
-  while (Args[0]=='/')
+  //cmdLine
   {
-    LPTSTR c=Args;
-    Args=PathGetArgs(Args);
-    if (*(Args-1)==' ')
-      *(Args-1)=0;
-    if (!_wcsicmp(c,L"/QUIET"))
-    {
+    LPTSTR args=_tcsdup(PathGetArgs(GetCommandLine()));
+    LPTSTR Args=args;
+    //Parse direct commands:
+    if (HideSuRun(g_RunData.UserName))
       g_RunData.beQuiet=TRUE;
-    }if (!_wcsicmp(c,L"/RUNAS"))
+    while (Args[0]=='/')
     {
-      g_RunData.bRunAs=TRUE;
-    }else if (!_wcsicmp(c,L"/SETUP"))
-    {
-      bRunSetup=TRUE;
-      wcscpy(g_RunData.cmdLine,L"/SETUP");
-      break;
-    }else if (!_wcsicmp(c,L"/TESTAA"))
-    {
-      g_RunData.bShlExHook=TRUE;
-      //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-      g_RunData.RetPID=wcstol(Args,0,10);
+      LPTSTR c=Args;
       Args=PathGetArgs(Args);
-      g_RunData.RetPtr=wcstoul(Args,0,16);
-      Args=PathGetArgs(Args);
-    }else if (!_wcsicmp(c,L"/KILL"))
-    {
-      g_RunData.KillPID=wcstol(Args,0,10);
-      Args=PathGetArgs(Args);
+      if (*(Args-1)==' ')
+        *(Args-1)=0;
+      if (!_wcsicmp(c,L"/QUIET"))
+      {
+        g_RunData.beQuiet=TRUE;
+      }if (!_wcsicmp(c,L"/RUNAS"))
+      {
+        g_RunData.bRunAs=TRUE;
+      }else if (!_wcsicmp(c,L"/SETUP"))
+      {
+        bRunSetup=TRUE;
+        wcscpy(g_RunData.cmdLine,L"/SETUP");
+        break;
+      }else if (!_wcsicmp(c,L"/TESTAA"))
+      {
+        g_RunData.bShlExHook=TRUE;
+        //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+        g_RunData.RetPID=wcstol(Args,0,10);
+        Args=PathGetArgs(Args);
+        g_RunData.RetPtr=wcstoul(Args,0,16);
+        Args=PathGetArgs(Args);
+      }else if (!_wcsicmp(c,L"/KILL"))
+      {
+        g_RunData.KillPID=wcstol(Args,0,10);
+        Args=PathGetArgs(Args);
+      }
     }
-  }
-  free(args);
-  bool bShellIsadmin=FALSE;
-  HANDLE hTok=GetShellProcessToken();
-  if(hTok)
-  {
-    bShellIsadmin=IsAdmin(hTok)!=0;
-    CloseHandle(hTok);
-  }
-  //Convert Command Line
-  if (!bRunSetup)
-  {
-    //If shell is Admin but User is SuRunner, the Shell must be restarted
-    if (IsInSuRunners(g_RunData.UserName) && bShellIsadmin)
+    bool bShellIsadmin=FALSE;
+    HANDLE hTok=GetShellProcessToken();
+    if(hTok)
     {
-      //Complain if shell user is an admin!
-      SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
-      return RETVAL_ACCESSDENIED;
-    }  
-    ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
+      bShellIsadmin=IsAdmin(hTok)!=0;
+      CloseHandle(hTok);
+    }
+    //Convert Command Line
+    if (!bRunSetup)
+    {
+      //If shell is Admin but User is SuRunner, the Shell must be restarted
+      if (IsInSuRunners(g_RunData.UserName) && bShellIsadmin)
+      {
+        //Complain if shell user is an admin!
+        SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
+        return RETVAL_ACCESSDENIED;
+      }  
+      ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
+    }
+    free(args);
   }
   //Usage
   if (!g_RunData.cmdLine[0])
