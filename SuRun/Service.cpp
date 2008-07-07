@@ -1774,6 +1774,7 @@ bool HandleServiceStuff()
       if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
         while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
             Sleep(1000);
+      StartTSAThread();
       if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
         return ExitProcess(0),true;
       if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
