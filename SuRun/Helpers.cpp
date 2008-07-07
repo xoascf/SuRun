@@ -40,11 +40,10 @@
 //  Registry Helper
 //
 //////////////////////////////////////////////////////////////////////////////
-
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
+  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
   {
     DWORD dwType=Type;
     BOOL bRet=(RegQueryValueEx(Key,ValName,NULL,&dwType,RetVal,nBytes)==ERROR_SUCCESS)
@@ -58,7 +57,7 @@ BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DW
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
+  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
   {
     BOOL bRet=RegQueryValueEx(Key,ValName,NULL,Type,RetVal,nBytes)==ERROR_SUCCESS;
     RegCloseKey(Key);
@@ -71,9 +70,9 @@ BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWOR
 {
   HKEY Key;
   BOOL bKey=FALSE;
-  bKey=RegOpenKeyEx(HK,SubKey,0,KEY_WRITE,&Key)==ERROR_SUCCESS;
+  bKey=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key)==ERROR_SUCCESS;
   if (!bKey)
-    bKey=RegCreateKey(HK,SubKey,&Key)==ERROR_SUCCESS;
+    bKey=RegCreateKeyEx(HK,SubKey,0,0,0,KSAM(KEY_WRITE),0,&Key,0)==ERROR_SUCCESS;
   if (bKey)
   {
     LONG l=RegSetValueEx(Key,ValName,0,Type,Data,nBytes);
@@ -86,7 +85,7 @@ BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWOR
 BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KEY_WRITE,&Key)==ERROR_SUCCESS)
+  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key)==ERROR_SUCCESS)
   {
     BOOL bRet=RegDeleteValue(Key,ValName)==ERROR_SUCCESS;
     RegCloseKey(Key);
@@ -142,7 +141,7 @@ BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
 BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
+  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
   {
     BOOL bRet=(RegEnumKey(Key,Index,Str,ccMax)==ERROR_SUCCESS);
     RegCloseKey(Key);
@@ -154,7 +153,7 @@ BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
+  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
   {
     BOOL bRet=(RegEnumValue(Key,Index,Str,&ccMax,0,0,0,0)==ERROR_SUCCESS);
     RegCloseKey(Key);
@@ -166,7 +165,7 @@ BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
 {
   HKEY hEnumKey;
-  if(RegOpenKeyEx(hKey,pszSubKey,0,KEY_ENUMERATE_SUB_KEYS,&hEnumKey)!=NOERROR)
+  if(RegOpenKeyEx(hKey,pszSubKey,0,KSAM(KEY_ENUMERATE_SUB_KEYS),&hEnumKey)!=NOERROR)
     return FALSE;
   TCHAR szKey[4096];
   DWORD dwSize = 4096;
@@ -191,9 +190,9 @@ void CopyRegKey(HKEY hSrc, HKEY hDst)
   for(i=0,nS=512;0==RegEnumKey(hSrc,i,s,nS);i++)
   {
     HKEY newDst,newSrc;
-    if(0==RegOpenKey(hSrc,s,&newSrc))
+    if(0==RegOpenKeyEx(hSrc,s,0,KSAM(KEY_ALL_ACCESS),&newSrc))
     {
-      if(0==RegCreateKey(hDst,s,&newDst))
+      if(0==RegCreateKeyEx(hDst,s,0,0,0,KSAM(KEY_ALL_ACCESS),0,&newDst,0))
       {
         CopyRegKey(newSrc,newDst);
         RegCloseKey(newDst);
@@ -207,9 +206,9 @@ void CopyRegKey(HKEY hSrc, HKEY hDst)
 BOOL RenameRegKey(HKEY hKeyRoot,LPTSTR sSrc,LPTSTR sDst)
 {
   HKEY hSrc,hDst;
-  if(RegOpenKey(hKeyRoot,sSrc,&hSrc))
+  if(RegOpenKeyEx(hKeyRoot,sSrc,0,KSAM(KEY_ALL_ACCESS),&hSrc))
     return FALSE;
-  if(RegCreateKey(hKeyRoot,sDst,&hDst))
+  if(RegCreateKeyEx(hKeyRoot,sDst,0,0,0,KSAM(KEY_ALL_ACCESS),0,&hDst,0))
     return RegCloseKey(hSrc),FALSE;
   CopyRegKey(hSrc,hDst);
   RegCloseKey(hDst);
