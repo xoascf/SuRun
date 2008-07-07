@@ -469,8 +469,15 @@ ChkAdmin:
         HANDLE hRun=0;
         HANDLE hProc=0;
         if(CrssPid)
+        {
           hRun=GetProcessUserToken(CrssPid);
-        else if(OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
+          if (!hRun)
+          {
+            CrssPid=GetCsrssPid();
+            hRun=GetProcessUserToken(CrssPid);
+          }
+        }
+        if ((!hRun)&& OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hProc))
         {
           if (DuplicateTokenEx(hProc,MAXIMUM_ALLOWED,NULL,
             SecurityIdentification,TokenPrimary,&hRun))
