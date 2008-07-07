@@ -270,8 +270,8 @@ LPVOID GetFromToken(HANDLE hToken, TOKEN_INFORMATION_CLASS tic)
         free(lpData);
       lpData = NULL;
     }
-    return lpData;
   }
+  return lpData;
 }
 
 //Caller free
