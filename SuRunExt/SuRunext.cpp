@@ -963,11 +963,11 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if ((!l_IsAdmin) && GetUseIATHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
-//    TCHAR fSuRunExe[4096];
-//    GetSystemWindowsDirectory(fSuRunExe,4096);
-//    PathAppend(fSuRunExe,L"SuRun.exe");
-//    PathQuoteSpaces(fSuRunExe);
-    BOOL bSetHook=(!l_IsAdmin)/*&&(_tcsicmp(fMod,fSuRunExe)!=0)*/;
+    TCHAR fSuRunExe[4096];
+    GetSystemWindowsDirectory(fSuRunExe,4096);
+    PathAppend(fSuRunExe,L"SuRun.exe");
+    PathQuoteSpaces(fSuRunExe);
+    BOOL bSetHook=(!l_IsAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
     DBGTrace7("Attach(hInst=%x,old %x) %d:%s[%s], Admin=%d, SetHook=%d",
       hInstDLL,lhi,PID,fMod,GetCommandLine(),l_IsAdmin,bSetHook);
     if(bSetHook)
