@@ -375,31 +375,17 @@ Cleanup:
 // SetAdminDenyUserAccess
 //
 //////////////////////////////////////////////////////////////////////////////
-
-void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/,DWORD Permissions/*=SYNCHRONIZE*/)
+PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCHRONIZE*/)
 {
-  DWORD dwRes;
-  PACL pOldDACL=NULL, pNewDACL=NULL;
-  PSECURITY_DESCRIPTOR pSD = NULL;
-  EXPLICIT_ACCESS ea[2]={0};
   SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
   PSID AdminSID = NULL;
-  if (ProcessID==0)
-    ProcessID=GetCurrentProcessId();
-  PSID UserSID  = GetProcessUserSID(ProcessID);
-  if (NULL == hObject) 
-    goto Cleanup; 
-  // Get a pointer to the existing DACL.
-  dwRes = GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
-  if (ERROR_SUCCESS != dwRes) 
-    goto Cleanup; 
-
   // Initialize Admin SID
   if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
     DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
-    goto Cleanup; 
+    return 0; 
   // Initialize EXPLICIT_ACCESS structures
   // The ACE will allow Administrators full access to the object.
+  EXPLICIT_ACCESS ea[2]={0};
   ea[0].grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL;
   ea[0].grfAccessMode = GRANT_ACCESS;
   ea[0].Trustee.ptstrName  = (LPTSTR)AdminSID;
@@ -409,20 +395,42 @@ void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/,DWORD Permissio
   ea[1].Trustee.ptstrName  = (LPTSTR)UserSID;
   // Create a new ACL that merges the new ACE
   // into the existing DACL.
-  dwRes = SetEntriesInAcl(2,&ea[0],pOldDACL,&pNewDACL);
-  if (ERROR_SUCCESS != dwRes)  
-    goto Cleanup; 
-  // Attach the new ACL as the object's DACL.
-  dwRes = SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
-  if (ERROR_SUCCESS != dwRes)  
-    goto Cleanup; 
-Cleanup:
-  if(pSD != NULL) 
-    LocalFree((HLOCAL) pSD); 
-  if(pNewDACL != NULL) 
-    LocalFree((HLOCAL) pNewDACL); 
+  PACL pNewDACL=NULL;
+  SetEntriesInAcl(2,&ea[0],pOldDACL,&pNewDACL);
   if (AdminSID)
     FreeSid(AdminSID);
+  return pNewDACL;
+}
+
+void SetAdminDenyUserAccess(HANDLE hObject,PSID UserSID,DWORD Permissions/*=SYNCHRONIZE*/)
+{
+  if (NULL == hObject) 
+    return; 
+  PACL pOldDACL=NULL;
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  // Get a pointer to the existing DACL.
+  if (0==GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD)) 
+  {
+    PACL pNewDACL=SetAdminDenyUserAccess(pOldDACL,UserSID,Permissions/*=SYNCHRONIZE*/);
+    // Attach the new ACL as the object's DACL.
+    if (pNewDACL)
+    {
+      SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
+      LocalFree((HLOCAL)pNewDACL); 
+    }
+  }
+  if(pSD != NULL) 
+    LocalFree((HLOCAL) pSD); 
+}
+
+void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID/*=0*/,DWORD Permissions/*=SYNCHRONIZE*/)
+{
+  if (ProcessID==0)
+    ProcessID=GetCurrentProcessId();
+  PSID UserSID=GetProcessUserSID(ProcessID);
+  if (!UserSID)
+    return;
+  SetAdminDenyUserAccess(hObject,UserSID,Permissions);
   free(UserSID);
 }
 
@@ -914,6 +922,34 @@ bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain/*=0*/)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+// GetTokenUserSID
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+PSID GetTokenUserSID(HANDLE hToken)
+{
+  PSID sid=0;
+  DWORD dwLen=0;
+  if ((GetTokenInformation(hToken, TokenUser,NULL,0,&dwLen))
+    ||(GetLastError()==ERROR_INSUFFICIENT_BUFFER))
+  {
+    TOKEN_USER* ptu=(TOKEN_USER*)malloc(dwLen);
+    if(ptu)
+    {
+      if(GetTokenInformation(hToken,TokenUser,(PVOID)ptu,dwLen,&dwLen))
+      {
+        dwLen=GetLengthSid(ptu->User.Sid);
+        sid=(PSID)malloc(dwLen);
+        CopySid(dwLen,sid,ptu->User.Sid);
+      }
+      free(ptu);
+    }
+  }
+  return sid;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 // GetProcessUserSID
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -929,22 +965,7 @@ PSID GetProcessUserSID(DWORD ProcessID)
   // Open impersonation token for process
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
-    DWORD dwLen=0;
-    if ((GetTokenInformation(hToken, TokenUser,NULL,0,&dwLen))
-      ||(GetLastError()==ERROR_INSUFFICIENT_BUFFER))
-    {
-      TOKEN_USER* ptu=(TOKEN_USER*)malloc(dwLen);
-      if(ptu)
-      {
-        if(GetTokenInformation(hToken,TokenUser,(PVOID)ptu,dwLen,&dwLen))
-        {
-          dwLen=GetLengthSid(ptu->User.Sid);
-          sid=(PSID)malloc(dwLen);
-          CopySid(dwLen,sid,ptu->User.Sid);
-        }
-        free(ptu);
-      }
-    }
+    sid=GetTokenUserSID(hToken);
     CloseHandle(hToken);
   }
   CloseHandle(hProc);
