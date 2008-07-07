@@ -95,7 +95,7 @@ TCHAR g_RunPwd[PWLEN]={0};
 int g_RetVal=0;
 bool g_CliIsAdmin=FALSE;
 
-bool g_bUsePasswords=TRUE;
+//bool g_bUsePasswords=TRUE;
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -663,16 +663,16 @@ DWORD PrepareSuRun()
   zero(g_RunPwd);
   BOOL PwOk=FALSE;
   //Do we have a Password for this user?
-  if(g_bUsePasswords)
-  {
-    if (GetSavePW &&(!PasswordExpired(g_RunData.UserName)))
-      LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
-    PwOk=PasswordOK(g_RunData.UserName,g_RunPwd,true);
-  }else
-  {
+//  if(g_bUsePasswords)
+//  {
+//    if (GetSavePW &&(!PasswordExpired(g_RunData.UserName)))
+//      LoadPassword(g_RunData.UserName,g_RunPwd,sizeof(g_RunPwd));
+//    PwOk=PasswordOK(g_RunData.UserName,g_RunPwd,true);
+//  }else
+//  {
     RegDelVal(HKLM,PASSWKEY,g_RunData.UserName);//Delete Password, keep time
     PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
-  }
+//  }
   BOOL bIsSuRunner=IsInSuRunners(g_RunData.UserName);
   if ((!PwOk)||(!bIsSuRunner))
   //Password is NOT ok:
@@ -706,8 +706,8 @@ DWORD PrepareSuRun()
     {
       l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
           BeautifyCmdLine(g_RunData.cmdLine));
-      if (g_bUsePasswords && GetSavePW && (l&1))
-        SavePassword(g_RunData.UserName,g_RunPwd);
+//      if (g_bUsePasswords && GetSavePW && (l&1))
+//        SavePassword(g_RunData.UserName,g_RunPwd);
     }else
     {
       l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
@@ -833,18 +833,18 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
   PathRemoveFileSpec(dn);
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
-  if (g_bUsePasswords && (!bNoAdmin) &&(g_RunPwd[0]==0))
-  {
-    bEmptyPWAllowed=EmptyPWAllowed;
-    AllowEmptyPW(TRUE);
-  }
-  if(g_bUsePasswords || bNoAdmin)
+//  if (g_bUsePasswords && (!bNoAdmin) &&(g_RunPwd[0]==0))
+//  {
+//    bEmptyPWAllowed=EmptyPWAllowed;
+//    AllowEmptyPW(TRUE);
+//  }
+  if(/*g_bUsePasswords || */bNoAdmin)
     hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
   else
     hUser=GetAdminToken(SessionID);
   //Reset status of "use of empty passwords for network logon"
-  if (g_bUsePasswords && (!bNoAdmin) && (g_RunPwd[0]==0))
-    AllowEmptyPW(bEmptyPWAllowed);
+//  if (g_bUsePasswords && (!bNoAdmin) && (g_RunPwd[0]==0))
+//    AllowEmptyPW(bEmptyPWAllowed);
   //Clear Password
   zero(g_RunPwd);
   return hUser;
@@ -1014,8 +1014,8 @@ void SuRun(DWORD ProcessID)
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
     return;
-  if (EnablePrivilege(SE_CREATE_TOKEN_NAME))
-    g_bUsePasswords=FALSE;
+//  if (EnablePrivilege(SE_CREATE_TOKEN_NAME))
+//    g_bUsePasswords=FALSE;
   zero(g_RunData);
   zero(g_RunPwd);
   RUNDATA RD={0};
