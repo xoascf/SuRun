@@ -801,27 +801,28 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
 {
   //Admin Token for SessionId
   HANDLE hUser=0;
-//  //Enable use of empty passwords for network logon
-//  BOOL bEmptyPWAllowed=FALSE;
-//  if ((!bNoAdmin) &&(Password[0]==0))
-//  {
-//    bEmptyPWAllowed=EmptyPWAllowed;
-//    AllowEmptyPW(TRUE);
-//  }
-  if(bNoAdmin)
+  TCHAR un[2*UNLEN+2]={0};
+  TCHAR dn[2*UNLEN+2]={0};
+  _tcscpy(un,UserName);
+  PathStripPath(un);
+  _tcscpy(dn,UserName);
+  PathRemoveFileSpec(dn);
+  //Enable use of empty passwords for network logon
+  BOOL bEmptyPWAllowed=FALSE;
+  if ((!bNoAdmin) &&(g_RunPwd[0]==0))
   {
-    TCHAR un[2*UNLEN+2]={0};
-    TCHAR dn[2*UNLEN+2]={0};
-    _tcscpy(un,UserName);
-    PathStripPath(un);
-    _tcscpy(dn,UserName);
-    PathRemoveFileSpec(dn);
+    bEmptyPWAllowed=EmptyPWAllowed;
+    AllowEmptyPW(TRUE);
+  }
+//  if(bNoAdmin)
     hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
-  }else
-    hUser=GetAdminToken(SessionID);
-//  //Reset status of "use of empty passwords for network logon"
-//  if ((!bNoAdmin) && (Password[0]==0))
-//    AllowEmptyPW(bEmptyPWAllowed);
+//  else
+//    hUser=GetAdminToken(SessionID);
+  //Clear Password
+  zero(g_RunPwd);
+  //Reset status of "use of empty passwords for network logon"
+  if ((!bNoAdmin) && (g_RunPwd[0]==0))
+    AllowEmptyPW(bEmptyPWAllowed);
   return hUser;
 }
 
@@ -846,72 +847,76 @@ DWORD LSAStartAdminProcess()
       HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
       //Clear Password
       zero(g_RunPwd);
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+      if (hAdmin)
       {
-        //Allow access to the Process and Thread to the Administrators and deny 
-        //access for the current user
-        SetAdminDenyUserAccess(pi.hThread,g_RunData.CliProcessId);
-        SetAdminDenyUserAccess(pi.hProcess,g_RunData.CliProcessId);
-        //Start the main thread
-        ResumeThread(pi.hThread);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-        RetVal=RETVAL_OK;
-        //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-        if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+        //CreateProcessAsUser will only work from an NT System Account since the
+        //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+        EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+        EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+        if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
+          CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
         {
-          pi.hThread=0;
-          pi.hProcess=0;
-          HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
-          if (hProcess)
+          //Allow access to the Process and Thread to the Administrators and deny 
+          //access for the current user
+          SetAdminDenyUserAccess(pi.hThread,g_RunData.CliProcessId);
+          SetAdminDenyUserAccess(pi.hProcess,g_RunData.CliProcessId);
+          //Start the main thread
+          ResumeThread(pi.hThread);
+          CloseHandle(pi.hThread);
+          CloseHandle(pi.hProcess);
+          RetVal=RETVAL_OK;
+          //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+          if((g_RunData.RetPID)&&(g_RunData.RetPtr))
           {
-            SIZE_T n;
-            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-              DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+            pi.hThread=0;
+            pi.hProcess=0;
+            HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+            if (hProcess)
+            {
+              SIZE_T n;
+              if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+                DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
+                g_RunData.cmdLine,GetLastErrorNameStatic());
+              CloseHandle(hProcess);
+            }else
+              DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
               g_RunData.cmdLine,GetLastErrorNameStatic());
-            CloseHandle(hProcess);
-          }else
-            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-            g_RunData.cmdLine,GetLastErrorNameStatic());
-        }
-        if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
-        {
-          TCHAR cmd[4096]={0};
-          GetSystemWindowsDirectory(cmd,4096);
-          PathAppend(cmd,L"SuRun.exe");
-          PathQuoteSpaces(cmd);
-          //Show ToolTip "<Program> is running elevated"...
-          if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-            CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-          {
-            //Tell SuRun to Say something:
-            SIZE_T n;
-            //Since it's the same process, g_RunData and g_RunPwd have the same address!
-            RUNDATA rd=g_RunData;
-            rd.KillPID=0;
-            rd.CliProcessId=0;
-            rd.CliThreadId=pi.dwThreadId;
-            rd.RetPtr=0;
-            rd.RetPID=0;
-            rd.IconId=IDI_SHIELD;
-            rd.TimeOut=20000;
-            _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
-            if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
-              TerminateProcess(pi.hProcess,0);
-            else
-              ResumeThread(pi.hThread);
-            CloseHandle(pi.hThread);
-            CloseHandle(pi.hProcess);
           }
-        }
+          if ((g_RunData.bShlExHook)&&(!GetHideFromUser(g_RunData.UserName)))
+          {
+            TCHAR cmd[4096]={0};
+            GetSystemWindowsDirectory(cmd,4096);
+            PathAppend(cmd,L"SuRun.exe");
+            PathQuoteSpaces(cmd);
+            //Show ToolTip "<Program> is running elevated"...
+            if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+              CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+            {
+              //Tell SuRun to Say something:
+              SIZE_T n;
+              //Since it's the same process, g_RunData and g_RunPwd have the same address!
+              RUNDATA rd=g_RunData;
+              rd.KillPID=0;
+              rd.CliProcessId=0;
+              rd.CliThreadId=pi.dwThreadId;
+              rd.RetPtr=0;
+              rd.RetPID=0;
+              rd.IconId=IDI_SHIELD;
+              rd.TimeOut=20000;
+              _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
+              if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
+                TerminateProcess(pi.hProcess,0);
+              else
+                ResumeThread(pi.hThread);
+              CloseHandle(pi.hThread);
+              CloseHandle(pi.hProcess);
+            }
+          }
+        }else
+          DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+        CloseHandle(hAdmin);
       }else
-        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-      CloseHandle(hAdmin);
+        DBGTrace("FATAL: Could not create user token!");
       DestroyEnvironmentBlock(Env);
     }
     UnloadUserProfile(hUser,ProfInf.hProfile);
@@ -1441,49 +1446,64 @@ BOOL InstallService()
     return CloseServiceHandle(hdlSCM),FALSE;
   CloseServiceHandle(hdlServ);
   InstLog(CResStr(IDS_STARTSVC));
-  hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START|SERVICE_CHANGE_CONFIG );
-  if (LOBYTE(LOWORD(GetVersion()))>=6)
-  {
-    TCHAR* ReqPriv[]=
-    {
-      SE_ASSIGNPRIMARYTOKEN_NAME TEXT("\0")
-      SE_CREATE_GLOBAL_NAME TEXT("\0")
-      SE_CREATE_TOKEN_NAME TEXT("\0")
-      SE_CREATE_PERMANENT_NAME TEXT("\0")
-      SE_CHANGE_NOTIFY_NAME TEXT("\0")
-      SE_DEBUG_NAME TEXT("\0")
-      SE_IMPERSONATE_NAME TEXT("\0")
-      SE_INCREASE_QUOTA_NAME TEXT("\0")
-      SE_TCB_NAME TEXT("\0")
-      TEXT("\0")
-    };
-    //Vista:
-    if (!ChangeServiceConfig2(hdlServ,6/*SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO*/,ReqPriv))
-      DBGTrace1("ChangeServiceConfig2 failed: %s",GetLastErrorNameStatic())
-    else
-      DBGTrace("ChangeServiceConfig2 OK");
-  }else
-  {
-    //2k/XP/2k3
-    WCHAR un[MAX_PATH+MAX_PATH+1]; 
-    SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_NT_AUTHORITY;
-    void* SystemSID = 0;
-    if (AllocateAndInitializeSid(&SidAuthority,1,SECURITY_LOCAL_SYSTEM_RID,
-                                 0,0,0,0,0,0,0,&SystemSID))
-    {
-      GetSIDUserName(SystemSID,un);
-      AddAcctPrivilege(un,SE_ASSIGNPRIMARYTOKEN_NAME);
-      AddAcctPrivilege(un,SE_CREATE_GLOBAL_NAME);
-      AddAcctPrivilege(un,SE_CREATE_TOKEN_NAME);
-      AddAcctPrivilege(un,SE_CREATE_PERMANENT_NAME);
-      AddAcctPrivilege(un,SE_CHANGE_NOTIFY_NAME);
-      AddAcctPrivilege(un,SE_DEBUG_NAME);
-      AddAcctPrivilege(un,SE_IMPERSONATE_NAME);
-      AddAcctPrivilege(un,SE_INCREASE_QUOTA_NAME);
-      AddAcctPrivilege(un,SE_TCB_NAME);
-      FreeSid(SystemSID);
-    }
-  }
+//  if (LOBYTE(LOWORD(GetVersion()))>=6)
+//  {
+//    //Vista:
+//    TCHAR* ReqPriv[]=
+//    {
+//      SE_ASSIGNPRIMARYTOKEN_NAME TEXT("\0")
+//      SE_AUDIT_NAME TEXT("\0")
+//      SE_CHANGE_NOTIFY_NAME TEXT("\0")
+//      SE_CREATE_GLOBAL_NAME TEXT("\0")
+//      SE_CREATE_TOKEN_NAME TEXT("\0")
+//      SE_CREATE_PAGEFILE_NAME TEXT("\0")
+//      SE_CREATE_PERMANENT_NAME TEXT("\0")
+//      //SE_CREATE_SYMBOLIC_LINK_NAME TEXT("\0")
+//      SE_DEBUG_NAME TEXT("\0")
+//      SE_IMPERSONATE_NAME TEXT("\0")
+//      SE_INCREASE_QUOTA_NAME TEXT("\0")
+//      //SE_INCREASE_WORKING_SET_NAME TEXT("\0")
+//      SE_TCB_NAME TEXT("\0")
+//      TEXT("\0")
+//    };
+//    hdlServ = OpenService(hdlSCM,SvcName,SERVICE_CHANGE_CONFIG);
+//
+//    typedef struct _SERVICE_SID_INFO {
+//      DWORD dwServiceSidType;
+//    } SERVICE_SID_INFO, *LPSERVICE_SID_INFO;
+//    SERVICE_SID_INFO Info={1/*SERVICE_SID_TYPE_UNRESTRICTED*/};
+//    if (!ChangeServiceConfig2(hdlServ,5/*SERVICE_CONFIG_SERVICE_SID_INFO*/,&Info))
+//      DBGTrace1("ChangeServiceConfig2 5 failed: %s",GetLastErrorNameStatic())
+//    else
+//      DBGTrace("ChangeServiceConfig2 5 OK");
+//    if (!ChangeServiceConfig2(hdlServ,6/*SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO*/,ReqPriv))
+//      DBGTrace1("ChangeServiceConfig2 6 failed: %s",GetLastErrorNameStatic())
+//    else
+//      DBGTrace("ChangeServiceConfig2 6 OK");
+//    CloseServiceHandle(hdlServ);
+//  }else
+//  {
+//    //2k/XP/2k3
+//    WCHAR un[MAX_PATH+MAX_PATH+1]; 
+//    SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_NT_AUTHORITY;
+//    void* SystemSID = 0;
+//    if (AllocateAndInitializeSid(&SidAuthority,1,SECURITY_LOCAL_SYSTEM_RID,
+//                                 0,0,0,0,0,0,0,&SystemSID))
+//    {
+//      GetSIDUserName(SystemSID,un);
+//      AddAcctPrivilege(un,SE_ASSIGNPRIMARYTOKEN_NAME);
+//      AddAcctPrivilege(un,SE_CHANGE_NOTIFY_NAME);
+//      AddAcctPrivilege(un,SE_CREATE_GLOBAL_NAME);
+//      AddAcctPrivilege(un,SE_CREATE_TOKEN_NAME);
+//      AddAcctPrivilege(un,SE_CREATE_PERMANENT_NAME);
+//      AddAcctPrivilege(un,SE_DEBUG_NAME);
+//      AddAcctPrivilege(un,SE_IMPERSONATE_NAME);
+//      AddAcctPrivilege(un,SE_INCREASE_QUOTA_NAME);
+//      AddAcctPrivilege(un,SE_TCB_NAME);
+//      FreeSid(SystemSID);
+//    }
+//  }
+  hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START);
   BOOL bRet=StartService(hdlServ,0,0);
   if (!bRet)
   {
