@@ -64,7 +64,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
   //cmdLine
-  LPTSTR Args=PathGetArgs(GetCommandLine());
+  LPTSTR args=_tcsdup(PathGetArgs(GetCommandLine()));
+  LPTSTR Args=args;
   //Parse direct commands:
   bool bRunSetup=FALSE;
   if (GetHideFromUser(g_RunData.UserName))
@@ -100,6 +101,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
     }
   }
+  free(args);
   bool bShellIsadmin=FALSE;
   HANDLE hTok=GetShellProcessToken();
   if(hTok)
