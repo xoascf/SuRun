@@ -37,12 +37,11 @@ BEGIN
                     WS_TABSTOP,83,14,195,11
     CONTROL         "Fade in",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
                     BS_MULTILINE | WS_TABSTOP,281,14,59,11
-    CONTROL         "&Store &Passwords, for a period of",IDC_SAVEPW,"Button",
+    CONTROL         "Require user password",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,27,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,26,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "minutes (0 = keep forever)",IDC_STATIC,226,27,92,11,NOT 
-                    WS_GROUP
+    LTEXT           "min grace period",IDC_STATIC,226,27,92,11,NOT WS_GROUP
     CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
                     IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
@@ -773,12 +772,12 @@ BEGIN
                     WS_TABSTOP,83,13,223,9
     CONTROL         "Einblenden",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
                     BS_MULTILINE | WS_TABSTOP,310,13,59,9
-    CONTROL         "&Passworte speichern und nach",IDC_SAVEPW,"Button",
+    CONTROL         "&Benutzer-Kennwort abfragen",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,26,116,9
     EDITTEXT        IDC_ASKTIMEOUT,202,24,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min löschen (0 = nie löschen)",IDC_STATIC,226,26,92,9,
-                    NOT WS_GROUP
+    LTEXT           "min warten vor erneuter Abfrage",IDC_STATIC,226,26,142,
+                    9,NOT WS_GROUP
     CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
                     IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
@@ -1342,12 +1341,11 @@ BEGIN
                     WS_TABSTOP,83,13,171,11
     CONTROL         "Fade in",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
                     BS_MULTILINE | WS_TABSTOP,256,13,59,11
-    CONTROL         "&Store &Passwords, for a period of",IDC_SAVEPW,"Button",
+    CONTROL         "Require user password",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,26,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,25,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "minutes (0 = keep forever)",IDC_STATIC,226,26,92,11,NOT 
-                    WS_GROUP
+    LTEXT           "min grace period",IDC_STATIC,226,26,92,11,NOT WS_GROUP
     CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
                     IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
@@ -2016,12 +2014,11 @@ BEGIN
                     WS_TABSTOP,83,13,171,11
     CONTROL         "Fade in",IDC_FADEDESKTOP,"Button",BS_AUTOCHECKBOX | 
                     BS_MULTILINE | WS_TABSTOP,256,13,59,11
-    CONTROL         "&Wachtwoorden opslaan en na",IDC_SAVEPW,"Button",
+    CONTROL         "Require user password",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,26,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,25,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "minuten wissen (0 = nooit)",IDC_STATIC,226,26,92,11,NOT 
-                    WS_GROUP
+    LTEXT           "min grace period",IDC_STATIC,226,26,92,11,NOT WS_GROUP
     CONTROL         "Vervang Windows 'Run as...' door SuRun 'Run as...'",
                     IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
