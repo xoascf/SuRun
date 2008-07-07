@@ -21,6 +21,12 @@
 #define HKCU HKEY_CURRENT_USER
 #define HKLM HKEY_LOCAL_MACHINE
 
+#ifdef _SR32
+#define KSAM(a) a|KEY_WOW64_64KEY
+#else
+#define KSAM(a) a
+#endif _SR32
+
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes);
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes);
 BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes);
