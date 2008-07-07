@@ -800,25 +800,27 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
 {
   //Admin Token for SessionId
   HANDLE hUser=0;
-  TCHAR un[2*UNLEN+2]={0};
-  TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(un,UserName);
-  PathStripPath(un);
-  _tcscpy(dn,UserName);
-  PathRemoveFileSpec(dn);
-  //Enable use of empty passwords for network logon
-  BOOL bEmptyPWAllowed=FALSE;
-  if ((!bNoAdmin) &&(g_RunPwd[0]==0))
+//  //Enable use of empty passwords for network logon
+//  BOOL bEmptyPWAllowed=FALSE;
+//  if ((!bNoAdmin) &&(Password[0]==0))
+//  {
+//    bEmptyPWAllowed=EmptyPWAllowed;
+//    AllowEmptyPW(TRUE);
+//  }
+  if(bNoAdmin)
   {
-    bEmptyPWAllowed=EmptyPWAllowed;
-    AllowEmptyPW(TRUE);
-  }
-  hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
-  //Clear Password
-  zero(g_RunPwd);
-  //Reset status of "use of empty passwords for network logon"
-  if ((!bNoAdmin) && (g_RunPwd[0]==0))
-    AllowEmptyPW(bEmptyPWAllowed);
+    TCHAR un[2*UNLEN+2]={0};
+    TCHAR dn[2*UNLEN+2]={0};
+    _tcscpy(un,UserName);
+    PathStripPath(un);
+    _tcscpy(dn,UserName);
+    PathRemoveFileSpec(dn);
+    hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
+  }else
+    hUser=GetAdminToken(SessionID);
+//  //Reset status of "use of empty passwords for network logon"
+//  if ((!bNoAdmin) && (Password[0]==0))
+//    AllowEmptyPW(bEmptyPWAllowed);
   return hUser;
 }
 
