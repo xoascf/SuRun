@@ -452,25 +452,21 @@ HANDLE GetAdminToken(DWORD SessionID)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
     if (LOBYTE(LOWORD(GetVersion()))>=6)
     {
-      //Vista UAC: Get the elevated token!
-      TOKEN_ELEVATION_TYPE et;
-      DWORD dwSize=sizeof(et);
-      if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenElevationType,
-                              &et,dwSize,&dwSize)
-        &&(et==TokenElevationTypeLimited))
+      //Vista UAC: Set Integrity level!
+      SID_IDENTIFIER_AUTHORITY siaMLA = {0,0,0,0,0,16}/*SECURITY_MANDATORY_LABEL_AUTHORITY*/;
+      PSID  pSidIL = NULL;
+      typedef struct _TOKEN_MANDATORY_LABEL 
       {
-        TOKEN_LINKED_TOKEN lt = {0}; 
-        HANDLE hAdmin=0;
-        dwSize = sizeof(lt); 
-        if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
-                                &lt,dwSize,&dwSize)
-          && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
-            SecurityImpersonation,TokenPrimary,&hAdmin)) 
-        {
-          CloseHandle(hUser);
-          hUser=hAdmin;
-        }
-      }
+        SID_AND_ATTRIBUTES Label;
+      } TOKEN_MANDATORY_LABEL, *PTOKEN_MANDATORY_LABEL;
+      TOKEN_MANDATORY_LABEL TIL = {0};
+      AllocateAndInitializeSid(&siaMLA,1,0x00003000L/*SECURITY_MANDATORY_HIGH_RID*/,
+                                0,0,0,0,0,0,0,&pSidIL );
+      TIL.Label.Attributes = 0x00000020/*SE_GROUP_INTEGRITY*/;
+      TIL.Label.Sid        = pSidIL ;
+      SetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenIntegrityLevel,
+                          &TIL,sizeof(TOKEN_MANDATORY_LABEL));
+      FreeSid(pSidIL);
     }
   }
   __finally
