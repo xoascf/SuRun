@@ -1842,7 +1842,9 @@ bool HandleServiceStuff()
       if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
         while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
             Sleep(1000);
+#ifndef _SR32
       StartTSAThread();
+#endif _SR32
       if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
         return ExitProcess(0),true;
       if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
@@ -1867,6 +1869,7 @@ bool HandleServiceStuff()
       bool TSA=FALSE;
       while (CheckServiceStatus()==SERVICE_RUNNING)
       {
+#ifndef _SR32
         if (ShowTray(g_RunData.UserName))
         {
           if(!TSA)
@@ -1875,6 +1878,7 @@ bool HandleServiceStuff()
           if (!ProcessTrayShowAdmin())
             Sleep(333);
         }else
+#endif _SR32
         {
           if(TSA)
             CloseTrayShowAdmin();
