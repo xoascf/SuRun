@@ -1440,7 +1440,26 @@ BOOL InstallService()
     return CloseServiceHandle(hdlSCM),FALSE;
   CloseServiceHandle(hdlServ);
   InstLog(CResStr(IDS_STARTSVC));
-  hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START);
+  hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START|SERVICE_CHANGE_CONFIG );
+  if (LOBYTE(LOWORD(GetVersion()))>=6)
+  {
+    //Vista:
+    ChangeServiceConfig2(hdlServ,6/*SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO*/,
+      ...)
+  }else
+  {
+    //2k/XP/2k3
+    WCHAR un[MAX_PATH+MAX_PATH+1]; 
+    SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_NT_AUTHORITY;
+    void* SystemSID = 0;
+    if (AllocateAndInitializeSid(&SidAuthority,1,SECURITY_LOCAL_SYSTEM_RID,
+                                 0,0,0,0,0,0,0,&SystemSID))
+    {
+      GetSIDUserName(SystemSID,un);
+      AddAcctPrivilege(un,SE_CREATE_TOKEN_NAME);
+      FreeSid(SystemSID);
+    }
+  }
   BOOL bRet=StartService(hdlServ,0,0);
   if (!bRet)
   {
@@ -1694,7 +1713,7 @@ BOOL UserInstall()
 {
   if (!IsAdmin())
   {
-    DBGTrace("UserUninstall: No Admin! starting SuRun /USERINST as Admin");
+    DBGTrace("UserInstall: No Admin! starting SuRun /USERINST as Admin");
     return RunThisAsAdmin(_T("/USERINST"),SERVICE_RUNNING,IDS_INSTALLADMIN);
   }
   return DialogBox(GetModuleHandle(0),
