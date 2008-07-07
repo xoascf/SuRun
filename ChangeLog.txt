@@ -1,5 +1,12 @@
 Done, to be tested:
----------------------
+---------------------------
+* Empty Admin Password Warning did not show on NonAdmin/NonSuRunners 
+  without Tray Icon
+* Settings Page 2 "Show Ballon Tips" was grayed out after "Set recommended 
+  options for home users"
+
+SuRun 1.1.9.0 - 2008-07-05: (beta)
+---------------------------
 * SuRun uses LSALogonUser instead of CreateProcessWithLogonW. Processes started
   by SuRun will be terminated by a WinLogon Notification handler in 
   SuRunExt.dll when the user logs off.
