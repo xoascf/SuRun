@@ -1942,9 +1942,13 @@ bool HandleServiceStuff()
     {
       DBGTrace2("Running from \"%s\" and NOT from WinDir(\"%s\")",fn,wd);
       //Only call UserInstall with empty command line
-      if (cmd.argc()==1)
+      if (cmd.argc()!=1)
+        ExitProcess(RETVAL_SX_NOTINLIST);
+      else
+      {
         UserInstall();
-      ExitProcess(0);
+        ExitProcess(0);
+      }
       return true;
     }
   }
