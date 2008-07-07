@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <shlwapi.h>
+#include "Setup.h"
 #include "DBGTrace.h"
 #pragma comment(lib,"shlwapi.lib")
 
@@ -102,6 +103,8 @@ BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lPara
 
 BOOL RequiresAdmin(LPCTSTR FileName)
 {
+  if (!GetTestReqAdmin)
+    return FALSE;
   TCHAR FName[4096];
   _tcscpy(FName,FileName);
   PathRemoveArgs(FName);
