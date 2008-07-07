@@ -36,61 +36,9 @@
 // WinMain
 //
 //////////////////////////////////////////////////////////////////////////////
-#ifdef _DEBUG
-#include "LSALogon.h"
-#include <USERENV.H>
-DWORD StartAdminProcess() 
-{
-  TCHAR cmd[4096]={0};
-  GetSystemWindowsDirectory(cmd,4096);
-  PathAppend(cmd,L"SuRun.exe");
-  PathQuoteSpaces(cmd);
-  DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=GetAdminToken(0);
-  PROCESS_INFORMATION pi={0};
-//  PROFILEINFO ProfInf = {sizeof(ProfInf),0,L"BRUNS\\Kay"};
-//  if(LoadUserProfile(hUser,&ProfInf))
-//  {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-    {
-      STARTUPINFO si={0};
-      si.cb	= sizeof(si);
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      TCHAR cmd[MAX_PATH];
-      _tcscpy(cmd,L"C:\\Windows\\Notepad.exe");
-      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-      {
-        //Allow access to the Process and Thread to the Administrators and deny 
-        //access for the current user
-//        SetAdminDenyUserAccess(pi.hThread,g_RunData.CliProcessId);
-//        SetAdminDenyUserAccess(pi.hProcess,g_RunData.CliProcessId);
-        //Start the main thread
-        ResumeThread(pi.hThread);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-        RetVal=RETVAL_OK;
-      }else
-        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-      DestroyEnvironmentBlock(Env);
-    }
-//    UnloadUserProfile(hUser,ProfInf.hProfile);
-//  }
-  CloseHandle(hUser);
-  return RetVal;
-}
-#endif _DEBUG
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-#ifdef _DEBUG
-  StartAdminProcess();
-  ExitProcess(0);
-#endif _DEBUG
   if(HandleServiceStuff())
     return 0;
   if (g_RunData.CliThreadId==GetCurrentThreadId())
