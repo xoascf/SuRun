@@ -67,6 +67,8 @@ void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow);
 BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account);
 
 // SetAdminDenyUserAccess
+PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions=SYNCHRONIZE);
+void SetAdminDenyUserAccess(HANDLE hObject,PSID UserSID,DWORD Permissions=SYNCHRONIZE);
 void SetAdminDenyUserAccess(HANDLE hObject,DWORD ProcessID=0,DWORD Permissions=SYNCHRONIZE);
 
 // GetUserAccessSD
@@ -86,6 +88,7 @@ bool DeleteDirectory(LPCTSTR DIR);
 
 //UserName:
 bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain=0);
+PSID GetTokenUserSID(HANDLE hToken);
 PSID GetProcessUserSID(DWORD ProcessID);
 bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain=0);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
