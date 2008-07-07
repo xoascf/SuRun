@@ -106,11 +106,11 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
     //system menu on the first click.
     case WM_SYSCOMMAND:
       if ((wps->wParam==SC_MOUSEMENU)||(SC_KEYMENU==wps->wParam))
-        GetSystemMenu((HWND)wps->wParam,FALSE);
+        GetSystemMenu((HWND)wps->hwnd,FALSE);
       break;
     case WM_NCRBUTTONDOWN:
     case WM_CONTEXTMENU:
-      GetSystemMenu((HWND)wps->wParam,FALSE);
+      GetSystemMenu((HWND)wps->hwnd,FALSE);
       break;
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
