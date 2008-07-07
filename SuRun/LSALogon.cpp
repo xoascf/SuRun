@@ -4,6 +4,7 @@
 #include <ntsecapi.h>
 #include <tchar.h>
 #include "Helpers.h"
+#include "LSA_laar.h"
 #include "DBGTrace.h"
 
 #pragma comment(lib,"Advapi32.lib")
@@ -248,7 +249,6 @@ typedef UINT (WINAPI * ZwCrTok)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES,
 
 ZwCrTok ZwCreateToken=NULL;
 
-//Caller free
 LPVOID GetFromToken(HANDLE hToken, TOKEN_INFORMATION_CLASS tic)
 {
   DWORD dw;
@@ -274,7 +274,6 @@ LPVOID GetFromToken(HANDLE hToken, TOKEN_INFORMATION_CLASS tic)
   return lpData;
 }
 
-//Caller free
 PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
 {
   if(!pSrcTG) 
@@ -302,6 +301,70 @@ PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
   return pDstTG;
 }
 
+PTOKEN_PRIMARY_GROUP CreateTokenPrimaryGroup(PSID pSID)
+{
+  if(!pSID) 
+    return NULL;
+  DWORD dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
+  PTOKEN_PRIMARY_GROUP pTPG = (PTOKEN_PRIMARY_GROUP)malloc(dwTGlen);
+  LPBYTE pBase=(LPBYTE)pTPG+sizeof(PSID);
+  memmove(pBase,pSID,GetLengthSid(pSID));
+  pTPG->PrimaryGroup=(PSID)pBase;
+  return pTPG;
+}
+
+PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
+{
+  DWORD nPrivs=pPriv->PrivilegeCount;
+  LPWSTR s=pAdd;
+  while (*s)
+  {
+    LUID luid;
+    if(LookupPrivilegeValue(0,s,&luid))
+    {
+      bool bAdd=TRUE;
+      for (DWORD p=0;p<pPriv->PrivilegeCount;p++)
+        if (memcmp(&pPriv->Privileges[p],&luid,sizeof(luid))==0)
+        {
+          bAdd=false;
+          break;
+        }
+      if(bAdd)
+        nPrivs++;
+    }
+    s+=wcslen(s)+1;
+  }
+  DWORD nBytes=sizeof(DWORD)+nPrivs*sizeof(LUID_AND_ATTRIBUTES);
+  PTOKEN_PRIVILEGES ptp=(PTOKEN_PRIVILEGES)calloc(nBytes,1);
+  if (!ptp)
+    return 0;
+  memmove(ptp,pPriv,sizeof(DWORD)+pPriv->PrivilegeCount*sizeof(LUID_AND_ATTRIBUTES));
+  s=pAdd;
+  nPrivs=pPriv->PrivilegeCount;
+  while (*s)
+  {
+    LUID luid;
+    if(LookupPrivilegeValue(0,s,&luid))
+    {
+      bool bAdd=TRUE;
+      for (DWORD p=0;p<pPriv->PrivilegeCount;p++)
+        if (memcmp(&pPriv->Privileges[p],&luid,sizeof(luid))==0)
+        {
+          bAdd=false;
+          break;
+        }
+      if(bAdd)
+      {
+        memmove(&ptp->Privileges[nPrivs],&luid,sizeof(luid));
+        nPrivs++;
+      }
+    }
+    s+=wcslen(s)+1;
+  }
+  ptp->PrivilegeCount=nPrivs;
+  return ptp;
+}
+
 HANDLE GetAdminToken(DWORD SessionID) 
 {
   if(!EnablePrivilege(SE_CREATE_TOKEN_NAME))
@@ -309,11 +372,13 @@ HANDLE GetAdminToken(DWORD SessionID)
   HANDLE hUser= NULL;
   HANDLE hShell= NULL;
   PSID LogonSID = NULL;
+  PSID UserSID  = NULL;
   PSID AdminSID = NULL;
   PTOKEN_GROUPS ptg = NULL;
-  PTOKEN_PRIVILEGES lpPrivToken = NULL; //(GetFromToken(hShell, TokenPrivileges)),
-  PTOKEN_PRIMARY_GROUP lpPriGrp = NULL; //(GetFromToken(hShell, TokenPrimaryGroup)), 
-  PTOKEN_DEFAULT_DACL  lpDaclToken = NULL;      //(GetFromToken(hShell, TokenDefaultDacl)),
+  PTOKEN_PRIVILEGES lpPrivToken = NULL;
+  PTOKEN_PRIMARY_GROUP lpPriGrp = NULL;
+  PTOKEN_DEFAULT_DACL  lpDaclToken = NULL;
+  PACL DefDACL=NULL;
   __try
   {
     HANDLE hShell=GetSessionUserToken(SessionID);
@@ -323,7 +388,6 @@ HANDLE GetAdminToken(DWORD SessionID)
     LogonSID=GetLogonSid(hShell);
     if(!LogonSID)
       __leave;
-    TOKEN_USER userToken = {{LogonSID, 0}};
     //Copy TokenSource from the Shell Process of SessionID:
     TOKEN_SOURCE tsrc = {0};
     DWORD n;
@@ -350,16 +414,28 @@ HANDLE GetAdminToken(DWORD SessionID)
       __leave;
     free(ptg);
     ptg=p;
-    //Set Token ToDo: OwnerToken haut nicht hin!
-    TOKEN_OWNER OwnerToken = {LogonSID};
+    //Set Admin SID as the Tokens Primary Group
+    lpPriGrp = CreateTokenPrimaryGroup(AdminSID);
+    //Set Token User, Token Owner is set to 0 so token User is Token owner
+    UserSID=GetTokenUserSID(hShell);
+    TOKEN_USER userToken = {{UserSID, 0}};
     //Privileges
     lpPrivToken = (PTOKEN_PRIVILEGES)(GetFromToken(hShell, TokenPrivileges));
-    lpPriGrp = (PTOKEN_PRIMARY_GROUP)(GetFromToken(hShell, TokenPrimaryGroup)); 
-
-    //ToDo: EnumAccountPrivilege; merge Privileges of User and Admin
-    
-    //ToDo: merge Dacl of User and Admin
+    //merge Privileges of User and Admin
+    WCHAR un[MAX_PATH+MAX_PATH+1]; 
+    GetSIDUserName(AdminSID,un);
+    LPWSTR aRights=GetAccountPrivileges(un);
+    PTOKEN_PRIVILEGES priv=AddPrivileges(lpPrivToken,aRights);
+    free(aRights);
+    if (!priv)
+      __leave;
+    free(lpPrivToken);
+    lpPrivToken=priv;
+    //Set Default DACL, Deny user Access but Allow Admins access, so User 
+    //running as admin can access this token but user running as user cannot
     lpDaclToken = (PTOKEN_DEFAULT_DACL)(GetFromToken(hShell, TokenDefaultDacl));
+    DefDACL=SetAdminDenyUserAccess(lpDaclToken->DefaultDacl,UserSID);
+    lpDaclToken->DefaultDacl=DefDACL;
     //
     SECURITY_QUALITY_OF_SERVICE sqos = {sizeof(sqos), SecurityAnonymous, SECURITY_STATIC_TRACKING, FALSE};
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, &sqos};
@@ -369,7 +445,7 @@ HANDLE GetAdminToken(DWORD SessionID)
       __leave;
     NTSTATUS ntStatus = ZwCreateToken(&hUser,TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
       &tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,ptg, 
-      lpPrivToken, &OwnerToken, lpPriGrp, lpDaclToken, &tsrc);
+      lpPrivToken, 0, lpPriGrp, lpDaclToken, &tsrc);
 
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
@@ -381,6 +457,8 @@ HANDLE GetAdminToken(DWORD SessionID)
       CloseHandle(hShell);
     if(LogonSID)
       free(LogonSID);
+    if (UserSID)
+      free(UserSID);
     if(AdminSID)
       FreeSid(AdminSID);
     if(ptg) 
@@ -389,6 +467,8 @@ HANDLE GetAdminToken(DWORD SessionID)
       free(lpPrivToken);
     if(lpPriGrp) 
       free(lpPriGrp);
+    if (DefDACL)
+      LocalFree(DefDACL);
     if(lpDaclToken) 
       free(lpDaclToken);
   }
