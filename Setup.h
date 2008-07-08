@@ -38,7 +38,8 @@
 #define RAPASSKEY(u)  CBigResStr(SVCKEY _T("\\RunAs\\%s\\Cache"),u)
 #define USROPTKEY(u)  CBigResStr(_T("CLSID\\") sGUID _T("\\Options\\%s"),u)
 
-#define WINLOGONKEY L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify\\SuRun"
+#define WINLOGONKEY _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify\\SuRun")
+#define SURUNKEY    _T("SOFTWARE\\SuRun")
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Macros for all Settings
@@ -322,6 +323,14 @@ BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flags=0);
 BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable);
 BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine);
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  BlackList for IATHook
+// 
+//////////////////////////////////////////////////////////////////////////////
+#define HKLSTKEY    SURUNKEY _T("\\DoNotHook")
+BOOL IsInBlackList(LPTSTR CmdLine);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
