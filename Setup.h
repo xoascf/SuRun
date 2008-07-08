@@ -205,7 +205,7 @@
 
 inline bool ShowTray(LPCTSTR u)
 {
-  if (HideSuRun(u))
+  if (HideSuRun(u)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)))
     return false;
   int utsa=(int)GetUserTSA(u);
   if (utsa>0)
@@ -226,7 +226,7 @@ inline bool ShowTray(LPCTSTR u)
 
 inline bool ShowBalloon(LPCTSTR u)
 {
-  if (HideSuRun(u))
+  if (HideSuRun(u)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)))
     return false;
   if (GetUserTSA(u)==2)
     return true;
