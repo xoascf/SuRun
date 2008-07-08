@@ -3,6 +3,48 @@ Done, to be tested:
 * "Hide SuRun from all non SuRunners" did also hide Setup from Administrators
 * Warning for SuRunners that want to hide SuRun from themselves
 
+ToDo
+---------------------
+* List of Programs not to hook
+* "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
+* Move Message Windows with WM_SETTINGCHANGE
+* "Show Warning for Admins with empty passwords" does not work with predefined 
+  Admin on XP Home
+* "Add Standard App" button to add common Windows Apps to the AutoMagic list 
+  Network Settings
+    %WinDir%\explorer.exe *::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
+  Computer Management
+    %WinDir%\system32\mmc.exe *%WinDir%\compmgmt.msc*
+  GPEdit.msc
+    %WinDir%\mmc.exe *%WinDir%\system32\gpedit.msc*
+  SecPol.msc
+    %WinDir%\mmc.exe *%WinDir%\system32\secpol.msc*
+  Sysdm.cpl
+    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL*SYSDM.CPL*
+  Safely Remove Hardware
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*hotplug.dll*
+  Add/Remove Programs
+    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*appwiz.cpl*
+
+To be done in future:
+---------------------
+* make context menu entries dynamically with ShellExt 
+  (E.g.: msi with popup-menu)
+* use MD5-Hash for "Always Yes" programs
+
+Deferred Whishlist:
+---------------------
+* Console SuRun support
+* Connect Network drives for admin process: 
+* Intercept "rundll32.exe newdev.dll,": 
+    needs CredUI hack for XP/2k3; ok with 2k and Vista
+    use "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File 
+    Execution Options\Rundll32.exe",Debugger,C:\Windows\SuRun.exe /AUTORUN
+
+------------------------------------------------------------------------------
+SuRun Changes:
+------------------------------------------------------------------------------
+
 SuRun 1.1.9.1 - 2008-07-07: (beta)
 ---------------------------
 * SuRun does not store passwords any more. To start a user process, SuRun uses
@@ -58,48 +100,6 @@ SuRun 1.1.9.0 - 2008-07-05: (beta)
 * IATHook uses InterlockedExchangePointer for better stability
 * Eclipse (JAVA) and SuRuns IAT Hook seem not to conflict anymore
 * The SuRun service uses uses a separate Thread to serve the Tray Icons
-
-ToDo
----------------------
-* List of Programs not to hook
-* "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
-* Move Message Windows with WM_SETTINGCHANGE
-* "Show Warning for Admins with empty passwords" does not work with predefined 
-  Admin on XP Home
-* "Add Standard App" button to add common Windows Apps to the AutoMagic list 
-  Network Settings
-    %WinDir%\explorer.exe *::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
-  Computer Management
-    %WinDir%\system32\mmc.exe *%WinDir%\compmgmt.msc*
-  GPEdit.msc
-    %WinDir%\mmc.exe *%WinDir%\system32\gpedit.msc*
-  SecPol.msc
-    %WinDir%\mmc.exe *%WinDir%\system32\secpol.msc*
-  Sysdm.cpl
-    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL*SYSDM.CPL*
-  Safely Remove Hardware
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*hotplug.dll*
-  Add/Remove Programs
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*appwiz.cpl*
-
-To be done in future:
----------------------
-* make context menu entries dynamically with ShellExt 
-  (E.g.: msi with popup-menu)
-* use MD5-Hash for "Always Yes" programs
-
-Deferred Whishlist:
----------------------
-* Console SuRun support
-* Connect Network drives for admin process: 
-* Intercept "rundll32.exe newdev.dll,": 
-    needs CredUI hack for XP/2k3; ok with 2k and Vista
-    use "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File 
-    Execution Options\Rundll32.exe",Debugger,C:\Windows\SuRun.exe /AUTORUN
-
-------------------------------------------------------------------------------
-SuRun Changes:
-------------------------------------------------------------------------------
 
 SuRun 1.1.0.6 refresh - 2008-05-26:
 -----------------------------------
