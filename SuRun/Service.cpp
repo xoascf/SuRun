@@ -1364,7 +1364,11 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   SetEnergy(false);
   //HKLM\Security\SuRun
   if (!g_bKeepRegistry)
+  {
     DelRegKey(HKLM,SVCKEY);
+    //HKLM\Software\SuRun
+    DelRegKey(HKLM,SURUNKEY);
+  }
   //Delete "SuRunners"?
   if(g_bDelSuRunners)
   {
