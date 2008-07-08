@@ -286,44 +286,34 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
   PathAppend(cmd,L"SuRun.exe");
   HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
   PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
+  STARTUPINFO si={0};
+  si.cb	= sizeof(si);
+  //Do not inherit Desktop from calling process, use Tokens Desktop
+  TCHAR WinstaDesk[MAX_PATH];
+  _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+  si.lpDesktop = WinstaDesk;
+  //CreateProcessAsUser will only work from an NT System Account since the
+  //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+  EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+  EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+  //Show ToolTip "<Program> is running elevated"...
+  if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+    CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,NULL,NULL,&si,&pi))
   {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
-    {
-      STARTUPINFO si={0};
-      si.cb	= sizeof(si);
-      //Do not inherit Desktop from calling process, use Tokens Desktop
-      TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
-      si.lpDesktop = WinstaDesk;
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      //Show ToolTip "<Program> is running elevated"...
-      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-      {
-        //Tell SuRun to Say something:
-        RUNDATA rd=g_RunData;
-        rd.CliProcessId=0;
-        rd.CliThreadId=pi.dwThreadId;
-        rd.RetPtr=0;
-        rd.RetPID=0;
-        rd.IconId=IconId;
-        _tcscpy(rd.cmdLine,Text);
-        DWORD_PTR n=0;
-        if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
-          TerminateProcess(pi.hProcess,0);
-        ResumeThread(pi.hThread);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-      }
-      DestroyEnvironmentBlock(Env);
-    }
-    UnloadUserProfile(hUser,ProfInf.hProfile);
+    //Tell SuRun to Say something:
+    RUNDATA rd=g_RunData;
+    rd.CliProcessId=0;
+    rd.CliThreadId=pi.dwThreadId;
+    rd.RetPtr=0;
+    rd.RetPID=0;
+    rd.IconId=IconId;
+    _tcscpy(rd.cmdLine,Text);
+    DWORD_PTR n=0;
+    if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
+      TerminateProcess(pi.hProcess,0);
+    ResumeThread(pi.hThread);
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
   }
   CloseHandle(hUser);
 }
@@ -836,13 +826,29 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
 DWORD LSAStartAdminProcess() 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
+  //Get Admin User Token and Job object token
+  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
+  //Clear Password
+  zero(g_RunPwd);
+  if (!hAdmin)
+  {
+    DBGTrace("FATAL: Could not create user token!");
+    return RetVal;
+  }
+  SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
   PROCESS_INFORMATION pi={0};
   PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
+  if(LoadUserProfile(hAdmin,&ProfInf))
   {
+    //To start control Panel and other Explorer children we need to tell 
+    //Explorer to start a new Process, because the Shell updates the state 
+    //from the registry and this cant' be forced to be done "now", the
+    //"SeparateProcess" registry value must be set early an remain set
+    SetRegInt((HKEY)ProfInf.hProfile,
+      _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),
+      _T("SeparateProcess"),1);
     void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
     {
       STARTUPINFO si={0};
       si.cb	= sizeof(si);
@@ -850,81 +856,44 @@ DWORD LSAStartAdminProcess()
       TCHAR WinstaDesk[MAX_PATH];
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
-      //Get Admin User Token and Job object token
-      HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
-      //Clear Password
-      zero(g_RunPwd);
-      if (hAdmin)
+      //CreateProcessAsUser will only work from an NT System Account since the
+      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+      if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
+        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
       {
-        SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
-        //CreateProcessAsUser will only work from an NT System Account since the
-        //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-        EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-        EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-        if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-          CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
+        DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+        RetVal=RETVAL_OK;
+        //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+        if((g_RunData.RetPID)&&(g_RunData.RetPtr))
         {
-          DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
-          CloseHandle(pi.hThread);
-          CloseHandle(pi.hProcess);
-          RetVal=RETVAL_OK;
-          //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-          if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+          pi.hThread=0;
+          pi.hProcess=0;
+          HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+          if (hProcess)
           {
-            pi.hThread=0;
-            pi.hProcess=0;
-            HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
-            if (hProcess)
-            {
-              SIZE_T n;
-              if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-                DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-                g_RunData.cmdLine,GetLastErrorNameStatic());
-              CloseHandle(hProcess);
-            }else
-              DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+            SIZE_T n;
+            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+              DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
               g_RunData.cmdLine,GetLastErrorNameStatic());
-          }
-          if ((g_RunData.bShlExHook)&&(!HideSuRun(g_RunData.UserName)))
-          {
-            TCHAR cmd[4096]={0};
-            GetSystemWindowsDirectory(cmd,4096);
-            PathAppend(cmd,L"SuRun.exe");
-            PathQuoteSpaces(cmd);
-            //Show ToolTip "<Program> is running elevated"...
-            if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-              CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
-            {
-              //Tell SuRun to Say something:
-              SIZE_T n;
-              //Since it's the same process, g_RunData and g_RunPwd have the same address!
-              RUNDATA rd=g_RunData;
-              rd.KillPID=0;
-              rd.CliProcessId=0;
-              rd.CliThreadId=pi.dwThreadId;
-              rd.RetPtr=0;
-              rd.RetPID=0;
-              rd.IconId=IDI_SHIELD;
-              rd.TimeOut=20000;
-              _tcscpy(rd.cmdLine,CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)));
-              if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
-                TerminateProcess(pi.hProcess,0);
-              else
-                ResumeThread(pi.hThread);
-              CloseHandle(pi.hThread);
-              CloseHandle(pi.hProcess);
-            }
-          }
-        }else
-          DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-        CloseHandle(hAdmin);
+            CloseHandle(hProcess);
+          }else
+            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+            g_RunData.cmdLine,GetLastErrorNameStatic());
+        }
+        if ((g_RunData.bShlExHook)&&(!HideSuRun(g_RunData.UserName)))
+          ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD);
       }else
-        DBGTrace("FATAL: Could not create user token!");
+        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
       DestroyEnvironmentBlock(Env);
-    }
-    UnloadUserProfile(hUser,ProfInf.hProfile);
+    }else
+      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
+    UnloadUserProfile(hAdmin,ProfInf.hProfile);
   }
-  CloseHandle(hUser);
+  CloseHandle(hAdmin);
   return RetVal;
 }
 
