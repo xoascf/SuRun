@@ -1,17 +1,10 @@
 Done, to be tested:
 ---------------------------
-
-SuRun 1.1.9.2 - 2008-07-08: (beta)
----------------------------
-* Warning for SuRunners that want to hide SuRun from themselves
-* FIX: "Hide SuRun from all non SuRunners" did also hide SuRun Settings from 
-  Administrators
-* FIX: SuRun did not work with console processes (e.g. cmd.exe)
-* FIX: If "hide SuRun from all non SuRunners" was active, SuRun did by default 
-  hide from all Users
+* Store Password in RunAs-Dialog was not moved while Dialog reszing 
 
 ToDo
 ---------------------
+* SuRun cannot launch apps with Guest account and builtin Admin account
 * List of Programs not to hook
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * Move Message Windows with WM_SETTINGCHANGE
@@ -51,6 +44,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.2 - 2008-07-08: (beta)
+---------------------------
+* Warning for SuRunners that want to hide SuRun from themselves
+* FIX: "Hide SuRun from all non SuRunners" did also hide SuRun Settings from 
+  Administrators
+* FIX: SuRun did not work with console processes (e.g. cmd.exe)
+* FIX: If "hide SuRun from all non SuRunners" was active, SuRun did by default 
+  hide from all Users
 
 SuRun 1.1.9.1 - 2008-07-07: (beta)
 ---------------------------
