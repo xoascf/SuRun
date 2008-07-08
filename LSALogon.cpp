@@ -1,3 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// This source code is part of SuRun
+//
+// Some sources in this project evolved from Microsoft sample code, some from 
+// other free sources. The Shield Icons are taken from Windows XP Service Pack 
+// 2 (xpsp2res.dll) 
+// 
+// Feel free to use the SuRun sources for your liking.
+// 
+//                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
+//////////////////////////////////////////////////////////////////////////////
+
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
@@ -232,6 +245,13 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
   LsaDeregisterLogonProcess(hLSA);
   return hUser;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// The code below is heavily based on "GUI-Based RunAsEx" by Zhefu Zhang
+//  http://www.codeproject.com/KB/system/RunUser.aspx
+//
+//////////////////////////////////////////////////////////////////////////////
 
 typedef struct _OBJECT_ATTRIBUTES
 {
