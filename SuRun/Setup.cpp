@@ -45,8 +45,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-static BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
-
 void DeletePassword(LPTSTR UserName)
 {
   RegDelVal(HKLM,PASSWKEY,UserName);//for Historical reasons!
@@ -86,10 +84,11 @@ void UpdLastRunTime(LPTSTR UserName)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
+//Common for GetWhiteListFlags and GetBlackListFlags
+DWORD GetRegListFlags(HKEY HKR,LPCTSTR SubKey,LPTSTR CmdLine,DWORD Default)
 {
   HKEY Key;
-  if(RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KSAM(KEY_READ),&Key)!=ERROR_SUCCESS)
+  if(RegOpenKeyEx(HKR,SubKey,0,KSAM(KEY_READ),&Key)!=ERROR_SUCCESS)
     return Default;
   DWORD sizd=sizeof(DWORD);
   DWORD d=Default;
@@ -111,10 +110,10 @@ DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
   return Default;
 }
 
-//DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
-//{
-//  return GetRegInt(HKLM,WHTLSTKEY(User),CmdLine,Default);
-//}
+DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default)
+{
+  return GetRegListFlags(HKLM,WHTLSTKEY(User),CmdLine,Default);
+}
 
 BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 {
@@ -162,6 +161,32 @@ BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag)
 BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine)
 {
   return RegDelVal(HKLM,WHTLSTKEY(User),CmdLine);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  BlackList for IATHook
+// 
+//////////////////////////////////////////////////////////////////////////////
+DWORD GetBlackListFlags(LPTSTR CmdLine,DWORD Default)
+{
+  return GetRegListFlags(HKLM,HKLSTKEY,CmdLine,Default);
+}
+
+BOOL IsInBlackList(LPTSTR CmdLine)
+{
+  return (GetBlackListFlags(CmdLine,0)&1)==1;
+}
+
+BOOL AddToBlackList(LPTSTR CmdLine,DWORD Flags/*=0*/)
+{
+  DWORD d=GetRegInt(HKLM,HKLSTKEY,CmdLine,-1);
+  return (d==Flags)||SetRegInt(HKLM,HKLSTKEY,CmdLine,Flags);
+}
+
+BOOL RemoveFromBlackList(LPTSTR CmdLine)
+{
+  return RegDelVal(HKLM,HKLSTKEY,CmdLine);
 }
 
 //////////////////////////////////////////////////////////////////////////////
