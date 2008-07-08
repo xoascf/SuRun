@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include <LMCONS.H>
 
 // SuRun users group name
 #define SURUNNERSGROUP  _T("SuRunners")
