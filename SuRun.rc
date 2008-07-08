@@ -628,7 +628,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
-    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?"
+    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
 END
 
 #endif    // Polish resources
@@ -1313,7 +1313,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "Das System muss neu gestartet werden!"
-    IDS_HIDESELF            "Wollen Sie SuRun wirklich vor sich selbst verstecken?"
+    IDS_HIDESELF            "Wollen Sie SuRun wirklich vor sich selbst verstecken?\n\nSie können danach keine SuRun-Einstellungen mehr verändern."
 END
 
 #endif    // German (Germany) resources
@@ -1822,8 +1822,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,1
- PRODUCTVERSION 1,1,9,1
+ FILEVERSION 1,1,9,2
+ PRODUCTVERSION 1,1,9,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1841,14 +1841,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 1, 9, 1\0"
+            VALUE "FileVersion", "1, 1, 9, 2\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 1, 9, 1\0"
+            VALUE "ProductVersion", "1, 1, 9, 2\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1982,7 +1982,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
-    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?"
+    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
 END
 
 #endif    // English (U.S.) resources
@@ -2605,7 +2605,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
-    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?"
+    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
 END
 
 #endif    // Dutch (Netherlands) resources
