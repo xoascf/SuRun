@@ -16,6 +16,7 @@
 #include <tchar.h>
 #include "helpers.h"
 #include "IsAdmin.h"
+#include "UserGroups.h"
 #include "resstr.h"
 #include "SuRunExt/SuRunExt.h"
 
@@ -197,7 +198,7 @@
 #define GetHideFromUser(u)    GetUsrOption(u,_T("HideFromUser"),0)
 #define SetHideFromUser(u,h)  SetUsrOption(u,_T("HideFromUser"),h,0)
 
-#define HideSuRun(u)          GetUsrOption(u,_T("HideFromUser"),GetDefHideSuRun)
+#define HideSuRun(u)          GetUsrOption(u,_T("HideFromUser"),IsInSuRunners(u)?0:GetDefHideSuRun)
 
 #define GetReqPw4Setup(u)    GetUsrOption(u,_T("ReqPw4Setup"),0)
 #define SetReqPw4Setup(u,b)  SetUsrOption(u,_T("ReqPw4Setup"),b,0)
