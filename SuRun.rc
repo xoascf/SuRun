@@ -628,6 +628,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
+    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?"
 END
 
 #endif    // Polish resources
@@ -1312,6 +1313,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "Das System muss neu gestartet werden!"
+    IDS_HIDESELF            "Wollen Sie SuRun wirklich vor sich selbst verstecken?"
 END
 
 #endif    // German (Germany) resources
@@ -1980,6 +1982,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
+    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?"
 END
 
 #endif    // English (U.S.) resources
@@ -2602,6 +2605,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
+    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?"
 END
 
 #endif    // Dutch (Netherlands) resources
