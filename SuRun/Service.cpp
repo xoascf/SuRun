@@ -1027,8 +1027,9 @@ void SuRun(DWORD ProcessID)
     {
       //Create the new desktop
       ResumeClient(RETVAL_OK);
-      //check if SuRun is hidden for user name
-      if (HideSuRun(g_RunData.UserName))
+      //check if SuRun Setup is hidden for user name
+      if (HideSuRun(g_RunData.UserName)
+          && (!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName)))
         return;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
