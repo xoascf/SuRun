@@ -946,9 +946,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //Process Attach:
   DisableThreadLibraryCalls(hInstDLL);
   GetProcessUserName(GetCurrentProcessId(),l_User);
-#ifdef DoDBGTrace
-  HINSTANCE lhi=l_hInst;
-#endif DoDBGTrace
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
@@ -967,16 +964,15 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     GetSystemWindowsDirectory(fSuRunExe,4096);
     PathAppend(fSuRunExe,L"SuRun.exe");
     PathQuoteSpaces(fSuRunExe);
-    BOOL bSetHook=(!l_IsAdmin)&&(_tcsicmp(fMod,fSuRunExe)!=0);
-    DBGTrace7("Attach(hInst=%x,old %x) %d:%s[%s], Admin=%d, SetHook=%d",
-      hInstDLL,lhi,PID,fMod,GetCommandLine(),l_IsAdmin,bSetHook);
+    BOOL bSetHook=_tcsicmp(fMod,fSuRunExe)!=0;
+    DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
+      hInstDLL,PID,fMod,GetCommandLine(),bSetHook);
     if(bSetHook)
       LoadHooks();
   }
 #ifdef DoDBGTrace
   else
-    DBGTrace5("Attach(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),l_IsAdmin);
+    DBGTrace4("Attach(hInst=%x) %d:%s[%s], ADMIN",hInstDLL,PID,fMod,GetCommandLine());
 #endif DoDBGTrace
   //DevInst
 //  if(!l_IsAdmin)
