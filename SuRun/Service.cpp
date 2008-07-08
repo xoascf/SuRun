@@ -474,6 +474,9 @@ ChkAdmin:
           {
             STARTUPINFO si={0};
             si.cb=sizeof(si);
+            TCHAR WinstaDesk[MAX_PATH];
+            _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+            si.lpDesktop = WinstaDesk;
             TCHAR cmd[4096]={0};
             GetSystemWindowsDirectory(cmd,4096);
             PathAppend(cmd,L"SuRun.exe");
@@ -859,14 +862,9 @@ DWORD LSAStartAdminProcess()
         EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
         EnablePrivilege(SE_INCREASE_QUOTA_NAME);
         if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-          CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,Env,NULL,&si,&pi))
+          CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
         {
-          //Allow access to the Process and Thread to the Administrators and deny 
-          //access for the current user
-          SetAdminDenyUserAccess(pi.hThread,g_RunData.CliProcessId);
-          SetAdminDenyUserAccess(pi.hProcess,g_RunData.CliProcessId);
-          //Start the main thread
-          ResumeThread(pi.hThread);
+          DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
           CloseHandle(pi.hThread);
           CloseHandle(pi.hProcess);
           RetVal=RETVAL_OK;
