@@ -1,8 +1,12 @@
 Done, to be tested:
 ---------------------------
-* "Hide SuRun from all non SuRunners" did also hide Setup from Administrators
+
+SuRun 1.1.9.2 - 2008-07-08: (beta)
+---------------------------
 * Warning for SuRunners that want to hide SuRun from themselves
-* FIX: SuRun did not work with console processes
+* FIX: "Hide SuRun from all non SuRunners" did also hide SuRun Settings from 
+  Administrators
+* FIX: SuRun did not work with console processes (e.g. cmd.exe)
 * FIX: If "hide SuRun from all non SuRunners" was active, SuRun did by default 
   hide from all Users
 
