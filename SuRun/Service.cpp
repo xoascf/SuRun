@@ -279,7 +279,7 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //////////////////////////////////////////////////////////////////////////////
 void ShowTrayWarning(LPCTSTR Text,int IconId) 
 {
-  if (HideSuRun(g_RunData.UserName))
+  if (HideSuRun(g_RunData.UserName)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName)))
     return;
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
