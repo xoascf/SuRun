@@ -1090,6 +1090,15 @@ EditApp:
       case MAKELPARAM(IDC_HIDESURUN,BN_CLICKED):
         if(IsDlgButtonChecked(hwnd,IDC_HIDESURUN))
         {
+          if (_tcscmp(g_RunData.UserName,g_SD->Users.GetUserName(g_SD->CurUser))==0)
+          {
+            if (SafeMsgBox(hwnd,CBigResStr(IDS_HIDESELF),CResStr(IDS_APPNAME),
+              MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDNO)
+            {
+              CheckDlgButton(hwnd,IDC_HIDESURUN,0);
+              return TRUE;
+            }
+          }
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),0);
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
           EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
