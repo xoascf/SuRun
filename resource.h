@@ -32,6 +32,7 @@
 #define IDS_SWITCHBACK                  27
 #define IDS_APPOK                       28
 #define IDS_GRPDESC                     29
+#define IDS_ADDTOBLKLIST                30
 #define IDS_DOMAINGROUPS                31
 #define IDS_ADDFILETOLIST               31
 #define IDS_DOMAINGROUPS2               32
@@ -125,6 +126,7 @@
 #define IDD_APPOPTIONS                  126
 #define IDI_ADMIN1                      127
 #define IDI_SHADMIN                     127
+#define IDD_BLKLST                      127
 #define IDI_SRADMIN                     129
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
@@ -220,6 +222,7 @@
 #define IDC_SIMPLESETUP                 1080
 #define IDC_ASKPW                       1081
 #define IDC_REQADMIN                    1084
+#define IDC_BLACKLIST                   1085
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -228,7 +231,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1085
+#define _APS_NEXT_CONTROL_VALUE         1086
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
