@@ -126,19 +126,17 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "User official Windows Hook Interface (recommended)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    209,10
+                    237,10
     CONTROL         "Modify Dll Import Address Tables (experimental)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    195,10
-    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,267,23,57,14
-    LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.",
-                    IDC_STATIC,31,35,218,18
-    CONTROL         "- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
+                    237,10
+    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,267,17,57,14
+    CONTROL         "Try to detect if unknown applications need to start with eleveted rights. (E.g. Installation programs)",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,53,241,17
+                    BS_MULTILINE | WS_TABSTOP,20,44,237,17
     CONTROL         "Show a message when a program has been started automagically",
-                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,74,
-                    301,10
+                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,71,
+                    237,10
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
                     IDC_STATIC,14,86,312,8
     GROUPBOX        "Display an Icon in the taskbar notification area",
@@ -896,19 +894,17 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "Benutze offizielles Windows Hook Interface (empfohlen)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    226,10
+                    232,10
     CONTROL         "Modifiziere Dll Importtabellen der Programme (experimentell)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    221,10
-    PUSHBUTTON      "Ausnahmen...",IDC_BLACKLIST,267,23,57,14
-    LTEXT           "SuRun wird vorschlagen folgendes mit gehobenen Rechten zu starten:\n- Programme die der Benutzer festgelegt hat.",
-                    IDC_STATIC,31,35,226,18
-    CONTROL         "- Programme, die ein Vista ""requireAdministrator"" Manifest haben\n- Programme, die Install, Setup, Update etc. im Dateinamen haben",
+                    232,10
+    PUSHBUTTON      "Ausnahmen...",IDC_BLACKLIST,267,17,57,14
+    CONTROL         "Versuche zu erkennen, wenn unbekannte Programme administrative Rechte benötigen. (z.B. Installationsprogramme)",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,53,241,17
+                    BS_MULTILINE | WS_TABSTOP,20,44,232,17
     CONTROL         "Zeige an, wenn Programme automagisch gestartet wurden",
-                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,74,
-                    301,10
+                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,71,
+                    232,10
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,86,312,8
     GROUPBOX        "Symbol im Infobereich der Taskleiste (Für alle Benutzer, auch nicht-SuRunner)",
@@ -1137,8 +1133,8 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Ausnahmen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Deaktiviere Hook in folgenden Programmen:",IDC_STATIC,7,
-                    4,233,8
+    LTEXT           "Deaktiviere Hooks in folgenden Programmen:",IDC_STATIC,
+                    7,4,233,8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
@@ -1478,19 +1474,17 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "User official Windows Hook Interface (recommended)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    215,10
+                    241,10
     CONTROL         "Modify Dll Import Address Tables (experimental)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    209,10
-    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,267,23,57,14
-    LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.",
-                    IDC_STATIC,31,35,214,18
-    CONTROL         "- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
+                    241,10
+    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,267,17,57,14
+    CONTROL         "Try to detect if unknown applications need to start with eleveted rights. (E.g. Installation programs)",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,53,241,17
+                    BS_MULTILINE | WS_TABSTOP,20,44,241,17
     CONTROL         "Show a message when a program has been started automagically",
-                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,74,
-                    301,10
+                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,71,
+                    241,10
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
                     IDC_STATIC,14,86,312,8
     GROUPBOX        "Display an Icon in the taskbar notification area",
@@ -2169,19 +2163,17 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "Gebruik de officiële Windows Hook Interface (aanbevolen)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    231,10
+                    243,10
     CONTROL         "Programma Dll Import-tabellen aanpassen (experimenteel)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    223,10
-    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,269,23,57,14
-    LTEXT           "SuRun laten voorstellen een programma met verhoogde rechten te starten:\n- Programma's van de gebruikerslijst",
-                    IDC_STATIC,31,35,237,18
-    CONTROL         "- Programma's voorzien van een Vista 'requireAdministrator' manifest\n- Programma's met 'Install', 'Setup', 'Update' etc. in de bestandsnaam",
+                    243,10
+    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,269,18,57,14
+    CONTROL         "Try to detect if unknown applications need to start with eleveted rights. (E.g. Installation programs)",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,53,241,17
+                    BS_MULTILINE | WS_TABSTOP,20,44,243,17
     CONTROL         "Toon een melding wanneer een programma automatisch wordt gestart",
-                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,74,
-                    301,10
+                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,72,
+                    243,10
     CTEXT           "LET OP: Wijzigingen komen van kracht bij de volgende Windows-aanmelding.",
                     IDC_STATIC,14,86,312,8
     GROUPBOX        "Systeemvak-ikoon",IDC_STATIC,10,101,320,37
