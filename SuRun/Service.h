@@ -57,10 +57,7 @@ extern bool g_CliIsAdmin;
 
 //This is used to verify that SuRun.exe started by the user is the same as 
 //the Service process
-extern RUNDATA g_RunData;
 
-//The service copies the users password via WriteProcessMemory to g_RunPwd of 
-//SuRun.exe that was started by the user
 #define RETVAL_NODESKTOP   -2
 #define RETVAL_WAIT        -1
 #define RETVAL_OK           0
