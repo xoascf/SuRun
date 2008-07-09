@@ -2,10 +2,10 @@ Done, to be tested:
 ---------------------------
 * "Store Password" in RunAs-Dialog was not moved while Dialog reszing 
 * "SuRun /RunAs" did load the wrong user environment
+* Blacklist for Programs not to hook
 
 ToDo
 ---------------------
-* List of Programs not to hook
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * Move Message Windows with WM_SETTINGCHANGE
 * "Show Warning for Admins with empty passwords" does not work with predefined 
