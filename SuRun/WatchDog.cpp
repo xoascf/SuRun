@@ -51,6 +51,9 @@ private:
 // CWDMsgWnd
 //
 /////////////////////////////////////////////////////////////////////////////
+#ifdef DoDBGTrace
+extern RUNDATA g_RunData;
+#endif DoDBGTrace
 
 CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
 {
