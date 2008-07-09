@@ -318,6 +318,42 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
   CloseHandle(hUser);
 }
 
+void TestEmptyAdminPasswords()
+{
+  switch(GetAdminNoPassWarn)
+  {
+  case APW_ALL:
+    break;
+  case APW_NR_SR_ADMIN:
+    if (IsInSuRunners(g_RunData.UserName)
+      &&(!GetRestrictApps(g_RunData.UserName))
+      &&(!GetNoRunSetup(g_RunData.UserName)))
+      break;
+    goto ChkAdmin;
+  case APW_SURUN_ADMIN:
+    if (IsInSuRunners(g_RunData.UserName))
+      break;
+  case APW_ADMIN:
+ChkAdmin:
+    if (g_CliIsAdmin)
+      break;
+  case APW_NONE:
+  default:
+    return;
+  }
+  USERLIST u;
+  u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
+  TCHAR un[4096]={0};
+  for (int i=0;i<u.GetCount();i++) if (PasswordOK(u.GetUserName(i),0,TRUE))
+  {
+    DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
+    _tcscat(un,u.GetUserName(i));
+    _tcscat(un,_T("\n"));
+  }
+  if(un[0])
+    ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
+}
+
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
 #ifdef _DEBUG_ENU
@@ -367,40 +403,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       {
         if ((_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)&&(g_RunData.KillPID==0xFFFFFFFF))
         {
+          TestEmptyAdminPasswords();
           CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
-          switch(GetAdminNoPassWarn)
-          {
-          case APW_ALL:
-            break;
-          case APW_NR_SR_ADMIN:
-            if (IsInSuRunners(g_RunData.UserName)
-              &&(!GetRestrictApps(g_RunData.UserName))
-              &&(!GetNoRunSetup(g_RunData.UserName)))
-              break;
-            goto ChkAdmin;
-          case APW_SURUN_ADMIN:
-            if (IsInSuRunners(g_RunData.UserName))
-              break;
-          case APW_ADMIN:
-ChkAdmin:
-            if (g_CliIsAdmin)
-              break;
-          case APW_NONE:
-          default:
-            ResumeClient(RETVAL_OK);
-            continue;
-          }
-          USERLIST u;
-          u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
-          TCHAR un[4096]={0};
-          for (int i=0;i<u.GetCount();i++) if (PasswordOK(u.GetUserName(i),0,TRUE))
-          {
-            DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
-            _tcscat(un,u.GetUserName(i));
-            _tcscat(un,_T("\n"));
-          }
-          if(un[0])
-            ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
           continue;
         }
         if (!g_RunData.bRunAs)
