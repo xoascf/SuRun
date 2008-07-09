@@ -178,10 +178,10 @@ BOOL IsInBlackList(LPTSTR CmdLine)
   return (GetBlackListFlags(CmdLine,0)&1)==1;
 }
 
-BOOL AddToBlackList(LPTSTR CmdLine,DWORD Flags/*=0*/)
+BOOL AddToBlackList(LPTSTR CmdLine)
 {
   DWORD d=GetRegInt(HKLM,HKLSTKEY,CmdLine,-1);
-  return (d==Flags)||SetRegInt(HKLM,HKLSTKEY,CmdLine,Flags);
+  return (d==1)||SetRegInt(HKLM,HKLSTKEY,CmdLine,1);
 }
 
 BOOL RemoveFromBlackList(LPTSTR CmdLine)
@@ -305,6 +305,7 @@ bool IsWin2k()
 typedef struct _SETUPDATA 
 {
   USERLIST Users;
+  LPCTSTR OrgUser;
   int CurUser;
   HICON UserIcon;
   HWND hTabCtrl[nTabs];
@@ -313,8 +314,9 @@ typedef struct _SETUPDATA
   HIMAGELIST ImgList;
   int ImgIconIdx[8];
   TCHAR NewUser[2*UNLEN+2];
-  _SETUPDATA()
+  _SETUPDATA(LPCTSTR User)
   {
+    OrgUser=User;
     Users.SetGroupUsers(SURUNNERSGROUP,FALSE);
     DlgExitCode=IDCANCEL;
     HelpWnd=0;
@@ -389,7 +391,6 @@ static void AddUsers(HWND hwnd,BOOL bDomainUsers)
   SetFocus(GetDlgItem(hwnd,IDC_USERNAME));
   SendMessage(GetDlgItem(hwnd,IDC_USERNAME),EM_SETSEL,0,-1);
 }
-
 
 INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -479,6 +480,177 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 //  Service setup
 // 
 //////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// Add/Edit file to IAT-Hook Blacklist:
+// 
+//////////////////////////////////////////////////////////////////////////////
+static BOOL GetFile(HWND hwnd,LPTSTR FileName)
+{
+  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
+  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
+  OPENFILENAME  ofn={0};
+  ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
+  ofn.hwndOwner         = hwnd;
+  ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
+  ofn.nFilterIndex      = 1;
+  ofn.lpstrFile         = FileName;
+  ofn.nMaxFile          = 4096;
+  ofn.lpstrTitle        = CResStr(IDS_ADDTOBLKLIST);
+  ofn.Flags             = OFN_ENABLESIZING|OFN_FILEMUSTEXIST|OFN_FORCESHOWHIDDEN;
+  BOOL bRet=GetOpenFileName(&ofn);
+//  DWORD dwe=CommDlgExtendedError();
+//  CDERR_DIALOGFAILURE
+  if (HideExt!=-1)
+    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
+  return bRet;
+  #undef ExpAdvReg
+}
+
+static void FillBlackList(HWND hwnd)
+{
+  HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+  ListView_DeleteAllItems(hBL);
+  HKEY Key;
+  if(RegOpenKeyEx(HKLM,HKLSTKEY,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  {
+    TCHAR cmd[4096];
+    DWORD ccMax=countof(cmd);
+    for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
+    {
+      ccMax=countof(cmd);
+      LVITEM item={LVIF_TEXT,i,0,0,0,cmd,0,0,0,0};
+      ListView_InsertItem(hBL,&item);
+    }
+    RegCloseKey(Key);
+  }
+  ListView_SortItemsEx(hBL,UsrListSortProc,hBL);
+  ListView_SetColumnWidth(hBL,0,LVSCW_AUTOSIZE_USEHEADER);
+  ListView_SetItemState(hBL,0,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
+  EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hBL)!=-1);
+  EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hBL)!=-1);
+}
+
+INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+      SendMessage(hBL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
+      LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
+      ListView_InsertColumn(hBL,0,&col);
+      FillBlackList(hwnd);
+    }
+    return TRUE;
+  case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
+    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_COMMAND:
+    switch (wParam)
+    {
+    case MAKELPARAM(IDC_SELFILE,BN_CLICKED):
+      {
+        TCHAR FileName[4096]={0};
+        if(GetFile(hwnd,FileName))
+        {
+          AddToBlackList(FileName);
+          FillBlackList(hwnd);
+        }
+      }
+      break;
+    //Delete App Button
+    case MAKELPARAM(IDC_DELETE,BN_CLICKED):
+      {
+        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+        int CurSel=(int)ListView_GetSelectionMark(hBL);
+        if (CurSel>=0)
+        {
+          TCHAR cmd[4096];
+          ListView_GetItemText(hBL,CurSel,0,cmd,4096);
+          if(RemoveFromBlackList(cmd))
+          {
+            ListView_DeleteItem(hBL,CurSel);
+            CurSel=ListView_GetSelectionMark(hBL);
+            if (CurSel>=0)
+              ListView_SetItemState(hBL,CurSel,LVIS_SELECTED,0x0F);
+          }else
+            MessageBeep(MB_ICONERROR);
+        }
+        EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hBL)!=-1);
+        EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hBL)!=-1);
+      }
+      return TRUE;
+    case MAKELPARAM(IDCANCEL,BN_CLICKED):
+    case MAKELPARAM(IDOK,BN_CLICKED):
+      //Test drive:
+      EndDialog(hwnd,IDCANCEL);
+      return TRUE;
+    case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
+      {
+EditLabel:
+      HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+      int CurSel=(int)ListView_GetSelectionMark(hBL);
+      if (CurSel>=0)
+      {
+        SetFocus(hBL);
+        ListView_EditLabel(hBL,CurSel);
+      }
+      }
+    }
+  case WM_NOTIFY:
+    {
+      switch (wParam)
+      {
+      //Program List Notifications
+      case IDC_BLACKLIST:
+        if (lParam) switch(((LPNMHDR)lParam)->code)
+        {
+        case LVN_KEYDOWN:
+          {
+            LPNMLVKEYDOWN pnkd = (LPNMLVKEYDOWN)lParam;
+            if (pnkd->wVKey==VK_F2)
+              goto EditLabel;
+          }
+          return TRUE;
+        case LVN_ENDLABELEDIT:
+          {
+            SetWindowLongPtr(hwnd,DWLP_MSGRESULT,0);
+            NMLVDISPINFO* pdi=(NMLVDISPINFO*)lParam;
+            if(pdi->item.pszText)
+            {
+              HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+              int CurSel=(int)ListView_GetSelectionMark(hBL);
+              if (CurSel>=0)
+              {
+                TCHAR cmd[4096];
+                ListView_GetItemText(hBL,CurSel,0,cmd,4096);
+                if(RemoveFromBlackList(cmd))
+                {
+                  AddToBlackList(pdi->item.pszText);
+                  SetWindowLongPtr(hwnd,DWLP_MSGRESULT,1);
+                }else
+                  MessageBeep(MB_ICONERROR);
+              }
+            }
+          }
+          return TRUE;
+        //Selection changed
+        case LVN_ITEMCHANGED:
+          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+            ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_BLACKLIST))!=-1);
+          return TRUE;
+        }//switch (switch(((LPNMHDR)lParam)->code)
+      }//switch (wParam)
+      break;
+    }//WM_NOTIFY
+  }
+  return FALSE;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -798,7 +970,7 @@ static void UpdateUser(HWND hwnd)
 // Populate User Combobox and the Program list for the selected User
 // 
 //////////////////////////////////////////////////////////////////////////////
-static void UpdateUserList(HWND hwnd,LPTSTR UserName=g_RunData.UserName)
+static void UpdateUserList(HWND hwnd,LPCTSTR UserName)
 {
   SendDlgItemMessage(hwnd,IDC_USER,CB_RESETCONTENT,0,0);
   SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,-1,0);
@@ -953,7 +1125,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         ListView_InsertColumn(hWL,i,&col);
       }
       //UserList
-      UpdateUserList(hwnd);
+      UpdateUserList(hwnd,g_SD->OrgUser);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -1056,7 +1228,7 @@ EditApp:
             AlterGroupMember(SURUNNERSGROUP,u,0);
             DelUsrSettings(u);
             g_SD->Users.SetGroupUsers(SURUNNERSGROUP,TRUE);
-            UpdateUserList(hwnd);
+            UpdateUserList(hwnd,g_SD->OrgUser);
             break;
           }
         }
@@ -1115,7 +1287,7 @@ EditApp:
       case MAKELPARAM(IDC_HIDESURUN,BN_CLICKED):
         if(IsDlgButtonChecked(hwnd,IDC_HIDESURUN))
         {
-          if (_tcscmp(g_RunData.UserName,g_SD->Users.GetUserName(g_SD->CurUser))==0)
+          if (_tcscmp(g_SD->OrgUser,g_SD->Users.GetUserName(g_SD->CurUser))==0)
           {
             if (SafeMsgBox(hwnd,CBigResStr(IDS_HIDESELF),CResStr(IDS_APPNAME),
               MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDNO)
@@ -1284,6 +1456,9 @@ ApplyChanges:
       case MAKELPARAM(IDC_IATHOOK,BN_CLICKED):
       case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
         UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
+        return TRUE;
+      case MAKELPARAM(IDC_BLACKLIST,BN_CLICKED):
+        DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_BLKLST),hwnd,BlkLstDlgProc);
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
@@ -1454,9 +1629,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   return FALSE;
 }
 
-BOOL RunSetup()
+BOOL RunSetup(LPCTSTR User)
 {
-  SETUPDATA sd;
+  SETUPDATA sd(User);
   g_SD=&sd;
   BOOL bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
                            0,MainSetupDlgProc)>=0;  
@@ -1469,23 +1644,26 @@ BOOL RunSetup()
 #include "WinStaDesk.h"
 BOOL TestSetup()
 {
-  INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
+  LoadLibrary(TEXT("Shell32.dll"));
+  INITCOMMONCONTROLSEX icce={sizeof(icce),0xFFFF};
+  TCHAR un[2*MAX_PATH+1];
+  GetProcessUserName(GetCurrentProcessId(),un);
   InitCommonControlsEx(&icce);
+
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-  if (!RunSetup())
+  if (!RunSetup(un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-  if (!RunSetup())
+  if (!RunSetup(un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
-  if (!RunSetup())
+  if (!RunSetup(un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   ::ExitProcess(0);
   return TRUE;
 }
 
-BOOL x=TestSetup();
 #endif _DEBUGSETUP
 
