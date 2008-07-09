@@ -959,7 +959,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   l_bSetHook=!l_IsAdmin;
   //IAT Hook:
-  if (l_bSetHook && GetUseIATHook)
+  if (l_bSetHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[4096];
@@ -969,11 +969,11 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) && (!IsInBlackList(fMod));
 #ifdef DoDBGTrace
     if(IsInBlackList(fMod))
-      DBGTrace1("%s is blacklisted! No IAT-Hook!",fMod);
-#endif DoDBGTrace
+      DBGTrace1("%s is blacklisted! No Hook!",fMod);
     DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
       hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
-    if(l_bSetHook)
+#endif DoDBGTrace
+    if(l_bSetHook && GetUseIATHook)
       LoadHooks();
   }
 #ifdef DoDBGTrace
