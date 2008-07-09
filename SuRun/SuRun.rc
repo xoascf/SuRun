@@ -495,10 +495,24 @@ BEGIN
     CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
                     233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
-    PUSHBUTTON      "&Add...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Add...",IDC_ADDAPP,10,179,46,14
     PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
     DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+END
+
+IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Program options"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,38,361,1
+    LTEXT           "Command line",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    LTEXT           "Wildcards '*' und '?' are supported.",-1,64,25,252,8
+    DEFPUSHBUTTON   "&OK",IDOK,241,45,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,45,50,14
 END
 
 
@@ -987,47 +1001,19 @@ BEGIN
     DEFPUSHBUTTON   "Schließen",IDCANCEL,105,160,50,14
 END
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Programmoptionen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,37,361,1
     LTEXT           "Befehlszeile",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.\nWichtig: Enthält der Befehl Leerzeichen, muss er in Anführugszeichen stehen!",
-                    IDC_STATIC,55,25,261,19
-    ICON            IDI_LISTICON2,IDC_STATIC,36,55,21,20,SS_REALSIZEIMAGE
-    CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf",
-                    IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,55,300,10
-    ICON            IDI_LISTICON3,IDC_STATIC,36,68,21,20,SS_REALSIZEIMAGE
-    CONTROL         "nicht fragen und das Programm immer mit erhöhten Rechten starten",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,68,300,10
-    ICON            IDI_LISTICON6,IDC_STATIC,36,81,21,20,SS_REALSIZEIMAGE
-    CONTROL         "nicht fragen und das Programm NIE mit erhöhten Rechten starten",
-                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,81,300,10
-    ICON            IDI_LISTICON1,IDC_STATIC,36,98,21,20,SS_REALSIZEIMAGE
-    CONTROL         "nur fragen, falls das Programm erhöhte Rechte benötigt. (Manifest, 'Install.exe' etc.)",
-                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,98,300,10
-    ICON            IDI_LISTICON,IDC_STATIC,36,111,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Programm automagisch mit erhöhten Rechten starten",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,111,300,10
-    ICON            IDI_LISTICON7,IDC_STATIC,36,124,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Programm automagisch NIE mit erhöhten Rechten starten",
-                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,124,300,10
-    ICON            IDI_LISTICON5,IDC_STATIC,36,141,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Benutzer darf dieses Programm mit erhöhten Rechten starten",
-                    IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,141,300,10
-    ICON            IDI_LISTICON4,IDC_STATIC,36,154,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Benutzer darf dieses Programm NICHT mit erhöhten Rechten starten",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,154,300,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,176,50,14
+    LTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.",
+                    IDC_STATIC,64,25,252,8
+    DEFPUSHBUTTON   "&OK",IDOK,241,44,50,14,WS_GROUP
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,44,50,14
 END
 
 IDD_SELUSER DIALOG DISCARDABLE  0, 0, 247, 227
@@ -1142,10 +1128,53 @@ BEGIN
     CTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.",
                     IDC_STATIC,8,160,233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
-    PUSHBUTTON      "&Hinzu...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Hinzu...",IDC_ADDAPP,10,179,46,14
     PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,60,179,50,14
     PUSHBUTTON      "&Löschen",IDC_DELETE,114,179,50,14
     DEFPUSHBUTTON   "&Fertig",IDOK,192,179,50,14
+END
+
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Programmoptionen"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    LTEXT           "Befehlszeile",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    LTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.\nWichtig: Enthält der Befehl Leerzeichen, muss er in Anführugszeichen stehen!",
+                    IDC_STATIC,55,25,261,19
+    ICON            IDI_LISTICON2,IDC_STATIC,36,55,21,20,SS_REALSIZEIMAGE
+    CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf",
+                    IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,50,55,300,10
+    ICON            IDI_LISTICON3,IDC_STATIC,36,68,21,20,SS_REALSIZEIMAGE
+    CONTROL         "nicht fragen und das Programm immer mit erhöhten Rechten starten",
+                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,68,300,10
+    ICON            IDI_LISTICON6,IDC_STATIC,36,81,21,20,SS_REALSIZEIMAGE
+    CONTROL         "nicht fragen und das Programm NIE mit erhöhten Rechten starten",
+                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,81,300,10
+    ICON            IDI_LISTICON1,IDC_STATIC,36,98,21,20,SS_REALSIZEIMAGE
+    CONTROL         "nur fragen, falls das Programm erhöhte Rechte benötigt. (Manifest, 'Install.exe' etc.)",
+                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,50,98,300,10
+    ICON            IDI_LISTICON,IDC_STATIC,36,111,21,20,SS_REALSIZEIMAGE
+    CONTROL         "Programm automagisch mit erhöhten Rechten starten",
+                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,111,300,10
+    ICON            IDI_LISTICON7,IDC_STATIC,36,124,21,20,SS_REALSIZEIMAGE
+    CONTROL         "Programm automagisch NIE mit erhöhten Rechten starten",
+                    IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,124,300,10
+    ICON            IDI_LISTICON5,IDC_STATIC,36,141,21,20,SS_REALSIZEIMAGE
+    CONTROL         "Benutzer darf dieses Programm mit erhöhten Rechten starten",
+                    IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,50,141,300,10
+    ICON            IDI_LISTICON4,IDC_STATIC,36,154,21,20,SS_REALSIZEIMAGE
+    CONTROL         "Benutzer darf dieses Programm NICHT mit erhöhten Rechten starten",
+                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,154,300,10
+    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,176,50,14
 END
 
 
@@ -1843,10 +1872,24 @@ BEGIN
     CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
                     233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
-    PUSHBUTTON      "&Add...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Add...",IDC_ADDAPP,10,179,46,14
     PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
     DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+END
+
+IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Program options"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,38,361,1
+    LTEXT           "Command line",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    LTEXT           "Wildcards '*' und '?' are supported.",-1,64,25,252,8
+    DEFPUSHBUTTON   "&OK",IDOK,241,45,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,45,50,14
 END
 
 
@@ -2532,10 +2575,24 @@ BEGIN
     CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
                     233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
-    PUSHBUTTON      "&Add...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Add...",IDC_ADDAPP,10,179,46,14
     PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
     DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+END
+
+IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 63
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Programma instellingen"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,37,361,1
+    LTEXT           "Opdrachtregel",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    LTEXT           "Wildcards '*' und '?' are supported.",-1,64,25,252,8
+    DEFPUSHBUTTON   "&OK",IDOK,241,44,50,14,WS_GROUP
+    PUSHBUTTON      "&Annuleren",IDCANCEL,304,44,50,14
 END
 
 
