@@ -633,12 +633,13 @@ INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               {
                 TCHAR cmd[4096];
                 ListView_GetItemText(hBL,CurSel,0,cmd,4096);
-                if(RemoveFromBlackList(cmd))
-                {
-                  AddToBlackList(pdi->item.pszText);
-                  SetWindowLongPtr(hwnd,DWLP_MSGRESULT,1);
-                }else
-                  MessageBeep(MB_ICONERROR);
+                if(_tcsicmp(pdi->item.pszText,cmd)!=0)
+                  if((!IsInBlackList(pdi->item.pszText)) && RemoveFromBlackList(cmd))
+                  {
+                    AddToBlackList(pdi->item.pszText);
+                    SetWindowLongPtr(hwnd,DWLP_MSGRESULT,1);
+                  }else
+                    MessageBeep(MB_ICONERROR);
               }
             }
           }
