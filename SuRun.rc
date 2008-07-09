@@ -126,12 +126,13 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "User official Windows Hook Interface (recommended)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    301,10
+                    209,10
     CONTROL         "Modify Dll Import Address Tables (experimental)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    301,10
+                    195,10
+    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,267,23,57,14
     LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.",
-                    IDC_STATIC,31,35,276,18
+                    IDC_STATIC,31,35,218,18
     CONTROL         "- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,53,241,17
@@ -482,6 +483,26 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,304,176,50,14
 END
 
+IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Hook blacklist"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Do not hook the following applications:",IDC_STATIC,7,4,
+                    233,8
+    CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+    CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
+                    233,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
+    PUSHBUTTON      "&Add...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
+    PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
+    DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -566,6 +587,7 @@ BEGIN
     IDS_SWITCHBACK          "Click here to switch\nback to SuRuns Desktop."
     IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Cz³onkowie tej grupy mog¹ u¿ywaæ SuRun."
+    IDS_ADDTOBLKLIST        "Add program not to hook"
     IDS_ADDFILETOLIST       "Enter file name and command line"
 END
 
@@ -874,12 +896,13 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "Benutze offizielles Windows Hook Interface (empfohlen)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    301,10
+                    226,10
     CONTROL         "Modifiziere Dll Importtabellen der Programme (experimentell)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    301,10
+                    221,10
+    PUSHBUTTON      "Ausnahmen...",IDC_BLACKLIST,267,23,57,14
     LTEXT           "SuRun wird vorschlagen folgendes mit gehobenen Rechten zu starten:\n- Programme die der Benutzer festgelegt hat.",
-                    IDC_STATIC,31,35,276,18
+                    IDC_STATIC,31,35,226,18
     CONTROL         "- Programme, die ein Vista ""requireAdministrator"" Manifest haben\n- Programme, die Install, Setup, Update etc. im Dateinamen haben",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,53,241,17
@@ -1109,6 +1132,26 @@ BEGIN
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
+IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Ausnahmen"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Deaktiviere Hook in folgenden Programmen:",IDC_STATIC,7,
+                    4,233,8
+    CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+    CTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.",
+                    IDC_STATIC,8,160,233,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
+    PUSHBUTTON      "&Hinzu...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,60,179,50,14
+    PUSHBUTTON      "&Löschen",IDC_DELETE,114,179,50,14
+    DEFPUSHBUTTON   "&Fertig",IDOK,192,179,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1251,6 +1294,7 @@ BEGIN
     IDS_SWITCHBACK          "Klicken Sie hier, um auf SuRuns\nDesktop zurückzuschalten."
     IDS_APPOK               "Die Kommandozeile scheint nicht zu funktionieren.\n\nSind Sie sicher, dass der Befehl ok so it?\n(Anführungszeichen korrekt gesetzt?)"
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
+    IDS_ADDTOBLKLIST        "Ausnahme hinzufügen"
     IDS_ADDFILETOLIST       "Geben Sie Dateinamen und Kommandozeilenparameter an"
 END
 
@@ -1434,12 +1478,13 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "User official Windows Hook Interface (recommended)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    301,10
+                    215,10
     CONTROL         "Modify Dll Import Address Tables (experimental)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    301,10
+                    209,10
+    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,267,23,57,14
     LTEXT           "SuRun will ask to start the following programs with elevated rights:\n- marked Programms from the Users Program List.",
-                    IDC_STATIC,31,35,276,18
+                    IDC_STATIC,31,35,214,18
     CONTROL         "- Programms containing a Vista 'requireAdministrator' manifest\n- Programs with 'Install', 'Setup', 'Update' etc. in their file name",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,53,241,17
@@ -1790,6 +1835,26 @@ BEGIN
                     PBS_SMOOTH,0,134,263,9
 END
 
+IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Hook blacklist"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Do not hook the following applications:",IDC_STATIC,7,4,
+                    233,8
+    CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+    CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
+                    233,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
+    PUSHBUTTON      "&Add...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
+    PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
+    DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1920,6 +1985,7 @@ BEGIN
     IDS_SWITCHBACK          "Click here to switch\nback to SuRuns Desktop."
     IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Members of this group can use SuRun."
+    IDS_ADDTOBLKLIST        "Add program not to hook"
     IDS_ADDFILETOLIST       "Enter file name and command line"
 END
 
@@ -2103,12 +2169,13 @@ BEGIN
                     IDC_STATIC,10,3,320,96
     CONTROL         "Gebruik de officiële Windows Hook Interface (aanbevolen)",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
-                    301,10
+                    231,10
     CONTROL         "Programma Dll Import-tabellen aanpassen (experimenteel)",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    301,10
+                    223,10
+    PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,269,23,57,14
     LTEXT           "SuRun laten voorstellen een programma met verhoogde rechten te starten:\n- Programma's van de gebruikerslijst",
-                    IDC_STATIC,31,35,276,18
+                    IDC_STATIC,31,35,237,18
     CONTROL         "- Programma's voorzien van een Vista 'requireAdministrator' manifest\n- Programma's met 'Install', 'Setup', 'Update' etc. in de bestandsnaam",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,53,241,17
@@ -2459,6 +2526,26 @@ BEGIN
                     PBS_SMOOTH,0,134,263,9
 END
 
+IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Hook blacklist"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Do not hook the following applications:",IDC_STATIC,7,4,
+                    233,8
+    CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
+                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+    CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
+                    233,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
+    PUSHBUTTON      "&Add...",IDC_SELFILE,10,179,46,14
+    PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
+    PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
+    DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2543,6 +2630,7 @@ BEGIN
     IDS_SWITCHBACK          "Klik hier om terug te schakelen\nnaar SuRuns bureaublad."
     IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Leden van deze groep kunnen SuRun gebruiken."
+    IDS_ADDTOBLKLIST        "Add program not to hook"
     IDS_ADDFILETOLIST       "Voer bestandsnaam en opdracht in"
 END
 
