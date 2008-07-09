@@ -104,12 +104,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       break;
     //Load the System menu for the Window, if we don't, we'll get a default 
     //system menu on the first click.
-    case WM_SYSCOMMAND:
-      if ((wps->wParam==SC_MOUSEMENU)||(SC_KEYMENU==wps->wParam))
-        GetSystemMenu((HWND)wps->hwnd,FALSE);
-      break;
-    case WM_NCRBUTTONDOWN:
-    case WM_CONTEXTMENU:
+    case WM_CREATE:
       GetSystemMenu((HWND)wps->hwnd,FALSE);
       break;
     case WM_INITMENUPOPUP:
