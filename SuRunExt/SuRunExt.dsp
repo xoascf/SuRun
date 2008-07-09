@@ -191,6 +191,10 @@ SOURCE=..\LSALogon.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\Setup.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\sspi_auth.cpp
 # End Source File
 # Begin Source File
