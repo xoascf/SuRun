@@ -346,5 +346,5 @@ void ReplaceSuRunWithRunAs(HKEY hKey=HKCR);
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL RunSetup();
+BOOL RunSetup(LPCTSTR User);
 
