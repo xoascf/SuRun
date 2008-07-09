@@ -31,12 +31,13 @@
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
 
+extern RUNDATA g_RunData;
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // WinMain
 //
 //////////////////////////////////////////////////////////////////////////////
-
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
   if(HandleServiceStuff())
