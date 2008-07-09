@@ -499,7 +499,7 @@ static BOOL GetFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrFile         = FileName;
   ofn.nMaxFile          = 4096;
   ofn.lpstrTitle        = CResStr(IDS_ADDTOBLKLIST);
-  ofn.Flags             = OFN_ENABLESIZING|OFN_FILEMUSTEXIST|OFN_FORCESHOWHIDDEN;
+  ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   BOOL bRet=GetOpenFileName(&ofn);
 //  DWORD dwe=CommDlgExtendedError();
 //  CDERR_DIALOGFAILURE
