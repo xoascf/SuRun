@@ -105,6 +105,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
     //Load the System menu for the Window, if we don't, we'll get a default 
     //system menu on the first click.
     case WM_CREATE:
+    case WM_INITDIALOG:
       GetSystemMenu((HWND)wps->hwnd,FALSE);
       break;
     case WM_INITMENUPOPUP:
