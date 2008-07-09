@@ -592,14 +592,13 @@ INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
       {
-EditLabel:
-      HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-      int CurSel=(int)ListView_GetSelectionMark(hBL);
-      if (CurSel>=0)
-      {
-        SetFocus(hBL);
-        ListView_EditLabel(hBL,CurSel);
-      }
+        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+        int CurSel=(int)ListView_GetSelectionMark(hBL);
+        if (CurSel>=0)
+        {
+          SetFocus(hBL);
+          ListView_EditLabel(hBL,CurSel);
+        }
       }
     }
   case WM_NOTIFY:
@@ -614,7 +613,12 @@ EditLabel:
           {
             LPNMLVKEYDOWN pnkd = (LPNMLVKEYDOWN)lParam;
             if (pnkd->wVKey==VK_F2)
-              goto EditLabel;
+            {
+              HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+              int CurSel=(int)ListView_GetSelectionMark(hBL);
+              if (CurSel>=0)
+                ListView_EditLabel(hBL,CurSel);
+            }
           }
           return TRUE;
         case LVN_ENDLABELEDIT:
