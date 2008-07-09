@@ -21,6 +21,8 @@
 #define CLASSNAME     _T("SuRunTrayShowAdminClass")
 #define MENU_SURUNSETUP WM_USER+903
 
+extern RUNDATA g_RunData;
+
 bool g_BallonTips=1;
 BOOL g_ForegroundWndIsAdmin=-1;
 HWND g_FgWnd=0;
