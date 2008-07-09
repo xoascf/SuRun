@@ -175,13 +175,12 @@ DWORD GetBlackListFlags(LPTSTR CmdLine,DWORD Default)
 
 BOOL IsInBlackList(LPTSTR CmdLine)
 {
-  return (GetBlackListFlags(CmdLine,0)&1)==1;
+  return GetBlackListFlags(CmdLine,-1)!=-1;
 }
 
 BOOL AddToBlackList(LPTSTR CmdLine)
 {
-  DWORD d=GetRegInt(HKLM,HKLSTKEY,CmdLine,-1);
-  return (d==1)||SetRegInt(HKLM,HKLSTKEY,CmdLine,1);
+  return SetRegInt(HKLM,HKLSTKEY,CmdLine,1);
 }
 
 BOOL RemoveFromBlackList(LPTSTR CmdLine)
