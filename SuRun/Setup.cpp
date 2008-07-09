@@ -482,185 +482,16 @@ INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-// Add/Edit file to IAT-Hook Blacklist:
-// 
-//////////////////////////////////////////////////////////////////////////////
-static BOOL GetFile(HWND hwnd,LPTSTR FileName)
-{
-  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
-  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
-  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
-  OPENFILENAME  ofn={0};
-  ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
-  ofn.hwndOwner         = hwnd;
-  ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
-  ofn.nFilterIndex      = 1;
-  ofn.lpstrFile         = FileName;
-  ofn.nMaxFile          = 4096;
-  ofn.lpstrTitle        = CResStr(IDS_ADDTOBLKLIST);
-  ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
-  BOOL bRet=GetOpenFileName(&ofn);
-//  DWORD dwe=CommDlgExtendedError();
-//  CDERR_DIALOGFAILURE
-  if (HideExt!=-1)
-    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
-  return bRet;
-  #undef ExpAdvReg
-}
-
-static void FillBlackList(HWND hwnd)
-{
-  HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-  ListView_DeleteAllItems(hBL);
-  HKEY Key;
-  if(RegOpenKeyEx(HKLM,HKLSTKEY,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
-  {
-    TCHAR cmd[4096];
-    DWORD ccMax=countof(cmd);
-    for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
-    {
-      ccMax=countof(cmd);
-      LVITEM item={LVIF_TEXT,i,0,0,0,cmd,0,0,0,0};
-      ListView_InsertItem(hBL,&item);
-    }
-    RegCloseKey(Key);
-  }
-  ListView_SortItemsEx(hBL,UsrListSortProc,hBL);
-  ListView_SetColumnWidth(hBL,0,LVSCW_AUTOSIZE_USEHEADER);
-  ListView_SetItemState(hBL,0,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
-  EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hBL)!=-1);
-  EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hBL)!=-1);
-}
-
-INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-  switch(msg)
-  {
-  case WM_INITDIALOG:
-    {
-      HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-      SendMessage(hBL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
-      LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
-      ListView_InsertColumn(hBL,0,&col);
-      FillBlackList(hwnd);
-    }
-    return TRUE;
-  case WM_CTLCOLORSTATIC:
-    SetBkMode((HDC)wParam,TRANSPARENT);
-  case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
-  case WM_COMMAND:
-    switch (wParam)
-    {
-    case MAKELPARAM(IDC_SELFILE,BN_CLICKED):
-      {
-        TCHAR FileName[4096]={0};
-        if(GetFile(hwnd,FileName))
-        {
-          AddToBlackList(FileName);
-          FillBlackList(hwnd);
-        }
-      }
-      break;
-    //Delete App Button
-    case MAKELPARAM(IDC_DELETE,BN_CLICKED):
-      {
-        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-        int CurSel=(int)ListView_GetSelectionMark(hBL);
-        if (CurSel>=0)
-        {
-          TCHAR cmd[4096];
-          ListView_GetItemText(hBL,CurSel,0,cmd,4096);
-          if(RemoveFromBlackList(cmd))
-          {
-            ListView_DeleteItem(hBL,CurSel);
-            CurSel=ListView_GetSelectionMark(hBL);
-            if (CurSel>=0)
-              ListView_SetItemState(hBL,CurSel,LVIS_SELECTED,0x0F);
-          }else
-            MessageBeep(MB_ICONERROR);
-        }
-        EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hBL)!=-1);
-        EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hBL)!=-1);
-      }
-      return TRUE;
-    case MAKELPARAM(IDCANCEL,BN_CLICKED):
-    case MAKELPARAM(IDOK,BN_CLICKED):
-      //Test drive:
-      EndDialog(hwnd,IDCANCEL);
-      return TRUE;
-    case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
-      {
-        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-        int CurSel=(int)ListView_GetSelectionMark(hBL);
-        if (CurSel>=0)
-        {
-          SetFocus(hBL);
-          ListView_EditLabel(hBL,CurSel);
-        }
-      }
-    }
-  case WM_NOTIFY:
-    {
-      switch (wParam)
-      {
-      //Program List Notifications
-      case IDC_BLACKLIST:
-        if (lParam) switch(((LPNMHDR)lParam)->code)
-        {
-        case LVN_KEYDOWN:
-          {
-            LPNMLVKEYDOWN pnkd = (LPNMLVKEYDOWN)lParam;
-            if (pnkd->wVKey==VK_F2)
-            {
-              HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-              int CurSel=(int)ListView_GetSelectionMark(hBL);
-              if (CurSel>=0)
-                ListView_EditLabel(hBL,CurSel);
-            }
-          }
-          return TRUE;
-        case LVN_ENDLABELEDIT:
-          {
-            SetWindowLongPtr(hwnd,DWLP_MSGRESULT,0);
-            NMLVDISPINFO* pdi=(NMLVDISPINFO*)lParam;
-            if(pdi->item.pszText)
-            {
-              HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
-              int CurSel=(int)ListView_GetSelectionMark(hBL);
-              if (CurSel>=0)
-              {
-                TCHAR cmd[4096];
-                ListView_GetItemText(hBL,CurSel,0,cmd,4096);
-                if(_tcsicmp(pdi->item.pszText,cmd)!=0)
-                  if((!IsInBlackList(pdi->item.pszText)) && RemoveFromBlackList(cmd))
-                  {
-                    AddToBlackList(pdi->item.pszText);
-                    SetWindowLongPtr(hwnd,DWLP_MSGRESULT,1);
-                  }else
-                    MessageBeep(MB_ICONERROR);
-              }
-            }
-          }
-          return TRUE;
-        //Selection changed
-        case LVN_ITEMCHANGED:
-          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
-            ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_BLACKLIST))!=-1);
-          return TRUE;
-        }//switch (switch(((LPNMHDR)lParam)->code)
-      }//switch (wParam)
-      break;
-    }//WM_NOTIFY
-  }
-  return FALSE;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 // Add/Edit file to users file list:
 // 
 //////////////////////////////////////////////////////////////////////////////
+struct
+{
+  DWORD* Flags;
+  LPTSTR FileName;
+  int OfnTitle;
+}g_AppOpt;
+
 static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 {
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
@@ -673,7 +504,7 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   ofn.nFilterIndex      = 1;
   ofn.lpstrFile         = FileName;
   ofn.nMaxFile          = 4096;
-  ofn.lpstrTitle        = CResStr(IDS_ADDFILETOLIST);
+  ofn.lpstrTitle        = CResStr(g_AppOpt.OfnTitle);
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   BOOL bRet=GetOpenFileName(&ofn);
   if (HideExt!=-1)
@@ -683,12 +514,6 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   return bRet;
   #undef ExpAdvReg
 }
-
-struct
-{
-  DWORD* Flags;
-  LPTSTR FileName;
-}g_AppOpt;
 
 INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -769,7 +594,8 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   return FALSE;
 }
 
-static BOOL GetFileName(HWND hwnd,DWORD& Flags,LPTSTR FileName)
+static BOOL GetFileName(HWND hwnd,DWORD& Flags,LPTSTR FileName,
+                        int DlgID=IDD_APPOPTIONS,int OfnTitle=IDS_ADDFILETOLIST)
 {
   if (FileName[0]==0)
   {
@@ -778,7 +604,152 @@ static BOOL GetFileName(HWND hwnd,DWORD& Flags,LPTSTR FileName)
   }
   g_AppOpt.FileName=FileName;
   g_AppOpt.Flags=&Flags;
-  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_APPOPTIONS),hwnd,AppOptDlgProc)==IDOK;
+  g_AppOpt.OfnTitle=OfnTitle;
+  return DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(DlgID),hwnd,AppOptDlgProc)==IDOK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// Add/Edit file to IAT-Hook Blacklist:
+// 
+//////////////////////////////////////////////////////////////////////////////
+static void FillBlackList(HWND hwnd)
+{
+  HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+  ListView_DeleteAllItems(hBL);
+  HKEY Key;
+  if(RegOpenKeyEx(HKLM,HKLSTKEY,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  {
+    TCHAR cmd[4096];
+    DWORD ccMax=countof(cmd);
+    for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
+    {
+      ccMax=countof(cmd);
+      LVITEM item={LVIF_TEXT,i,0,0,0,cmd,0,0,0,0};
+      ListView_InsertItem(hBL,&item);
+    }
+    RegCloseKey(Key);
+  }
+  ListView_SortItemsEx(hBL,UsrListSortProc,hBL);
+  ListView_SetColumnWidth(hBL,0,LVSCW_AUTOSIZE_USEHEADER);
+  ListView_SetItemState(hBL,0,LVIS_FOCUSED|LVIS_SELECTED,LVIS_FOCUSED|LVIS_SELECTED);
+  EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hBL)!=-1);
+  EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hBL)!=-1);
+}
+
+INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+  switch(msg)
+  {
+  case WM_INITDIALOG:
+    {
+      HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+      SendMessage(hBL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
+      LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
+      ListView_InsertColumn(hBL,0,&col);
+      FillBlackList(hwnd);
+    }
+    return TRUE;
+  case WM_CTLCOLORSTATIC:
+    SetBkMode((HDC)wParam,TRANSPARENT);
+  case WM_CTLCOLORDLG:
+    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+  case WM_COMMAND:
+    switch (wParam)
+    {
+    case MAKELPARAM(IDC_ADDAPP,BN_CLICKED):
+      {
+        TCHAR cmd[4096]={0};
+        DWORD f=0;
+        if (GetFileName(hwnd,f,cmd,IDD_ADDTOBLKLST,IDS_ADDTOBLKLIST))
+        {
+          AddToBlackList(cmd);
+          FillBlackList(hwnd);
+        }
+      }
+      return TRUE;
+    //Edit App Button
+    case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
+      {
+EditApp:
+        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+        int CurSel=(int)ListView_GetSelectionMark(hBL);
+        if (CurSel>=0)
+        {
+          TCHAR cmd[4096];
+          TCHAR CMD[4096];
+          ListView_GetItemText(hBL,CurSel,3,cmd,4096);
+          _tcscpy(CMD,cmd);
+          DWORD f=0;
+          if ( GetFileName(hwnd,f,CMD,IDD_ADDTOBLKLST,IDS_ADDTOBLKLIST)
+            &&(_tcsicmp(CMD,cmd)!=0))
+          {
+            if((GetRegInt(HKLM,HKLSTKEY,CMD,-1)==-1) //No duplicates!
+              && RemoveFromBlackList(cmd))
+            {
+              AddToBlackList(CMD);
+              FillBlackList(hwnd);
+            }else
+              MessageBeep(MB_ICONERROR);
+            }
+        }
+      }
+      return TRUE;
+    }
+    //Delete App Button
+    case MAKELPARAM(IDC_DELETE,BN_CLICKED):
+      {
+        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+        int CurSel=(int)ListView_GetSelectionMark(hBL);
+        if (CurSel>=0)
+        {
+          TCHAR cmd[4096];
+          ListView_GetItemText(hBL,CurSel,0,cmd,4096);
+          if(RemoveFromBlackList(cmd))
+          {
+            ListView_DeleteItem(hBL,CurSel);
+            CurSel=ListView_GetSelectionMark(hBL);
+            if (CurSel>=0)
+              ListView_SetItemState(hBL,CurSel,LVIS_SELECTED,0x0F);
+          }else
+            MessageBeep(MB_ICONERROR);
+        }
+        EnableWindow(GetDlgItem(hwnd,IDC_DELETE),ListView_GetSelectionMark(hBL)!=-1);
+        EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),ListView_GetSelectionMark(hBL)!=-1);
+      }
+      return TRUE;
+    case MAKELPARAM(IDCANCEL,BN_CLICKED):
+    case MAKELPARAM(IDOK,BN_CLICKED):
+      //Test drive:
+      EndDialog(hwnd,IDCANCEL);
+      return TRUE;
+  case WM_NOTIFY:
+    {
+      switch (wParam)
+      {
+      //Program List Notifications
+      case IDC_BLACKLIST:
+        if (lParam) switch(((LPNMHDR)lParam)->code)
+        {
+        case LVN_KEYDOWN:
+          if (((LPNMLVKEYDOWN)lParam)->wVKey==VK_F2)
+            goto EditApp;
+          break;
+        //Mouse Click: Toggle Flags
+        case NM_DBLCLK:
+        case LVN_BEGINLABELEDIT:
+          goto EditApp;
+        //Selection changed
+        case LVN_ITEMCHANGED:
+          EnableWindow(GetDlgItem(hwnd,IDC_DELETE),
+            ListView_GetSelectionMark(GetDlgItem(hwnd,IDC_BLACKLIST))!=-1);
+          return TRUE;
+        }//switch (switch(((LPNMHDR)lParam)->code)
+      }//switch (wParam)
+      break;
+    }//WM_NOTIFY
+  }
+  return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////////
