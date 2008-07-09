@@ -10,6 +10,10 @@
 // 
 //                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
 //////////////////////////////////////////////////////////////////////////////
+#ifdef _DEBUG
+#define _DEBUGSETUP
+#endif _DEBUG
+
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
