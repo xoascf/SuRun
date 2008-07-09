@@ -775,27 +775,27 @@ BOOL Setup()
   {
     if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
-    return RunSetup();
+    return RunSetup(g_RunData.UserName);
   }
   //check if user name needs to enter the password:
   if (GetReqPw4Setup(g_RunData.UserName))
   {
     if(!ValidateCurrentUser(g_RunData.UserName,IDS_PW4SETUP))
       return FALSE;
-    return RunSetup();
+    return RunSetup(g_RunData.UserName);
   }
   //only Admins and SuRunners may setup SuRun
   if (g_CliIsAdmin)
-    return RunSetup();
+    return RunSetup(g_RunData.UserName);
   //If no users should become SuRunners, ask for Admin credentials
   if (GetNoConvUser && (!IsInSuRunners(g_RunData.UserName)))
   {
     if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
-    return RunSetup();
+    return RunSetup(g_RunData.UserName);
   }
   if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
-    return RunSetup();
+    return RunSetup(g_RunData.UserName);
   return false;
 }
 
