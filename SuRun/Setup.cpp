@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-#define _DEBUGSETUP
+//#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -521,28 +521,31 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     SetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName);
-    CheckDlgButton(hwnd,IDC_NOASK1,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_AUTOCANCEL))==0);
-    CheckDlgButton(hwnd,IDC_NOASK2,(*g_AppOpt.Flags&FLAG_DONTASK)!=0);
-    CheckDlgButton(hwnd,IDC_NOASK3,(*g_AppOpt.Flags&FLAG_AUTOCANCEL)!=0);
-
-    CheckDlgButton(hwnd,IDC_AUTO1,(*g_AppOpt.Flags&(FLAG_SHELLEXEC|FLAG_CANCEL_SX))==0);
-    CheckDlgButton(hwnd,IDC_AUTO2,(*g_AppOpt.Flags&FLAG_SHELLEXEC)!=0);
-    CheckDlgButton(hwnd,IDC_AUTO3,(*g_AppOpt.Flags&FLAG_CANCEL_SX)!=0);
-
-    if((!IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK))
-      &&(!IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK)))
+    if (g_AppOpt.OfnTitle==IDS_ADDFILETOLIST)
     {
-      EnableWindow(GetDlgItem(hwnd,IDC_AUTO1),0);
-      EnableWindow(GetDlgItem(hwnd,IDC_AUTO2),0);
-      EnableWindow(GetDlgItem(hwnd,IDC_AUTO3),0);
-    }
-
-    CheckDlgButton(hwnd,IDC_RESTRICT1,(*g_AppOpt.Flags&FLAG_NORESTRICT)!=0);
-    CheckDlgButton(hwnd,IDC_RESTRICT2,(*g_AppOpt.Flags&FLAG_NORESTRICT)==0);
-    if(!IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED))
-    {
-      EnableWindow(GetDlgItem(hwnd,IDC_RESTRICT1),0);
-      EnableWindow(GetDlgItem(hwnd,IDC_RESTRICT2),0);
+      CheckDlgButton(hwnd,IDC_NOASK1,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_AUTOCANCEL))==0);
+      CheckDlgButton(hwnd,IDC_NOASK2,(*g_AppOpt.Flags&FLAG_DONTASK)!=0);
+      CheckDlgButton(hwnd,IDC_NOASK3,(*g_AppOpt.Flags&FLAG_AUTOCANCEL)!=0);
+      
+      CheckDlgButton(hwnd,IDC_AUTO1,(*g_AppOpt.Flags&(FLAG_SHELLEXEC|FLAG_CANCEL_SX))==0);
+      CheckDlgButton(hwnd,IDC_AUTO2,(*g_AppOpt.Flags&FLAG_SHELLEXEC)!=0);
+      CheckDlgButton(hwnd,IDC_AUTO3,(*g_AppOpt.Flags&FLAG_CANCEL_SX)!=0);
+      
+      if((!IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK))
+        &&(!IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK)))
+      {
+        EnableWindow(GetDlgItem(hwnd,IDC_AUTO1),0);
+        EnableWindow(GetDlgItem(hwnd,IDC_AUTO2),0);
+        EnableWindow(GetDlgItem(hwnd,IDC_AUTO3),0);
+      }
+      
+      CheckDlgButton(hwnd,IDC_RESTRICT1,(*g_AppOpt.Flags&FLAG_NORESTRICT)!=0);
+      CheckDlgButton(hwnd,IDC_RESTRICT2,(*g_AppOpt.Flags&FLAG_NORESTRICT)==0);
+      if(!IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED))
+      {
+        EnableWindow(GetDlgItem(hwnd,IDC_RESTRICT1),0);
+        EnableWindow(GetDlgItem(hwnd,IDC_RESTRICT2),0);
+      }
     }
     return TRUE;
   case WM_CTLCOLORSTATIC:
@@ -562,31 +565,34 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     case MAKELPARAM(IDOK,BN_CLICKED):
       GetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName,4096);
-      //Test drive:
-      STARTUPINFO si={0};
-      si.cb	= sizeof(si);
-      PROCESS_INFORMATION pi={0};
-      if (CreateProcess(NULL,g_AppOpt.FileName,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+      if (g_AppOpt.OfnTitle==IDS_ADDFILETOLIST)
       {
-        TerminateProcess(pi.hProcess,0);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-      }else
-        if (SafeMsgBox(hwnd,CBigResStr(IDS_APPOK),CResStr(IDS_APPNAME),
-          MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDNO)
-          return TRUE;
-      *g_AppOpt.Flags=0;
-      if (IsDlgButtonChecked(hwnd,IDC_NOASK2))
-        *g_AppOpt.Flags|=FLAG_DONTASK;
-      if (IsDlgButtonChecked(hwnd,IDC_NOASK3))
-        *g_AppOpt.Flags|=FLAG_AUTOCANCEL;
-      if (IsDlgButtonChecked(hwnd,IDC_AUTO2))
-        *g_AppOpt.Flags|=FLAG_SHELLEXEC;
-      if (IsDlgButtonChecked(hwnd,IDC_AUTO3))
-        *g_AppOpt.Flags|=FLAG_CANCEL_SX;
-      if (IsDlgButtonChecked(hwnd,IDC_RESTRICT1))
-        *g_AppOpt.Flags|=FLAG_NORESTRICT;
+        //Test drive:
+        STARTUPINFO si={0};
+        si.cb	= sizeof(si);
+        PROCESS_INFORMATION pi={0};
+        if (CreateProcess(NULL,g_AppOpt.FileName,NULL,NULL,FALSE,
+          CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
+        {
+          TerminateProcess(pi.hProcess,0);
+          CloseHandle(pi.hThread);
+          CloseHandle(pi.hProcess);
+        }else
+          if (SafeMsgBox(hwnd,CBigResStr(IDS_APPOK),CResStr(IDS_APPNAME),
+            MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDNO)
+            return TRUE;
+        *g_AppOpt.Flags=0;
+        if (IsDlgButtonChecked(hwnd,IDC_NOASK2))
+          *g_AppOpt.Flags|=FLAG_DONTASK;
+        if (IsDlgButtonChecked(hwnd,IDC_NOASK3))
+          *g_AppOpt.Flags|=FLAG_AUTOCANCEL;
+        if (IsDlgButtonChecked(hwnd,IDC_AUTO2))
+          *g_AppOpt.Flags|=FLAG_SHELLEXEC;
+        if (IsDlgButtonChecked(hwnd,IDC_AUTO3))
+          *g_AppOpt.Flags|=FLAG_CANCEL_SX;
+        if (IsDlgButtonChecked(hwnd,IDC_RESTRICT1))
+          *g_AppOpt.Flags|=FLAG_NORESTRICT;
+      }
       EndDialog(hwnd,IDOK);
       return TRUE;
     }
@@ -597,7 +603,7 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 static BOOL GetFileName(HWND hwnd,DWORD& Flags,LPTSTR FileName,
                         int DlgID=IDD_APPOPTIONS,int OfnTitle=IDS_ADDFILETOLIST)
 {
-  if (FileName[0]==0)
+  if ((DlgID==IDD_APPOPTIONS)&&(FileName[0]==0))
   {
     if(!ChooseFile(hwnd,FileName))
       return FALSE;
@@ -661,7 +667,7 @@ INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
         TCHAR cmd[4096]={0};
         DWORD f=0;
-        if (GetFileName(hwnd,f,cmd,IDD_ADDTOBLKLST,IDS_ADDTOBLKLIST))
+        if (GetFileName(hwnd,f,cmd,IDD_ADDTOBLKLST,IDS_ADDTOBLKLIST) && cmd[0])
         {
           AddToBlackList(cmd);
           FillBlackList(hwnd);
@@ -678,11 +684,11 @@ EditApp:
         {
           TCHAR cmd[4096];
           TCHAR CMD[4096];
-          ListView_GetItemText(hBL,CurSel,3,cmd,4096);
+          ListView_GetItemText(hBL,CurSel,0,cmd,4096);
           _tcscpy(CMD,cmd);
           DWORD f=0;
           if ( GetFileName(hwnd,f,CMD,IDD_ADDTOBLKLST,IDS_ADDTOBLKLIST)
-            &&(_tcsicmp(CMD,cmd)!=0))
+            && (CMD[0]) &&(_tcsicmp(CMD,cmd)!=0))
           {
             if((GetRegInt(HKLM,HKLSTKEY,CMD,-1)==-1) //No duplicates!
               && RemoveFromBlackList(cmd))
@@ -691,11 +697,10 @@ EditApp:
               FillBlackList(hwnd);
             }else
               MessageBeep(MB_ICONERROR);
-            }
+          }
         }
       }
       return TRUE;
-    }
     //Delete App Button
     case MAKELPARAM(IDC_DELETE,BN_CLICKED):
       {
@@ -720,9 +725,9 @@ EditApp:
       return TRUE;
     case MAKELPARAM(IDCANCEL,BN_CLICKED):
     case MAKELPARAM(IDOK,BN_CLICKED):
-      //Test drive:
       EndDialog(hwnd,IDCANCEL);
       return TRUE;
+    }//WM_COMMAND
   case WM_NOTIFY:
     {
       switch (wParam)
