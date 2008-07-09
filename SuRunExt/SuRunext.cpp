@@ -64,6 +64,7 @@ UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 HINSTANCE   l_hInst     = NULL;
 TCHAR       l_User[514] = {0};
 BOOL        l_IsAdmin   = FALSE;
+BOOL        l_bSetHook  = TRUE;
 
 UINT        WM_SYSMH0   = 0;
 UINT        WM_SYSMH1   = 0;
@@ -391,7 +392,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   if ((!IsInSuRunners(l_User))||HideSuRun(l_User))
     return NOERROR;
   //Non Admins don't need the Shell Extension!
-  if (l_IsAdmin)
+  if (!l_bSetHook)
     return NOERROR;
   if (pDataObj==0)
   {
@@ -956,18 +957,23 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #endif _DEBUG_ENU
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+  l_bSetHook=!l_IsAdmin;
   //IAT Hook:
-  if ((!l_IsAdmin) && GetUseIATHook)
+  if (l_bSetHook && GetUseIATHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[4096];
     GetSystemWindowsDirectory(fSuRunExe,4096);
     PathAppend(fSuRunExe,L"SuRun.exe");
     PathQuoteSpaces(fSuRunExe);
-    BOOL bSetHook=_tcsicmp(fMod,fSuRunExe)!=0;
+    l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) && (!IsInBlackList(fMod));
+#ifdef DoDBGTrace
+    if(IsInBlackList(fMod))
+      DBGTrace1("%s is blacklisted! No IAT-Hook!",fMod);
+#endif DoDBGTrace
     DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),bSetHook);
-    if(bSetHook)
+      hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
+    if(l_bSetHook)
       LoadHooks();
   }
 #ifdef DoDBGTrace
