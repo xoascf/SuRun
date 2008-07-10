@@ -212,7 +212,7 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_MOVING:
 	  *((RECT*)lParam)=m_wr;
     return TRUE;
-  case WM_SETTINGCHANGE:
+  case WM_DISPLAYCHANGE:
     {
       RECT dr;
       SystemParametersInfo(SPI_GETWORKAREA,0,&dr,0);
