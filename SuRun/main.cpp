@@ -42,8 +42,12 @@ extern RUNDATA g_RunData;
 // WinMain
 //
 //////////////////////////////////////////////////////////////////////////////
+//extern BOOL TestSetup();
+
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+//  TestSetup();
+
   if(HandleServiceStuff())
     return 0;
   if (g_RunData.CliThreadId==GetCurrentThreadId())
