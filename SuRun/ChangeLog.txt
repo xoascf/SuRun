@@ -2,7 +2,8 @@ Done, to be tested:
 ---------------------------
 * Added mini Edit-Dialog for Hook-Blacklist
 * SuRun Settings dialog is now resizeable
-* Message Windows move when Display resolution changes
+* Tray Message Windows move when Display resolution changes
+* FIX: Tray Message Windows did not close after 20s
 
 SuRun 1.1.9.3 - 2008-07-09: (beta)
 ---------------------------
