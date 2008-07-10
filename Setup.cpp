@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#define _DEBUGSETUP
+#define _DEBUGSETUP
 #endif _DEBUG
 
 #define _WIN32_WINNT 0x0500
@@ -33,7 +33,7 @@
 #include "DBGTrace.h"
 #include "WinStaDesk.h"
 #include "Resource.h"
-#include "Service.h"
+#include "Anchor.h"
 
 #pragma comment(lib,"comctl32.lib")
 #pragma comment(lib,"Comdlg32.lib")
@@ -313,8 +313,14 @@ typedef struct _SETUPDATA
   HIMAGELIST ImgList;
   int ImgIconIdx[8];
   TCHAR NewUser[2*UNLEN+2];
+  CDlgAnchor MainSetupAnchor;
+  CDlgAnchor Setup2Anchor;
+  int MinW;
+  int MinH;
   _SETUPDATA(LPCTSTR User)
   {
+    MinW=600;
+    MinH=400;
     OrgUser=User;
     Users.SetGroupUsers(SURUNNERSGROUP,FALSE);
     DlgExitCode=IDCANCEL;
@@ -1106,8 +1112,23 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       }
       //UserList
       UpdateUserList(hwnd,g_SD->OrgUser);
+      g_SD->Setup2Anchor.Init(hwnd);
+      g_SD->Setup2Anchor.Add(IDC_USER,ANCHOR_TOPLEFT|ANCHOR_RIGHT);
+      g_SD->Setup2Anchor.Add(IDC_ADDUSER,ANCHOR_TOPRIGHT);
+      g_SD->Setup2Anchor.Add(IDC_DELUSER,ANCHOR_TOPRIGHT);
+      g_SD->Setup2Anchor.Add(IDS_GRPDESC,ANCHOR_ALL);
+      g_SD->Setup2Anchor.Add(IDC_WHITELIST,ANCHOR_ALL);
+      g_SD->Setup2Anchor.Add(IDC_ADDAPP,ANCHOR_BOTTOMRIGHT);
+      g_SD->Setup2Anchor.Add(IDC_EDITAPP,ANCHOR_BOTTOMRIGHT);
+      g_SD->Setup2Anchor.Add(IDC_DELETE,ANCHOR_BOTTOMRIGHT);
+      g_SD->Setup2Anchor.Add(IDC_ICONHELP,ANCHOR_BOTTOMRIGHT);
       return TRUE;
     }//WM_INITDIALOG
+  case WM_SIZE:
+    {
+      g_SD->Setup2Anchor.OnSize(false);
+      return TRUE;
+    }
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
@@ -1178,6 +1199,7 @@ EditApp:
               }else
                 MessageBeep(MB_ICONERROR);
             }
+            RedrawWindow(hwnd,0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
           }
         }
         return TRUE;
@@ -1535,7 +1557,8 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       int TabNames[nTabs]= {IDS_SETUP1,IDS_SETUP2,IDS_SETUP3};
       int TabIDs[nTabs]= { IDD_SETUP1,IDD_SETUP2,IDD_SETUP3};
       DLGPROC TabProcs[nTabs]= { SetupDlg1Proc,SetupDlg2Proc,SetupDlg3Proc};
-      for (int i=0;i<nTabs;i++)
+      int i;
+      for (i=0;i<nTabs;i++)
       {
         TCITEM tie={TCIF_TEXT,0,0,CResStr(TabNames[i]),0,0,0};
 		    TabCtrl_InsertItem(hTab,i,&tie);
@@ -1552,10 +1575,45 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       //...
       UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
       SetFocus(hTab);
+      g_SD->MainSetupAnchor.Init(hwnd);
+      g_SD->MainSetupAnchor.Add(IDC_SETUP_TAB,ANCHOR_ALL);
+      for (i=0;i<nTabs;i++)
+        g_SD->MainSetupAnchor.Add(g_SD->hTabCtrl[i],ANCHOR_ALL);
+      g_SD->MainSetupAnchor.Add(IDC_SIMPLESETUP,ANCHOR_BOTTOMLEFT);
+      g_SD->MainSetupAnchor.Add(ID_APPLY,ANCHOR_BOTTOMRIGHT);
+      g_SD->MainSetupAnchor.Add(IDOK,ANCHOR_BOTTOMRIGHT);
+      g_SD->MainSetupAnchor.Add(IDCANCEL,ANCHOR_BOTTOMRIGHT);
+      RECT r;
+      GetWindowRect(hwnd,&r);
+      g_SD->MinW=r.right-r.left;
+      g_SD->MinH=r.bottom-r.top;
+      int w=GetRegInt(HKLM,SURUNKEY,L"SetupW",g_SD->MinW);
+      int h=GetRegInt(HKLM,SURUNKEY,L"SetupH",g_SD->MinH);
+      int x=r.left-(w-g_SD->MinW)/2;
+      int y=r.top-(h-g_SD->MinH)/2;
+      MoveWindow(hwnd,x,y,w,h,false);
+      PostMessage(hwnd,WM_SIZE,0,0);
       return FALSE;
     }//WM_INITDIALOG
+  case WM_SIZE:
+    {
+      g_SD->MainSetupAnchor.OnSize(false);
+      RedrawWindow(hwnd,0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
+      return TRUE;
+    }
+  case WM_GETMINMAXINFO:
+    {
+      MINMAXINFO* lpMMI=(MINMAXINFO*)lParam;
+      lpMMI->ptMinTrackSize.x=g_SD->MinW;
+      lpMMI->ptMinTrackSize.y=g_SD->MinH;
+      return TRUE;
+    }
   case WM_NCDESTROY:
     {
+      RECT r;
+      GetWindowRect(hwnd,&r);
+      SetRegInt(HKLM,SURUNKEY,L"SetupW",r.right-r.left);
+      SetRegInt(HKLM,SURUNKEY,L"SetupH",r.bottom-r.top);
       for (int i=0;i<nTabs;i++)
         DestroyWindow(g_SD->hTabCtrl[i]);
       DestroyIcon((HICON)SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
