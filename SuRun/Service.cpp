@@ -277,7 +277,7 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //  ShowTrayWarning
 // 
 //////////////////////////////////////////////////////////////////////////////
-void ShowTrayWarning(LPCTSTR Text,int IconId) 
+void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut) 
 {
   if (HideSuRun(g_RunData.UserName)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName)))
     return;
@@ -307,6 +307,7 @@ void ShowTrayWarning(LPCTSTR Text,int IconId)
     rd.RetPtr=0;
     rd.RetPID=0;
     rd.IconId=IconId;
+    rd.TimeOut=TimeOut;
     _tcscpy(rd.cmdLine,Text);
     DWORD_PTR n=0;
     if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
@@ -351,7 +352,7 @@ ChkAdmin:
     _tcscat(un,_T("\n"));
   }
   if(un[0])
-    ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2);
+    ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
 }
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
@@ -889,7 +890,7 @@ DWORD LSAStartAdminProcess()
             g_RunData.cmdLine,GetLastErrorNameStatic());
         }
         if ((g_RunData.bShlExHook)&&(!HideSuRun(g_RunData.UserName)))
-          ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD);
+          ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
       DestroyEnvironmentBlock(Env);
