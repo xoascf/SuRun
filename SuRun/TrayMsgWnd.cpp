@@ -39,6 +39,7 @@ protected:
   HFONT m_hFont;
   HBRUSH m_bkBrush;
   RECT m_wr;
+  RECT m_dr;
   int m_DoSlide;
   HICON m_Icon;
 private:
@@ -122,6 +123,7 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
     m_wr.bottom+=2*GetSystemMetrics(SM_CYDLGFRAME)+GetSystemMetrics(SM_CYSMCAPTION)+10;
     OffsetRect(&m_wr,rd.right-m_wr.right+m_wr.left,rd.bottom-m_wr.bottom+m_wr.top);
   }
+  SystemParametersInfo(SPI_GETWORKAREA,0,&m_dr,0);
   //Get Position:
   MoveAboveOthers();
   m_bkBrush=CreateSolidBrush(GetSysColor(COLOR_WINDOW));
@@ -210,6 +212,18 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_MOVING:
 	  *((RECT*)lParam)=m_wr;
     return TRUE;
+  case WM_SETTINGCHANGE:
+    {
+      RECT dr;
+      SystemParametersInfo(SPI_GETWORKAREA,0,&dr,0);
+      if (memcmp(&m_dr,&dr,sizeof(RECT))!=0)
+      {
+        OffsetRect(&m_wr,dr.right-m_dr.right,dr.bottom-m_dr.bottom);
+        SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+        m_dr=dr;
+      }
+    }
+    return 0;
   case WM_TIMER:
     if (wParam==2)
     {
