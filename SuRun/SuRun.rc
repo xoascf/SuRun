@@ -893,16 +893,16 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     GROUPBOX        "Versuche bestimmte Programme AUTOMAGISCH mit gehobenen Rechten zu starten",
                     IDC_STATIC,10,3,320,96
-    CONTROL         "Benutze offizielles Windows Hook Interface (empfohlen)",
+    CONTROL         "Abfangen, wenn die Windows Shell ein Programm ausführen will",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,14,
                     232,10
-    CONTROL         "Modifiziere Dll Importtabellen der Programme (experimentell)",
+    CONTROL         "Direkt in Programme einhängen, die andere Programme ausführen",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
                     232,10
     PUSHBUTTON      "Ausnahmen...",IDC_BLACKLIST,267,17,57,14
-    CONTROL         "Versuche zu erkennen, wenn unbekannte Programme administrative Rechte benötigen. (z.B. Installationsprogramme)",
+    CONTROL         "Versuche zu erkennen, ob unbekannte Programme administrative Rechte benötigen. (z.B. Installationsprogramme)",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,44,232,17
+                    BS_MULTILINE | WS_TABSTOP,20,46,232,17
     CONTROL         "Zeige an, wenn Programme automagisch gestartet wurden",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,71,
                     232,10
