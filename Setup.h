@@ -102,8 +102,8 @@
 #define APW_ADMIN       3
 #define APW_NONE        4
 
-#define GetAdminNoPassWarn    GetOption(L"AdminNoPassWarn",2)
-#define SetAdminNoPassWarn(v) SetOption(L"AdminNoPassWarn",v,2)
+#define GetAdminNoPassWarn    GetOption(L"AdminNoPassWarn",APW_NR_SR_ADMIN)
+#define SetAdminNoPassWarn(v) SetOption(L"AdminNoPassWarn",v,APW_NR_SR_ADMIN)
 
 //////////////////////////////////////////////////////////////////////////////
 //Settings for every user; saved to "HKLM\SECURITY\SuRun\<ComputerName>\<UserName>":
@@ -181,8 +181,8 @@
 #define TSA_ADMIN 2 //TSA for admins
 #define TSA_TIPS  8 //show balloon tips
 
-#define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),0)
-#define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,0)
+#define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),TSA_ADMIN|TSA_TIPS)
+#define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,TSA_ADMIN|TSA_TIPS)
 
 
 //Show App admin status in system tray per user setting
@@ -192,9 +192,8 @@
 
 #define DelUsrOption(u,s)     RegDelVal(HKCR,USROPTKEY(u),s)
 
-#define GetUserTSA(u)         GetUsrOption(u,_T("ShowTrayAdmin"),-1)
-#define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,-1)
-#define DelUserTSA(u)         DelUsrOption(u,_T("ShowTrayAdmin"))
+#define GetUserTSA(u)         GetUsrOption(u,_T("ShowTrayAdmin"),2)
+#define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,2)
 
 #define GetHideFromUser(u)    GetUsrOption(u,_T("HideFromUser"),0)
 #define SetHideFromUser(u,h)  SetUsrOption(u,_T("HideFromUser"),h,0)
@@ -206,12 +205,10 @@
 
 inline bool ShowTray(LPCTSTR u)
 {
-  if (HideSuRun(u)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)))
-    return false;
-  int utsa=(int)GetUserTSA(u);
-  if (utsa>0)
-    return true;
-  if (utsa==0)
+  if (IsInSuRunners(u))
+    return (!HideSuRun(u)) && (GetUserTSA(u)>0);
+  bool bAdmin=IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)!=0;
+  if (GetDefHideSuRun &&(!bAdmin))
     return false;
   switch (GetShowTrayAdmin & (~TSA_TIPS))
   {
@@ -220,17 +217,18 @@ inline bool ShowTray(LPCTSTR u)
   case TSA_ALL:
     return true;
   case TSA_ADMIN:
-    return IsAdmin()!=0;
+    return bAdmin;
   }
   return false;
 }
 
 inline bool ShowBalloon(LPCTSTR u)
 {
-  if (HideSuRun(u)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)))
+  if (IsInSuRunners(u))
+    return (!HideSuRun(u)) && (GetUserTSA(u)==2);
+  bool bAdmin=IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)!=0;
+  if (GetDefHideSuRun && (!bAdmin))
     return false;
-  if (GetUserTSA(u)==2)
-    return true;
   DWORD tsa=GetShowTrayAdmin;
   if((tsa & TSA_TIPS)==0)
     return false;
@@ -241,7 +239,7 @@ inline bool ShowBalloon(LPCTSTR u)
   case TSA_ALL:
     return true;
   case TSA_ADMIN:
-    return IsAdmin()!=0;
+    return bAdmin;
   }
   return false;
 }
@@ -313,7 +311,7 @@ void UpdLastRunTime(LPTSTR UserName);
 
 #define FLAG_DONTASK    0x01 //SuRun will not ask if App can be executed
 #define FLAG_SHELLEXEC  0x02 //ShellExecute hook will execute App elevated
-#define FLAG_NORESTRICT 0x04 //Restricted SuRunner may execute App elevated
+//deleted flag: #define FLAG_NORESTRICT 0x04 //Restricted SuRunner may execute App elevated
 #define FLAG_AUTOCANCEL 0x08 //SuRun will always answer "cancel"
 #define FLAG_CANCEL_SX  0x10 //SuRun will answer "cancel" on ShellExec
 
