@@ -6,6 +6,7 @@ Done, to be tested:
 
 ToDo
 ---------------------
+* Export/Import SuRun settings
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
