@@ -43,7 +43,7 @@ BEGIN
                     ES_NUMBER
     LTEXT           "min grace period",IDC_STATIC,226,27,92,11,NOT WS_GROUP
     CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
-                    IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
     LTEXT           "Show Warning, if Administrators have no password to:",
                     IDC_STATIC,83,52,114,17
@@ -103,7 +103,7 @@ BEGIN
     CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
-                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
@@ -139,7 +139,7 @@ BEGIN
                     237,10
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Display an Icon in the taskbar notification area",
+    GROUPBOX        "Display an Icon in the taskbar notification area for non members of the 'SuRunners' group",
                     IDC_STATIC,10,101,320,37
     LTEXT           "Display user status for the active program in the taskbar 'tray'",
                     IDC_STATIC,20,113,191,8
@@ -186,37 +186,31 @@ BEGIN
     PUSHBUTTON      "&Anuluj",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 178
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 140
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Help"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning NEVER start this program (automagically) with elevated rights",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
     LTEXT           "If the program requires elevated rights, SuRun asks to run the program as Administrator.",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will NEVER automagically be run with elevated rights",
                     IDC_STATIC,24,98,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
-    LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
-                    IDC_STATIC,24,116,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,134,20,20,SS_REALSIZEIMAGE
-    LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
-                    IDC_STATIC,24,134,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,156,262,1
-    DEFPUSHBUTTON   "Close",IDCANCEL,105,160,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,118,262,1
+    DEFPUSHBUTTON   "Close",IDCANCEL,105,122,50,14
 END
 
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 143
@@ -438,47 +432,40 @@ BEGIN
                     PBS_SMOOTH,0,134,263,9
 END
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 172
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Program options"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,145,361,1
     LTEXT           "Command line",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     LTEXT           "Wildcards '*' und '?' are supported.\nIMPORTANT: If the command contains spaces, it must be enclosed in quotes.",
                     IDC_STATIC,55,25,261,19
-    ICON            IDI_LISTICON2,IDC_STATIC,36,55,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,36,55,21,20,SS_REALSIZEIMAGE
     CONTROL         "ask if the program can be started with elevated rights",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,55,300,10
-    ICON            IDI_LISTICON3,IDC_STATIC,36,68,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,36,68,21,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and always start the program with elevated rights",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,68,300,10
-    ICON            IDI_LISTICON6,IDC_STATIC,36,81,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,36,81,21,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and NEVER start the program with elevated rights",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,81,300,10
-    ICON            IDI_LISTICON1,IDC_STATIC,36,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,36,98,21,20,SS_REALSIZEIMAGE
     CONTROL         "ask only if the program requires to run with elevated rights. (Manifest, 'Install.exe' etc.)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,98,300,10
-    ICON            IDI_LISTICON,IDC_STATIC,36,111,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,36,111,21,20,SS_REALSIZEIMAGE
     CONTROL         "start the program automagically with elevated rights",
                     IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,111,300,10
-    ICON            IDI_LISTICON7,IDC_STATIC,36,124,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,36,124,21,20,SS_REALSIZEIMAGE
     CONTROL         "NEVER start the program automagically with elevated rights",
                     IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,124,300,10
-    ICON            IDI_LISTICON5,IDC_STATIC,36,141,20,20,SS_REALSIZEIMAGE
-    CONTROL         "user is allowed to start the program with elevated rights",
-                    IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,141,300,10
-    ICON            IDI_LISTICON4,IDC_STATIC,36,154,20,20,SS_REALSIZEIMAGE
-    CONTROL         "user MUST NOT start the program with elevated rights",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,154,300,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancel",IDCANCEL,304,176,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,152,50,14
 END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
@@ -821,7 +808,7 @@ BEGIN
     LTEXT           "min warten vor erneuter Abfrage",IDC_STATIC,226,26,142,
                     9,NOT WS_GROUP
     CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
-                    IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
     LTEXT           "Zeige Warnung bei Administratoren mit leeren Kennwörtern:",
                     IDC_STATIC,83,52,114,17
@@ -884,7 +871,7 @@ BEGIN
     CONTROL         "SuRun vor Benutzer verbergen",IDC_HIDESURUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Benutzerstatus in Taskleiste anzeigen",
-                    IDC_TRAYSHOWADMIN,"Button",BS_AUTO3STATE | WS_TABSTOP,
+                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     252,30,137,10
     CONTROL         "Benutzerstatus Info als 'Balloon-Tips'",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
@@ -921,7 +908,7 @@ BEGIN
                     232,10
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Symbol im Infobereich der Taskleiste (Für alle Benutzer, auch nicht-SuRunner)",
+    GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",
                     IDC_STATIC,10,101,320,37
     LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",
                     IDC_STATIC,20,113,191,8
@@ -968,37 +955,31 @@ BEGIN
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 178
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 140
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Hilfe"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun wird nicht fragen und das Programm immer mit erhöhten Rechten starten",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun wird nicht fragen und das Programm NIE mit erhöhten Rechten starten",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
     LTEXT           "Nur wenn ein Programm erhöhte Rechte benötigt, fragt SuRun, ob es administrativ gestartet werden darf.",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
     LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es NIE automagisch mit erhöhten Rechten gestartet",
                     IDC_STATIC,24,98,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm erlaubt",
-                    IDC_STATIC,24,116,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,134,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn der Benutzer nur bestimmte Programme mit erhöhten Rechten ausführen darf, ist das für dieses Programm untersagt",
-                    IDC_STATIC,24,134,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,156,262,1
-    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,160,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,117,262,1
+    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,121,50,14
 END
 
 IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
@@ -1134,13 +1115,13 @@ BEGIN
     DEFPUSHBUTTON   "&Fertig",IDOK,192,179,50,14
 END
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 172
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Programmoptionen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,145,361,1
     LTEXT           "Befehlszeile",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
@@ -1166,15 +1147,8 @@ BEGIN
     ICON            IDI_LISTICON7,IDC_STATIC,36,124,21,20,SS_REALSIZEIMAGE
     CONTROL         "Programm automagisch NIE mit erhöhten Rechten starten",
                     IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,124,300,10
-    ICON            IDI_LISTICON5,IDC_STATIC,36,141,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Benutzer darf dieses Programm mit erhöhten Rechten starten",
-                    IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,141,300,10
-    ICON            IDI_LISTICON4,IDC_STATIC,36,154,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Benutzer darf dieses Programm NICHT mit erhöhten Rechten starten",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,154,300,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,176,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,152,50,14
 END
 
 
@@ -1420,7 +1394,7 @@ BEGIN
                     ES_NUMBER
     LTEXT           "min grace period",IDC_STATIC,226,26,92,11,NOT WS_GROUP
     CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
-                    IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
     LTEXT           "Show Warning, if Administrators have no password to:",
                     IDC_STATIC,83,52,114,17
@@ -1480,7 +1454,7 @@ BEGIN
     CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Display user status in taskbar",IDC_TRAYSHOWADMIN,
-                    "Button",BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
@@ -1516,7 +1490,7 @@ BEGIN
                     241,10
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Display an Icon in the taskbar notification area",
+    GROUPBOX        "Display an Icon in the taskbar notification area for non members of the 'SuRunners' group",
                     IDC_STATIC,10,101,320,37
     LTEXT           "Display user status for the active program in the taskbar 'tray'",
                     IDC_STATIC,20,113,191,8
@@ -1563,80 +1537,67 @@ BEGIN
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 178
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 142
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Icon Help"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning start this program with elevated rights",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun will without questioning NEVER start this program (automagically) with elevated rights",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
     LTEXT           "If the program requires elevated rights, SuRun asks to run the program as Administrator.",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
     LTEXT           "If the Windows shell starts this program, it will NEVER automagically be run with elevated rights",
                     IDC_STATIC,24,98,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
-    LTEXT           "This program is granted to launch with elevated rights if the User is a restricted SuRunner",
-                    IDC_STATIC,24,116,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,134,20,20,SS_REALSIZEIMAGE
-    LTEXT           "If the User is a restricted SuRunner, (s)he is NOT allowed to launch this program with elevated rights",
-                    IDC_STATIC,24,134,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,156,262,1
-    DEFPUSHBUTTON   "Close",IDCANCEL,105,160,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,119,262,1
+    DEFPUSHBUTTON   "Close",IDCANCEL,105,123,50,14
 END
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 171
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Program options"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,145,361,1
     LTEXT           "Command line",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     LTEXT           "Wildcards '*' und '?' are supported.\nIMPORTANT: If the command contains spaces, it must be enclosed in quotes.",
                     IDC_STATIC,55,25,261,19
-    ICON            IDI_LISTICON2,IDC_STATIC,36,55,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,36,55,21,20,SS_REALSIZEIMAGE
     CONTROL         "ask if the program can be started with elevated rights",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,55,302,10
-    ICON            IDI_LISTICON3,IDC_STATIC,36,68,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,36,68,21,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and always start the program with elevated rights",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,68,302,10
-    ICON            IDI_LISTICON6,IDC_STATIC,36,81,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,36,81,21,20,SS_REALSIZEIMAGE
     CONTROL         "don't ask and NEVER start the program with elevated rights",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,81,302,10
-    ICON            IDI_LISTICON1,IDC_STATIC,36,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,36,98,21,20,SS_REALSIZEIMAGE
     CONTROL         "ask only if the program requires to run with elevated rights. (Manifest, 'Install.exe' etc.)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,98,302,10
-    ICON            IDI_LISTICON,IDC_STATIC,36,111,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,36,111,21,20,SS_REALSIZEIMAGE
     CONTROL         "start the program automagically with elevated rights",
                     IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,111,302,10
-    ICON            IDI_LISTICON7,IDC_STATIC,36,124,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,36,124,21,20,SS_REALSIZEIMAGE
     CONTROL         "NEVER start the program automagically with elevated rights",
                     IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,124,302,10
-    ICON            IDI_LISTICON5,IDC_STATIC,36,141,20,20,SS_REALSIZEIMAGE
-    CONTROL         "user is allowed to start the program with elevated rights",
-                    IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,50,141,302,10
-    ICON            IDI_LISTICON4,IDC_STATIC,36,154,20,20,SS_REALSIZEIMAGE
-    CONTROL         "user MUST NOT start the program with elevated rights",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,50,154,302,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancel",IDCANCEL,304,176,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,152,50,14
 END
 
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 143
@@ -2123,7 +2084,7 @@ BEGIN
                     ES_NUMBER
     LTEXT           "min grace period",IDC_STATIC,226,26,92,11,NOT WS_GROUP
     CONTROL         "Vervang Windows 'Run as...' door SuRun 'Run as...'",
-                    IDC_DORUNAS,"Button",BS_AUTO3STATE | BS_MULTILINE | 
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,39,242,9
     LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord:",
                     IDC_STATIC,83,52,114,17
@@ -2183,7 +2144,7 @@ BEGIN
     CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
-                    BS_AUTO3STATE | WS_TABSTOP,252,30,137,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
     GROUPBOX        "Programmalijst voor de gebruiker (Wijzigingen zijn direct van toepassing, ook bij 'Annuleren').",
@@ -2219,7 +2180,8 @@ BEGIN
                     243,10
     CTEXT           "LET OP: Wijzigingen komen van kracht bij de volgende Windows-aanmelding.",
                     IDC_STATIC,14,86,312,8
-    GROUPBOX        "Systeemvak-ikoon",IDC_STATIC,10,101,320,37
+    GROUPBOX        "Display an Icon in the taskbar notification area for non members of the 'SuRunners' group",
+                    IDC_STATIC,10,101,320,37
     LTEXT           "Ikoon in het systeemvak van de taakbalk tonen",
                     IDC_STATIC,20,113,191,8
     COMBOBOX        IDC_TRAYSHOWADMIN,219,111,99,30,CBS_DROPDOWNLIST | 
@@ -2265,80 +2227,67 @@ BEGIN
     PUSHBUTTON      "&Annuleren",IDCANCEL,338,256,50,14
 END
 
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 178
+IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 139
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun - Verklaring symbolen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun start het programma ALTIJD met verhoogde rechten",
                     IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun vraagt toestemming om dit programma met verhoogde rechten te starten",
                     IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
     LTEXT           "SuRun start dit programma NOOIT met verhoogde rechten",
                     IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
     LTEXT           "Windows mag dit programma automatisch met verhoogde rechten starten",
                     IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
     LTEXT           "Als dit programma verhoogde rechten nodig heeft, stelt SuRun voor het als Administrator te starten.",
                     IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
     LTEXT           "Windows mag dit programma NIET automatisch met verhoogde rechten starten",
                     IDC_STATIC,24,98,226,16
-    ICON            IDI_LISTICON5,IDC_STATIC,8,116,20,20,SS_REALSIZEIMAGE
-    LTEXT           "De gebruiker mag dit programma met verhoogde rechten starten",
-                    IDC_STATIC,24,116,226,16
-    ICON            IDI_LISTICON4,IDC_STATIC,8,134,20,20,SS_REALSIZEIMAGE
-    LTEXT           "De gebruiker mag dit programma NIET met verhoogde rechten starten",
-                    IDC_STATIC,24,134,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,156,262,1
-    DEFPUSHBUTTON   "Sluiten",IDCANCEL,105,160,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,118,262,1
+    DEFPUSHBUTTON   "Sluiten",IDCANCEL,105,122,50,14
 END
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 171
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Programma instellingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,144,361,1
     LTEXT           "Opdrachtregel",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     LTEXT           "Wildcards '*' und '?' are supported.\nIMPORTANT: If the command contains spaces, it must be enclosed in quotes.",
                     IDC_STATIC,55,25,261,19
-    ICON            IDI_LISTICON2,IDC_STATIC,18,55,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,18,55,21,20,SS_REALSIZEIMAGE
     CONTROL         "vragen om dit programma met verhoogde rechten te starten",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,32,55,329,10
-    ICON            IDI_LISTICON3,IDC_STATIC,18,68,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,18,68,21,20,SS_REALSIZEIMAGE
     CONTROL         "dit programma ALTIJD met verhoogde rechten starten",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,32,68,329,10
-    ICON            IDI_LISTICON6,IDC_STATIC,18,81,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,18,81,21,20,SS_REALSIZEIMAGE
     CONTROL         "dit programma NOOIT met verhoogde rechten starten",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,32,81,329,10
-    ICON            IDI_LISTICON1,IDC_STATIC,18,98,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,18,98,21,20,SS_REALSIZEIMAGE
     CONTROL         "vragen als het programma verhoogde rechten nodig heeft. (Manifest, 'Install.exe' etc.)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,32,98,329,10
-    ICON            IDI_LISTICON,IDC_STATIC,18,111,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,18,111,21,20,SS_REALSIZEIMAGE
     CONTROL         "het programma automatisch met verhoogde rechten starten",
                     IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,32,111,329,10
-    ICON            IDI_LISTICON7,IDC_STATIC,18,124,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,18,124,21,20,SS_REALSIZEIMAGE
     CONTROL         "het programma NOOIT met verhoogde rechten starten",
                     IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,32,124,329,10
-    ICON            IDI_LISTICON5,IDC_STATIC,18,141,20,20,SS_REALSIZEIMAGE
-    CONTROL         "de gebruiker mag het programma met verhoogde rechten starten",
-                    IDC_RESTRICT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,32,141,329,10
-    ICON            IDI_LISTICON4,IDC_STATIC,18,154,20,20,SS_REALSIZEIMAGE
-    CONTROL         "de gebruiker mag het programma NIET met verhoogde rechten starten",
-                    IDC_RESTRICT2,"Button",BS_AUTORADIOBUTTON,32,154,329,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Annuleren",IDCANCEL,304,176,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,241,151,50,14,WS_GROUP
+    PUSHBUTTON      "&Annuleren",IDCANCEL,304,151,50,14
 END
 
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 143
