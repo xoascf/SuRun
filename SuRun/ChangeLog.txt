@@ -2,6 +2,15 @@ Done, to be tested:
 ---------------------------
 * SuRun Settings dialog is now resizeable
 * Tray Message Windows move when Display resolution changes
+* Removed indeterminate state for "Show Icon in Taskbar"
+* Removed indeterminate state for "Replace RunAs"
+* Removed "Restricted SuRunner may start this app" Option. 
+  Restricted SuRunners may run programs with elevated rights as specified in 
+  their program list.
+* Restricted SuRunners are not asked any more if they want to start Setup(etc.) 
+  programs with elevated rights
+* Button "Set recommended options for home users" sets Settings on all pages
+  but only for selected user.
 * FIX: Tray Message Windows did not close after 20s
 
 ToDo
