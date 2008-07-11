@@ -1315,7 +1315,7 @@ EditApp:
           return TRUE;
         //Mouse Click: Toggle Flags
         case NM_DBLCLK:
-          if(((LPNMITEMACTIVATE)lParam)->iSubItem>2)
+          if(((LPNMITEMACTIVATE)lParam)->iSubItem>1)
             goto EditApp;
         case NM_CLICK:
           {
