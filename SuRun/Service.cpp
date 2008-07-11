@@ -410,7 +410,18 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         }
         if (!g_RunData.bRunAs)
         {
-          DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
+          DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
+          bool bNotInList=wlf==-1;
+          if(bNotInList)
+            wlf=0;
+          if  (bNotInList 
+            && GetRestrictApps(g_RunData.UserName) 
+            && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
+          {
+            ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
+            //DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            continue;
+          }
           //check if the requested App is Flagged with AutoCancel
           if (wlf&FLAG_AUTOCANCEL)
           {
@@ -430,7 +441,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               //DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
               continue;
             }
-            //Only SuRunners will can use the hooks
+            //Only SuRunners can use the hooks
             if (!IsInSuRunners(g_RunData.UserName))
             {
               ResumeClient(RETVAL_SX_NOTINLIST);
@@ -446,17 +457,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               continue;
             }
             //DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-          }
-          if  (GetRestrictApps(g_RunData.UserName) 
-            && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
-          {
-            if (!(wlf&FLAG_NORESTRICT))
-            {
-              ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
-              //DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-              continue;
-            }
-            //DBGTrace2("Restriction WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
@@ -688,8 +688,11 @@ DWORD PrepareSuRun()
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
       return RETVAL_CANCELLED;
     //Is User Restricted?
-    DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0);
-    if  (GetRestrictApps(g_RunData.UserName) && ((f&FLAG_NORESTRICT)==0))
+    DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
+    bool bNotInList=f==-1;
+    if(bNotInList)
+      f=0;
+    if  (GetRestrictApps(g_RunData.UserName) && bNotInList)
       return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
     DWORD l=0;
     if (!PwOk)
