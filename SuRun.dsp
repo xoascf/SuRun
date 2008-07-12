@@ -251,6 +251,10 @@ SOURCE=.\WinStaDesk.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\anchor.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\BLOWFISH.h
 # End Source File
 # Begin Source File
