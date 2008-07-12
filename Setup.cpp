@@ -1371,7 +1371,6 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_SHEXHOOK,GetUseIShExHook);
       CheckDlgButton(hwnd,IDC_IATHOOK,GetUseIATHook);
       CheckDlgButton(hwnd,IDC_SHOWTRAY,GetShowAutoRuns);
-      CheckDlgButton(hwnd,IDC_NOSETUPNEW,GetNoSetupNew);
       CheckDlgButton(hwnd,IDC_REQADMIN,GetTestReqAdmin);
       BOOL bHook=GetUseIShExHook || GetUseIATHook;
       EnableWindow(GetDlgItem(hwnd,IDC_REQADMIN),bHook);
@@ -1393,7 +1392,6 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVADMIN,GetNoConvAdmin);
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_HIDESURUN,GetDefHideSuRun);
-      CheckDlgButton(hwnd,IDC_RESTRICTNEW,GetRestrictNew);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -1410,8 +1408,6 @@ ApplyChanges:
       SetNoConvAdmin(IsDlgButtonChecked(hwnd,IDC_NOCONVADMIN));
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
       SetDefHideSuRun(IsDlgButtonChecked(hwnd,IDC_HIDESURUN));
-      SetRestrictNew(IsDlgButtonChecked(hwnd,IDC_RESTRICTNEW));
-      SetNoSetupNew(IsDlgButtonChecked(hwnd,IDC_NOSETUPNEW));
       SetTestReqAdmin(IsDlgButtonChecked(hwnd,IDC_REQADMIN));
       DWORD tsa=ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN));
       if (IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON))
@@ -1501,8 +1497,6 @@ void SetSimpleSettings()
   CheckDlgButton(h,IDC_NOCONVADMIN,0);
   CheckDlgButton(h,IDC_NOCONVUSER,0);
   CheckDlgButton(h,IDC_HIDESURUN,0);
-  CheckDlgButton(h,IDC_RESTRICTNEW,0);
-  CheckDlgButton(h,IDC_NOSETUPNEW,0);
   UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
 }
 
