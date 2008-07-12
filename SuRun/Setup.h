@@ -72,14 +72,6 @@
 #define GetNoConvUser     (GetOption(_T("NoAutoUserToSuRunner"),0)!=0)
 #define SetNoConvUser(b)  SetOption(_T("NoAutoUserToSuRunner"),b,0)
 
-//New SuRunners are Restricted
-#define GetRestrictNew    (GetOption(_T("RestrictNewRunner"),0)!=0)
-#define SetRestrictNew(b) SetOption(_T("RestrictNewRunner"),b,0)
-
-//New SuRunners may not Run Setup
-#define GetNoSetupNew     (GetOption(_T("NewRunnerDenySetup"),0)!=0)
-#define SetNoSetupNew(b)  SetOption(_T("NewRunnerDenySetup"),b,0)
-
 //Test Manifest and file name of started files
 #define GetTestReqAdmin    (GetOption(_T("TestReqAdmin"),1)!=0)
 #define SetTestReqAdmin(b) SetOption(_T("TestReqAdmin"),b,1)
