@@ -1,5 +1,8 @@
 Done, to be tested:
 ---------------------------
+
+SuRun 1.1.9.4 - 2008-07-12: (beta)
+---------------------------
 * SuRun Settings dialog is now resizeable
 * Tray Message Windows move when Display resolution changes
 * Removed indeterminate state for "Show Icon in Taskbar"
