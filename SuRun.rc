@@ -161,14 +161,6 @@ BEGIN
                     174,301,8
     LTEXT           "You can still add users to the group 'SuRunners' on the page 'SuRunners group'.",
                     IDC_STATIC,20,184,306,8
-    GROUPBOX        "If a user has been added to the group 'SuRunners':",
-                    IDC_STATIC,10,196,320,35
-    CONTROL         "New SuRunners MUST NOT change SuRun settings",
-                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    206,301,10
-    CONTROL         "New SuRunners can only run predefined programs with elevated rights",
-                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    218,301,10
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -930,14 +922,6 @@ BEGIN
                     174,301,8
     LTEXT           "Auf der Seite 'SuRunners-Gruppe' können Benutzer zur Gruppe 'SuRunners' hinzugefügt werden.",
                     IDC_STATIC,20,184,306,8
-    GROUPBOX        "Wenn Benutzer zur Gruppe 'SuRunners' hinzugefügt werden:",
-                    IDC_STATIC,10,196,320,35
-    CONTROL         "Neue SuRunner dürfen SuRuns Einstellungen NICHT verändern",
-                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    206,301,10
-    CONTROL         "Neue SuRunner dürfen nur festgelegte Programme mit SuRun starten",
-                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    218,301,10
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -1512,14 +1496,6 @@ BEGIN
                     174,301,8
     LTEXT           "You can still add users to the group 'SuRunners' on the page 'SuRunners group'.",
                     IDC_STATIC,20,185,306,8
-    GROUPBOX        "If a user has been added to the group 'SuRunners':",
-                    IDC_STATIC,10,196,320,35
-    CONTROL         "New SuRunners MUST NOT change SuRun settings",
-                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    206,301,10
-    CONTROL         "New SuRunners can only run predefined programs with elevated rights",
-                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    218,301,10
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -2202,14 +2178,6 @@ BEGIN
                     174,301,8
     LTEXT           "In de tab 'SuRunners Groep' kunnen gebruikers aan de groep 'SuRunners' worden toegevoegd.",
                     IDC_STATIC,20,184,306,8
-    GROUPBOX        "Wanneer een gebruiker aan de groep 'SuRunners' is toegevoegd:",
-                    IDC_STATIC,10,196,320,35
-    CONTROL         "Nieuwe SuRunners mogen SuRun instellingen niet wijzigen",
-                    IDC_RESTRICTNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    206,301,10
-    CONTROL         "Nieuwe SuRunners mogen alleen vooraf bepaalde programma's met SuRun starten",
-                    IDC_NOSETUPNEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    218,301,10
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
