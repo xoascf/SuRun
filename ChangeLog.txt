@@ -11,6 +11,8 @@ Done, to be tested:
   programs with elevated rights
 * Button "Set recommended options for home users" sets Settings on all pages
   but only for selected user.
+* Options, that new SuRunners may not run Setup and that they and may only run 
+  predefined Apps with SuRun were removed
 * FIX: Tray Message Windows did not close after 20s
 * FIX: All elevated processes were started from %windir%\system32
 
