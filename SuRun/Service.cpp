@@ -869,7 +869,7 @@ DWORD LSAStartAdminProcess()
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT,Env,NULL,&si,&pi))
+        CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         CloseHandle(pi.hThread);
