@@ -271,8 +271,6 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
         sCaption,MB_ICONSTOP);
       return FALSE;
     }
-    SetRestrictApps(UserName,(DWORD)GetRestrictNew);
-    SetNoRunSetup(UserName,(DWORD)GetNoSetupNew);
     if (bHimSelf)
       SafeMsgBox(hwnd,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
@@ -288,8 +286,6 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
       sCaption,MB_ICONSTOP);
     return FALSE;
   }
-  SetRestrictApps(UserName,(DWORD)GetRestrictNew);
-  SetNoRunSetup(UserName,(DWORD)GetNoSetupNew);
   if (bHimSelf)
     SafeMsgBox(hwnd,CBigResStr(IDS_SURUNNER_OK),sCaption,MB_ICONINFORMATION);
   return TRUE;
