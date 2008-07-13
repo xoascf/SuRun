@@ -850,13 +850,14 @@ BOOL CALLBACK KillProxyDesktopEnum(HWND hwnd, LPARAM lParam)
     {
       DWORD pid=0;
       GetWindowThreadProcessId(hwnd,&pid);
-      if (pid==(DWORD)lParam)
+      if (pid==*((DWORD*)lParam))
       {
-        DestroyWindow(hwnd);
-        return TRUE;
+        SendMessage(hwnd,WM_CLOSE,0,0);
+        *((DWORD*)lParam)=0;
+        return FALSE;
       }
-    }
-    DestroyWindow(hwnd);
+    }else
+      SendMessage(hwnd,WM_CLOSE,0,0);
   }
   return TRUE;
 }
@@ -899,7 +900,7 @@ DWORD LSAStartAdminProcess()
         _tcscpy(cmd,g_RunData.cmdLine);
         PathRemoveArgs(cmd);
         PathUnquoteSpaces(cmd);
-        bIsExplorer=_tcscmp(cmd,app);
+        bIsExplorer=_tcscmp(cmd,app)==0;
       }
       if(bIsExplorer)
       {
@@ -921,8 +922,6 @@ DWORD LSAStartAdminProcess()
         CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
         if(bIsExplorer)
         {
           //To start control Panel and other Explorer children we need to tell 
@@ -934,10 +933,14 @@ DWORD LSAStartAdminProcess()
           //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
           //Explorer.exe, this will cause a new Explorer.exe to stay running
           CTimeOut to(10000);
-          while ((!to.TimedOut()) && (!EnumWindows(KillProxyDesktopEnum,pi.dwProcessId)))
-            Sleep(100);
+          DWORD pid=pi.dwProcessId;
+          while ((!to.TimedOut()) 
+            && pid && EnumWindows(KillProxyDesktopEnum,(LPARAM)&pid)
+            && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT));
           SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
         }
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
         RetVal=RETVAL_OK;
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         if((g_RunData.RetPID)&&(g_RunData.RetPtr))
