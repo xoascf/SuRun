@@ -831,6 +831,37 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
   return hUser;
 }
 
+#define GetSeparateProcess(k) GetRegInt(k,\
+                    _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),\
+                    _T("SeparateProcess"),0)
+#define SetSeparateProcess(k,b) SetRegInt(k,\
+                    _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),\
+                    _T("SeparateProcess"),b)
+
+#define DESKTOPPROXYCLASS   TEXT("Proxy Desktop")
+
+BOOL CALLBACK KillProxyDesktopEnum(HWND hwnd, LPARAM lParam)
+{
+  TCHAR cn[MAX_PATH];
+  GetClassName(hwnd, cn, countof(cn));
+  if (_tcsicmp(cn, DESKTOPPROXYCLASS)==0)
+  {
+    if(lParam)
+    {
+      DWORD pid=0;
+      GetWindowThreadProcessId(hwnd,&pid);
+      if (pid==(DWORD)lParam)
+      {
+        DestroyWindow(hwnd);
+        return TRUE;
+      }
+    }
+    DestroyWindow(hwnd);
+  }
+  return TRUE;
+}
+
+
 DWORD LSAStartAdminProcess() 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
@@ -848,13 +879,6 @@ DWORD LSAStartAdminProcess()
   PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
   if(LoadUserProfile(hAdmin,&ProfInf))
   {
-    //To start control Panel and other Explorer children we need to tell 
-    //Explorer to start a new Process, because the Shell updates the state 
-    //from the registry and this cant' be forced to be done "now", the
-    //"SeparateProcess" registry value must be set early an remain set
-//    SetRegInt((HKEY)ProfInf.hProfile,
-//      _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),
-//      _T("SeparateProcess"),1);
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
     {
@@ -864,6 +888,31 @@ DWORD LSAStartAdminProcess()
       TCHAR WinstaDesk[MAX_PATH];
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
+      //Special handling for Explorer:
+      BOOL orgSP=FALSE;
+      BOOL bIsExplorer=FALSE;
+      {
+        TCHAR app[MAX_PATH]={0};
+        GetSystemWindowsDirectory(app,4096);
+        PathAppend(app,L"explorer.exe");
+        TCHAR cmd[MAX_PATH]={0};
+        _tcscpy(cmd,g_RunData.cmdLine);
+        PathRemoveArgs(cmd);
+        PathUnquoteSpaces(cmd);
+        bIsExplorer=_tcscmp(cmd,app);
+      }
+      if(bIsExplorer)
+      {
+        //To start control Panel and other Explorer children we need to tell 
+        //Explorer to open folders in a new proecess
+        orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
+        SetSeparateProcess((HKEY)ProfInf.hProfile,1);
+        //Messages work on the same WinSta/Desk only
+        SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
+        //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
+        //Explorer.exe, this will cause a new Explorer.exe to stay running
+        EnumWindows(KillProxyDesktopEnum,0);
+      }
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
@@ -874,6 +923,21 @@ DWORD LSAStartAdminProcess()
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
+        if(bIsExplorer)
+        {
+          //To start control Panel and other Explorer children we need to tell 
+          //Explorer to open folders in a new proecess
+          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
+          SetSeparateProcess((HKEY)ProfInf.hProfile,1);
+          //Messages work on the same WinSta/Desk only
+          SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
+          //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
+          //Explorer.exe, this will cause a new Explorer.exe to stay running
+          CTimeOut to(10000);
+          while ((!to.TimedOut()) && (!EnumWindows(KillProxyDesktopEnum,pi.dwProcessId)))
+            Sleep(100);
+          SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
+        }
         RetVal=RETVAL_OK;
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         if((g_RunData.RetPID)&&(g_RunData.RetPtr))
@@ -1809,11 +1873,6 @@ bool HandleServiceStuff()
       GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
       GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
-      //To start control Panel and other Explorer children we need to tell 
-      //Explorer to start a new Process, because the Shell updates the state 
-      //from the registry and this cant' be forced to be done "now", the
-      //"SeparateProcess" registry value must be set early an remain set
-//      SetSeparateProcess(1);
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
