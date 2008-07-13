@@ -121,10 +121,6 @@ extern RUNDATA g_RunData;
 //      DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
 //      if(bIsExplorer)
 //      {
-//        //To start control Panel and other Explorer children we need to tell 
-//        //Explorer to open folders in a new proecess
-//        orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-//        SetSeparateProcess((HKEY)ProfInf.hProfile,1);
 //        //Messages work on the same WinSta/Desk only
 //        SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
 //        //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
@@ -134,12 +130,13 @@ extern RUNDATA g_RunData;
 //        while ((!to.TimedOut()) 
 //          && pid && EnumWindows(KillProxyDesktopEnum1,(LPARAM)&pid)
 //          && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT));
-//        SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
 //      }
 //      CloseHandle(pi.hThread);
 //      CloseHandle(pi.hProcess);
 //    }else
 //      DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+//    if(bIsExplorer &&(!orgSP))
+//      SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
 //    DestroyEnvironmentBlock(Env);
 //  }else
 //    DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
