@@ -907,7 +907,8 @@ DWORD LSAStartAdminProcess()
         //To start control Panel and other Explorer children we need to tell 
         //Explorer to open folders in a new proecess
         orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-        SetSeparateProcess((HKEY)ProfInf.hProfile,1);
+        if(!orgSP)
+          SetSeparateProcess((HKEY)ProfInf.hProfile,1);
         //Messages work on the same WinSta/Desk only
         SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
         //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
@@ -924,10 +925,6 @@ DWORD LSAStartAdminProcess()
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         if(bIsExplorer)
         {
-          //To start control Panel and other Explorer children we need to tell 
-          //Explorer to open folders in a new proecess
-          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-          SetSeparateProcess((HKEY)ProfInf.hProfile,1);
           //Messages work on the same WinSta/Desk only
           SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
           //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
@@ -936,8 +933,8 @@ DWORD LSAStartAdminProcess()
           DWORD pid=pi.dwProcessId;
           while ((!to.TimedOut()) 
             && pid && EnumWindows(KillProxyDesktopEnum,(LPARAM)&pid)
-            && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT));
-          SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
+            && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT))
+            ;
         }
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
@@ -963,6 +960,8 @@ DWORD LSAStartAdminProcess()
           ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+      if(bIsExplorer && (!orgSP))
+        SetSeparateProcess((HKEY)ProfInf.hProfile,0);
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
