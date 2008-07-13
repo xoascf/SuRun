@@ -852,9 +852,9 @@ DWORD LSAStartAdminProcess()
     //Explorer to start a new Process, because the Shell updates the state 
     //from the registry and this cant' be forced to be done "now", the
     //"SeparateProcess" registry value must be set early an remain set
-    SetRegInt((HKEY)ProfInf.hProfile,
-      _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),
-      _T("SeparateProcess"),1);
+//    SetRegInt((HKEY)ProfInf.hProfile,
+//      _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),
+//      _T("SeparateProcess"),1);
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
     {
@@ -1813,7 +1813,7 @@ bool HandleServiceStuff()
       //Explorer to start a new Process, because the Shell updates the state 
       //from the registry and this cant' be forced to be done "now", the
       //"SeparateProcess" registry value must be set early an remain set
-      SetSeparateProcess(1);
+//      SetSeparateProcess(1);
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
