@@ -142,11 +142,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //Lets go:
   g_RetVal=RETVAL_WAIT;
   HANDLE hPipe=INVALID_HANDLE_VALUE;
-  //To start control Panel and other Explorer children we need to tell 
-  //Explorer to start a new Process, because the Shell updates the state 
-  //from the registry and this cant' be forced to be done "now", the
-  //"SeparateProcess" registry value must be set early an remain set
-//  SetSeparateProcess(1);
   //retry if the pipe is busy: (max 240s)
   for(int i=0;i<720;i++)
   {
