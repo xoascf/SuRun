@@ -1020,6 +1020,25 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
   CheckDlgButton(h,IDC_HIDESURUN,0);
 }
 
+void ShowExpertSettings(HWND hwnd,bool bShow)
+{
+  HWND hTab=GetDlgItem(hwnd,IDC_SETUP_TAB);
+  if (bShow)
+  {
+    SetRecommendedSettings(true);
+    TabCtrl_DeleteItem(hTab,3);
+    TabCtrl_DeleteItem(hTab,2);
+    RedrawWindow(hwnd,0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
+  }else
+  {
+    TCITEM tie3={TCIF_TEXT,0,0,CResStr(IDS_SETUP3),0,0,0};
+    TCITEM tie4={TCIF_TEXT,0,0,CResStr(IDS_SETUP4),0,0,0};
+    TabCtrl_InsertItem(hTab,2,&tie3);
+    TabCtrl_InsertItem(hTab,3,&tie4);
+    RedrawWindow(GetParent(hwnd),0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 // Dialog Proc for first Tab-Control
@@ -1052,6 +1071,8 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       
       CheckDlgButton(hwnd,IDC_RESTARTADMIN,GetRestartAsAdmin);
       CheckDlgButton(hwnd,IDC_STARTADMIN,GetStartAsAdmin);
+
+      CheckDlgButton(hwnd,IDC_NOEXPERT,GetHideExpertSettings);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -1073,22 +1094,11 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           if (SafeMsgBox(hwnd,CBigResStr(IDS_EXPERTSETUP),CResStr(IDS_APPNAME),
             MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDYES)
-          {
-            SetRecommendedSettings(true);
-            HWND hTab=GetDlgItem(GetParent(hwnd),IDC_SETUP_TAB);
-            TabCtrl_DeleteItem(hTab,3);
-            TabCtrl_DeleteItem(hTab,2);
-            RedrawWindow(GetParent(hwnd),0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
-          }
+            ShowExpertSettings(GetParent(hwnd),false);
+          else
+            CheckDlgButton(hwnd,IDC_NOEXPERT,0);
         }else
-        {
-          HWND hTab=GetDlgItem(GetParent(hwnd),IDC_SETUP_TAB);
-          TCITEM tie3={TCIF_TEXT,0,0,CResStr(IDS_SETUP3),0,0,0};
-          TCITEM tie4={TCIF_TEXT,0,0,CResStr(IDS_SETUP4),0,0,0};
-		      TabCtrl_InsertItem(hTab,2,&tie3);
-		      TabCtrl_InsertItem(hTab,3,&tie4);
-          RedrawWindow(GetParent(hwnd),0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
-        }
+          ShowExpertSettings(GetParent(hwnd),TRUE);
         break;
       case MAKELPARAM(IDC_SIMPLESETUP,BN_CLICKED):
         if (SafeMsgBox(hwnd,CBigResStr(IDS_SIMPLESETUP),CResStr(IDS_APPNAME),
@@ -1124,6 +1134,7 @@ ApplyChanges:
       SetRestartAsAdmin(IsDlgButtonChecked(hwnd,IDC_RESTARTADMIN));
       SetStartAsAdmin(IsDlgButtonChecked(hwnd,IDC_STARTADMIN));
 
+      SetHideExpertSettings(IsDlgButtonChecked(hwnd,IDC_NOEXPERT));
       return TRUE;
     }//WM_DESTROY
   }
@@ -1625,6 +1636,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       ShowWindow(g_SD->hTabCtrl[0],TRUE);
       //...
       UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
+      //...
+      if (!GetHideExpertSettings)
+        ShowExpertSettings(hwnd,false);
       SetFocus(hTab);
       g_SD->MainSetupAnchor.Init(hwnd);
       g_SD->MainSetupAnchor.Add(IDC_SETUP_TAB,ANCHOR_ALL);
