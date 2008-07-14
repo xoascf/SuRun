@@ -1023,20 +1023,19 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
 void ShowExpertSettings(HWND hwnd,bool bShow)
 {
   HWND hTab=GetDlgItem(hwnd,IDC_SETUP_TAB);
-  if (bShow)
+  TabCtrl_DeleteItem(hTab,3);
+  TabCtrl_DeleteItem(hTab,2);
+  if (!bShow)
   {
     SetRecommendedSettings(true);
-    TabCtrl_DeleteItem(hTab,3);
-    TabCtrl_DeleteItem(hTab,2);
-    RedrawWindow(hwnd,0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
   }else
   {
     TCITEM tie3={TCIF_TEXT,0,0,CResStr(IDS_SETUP3),0,0,0};
     TCITEM tie4={TCIF_TEXT,0,0,CResStr(IDS_SETUP4),0,0,0};
     TabCtrl_InsertItem(hTab,2,&tie3);
     TabCtrl_InsertItem(hTab,3,&tie4);
-    RedrawWindow(GetParent(hwnd),0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
   }
+  RedrawWindow(hwnd,0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
 }
 
 //////////////////////////////////////////////////////////////////////////////
