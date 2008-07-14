@@ -1636,7 +1636,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
       //...
       UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
       //...
-      if (!GetHideExpertSettings)
+      if (GetHideExpertSettings)
         ShowExpertSettings(hwnd,false);
       SetFocus(hTab);
       g_SD->MainSetupAnchor.Init(hwnd);
