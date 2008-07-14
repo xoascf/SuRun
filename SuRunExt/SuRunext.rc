@@ -13,42 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Polish resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PLK)
-#ifdef _WIN32
-LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
-#pragma code_page(1250)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_FILENOTFOUND        "Nie znaleziono pliku: SuRun.exe"
-    IDS_ERR                 "B³¹d SuRunExt.dll"
-    IDS_TOOLTIP             "Uruchom 'Panel sterowania' z prawami administratora"
-    IDS_SURUN               "Panel sterowania jako administrator"
-    IDS_SURUNCMD            "'SuRun cmd' here"
-    IDS_SURUNEXP            "'SuRun Explorer' here"
-    IDS_RESTARTSHELL        "Do you really want to restart the Windows Shell\n(%s) with elevated rights??"
-    IDS_CPLNAME             "SuRun Settings"
-    IDS_MENURESTART         "Uruchom ponownie jako administrator"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUSTART           "Uruchom jako administrator"
-END
-
-#endif    // Polish resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
@@ -135,8 +99,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,4
- PRODUCTVERSION 1,1,9,4
+ FILEVERSION 1,1,9,5
+ PRODUCTVERSION 1,1,9,5
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -154,14 +118,14 @@ BEGIN
             VALUE "Comments", "Based on SuDown http://sudown.sourceforge.net and Tianmiao Hu's gvim extension\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "Shell extension for SuRun\0"
-            VALUE "FileVersion", "1, 1, 9, 4\0"
+            VALUE "FileVersion", "1, 1, 9, 5\0"
             VALUE "InternalName", "SuRun right-click menu extension\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun Context Menu Extension\0"
             VALUE "OriginalFilename", "SuRunExt.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuRun Context Menu Extension\0"
-            VALUE "ProductVersion", "1, 1, 9, 4\0"
+            VALUE "ProductVersion", "1, 1, 9, 5\0"
             VALUE "SpecialBuild", "\0"
         END
     END
