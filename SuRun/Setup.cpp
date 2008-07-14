@@ -1031,8 +1031,8 @@ void ShowExpertSettings(HWND hwnd,bool bShow)
   }else
   {
     TCITEM tie3={TCIF_TEXT,0,0,CResStr(IDS_SETUP3),0,0,0};
-    TCITEM tie4={TCIF_TEXT,0,0,CResStr(IDS_SETUP4),0,0,0};
     TabCtrl_InsertItem(hTab,2,&tie3);
+    TCITEM tie4={TCIF_TEXT,0,0,CResStr(IDS_SETUP4),0,0,0};
     TabCtrl_InsertItem(hTab,3,&tie4);
   }
   RedrawWindow(hwnd,0,0,RDW_INVALIDATE|RDW_ALLCHILDREN);
