@@ -1,29 +1,16 @@
 Done, to be tested:
 ---------------------------
+
+SuRun 1.1.9.5 - 2008-07-15: (beta)
+---------------------------
+* SuRun Settings Dialog has four tabs. The last two can be hidden.
 * Implemented Explorer tricks so that you can start Explorer after an elevated 
   Explorer runs. SuRun also does not set permanently the "SeparateProcess" 
-  registry entry.
+  registry entry. In Windows Vista SuRun uses Explorers command line switch 
+  "/SEPARATE" to start elevated processes.
 * To avoid AutoRun startup delays SuRuns service is now loaded in the 
   "PlugPlay" service group, before the network is started.
 * Tray Message Windows placement has been improved.
-
-SuRun 1.1.9.4 - 2008-07-12: (beta)
----------------------------
-* SuRun Settings dialog is now resizeable
-* Tray Message Windows move when Display resolution changes
-* Removed indeterminate state for "Show Icon in Taskbar"
-* Removed indeterminate state for "Replace RunAs"
-* Removed "Restricted SuRunner may start this app" Option. 
-  Restricted SuRunners may run programs with elevated rights as specified in 
-  their program list.
-* Restricted SuRunners are not asked any more if they want to start Setup(etc.) 
-  programs with elevated rights
-* Button "Set recommended options for home users" sets Settings on all pages
-  but only for selected user.
-* Options, that new SuRunners may not run Setup and that they and may only run 
-  predefined Apps with SuRun were removed
-* FIX: Tray Message Windows did not close after 20s
-* FIX: All elevated processes were started from %windir%\system32
 
 ToDo
 ---------------------
@@ -65,6 +52,24 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.4 - 2008-07-12: (beta)
+---------------------------
+* SuRun Settings dialog is now resizeable
+* Tray Message Windows move when Display resolution changes
+* Removed indeterminate state for "Show Icon in Taskbar"
+* Removed indeterminate state for "Replace RunAs"
+* Removed "Restricted SuRunner may start this app" Option. 
+  Restricted SuRunners may run programs with elevated rights as specified in 
+  their program list.
+* Restricted SuRunners are not asked any more if they want to start Setup(etc.) 
+  programs with elevated rights
+* Button "Set recommended options for home users" sets Settings on all pages
+  but only for selected user.
+* Options, that new SuRunners may not run Setup and that they and may only run 
+  predefined Apps with SuRun were removed
+* FIX: Tray Message Windows did not close after 20s
+* FIX: All elevated processes were started from %windir%\system32
 
 SuRun 1.1.9.3 - 2008-07-09: (beta)
 ---------------------------
