@@ -895,7 +895,7 @@ DWORD LSAStartAdminProcess()
       {
         TCHAR app[MAX_PATH]={0};
         GetSystemWindowsDirectory(app,4096);
-        PathAppend(app,L"explorer.exe");
+        PathAppend(app,_T("explorer.exe"));
         TCHAR cmd[MAX_PATH]={0};
         _tcscpy(cmd,g_RunData.cmdLine);
         PathRemoveArgs(cmd);
@@ -918,12 +918,15 @@ DWORD LSAStartAdminProcess()
           //Explorer.exe, this will cause a new Explorer.exe to stay running
           EnumWindows(KillProxyDesktopEnum,0);
         }
-//        else //Vista and newer, SetSeparateProcess(0)
-//        {
-//          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-//          if(orgSP)
-//            SetSeparateProcess((HKEY)ProfInf.hProfile,0);
-//        }
+        else //Vista and newer, use "/separate" command line option
+        {
+          TCHAR cmd[MAX_PATH]={0};
+          _tcscpy(cmd,g_RunData.cmdLine);
+          PathRemoveArgs(cmd);
+          _tcscat(cmd,_T(" /SEPARATE, "));
+          _tcscat(cmd,PathGetArgs(g_RunData.cmdLine));
+          _tcscpy(g_RunData.cmdLine,cmd);
+        }
       }
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
