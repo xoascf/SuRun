@@ -37,125 +37,21 @@
 
 extern RUNDATA g_RunData;
 
-//#define GetSeparateProcess(k) GetRegInt(k,\
-//                    _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),\
-//                    _T("SeparateProcess"),0)
-//#define SetSeparateProcess(k,b) SetRegInt(k,\
-//                    _T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"),\
-//                    _T("SeparateProcess"),b)
-//
-//#define DESKTOPPROXYCLASS   TEXT("Proxy Desktop")
-//
-//BOOL CALLBACK KillProxyDesktopEnum1(HWND hwnd, LPARAM lParam)
-//{
-//  TCHAR cn[MAX_PATH];
-//  GetClassName(hwnd, cn, countof(cn));
-//  if (_tcsicmp(cn, DESKTOPPROXYCLASS)==0)
-//  {
-//    if(lParam)
-//    {
-//      DWORD pid=0;
-//      GetWindowThreadProcessId(hwnd,&pid);
-//      if (pid==*((DWORD*)lParam))
-//      {
-//        SendMessage(hwnd,WM_CLOSE,0,0);
-//        *((DWORD*)lParam)=0;
-//        return FALSE;
-//      }
-//    }else
-//      SendMessage(hwnd,WM_CLOSE,0,0);
-//  }
-//  return TRUE;
-//}
-//
-//#include <USERENV.H>
-//#include "LSALogon.h"
-//void test()
-//{
-//  _tcscpy(g_RunData.cmdLine,L"C:\\WINDOWS\\explorer.exe ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
-//  _tcscpy(g_RunData.CurDir,L"C:\\WINDOWS");
-//  DWORD SessionID=0;
-//  HANDLE hAdmin=GetAdminToken(SessionID);
-//  SetTokenInformation(hAdmin,TokenSessionId,&SessionID,sizeof(DWORD));
-//  PROFILEINFO ProfInf = {sizeof(ProfInf),0,L"BRUNS\\Kay"};
-//  if(!LoadUserProfile(hAdmin,&ProfInf))
-//    return;
-//  void* Env=0;
-//  if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
-//  {
-//    PROCESS_INFORMATION pi={0};
-//    STARTUPINFO si={0};
-//    si.cb	= sizeof(si);
-//    //Special handling for Explorer:
-//    BOOL orgSP=FALSE;
-//    BOOL bIsExplorer=FALSE;
-//    {
-//      TCHAR app[MAX_PATH]={0};
-//      GetSystemWindowsDirectory(app,4096);
-//      PathAppend(app,L"explorer.exe");
-//      TCHAR cmd[MAX_PATH]={0};
-//      _tcscpy(cmd,g_RunData.cmdLine);
-//      PathRemoveArgs(cmd);
-//      PathUnquoteSpaces(cmd);
-//      bIsExplorer=_tcscmp(cmd,app)==0;
-//    }
-//    if(bIsExplorer)
-//    {
-//      //To start control Panel and other Explorer children we need to tell 
-//      //Explorer to open folders in a new proecess
-//      orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-//      SetSeparateProcess((HKEY)ProfInf.hProfile,1);
-//      //Messages work on the same WinSta/Desk only
-//      SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-//      //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
-//      //Explorer.exe, this will cause a new Explorer.exe to stay running
-//      EnumWindows(KillProxyDesktopEnum1,0);
-//    }
-//    //CreateProcessAsUser will only work from an NT System Account since the
-//    //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-//    EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-//    EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-//    if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-//      CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
-//    {
-//      DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
-//      if(bIsExplorer)
-//      {
-//        //Messages work on the same WinSta/Desk only
-//        SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-//        //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
-//        //Explorer.exe, this will cause a new Explorer.exe to stay running
-//        CTimeOut to(10000);
-//        DWORD pid=pi.dwProcessId;
-//        while ((!to.TimedOut()) 
-//          && pid && EnumWindows(KillProxyDesktopEnum1,(LPARAM)&pid)
-//          && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT));
-//      }
-//      CloseHandle(pi.hThread);
-//      CloseHandle(pi.hProcess);
-//    }else
-//      DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-//    if(bIsExplorer &&(!orgSP))
-//      SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
-//    DestroyEnvironmentBlock(Env);
-//  }else
-//    DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-//  UnloadUserProfile(hAdmin,ProfInf.hProfile);
-//  CloseHandle(hAdmin);
-//}
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // WinMain
 //
 //////////////////////////////////////////////////////////////////////////////
-//extern BOOL TestSetup();
+
+#ifdef _DEBUG
+extern BOOL TestSetup();
+#endif _DEBUG
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-//  TestSetup();
-//  test();
-//  ExitProcess(0);
+#ifdef _DEBUG
+  TestSetup();
+#endif _DEBUG
   if(HandleServiceStuff())
     return 0;
   if (g_RunData.CliThreadId==GetCurrentThreadId())
