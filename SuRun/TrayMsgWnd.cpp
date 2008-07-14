@@ -35,48 +35,61 @@ public:
   HWND m_hWnd;
 protected:
   UINT WM_SRTRMSGWNDCLOSED;
-  UINT WM_SRTRMSGWNDGETPOS;
   HFONT m_hFont;
   HBRUSH m_bkBrush;
   RECT m_wr;
   RECT m_dr;
   int m_DoSlide;
   HICON m_Icon;
+  int m_MaxBottom;
 private:
   static LRESULT CALLBACK WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam);
   LRESULT CALLBACK WinProc(UINT msg,WPARAM wParam,LPARAM lParam);
 private:
   void MoveAboveOthers()
   {
-    //CTimeLog l(L"MoveAboveOthers");
-    SendMessageCallback(HWND_BROADCAST,WM_SRTRMSGWNDGETPOS,0,0,MaxYProc,(ULONG_PTR)this);
-    int y=m_wr.bottom;
-    CTimeOut t(100);
-    //Wait 100ms until y does not change
-    while (!t.TimedOut())
-    {
-      MSG msg;
-      while (PeekMessage(&msg,0,0,0,PM_REMOVE))
-      {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-      }
-      if(y!=m_wr.bottom)
-      {
-        y=m_wr.bottom;
-        t.Set(100);
-      }
+    EnumWindows(MinYProc,(LPARAM)this);
+    SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,0,0,
+      SWP_SHOWWINDOW|SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+    InvalidateRect(m_hWnd,0,1);
+    UpdateWindow(m_hWnd);
+    MsgLoop();
+  }
+  static BOOL CALLBACK MinYProc(HWND hwnd,LPARAM lParam)
+  {
+    TCHAR cn[MAX_PATH];
+    GetClassName(hwnd, cn, countof(cn));
+    if (_tcsicmp(cn, Classname)==0)
+      ((CTrayMsgWnd*)lParam)->MinYProc(hwnd);
+    return TRUE;
+  }
+  VOID CALLBACK MinYProc(HWND hwnd)
+  {
+    if (m_hWnd!=hwnd)
+    { 
+      RECT r;
+      GetWindowRect(hwnd,&r);
+      if (m_wr.bottom>r.top)
+        OffsetRect(&m_wr,0,r.top-m_wr.bottom);
     }
   }
-  static VOID CALLBACK MaxYProc(HWND hwnd,UINT uMsg,ULONG_PTR dwData,LRESULT lResult)
+  static BOOL CALLBACK CheckMinYProc(HWND hwnd,LPARAM lParam)
   {
-    if(LOWORD(lResult)==10131)
-      ((CTrayMsgWnd*)dwData)->MaxYProc(HIWORD(lResult));
+    TCHAR cn[MAX_PATH];
+    GetClassName(hwnd, cn, countof(cn));
+    if (_tcsicmp(cn, Classname)==0)
+      ((CTrayMsgWnd*)lParam)->CheckMinYProc(hwnd);
+    return TRUE;
   }
-  VOID CALLBACK MaxYProc(int y)
+  VOID CALLBACK CheckMinYProc(HWND hwnd)
   {
-    if (m_wr.bottom>y)
-      OffsetRect(&m_wr,0,y-m_wr.bottom);
+    if (m_hWnd!=hwnd)
+    { 
+      RECT r;
+      GetWindowRect(hwnd,&r);
+      if ((r.top>=m_wr.top)&&(m_MaxBottom>r.top))
+        m_MaxBottom=r.top;
+    }
   }
 };
 
@@ -90,9 +103,7 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
 {
   LoadLibrary(_T("Shell32.dll"));//Load Shell Window Classes
   m_Icon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IconId),IMAGE_ICON,16,16,0);
-
   WM_SRTRMSGWNDCLOSED=RegisterWindowMessage(_T("WM_SRTRMSGWNDCLOSED"));
-  WM_SRTRMSGWNDGETPOS=RegisterWindowMessage(_T("WM_SRTRMSGWNDGETPOS"));
   m_DoSlide=0;
   m_hFont=CreateFont(-14,0,0,0,FW_MEDIUM,0,0,0,0,0,0,0,0,_T("MS Shell Dlg"));
   {
@@ -125,7 +136,6 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
   }
   SystemParametersInfo(SPI_GETWORKAREA,0,&m_dr,0);
   //Get Position:
-  MoveAboveOthers();
   m_bkBrush=CreateSolidBrush(GetSysColor(COLOR_WINDOW));
   WNDCLASS wc={0};
   wc.lpfnWndProc=CTrayMsgWnd::WindowProc;
@@ -133,7 +143,7 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
   wc.hbrBackground=m_bkBrush;
   RegisterClass(&wc);
   m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE|WS_EX_TOPMOST,
-    Classname,DlgTitle,WS_VISIBLE|WS_CAPTION|WS_SYSMENU|WS_BORDER,
+    Classname,DlgTitle,WS_CAPTION|WS_SYSMENU|WS_BORDER,
     m_wr.left,m_wr.top,m_wr.right-m_wr.left,m_wr.bottom-m_wr.top,
     0,0,0,(LPVOID)this);
   SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
@@ -154,12 +164,10 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
   s=CreateWindowEx(0,_T("Static"),Text,WS_CHILD|WS_VISIBLE|SS_NOPREFIX,
     cr.left,cr.top,cr.right-cr.left,cr.bottom-cr.top,m_hWnd,0,0,0);
   SendMessage(s,WM_SETFONT,(WPARAM)m_hFont,1);
+  MoveAboveOthers();
   if (TimeOut)
     SetTimer(m_hWnd,2,TimeOut,0);
-  InvalidateRect(m_hWnd,0,1);
-  UpdateWindow(m_hWnd);
-  MsgLoop();
-  SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
+  SetTimer(m_hWnd,1,10,0);
 }
 
 CTrayMsgWnd::~CTrayMsgWnd()
@@ -242,12 +250,17 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
       {
         m_DoSlide=0;
         KillTimer(m_hWnd,1);
+        m_MaxBottom=MAXLONG;
+        EnumWindows(CheckMinYProc,(LPARAM)this);
+        if((m_MaxBottom!=MAXLONG)&&(m_wr.bottom<m_MaxBottom))
+        {
+          m_DoSlide+=m_MaxBottom-m_wr.bottom;
+          SetTimer(m_hWnd,1,10,0);
+        }
       }
     }
     return 0;
   default:
-    if (msg==WM_SRTRMSGWNDGETPOS)
-      return MAKELONG(10131,m_wr.top);
     if (msg==WM_SRTRMSGWNDCLOSED)
     {
       int t=HIWORD(wParam);
