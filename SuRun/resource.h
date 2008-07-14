@@ -41,12 +41,15 @@
 #define IDS_NOADD2USERS                 34
 #define IDS_NOREMADMINS                 35
 #define IDS_ADMINSHELL                  36
+#define IDS_SIMPLESETUP                 37
 #define IDS_NOADMIN2                    38
 #define IDS_RUNRESTRICTED               39
 #define IDS_SETUP1                      40
 #define IDS_SETUP2                      41
 #define IDS_SETUP3                      42
+#define IDS_SETUP4                      43
 #define IDS_ASKAUTO                     44
+#define IDS_EXPERTSETUP                 45
 #define IDS_STARTED                     47
 #define IDS_ASKSURUNNER1                48
 #define IDS_BUILTINADMIN1               49
@@ -186,6 +189,7 @@
 #define IDC_ADDAPP                      1034
 #define IDC_SELFILE                     1034
 #define IDC_EDITAPP                     1035
+#define IDC_EXTOPT3                     1035
 #define IDC_CTRLASADMIN                 1036
 #define IDC_ADDUSER                     1036
 #define IDC_CMDASADMIN                  1037
@@ -224,6 +228,7 @@
 #define IDC_ASKPW                       1081
 #define IDC_REQADMIN                    1084
 #define IDC_BLACKLIST                   1085
+#define IDC_NOEXPERT                    1087
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -232,7 +237,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1087
+#define _APS_NEXT_CONTROL_VALUE         1088
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
