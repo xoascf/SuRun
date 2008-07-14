@@ -1,6 +1,8 @@
 Done, to be tested:
 ---------------------------
-*Special Explorer handling
+* Implemented Explorer tricks so that you can start Explorer after an elevated 
+  Explorer runs. SuRun also does not set permanently the "SeparateProcess" 
+  registry entry.
 
 SuRun 1.1.9.4 - 2008-07-12: (beta)
 ---------------------------
