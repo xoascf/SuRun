@@ -76,6 +76,10 @@
 #define GetTestReqAdmin    (GetOption(_T("TestReqAdmin"),1)!=0)
 #define SetTestReqAdmin(b) SetOption(_T("TestReqAdmin"),b,1)
 
+//Hide Expert settings
+#define GetHideExpertSettings    (GetOption(_T("HideExpertSettings"),0)!=0)
+#define SetHideExpertSettings(b) SetOption(_T("HideExpertSettings"),b,0)
+
 //Save or not Passwords in the registry
 #define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
 
