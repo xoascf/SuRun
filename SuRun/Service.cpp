@@ -904,16 +904,25 @@ DWORD LSAStartAdminProcess()
       }
       if(bIsExplorer)
       {
-        //To start control Panel and other Explorer children we need to tell 
-        //Explorer to open folders in a new proecess
-        orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-        if(!orgSP)
-          SetSeparateProcess((HKEY)ProfInf.hProfile,1);
-        //Messages work on the same WinSta/Desk only
-        SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-        //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
-        //Explorer.exe, this will cause a new Explorer.exe to stay running
-        EnumWindows(KillProxyDesktopEnum,0);
+        //Before Vista: kill Desktop Proxy
+        if (LOBYTE(LOWORD(GetVersion()))<6)
+        {
+          //To start control Panel and other Explorer children we need to tell 
+          //Explorer to open folders in a new proecess
+          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
+          if(!orgSP)
+            SetSeparateProcess((HKEY)ProfInf.hProfile,1);
+          //Messages work on the same WinSta/Desk only
+          SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
+          //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
+          //Explorer.exe, this will cause a new Explorer.exe to stay running
+          EnumWindows(KillProxyDesktopEnum,0);
+        }else //Vista and newer, SetSeparateProcess(0)
+        {
+          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
+          if(orgSP)
+            SetSeparateProcess((HKEY)ProfInf.hProfile,0);
+        }
       }
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
@@ -960,8 +969,8 @@ DWORD LSAStartAdminProcess()
           ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-      if(bIsExplorer && (!orgSP))
-        SetSeparateProcess((HKEY)ProfInf.hProfile,0);
+      if(bIsExplorer)
+        SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
@@ -1491,68 +1500,11 @@ BOOL InstallService()
   _tcscat(SvcFile,_T(" /ServiceRun"));
   SC_HANDLE hdlServ = CreateService(hdlSCM,SvcName,SvcName,STANDARD_RIGHTS_REQUIRED,
                           SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,
-                          SERVICE_ERROR_NORMAL,SvcFile,0,0,0,0,0);
+                          SERVICE_ERROR_NORMAL,SvcFile,L"PlugPlay",0,0,0,0);
   if (!hdlServ) 
     return CloseServiceHandle(hdlSCM),FALSE;
   CloseServiceHandle(hdlServ);
   InstLog(CResStr(IDS_STARTSVC));
-//  if (LOBYTE(LOWORD(GetVersion()))>=6)
-//  {
-//    //Vista:
-//    TCHAR* ReqPriv[]=
-//    {
-//      SE_ASSIGNPRIMARYTOKEN_NAME TEXT("\0")
-//      SE_AUDIT_NAME TEXT("\0")
-//      SE_CHANGE_NOTIFY_NAME TEXT("\0")
-//      SE_CREATE_GLOBAL_NAME TEXT("\0")
-//      SE_CREATE_TOKEN_NAME TEXT("\0")
-//      SE_CREATE_PAGEFILE_NAME TEXT("\0")
-//      SE_CREATE_PERMANENT_NAME TEXT("\0")
-//      //SE_CREATE_SYMBOLIC_LINK_NAME TEXT("\0")
-//      SE_DEBUG_NAME TEXT("\0")
-//      SE_IMPERSONATE_NAME TEXT("\0")
-//      SE_INCREASE_QUOTA_NAME TEXT("\0")
-//      //SE_INCREASE_WORKING_SET_NAME TEXT("\0")
-//      SE_TCB_NAME TEXT("\0")
-//      TEXT("\0")
-//    };
-//    hdlServ = OpenService(hdlSCM,SvcName,SERVICE_CHANGE_CONFIG);
-//
-//    typedef struct _SERVICE_SID_INFO {
-//      DWORD dwServiceSidType;
-//    } SERVICE_SID_INFO, *LPSERVICE_SID_INFO;
-//    SERVICE_SID_INFO Info={1/*SERVICE_SID_TYPE_UNRESTRICTED*/};
-//    if (!ChangeServiceConfig2(hdlServ,5/*SERVICE_CONFIG_SERVICE_SID_INFO*/,&Info))
-//      DBGTrace1("ChangeServiceConfig2 5 failed: %s",GetLastErrorNameStatic())
-//    else
-//      DBGTrace("ChangeServiceConfig2 5 OK");
-//    if (!ChangeServiceConfig2(hdlServ,6/*SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO*/,ReqPriv))
-//      DBGTrace1("ChangeServiceConfig2 6 failed: %s",GetLastErrorNameStatic())
-//    else
-//      DBGTrace("ChangeServiceConfig2 6 OK");
-//    CloseServiceHandle(hdlServ);
-//  }else
-//  {
-//    //2k/XP/2k3
-//    WCHAR un[MAX_PATH+MAX_PATH+1]; 
-//    SID_IDENTIFIER_AUTHORITY SidAuthority = SECURITY_NT_AUTHORITY;
-//    void* SystemSID = 0;
-//    if (AllocateAndInitializeSid(&SidAuthority,1,SECURITY_LOCAL_SYSTEM_RID,
-//                                 0,0,0,0,0,0,0,&SystemSID))
-//    {
-//      GetSIDUserName(SystemSID,un);
-//      AddAcctPrivilege(un,SE_ASSIGNPRIMARYTOKEN_NAME);
-//      AddAcctPrivilege(un,SE_CHANGE_NOTIFY_NAME);
-//      AddAcctPrivilege(un,SE_CREATE_GLOBAL_NAME);
-//      AddAcctPrivilege(un,SE_CREATE_TOKEN_NAME);
-//      AddAcctPrivilege(un,SE_CREATE_PERMANENT_NAME);
-//      AddAcctPrivilege(un,SE_DEBUG_NAME);
-//      AddAcctPrivilege(un,SE_IMPERSONATE_NAME);
-//      AddAcctPrivilege(un,SE_INCREASE_QUOTA_NAME);
-//      AddAcctPrivilege(un,SE_TCB_NAME);
-//      FreeSid(SystemSID);
-//    }
-//  }
   hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START);
   BOOL bRet=StartService(hdlServ,0,0);
   if (!bRet)
