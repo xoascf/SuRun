@@ -5,6 +5,7 @@ Done, to be tested:
   registry entry.
 * To avoid AutoRun startup delays SuRuns service is now loaded in the 
   "PlugPlay" service group, before the network is started.
+* Tray Message Windows placement has been improved.
 
 SuRun 1.1.9.4 - 2008-07-12: (beta)
 ---------------------------
