@@ -890,7 +890,7 @@ DWORD LSAStartAdminProcess()
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
       //Special handling for Explorer:
-      BOOL orgSP=FALSE;
+      BOOL orgSP=1;
       BOOL bIsExplorer=FALSE;
       {
         TCHAR app[MAX_PATH]={0};
@@ -917,12 +917,13 @@ DWORD LSAStartAdminProcess()
           //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
           //Explorer.exe, this will cause a new Explorer.exe to stay running
           EnumWindows(KillProxyDesktopEnum,0);
-        }else //Vista and newer, SetSeparateProcess(0)
-        {
-          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-          if(orgSP)
-            SetSeparateProcess((HKEY)ProfInf.hProfile,0);
         }
+//        else //Vista and newer, SetSeparateProcess(0)
+//        {
+//          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
+//          if(orgSP)
+//            SetSeparateProcess((HKEY)ProfInf.hProfile,0);
+//        }
       }
       //CreateProcessAsUser will only work from an NT System Account since the
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
@@ -934,16 +935,20 @@ DWORD LSAStartAdminProcess()
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         if(bIsExplorer)
         {
-          //Messages work on the same WinSta/Desk only
-          SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-          //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
-          //Explorer.exe, this will cause a new Explorer.exe to stay running
-          CTimeOut to(10000);
-          DWORD pid=pi.dwProcessId;
-          while ((!to.TimedOut()) 
-            && pid && EnumWindows(KillProxyDesktopEnum,(LPARAM)&pid)
-            && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT))
-            ;
+          //Before Vista: wait for and kill Desktop Proxy
+          if (LOBYTE(LOWORD(GetVersion()))<6)
+          {
+            //Messages work on the same WinSta/Desk only
+            SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
+            //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
+            //Explorer.exe, this will cause a new Explorer.exe to stay running
+            CTimeOut to(10000);
+            DWORD pid=pi.dwProcessId;
+            while ((!to.TimedOut()) 
+              && pid && EnumWindows(KillProxyDesktopEnum,(LPARAM)&pid)
+              && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT))
+              ;
+          }
         }
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
@@ -969,8 +974,8 @@ DWORD LSAStartAdminProcess()
           ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-      if(bIsExplorer)
-        SetSeparateProcess((HKEY)ProfInf.hProfile,orgSP);
+      if(bIsExplorer && (!orgSP))
+        SetSeparateProcess((HKEY)ProfInf.hProfile,0);
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
