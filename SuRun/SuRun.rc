@@ -259,12 +259,12 @@ BEGIN
     CONTROL         "Versuche zu erkennen, ob unbekannte Programme administrative Rechte benötigen.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,152,344,10
-    LTEXT           "Ist diese Option aktiv und ein Programm soll ausgeführt werden, das gehobene Rechte benötigt, aber nicht in der Programmliste des Benutzers steht, wird SuRun fragen, ob es administrativ gestartet werden darf.",
+    LTEXT           "Ein Deaktivieren dieser Option bewirkt, dass von SuRun nur noch vordefinierte Programme automagisch mit erhöhten Rechten gestartet werden. Setup(etc.)-Programme werden dann nicht mehr erkannt.",
                     IDC_STATIC,31,162,335,17
     CONTROL         "Zeige ein Informationsfenster, wenn Programme automagisch gestartet wurden",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, dass über den Start mit erhöhten Rechten informiert.",
+    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, dass darüber informiert.",
                     IDC_STATIC,31,198,335,17
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,220,356,8
@@ -485,48 +485,49 @@ IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,4,4,369,
-                    113,WS_GROUP
-    CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
-                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,11,15,346,9
-    CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
-                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,27,346,9
-    CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
-                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,40,346,9
-    CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
-                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,52,346,9
-    CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
-                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,65,346,9
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer, mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,77,346,25
-    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
-                    IDC_STATIC,6,106,365,8
     GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",
-                    IDC_STATIC,4,120,369,37
+                    IDC_STATIC,4,3,369,37
     LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",
-                    IDC_STATIC,14,132,191,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,213,130,99,30,CBS_DROPDOWNLIST | 
+                    IDC_STATIC,14,15,191,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,213,13,99,30,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Zeige Info, für aktive Programme, die nicht als angemeldeter Benutzer laufen",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    143,346,10
+                    26,346,10
     GROUPBOX        "Wenn der Benutzer nicht Mitglied der Gruppe 'SuRunners' ist und SuRun benutzen will:",
-                    IDC_STATIC,4,160,369,46
+                    IDC_STATIC,4,43,369,46
     CONTROL         "Frage Administratoren niemals, ob sie in die Gruppe 'SuRunners' aufgenommen werden wollen",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    171,346,8
+                    54,346,8
     CONTROL         "Frage niemanden, ob er in die Gruppe 'SuRunner' aufgenommen werden will",
                     IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    182,346,8
+                    65,346,8
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    193,346,8
+                    76,346,8
+    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,4,94,369,
+                    74,WS_GROUP
+    CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,11,105,346,9
+    CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
+                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,117,346,9
+    CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
+                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,130,346,9
+    CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
+                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,142,346,9
+    CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
+                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,155,346,9
+    GROUPBOX        "Windows Sicherheit",IDC_STATIC,4,173,369,39
+    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer, mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,184,346,25
+    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
+                    IDC_STATIC,6,218,365,8
 END
 
 IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
@@ -908,7 +909,7 @@ BEGIN
     CONTROL         "Try to detect if unknown applications need to start with eleveted rights.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,150,238,10
-    LTEXT           "If you activate this option and Windows starts a program that requires elevated rights but is not in the users program list, SuRun will ask to start this program with elevated rights.",
+    LTEXT           "If you disable this Option, SuRun will only start predefined programs automagically with elevated rights. Then no Setup (etc.) programs are detect and run administrative.",
                     IDC_STATIC,31,162,335,17
     CONTROL         "Show a message when a program has been started automagically",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
@@ -1254,46 +1255,48 @@ IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Convenience settings",IDC_EXTOPT,3,1,370,120,WS_GROUP
-    CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
-                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,11,12,349,9
-    CONTROL         "Allow 'SuRunners' to set (and show) the system time.",
-                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,25,349,11
-    CONTROL         "Allow 'SuRunners' to change 'Power Options' and to select power schemes.",
-                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,39,349,11
-    CONTROL         "Show Windows update notifications to all users (if automatic updates are activated).",
-                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,53,349,11
-    CONTROL         "No auto-restart for scheduled Automatic Windows Update installations",
-                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,67,349,11
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,81,349,26
-    CTEXT           "NOTE: Changes in these settings become effective after the next logon.",
-                    -1,6,109,365,8
     GROUPBOX        "Display an Icon in the taskbar notification area for non members of the 'SuRunners' group",
-                    -1,3,126,370,37
+                    IDC_STATIC,3,4,370,37
     LTEXT           "Display user status for the active program in the taskbar 'tray'",
-                    -1,11,138,201,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,219,136,99,30,CBS_DROPDOWNLIST | 
+                    IDC_STATIC,11,16,201,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,219,14,99,30,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Display balloon tips, for active programs, running with different user credentials",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    149,349,10
-    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",-1,3,168,370,48
+                    27,349,10
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,3,46,
+                    370,48
     CONTROL         "Never ask real Administrators to become member of 'SuRunners'",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    179,349,8
+                    57,349,8
     CONTROL         "Never ask anyone to become member of 'SuRunners'",
                     IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    191,349,8
+                    69,349,8
     CONTROL         "Hide SuRun from users that are not member of the 'SuRunners' Group",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    203,349,8
+                    81,349,8
+    GROUPBOX        "Convenience settings",IDC_EXTOPT,3,99,370,79,WS_GROUP
+    CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,11,110,349,9
+    CONTROL         "Allow 'SuRunners' to set (and show) the system time.",
+                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,123,349,11
+    CONTROL         "Allow 'SuRunners' to change 'Power Options' and to select power schemes.",
+                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,137,349,11
+    CONTROL         "Show Windows update notifications to all users (if automatic updates are activated).",
+                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,151,349,11
+    CONTROL         "No auto-restart for scheduled Automatic Windows Update installations",
+                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,165,349,11
+    GROUPBOX        "Windows Security",IDC_STATIC,4,183,369,39
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,193,349,26
+    CTEXT           "NOTE: Changes in some of these settings become effective after the next logon.",
+                    IDC_STATIC,6,224,365,8
 END
 
 IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
@@ -1996,12 +1999,12 @@ BEGIN
     CONTROL         "Versuche zu erkennen, ob unbekannte Programme administrative Rechte benötigen.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,152,344,10
-    LTEXT           "Ist diese Option aktiv und ein Programm soll ausgeführt werden, das gehobene Rechte benötigt, aber nicht in der Programmliste des Benutzers steht, wird SuRun fragen, ob es administrativ gestartet werden darf.",
+    LTEXT           "Ein Deaktivieren dieser Option bewirkt, dass von SuRun nur noch vordefinierte Programme automagisch mit erhöhten Rechten gestartet werden. Setup(etc.)-Programme werden dann nicht mehr erkannt.",
                     IDC_STATIC,31,162,335,17
     CONTROL         "Zeige ein Informationsfenster, wenn Programme automagisch gestartet wurden",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, dass über den Start mit erhöhten Rechten informiert.",
+    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, dass darüber informiert.",
                     IDC_STATIC,31,198,335,17
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,220,356,8
@@ -2011,48 +2014,49 @@ IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,4,4,369,
-                    113,WS_GROUP
-    CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
-                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,11,15,346,9
-    CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
-                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,27,346,9
-    CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
-                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,40,346,9
-    CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
-                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,52,346,9
-    CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
-                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,65,346,9
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer, mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,77,346,25
-    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
-                    IDC_STATIC,6,106,365,8
     GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",
-                    IDC_STATIC,4,120,369,37
+                    IDC_STATIC,4,3,369,37
     LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",
-                    IDC_STATIC,14,132,191,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,213,130,99,30,CBS_DROPDOWNLIST | 
+                    IDC_STATIC,14,15,191,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,213,13,99,30,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Zeige Info, für aktive Programme, die nicht als angemeldeter Benutzer laufen",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    143,346,10
+                    26,346,10
     GROUPBOX        "Wenn der Benutzer nicht Mitglied der Gruppe 'SuRunners' ist und SuRun benutzen will:",
-                    IDC_STATIC,4,160,369,46
+                    IDC_STATIC,4,43,369,46
     CONTROL         "Frage Administratoren niemals, ob sie in die Gruppe 'SuRunners' aufgenommen werden wollen",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    171,346,8
+                    54,346,8
     CONTROL         "Frage niemanden, ob er in die Gruppe 'SuRunner' aufgenommen werden will",
                     IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    182,346,8
+                    65,346,8
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    193,346,8
+                    76,346,8
+    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,4,94,369,
+                    74,WS_GROUP
+    CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,11,105,346,9
+    CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
+                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,117,346,9
+    CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
+                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,130,346,9
+    CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
+                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,142,346,9
+    CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
+                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,155,346,9
+    GROUPBOX        "Windows Sicherheit",IDC_STATIC,4,173,369,39
+    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer, mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,184,346,25
+    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
+                    IDC_STATIC,6,218,365,8
 END
 
 IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
