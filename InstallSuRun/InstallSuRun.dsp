@@ -124,25 +124,5 @@ SOURCE=..\res\SuRun.ico
 SOURCE=..\ReleaseUx64\SuRun32.bin
 # End Source File
 # End Group
-# Begin Source File
-
-SOURCE=..\ReleaseU\SuRun.exe
-# End Source File
-# Begin Source File
-
-SOURCE=..\ReleaseUx64\SuRun.exe
-# End Source File
-# Begin Source File
-
-SOURCE=..\ReleaseU\SuRunExt.dll
-# End Source File
-# Begin Source File
-
-SOURCE=..\ReleaseUx64\SuRunExt.dll
-# End Source File
-# Begin Source File
-
-SOURCE=..\ReleaseUx64\SuRunExt32.dll
-# End Source File
 # End Target
 # End Project
