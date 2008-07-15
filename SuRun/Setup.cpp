@@ -2100,7 +2100,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
 
 BOOL RunSetup(LPCTSTR User)
 {
-  BOOL bRet=-1;
+  INT_PTR bRet=-1;
   while (bRet==-1)
   {
     SETUPDATA sd(User);
@@ -2109,7 +2109,7 @@ BOOL RunSetup(LPCTSTR User)
       0,MainSetupDlgProc);  
     g_SD=0;
   }
-  return bRet;
+  return bRet==IDOK;
 }
 
 #ifdef _DEBUGSETUP
