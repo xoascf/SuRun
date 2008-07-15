@@ -317,21 +317,30 @@ typedef struct _SETUPDATA
   CDlgAnchor Setup2Anchor;
   int MinW;
   int MinH;
+  int CurTab;
   _SETUPDATA(LPCTSTR User)
   {
     MinW=600;
     MinH=400;
     OrgUser=User;
+    CurTab=0;
     Users.SetGroupUsers(SURUNNERSGROUP,FALSE);
+    CurUser=-1;
+    int i;
+    for (i=0;i<Users.GetCount();i++)
+      if (_tcsicmp(Users.GetUserName(i),OrgUser)==0)
+      {
+        CurUser=i;
+        break;
+      }
     DlgExitCode=IDCANCEL;
     HelpWnd=0;
     zero(hTabCtrl);
     zero(NewUser);
-    CurUser=-1;
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
     ImgList=ImageList_Create(16,16,ILC_COLOR8,7,1);
-    for (int i=0;i<8;i++)
+    for (i=0;i<8;i++)
     {
       HICON icon=(HICON)LoadImage(GetModuleHandle(0),
         MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
@@ -1152,6 +1161,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       //Program list icons:
       HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+      SetWindowLong(hWL,GWL_STYLE,GetWindowLong(hWL,GWL_STYLE)|LVS_SHAREIMAGELISTS);
       SendMessage(hWL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,
         LVS_EX_FULLROWSELECT|LVS_EX_SUBITEMIMAGES);
       ListView_SetImageList(hWL,g_SD->ImgList,LVSIL_SMALL);
@@ -1161,7 +1171,8 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         ListView_InsertColumn(hWL,i,&col);
       }
       //UserList
-      UpdateUserList(hwnd,g_SD->OrgUser);
+      UpdateUserList(hwnd,
+        (g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
       g_SD->Setup2Anchor.Init(hwnd);
       g_SD->Setup2Anchor.Add(IDC_USER,ANCHOR_TOPLEFT|ANCHOR_RIGHT);
       g_SD->Setup2Anchor.Add(IDC_ADDUSER,ANCHOR_TOPRIGHT);
@@ -1484,7 +1495,6 @@ ApplyChanges:
           EnableWindow(GetDlgItem(hwnd,IDC_BLACKLIST),bHook);
           EnableWindow(GetDlgItem(hwnd,IDC_SHOWTRAY),bHook);
         }
-
         return TRUE;
       case MAKELPARAM(IDC_BLACKLIST,BN_CLICKED):
         DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_BLKLST),hwnd,BlkLstDlgProc);
@@ -1745,8 +1755,12 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User
 
     switch(GetPrivateProfileInt(_T("SuRun"),_T("ReplaceRunAs"),-1,ini))
     {
-    case 0:ReplaceSuRunWithRunAs();
-    case 1:ReplaceRunAsWithSuRun();
+    case 0:
+      ReplaceSuRunWithRunAs(); 
+      break;
+    case 1:
+      ReplaceRunAsWithSuRun(); 
+      break;
     }
     IMPORTINT("SuRun",OwnerAdminGrp,ini);
     IMPORTINT("SuRun",WinUpd4All,ini);
@@ -2022,7 +2036,8 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
         ScreenToClient(hwnd,(POINT*)&r.right);
 	      SetWindowPos(g_SD->hTabCtrl[i],hTab,r.left,r.top,r.right-r.left,r.bottom-r.top,0);
       }
-      ShowWindow(g_SD->hTabCtrl[0],TRUE);
+      TabCtrl_SetCurSel(hTab,g_SD->CurTab);
+      ShowWindow(g_SD->hTabCtrl[g_SD->CurTab],TRUE);
       //...
       UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
       //...
@@ -2087,6 +2102,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
             return TRUE;
 		      case TCN_SELCHANGE:
             ShowWindow(g_SD->hTabCtrl[nSel],TRUE);
+            g_SD->CurTab=nSel;
             return TRUE;
         }
       }
@@ -2129,14 +2145,14 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
 BOOL RunSetup(LPCTSTR User)
 {
   INT_PTR bRet=-1;
+  SETUPDATA sd(User);
+  g_SD=&sd;
   while (bRet==-1)
   {
-    SETUPDATA sd(User);
-    g_SD=&sd;
     bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
       0,MainSetupDlgProc);  
-    g_SD=0;
   }
+  g_SD=0;
   return bRet==IDOK;
 }
 
