@@ -1005,7 +1005,7 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
   EnableWindow(GetDlgItem(h,IDC_SHOWTRAY),1);
   UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
   h=g_SD->hTabCtrl[3];
-  CheckDlgButton(h,IDC_DORUNAS,1);
+  CheckDlgButton(h,IDC_DORUNAS,0);
   CheckDlgButton(h,IDC_ALLOWTIME,0);
   CheckDlgButton(h,IDC_SETENERGY,1);
   CheckDlgButton(h,IDC_WINUPD4ALL,1);
@@ -1070,7 +1070,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_RESTARTADMIN,GetRestartAsAdmin);
       CheckDlgButton(hwnd,IDC_STARTADMIN,GetStartAsAdmin);
 
-      CheckDlgButton(hwnd,IDC_NOEXPERT,GetHideExpertSettings);
+      CheckDlgButton(hwnd,IDC_NOEXPERT,!GetHideExpertSettings);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -1088,13 +1088,13 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_ASKPW));
         return TRUE;
       case MAKELPARAM(IDC_NOEXPERT,BN_CLICKED):
-        if (IsDlgButtonChecked(hwnd,IDC_NOEXPERT))
+        if (!IsDlgButtonChecked(hwnd,IDC_NOEXPERT))
         {
           if (SafeMsgBox(hwnd,CBigResStr(IDS_EXPERTSETUP),CResStr(IDS_APPNAME),
             MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDYES)
             ShowExpertSettings(GetParent(hwnd),false);
           else
-            CheckDlgButton(hwnd,IDC_NOEXPERT,0);
+            CheckDlgButton(hwnd,IDC_NOEXPERT,1);
         }else
           ShowExpertSettings(GetParent(hwnd),TRUE);
         break;
@@ -1132,7 +1132,7 @@ ApplyChanges:
       SetRestartAsAdmin(IsDlgButtonChecked(hwnd,IDC_RESTARTADMIN));
       SetStartAsAdmin(IsDlgButtonChecked(hwnd,IDC_STARTADMIN));
 
-      SetHideExpertSettings(IsDlgButtonChecked(hwnd,IDC_NOEXPERT));
+      SetHideExpertSettings(IsDlgButtonChecked(hwnd,IDC_NOEXPERT)==0);
       return TRUE;
     }//WM_DESTROY
   }
