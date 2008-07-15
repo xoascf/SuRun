@@ -1809,6 +1809,7 @@ INT_PTR CALLBACK ExportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       GetDlgItemText(hwnd,IDC_EXPUSRSETTINGS,s,MAX_PATH);
       LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
       SetDlgItemText(hwnd,IDC_EXPUSRSETTINGS,CBigResStr(s,u));
+      PostMessage(hwnd,WM_COMMAND,IDC_SELFILE,(LPARAM)GetDlgItem(hwnd,IDC_SELFILE));
     }
     return TRUE;
   case WM_CTLCOLORSTATIC:
@@ -1824,6 +1825,9 @@ INT_PTR CALLBACK ExportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         GetDlgItemText(hwnd,IDC_FILENAME,f,4096);
         if(GetINIFile(hwnd,f))
           SetDlgItemText(hwnd,IDC_FILENAME,f);
+        else 
+          if (f[0]==0)
+            EndDialog(hwnd,IDCANCEL);
       }
       break;
     case MAKELPARAM(IDCANCEL,BN_CLICKED):
@@ -1913,7 +1917,9 @@ INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           EnableWindow(GetDlgItem(hwnd,IDC_IMPSURUNSETTINGS),bSRSet);
           EnableWindow(GetDlgItem(hwnd,IDC_IMPBLACKLIST),bBlLst);
           EnableWindow(GetDlgItem(hwnd,IDC_IMPUSRSETTINGS),bUsrSet);
-        }
+        }else 
+          if (f[0]==0)
+            EndDialog(hwnd,IDCANCEL);
       }
       break;
     case MAKELPARAM(IDCANCEL,BN_CLICKED):
