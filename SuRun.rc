@@ -278,6 +278,8 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,256,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "Ü&bernehmen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Speichern",IDOK,279,256,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
@@ -312,7 +314,7 @@ END
 
 IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Programmoptionen"
+CAPTION "Ausnahme hinzufügen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,37,361,1
@@ -525,6 +527,46 @@ BEGIN
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     193,346,8
+END
+
+IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Einstellungen exportieren"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Dateiname",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Exportiere SuRuns Einstellungen",IDC_EXPSURUNSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Exportiere Ausnahmen-Liste",IDC_EXPBLACKLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Exportiere Einstellungen von %s",IDC_EXPUSRSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,81,50,14
+END
+
+IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Einstellungen importieren"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Dateiname",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Importiere SuRuns Einstellungen",IDC_IMPSURUNSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Importiere Ausnahmen-Liste",IDC_IMPBLACKLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Importiere Einstellungen für %s",IDC_IMPUSRSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,81,50,14
 END
 
 
@@ -885,6 +927,8 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
+    PUSHBUTTON      "Import...",IDC_IMPORT,8,256,50,14
+    PUSHBUTTON      "Export...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "&Apply",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Save",IDOK,279,256,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
@@ -1194,7 +1238,7 @@ END
 
 IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Program options"
+CAPTION "Add program to blacklist"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,38,361,1
@@ -1250,6 +1294,46 @@ BEGIN
     CONTROL         "Hide SuRun from users that are not member of the 'SuRunners' Group",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
                     203,349,8
+END
+
+IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Import SuRun settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Import SuRun Settings",IDC_IMPSURUNSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Import Hook Blacklist",IDC_IMPBLACKLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Import user settings for %s",IDC_IMPUSRSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
+END
+
+IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Export SuRun settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Export SuRun Settings",IDC_EXPSURUNSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Export Hook Blacklist",IDC_EXPBLACKLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Export user settings for %s",IDC_EXPUSRSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
 END
 
 
@@ -1514,6 +1598,8 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,256,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "&Toepassen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Opslaan",IDOK,279,256,50,14
     PUSHBUTTON      "&Annuleren",IDCANCEL,338,256,50,14
@@ -1824,7 +1910,7 @@ END
 
 IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 63
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Programma instellingen"
+CAPTION "Add program to blacklist"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,37,361,1
@@ -1967,6 +2053,46 @@ BEGIN
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     193,346,8
+END
+
+IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Import SuRun settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Import SuRun Settings",IDC_IMPSURUNSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Import Hook Blacklist",IDC_IMPBLACKLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Import user settings for %s",IDC_IMPUSRSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
+END
+
+IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Export SuRun settings"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Export SuRun Settings",IDC_EXPSURUNSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Export Hook Blacklist",IDC_EXPBLACKLIST,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Export user settings for %s",IDC_EXPUSRSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
 END
 
 
