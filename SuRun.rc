@@ -185,7 +185,7 @@ BEGIN
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
     GROUPBOX        "Hilfestellungen",IDC_STATIC,75,179,297,45
-    CONTROL         "Deaktiviere Einstellungen für erfahrene Benutzer",
+    CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     191,283,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
@@ -840,7 +840,7 @@ BEGIN
     PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
                     83,203,201,14
     GROUPBOX        "Hilfestellungen",IDC_STATIC,75,178,297,45
-    CONTROL         "Hide SuRun settings for experienced users",IDC_NOEXPERT,
+    CONTROL         "Show SuRun settings for experienced users",IDC_NOEXPERT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,190,283,10
 END
 
@@ -1964,7 +1964,7 @@ BEGIN
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
     GROUPBOX        "Hilfestellungen",IDC_STATIC,75,179,297,45
-    CONTROL         "Deaktiviere Einstellungen für erfahrene Benutzer",
+    CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     191,283,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
