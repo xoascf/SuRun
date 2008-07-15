@@ -244,15 +244,15 @@ inline bool ShowBalloon(LPCTSTR u)
 //  Windows Policy Stuff
 //////////////////////////////////////////////////////////////////////////////
 
-#define IsOwnerAdminGrp     (GetRegInt(HKLM,\
+#define GetOwnerAdminGrp      (GetRegInt(HKLM,\
                               _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                               _T("nodefaultadminowner"),1)==0)
 
-#define SetOwnerAdminGrp(b) SetRegInt(HKLM,\
+#define SetOwnerAdminGrp(b)   SetRegInt(HKLM,\
                               _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                               _T("nodefaultadminowner"),(b)==0)
 
-#define IsWinUpd4All      GetRegInt(HKLM,\
+#define GetWinUpd4All     GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
                             _T("ElevateNonAdmins"),0)
 
@@ -260,7 +260,7 @@ inline bool ShowBalloon(LPCTSTR u)
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
                             _T("ElevateNonAdmins"),b)
 
-#define IsWinUpdBoot      GetRegInt(HKLM,\
+#define GetWinUpdBoot     GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
                             _T("NoAutoRebootWithLoggedOnUsers"),0)
 
@@ -268,11 +268,11 @@ inline bool ShowBalloon(LPCTSTR u)
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
                             _T("NoAutoRebootWithLoggedOnUsers"),b)
 
-#define CanSetEnergy  HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
+#define GetSetEnergy    HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
                     _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP)
 
-#define SetEnergy(b)  SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
-                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b)
+#define SetSetEnergy(b) SetRegistryTreeAccess(_T("MACHINE\\Software\\Microsoft\\")\
+                    _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP,b!=0)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -303,12 +303,12 @@ void UpdLastRunTime(LPTSTR UserName);
 #define FLAG_AUTOCANCEL 0x08 //SuRun will always answer "cancel"
 #define FLAG_CANCEL_SX  0x10 //SuRun will answer "cancel" on ShellExec
 
-BOOL IsInWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
-DWORD GetWhiteListFlags(LPTSTR User,LPTSTR CmdLine,DWORD Default);
-BOOL AddToWhiteList(LPTSTR User,LPTSTR CmdLine,DWORD Flags=0);
-BOOL SetWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag,bool Enable);
-BOOL ToggleWhiteListFlag(LPTSTR User,LPTSTR CmdLine,DWORD Flag);
-BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine);
+BOOL IsInWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag);
+DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default);
+BOOL AddToWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flags=0);
+BOOL SetWhiteListFlag(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag,bool Enable);
+BOOL ToggleWhiteListFlag(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag);
+BOOL RemoveFromWhiteList(LPCTSTR User,LPCTSTR CmdLine);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -316,7 +316,7 @@ BOOL RemoveFromWhiteList(LPTSTR User,LPTSTR CmdLine);
 // 
 //////////////////////////////////////////////////////////////////////////////
 #define HKLSTKEY    SURUNKEY _T("\\DoNotHook")
-BOOL IsInBlackList(LPTSTR CmdLine);
+BOOL IsInBlackList(LPCTSTR CmdLine);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
