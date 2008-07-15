@@ -1695,7 +1695,7 @@ void ExportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
       DWORD ccMax=countof(cmd)-2;
       DWORD Flags=0;
       DWORD siz=sizeof(Flags);
-      for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,(BYTE*)&Flags,&siz)==ERROR_SUCCESS);i++)
+      for (int i=0;(RegEnumValue(Key,i,&cmd[1],&ccMax,0,0,(BYTE*)&Flags,&siz)==ERROR_SUCCESS);i++)
       {
         ccMax=countof(cmd);
         siz=sizeof(Flags);
