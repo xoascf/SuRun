@@ -1006,7 +1006,7 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
   UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
   h=g_SD->hTabCtrl[3];
   CheckDlgButton(h,IDC_DORUNAS,1);
-  CheckDlgButton(h,IDC_ALLOWTIME,1);
+  CheckDlgButton(h,IDC_ALLOWTIME,0);
   CheckDlgButton(h,IDC_SETENERGY,1);
   CheckDlgButton(h,IDC_WINUPD4ALL,1);
   CheckDlgButton(h,IDC_WINUPDBOOT,1);
