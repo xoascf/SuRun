@@ -512,7 +512,7 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
-  ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
+  ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
   ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
   ofn.nFilterIndex      = 1;
@@ -520,6 +520,7 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   ofn.nMaxFile          = 4096;
   ofn.lpstrTitle        = CResStr(g_AppOpt.OfnTitle);
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
+  ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
@@ -1817,7 +1818,7 @@ static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
-  ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
+  ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
   ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
   ofn.nFilterIndex      = 1;
@@ -1825,6 +1826,7 @@ static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
   ofn.nMaxFile          = 4096;
   ofn.lpstrTitle        = 0;
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
+  ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetSaveFileName(&ofn);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
@@ -1898,7 +1900,7 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
-  ofn.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
+  ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
   ofn.lpstrFilter       = TEXT("*.*\0*.*\0\0"); 
   ofn.nFilterIndex      = 1;
@@ -1906,6 +1908,7 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   ofn.nMaxFile          = 4096;
   ofn.lpstrTitle        = 0;
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
+  ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
