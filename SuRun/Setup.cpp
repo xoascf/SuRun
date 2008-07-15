@@ -1668,11 +1668,14 @@ void ExportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
     if(RegOpenKeyEx(HKLM,HKLSTKEY,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
     {
       TCHAR cmd[4096];
-      DWORD ccMax=countof(cmd);
-      for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
+      _tcscpy(cmd,_T("\"")); //Quote strings!
+      DWORD ccMax=countof(cmd)-2;
+      for (int i=0;(RegEnumValue(Key,i,&cmd[1],&ccMax,0,0,0,0)==ERROR_SUCCESS);i++)
       {
-        ccMax=countof(cmd);
+        ccMax=countof(cmd)-2;
+        _tcscat(cmd,_T("\"")); //Quote strings!
         EXPORTSTR("BlackList",i,cmd,ini);
+        _tcscpy(cmd,_T("\"")); //Quote strings!
       }
       RegCloseKey(Key);
     }
@@ -1688,15 +1691,18 @@ void ExportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
     if(RegOpenKeyEx(HKLM,WHTLSTKEY(u),0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
     {
       TCHAR cmd[4096];
-      DWORD ccMax=countof(cmd);
+      _tcscpy(cmd,_T("\"")); //Quote strings!
+      DWORD ccMax=countof(cmd)-2;
       DWORD Flags=0;
       DWORD siz=sizeof(Flags);
       for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,0,(BYTE*)&Flags,&siz)==ERROR_SUCCESS);i++)
       {
         ccMax=countof(cmd);
         siz=sizeof(Flags);
+        _tcscat(cmd,_T("\"")); //Quote strings!
         EXPORTSTR("WhiteList",i,cmd,ini);
         EXPORTVAL("WhiteListFlags",i,Flags,ini);
+        _tcscpy(cmd,_T("\"")); //Quote strings!
 
       }
       RegCloseKey(Key);
