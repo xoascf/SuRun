@@ -132,6 +132,8 @@
 #define IDD_BLKLST                      127
 #define IDI_SRADMIN                     129
 #define IDD_ADDTOBLKLST                 135
+#define IDD_EXPORTSETTINGS              136
+#define IDD_IMPORTSETTINGS              137
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
@@ -188,8 +190,10 @@
 #define IDC_BUTTON1                     1034
 #define IDC_ADDAPP                      1034
 #define IDC_SELFILE                     1034
+#define IDC_IMPORT                      1034
 #define IDC_EDITAPP                     1035
 #define IDC_EXTOPT3                     1035
+#define IDC_EXPORT                      1035
 #define IDC_CTRLASADMIN                 1036
 #define IDC_ADDUSER                     1036
 #define IDC_CMDASADMIN                  1037
@@ -229,6 +233,12 @@
 #define IDC_REQADMIN                    1084
 #define IDC_BLACKLIST                   1085
 #define IDC_NOEXPERT                    1087
+#define IDC_EXPSURUNSETTINGS            1088
+#define IDC_EXPBLACKLIST                1089
+#define IDC_EXPUSRSETTINGS              1090
+#define IDC_IMPSURUNSETTINGS            1091
+#define IDC_IMPBLACKLIST                1092
+#define IDC_IMPUSRSETTINGS              1093
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -237,7 +247,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1088
+#define _APS_NEXT_CONTROL_VALUE         1094
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
