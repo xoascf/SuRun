@@ -1630,37 +1630,46 @@ BOOL WritePrivateProfileInt(LPCTSTR App, LPCTSTR Key, DWORD Val, LPCTSTR ini)
       d=GetPrivateProfileInt(_T(App),_itot(n,ts,10),d,ini);\
   }
 
-void ExportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
+void ExportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User)
 {
   DeleteFile(ini);
   if (bSuRunSettings)
   {
+    WritePrivateProfileString(_T("SuRun"),_T("Version"),
+      CResStr(_T("\"SuRun %s\""),GetVersionString()),ini);
     EXPORTINT("SuRun",BlurDesk,ini);
     EXPORTINT("SuRun",FadeDesk,ini);
-    EXPORTINT("SuRun",PwTimeOut,ini);
-    EXPORTINT("SuRun",NoConvAdmin,ini);
-    EXPORTINT("SuRun",NoConvUser,ini);
-    EXPORTINT("SuRun",TestReqAdmin,ini);
-    EXPORTINT("SuRun",HideExpertSettings,ini);
     EXPORTINT("SuRun",SavePW,ini);
+    
+    EXPORTINT("SuRun",PwTimeOut,ini);
     EXPORTINT("SuRun",AdminNoPassWarn,ini);
-    EXPORTINT("SuRun",DefHideSuRun,ini);
+    
     EXPORTINT("SuRun",CtrlAsAdmin,ini);
     EXPORTINT("SuRun",CmdAsAdmin,ini);
     EXPORTINT("SuRun",ExpAsAdmin,ini);
     EXPORTINT("SuRun",RestartAsAdmin,ini);
     EXPORTINT("SuRun",StartAsAdmin,ini);
+    
+    EXPORTINT("SuRun",HideExpertSettings,ini);
+    
     EXPORTINT("SuRun",UseIShExHook,ini);
     EXPORTINT("SuRun",UseIATHook,ini);
+    EXPORTINT("SuRun",TestReqAdmin,ini);
     EXPORTINT("SuRun",ShowAutoRuns,ini);
-    EXPORTINT("SuRun",ShowTrayAdmin,ini);
-    EXPORTINT("SuRun",OwnerAdminGrp,ini);
-    EXPORTINT("SuRun",WinUpd4All,ini);
-    EXPORTINT("SuRun",WinUpdBoot,ini);
-    EXPORTINT("SuRun",SetEnergy,ini);
-    EXPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+    
     WritePrivateProfileInt(_T("SuRun"),_T("ReplaceRunAs"),
       IsDlgButtonChecked(g_SD->hTabCtrl[3],IDC_DORUNAS),ini);
+    EXPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+    EXPORTINT("SuRun",SetEnergy,ini);
+    EXPORTINT("SuRun",WinUpd4All,ini);
+    EXPORTINT("SuRun",WinUpdBoot,ini);
+    EXPORTINT("SuRun",OwnerAdminGrp,ini);
+    
+    EXPORTINT("SuRun",ShowTrayAdmin,ini);
+    
+    EXPORTINT("SuRun",NoConvAdmin,ini);
+    EXPORTINT("SuRun",NoConvUser,ini);
+    EXPORTINT("SuRun",DefHideSuRun,ini);
   }
   if (bBlackList)
   {
@@ -1680,15 +1689,15 @@ void ExportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
       RegCloseKey(Key);
     }
   }
-  if(u)
+  if(User)
   {
-    EXPORTINTu("User",NoRunSetup,u,ini);
-    EXPORTINTu("User",RestrictApps,u,ini);
-    EXPORTINTu("User",UserTSA,u,ini);
-    EXPORTINTu("User",HideFromUser,u,ini);
-    EXPORTINTu("User",ReqPw4Setup,u,ini);
+    EXPORTINTu("User",NoRunSetup,User,ini);
+    EXPORTINTu("User",RestrictApps,User,ini);
+    EXPORTINTu("User",UserTSA,User,ini);
+    EXPORTINTu("User",HideFromUser,User,ini);
+    EXPORTINTu("User",ReqPw4Setup,User,ini);
     HKEY Key;
-    if(RegOpenKeyEx(HKLM,WHTLSTKEY(u),0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+    if(RegOpenKeyEx(HKLM,WHTLSTKEY(User),0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
     {
       TCHAR cmd[4096];
       _tcscpy(cmd,_T("\"")); //Quote strings!
@@ -1710,39 +1719,46 @@ void ExportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
   }
 }
 
-void ImportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
+void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User)
 {
   if (bSuRunSettings)
   {
     IMPORTINT("SuRun",BlurDesk,ini);
     IMPORTINT("SuRun",FadeDesk,ini);
-    IMPORTINT("SuRun",PwTimeOut,ini);
-    IMPORTINT("SuRun",NoConvAdmin,ini);
-    IMPORTINT("SuRun",NoConvUser,ini);
-    IMPORTINT("SuRun",TestReqAdmin,ini);
-    IMPORTINT("SuRun",HideExpertSettings,ini);
     IMPORTINT("SuRun",SavePW,ini);
+    
+    IMPORTINT("SuRun",PwTimeOut,ini);
     IMPORTINT("SuRun",AdminNoPassWarn,ini);
-    IMPORTINT("SuRun",DefHideSuRun,ini);
+
     IMPORTINT("SuRun",CtrlAsAdmin,ini);
     IMPORTINT("SuRun",CmdAsAdmin,ini);
     IMPORTINT("SuRun",ExpAsAdmin,ini);
     IMPORTINT("SuRun",RestartAsAdmin,ini);
     IMPORTINT("SuRun",StartAsAdmin,ini);
+    
+    IMPORTINT("SuRun",HideExpertSettings,ini);
+
     IMPORTINT("SuRun",UseIShExHook,ini);
     IMPORTINT("SuRun",UseIATHook,ini);
+    IMPORTINT("SuRun",TestReqAdmin,ini);
     IMPORTINT("SuRun",ShowAutoRuns,ini);
-    IMPORTINT("SuRun",ShowTrayAdmin,ini);
-    IMPORTINT("SuRun",OwnerAdminGrp,ini);
-    IMPORTINT("SuRun",WinUpd4All,ini);
-    IMPORTINT("SuRun",WinUpdBoot,ini);
-    IMPORTINT("SuRun",SetEnergy,ini);
-    IMPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+
     switch(GetPrivateProfileInt(_T("SuRun"),_T("ReplaceRunAs"),-1,ini))
     {
     case 0:ReplaceSuRunWithRunAs();
     case 1:ReplaceRunAsWithSuRun();
     }
+    IMPORTINT("SuRun",OwnerAdminGrp,ini);
+    IMPORTINT("SuRun",WinUpd4All,ini);
+    IMPORTINT("SuRun",WinUpdBoot,ini);
+    IMPORTINT("SuRun",SetEnergy,ini);
+    IMPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+
+    IMPORTINT("SuRun",ShowTrayAdmin,ini);
+    
+    IMPORTINT("SuRun",NoConvAdmin,ini);
+    IMPORTINT("SuRun",NoConvUser,ini);
+    IMPORTINT("SuRun",DefHideSuRun,ini);
   }
   if (bBlackList)
   {
@@ -1757,14 +1773,14 @@ void ImportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
         break;
     }
   }
-  if(u)
+  if(User)
   {
-    DelUsrSettings(u);
-    IMPORTINTu("User",NoRunSetup,u,ini);
-    IMPORTINTu("User",RestrictApps,u,ini);
-    IMPORTINTu("User",UserTSA,u,ini);
-    IMPORTINTu("User",HideFromUser,u,ini);
-    IMPORTINTu("User",ReqPw4Setup,u,ini);
+    DelUsrSettings(User);
+    IMPORTINTu("User",NoRunSetup,User,ini);
+    IMPORTINTu("User",RestrictApps,User,ini);
+    IMPORTINTu("User",UserTSA,User,ini);
+    IMPORTINTu("User",HideFromUser,User,ini);
+    IMPORTINTu("User",ReqPw4Setup,User,ini);
     for (int i=0;;i++)
     {
       TCHAR cmd[4096];
@@ -1774,7 +1790,7 @@ void ImportSettings(LPCTSTR ini,LPCTSTR u,bool bSuRunSettings,bool bBlackList)
       {
         DWORD d=0;
         IMPORTVAL("WhiteListFlags",i,d,ini)
-          AddToWhiteList(u,cmd,d);
+          AddToWhiteList(User,cmd,d);
       }else
         break;
     }
@@ -1845,9 +1861,9 @@ INT_PTR CALLBACK ExportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         GetDlgItemText(hwnd,IDC_FILENAME,f,4096);
         LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
         ExportSettings(f,
-          IsDlgButtonChecked(hwnd,IDC_EXPUSRSETTINGS)?u:0,
           IsDlgButtonChecked(hwnd,IDC_EXPSURUNSETTINGS)!=0,
-          IsDlgButtonChecked(hwnd,IDC_EXPBLACKLIST)!=0);
+          IsDlgButtonChecked(hwnd,IDC_EXPBLACKLIST)!=0,
+          IsDlgButtonChecked(hwnd,IDC_EXPUSRSETTINGS)?u:0);
         EndDialog(hwnd,IDOK);
       }
       return TRUE;
@@ -1945,9 +1961,9 @@ INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           if(bSRSet || bBlLst || bUsrSet)
           {
             ImportSettings(f,
-              (bUsrSet && IsDlgButtonChecked(hwnd,IDC_IMPUSRSETTINGS))?u:0,
               bSRSet && (IsDlgButtonChecked(hwnd,IDC_IMPSURUNSETTINGS)!=0),
-              bBlLst && (IsDlgButtonChecked(hwnd,IDC_IMPBLACKLIST)!=0));
+              bBlLst && (IsDlgButtonChecked(hwnd,IDC_IMPBLACKLIST)!=0),
+              (bUsrSet && IsDlgButtonChecked(hwnd,IDC_IMPUSRSETTINGS))?u:0);
             EndDialog(hwnd,IDOK);
           }
         }
