@@ -26,5 +26,5 @@ LPWSTR GetAccountPrivileges(LPWSTR Account);
 #define DelAcctPrivilege(a,p) AccountPrivilege(a,p,DelPrivilege)
 #define HasAcctPrivilege(a,p) AccountPrivilege(a,p,HasPrivilege)
 
-#define CanSetTime(a)     HasAcctPrivilege(a,SE_SYSTEMTIME_NAME)
-#define AllowSetTime(a,b) AccountPrivilege(a,SE_SYSTEMTIME_NAME,b?AddPrivilege:DelPrivilege)
+#define GetSetTime(a)   HasAcctPrivilege(a,SE_SYSTEMTIME_NAME)
+#define SetSetTime(a,b) AccountPrivilege(a,SE_SYSTEMTIME_NAME,b?AddPrivilege:DelPrivilege)
