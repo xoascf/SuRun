@@ -1452,7 +1452,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     ReplaceSuRunWithRunAs();
   }
   //Remove SuRunners from Registry
-  SetEnergy(false);
+  SetSetEnergy(false);
   //HKLM\Security\SuRun
   if (!g_bKeepRegistry)
   {
@@ -1563,7 +1563,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_RUNSETUP,1);
       CheckDlgButton(hwnd,IDC_KEEPREGISTRY,g_bKeepRegistry);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,1);
-      if (IsOwnerAdminGrp)
+      if (GetOwnerAdminGrp)
       {
         ShowWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),SW_HIDE);
         ShowWindow(GetDlgItem(hwnd,IDC_OWNGRPST),SW_HIDE);
