@@ -1456,6 +1456,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   //HKLM\Security\SuRun
   if (!g_bKeepRegistry)
   {
+    SetRegistryTreeAccess(_T("MACHINE\\") SVCKEY,DOMAIN_ALIAS_RID_ADMINS,true);
     DelRegKey(HKLM,SVCKEY);
     //HKLM\Software\SuRun
     DelRegKey(HKLM,SURUNKEY);
