@@ -70,7 +70,9 @@ BOOL EnablePrivilege(LPCTSTR name);
 //  AllowAccess
 void AllowAccess(HANDLE hObject);
 void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow);
+void SetRegistryTreeAccess(LPTSTR KeyName,DWORD Rid,bool bAllow);
 BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account);
+BOOL HasRegistryKeyAccess(LPTSTR KeyName,DWORD Rid);
 
 // SetAdminDenyUserAccess
 PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions=SYNCHRONIZE);
