@@ -60,6 +60,17 @@
 #define GetFadeDesk       (GetOption(_T("FadeDesktop"),1)!=0)
 #define SetFadeDesk(b)    SetOption(_T("FadeDesktop"),b,1)
 
+//Save or not Passwords in the registry
+#define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
+
+#define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
+#define SetSavePW(b)      SetOption(_T("SavePasswords"),b,1); \
+                          if (!b) \
+                          { \
+                            DelRegKey(HKLM,PASSWKEY); \
+                            DelRegKey(HKLM,TIMESKEY); \
+                          }
+
 //Minutes to wait until "Is that OK?" is asked again
 #define GetPwTimeOut      min(60,max(0,(int)GetOption(_T("AskTimeOut"),0)))
 #define SetPwTimeOut(t)   SetOption(_T("AskTimeOut"),(DWORD)min(60,max(0,(int)t)),0)
@@ -79,17 +90,6 @@
 //Hide Expert settings
 #define GetHideExpertSettings    (GetOption(_T("HideExpertSettings"),0)!=0)
 #define SetHideExpertSettings(b) SetOption(_T("HideExpertSettings"),b,0)
-
-//Save or not Passwords in the registry
-#define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
-
-#define GetSavePW         (GetOption(_T("SavePasswords"),1)!=0)
-#define SetSavePW(b)      SetOption(_T("SavePasswords"),b,1); \
-                          if (!b) \
-                          { \
-                            DelRegKey(HKLM,PASSWKEY); \
-                            DelRegKey(HKLM,TIMESKEY); \
-                          }
 
 //Show warning if Admin has no password to:
 #define APW_ALL         0
@@ -149,8 +149,8 @@
 #define GetCtrlAsAdmin        (GetShExtSetting(ControlAsAdmin,1)!=0)
 #define SetCtrlAsAdmin(b)     SetShExtSetting(ControlAsAdmin,b,1)
 //"Cmd here As Admin" on Folder Menu
-#define GetCmdAsAdmin         (GetShExtSetting(CmdHereAsAdmin,1)!=0)
-#define SetCmdAsAdmin(b)      SetShExtSetting(CmdHereAsAdmin,b,1)
+#define GetCmdAsAdmin         (GetShExtSetting(CmdHereAsAdmin,0)!=0)
+#define SetCmdAsAdmin(b)      SetShExtSetting(CmdHereAsAdmin,b,0)
 //"Explorer here As Admin" on Folder Menu
 #define GetExpAsAdmin         (GetShExtSetting(ExpHereAsAdmin,1)!=0)
 #define SetExpAsAdmin(b)      SetShExtSetting(ExpHereAsAdmin,b,1)
@@ -158,14 +158,14 @@
 #define GetRestartAsAdmin     (GetShExtSetting(RestartAsAdmin,1)!=0)
 #define SetRestartAsAdmin(b)  SetShExtSetting(RestartAsAdmin,b,1)
 //"Start As Admin" in System-Menu
-#define GetStartAsAdmin       (GetShExtSetting(StartAsAdmin,1)!=0)
-#define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,1)
+#define GetStartAsAdmin       (GetShExtSetting(StartAsAdmin,0)!=0)
+#define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,0)
 
 //Hook stuff
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
-#define GetUseIATHook         (GetShExtSetting(UseIATHook,0)!=0)
-#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,0)
+#define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
+#define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
 
 //TrayMsg stuff
 #define GetShowAutoRuns       (GetShExtSetting(ShowAutoRuns,1)!=0)
