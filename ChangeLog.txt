@@ -1,10 +1,12 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.6 - 2008-07-15: (beta)
+SuRun 1.1.9.7 - 2008-07-15: (beta)
 ---------------------------
-* Import/Export settings
-* Cosmetical improvements for SuRuns Settings Dialog
+* Cosmetical stuff in SuRun settings
+* Setup Dialog restores last selected tab and user after import
+* FIX: Import of "Replace RunAs" failed
+* FIX: SuRun did not delete HKLM\Security\SuRun
 
 ToDo
 ---------------------
@@ -31,6 +33,11 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.6 - 2008-07-15: (beta)
+---------------------------
+* Import/Export settings
+* Cosmetical improvements for SuRuns Settings Dialog
 
 SuRun 1.1.9.5 - 2008-07-15: (beta)
 ---------------------------
