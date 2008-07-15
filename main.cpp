@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;
-      }if (!_wcsicmp(c,L"/RUNAS"))
+      }else if (!_wcsicmp(c,L"/RUNAS"))
       {
         g_RunData.bRunAs=TRUE;
       }else if (!_wcsicmp(c,L"/SETUP"))
@@ -113,6 +113,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       {
         g_RunData.KillPID=wcstol(Args,0,10);
         Args=PathGetArgs(Args);
+      }else
+      {
+        //Usage
+        SafeMsgBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        return RETVAL_ACCESSDENIED;
       }
     }
     bool bShellIsadmin=FALSE;
