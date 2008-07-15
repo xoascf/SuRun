@@ -24,6 +24,7 @@
 #include <Tlhelp32.h>
 
 #include "Helpers.h"
+#include "UserGroups.h"
 #include "DBGTRace.h"
 
 #pragma comment(lib,"ShlWapi.lib")
@@ -367,6 +368,23 @@ Cleanup:
   if(pDACL != NULL) 
     LocalFree((HLOCAL) pDACL); 
   return (am&KEY_WRITE)==KEY_WRITE;
+}
+
+BOOL HasRegistryKeyAccess(LPTSTR KeyName,DWORD Rid)
+{
+  DWORD cchG=GNLEN;
+  WCHAR Group[GNLEN+1]={0};
+  if (GetGroupName(Rid,Group,&cchG))
+    return HasRegistryKeyAccess(KeyName,Group);
+  return false;
+}
+
+void SetRegistryTreeAccess(LPTSTR KeyName,DWORD Rid,bool bAllow)
+{
+  DWORD cchG=GNLEN;
+  WCHAR Group[GNLEN+1]={0};
+  if (GetGroupName(Rid,Group,&cchG))
+    SetRegistryTreeAccess(KeyName,Group,bAllow);
 }
 
 //////////////////////////////////////////////////////////////////////////////
