@@ -88,8 +88,8 @@
 #define SetTestReqAdmin(b) SetOption(_T("TestReqAdmin"),b,1)
 
 //Hide Expert settings
-#define GetHideExpertSettings    (GetOption(_T("HideExpertSettings"),0)!=0)
-#define SetHideExpertSettings(b) SetOption(_T("HideExpertSettings"),b,0)
+#define GetHideExpertSettings    (GetOption(_T("HideExpertSettings"),1)!=0)
+#define SetHideExpertSettings(b) SetOption(_T("HideExpertSettings"),b,1)
 
 //Show warning if Admin has no password to:
 #define APW_ALL         0
