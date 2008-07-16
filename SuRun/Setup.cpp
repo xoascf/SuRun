@@ -1965,7 +1965,9 @@ INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           TCHAR cmd[MAX_PATH];
           bool bSRSet=GetPrivateProfileInt(L"SuRun",L"BlurDesk",-1,f)!=-1;
           bool bBlLst=GetPrivateProfileString(L"BlackList",L"0",L"",cmd,MAX_PATH,f)!=0;
-          bool bUsrSet=GetPrivateProfileInt(L"User",L"NoRunSetup",-1,f)!=-1;
+          bool bUsrSet=(GetPrivateProfileInt(L"User",L"NoRunSetup",-1,f)!=-1)
+                    && (g_SD->CurUser>=0)
+                    && (g_SD->Users.GetCount());
           CheckDlgButton(hwnd,IDC_IMPSURUNSETTINGS,bSRSet);
           CheckDlgButton(hwnd,IDC_IMPBLACKLIST,bBlLst);
           CheckDlgButton(hwnd,IDC_IMPUSRSETTINGS,bUsrSet);
