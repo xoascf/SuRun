@@ -279,7 +279,7 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //////////////////////////////////////////////////////////////////////////////
 void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut) 
 {
-  if (HideSuRun(g_RunData.UserName)&&(!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName)))
+  if (HideSuRun(g_RunData.UserName)&&(!IsInAdmins(g_RunData.UserName)))
     return;
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
@@ -664,16 +664,11 @@ DWORD PrepareSuRun()
   //Ask For Password?
   PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
   BOOL bIsSuRunner=IsInSuRunners(g_RunData.UserName);
-  if ((!PwOk)||(!bIsSuRunner))
-  //Password is NOT ok:
-  {
-    if((!bIsSuRunner) && GetNoConvUser)
-      return RETVAL_ACCESSDENIED;
-    zero(g_RunPwd);
+  if((!bIsSuRunner) && GetNoConvUser)
+    return RETVAL_ACCESSDENIED;
+  if (!PwOk)
     DeletePassword(g_RunData.UserName);
-    PwOk=FALSE;
-  }else
-  //Password is ok:
+  else
   //If SuRunner is already Admin, let him run the new process!
   if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
@@ -687,6 +682,11 @@ DWORD PrepareSuRun()
     //secure desktop created...
     if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
       return RETVAL_CANCELLED;
+    if (!bIsSuRunner)
+    {
+      PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
+      bIsSuRunner=TRUE;
+    }
     //Is User Restricted?
     DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
     bool bNotInList=f==-1;
@@ -1087,7 +1087,7 @@ void SuRun(DWORD ProcessID)
       ResumeClient(RETVAL_OK);
       //check if SuRun Setup is hidden for user name
       if (HideSuRun(g_RunData.UserName)
-          && (!IsInGroup(DOMAIN_ALIAS_RID_ADMINS,g_RunData.UserName)))
+          && (!IsInAdmins(g_RunData.UserName)))
         return;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
@@ -1468,7 +1468,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     if (g_bSR2Admins)
     {
       USERLIST SuRunners;
-      SuRunners.SetGroupUsers(SURUNNERSGROUP,FALSE);
+      SuRunners.SetSurunnersUsers(FALSE);
       for (int i=0;i<SuRunners.GetCount();i++)
       {
         InstLog(CResStr(IDS_SR2ADMIN,SuRunners.GetUserName(i)));
