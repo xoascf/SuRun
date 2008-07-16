@@ -32,6 +32,7 @@ BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DW
 BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes);
 
 BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey);
+BOOL DelRegKeyChildren(HKEY hKey,LPTSTR pszSubKey);
 BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName);
 
 BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value);
