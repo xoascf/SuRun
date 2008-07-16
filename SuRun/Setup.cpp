@@ -324,7 +324,7 @@ typedef struct _SETUPDATA
     MinH=400;
     OrgUser=User;
     CurTab=0;
-    Users.SetSurunnersUsers(FALSE);
+    Users.SetSurunnersUsers(User,FALSE);
     CurUser=-1;
     int i;
     for (i=0;i<Users.GetCount();i++)
@@ -969,10 +969,18 @@ static void UpdateUserList(HWND hwnd,LPCTSTR UserName)
 //////////////////////////////////////////////////////////////////////////////
 void SetUseSuRuners(BOOL bUse)
 {
+  if (GetUseSuRunGrp==bUse)
+    return;
+  if SafeMsgBox()
   TCHAR u[MAX_PATH];
   _tcscpy(u,(g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
   SetUseSuRunGrp((DWORD)bUse);
-  g_SD->Users.SetSurunnersUsers(false);
+  if (bUse)
+    CreateSuRunnersGroup(); 
+  else
+    DeleteSuRunnersGroup();
+  DelAllUsrSettings;
+  g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,false);
   UpdateUserList(g_SD->hTabCtrl[1],u);
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_ADDUSER),bUse);
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_DELUSER),bUse);
@@ -1312,7 +1320,7 @@ EditApp:
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
           if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE,hwnd))
           {
-            g_SD->Users.SetSurunnersUsers(TRUE);
+            g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,TRUE);
             UpdateUserList(hwnd,g_SD->NewUser);
             zero(g_SD->NewUser);
           }
@@ -1332,7 +1340,7 @@ EditApp:
           case IDNO:
             AlterGroupMember(SURUNNERSGROUP,u,0);
             DelUsrSettings(u);
-            g_SD->Users.SetSurunnersUsers(TRUE);
+            g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,TRUE);
             UpdateUserList(hwnd,g_SD->OrgUser);
             break;
           }
