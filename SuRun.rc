@@ -745,7 +745,7 @@ BEGIN
     IDS_DELSURUNNERS        "Lösche 'SuRunners' Gruppe"
     IDS_INSTFAILED          "Installation fehlgeschlagen!"
     IDS_CLOSE               "&Schließen"
-    IDS_INSTSUCCESS         "SuRun wurde erfogreich installiert"
+    IDS_INSTSUCCESS         "SuRun wurde erfolgreich installiert"
     IDS_INSTSUCCESS2        "Sie müssen sich abmelden, bevor Sie SuRun benutzen"
     IDC_LOGOFF              "&Abmelden"
     IDC_INSTALL             "SuRun wird installiert"
