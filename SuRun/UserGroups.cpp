@@ -47,9 +47,12 @@
 /////////////////////////////////////////////////////////////////////////////
 void CreateSuRunnersGroup()
 {
-  LOCALGROUP_INFO_1	lgri1={SURUNNERSGROUP,CResStr(IDS_GRPDESC)};
-  DWORD error;
-  NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
+  if(GetUseSuRunGrp)
+  {
+    LOCALGROUP_INFO_1	lgri1={SURUNNERSGROUP,CResStr(IDS_GRPDESC)};
+    DWORD error;
+    NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -211,6 +214,8 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName)
 /////////////////////////////////////////////////////////////////////////////
 BOOL IsInSuRunners(LPCWSTR DomainAndName)
 {
+  if(!GetUseSuRunGrp)
+    return TRUE;
   if (IsInGroup(SURUNNERSGROUP,DomainAndName))
     return TRUE;
   DelUsrSettings(DomainAndName);
@@ -235,7 +240,7 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
     _tcscat(sCaption,L")");
   }
   //Is User member of Administrators?
-  if (IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+  if (IsInAdmins(UserName))
   {
     //Whoops...need to become a User!
     if(SafeMsgBox(hwnd,
@@ -373,6 +378,14 @@ void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
   WCHAR GroupName[GNLEN+1];
   if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
     SetGroupUsers(GroupName,bScanDomain);
+}
+
+void USERLIST::SetSurunnersUsers(BOOL bScanDomain)
+{
+  if(GetUseSuRunGrp)
+    SetGroupUsers(SURUNNERSGROUP,bScanDomain);
+  else
+    SetGroupUsers(_T("*"),bScanDomain);
 }
 
 static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
