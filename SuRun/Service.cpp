@@ -1450,25 +1450,26 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     DelRegKey(HKCR,L"CLSID\\" sGUID);
     //restore RunAs
     ReplaceSuRunWithRunAs();
-  }
-  //Remove SuRunners from Registry
-  SetSetEnergy(false);
-  //HKLM\Security\SuRun
-  if (!g_bKeepRegistry)
-  {
+    //Remove SuRunners from Registry
+    //HKLM\Security\SuRun
     SetRegistryTreeAccess(_T("MACHINE\\") SVCKEY,DOMAIN_ALIAS_RID_ADMINS,true);
     DelRegKey(HKLM,SVCKEY);
     //HKLM\Software\SuRun
     DelRegKey(HKLM,SURUNKEY);
+    //Set
+    SetWinUpdBoot(false);
+    SetWinUpd4All(false);
+    SetOwnerAdminGrp(false);
   }
   //Delete "SuRunners"?
   if(g_bDelSuRunners)
   {
+    SetSetEnergy(false);
     //Make "SuRunners"->"Administrators"?
     if (g_bSR2Admins)
     {
       USERLIST SuRunners;
-      SuRunners.SetSurunnersUsers(FALSE);
+      SuRunners.SetSurunnersUsers(0,FALSE);
       for (int i=0;i<SuRunners.GetCount();i++)
       {
         InstLog(CResStr(IDS_SR2ADMIN,SuRunners.GetUserName(i)));
