@@ -845,7 +845,7 @@ static void UpdateUser(HWND hwnd)
     LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
     bm=g_SD->Users.GetUserBitmap(n);
     EnableWindow(GetDlgItem(hwnd,IDC_USER),1);
-    EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),1);
+    EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),GetUseSuRunGrp);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
     CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(u));
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
