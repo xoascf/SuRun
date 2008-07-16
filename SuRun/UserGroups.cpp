@@ -390,6 +390,7 @@ void USERLIST::SetSurunnersUsers(BOOL bScanDomain)
     //Add all users
     m_bSkipAdmins=TRUE;
     SetGroupUsers(_T("*"),bScanDomain);
+    ToDo: Add Registry SuRunners!!!
     m_bSkipAdmins=FALSE;
   }
 }
