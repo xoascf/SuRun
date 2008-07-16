@@ -1,7 +1,7 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.7 - 2008-07-16: (beta)
+SuRun 1.1.9.7b1 - 2008-07-16: (beta)
 ---------------------------
 * Added option "Do not use 'SuRunners' group"
 * After a SuRunner was put to the SuRunners group, SuRun always asked for the 
