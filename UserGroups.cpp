@@ -306,6 +306,7 @@ USERLIST::USERLIST()
 {
   nUsers=0;
   User=0;
+  m_bSkipAdmins=FALSE;
 }
 
 USERLIST::~USERLIST()
@@ -385,7 +386,12 @@ void USERLIST::SetSurunnersUsers(BOOL bScanDomain)
   if(GetUseSuRunGrp)
     SetGroupUsers(SURUNNERSGROUP,bScanDomain);
   else
+  {
+    //Add all users
+    m_bSkipAdmins=TRUE;
     SetGroupUsers(_T("*"),bScanDomain);
+    m_bSkipAdmins=FALSE;
+  }
 }
 
 static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
@@ -403,6 +409,8 @@ static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
 
 void USERLIST::Add(LPWSTR UserName)
 {
+  if ((m_bSkipAdmins) && IsInAdmins(UserName))
+    return;
   int j=0;
   for(;j<nUsers;j++)
   {
