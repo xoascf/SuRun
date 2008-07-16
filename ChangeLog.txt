@@ -1,8 +1,10 @@
 Done, to be tested:
 ---------------------------
 
-* If pages 3 or 4 were activated an data with pages 3 and 4 turned of were 
-  impoerted, the UI was screwed up
+* On Import, if no SuRunner is present, "Import Settings for <user>" is 
+  grayed out
+* If pages 3 or 4 were activated and data with pages 3 and 4 turned off was
+  imported, the UI was screwed up
 * Before Exporting data, current settings are applied
 
 
