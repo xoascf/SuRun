@@ -80,12 +80,12 @@ public:
   void SetUsualUsers(BOOL bScanDomain);
   void SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
   void SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
-  void SetSurunnersUsers(BOOL bScanDomain);
+  void SetSurunnersUsers(LPCTSTR CurUser,BOOL bScanDomain);
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
   int     GetCount(){return nUsers;};
-  void Add(LPWSTR UserName);
+  void Add(LPCWSTR UserName);
 private:
   int nUsers;
   USERDATA* User;
