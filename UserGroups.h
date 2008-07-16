@@ -57,6 +57,7 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName);
 // is User "DomainAndName" member of SuRunners?
 BOOL IsInSuRunners(LPCWSTR DomainAndName);
 
+#define IsInAdmins(u) IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)
 //  BeOrBecomeSuRunner: check, if User is SuRunner if not, try to join him
 BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd);
 
@@ -79,6 +80,7 @@ public:
   void SetUsualUsers(BOOL bScanDomain);
   void SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
   void SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
+  void SetSurunnersUsers(BOOL bScanDomain);
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
