@@ -324,7 +324,7 @@ typedef struct _SETUPDATA
     MinH=400;
     OrgUser=User;
     CurTab=0;
-    Users.SetGroupUsers(SURUNNERSGROUP,FALSE);
+    Users.SetSurunnersUsers(FALSE);
     CurUser=-1;
     int i;
     for (i=0;i<Users.GetCount();i++)
@@ -967,6 +967,15 @@ static void UpdateUserList(HWND hwnd,LPCTSTR UserName)
 // SetRecommendedSettings()
 // 
 //////////////////////////////////////////////////////////////////////////////
+void SetUseSuRuners(HWND hwnd,BOOL bUse)
+{
+  TCHAR u[MAX_PATH];
+  _tcscpy(u,(g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
+  SetUseSuRunGrp((DWORD)bUse);
+  g_SD->Users.SetSurunnersUsers(false);
+  UpdateUserList(hwnd,u);
+}
+
 void SetRecommendedSettings(bool bExpertOnly=FALSE)
 {
   HWND h=g_SD->hTabCtrl[0];
@@ -1010,6 +1019,8 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
   CheckDlgButton(h,IDC_IATHOOK,1);
   CheckDlgButton(h,IDC_REQADMIN,1);
   CheckDlgButton(h,IDC_SHOWTRAY,1);
+  CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
+  SetUseSuRuners(h,TRUE);
   EnableWindow(GetDlgItem(h,IDC_REQADMIN),1);
   EnableWindow(GetDlgItem(h,IDC_BLACKLIST),1);
   EnableWindow(GetDlgItem(h,IDC_SHOWTRAY),1);
@@ -1037,6 +1048,7 @@ void ShowExpertSettings(HWND hwnd,bool bShow)
   TabCtrl_DeleteItem(hTab,2);
   if (!bShow)
   {
+    ShowWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_NOUSESURUNNERS),SW_HIDE);
     if (nSel>1)
     {
       ShowWindow(g_SD->hTabCtrl[nSel],FALSE);
@@ -1047,6 +1059,7 @@ void ShowExpertSettings(HWND hwnd,bool bShow)
     SetRecommendedSettings(true);
   }else
   {
+    ShowWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_NOUSESURUNNERS),SW_SHOW);
     TCITEM tie3={TCIF_TEXT,0,0,CResStr(IDS_SETUP3),0,0,0};
     TabCtrl_InsertItem(hTab,2,&tie3);
     TCITEM tie4={TCIF_TEXT,0,0,CResStr(IDS_SETUP4),0,0,0};
@@ -1179,6 +1192,12 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         LVCOLUMN col={LVCF_WIDTH,0,(i==0)?26:22,0,0,0,0,0};
         ListView_InsertColumn(hWL,i,&col);
       }
+      CheckDlgButton(hwnd,IDC_NOUSESURUNNERS,GetUseSuRunGrp==0);
+      if (!GetUseSuRunGrp)
+      {
+        EnableWindow(GetDlgItem(hwnd,IDC_ADDUSER),false);
+        EnableWindow(GetDlgItem(hwnd,IDC_DELUSER),false);
+      }
       //UserList
       UpdateUserList(hwnd,
         (g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
@@ -1188,6 +1207,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       g_SD->Setup2Anchor.Add(IDC_DELUSER,ANCHOR_TOPRIGHT);
       g_SD->Setup2Anchor.Add(IDS_GRPDESC,ANCHOR_ALL);
       g_SD->Setup2Anchor.Add(IDC_WHITELIST,ANCHOR_ALL);
+      g_SD->Setup2Anchor.Add(IDC_NOUSESURUNNERS,ANCHOR_BOTTOMLEFT);
       g_SD->Setup2Anchor.Add(IDC_ADDAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_EDITAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_DELETE,ANCHOR_BOTTOMRIGHT);
@@ -1228,6 +1248,9 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKEWPARAM(IDC_USER,CBN_SELCHANGE):
       case MAKEWPARAM(IDC_USER,CBN_EDITCHANGE):
         UpdateUser(hwnd);
+        return TRUE;
+      case MAKELPARAM(IDC_NOUSESURUNNERS,BN_CLICKED):
+        SetUseSuRuners(hwnd,IsDlgButtonChecked(hwnd,IDC_NOUSESURUNNERS)==0);
         return TRUE;
       //Help Button
       case MAKELPARAM(IDC_ICONHELP,BN_CLICKED):
@@ -1280,7 +1303,7 @@ EditApp:
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
           if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE,hwnd))
           {
-            g_SD->Users.SetGroupUsers(SURUNNERSGROUP,TRUE);
+            g_SD->Users.SetSurunnersUsers(TRUE);
             UpdateUserList(hwnd,g_SD->NewUser);
             zero(g_SD->NewUser);
           }
@@ -1288,6 +1311,7 @@ EditApp:
         return TRUE;
       //Delete User Button
       case MAKELPARAM(IDC_DELUSER,BN_CLICKED):
+        if(GetUseSuRunGrp)
         {
           LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
           switch (SafeMsgBox(hwnd,CBigResStr(IDS_DELUSER,u),
@@ -1299,7 +1323,7 @@ EditApp:
           case IDNO:
             AlterGroupMember(SURUNNERSGROUP,u,0);
             DelUsrSettings(u);
-            g_SD->Users.SetGroupUsers(SURUNNERSGROUP,TRUE);
+            g_SD->Users.SetSurunnersUsers(TRUE);
             UpdateUserList(hwnd,g_SD->OrgUser);
             break;
           }
@@ -1534,11 +1558,19 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         &&(0==RegOpenKeyEx(HKCR,L"cplfile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra)))
         RegCloseKey(kra);
       CheckDlgButton(hwnd,IDC_DORUNAS,(kra?BST_UNCHECKED:BST_CHECKED));
-      CheckDlgButton(hwnd,IDC_ALLOWTIME,GetSetTime(SURUNNERSGROUP));
+      if(GetUseSuRunGrp)
+      {
+        CheckDlgButton(hwnd,IDC_ALLOWTIME,GetSetTime(SURUNNERSGROUP));
+        CheckDlgButton(hwnd,IDC_SETENERGY,GetSetEnergy);
+      }
+      else
+      {
+        EnableWindow(GetDlgItem(hwnd,IDC_ALLOWTIME),false);
+        EnableWindow(GetDlgItem(hwnd,IDC_SETENERGY),false);
+      }
       CheckDlgButton(hwnd,IDC_OWNERGROUP,GetOwnerAdminGrp);
       CheckDlgButton(hwnd,IDC_WINUPD4ALL,GetWinUpd4All);
       CheckDlgButton(hwnd,IDC_WINUPDBOOT,GetWinUpdBoot);
-      CheckDlgButton(hwnd,IDC_SETENERGY,GetSetEnergy);
 
       HWND cb=GetDlgItem(hwnd,IDC_TRAYSHOWADMIN);
       DWORD tsa=GetShowTrayAdmin;
@@ -1574,10 +1606,13 @@ ApplyChanges:
         ReplaceSuRunWithRunAs();
         break;
       }
-      if ((GetSetTime(SURUNNERSGROUP)!=0)!=((int)IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)))
-        SetSetTime(SURUNNERSGROUP,IsDlgButtonChecked(hwnd,IDC_ALLOWTIME));
-      if (GetSetEnergy!=(int)IsDlgButtonChecked(hwnd,IDC_SETENERGY))
-        SetSetEnergy(IsDlgButtonChecked(hwnd,IDC_SETENERGY)!=0);
+      if(GetUseSuRunGrp)
+      {
+        if ((GetSetTime(SURUNNERSGROUP)!=0)!=((int)IsDlgButtonChecked(hwnd,IDC_ALLOWTIME)))
+          SetSetTime(SURUNNERSGROUP,IsDlgButtonChecked(hwnd,IDC_ALLOWTIME));
+        if (GetSetEnergy!=(int)IsDlgButtonChecked(hwnd,IDC_SETENERGY))
+          SetSetEnergy(IsDlgButtonChecked(hwnd,IDC_SETENERGY)!=0);
+      }
       SetWinUpd4All(IsDlgButtonChecked(hwnd,IDC_WINUPD4ALL));
       SetWinUpdBoot(IsDlgButtonChecked(hwnd,IDC_WINUPDBOOT));
       SetOwnerAdminGrp(IsDlgButtonChecked(hwnd,IDC_OWNERGROUP));
@@ -1656,6 +1691,8 @@ void ExportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User
   {
     WritePrivateProfileString(_T("SuRun"),_T("Version"),
       CResStr(_T("\"SuRun %s\""),GetVersionString()),ini);
+    EXPORTINT("SuRun",UseSuRunGrp,ini);
+
     EXPORTINT("SuRun",BlurDesk,ini);
     EXPORTINT("SuRun",FadeDesk,ini);
     EXPORTINT("SuRun",SavePW,ini);
@@ -1678,8 +1715,11 @@ void ExportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User
     
     WritePrivateProfileInt(_T("SuRun"),_T("ReplaceRunAs"),
       IsDlgButtonChecked(g_SD->hTabCtrl[3],IDC_DORUNAS),ini);
-    EXPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
-    EXPORTINT("SuRun",SetEnergy,ini);
+    if(GetUseSuRunGrp)
+    {
+      EXPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+      EXPORTINT("SuRun",SetEnergy,ini);
+    }
     EXPORTINT("SuRun",WinUpd4All,ini);
     EXPORTINT("SuRun",WinUpdBoot,ini);
     EXPORTINT("SuRun",OwnerAdminGrp,ini);
@@ -1742,6 +1782,8 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User
 {
   if (bSuRunSettings)
   {
+    IMPORTINT("SuRun",UseSuRunGrp,ini);
+
     IMPORTINT("SuRun",BlurDesk,ini);
     IMPORTINT("SuRun",FadeDesk,ini);
     IMPORTINT("SuRun",SavePW,ini);
@@ -1774,8 +1816,11 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User
     IMPORTINT("SuRun",OwnerAdminGrp,ini);
     IMPORTINT("SuRun",WinUpd4All,ini);
     IMPORTINT("SuRun",WinUpdBoot,ini);
-    IMPORTINT("SuRun",SetEnergy,ini);
-    IMPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+    if(GetUseSuRunGrp)
+    {
+      IMPORTINT("SuRun",SetEnergy,ini);
+      IMPORTINTu("SuRun",SetTime,SURUNNERSGROUP,ini);
+    }
 
     IMPORTINT("SuRun",ShowTrayAdmin,ini);
     
