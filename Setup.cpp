@@ -1596,6 +1596,14 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_NOCONVADMIN,GetNoConvAdmin);
       CheckDlgButton(hwnd,IDC_NOCONVUSER,GetNoConvUser);
       CheckDlgButton(hwnd,IDC_HIDESURUN,GetDefHideSuRun);
+
+      bool bUse=GetUseSuRunGrp;
+      EnableWindow(GetDlgItem(hwnd,IDC_NOCONVADMIN),bUse);
+      EnableWindow(GetDlgItem(hwnd,IDC_NOCONVADMIN),bUse);
+      EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),bUse);
+      EnableWindow(GetDlgItem(hwnd,IDC_ALLOWTIME),bUse);
+      EnableWindow(GetDlgItem(hwnd,IDC_SETENERGY),bUse);
+
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
