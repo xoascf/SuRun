@@ -1,6 +1,9 @@
 Done, to be tested:
 ---------------------------
 
+* Added option "Do not use 'SuRunners' group"
+* After a SuRunner was put to the SuRunners group, SuRun always asked for the 
+  password 
 * On Import, if no SuRunner is present, "Import Settings for <user>" is 
   grayed out
 * If pages 3 or 4 were activated and data with pages 3 and 4 turned off was
