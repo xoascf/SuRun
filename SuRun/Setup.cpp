@@ -1032,10 +1032,18 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
 void ShowExpertSettings(HWND hwnd,bool bShow)
 {
   HWND hTab=GetDlgItem(hwnd,IDC_SETUP_TAB);
+  int nSel=TabCtrl_GetCurSel(hTab);
   TabCtrl_DeleteItem(hTab,3);
   TabCtrl_DeleteItem(hTab,2);
   if (!bShow)
   {
+    if (nSel>1)
+    {
+      ShowWindow(g_SD->hTabCtrl[nSel],FALSE);
+      ShowWindow(g_SD->hTabCtrl[1],TRUE);
+      TabCtrl_SetCurSel(hTab,1);
+      g_SD->CurTab=1;
+    }
     SetRecommendedSettings(true);
   }else
   {
@@ -1873,6 +1881,10 @@ INT_PTR CALLBACK ExportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     case MAKELPARAM(IDOK,BN_CLICKED):
       {
+        for (int i=0;i<nTabs;i++)
+          SendMessage(g_SD->hTabCtrl[i],
+            WM_COMMAND,MAKELPARAM(ID_APPLY,BN_CLICKED),
+            (LPARAM)GetDlgItem(g_SD->hTabCtrl[i],ID_APPLY));
         TCHAR f[4096]={0};
         GetDlgItemText(hwnd,IDC_FILENAME,f,4096);
         LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
