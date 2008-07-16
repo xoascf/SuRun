@@ -967,13 +967,22 @@ static void UpdateUserList(HWND hwnd,LPCTSTR UserName)
 // SetRecommendedSettings()
 // 
 //////////////////////////////////////////////////////////////////////////////
-void SetUseSuRuners(HWND hwnd,BOOL bUse)
+void SetUseSuRuners(BOOL bUse)
 {
   TCHAR u[MAX_PATH];
   _tcscpy(u,(g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
   SetUseSuRunGrp((DWORD)bUse);
   g_SD->Users.SetSurunnersUsers(false);
-  UpdateUserList(hwnd,u);
+  UpdateUserList(g_SD->hTabCtrl[1],u);
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_ADDUSER),bUse);
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_DELUSER),bUse);
+  
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVADMIN),bUse);
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVADMIN),bUse);
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_HIDESURUN),bUse);
+
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_ALLOWTIME),bUse);
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_SETENERGY),bUse);
 }
 
 void SetRecommendedSettings(bool bExpertOnly=FALSE)
@@ -1007,6 +1016,8 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
     CheckDlgButton(h,IDC_HIDESURUN,0);
     CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
     CheckDlgButton(h,IDC_TRAYBALLOON,1);
+    CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
+    SetUseSuRuners(TRUE);
     
     int User=g_SD->CurUser;
     for (g_SD->CurUser=0;g_SD->CurUser<g_SD->Users.GetCount();g_SD->CurUser++)
@@ -1019,8 +1030,6 @@ void SetRecommendedSettings(bool bExpertOnly=FALSE)
   CheckDlgButton(h,IDC_IATHOOK,1);
   CheckDlgButton(h,IDC_REQADMIN,1);
   CheckDlgButton(h,IDC_SHOWTRAY,1);
-  CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
-  SetUseSuRuners(h,TRUE);
   EnableWindow(GetDlgItem(h,IDC_REQADMIN),1);
   EnableWindow(GetDlgItem(h,IDC_BLACKLIST),1);
   EnableWindow(GetDlgItem(h,IDC_SHOWTRAY),1);
@@ -1250,7 +1259,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         UpdateUser(hwnd);
         return TRUE;
       case MAKELPARAM(IDC_NOUSESURUNNERS,BN_CLICKED):
-        SetUseSuRuners(hwnd,IsDlgButtonChecked(hwnd,IDC_NOUSESURUNNERS)==0);
+        SetUseSuRuners(IsDlgButtonChecked(hwnd,IDC_NOUSESURUNNERS)==0);
         return TRUE;
       //Help Button
       case MAKELPARAM(IDC_ICONHELP,BN_CLICKED):
