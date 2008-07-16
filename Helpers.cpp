@@ -180,6 +180,22 @@ BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
   return TRUE;
 }
 
+BOOL DelRegKeyChildren(HKEY hKey,LPTSTR pszSubKey)
+{
+  HKEY hEnumKey;
+  if(RegOpenKeyEx(hKey,pszSubKey,0,KSAM(KEY_ENUMERATE_SUB_KEYS),&hEnumKey)!=NOERROR)
+    return FALSE;
+  TCHAR szKey[4096];
+  DWORD dwSize = 4096;
+  while (ERROR_SUCCESS==RegEnumKeyEx(hEnumKey,0,szKey,&dwSize,0,0,0,0))
+  {
+    DelRegKey(hEnumKey, szKey);
+    dwSize=4096;
+  }
+  RegCloseKey(hEnumKey);
+  return TRUE;
+}
+
 void CopyRegKey(HKEY hSrc, HKEY hDst)
 {
   LPTSTR s=(LPTSTR)malloc(512*sizeof(TCHAR));
