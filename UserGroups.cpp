@@ -381,7 +381,7 @@ void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
     SetGroupUsers(GroupName,bScanDomain);
 }
 
-void USERLIST::SetSurunnersUsers(BOOL bScanDomain)
+void USERLIST::SetSurunnersUsers(LPCTSTR CurUser,BOOL bScanDomain)
 {
   if(GetUseSuRunGrp)
     SetGroupUsers(SURUNNERSGROUP,bScanDomain);
@@ -390,7 +390,8 @@ void USERLIST::SetSurunnersUsers(BOOL bScanDomain)
     //Add all users
     m_bSkipAdmins=TRUE;
     SetGroupUsers(_T("*"),bScanDomain);
-    ToDo: Add Registry SuRunners!!!
+    if (CurUser && *CurUser)
+      Add(CurUser);
     m_bSkipAdmins=FALSE;
   }
 }
@@ -408,7 +409,7 @@ static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
 }
 
 
-void USERLIST::Add(LPWSTR UserName)
+void USERLIST::Add(LPCWSTR UserName)
 {
   if ((m_bSkipAdmins) && IsInAdmins(UserName))
     return;
