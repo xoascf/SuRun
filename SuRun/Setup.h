@@ -36,7 +36,8 @@
 #define USERKEY(u)    CBigResStr(SVCKEY _T("\\%s\\Settings"),u)
 
 #define RAPASSKEY(u)  CBigResStr(SVCKEY _T("\\RunAs\\%s\\Cache"),u)
-#define USROPTKEY(u)  CBigResStr(_T("CLSID\\") sGUID _T("\\Options\\%s"),u)
+#define SHEXOPTKEY     _T("CLSID\\") sGUID _T("\\Options")
+#define USROPTKEY(u)  CBigResStr(SHEXOPTKEY _T("\\%s"),u)
 
 #define WINLOGONKEY _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify\\SuRun")
 #define SURUNKEY    _T("SOFTWARE\\SuRun")
@@ -110,6 +111,10 @@
 
 #define DelUsrSettings(u)       DelRegKey(HKLM,WHTLSTKEY(u));\
                                 DelRegKey(HKCR,USROPTKEY(u))
+                                
+#define DelAllUsrSettings       DelRegKeyChildren(HKLM,SVCKEY);\
+                                DelRegKey(HKCR,SHEXOPTKEY)
+                                  
 
 //SuRunner is not allowed to run Setup
 #define GetNoRunSetup(u)      (GetUsrSetting(u,_T("AdminOnlySetup"),0)!=0)
