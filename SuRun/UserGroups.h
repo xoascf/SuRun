@@ -89,6 +89,7 @@ public:
 private:
   int nUsers;
   USERDATA* User;
+  bool m_bSkipAdmins;
   void AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
   void AddGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
   void AddAllUsers(BOOL bScanDomain);
