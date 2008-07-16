@@ -145,6 +145,8 @@
 
 #define ShowAutoRuns    L"ShowAutoRuns"    //use Show Message in Tray
 
+#define UseSuRunGrp     L"UseSuRunners"    //use SuRunners Group
+
 //"Control Panel As Admin" on Desktop Menu
 #define GetCtrlAsAdmin        (GetShExtSetting(ControlAsAdmin,1)!=0)
 #define SetCtrlAsAdmin(b)     SetShExtSetting(ControlAsAdmin,b,1)
@@ -160,6 +162,9 @@
 //"Start As Admin" in System-Menu
 #define GetStartAsAdmin       (GetShExtSetting(StartAsAdmin,0)!=0)
 #define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,0)
+
+#define GetUseSuRunGrp        (GetShExtSetting(UseSuRunGrp,1)!=0)
+#define SetUseSuRunGrp(b)     SetShExtSetting(UseSuRunGrp,b,1)
 
 //Hook stuff
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
@@ -203,7 +208,7 @@ inline bool ShowTray(LPCTSTR u)
 {
   if (IsInSuRunners(u))
     return (!HideSuRun(u)) && (GetUserTSA(u)>0);
-  bool bAdmin=IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)!=0;
+  bool bAdmin=IsInAdmins(u)!=0;
   if (GetDefHideSuRun &&(!bAdmin))
     return false;
   switch (GetShowTrayAdmin & (~TSA_TIPS))
@@ -222,7 +227,7 @@ inline bool ShowBalloon(LPCTSTR u)
 {
   if (IsInSuRunners(u))
     return (!HideSuRun(u)) && (GetUserTSA(u)==2);
-  bool bAdmin=IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)!=0;
+  bool bAdmin=IsInAdmins(u)!=0;
   if (GetDefHideSuRun && (!bAdmin))
     return false;
   DWORD tsa=GetShowTrayAdmin;
