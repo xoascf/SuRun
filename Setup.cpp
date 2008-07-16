@@ -1848,13 +1848,17 @@ INT_PTR CALLBACK ExportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-      CheckDlgButton(hwnd,IDC_EXPSURUNSETTINGS,1);
-      CheckDlgButton(hwnd,IDC_EXPBLACKLIST,1);
-      CheckDlgButton(hwnd,IDC_EXPUSRSETTINGS,1);
+      CheckDlgButton(hwnd,IDC_EXPSURUNSETTINGS,(g_SD->CurTab==0)||(g_SD->CurTab==3));
+      CheckDlgButton(hwnd,IDC_EXPBLACKLIST,g_SD->CurTab==2);
+      CheckDlgButton(hwnd,IDC_EXPUSRSETTINGS,g_SD->CurTab==1);
+      if(!IsDlgButtonChecked(g_SD->hTabCtrl[0],IDC_NOEXPERT))
+        EnableWindow(GetDlgItem(hwnd,IDC_EXPBLACKLIST),0);
       TCHAR s[MAX_PATH];
       GetDlgItemText(hwnd,IDC_EXPUSRSETTINGS,s,MAX_PATH);
       LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
       SetDlgItemText(hwnd,IDC_EXPUSRSETTINGS,CBigResStr(s,u));
+          
+
       PostMessage(hwnd,WM_COMMAND,IDC_SELFILE,(LPARAM)GetDlgItem(hwnd,IDC_SELFILE));
     }
     return TRUE;
