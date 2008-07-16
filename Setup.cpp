@@ -978,7 +978,7 @@ void SetUseSuRuners(BOOL bUse)
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_DELUSER),bUse);
   
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVADMIN),bUse);
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVADMIN),bUse);
+  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVUSER),bUse);
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_HIDESURUN),bUse);
 
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_ALLOWTIME),bUse);
@@ -1599,7 +1599,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
       bool bUse=GetUseSuRunGrp;
       EnableWindow(GetDlgItem(hwnd,IDC_NOCONVADMIN),bUse);
-      EnableWindow(GetDlgItem(hwnd,IDC_NOCONVADMIN),bUse);
+      EnableWindow(GetDlgItem(hwnd,IDC_NOCONVUSER),bUse);
       EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),bUse);
       EnableWindow(GetDlgItem(hwnd,IDC_ALLOWTIME),bUse);
       EnableWindow(GetDlgItem(hwnd,IDC_SETENERGY),bUse);
