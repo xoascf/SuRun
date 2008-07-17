@@ -305,6 +305,7 @@ typedef struct _SETUPDATA
 {
   USERLIST Users;
   LPCTSTR OrgUser;
+  DWORD SessID;
   int CurUser;
   HICON UserIcon;
   HWND hTabCtrl[nTabs];
@@ -317,11 +318,12 @@ typedef struct _SETUPDATA
   CDlgAnchor Setup2Anchor;
   int MinW;
   int MinH;
-  _SETUPDATA(LPCTSTR User)
+  _SETUPDATA(DWORD SessionID,LPCTSTR User)
   {
     MinW=600;
     MinH=400;
     OrgUser=User;
+    SessID=SessionID;
     Users.SetSurunnersUsers(User,FALSE);
     CurUser=-1;
     int i;
@@ -519,7 +521,11 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrTitle        = CResStr(g_AppOpt.OfnTitle);
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
+  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
+  ImpersonateLoggedOnUser(hTok);
   BOOL bRet=GetOpenFileName(&ofn);
+  RevertToSelf();
+  CloseHandle(hTok);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   if (PathFileExists(FileName))
@@ -1277,7 +1283,11 @@ static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrTitle        = 0;
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN|OFN_OVERWRITEPROMPT;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
+  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
+  ImpersonateLoggedOnUser(hTok);
   BOOL bRet=GetSaveFileName(&ofn);
+  RevertToSelf();
+  CloseHandle(hTok);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
@@ -1360,7 +1370,11 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrTitle        = 0;
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
+  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
+  ImpersonateLoggedOnUser(hTok);
   BOOL bRet=GetOpenFileName(&ofn);
+  RevertToSelf();
+  CloseHandle(hTok);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
@@ -2325,12 +2339,12 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
   return FALSE;
 }
 
-BOOL RunSetup(LPCTSTR User)
+BOOL RunSetup(DWORD SessionID,LPCTSTR User)
 {
   INT_PTR bRet=-1;
   while (bRet==-1)
   {
-    SETUPDATA sd(User);
+    SETUPDATA sd(SessionID,User);
     g_SD=&sd;
     bRet=DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SETUP_MAIN),
       0,MainSetupDlgProc);  
@@ -2351,15 +2365,15 @@ BOOL TestSetup()
   InitCommonControlsEx(&icce);
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-  if (!RunSetup(un))
+  if (!RunSetup(0,un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-  if (!RunSetup(un))
+  if (!RunSetup(0,un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
-  if (!RunSetup(un))
+  if (!RunSetup(0,un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   ::ExitProcess(0);
   return TRUE;
