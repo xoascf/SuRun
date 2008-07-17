@@ -262,17 +262,17 @@ inline bool ShowBalloon(LPCTSTR u)
                               _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                               _T("nodefaultadminowner"),(b)==0)
 
-#define GetWinUpd4All     GetRegInt(HKLM,\
+#define GetWinUpd4All     (GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
-                            _T("ElevateNonAdmins"),0)
+                            _T("ElevateNonAdmins"),0)!=0)
 
 #define SetWinUpd4All(b)  SetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
                             _T("ElevateNonAdmins"),b)
 
-#define GetWinUpdBoot     GetRegInt(HKLM,\
+#define GetWinUpdBoot     (GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
-                            _T("NoAutoRebootWithLoggedOnUsers"),0)
+                            _T("NoAutoRebootWithLoggedOnUsers"),0)!=0)
 
 #define SetWinUpdBoot(b)  SetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
