@@ -141,6 +141,7 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 /////////////////////////////////////////////////////////////////////////////
 BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
+  CTimeLog l(L"IsInGroupDirect(%s,%s)",Group,DomainAndName);
 	DWORD result = 0;
 	NET_API_STATUS status;
 	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
@@ -155,11 +156,17 @@ BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 		{
 			if (Members)
 				for(i = 0; (i<total); i++)
-					if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
+        {
+          if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
           {
+            DBGTrace3("IsInGroupDirect(%s,%s): User: %s SUCCESS!",
+              Group,DomainAndName,Members[i].lgrmi3_domainandname);
             NetApiBufferFree(Members);
             return TRUE;
           }
+          DBGTrace3("IsInGroupDirect(%s,%s): User: %s mismatch",
+            Group,DomainAndName,Members[i].lgrmi3_domainandname);
+        }
 		}
 	}while (status==ERROR_MORE_DATA);
 	NetApiBufferFree(Members);
@@ -168,6 +175,7 @@ BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 
 BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
+  CTimeLog l(L"IsInGroup(%s,%s)",Group,DomainAndName);
   //try to find user in local group
   NET_API_STATUS status;
 	{
@@ -180,17 +188,23 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
 		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
     {
       for(DWORD i = 0; (i<total); i++) 
+      {
         if(wcsicmp(Users[i].lgrui0_name, Group)==0)
         {
+          DBGTrace3("IsInGroup(%s,%s): User: %s SUCCESS!",
+            Group,DomainAndName,Users[i].lgrui0_name);
           NetApiBufferFree(Users);
           return TRUE;
         }
+        DBGTrace3("IsInGroup(%s,%s): User: %s mismatch",
+          Group,DomainAndName,Users[i].lgrui0_name);
+      }
       NetApiBufferFree(Users);
       Users=0;
     }else
     {
-//      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
-//        Group,DomainAndName,GetErrorNameStatic(status));
+      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
+        Group,DomainAndName,GetErrorNameStatic(status));
       return IsInGroupDirect(Group,DomainAndName);
     }
 	}
