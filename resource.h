@@ -190,10 +190,8 @@
 #define IDC_BUTTON1                     1034
 #define IDC_ADDAPP                      1034
 #define IDC_SELFILE                     1034
-#define IDC_IMPORT                      1034
 #define IDC_EDITAPP                     1035
 #define IDC_EXTOPT3                     1035
-#define IDC_EXPORT                      1035
 #define IDC_CTRLASADMIN                 1036
 #define IDC_ADDUSER                     1036
 #define IDC_CMDASADMIN                  1037
@@ -202,7 +200,6 @@
 #define IDC_STARTADMIN                  1040
 #define IDC_RUNSETUP                    1041
 #define IDC_RESTRICTED                  1042
-#define IDC_EDIT1                       1045
 #define IDC_FILENAME                    1045
 #define IDC_USERLIST                    1046
 #define IDC_USERNAME                    1047
@@ -219,6 +216,8 @@
 #define IDC_QUESTION                    1057
 #define IDC_SR2ADMIN                    1058
 #define IDC_INSTLOG                     1059
+#define IDC_IMPORT                      1060
+#define IDC_EXPORT                      1061
 #define IDC_OWNGRPST                    1070
 #define IDC_OPTNST                      1071
 #define IDC_TRAYSHOWADMIN               1072
