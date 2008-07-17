@@ -268,7 +268,7 @@ BEGIN
     CONTROL         "Zeige ein Informationsfenster, wenn Programme automagisch gestartet wurden",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, dass darüber informiert.",
+    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, das darüber informiert.",
                     IDC_STATIC,31,198,335,17
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,220,356,8
@@ -2015,7 +2015,7 @@ BEGIN
     CONTROL         "Zeige ein Informationsfenster, wenn Programme automagisch gestartet wurden",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, dass darüber informiert.",
+    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, das darüber informiert.",
                     IDC_STATIC,31,198,335,17
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
                     IDC_STATIC,14,220,356,8
