@@ -351,5 +351,5 @@ void ReplaceSuRunWithRunAs(HKEY hKey=HKCR);
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL RunSetup(LPCTSTR User);
+BOOL RunSetup(DWORD SessionID,LPCTSTR User);
 
