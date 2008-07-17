@@ -1,24 +1,12 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.7b1 - 2008-07-16: (beta)
+SuRun 1.1.9.7b1 - 2008-07-17: (beta)
 ---------------------------
-* Added option "Do not use 'SuRunners' group"
-* After a SuRunner was put to the SuRunners group, SuRun always asked for the 
-  password 
-* On Import, if no SuRunner is present, "Import Settings for <user>" is 
-  grayed out
-* If pages 3 or 4 were activated and data with pages 3 and 4 turned off was
-  imported, the UI was screwed up
-* Before Exporting data, current settings are applied
-
-
-SuRun 1.1.9.7 - 2008-07-15: (beta)
----------------------------
-* Cosmetical stuff in SuRun settings
-* Setup Dialog restores last selected tab and user after import
-* FIX: Import of "Replace RunAs" failed
-* FIX: SuRun did not delete HKLM\Security\SuRun
+* Removed option "Do not use 'SuRunners' group"
+* Export/Import is split: 
+  -On page 1 you can Import/Export all SuRun settings and SuRunners users
+  -On page 2 you can Import/Export the current users WhiteList and Settings
 
 ToDo
 ---------------------
@@ -45,6 +33,25 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.7b1 - 2008-07-16: (beta)
+---------------------------
+* Added option "Do not use 'SuRunners' group"
+* After a SuRunner was put to the SuRunners group, SuRun always asked for the 
+  password 
+* On Import, if no SuRunner is present, "Import Settings for <user>" is 
+  grayed out
+* If pages 3 or 4 were activated and data with pages 3 and 4 turned off was
+  imported, the UI was screwed up
+* Before Exporting data, current settings are applied
+
+
+SuRun 1.1.9.7 - 2008-07-15: (beta)
+---------------------------
+* Cosmetical stuff in SuRun settings
+* Setup Dialog restores last selected tab and user after import
+* FIX: Import of "Replace RunAs" failed
+* FIX: SuRun did not delete HKLM\Security\SuRun
 
 SuRun 1.1.9.6 - 2008-07-15: (beta)
 ---------------------------
