@@ -2237,6 +2237,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
         EndDialog(hwnd,-2);
         return TRUE;
       }
+      break;
     }
   case WM_SIZE:
     {
