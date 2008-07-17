@@ -168,8 +168,8 @@
 #define GetStartAsAdmin       (GetShExtSetting(StartAsAdmin,0)!=0)
 #define SetStartAsAdmin(b)    SetShExtSetting(StartAsAdmin,b,0)
 
-#define GetUseSuRunGrp        (GetShExtSetting(UseSuRunGrp,1)!=0)
-#define SetUseSuRunGrp(b)     SetShExtSetting(UseSuRunGrp,b,1)
+#define GetUseSuRunGrp        (1/*GetShExtSetting(UseSuRunGrp,1)!=0*/)
+//#define SetUseSuRunGrp(b)     SetShExtSetting(UseSuRunGrp,b,1)
 
 //Hook stuff
 #define GetUseIShExHook       (GetShExtSetting(UseIShExHook,1)!=0)
@@ -342,8 +342,8 @@ void ReplaceSuRunWithRunAs(HKEY hKey=HKCR);
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User);
-void ExportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User);
+//void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User);
+//void ExportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,LPCTSTR User);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
