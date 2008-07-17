@@ -44,13 +44,13 @@ extern RUNDATA g_RunData;
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//extern BOOL TestSetup();
+extern BOOL TestSetup();
 #endif _DEBUG
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
 #ifdef _DEBUG
-//  TestSetup();
+  TestSetup();
 #endif _DEBUG
   if(HandleServiceStuff())
     return 0;
