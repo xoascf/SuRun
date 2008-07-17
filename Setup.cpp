@@ -210,7 +210,7 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
       TCHAR v[4096];
       DWORD n=4096;
       DWORD t=0;
-      BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",&t,(BYTE*)&v,&n);
+      BOOL bOk=GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",&t,(BYTE*)&v,&n);
       if (bOk 
         && ((t==REG_SZ)||(t==REG_EXPAND_SZ))
         && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun")))
@@ -229,7 +229,7 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
         //Preserve original command name:
         n=4096;
         zero(v);
-        GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"",&t,(BYTE*)&v,&n);
+        GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"",&t,(BYTE*)&v,&n);
         SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"orgname",t,(BYTE*)&v,n);
         //Set SuRun command name
         SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"",CResStr(IDS_RUNAS));
@@ -255,7 +255,7 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
       TCHAR v[4096];
       DWORD n=4096;
       DWORD t=0;
-      BOOL bOk=GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),
+      BOOL bOk=GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),
                          L"SuRunWasHere",&t,(BYTE*)&v,&n);
       if ( bOk
         && ((t==REG_SZ)||(t==REG_EXPAND_SZ))
@@ -268,7 +268,7 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
         //Restore  original command name:
         n=4096;
         zero(v);
-        if(GetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"orgname",&t,(BYTE*)&v,&n))
+        if(GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"orgname",&t,(BYTE*)&v,&n))
         {
           if (v[0])
             SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"",t,(BYTE*)&v,n);
@@ -458,32 +458,6 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       }//switch (wParam)
       break;
     }//WM_COMMAND
-  }
-  return FALSE;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  Help Dialog: White background, Cancel Button.
-// 
-//////////////////////////////////////////////////////////////////////////////
-
-INT_PTR CALLBACK HelpDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-  switch(msg)
-  {
-  case WM_CTLCOLORSTATIC:
-    SetBkMode((HDC)wParam,TRANSPARENT);
-  case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
-  case WM_COMMAND:
-    if (wParam==MAKELPARAM(IDCANCEL,BN_CLICKED))
-    {
-      g_SD->HelpWnd=0;
-      EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_ICONHELP),1);
-      EndDialog(hwnd,0);
-      return TRUE;
-    }
   }
   return FALSE;
 }
@@ -1567,7 +1541,6 @@ void ShowExpertSettings(HWND hwnd,bool bShow)
       ShowWindow(g_SD->hTabCtrl[1],TRUE);
       TabCtrl_SetCurSel(hTab,1);
     }
-    SetRecommendedSettings(true);
   }else
   {
     //ShowWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_NOUSESURUNNERS),SW_SHOW);
@@ -1634,8 +1607,10 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           if (SafeMsgBox(hwnd,CBigResStr(IDS_EXPERTSETUP),CResStr(IDS_APPNAME),
             MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDYES)
+          {
+            SetRecommendedSettings(true);
             ShowExpertSettings(GetParent(hwnd),false);
-          else
+          }else
             CheckDlgButton(hwnd,IDC_NOEXPERT,1);
         }else
           ShowExpertSettings(GetParent(hwnd),TRUE);
@@ -1729,12 +1704,12 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       g_SD->Setup2Anchor.Add(IDS_GRPDESC,ANCHOR_ALL);
       g_SD->Setup2Anchor.Add(IDC_WHITELIST,ANCHOR_ALL);
       //g_SD->Setup2Anchor.Add(IDC_NOUSESURUNNERS,ANCHOR_BOTTOMLEFT);
+      g_SD->Setup2Anchor.Add(IDC_IMPORT,IDC_IMEXSTATIC);
       g_SD->Setup2Anchor.Add(IDC_IMPORT,ANCHOR_BOTTOMLEFT);
       g_SD->Setup2Anchor.Add(IDC_EXPORT,ANCHOR_BOTTOMLEFT);
       g_SD->Setup2Anchor.Add(IDC_ADDAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_EDITAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_DELETE,ANCHOR_BOTTOMRIGHT);
-      g_SD->Setup2Anchor.Add(IDC_ICONHELP,ANCHOR_BOTTOMRIGHT);
       return TRUE;
     }//WM_INITDIALOG
   case WM_SIZE:
@@ -1797,16 +1772,6 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 //      case MAKELPARAM(IDC_NOUSESURUNNERS,BN_CLICKED):
 //        SetUseSuRuners(IsDlgButtonChecked(hwnd,IDC_NOUSESURUNNERS)==0);
 //        return TRUE;
-      //Help Button
-      case MAKELPARAM(IDC_ICONHELP,BN_CLICKED):
-        if (g_SD->HelpWnd==0)
-          g_SD->HelpWnd=CreateDialog(GetModuleHandle(0),MAKEINTRESOURCE(IDD_ICONHELP),hwnd,HelpDlgProc);
-        if (g_SD->HelpWnd)
-        {
-          ShowWindow(g_SD->HelpWnd,SW_SHOW);
-          EnableWindow(GetDlgItem(hwnd,IDC_ICONHELP),0);
-        }
-        return TRUE;
       //Edit Button
       case MAKELPARAM(IDC_EDITAPP,BN_CLICKED):
         {
