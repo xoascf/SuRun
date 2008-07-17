@@ -204,6 +204,8 @@ void DisplayMenu(HWND hWnd)
   MenuAdd(hMenu,CResStr(_T("SuRun %s"),GetVersionString()),(UINT)-1,MFS_DEFAULT);
   AppendMenu(hMenu,MF_SEPARATOR,(UINT)-1,0);
   MenuAdd(hMenu,CResStr(IDS_CPLNAME),MENU_SURUNSETUP,0);
+  AllowSetForegroundWindow(GetCurrentProcessId());
+  SetForegroundWindow(hWnd);
   switch (TrackPopupMenu(hMenu,TPM_RIGHTALIGN|TPM_RETURNCMD|TPM_NONOTIFY|TPM_VERNEGANIMATION,
     pt.x+1,pt.y+1,0,hWnd,NULL))
   {
