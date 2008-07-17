@@ -193,8 +193,8 @@ BEGIN
     PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,223,204,68,14
     PUSHBUTTON      "Sichern...",IDC_EXPORT,297,204,68,14
     GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
-    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,215,
-                    191,157,8
+    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,217,
+                    191,152,8
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -823,8 +823,8 @@ BEGIN
     PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
                     14,203,185,14
     GROUPBOX        "Backup",IDC_STATIC,215,179,157,45
-    CTEXT           "All SuRun Settings, 'SuRunners' members",IDC_STATIC,217,
-                    190,153,8
+    CTEXT           "All SuRun Settings, 'SuRunners' members",IDC_STATIC,219,
+                    190,148,8
     PUSHBUTTON      "Backup...",IDC_IMPORT,224,203,63,14
     PUSHBUTTON      "Restore...",IDC_EXPORT,301,203,63,14
 END
@@ -1330,8 +1330,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,8
- PRODUCTVERSION 1,1,9,8
+ FILEVERSION 1,1,9,9
+ PRODUCTVERSION 1,1,9,9
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1349,14 +1349,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 1, 9, 8\0"
+            VALUE "FileVersion", "1, 1, 9, 9\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 1, 9, 8\0"
+            VALUE "ProductVersion", "1, 1, 9, 9\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1922,8 +1922,8 @@ BEGIN
     PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,223,204,68,14
     PUSHBUTTON      "Sichern...",IDC_EXPORT,297,204,68,14
     GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
-    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,215,
-                    191,157,8
+    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,217,
+                    191,153,8
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
