@@ -667,7 +667,7 @@ BOOL TestLogonDlg()
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
 
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,0),SORT_DEFAULT));
+  SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
   
   l=Logon(User,Password,IDS_ASKAUTO);
   if (l==-1)
