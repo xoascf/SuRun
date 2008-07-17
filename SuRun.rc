@@ -187,9 +187,11 @@ BEGIN
     GROUPBOX        "Hilfestellungen",IDC_STATIC,75,179,297,45
     CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    191,283,10
+                    191,186,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
-                    IDC_SIMPLESETUP,83,204,223,14
+                    IDC_SIMPLESETUP,83,204,180,14
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,266,204,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,317,204,50,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -225,12 +227,12 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
                     WS_BORDER | WS_TABSTOP,8,69,373,143
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,216,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,62,216,50,14
     PUSHBUTTON      "H&inzu...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Löschen",IDC_DELETE,273,216,50,14
     PUSHBUTTON      "&Hilfe",IDC_ICONHELP,326,216,50,14
-    CONTROL         "Gruppe 'SuRunners' nicht verwenden",IDC_NOUSESURUNNERS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,218,134,10
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -280,8 +282,6 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,256,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "Ü&bernehmen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Speichern",IDOK,279,256,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
@@ -545,8 +545,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Exportiere Ausnahmen-Liste",IDC_EXPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Exportiere Einstellungen von %s",IDC_EXPUSRSETTINGS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "Exportiere Einstellungen aller Mitglieder der Gruppe 'SuRunners'",
+                    IDC_EXPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
     PUSHBUTTON      "&Abbrechen",IDCANCEL,304,81,50,14
@@ -565,8 +566,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Importiere Ausnahmen-Liste",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Importiere Einstellungen für %s",IDC_IMPUSRSETTINGS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "Importiere Mitglieder der Gruppe 'SuRunners' und deren Einstellungen",
+                    IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
     PUSHBUTTON      "&Abbrechen",IDCANCEL,304,81,50,14
@@ -840,10 +842,12 @@ BEGIN
                     158,283,11
     GROUPBOX        "Security",IDC_EXTOPT3,77,44,297,49,WS_GROUP
     PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
-                    83,203,201,14
+                    83,203,174,14
     GROUPBOX        "Hilfestellungen",IDC_STATIC,75,178,297,45
     CONTROL         "Show SuRun settings for experienced users",IDC_NOEXPERT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,190,283,10
+    PUSHBUTTON      "Import...",IDC_IMPORT,263,203,50,14
+    PUSHBUTTON      "Export...",IDC_EXPORT,317,203,50,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -877,12 +881,12 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
                     WS_BORDER | WS_TABSTOP,8,68,373,144
+    PUSHBUTTON      "Import...",IDC_IMPORT,8,216,50,14
+    PUSHBUTTON      "Export...",IDC_EXPORT,62,216,50,14
     PUSHBUTTON      "&Add...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Edit...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
     PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
-    CONTROL         "Do not use 'SuRunners' group",IDC_NOUSESURUNNERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,15,218,111,10
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -932,8 +936,6 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
-    PUSHBUTTON      "Import...",IDC_IMPORT,8,256,50,14
-    PUSHBUTTON      "Export...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "&Apply",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Save",IDOK,279,256,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
@@ -1316,8 +1318,9 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Import Hook Blacklist",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Import user settings for %s",IDC_IMPUSRSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "Import user of the 'SuRunners' group and their settings",
+                    IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
     PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
@@ -1591,12 +1594,12 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
                     WS_BORDER | WS_TABSTOP,8,68,373,144
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,216,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,62,216,50,14
     PUSHBUTTON      "&Toevoegen...",IDC_ADDAPP,166,216,50,14
     PUSHBUTTON      "&Bewerken...",IDC_EDITAPP,220,216,50,14
     PUSHBUTTON      "&Verwijderen",IDC_DELETE,273,216,50,14
     PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
-    CONTROL         "Gruppe 'SuRunners' nicht verwenden",IDC_NOUSESURUNNERS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,218,134,10
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -1974,7 +1977,9 @@ BEGIN
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     191,283,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
-                    IDC_SIMPLESETUP,83,204,223,14
+                    IDC_SIMPLESETUP,83,204,180,14
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,266,204,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,317,204,50,14
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -2078,8 +2083,9 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Import Hook Blacklist",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Import user settings for %s",IDC_IMPUSRSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "Import user of the 'SuRunners' group and their settings",
+                    IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
     PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
@@ -2098,8 +2104,9 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Export Hook Blacklist",IDC_EXPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Export user settings for %s",IDC_EXPUSRSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
+    CONTROL         "Export settings of all 'SuRunners' group users",
+                    IDC_EXPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
     PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
