@@ -55,7 +55,7 @@ BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DW
   return FALSE;
 }
 
-BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes)
+BOOL GetRegAnyPtr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
   if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
@@ -97,7 +97,7 @@ BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName)
 
 DWORD GetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Default)
 {
-  DWORD RetVal=0;
+  DWORD RetVal=Default;
   DWORD n=sizeof(RetVal);
   if (GetRegAny(HK,SubKey,ValName,REG_DWORD,(BYTE*)&RetVal,&n))
     return RetVal;
@@ -111,7 +111,7 @@ BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value)
 
 __int64 GetRegInt64(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,__int64 Default)
 {
-  __int64 RetVal=0;
+  __int64 RetVal=Default;
   DWORD n=sizeof(RetVal);
   if (GetRegAny(HK,SubKey,ValName,REG_BINARY,(BYTE*)&RetVal,&n))
     return RetVal;
@@ -377,7 +377,10 @@ BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account)
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
   BuildTrusteeWithName(&tr,Account);
   if (GetEffectiveRightsFromAcl(pDACL,&tr,&am)!=ERROR_SUCCESS)
+  {
     DBGTrace1( "GetEffectiveRightsFromAcl failed %s\n", GetErrorNameStatic(dwRes));
+    am=0;
+  }
 Cleanup:
   if(pSD != NULL) 
     LocalFree((HLOCAL) pSD); 
