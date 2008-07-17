@@ -1627,7 +1627,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKELPARAM(IDC_IMPORT,BN_CLICKED):
         if (ImportSettings(hwnd)==IDOK)
         {
-          g_SD->DlgExitCode=-1;
+          g_SD->DlgExitCode=-2;
           PostMessage(GetParent(hwnd),WM_CLOSE,0,0);
         }
         return TRUE;
@@ -1979,7 +1979,7 @@ EditApp:
     if (g_SD->HelpWnd)
       DestroyWindow(g_SD->HelpWnd);
     g_SD->HelpWnd=0;
-    if (g_SD->DlgExitCode!=-1)
+    if (g_SD->DlgExitCode!=-2)
     {
 ApplyChanges:
       SaveUserFlags();
@@ -2232,9 +2232,9 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     }//WM_INITDIALOG
   case WM_CLOSE:
     {
-      if (g_SD->DlgExitCode==-1)
+      if (g_SD->DlgExitCode==-2)
       {
-        EndDialog(hwnd,-1);
+        EndDialog(hwnd,-2);
         return TRUE;
       }
     }
@@ -2306,8 +2306,8 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
 
 BOOL RunSetup(DWORD SessionID,LPCTSTR User)
 {
-  INT_PTR bRet=-1;
-  while (bRet==-1)
+  INT_PTR bRet=-2;
+  while (bRet==-2)
   {
     SETUPDATA sd(SessionID,User);
     g_SD=&sd;
