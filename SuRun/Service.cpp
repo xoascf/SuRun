@@ -1460,11 +1460,12 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     SetWinUpdBoot(false);
     SetWinUpd4All(false);
     SetOwnerAdminGrp(false);
+    SetSetEnergy(false);
+    SetSetTime(SURUNNERSGROUP,false);
   }
   //Delete "SuRunners"?
   if(g_bDelSuRunners)
   {
-    SetSetEnergy(false);
     //Make "SuRunners"->"Administrators"?
     if (g_bSR2Admins)
     {
