@@ -243,9 +243,9 @@ BEGIN
                     IDC_STATIC,10,3,361,229
     LTEXT           "Um Programme automatisch administrativ zu starten, muss mindestens eins der beiden folgenden aktiv sein:",
                     IDC_STATIC,13,13,354,8
-    CONTROL         "Programmstarts der Windows-Shell filtern",IDC_SHEXHOOK,
-                    "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | 
-                    WS_TABSTOP,20,26,331,10
+    CONTROL         "Programmstarts der Windows Benutzeroberfläche filtern",
+                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,20,26,331,10
     LTEXT           "Diese Option installiert einen systemweiten Filter, den die Windows Shell aufruft, wenn ein Programm gestartet werden soll. SuRun kann dann entscheiden, es automatisch administrativ zu starten.",
                     IDC_STATIC,31,36,335,17
     LTEXT           "Diese Option kann allerdings nicht abfangen, wenn Programme direkt an der Shell vorbei gestartet werden. Aktivieren Sie die nächste Option, kann SuRun auch dies abfangen.",
@@ -897,9 +897,9 @@ BEGIN
                     IDC_STATIC,10,3,361,227
     LTEXT           "To automatically start programs with elevated rights, at least one of the two following options must be set:",
                     IDC_STATIC,13,13,354,8
-    CONTROL         "Install filter to intercept program execution of the Windows shell",
+    CONTROL         "Install filter to intercept program execution of the Windows user interface",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,25,
-                    241,10
+                    319,10
     LTEXT           "This option installs a system wide filter that will be called when the windows shell is trying to start an application. SuRun can then decide whether to start the application with elevated rights.",
                     IDC_STATIC,31,36,335,17
     LTEXT           "This option can not detect if a program want to create a process directly whithout calling the shell. If you want SuRun to be able to intercept direct process creation, you need to enable the option below.",
@@ -1990,9 +1990,9 @@ BEGIN
                     IDC_STATIC,10,3,361,229
     LTEXT           "Um Programme automatisch administrativ zu starten, muss mindestens eins der beiden folgenden aktiv sein:",
                     IDC_STATIC,13,13,354,8
-    CONTROL         "Programmstarts der Windows-Shell filtern",IDC_SHEXHOOK,
-                    "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | 
-                    WS_TABSTOP,20,26,331,10
+    CONTROL         "Programmstarts der Windows Benutzeroberfläche filtern",
+                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,20,26,331,10
     LTEXT           "Diese Option installiert einen systemweiten Filter, den die Windows Shell aufruft, wenn ein Programm gestartet werden soll. SuRun kann dann entscheiden, es automatisch administrativ zu starten.",
                     IDC_STATIC,31,36,335,17
     LTEXT           "Diese Option kann allerdings nicht abfangen, wenn Programme direkt an der Shell vorbei gestartet werden. Aktivieren Sie die nächste Option, kann SuRun auch dies abfangen.",
