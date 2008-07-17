@@ -184,14 +184,17 @@ BEGIN
     CONTROL         "Zeige ""Start als Administrator"" im System-Menü von Programmen",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
-    GROUPBOX        "Hilfestellungen",IDC_STATIC,75,179,297,45
+    GROUPBOX        "Bequemlichkeit",IDC_STATIC,4,179,206,45
     CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
-                    IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
+                    IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     191,186,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
-                    IDC_SIMPLESETUP,83,204,180,14
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,266,204,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,317,204,50,14
+                    IDC_SIMPLESETUP,12,204,192,14
+    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,223,204,68,14
+    PUSHBUTTON      "Sichern...",IDC_EXPORT,297,204,68,14
+    GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
+    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,215,
+                    191,157,8
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -227,12 +230,12 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
                     WS_BORDER | WS_TABSTOP,8,69,373,143
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,216,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,62,216,50,14
-    PUSHBUTTON      "H&inzu...",IDC_ADDAPP,166,216,50,14
-    PUSHBUTTON      "&Bearbeiten...",IDC_EDITAPP,220,216,50,14
-    PUSHBUTTON      "&Löschen",IDC_DELETE,273,216,50,14
-    PUSHBUTTON      "&Hilfe",IDC_ICONHELP,326,216,50,14
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,86,216,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,138,216,50,14
+    PUSHBUTTON      "H&inzu...",IDC_ADDAPP,227,216,50,14
+    PUSHBUTTON      "Ändern...",IDC_EDITAPP,279,216,50,14
+    PUSHBUTTON      "&Löschen",IDC_DELETE,331,216,50,14
+    LTEXT           "Benutzer-Einstellungen",IDC_IMEXSTATIC,9,219,73,8
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -285,33 +288,6 @@ BEGIN
     PUSHBUTTON      "Ü&bernehmen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Speichern",IDOK,279,256,50,14
     PUSHBUTTON      "&Abbrechen",IDCANCEL,338,256,50,14
-END
-
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 140
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SuRun - Icon Hilfe"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun wird nicht fragen und das Programm immer mit erhöhten Rechten starten",
-                    IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun fragt nach, ob das Programm mit erhöhten Rechten gestartet werden darf",
-                    IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun wird nicht fragen und das Programm NIE mit erhöhten Rechten starten",
-                    IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es automatisch mit erhöhten Rechten gestartet",
-                    IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Nur wenn ein Programm erhöhte Rechte benötigt, fragt SuRun, ob es administrativ gestartet werden darf.",
-                    IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Wenn die Windows Shell das Programm ausführt, wird es NIE automagisch mit erhöhten Rechten gestartet",
-                    IDC_STATIC,24,98,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,117,262,1
-    DEFPUSHBUTTON   "Schließen",IDCANCEL,105,121,50,14
 END
 
 IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
@@ -814,6 +790,7 @@ BEGIN
                     WS_TABSTOP,83,11,283,11
     CONTROL         "Fade desktop in",IDC_FADEDESKTOP,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,23,283,11
+    GROUPBOX        "Security",IDC_EXTOPT3,77,44,297,49,WS_GROUP
     CONTROL         "Verify a users password",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,56,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
@@ -840,14 +817,16 @@ BEGIN
     CONTROL         "Show ""Start as administrator"" in the System menu of applications",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     158,283,11
-    GROUPBOX        "Security",IDC_EXTOPT3,77,44,297,49,WS_GROUP
-    PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
-                    83,203,174,14
-    GROUPBOX        "Hilfestellungen",IDC_STATIC,75,178,297,45
+    GROUPBOX        "Convenience",IDC_STATIC,4,179,206,45
     CONTROL         "Show SuRun settings for experienced users",IDC_NOEXPERT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,190,283,10
-    PUSHBUTTON      "Import...",IDC_IMPORT,263,203,50,14
-    PUSHBUTTON      "Export...",IDC_EXPORT,317,203,50,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,190,185,10
+    PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
+                    14,203,185,14
+    GROUPBOX        "Backup",IDC_STATIC,215,179,157,45
+    CTEXT           "All SuRun Settings, 'SuRunners' members",IDC_STATIC,217,
+                    190,153,8
+    PUSHBUTTON      "Backup...",IDC_IMPORT,224,203,63,14
+    PUSHBUTTON      "Restore...",IDC_EXPORT,301,203,63,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -881,12 +860,12 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
                     WS_BORDER | WS_TABSTOP,8,68,373,144
-    PUSHBUTTON      "Import...",IDC_IMPORT,8,216,50,14
-    PUSHBUTTON      "Export...",IDC_EXPORT,62,216,50,14
-    PUSHBUTTON      "&Add...",IDC_ADDAPP,166,216,50,14
-    PUSHBUTTON      "&Edit...",IDC_EDITAPP,220,216,50,14
-    PUSHBUTTON      "&Delete",IDC_DELETE,273,216,50,14
-    PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
+    PUSHBUTTON      "Import...",IDC_IMPORT,60,216,50,14
+    PUSHBUTTON      "Export...",IDC_EXPORT,114,216,50,14
+    PUSHBUTTON      "&Add...",IDC_ADDAPP,224,216,50,14
+    PUSHBUTTON      "&Edit...",IDC_EDITAPP,278,216,50,14
+    PUSHBUTTON      "&Delete",IDC_DELETE,331,216,50,14
+    LTEXT           "User settings",IDC_IMEXSTATIC,9,219,50,8
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -939,33 +918,6 @@ BEGIN
     PUSHBUTTON      "&Apply",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Save",IDOK,279,256,50,14
     PUSHBUTTON      "&Cancel",IDCANCEL,338,256,50,14
-END
-
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 142
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SuRun - Icon Help"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will without questioning start this program with elevated rights",
-                    IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will ask for your permission to start this program with elevated rights",
-                    IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun will without questioning NEVER start this program (automagically) with elevated rights",
-                    IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will automagically be run with elevated rights",
-                    IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
-    LTEXT           "If the program requires elevated rights, SuRun asks to run the program as Administrator.",
-                    IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
-    LTEXT           "If the Windows shell starts this program, it will NEVER automagically be run with elevated rights",
-                    IDC_STATIC,24,98,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,119,262,1
-    DEFPUSHBUTTON   "Close",IDCANCEL,105,123,50,14
 END
 
 IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 171
@@ -1419,6 +1371,22 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_SETUP1, DIALOG
+    BEGIN
+        RIGHTMARGIN, 374
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
@@ -1594,12 +1562,12 @@ BEGIN
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
                     LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
                     WS_BORDER | WS_TABSTOP,8,68,373,144
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,216,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,62,216,50,14
-    PUSHBUTTON      "&Toevoegen...",IDC_ADDAPP,166,216,50,14
-    PUSHBUTTON      "&Bewerken...",IDC_EDITAPP,220,216,50,14
-    PUSHBUTTON      "&Verwijderen",IDC_DELETE,273,216,50,14
-    PUSHBUTTON      "&Help",IDC_ICONHELP,326,216,50,14
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,86,216,50,14
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,138,216,50,14
+    PUSHBUTTON      "H&inzu...",IDC_ADDAPP,227,216,50,14
+    PUSHBUTTON      "Ändern...",IDC_EDITAPP,279,216,50,14
+    PUSHBUTTON      "&Löschen",IDC_DELETE,331,216,50,14
+    LTEXT           "Benutzer-Einstellungen",IDC_IMEXSTATIC,9,219,73,8
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -1615,33 +1583,6 @@ BEGIN
     PUSHBUTTON      "&Toepassen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Opslaan",IDOK,279,256,50,14
     PUSHBUTTON      "&Annuleren",IDCANCEL,338,256,50,14
-END
-
-IDD_ICONHELP DIALOG DISCARDABLE  0, 0, 260, 139
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SuRun - Verklaring symbolen"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    ICON            IDI_LISTICON3,IDC_STATIC,8,8,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun start het programma ALTIJD met verhoogde rechten",
-                    IDC_STATIC,24,8,226,16
-    ICON            IDI_LISTICON2,IDC_STATIC,8,26,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun vraagt toestemming om dit programma met verhoogde rechten te starten",
-                    IDC_STATIC,24,26,226,16
-    ICON            IDI_LISTICON6,IDC_STATIC,8,44,21,20,SS_REALSIZEIMAGE
-    LTEXT           "SuRun start dit programma NOOIT met verhoogde rechten",
-                    IDC_STATIC,24,44,226,16
-    ICON            IDI_LISTICON,IDC_STATIC,8,62,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Windows mag dit programma automatisch met verhoogde rechten starten",
-                    IDC_STATIC,24,62,226,16
-    ICON            IDI_LISTICON1,IDC_STATIC,8,80,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Als dit programma verhoogde rechten nodig heeft, stelt SuRun voor het als Administrator te starten.",
-                    IDC_STATIC,24,80,226,16
-    ICON            IDI_LISTICON7,IDC_STATIC,8,98,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Windows mag dit programma NIET automatisch met verhoogde rechten starten",
-                    IDC_STATIC,24,98,226,16
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,118,262,1
-    DEFPUSHBUTTON   "Sluiten",IDCANCEL,105,122,50,14
 END
 
 IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 171
@@ -1972,14 +1913,17 @@ BEGIN
     CONTROL         "Zeige ""Start als Administrator"" im System-Menü von Programmen",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
-    GROUPBOX        "Hilfestellungen",IDC_STATIC,75,179,297,45
+    GROUPBOX        "Bequemlichkeit",IDC_STATIC,4,179,206,45
     CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
-                    IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    191,283,10
+                    IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
+                    191,186,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
-                    IDC_SIMPLESETUP,83,204,180,14
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,266,204,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,317,204,50,14
+                    IDC_SIMPLESETUP,12,204,192,14
+    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,223,204,68,14
+    PUSHBUTTON      "Sichern...",IDC_EXPORT,297,204,68,14
+    GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
+    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,215,
+                    191,157,8
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
