@@ -184,17 +184,16 @@ BEGIN
     CONTROL         "Zeige ""Start als Administrator"" im System-Menü von Programmen",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
-    GROUPBOX        "Bequemlichkeit",IDC_STATIC,4,179,206,45
+    GROUPBOX        "Hilfestellungen",IDC_STATIC,4,179,206,45
     CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     191,186,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
                     IDC_SIMPLESETUP,12,204,192,14
-    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,223,204,68,14
-    PUSHBUTTON      "Sichern...",IDC_EXPORT,297,204,68,14
     GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
-    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,217,
-                    191,152,8
+    CTEXT           "Sämtliche SuRun Einstellungen",IDC_STATIC,217,191,152,8
+    PUSHBUTTON      "Sichern...",IDC_EXPORT,223,204,68,14
+    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,297,204,68,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -227,15 +226,15 @@ BEGIN
     GROUPBOX        "Programmliste für den Benutzer (Änderungen werden sofort wirksam, auch wenn 'Abbrechen' gedrückt wird).",
                     IDS_GRPDESC,6,58,378,175
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,69,373,143
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,86,216,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,138,216,50,14
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,8,69,373,143
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,216,50,14
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,117,216,50,14
     PUSHBUTTON      "H&inzu...",IDC_ADDAPP,227,216,50,14
     PUSHBUTTON      "Ändern...",IDC_EDITAPP,279,216,50,14
     PUSHBUTTON      "&Löschen",IDC_DELETE,331,216,50,14
-    LTEXT           "Benutzer-Einstellungen",IDC_IMEXSTATIC,9,219,73,8
+    LTEXT           "Programmliste",IDC_IMEXSTATIC,9,219,52,8
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -411,9 +410,9 @@ BEGIN
     LTEXT           "Deaktiviere Hooks in folgenden Programmen:",IDC_STATIC,
                     7,4,233,8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
+                    WS_TABSTOP,7,15,233,141
     CTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.",
                     IDC_STATIC,8,160,233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
@@ -483,8 +482,8 @@ BEGIN
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     76,346,8
-    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,4,94,369,
-                    74,WS_GROUP
+    GROUPBOX        "Erleichterte Bedienung. (Diese Optionen sind Teil von Windows, die SuRun anpassen kann.)",
+                    IDC_EXTOPT,4,94,369,74,WS_GROUP
     CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,11,105,346,9
@@ -500,33 +499,13 @@ BEGIN
     CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,155,346,9
-    GROUPBOX        "Windows Sicherheit",IDC_STATIC,4,173,369,39
+    GROUPBOX        "Windows Sicherheit. (Diese Option ist eine Windows-Sicherheitsrichtlinie, die SuRun anpassen kann.)",
+                    IDC_STATIC,4,173,369,39
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,184,346,25
     CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
                     IDC_STATIC,6,218,365,8
-END
-
-IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Einstellungen exportieren"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Dateiname",-1,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Exportiere SuRuns Einstellungen",IDC_EXPSURUNSETTINGS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
-    CONTROL         "Exportiere Ausnahmen-Liste",IDC_EXPBLACKLIST,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Exportiere Einstellungen aller Mitglieder der Gruppe 'SuRunners'",
-                    IDC_EXPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    63,58,273,10
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
-    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,81,50,14
 END
 
 IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
@@ -711,7 +690,6 @@ BEGIN
     IDS_SETUP3              "Programmfilter"
     IDS_SETUP4              "Erweitert"
     IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen.\r\n\r\nWenn Sie  'Abbrechen' wählen, wird das Programm ohne erhöhte Rechte gestartet."
-    IDS_EXPERTSETUP         "Wollen Sie die Experteneinstellungen auf Standardwerte setzen und verbergen?"
     IDS_STARTED             "Info:\r\n%s\r\nwird mit erhöhten Rechten ausgeführt."
 END
 
@@ -823,10 +801,9 @@ BEGIN
     PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
                     14,203,185,14
     GROUPBOX        "Backup",IDC_STATIC,215,179,157,45
-    CTEXT           "All SuRun Settings, 'SuRunners' members",IDC_STATIC,219,
-                    190,148,8
-    PUSHBUTTON      "Backup...",IDC_IMPORT,224,203,63,14
-    PUSHBUTTON      "Restore...",IDC_EXPORT,301,203,63,14
+    CTEXT           "All SuRun Settings",IDC_STATIC,219,190,148,8
+    PUSHBUTTON      "Backup...",IDC_EXPORT,224,203,63,14
+    PUSHBUTTON      "Restore...",IDC_IMPORT,301,203,63,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -857,15 +834,15 @@ BEGIN
     GROUPBOX        "Program list for the selected user (Changes instantly become effective, even if you click on 'Cancel').",
                     IDS_GRPDESC,6,57,378,176
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,68,373,144
-    PUSHBUTTON      "Import...",IDC_IMPORT,60,216,50,14
-    PUSHBUTTON      "Export...",IDC_EXPORT,114,216,50,14
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,8,68,373,144
+    PUSHBUTTON      "Export...",IDC_EXPORT,55,216,50,14
+    PUSHBUTTON      "Import...",IDC_IMPORT,109,216,50,14
     PUSHBUTTON      "&Add...",IDC_ADDAPP,224,216,50,14
     PUSHBUTTON      "&Edit...",IDC_EDITAPP,278,216,50,14
     PUSHBUTTON      "&Delete",IDC_DELETE,331,216,50,14
-    LTEXT           "User settings",IDC_IMEXSTATIC,9,219,50,8
+    LTEXT           "Program list",IDC_IMEXSTATIC,9,219,43,8
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -1183,9 +1160,9 @@ BEGIN
     LTEXT           "Do not hook the following applications:",IDC_STATIC,7,4,
                     233,8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
+                    WS_TABSTOP,7,15,233,141
     CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
                     233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
@@ -1233,7 +1210,8 @@ BEGIN
     CONTROL         "Hide SuRun from users that are not member of the 'SuRunners' Group",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
                     81,349,8
-    GROUPBOX        "Convenience settings",IDC_EXTOPT,3,99,370,79,WS_GROUP
+    GROUPBOX        "Convenience settings (These are Windows settings that you can adjust with SuRun)",
+                    IDC_EXTOPT,3,99,370,79,WS_GROUP
     CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,11,110,349,9
@@ -1249,7 +1227,8 @@ BEGIN
     CONTROL         "No auto-restart for scheduled Automatic Windows Update installations",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,165,349,11
-    GROUPBOX        "Windows Security",IDC_STATIC,4,183,369,39
+    GROUPBOX        "Windows Security (This is a Windows policy that you can adjust with SuRun)",
+                    IDC_STATIC,4,183,369,39
     CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,193,349,26
@@ -1273,26 +1252,6 @@ BEGIN
     CONTROL         "Import user of the 'SuRunners' group and their settings",
                     IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     63,58,273,10
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
-    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
-END
-
-IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Export SuRun settings"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Export SuRun Settings",IDC_EXPSURUNSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
-    CONTROL         "Export Hook Blacklist",IDC_EXPBLACKLIST,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Export user settings for %s",IDC_EXPUSRSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
     PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
@@ -1330,8 +1289,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,9
- PRODUCTVERSION 1,1,9,9
+ FILEVERSION 1,1,9,10
+ PRODUCTVERSION 1,1,9,10
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1349,14 +1308,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 1, 9, 9\0"
+            VALUE "FileVersion", "1, 1, 9, 10\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 1, 9, 9\0"
+            VALUE "ProductVersion", "1, 1, 9, 10\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1463,7 +1422,6 @@ BEGIN
     IDS_SETUP3              "Execution hooks"
     IDS_SETUP4              "Advanced"
     IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
-    IDS_EXPERTSETUP         "Do you want to set the expert settings to defaults and then hide them?"
     IDS_STARTED             "Info:\r\n%s\r\nis running with elevated rights."
 END
 
@@ -1559,15 +1517,15 @@ BEGIN
     GROUPBOX        "Programmalijst voor de gebruiker (Wijzigingen zijn direct van toepassing, ook bij 'Annuleren').",
                     IDS_GRPDESC,6,58,378,175
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | 
-                    WS_BORDER | WS_TABSTOP,8,68,373,144
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,86,216,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,138,216,50,14
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,8,68,373,144
+    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,216,50,14
+    PUSHBUTTON      "Importieren...",IDC_IMPORT,117,216,50,14
     PUSHBUTTON      "H&inzu...",IDC_ADDAPP,227,216,50,14
     PUSHBUTTON      "Ändern...",IDC_EDITAPP,279,216,50,14
     PUSHBUTTON      "&Löschen",IDC_DELETE,331,216,50,14
-    LTEXT           "Benutzer-Einstellungen",IDC_IMEXSTATIC,9,219,73,8
+    LTEXT           "Programmliste",IDC_IMEXSTATIC,9,219,52,8
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -1849,9 +1807,9 @@ BEGIN
     LTEXT           "Do not hook the following applications:",IDC_STATIC,7,4,
                     233,8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | 
-                    LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,15,233,141
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
+                    WS_TABSTOP,7,15,233,141
     CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
                     233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
@@ -1913,17 +1871,16 @@ BEGIN
     CONTROL         "Zeige ""Start als Administrator"" im System-Menü von Programmen",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
-    GROUPBOX        "Bequemlichkeit",IDC_STATIC,4,179,206,45
+    GROUPBOX        "Hilfestellungen",IDC_STATIC,4,179,206,45
     CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     191,186,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
                     IDC_SIMPLESETUP,12,204,192,14
-    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,223,204,68,14
-    PUSHBUTTON      "Sichern...",IDC_EXPORT,297,204,68,14
     GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
-    CTEXT           "SuRun Einstellungen, 'SuRunners' Gruppe",IDC_STATIC,217,
-                    191,153,8
+    CTEXT           "Sämtliche SuRun Einstellungen",IDC_STATIC,217,191,152,8
+    PUSHBUTTON      "Sichern...",IDC_EXPORT,223,204,68,14
+    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,297,204,68,14
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -1989,8 +1946,8 @@ BEGIN
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     76,346,8
-    GROUPBOX        "Erleichterte Bedienung  (Windows)",IDC_EXTOPT,4,94,369,
-                    74,WS_GROUP
+    GROUPBOX        "Erleichterte Bedienung. (Diese Optionen sind Teil von Windows, die SuRun anpassen kann.)",
+                    IDC_EXTOPT,4,94,369,74,WS_GROUP
     CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,11,105,346,9
@@ -2006,7 +1963,8 @@ BEGIN
     CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,155,346,9
-    GROUPBOX        "Windows Sicherheit",IDC_STATIC,4,173,369,39
+    GROUPBOX        "Windows Sicherheit. (Diese Option ist eine Windows-Sicherheitsrichtlinie, die SuRun anpassen kann.)",
+                    IDC_STATIC,4,173,369,39
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,184,346,25
@@ -2029,27 +1987,6 @@ BEGIN
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
     CONTROL         "Import user of the 'SuRunners' group and their settings",
                     IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    63,58,273,10
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
-    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
-END
-
-IDD_EXPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Export SuRun settings"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Export SuRun Settings",IDC_EXPSURUNSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
-    CONTROL         "Export Hook Blacklist",IDC_EXPBLACKLIST,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Export settings of all 'SuRunners' group users",
-                    IDC_EXPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
@@ -2159,7 +2096,6 @@ BEGIN
     IDS_SETUP3              "Execution hooks"
     IDS_SETUP4              "Geavanceerd"
     IDS_ASKAUTO             "Het programma:\r\n\r\n%s\r\n\r\nheeft voor de uitvoering verhoogde rechten nodig.\r\n\r\nDruk 'Annuleren' om het programma zonder verhoogde rechten te starten."
-    IDS_EXPERTSETUP         "Wollen Sie die Experteneinstellungen auf Standardwerte setzen und verbergen?"
     IDS_STARTED             "Info:\r\n%s\r\nwordt met verhoogde rechten uitgevoerd."
 END
 
