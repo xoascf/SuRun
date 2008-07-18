@@ -1,13 +1,16 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.9 - 2008-07-17: (beta)
+SuRun 1.1.9.10 - 2008-07-17: (beta)
 ---------------------------
-* Cosmetical changes in Settings Dialog Pages 1 and 2
-* Removed Help-Button from SuRun Settings Page 2
-* FIX: When "Show SuRun settings for experienced users" was disabled, SuRun 
-  did always Set recommended defaults on Setup pages 3 and 4
-* FIX: SuRuns Tray menu now closes when clicking outside
+* When Uninstalling SuRun, the Windows settings for Windows update and "Set 
+  'Administrators' instead of 'Object creator' as default owner for objects 
+  created by administrators." are not disabled anymore.
+* Import/Export on settings page 2 only imports/exports the users program list.
+* Settings Backup does not ask for options. Just everything is backed up.
+* Cosmetical changes in Settings Dialog Page 1
+* Users program list can now have mutliple items selected and deleted at once
+* Truning off "Show Expert settings" does not ask nor set defaults anymore
 
 ToDo
 ---------------------
@@ -33,6 +36,14 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.9 - 2008-07-17: (beta)
+---------------------------
+* Cosmetical changes in Settings Dialog Pages 1 and 2
+* Removed Help-Button from SuRun Settings Page 2
+* FIX: When "Show SuRun settings for experienced users" was disabled, SuRun 
+  did always Set recommended defaults on Setup pages 3 and 4
+* FIX: SuRuns Tray menu now closes when clicking outside
 
 SuRun 1.1.9.8 - 2008-07-17: (beta)
 ---------------------------
