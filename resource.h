@@ -49,7 +49,6 @@
 #define IDS_SETUP3                      42
 #define IDS_SETUP4                      43
 #define IDS_ASKAUTO                     44
-#define IDS_EXPERTSETUP                 45
 #define IDS_STARTED                     47
 #define IDS_ASKSURUNNER1                48
 #define IDS_BUILTINADMIN1               49
@@ -132,7 +131,6 @@
 #define IDD_BLKLST                      127
 #define IDI_SRADMIN                     129
 #define IDD_ADDTOBLKLST                 135
-#define IDD_EXPORTSETTINGS              136
 #define IDD_IMPORTSETTINGS              137
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
@@ -248,7 +246,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1096
+#define _APS_NEXT_CONTROL_VALUE         1099
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
