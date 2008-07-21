@@ -1457,9 +1457,13 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     //HKLM\Software\SuRun
     DelRegKey(HKLM,SURUNKEY);
     //Set
-    //SetWinUpdBoot(false);
-    //SetWinUpd4All(false);
-    //SetOwnerAdminGrp(false);
+    if (SRGetWinUpdBoot && GetWinUpdBoot)
+      SetWinUpdBoot(false);
+    if (SRGetWinUpd4All && GetWinUpd4All)
+      SetWinUpd4All(false);
+    if (SRGetOwnerAdminGrp && GetOwnerAdminGrp)
+      SetOwnerAdminGrp(false);
+
     SetSetEnergy(false);
     SetSetTime(SURUNNERSGROUP,false);
   }
