@@ -254,7 +254,7 @@ inline bool ShowBalloon(LPCTSTR u)
 //  Windows Policy Stuff
 //////////////////////////////////////////////////////////////////////////////
 
-#define SRGetOwnerAdminGrp   (GetOption(L"DefaultOwnerAdmins",0)!=0)
+#define SRGetOwnerAdminGrp   (GetShExtSetting(L"DefaultOwnerAdmins",0)!=0)
 
 #define GetOwnerAdminGrp      (GetRegInt(HKLM,\
                               _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
@@ -263,9 +263,9 @@ inline bool ShowBalloon(LPCTSTR u)
 #define SetOwnerAdminGrp(b)   {SetRegInt(HKLM,\
                               _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                               _T("nodefaultadminowner"),(b)==0);\
-                              SetOption(L"DefaultOwnerAdmins",b,0);}
+                              SetShExtSetting(L"DefaultOwnerAdmins",b,0);}
 
-#define SRGetWinUpd4All     (GetOption(L"ShowWindowsUpdateForAll",0)!=0)
+#define SRGetWinUpd4All     (GetShExtSetting(L"ShowWindowsUpdateForAll",0)!=0)
 
 #define GetWinUpd4All     (GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
@@ -274,9 +274,9 @@ inline bool ShowBalloon(LPCTSTR u)
 #define SetWinUpd4All(b)  {SetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
                             _T("ElevateNonAdmins"),b);\
-                          SetOption(L"ShowWindowsUpdateForAll",b,0);}
+                          SetShExtSetting(L"ShowWindowsUpdateForAll",b,0);}
 
-#define SRGetWinUpdBoot     (GetOption(L"WindowsUpdateNoReboot",0)!=0)
+#define SRGetWinUpdBoot     (GetShExtSetting(L"WindowsUpdateNoReboot",0)!=0)
 
 #define GetWinUpdBoot     (GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
@@ -285,7 +285,7 @@ inline bool ShowBalloon(LPCTSTR u)
 #define SetWinUpdBoot(b)  {SetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU"),\
                             _T("NoAutoRebootWithLoggedOnUsers"),b);\
-                            SetOption(L"WindowsUpdateNoReboot",b,0);}
+                            SetShExtSetting(L"WindowsUpdateNoReboot",b,0);}
 
 #define GetSetEnergy    HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\")\
                     _T("Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),SURUNNERSGROUP)
