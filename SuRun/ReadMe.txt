@@ -157,6 +157,57 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.0 - 2008-07-22:
+---------------------------
+* SuRun does not need nor store user passwords any more.
+  SuRun does not need to put SuRunners into the Admin group anymore for 
+  starting elevated Processes. SuRun does not need to use a helper process to 
+  start the elevated process anymore.
+  SuRun does not depend any more on the Secondary Logon Service.
+* SuRun works in Windows Vista side by side with UAC enabled
+* SuRun can Backup and Restore SuRun settings
+* SuRun can Export and Import a users program list
+* Implemented Explorer tricks so that you can start Explorer after an elevated 
+  Explorer runs. In Windows Vista SuRun uses Explorers command line switch 
+  "/SEPARATE" to start elevated processes.
+* To avoid AutoRun startup delays SuRuns service is now loaded in the 
+  "PlugPlay" service group, before the network is started.
+* Blacklist for Programs not to hook
+* New Settings Option to hide SuRun from all non SuRunners
+* New Settings Option to not detect Programs that require elevation
+* SuRun Settigs have a "Set recommended options for home users" Button. 
+* Wildcards "*" and "?" are supported for commands in the users program list
+* When adding files to the users program list, SuRun adds automatic quotes.
+* Setup does a test run of added/edited commands
+* SuRuns "Replace RunAs" now preserves the original "RunAs" display name
+* New Setup Option "Hide SuRun from user"
+* New Setup Option "Require user password for SuRun Settings"
+* New Setup Option "Hide SuRun from users that are not member of the 
+  'SuRunners' Group"
+* When asking to elevate a process, a "Cancel" count down progress bar is shown
+* SuRun does not show "Restart as Admin" in system menu of the shell process
+* SuRun does not try to start automagically elevated "AsInvoker" Apps
+* "Restart as Admin" Processes are killed only AFTER the user chooses "OK"
+* "Restart as Admin" Processes are killed the way TaskManager closes 
+  Applications by sending WM_CLOSE to the top level widows of the process, 
+  giving the process 5 seconds time to close and then terminating the process.
+* FIX: In Windows x64 SuRun32 could not read SuRuns Settings
+* FIX: SuRun created an endless loop of "SuRun /USERINST" processes when it 
+  was run in the Ceedo sandbox.
+* FIX: SuRuns System menu entries did not always show on the first click.
+* FIX: When SuRun "Failed to create the safe Desktop" the WatchDog was shown on 
+  the users desktop
+* Safe Desktop is now created before the screenshot is made to save resources
+* The WatchDog process now handles SwitchDesktop issues
+* SuRun uses a separate thread to create and fade in the blurred screen
+* FIX: When installing applications that require to reboot and to run a "Setup"
+  on logon (XP SP3 is an example), SURUN asked to start that setup as Admin but 
+  then it DID NOT SWITCH BACK TO THE USER'S DESKTOP 
+* IATHook only hooks modules that actually use "CreateProcess"
+* IATHook uses InterlockedExchangePointer for better stability
+* Eclipse (JAVA) and SuRuns IAT Hook do not conflict anymore
+* The SuRun service uses uses a separate Thread to serve the Tray Icons
+
 SuRun 1.1.0.6 - 2008-05-26:
 ---------------------------
 * Win64 "SuRun /SYSMENUHOOK" did not start SuRun32.bin (Mutex)
