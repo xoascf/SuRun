@@ -1443,29 +1443,28 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   RemoveRegistry();
   if (bJustStop)
     return TRUE;
+  //restore RunAs
+  ReplaceSuRunWithRunAs();
+  //Restore Windows Options
+  if (SRGetWinUpdBoot && GetWinUpdBoot)
+    SetWinUpdBoot(false);
+  if (SRGetWinUpd4All && GetWinUpd4All)
+    SetWinUpd4All(false);
+  if (SRGetOwnerAdminGrp && GetOwnerAdminGrp)
+    SetOwnerAdminGrp(false);
+  SetSetEnergy(false);
+  SetSetTime(SURUNNERSGROUP,false);
   if (!g_bKeepRegistry)
   {
     InstLog(CResStr(IDS_DELREG));
     //remove COM Object Settings
     DelRegKey(HKCR,L"CLSID\\" sGUID);
-    //restore RunAs
-    ReplaceSuRunWithRunAs();
     //Remove SuRunners from Registry
     //HKLM\Security\SuRun
     SetRegistryTreeAccess(_T("MACHINE\\") SVCKEY,DOMAIN_ALIAS_RID_ADMINS,true);
     DelRegKey(HKLM,SVCKEY);
     //HKLM\Software\SuRun
     DelRegKey(HKLM,SURUNKEY);
-    //Set
-    if (SRGetWinUpdBoot && GetWinUpdBoot)
-      SetWinUpdBoot(false);
-    if (SRGetWinUpd4All && GetWinUpd4All)
-      SetWinUpd4All(false);
-    if (SRGetOwnerAdminGrp && GetOwnerAdminGrp)
-      SetOwnerAdminGrp(false);
-
-    SetSetEnergy(false);
-    SetSetTime(SURUNNERSGROUP,false);
   }
   //Delete "SuRunners"?
   if(g_bDelSuRunners)
