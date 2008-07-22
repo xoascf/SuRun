@@ -1142,16 +1142,16 @@ void ExportSettings(LPCTSTR ini)
   EXPORTINT(SuRunKey,TestReqAdmin,ini);
   EXPORTINT(SuRunKey,ShowAutoRuns,ini);
   
-  WritePrivateProfileInt(SuRunKey,_T("ReplaceRunAs"),
-    IsDlgButtonChecked(g_SD->hTabCtrl[3],IDC_DORUNAS),ini);
-  if(GetUseSuRunGrp)
-  {
-    EXPORTINTu(SuRunKey,SetTime,SURUNNERSGROUP,ini);
-    EXPORTINT(SuRunKey,SetEnergy,ini);
-  }
-  EXPORTINT(SuRunKey,WinUpd4All,ini);
-  EXPORTINT(SuRunKey,WinUpdBoot,ini);
-  EXPORTINT(SuRunKey,OwnerAdminGrp,ini);
+//  WritePrivateProfileInt(SuRunKey,_T("ReplaceRunAs"),
+//    IsDlgButtonChecked(g_SD->hTabCtrl[3],IDC_DORUNAS),ini);
+//  if(GetUseSuRunGrp)
+//  {
+//    EXPORTINTu(SuRunKey,SetTime,SURUNNERSGROUP,ini);
+//    EXPORTINT(SuRunKey,SetEnergy,ini);
+//  }
+//  EXPORTINT(SuRunKey,WinUpd4All,ini);
+//  EXPORTINT(SuRunKey,WinUpdBoot,ini);
+//  EXPORTINT(SuRunKey,OwnerAdminGrp,ini);
   
   EXPORTINT(SuRunKey,ShowTrayAdmin,ini);
   
@@ -1230,23 +1230,23 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
     IMPORTINT(SuRunKey,TestReqAdmin,ini);
     IMPORTINT(SuRunKey,ShowAutoRuns,ini);
 
-    switch(GetPrivateProfileInt(SuRunKey,_T("ReplaceRunAs"),-1,ini))
-    {
-    case 0:
-      ReplaceSuRunWithRunAs(); 
-      break;
-    case 1:
-      ReplaceRunAsWithSuRun(); 
-      break;
-    }
-    IMPORTINT(SuRunKey,OwnerAdminGrp,ini);
-    IMPORTINT(SuRunKey,WinUpd4All,ini);
-    IMPORTINT(SuRunKey,WinUpdBoot,ini);
-    if(GetUseSuRunGrp)
-    {
-      IMPORTINT(SuRunKey,SetEnergy,ini);
-      IMPORTINTu(SuRunKey,SetTime,SURUNNERSGROUP,ini);
-    }
+//    switch(GetPrivateProfileInt(SuRunKey,_T("ReplaceRunAs"),-1,ini))
+//    {
+//    case 0:
+//      ReplaceSuRunWithRunAs(); 
+//      break;
+//    case 1:
+//      ReplaceRunAsWithSuRun(); 
+//      break;
+//    }
+//    IMPORTINT(SuRunKey,OwnerAdminGrp,ini);
+//    IMPORTINT(SuRunKey,WinUpd4All,ini);
+//    IMPORTINT(SuRunKey,WinUpdBoot,ini);
+//    if(GetUseSuRunGrp)
+//    {
+//      IMPORTINT(SuRunKey,SetEnergy,ini);
+//      IMPORTINTu(SuRunKey,SetTime,SURUNNERSGROUP,ini);
+//    }
 
     IMPORTINT(SuRunKey,ShowTrayAdmin,ini);
     
@@ -1451,12 +1451,12 @@ void SetRecommendedSettings()
   EnableWindow(GetDlgItem(h,IDC_SHOWTRAY),1);
   UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
   h=g_SD->hTabCtrl[3];
-  CheckDlgButton(h,IDC_DORUNAS,0);
-  CheckDlgButton(h,IDC_ALLOWTIME,0);
-  CheckDlgButton(h,IDC_SETENERGY,1);
-  CheckDlgButton(h,IDC_WINUPD4ALL,1);
-  CheckDlgButton(h,IDC_WINUPDBOOT,1);
-  CheckDlgButton(h,IDC_OWNERGROUP,1);
+//  CheckDlgButton(h,IDC_DORUNAS,0);
+//  CheckDlgButton(h,IDC_ALLOWTIME,0);
+//  CheckDlgButton(h,IDC_SETENERGY,1);
+//  CheckDlgButton(h,IDC_WINUPD4ALL,1);
+//  CheckDlgButton(h,IDC_WINUPDBOOT,1);
+//  CheckDlgButton(h,IDC_OWNERGROUP,1);
   ComboBox_SetCurSel(GetDlgItem(h,IDC_TRAYSHOWADMIN),TSA_ADMIN);
   CheckDlgButton(h,IDC_TRAYBALLOON,1);
   EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
