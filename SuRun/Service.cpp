@@ -669,8 +669,7 @@ DWORD PrepareSuRun()
   if (!PwOk)
     DeletePassword(g_RunData.UserName);
   else
-  //If SuRunner is already Admin, let him run the new process!
-  if (g_CliIsAdmin || IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
+  if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   if (HideSuRun(g_RunData.UserName))
     return RETVAL_CANCELLED;
