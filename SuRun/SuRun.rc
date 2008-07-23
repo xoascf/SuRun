@@ -1289,8 +1289,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,9,11
- PRODUCTVERSION 1,1,9,11
+ FILEVERSION 1,1,9,12
+ PRODUCTVERSION 1,1,9,12
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1308,14 +1308,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 1, 9, 11\0"
+            VALUE "FileVersion", "1, 1, 9, 12\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 1, 9, 11\0"
+            VALUE "ProductVersion", "1, 1, 9, 12\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1508,8 +1508,8 @@ BEGIN
     CONTROL         "Alleen bepaalde programma's met SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,202,10
-    CONTROL         "SuRun voor deze gebruiker verbergen",IDC_HIDESURUN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
+    CONTROL         "SuRun voor deze gebruiker verbergen",IDC_HIDESURUN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
@@ -1804,14 +1804,14 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun Uitsluitingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,
-                    233,8
+    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,233,
+                    8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
                     LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
                     WS_TABSTOP,7,15,233,141
-    CTEXT           "Wildcards '*' en '?' toegestaan.",IDC_STATIC,8,160,
-                    233,10
+    CTEXT           "Wildcards '*' en '?' toegestaan.",IDC_STATIC,8,160,233,
+                    10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
     PUSHBUTTON      "&Toevoegen...",IDC_ADDAPP,10,179,46,14
     PUSHBUTTON      "&Bewerken",IDC_EDITAPP,60,179,50,14
@@ -1842,15 +1842,16 @@ BEGIN
     CONTROL         "Scherm dimmen en Bureaublad naar de achtergrond 'drukken'",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,13,283,9
-    CONTROL         "Bureaublad laten 'doorschemeren'",IDC_FADEDESKTOP,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,25,283,9
+    CONTROL         "Bureaublad laten 'doorschemeren'",IDC_FADEDESKTOP,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,
+                    25,283,9
     GROUPBOX        "Beveiliging",IDC_STATIC,75,45,297,49
     CONTROL         "&Gebruikerswachtwoord vragen",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
     EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,142,
-                    9,NOT WS_GROUP
+    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,
+                    142,9,NOT WS_GROUP
     LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord:",
                     IDC_STATIC,83,71,114,17
     COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
@@ -1891,7 +1892,7 @@ BEGIN
                     IDC_STATIC,10,3,361,229
     LTEXT           "Opties voor het automatisch met verhoogde rechten starten van programma's:",
                     IDC_STATIC,13,13,354,8
-    CONTROL        "Filter programma's die vanuit de Windows omgeving worden gestart",
+    CONTROL         "Filter programma's die vanuit de Windows omgeving worden gestart",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,26,331,10
     LTEXT           "Deze optie installeert een filter op programma's die door Windows gestart worden. SuRun kan dan proberen het automatisch met verhoogde rechten te starten.",
@@ -1981,8 +1982,8 @@ BEGIN
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Importeer Uitsluitingenlijst",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
     CONTROL         "Importeer gebruikers en instellingen van de 'SuRunners' groep",
