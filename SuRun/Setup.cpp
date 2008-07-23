@@ -1432,7 +1432,7 @@ void SetRecommendedSettings()
   CheckDlgButton(h,IDC_RESTRICTED,0);
   CheckDlgButton(h,IDC_HIDESURUN,0);
   CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
-  CheckDlgButton(h,IDC_TRAYBALLOON,1);
+  CheckDlgButton(h,IDC_TRAYBALLOON,!IsWin2k());
   //CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
   //SetUseSuRuners(TRUE);
   
@@ -1458,7 +1458,7 @@ void SetRecommendedSettings()
 //  CheckDlgButton(h,IDC_WINUPDBOOT,1);
 //  CheckDlgButton(h,IDC_OWNERGROUP,1);
   ComboBox_SetCurSel(GetDlgItem(h,IDC_TRAYSHOWADMIN),TSA_ADMIN);
-  CheckDlgButton(h,IDC_TRAYBALLOON,1);
+  CheckDlgButton(h,IDC_TRAYBALLOON,!IsWin2k());
   EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
   CheckDlgButton(h,IDC_NOCONVADMIN,0);
   CheckDlgButton(h,IDC_NOCONVUSER,0);
@@ -1862,8 +1862,12 @@ EditApp:
         return TRUE;
       case MAKELPARAM(IDC_TRAYSHOWADMIN,BN_CLICKED):
         if (!IsWin2k())
-          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
-            IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_CHECKED);
+        {
+          BOOL bTSA=IsDlgButtonChecked(hwnd,IDC_TRAYSHOWADMIN)==BST_CHECKED;
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bTSA);
+          if(!bTSA)
+            CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
+        }
         return TRUE;
       }//switch (wParam)
       break;
@@ -2093,8 +2097,12 @@ ApplyChanges:
       {
       case MAKELPARAM(IDC_TRAYSHOWADMIN,CBN_SELCHANGE):
         if (!IsWin2k())
-          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),
-            ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN))>0);
+        {
+          BOOL bTSA=ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN))>0;
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bTSA);
+          if(!bTSA)
+            CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
+        }
         return TRUE;
       case MAKELPARAM(ID_APPLY,BN_CLICKED):
         goto ApplyChanges;
