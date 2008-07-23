@@ -26,6 +26,13 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.9.12 - 2008-07-23: (rc2)
+---------------------------
+* Updated dutch resources
+* When deactivating the Tray Icon SuRun also deactivates balloon tips
+* When Hiding SuRun from all users, "Start as Administrator" did do nothing
+  on administrator accounts
+
 SuRun 1.1.9.11 - 2008-07-22: (rc1)
 ---------------------------
 * SuRun does not import, export nor set defaults for the Windows Settings
