@@ -187,7 +187,7 @@ BEGIN
     IDS_SURUN               "Configuratiescherm als Administrator"
     IDS_SURUNCMD            "'SuRun cmd' hier"
     IDS_SURUNEXP            "'SuRun Explorer' hier"
-    IDS_RESTARTSHELL        "Wilt u echt de Windows Shell (%s)\nopnieuw starten met Administrator rechten??"
+    IDS_RESTARTSHELL        "Wilt u de Windows omgeving (%s)\nopnieuw starten met Administrator rechten??"
     IDS_CPLNAME             "SuRun instellingen"
     IDS_MENURESTART         "Opnieuw starten als Administrator"
 END
