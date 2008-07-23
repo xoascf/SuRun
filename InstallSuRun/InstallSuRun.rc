@@ -44,7 +44,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
+            VALUE "Comments", "SuRun, start programs with administrator rights, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "InstallSuRun\0"
             VALUE "FileVersion", "1, 1, 9, 11\0"
