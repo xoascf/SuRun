@@ -858,7 +858,7 @@ BEGIN
                     319,10
     LTEXT           "This option installs a system wide filter that will be called when the windows shell is trying to start an application. SuRun can then decide whether to start the application with elevated rights.",
                     IDC_STATIC,31,36,335,17
-    LTEXT           "This option can not detect if a program want to create a process directly whithout calling the shell. If you want SuRun to be able to intercept direct process creation, you need to enable the option below.",
+    LTEXT           "This option can not detect if a program wants to create a process directly whithout calling the shell. If you want SuRun to be able to intercept direct process creation, you need to enable the option below.",
                     IDC_STATIC,31,53,335,16
     CONTROL         "Set a Hook into all processes that directly execute applications",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,72,
@@ -1502,30 +1502,30 @@ BEGIN
     PUSHBUTTON      "Verwijderen",IDC_DELUSER,334,4,50,14
     CONTROL         "Gebruiker kan SuRun instellingen wijzigen",IDC_RUNSETUP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,202,10
-    CONTROL         "Require user password for SuRun Settings",
+    CONTROL         "Wachtwoord vereist voor SuRun instellingen",
                     IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     30,202,10
     CONTROL         "Alleen bepaalde programma's met SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,202,10
-    CONTROL         "Hide SuRun from this user",IDC_HIDESURUN,"Button",
+    CONTROL         "SuRun voor deze gebruiker verbergen",IDC_HIDESURUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,41,137,10
-    GROUPBOX        "Programmalijst voor de gebruiker (Wijzigingen zijn direct van toepassing, ook bij 'Annuleren').",
+    GROUPBOX        "Programmalijst voor de gebruiker (Wijzigingen zijn direct van kracht, ook bij 'Annuleren').",
                     IDS_GRPDESC,6,58,378,175
     CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
                     LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
                     WS_TABSTOP,8,68,373,144
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,216,50,14
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,117,216,50,14
-    PUSHBUTTON      "H&inzu...",IDC_ADDAPP,227,216,50,14
-    PUSHBUTTON      "Ändern...",IDC_EDITAPP,279,216,50,14
-    PUSHBUTTON      "&Löschen",IDC_DELETE,331,216,50,14
-    LTEXT           "Programmliste",IDC_IMEXSTATIC,9,219,52,8
+    PUSHBUTTON      "Exporteren...",IDC_EXPORT,65,216,50,14
+    PUSHBUTTON      "Importeren...",IDC_IMPORT,117,216,50,14
+    PUSHBUTTON      "&Naar...",IDC_ADDAPP,227,216,50,14
+    PUSHBUTTON      "Aanpassen...",IDC_EDITAPP,279,216,50,14
+    PUSHBUTTON      "&Wissen",IDC_DELETE,331,216,50,14
+    LTEXT           "Programmalijst",IDC_IMEXSTATIC,9,219,52,8
 END
 
 IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
@@ -1536,8 +1536,8 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
-    PUSHBUTTON      "Importieren...",IDC_IMPORT,8,256,50,14
-    PUSHBUTTON      "Exportieren...",IDC_EXPORT,65,256,50,14
+    PUSHBUTTON      "Importeren...",IDC_IMPORT,8,256,50,14
+    PUSHBUTTON      "Exporteren...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "&Toepassen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&Opslaan",IDOK,279,256,50,14
     PUSHBUTTON      "&Annuleren",IDCANCEL,338,256,50,14
@@ -1553,7 +1553,7 @@ BEGIN
     LTEXT           "Opdrachtregel",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Wildcards '*' und '?' are supported.\nIMPORTANT: If the command contains spaces, it must be enclosed in quotes.",
+    LTEXT           "Wildcards '*' en '?' toegestaan.\nLET OP: Plaats opdrachten met spaties tussen aanhalingstekens.",
                     IDC_STATIC,55,25,261,19
     ICON            IDI_LISTICON2,IDC_STATIC,18,55,21,20,SS_REALSIZEIMAGE
     CONTROL         "vragen om dit programma met verhoogde rechten te starten",
@@ -1707,7 +1707,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun installeren?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
-    CONTROL         "Open na de installatie 'SuRun instellingen'",
+    CONTROL         "Na installatie 'SuRun instellingen' openen",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
                     171,10
     LTEXT           "Het volgende veiligheidsbeleid moet worden ingesteld:",
@@ -1733,7 +1733,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    CONTROL         "Behoud SuRun's bestandstype-associaties",
+    CONTROL         "SuRun bestandstype-associaties behouden",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     18,44,176,10
     LTEXT           "Het volgende veiligheidsbeleid moet worden ingesteld:",
@@ -1801,34 +1801,34 @@ END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Hook blacklist"
+CAPTION "SuRun Uitsluitingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Do not hook the following applications:",IDC_STATIC,7,4,
+    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,
                     233,8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
                     LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
                     WS_TABSTOP,7,15,233,141
-    CTEXT           "Wildcards '*' und '?' are supported.",IDC_STATIC,8,160,
+    CTEXT           "Wildcards '*' en '?' toegestaan.",IDC_STATIC,8,160,
                     233,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
-    PUSHBUTTON      "&Add...",IDC_ADDAPP,10,179,46,14
-    PUSHBUTTON      "&Edit",IDC_EDITAPP,60,179,50,14
-    PUSHBUTTON      "&Delete",IDC_DELETE,114,179,50,14
-    DEFPUSHBUTTON   "&Done",IDOK,192,179,50,14
+    PUSHBUTTON      "&Toevoegen...",IDC_ADDAPP,10,179,46,14
+    PUSHBUTTON      "&Bewerken",IDC_EDITAPP,60,179,50,14
+    PUSHBUTTON      "&Verwijderen",IDC_DELETE,114,179,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,192,179,50,14
 END
 
 IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 63
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Add program to blacklist"
+CAPTION "Programma aan uitsluitingen toevoegen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,37,361,1
     LTEXT           "Opdrachtregel",-1,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Wildcards '*' und '?' are supported.",-1,64,25,252,8
+    LTEXT           "Wildcards '*' en '?' toegestaan.",-1,64,25,252,8
     DEFPUSHBUTTON   "&OK",IDOK,241,44,50,14,WS_GROUP
     PUSHBUTTON      "&Annuleren",IDCANCEL,304,44,50,14
 END
@@ -1838,87 +1838,87 @@ STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Sicherer Desktop",IDC_EXTOPT2,75,2,297,38,WS_GROUP
-    CONTROL         "Zeige unscharfen, abgedunkelten Benutzer-&Desktop als Hintergrund",
+    GROUPBOX        "Beveiligd Bureaublad",IDC_EXTOPT2,75,2,297,38,WS_GROUP
+    CONTROL         "Scherm dimmen en Bureaublad vervaagd in de achtergrond",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,13,283,9
-    CONTROL         "Desktop 'einblenden'",IDC_FADEDESKTOP,"Button",
+    CONTROL         "Bureaublad laten 'doorschemeren'",IDC_FADEDESKTOP,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,25,283,9
-    GROUPBOX        "Sicherheit",IDC_STATIC,75,45,297,49
-    CONTROL         "&Benutzer-Kennwort abfragen",IDC_ASKPW,"Button",
+    GROUPBOX        "Beveiliging",IDC_STATIC,75,45,297,49
+    CONTROL         "&Gebruikerswachtwoord vragen",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
     EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min warten vor erneuter Abfrage",IDC_STATIC,225,57,142,
+    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,142,
                     9,NOT WS_GROUP
-    LTEXT           "Zeige Warnung bei Administratoren mit leeren Kennwörtern:",
+    LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord:",
                     IDC_STATIC,83,71,114,17
     COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Shell-Integration:",IDC_STATIC,75,99,297,75,WS_GROUP
-    CONTROL         "Zeige ""Systemsteuerung als Administrator"" im Kontext-Menü des Desktop",
+    GROUPBOX        "Systeem-Integratie:",IDC_STATIC,75,99,297,75,WS_GROUP
+    CONTROL         "Toon ""Configuratiescherm als Administrator"" in het Bureaublad context-menu",
                     IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     110,283,9
-    CONTROL         "Zeige ""'SuRun cmd' hier"" im Kontext-Menü für Ordner",
+    CONTROL         "Toon ""'SuRun cmd' hier"" in folder context-menus",
                     IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     122,283,9
-    CONTROL         "Zeige ""'SuRun Explorer' hier"" im Kontext-Menü für Ordner",
+    CONTROL         "Toon ""'SuRun Explorer' hier"" in folder context-menus",
                     IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     134,283,9
-    CONTROL         "Zeige ""Neustart als Administrator"" im System-Menü von Programmen",
+    CONTROL         "Toon ""Opnieuw starten als Administrator"" in het Start-menu",
                     IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     83,146,283,9
-    CONTROL         "Zeige ""Start als Administrator"" im System-Menü von Programmen",
+    CONTROL         "Toon ""Start als Administrator"" in het Start-menu",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
-    GROUPBOX        "Hilfestellungen",IDC_STATIC,4,179,206,45
-    CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
+    GROUPBOX        "Gebruiksgemak",IDC_STATIC,4,179,206,45
+    CONTROL         "Toon geavanceerde instellingen voor ervaren gebruikers",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     191,186,10
-    PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
+    PUSHBUTTON      "Aanbevolen instellingen voor regulier gebruik",
                     IDC_SIMPLESETUP,12,204,192,14
-    GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
-    CTEXT           "Sämtliche SuRun Einstellungen",IDC_STATIC,217,191,152,8
-    PUSHBUTTON      "Sichern...",IDC_EXPORT,223,204,68,14
-    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,297,204,68,14
+    GROUPBOX        "Backup",IDC_STATIC,215,179,157,45
+    CTEXT           "Alle SuRun Instellingen",IDC_STATIC,217,191,152,8
+    PUSHBUTTON      "Opslaan...",IDC_EXPORT,223,204,68,14
+    PUSHBUTTON      "Laden...",IDC_IMPORT,297,204,68,14
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Versuche bestimmte Programme AUTOMAGISCH mit gehobenen Rechten zu starten",
+    GROUPBOX        "Probeer bepaalde programma's automatisch met verhoogde rechten te starten",
                     IDC_STATIC,10,3,361,229
-    LTEXT           "Um Programme automatisch administrativ zu starten, muss mindestens eins der beiden folgenden aktiv sein:",
+    LTEXT           "Programma's kunnen automatisch met verhoogde rechten worden gestart als aan een van de volgende voorwaarden is voldaan:",
                     IDC_STATIC,13,13,354,8
-    CONTROL         "Programmstarts der Windows Benutzeroberfläche filtern",
+    CONTROL        "Filter programma's die vanuit de Windows omgeving worden gestart",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,26,331,10
-    LTEXT           "Diese Option installiert einen systemweiten Filter, den die Windows Shell aufruft, wenn ein Programm gestartet werden soll. SuRun kann dann entscheiden, es automatisch administrativ zu starten.",
+    LTEXT           "Deze optie installeert een filter op programma's die door Windows gestart worden. SuRun kan dan proberen het automatisch met verhoogde rechten te starten.",
                     IDC_STATIC,31,36,335,17
-    LTEXT           "Diese Option kann allerdings nicht abfangen, wenn Programme direkt an der Shell vorbei gestartet werden. Aktivieren Sie die nächste Option, kann SuRun auch dies abfangen.",
+    LTEXT           "Programma's of processen die buiten de Windows omgeving om gestart worden, blijven voor dit filter onopgemerkt. Activeer de volgende optie zodat SuRun deze ook kan ondervangen.",
                     IDC_STATIC,31,53,335,16
-    CONTROL         "Direkt in Programme einhängen, die andere Programme ausführen.",
+    CONTROL         "SuRun direct koppelen aan het starten van programma's.",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,74,341,10
-    LTEXT           "Ist diese Option nicht aktiv, kann SuRun einige (in Windows Vista viele) Programme nicht automatisch administrativ starten.",
+    LTEXT           "Is deze optie gedeactiveerd, dan kan SuRun sommige (bij Windows Vista vele) programma's niet automatisch met verhoogde rechten starten.",
                     IDC_STATIC,31,83,335,17
-    LTEXT           "Das Aktivieren dieser Option kann jedoch in seltenen Fällen Inkompatibiläten verursachen.\nSolche Inkompatibilitäten können Sie in der Liste mit Ausnahmen angeben.",
+    LTEXT           "Het activeren van deze optie kan in sommige gevallen problemen geven.\nDeze probleemgevallen kunt u in de lijst met SuRun Uitsluitingen opnemen.",
                     IDC_STATIC,31,100,335,17
-    LTEXT           "Sollte ein Programm nach Aktivieren einer der obigen Optionen nicht mehr wie gewohnt funktionieren, können sie unter 'Ausnahmen' festlegen, dass SuRun sich nicht in dieses Programm einhängt, um Programmstarts zu filtern",
+    LTEXT           "Indien een programma na activering van een van de bovenstaande opties niet meer naar behoren functioneren, dan kunt deze in de lijst met SuRun Uitsluitingen opnemen",
                     IDC_STATIC,20,122,256,27
-    PUSHBUTTON      "Ausnahmen...",IDC_BLACKLIST,287,128,57,14
-    CONTROL         "Versuche zu erkennen, ob unbekannte Programme administrative Rechte benötigen.",
+    PUSHBUTTON      "Uitsluitingen...",IDC_BLACKLIST,287,128,57,14
+    CONTROL         "Probeer te herkennen of onbekende programma's verhoogde rechten nodig hebben.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,152,344,10
-    LTEXT           "Ein Deaktivieren dieser Option bewirkt, dass von SuRun nur noch vordefinierte Programme automagisch mit erhöhten Rechten gestartet werden. Setup(etc.)-Programme werden dann nicht mehr erkannt.",
+    LTEXT           "Het deactiveren van deze optie leidt ertoe dat SuRun alleen nog vooraf gespecificeerde programma's automatisch met verhoogde rechten zal starten. Setup programma's enzo worden dan niet meer herkent.",
                     IDC_STATIC,31,162,335,17
-    CONTROL         "Zeige ein Informationsfenster, wenn Programme automagisch gestartet wurden",
+    CONTROL         "Toon een informatievenster wanneer SuRun een programma automatisch start",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, das darüber informiert.",
+    LTEXT           "Bij deze optie toont SuRun gedurende 20 seconden een pop-up venster rechtsonder op het Bureaublad met informatie over het gestarte programma.",
                     IDC_STATIC,31,198,335,17
-    CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",
+    CTEXT           "LET OP: Deze instellingen zijn pas na de volgende Windows-aanmelding volledig van kracht",
                     IDC_STATIC,14,220,356,8
 END
 
@@ -1926,71 +1926,71 @@ IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",
+    GROUPBOX        "Markeer programma's van gebruikers die geen 'SuRunner' zijn",
                     IDC_STATIC,4,3,369,37
-    LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",
+    LTEXT           "Toon gebruikersstatus voor actieve processen",
                     IDC_STATIC,14,15,191,8
     COMBOBOX        IDC_TRAYSHOWADMIN,213,13,99,30,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Zeige Info, für aktive Programme, die nicht als angemeldeter Benutzer laufen",
+    CONTROL         "Toon informatie voor programma's die niet door de huidige gebruiker gestart zijn",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     26,346,10
-    GROUPBOX        "Wenn der Benutzer nicht Mitglied der Gruppe 'SuRunners' ist und SuRun benutzen will:",
+    GROUPBOX        "Indien een gebruiker geen lid is van de groep 'SuRunners' en SuRun wil gebruiken:",
                     IDC_STATIC,4,43,369,46
-    CONTROL         "Frage Administratoren niemals, ob sie in die Gruppe 'SuRunners' aufgenommen werden wollen",
+    CONTROL         "Administrators nooit vragen om aan de groep 'SuRunners' toegevoegd te worden",
                     IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     54,346,8
-    CONTROL         "Frage niemanden, ob er in die Gruppe 'SuRunner' aufgenommen werden will",
+    CONTROL         "Niemand vragen of hij aan de groep 'SuRunners' toegevoegd moet worden",
                     IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     65,346,8
-    CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",
+    CONTROL         "SuRun verbergen voor alle gebruikers die geen lid zijn van de groep 'SuRunners'",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     76,346,8
-    GROUPBOX        "Erleichterte Bedienung. (Diese Optionen sind Teil von Windows, die SuRun anpassen kann.)",
+    GROUPBOX        "Vereenvoudigde bediening. (SuRun kan deze Windows-optie aanpassen.)",
                     IDC_EXTOPT,4,94,369,74,WS_GROUP
-    CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",
+    CONTROL         "Vervang Windows 'Uitvoeren als...' voor SuRun's 'Uitvoeren als...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,11,105,346,9
-    CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",
+    CONTROL         "'SuRunners' mogen de systeemtijd aanpassen",
                     IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,117,346,9
-    CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",
+    CONTROL         "'SuRunners' mogen instellingen van Energiebeheer en Energieschemas aanpassen",
                     IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,130,346,9
-    CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",
+    CONTROL         "Windows Update berichten aan alle gebruikers doorgeven (als automatische updates geactiveerd is).",
                     IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,142,346,9
-    CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",
+    CONTROL         "Niet automatisch opnieuw starten na installatie van Windows Updates",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,155,346,9
-    GROUPBOX        "Windows Sicherheit. (Diese Option ist eine Windows-Sicherheitsrichtlinie, die SuRun anpassen kann.)",
+    GROUPBOX        "Windows Beveiliging. (SuRun kan deze Windows-beveiligingsoptie aanpassen.)",
                     IDC_STATIC,4,173,369,39
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
+    CONTROL         "Markeer 'Administrators' i.p.v. 'Maker' als eigenaar van Administrators-bestanden.\nWAARSCHUWING: Indien niet geactiveerd, kunnen gebruikers bestanden en registersleutels van SuRun Administrators wijzigen!!",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,184,346,25
-    CTEXT           "ACHTUNG: Änderungen dieser Einstellungen werden teilweise erst bei der nächsten Windows-Anmeldung aktiv",
+    CTEXT           "LET OP: Deze instellingen zijn pas na de volgende Windows-aanmelding volledig van kracht",
                     IDC_STATIC,6,218,365,8
 END
 
 IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Import SuRun settings"
+CAPTION "SuRun instellingen importeren"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "File name",-1,7,7,52,14,SS_CENTERIMAGE
+    LTEXT           "Bestandsnaam",-1,7,7,52,14,SS_CENTERIMAGE
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Import SuRun Settings",IDC_IMPSURUNSETTINGS,"Button",
+    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
-    CONTROL         "Import Hook Blacklist",IDC_IMPBLACKLIST,"Button",
+    CONTROL         "Importeer Uitsluitingenlijst",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Import user of the 'SuRunners' group and their settings",
+    CONTROL         "Importeer gebruikers en instellingen van de 'SuRunners' groep",
                     IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     63,58,273,10
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
     DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancel",IDCANCEL,304,81,50,14
+    PUSHBUTTON      "&Annuleren",IDCANCEL,304,81,50,14
 END
 
 
@@ -2035,8 +2035,8 @@ BEGIN
     IDS_INSTALLADMIN        "Administrator-rechten zijn nodig om SuRun te installeren.\r\n\r\nVoer de naam en het wachtwoord van de systeembeheerder in:"
     IDS_LOGONFAILED         "Aanmelding mislukt!\r\n\r\nVoer gebruikersnaam en wachtwoord nogmaals in!\r\n\r\nLet op eventuele hoofdletters en de Caps Lock."
     IDS_NOADMIN             "Fout!\r\n\r\nGebruiker %s is geen Administrator!"
-    IDS_NOSURUNNER          "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nVoer naam en wachtwoord van de systeembeheerder in om lid te worden van ""SuRunners"".\r\n\r\nOf druk 'Annuleren'!"
-    IDS_ASKSURUNNER         "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nAls u JA drukt, wordt u toegevoegd aan de groep SuRunner en VERLIEST u uw ADMINISTRATOR STATUS.\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
+    IDS_NOSURUNNER          "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nVoer naam en wachtwoord van de systeembeheerder in.\r\n\r\nOf druk 'Annuleren'!"
+    IDS_ASKSURUNNER         "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nAls u JA drukt, wordt u toegevoegd aan de groep SuRunners en VERLIEST u uw ADMINISTRATOR STATUS.\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
     IDS_MENUSTR             "Start als Administrator"
     IDS_BUILTINADMIN        "U bent aangemeld als de ""ingebouwde"" Windows Administrator.\r\n\r\nU kunt SuRun zo niet gebruiken!"
     IDS_SURUNNER_OK         "U bent toegevoegd aan de gebruikersgroep ""SuRunners""."
@@ -2063,7 +2063,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR        "Fout!\r\n\r\nUw gebruikersnaam kan niet aan de groep ""SuRunners"" worden toegevoeg.\r\nWindows foutmelding:\r\n\r\n%s"
+    IDS_SURUNNER_ERR        "Fout!\r\n\r\nUw gebruikersnaam kan niet aan de groep ""SuRunners"" worden toegevoegd.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_LOGOFFON            "U bent aan de groep ""SuRunners"" toegevoegd en verwijderd uit de groep Administrators.\r\n\r\nMeld u opnieuw aan om de computer verder met beperkte rechten te gebruiken."
     IDS_SYSMENUEXT          "SuRun Systeem-menu uitbreiding"
     IDS_SURUNINST           "Als Administrator installeren"
@@ -2075,9 +2075,9 @@ BEGIN
     IDS_STARTMENUDIR        "SuRun"
     IDS_SURUNSTUCK          "SuRun reageert niet!\n\nMogelijk wil een ""host intrusion protection system"" (HIPS) \nu hiervan melding maken.\n\nKlik hier om terug te schakelen naar het bureaublad."
     IDS_SWITCHBACK          "Klik hier om terug te schakelen\nnaar SuRuns bureaublad."
-    IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
+    IDS_APPOK               "De opdrachtregel lijkt niet te werken.\n\nWeet u zeker dat hij goed is?\n(Aanhalingstekens toegepast bij spaties?)"
     IDS_GRPDESC             "Leden van deze groep kunnen SuRun gebruiken."
-    IDS_ADDTOBLKLIST        "Add program not to hook"
+    IDS_ADDTOBLKLIST        "Program aan uitsluitingenlijst toevoegen"
     IDS_ADDFILETOLIST       "Voer bestandsnaam en opdracht in"
 END
 
@@ -2086,14 +2086,14 @@ BEGIN
     IDS_DELUSER             "U wilt gebruiker '%s' verwijderen uit de groep SuRunners.\r\n\r\nAlle gebruikersinstellingen zullen worden gewist.\r\n\r\nWilt u dat de gebruiker wordt toegevoegd aan de groep Administrators?"
     IDS_CANCEL              "Annuleren (%d)"
     IDS_NOADD2USERS         "Fout!\r\n\r\nKan uw gebruikersnaam niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Error!\r\n\r\nKan uw gebruikersnaam niet van de groep Administrators verwijderen.\r\nWindows foutmelding:\r\n\r\n%s"
+    IDS_NOREMADMINS         "Fout!\r\n\r\nKan uw gebruikersnaam niet van de groep Administrators verwijderen.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_ADMINSHELL          "De Windows omgeving draait momenteel met Administrator-rechten!\r\n\r\nU moet opnieuw aanmelden om SuRun te kunnen gebruiken."
-    IDS_SIMPLESETUP         "Wollen sie alle Einstellungen auf für Heimanwender empfohlene Werte setzen?"
-    IDS_NOADMIN2            "U (%s) mag de 'SuRun instellingen' niet wijzigen.\r\n\r\nVoer de naam en het wachtwoord van de systeembeheerder in om de SuRun instellingen te wijzigen.\r\n\r\nOf druk op 'Annuleren'!"
+    IDS_SIMPLESETUP         "Aanbevolen instellingen voor regulier gebruik toepassen?"
+    IDS_NOADMIN2            "U (%s) mag de 'SuRun instellingen' niet wijzigen.\r\n\r\nVoer de naam en het wachtwoord van de systeembeheerder in.\r\n\r\nOf druk op 'Annuleren'!"
     IDS_RUNRESTRICTED       "SuRun laat u (%s) slechts bepaalde programma's starten.\r\nHet is u niet toegestaan '%s' met verhoogde rechten te starten."
     IDS_SETUP1              "Algemene instellingen"
     IDS_SETUP2              "SuRunners groep"
-    IDS_SETUP3              "Execution hooks"
+    IDS_SETUP3              "Programma uitvoering"
     IDS_SETUP4              "Geavanceerd"
     IDS_ASKAUTO             "Het programma:\r\n\r\n%s\r\n\r\nheeft voor de uitvoering verhoogde rechten nodig.\r\n\r\nDruk 'Annuleren' om het programma zonder verhoogde rechten te starten."
     IDS_STARTED             "Info:\r\n%s\r\nwordt met verhoogde rechten uitgevoerd."
@@ -2135,14 +2135,14 @@ BEGIN
     IDS_SHNAME7             "Systeembeheer"
     IDS_SHNAME8             "Mijn Documenten"
     IDS_BEAUTIFIED          "%s\r\n[Betekenis: %s]"
-    IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
-    IDS_REBOOT              "&Reboot"
+    IDS_PW4SETUP            "Om SuRun instellingen te wijzigen moet u uw wachtwoord invoeren."
+    IDS_REBOOT              "&Opnieuw starten"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_INSTSUCCESS3        "The system must be restarted!"
-    IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
+    IDS_INSTSUCCESS3        "De computer moet opnieuw starten!"
+    IDS_HIDESELF            "Wilt u SuRun voor UZELF verbergen?\n\nSuRun instellingen kunnen hierna niet meer worden gewijzigd."
 END
 
 #endif    // Dutch (Netherlands) resources
