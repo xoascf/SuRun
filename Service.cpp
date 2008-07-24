@@ -671,7 +671,7 @@ DWORD PrepareSuRun()
   else
   if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-  if (HideSuRun(g_RunData.UserName))
+  if (HideSuRun(g_RunData.UserName)&&(!IsInAdmins(g_RunData.UserName)))
     return RETVAL_CANCELLED;
   //Create the new desktop
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
@@ -972,7 +972,7 @@ DWORD LSAStartAdminProcess()
             DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
             g_RunData.cmdLine,GetLastErrorNameStatic());
         }
-        if ((g_RunData.bShlExHook)&&(!HideSuRun(g_RunData.UserName)))
+        if (g_RunData.bShlExHook)
           ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
@@ -1085,8 +1085,7 @@ void SuRun(DWORD ProcessID)
       //Create the new desktop
       ResumeClient(RETVAL_OK);
       //check if SuRun Setup is hidden for user name
-      if (HideSuRun(g_RunData.UserName)
-          && (!IsInAdmins(g_RunData.UserName)))
+      if (HideSuRun(g_RunData.UserName) && (!IsInAdmins(g_RunData.UserName)))
         return;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
