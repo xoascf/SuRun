@@ -693,7 +693,7 @@ EditApp:
     //Delete App Button
     case MAKELPARAM(IDC_DELETE,BN_CLICKED):
       {
-        HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+DelApp: HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
         int cSel=ListView_GetSelectedCount(hBL);
         if (cSel>0) for (int n=0;n<ListView_GetItemCount(hBL);)
         {
@@ -730,8 +730,25 @@ EditApp:
         if (lParam) switch(((LPNMHDR)lParam)->code)
         {
         case LVN_KEYDOWN:
-          if (((LPNMLVKEYDOWN)lParam)->wVKey==VK_F2)
+          switch (((LPNMLVKEYDOWN)lParam)->wVKey)
+          {
+          case VK_F2:
             goto EditApp;
+          case VK_DELETE:
+            goto DelApp;
+          case (WORD)'A':
+            if (GetKeyState(VK_CONTROL)&0x8000)
+            {
+              HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
+              if(ListView_GetItemCount(hBL))
+              {
+                for (int n=0;n<ListView_GetItemCount(hBL);n++)
+                  ListView_SetItemState(hBL,n,LVIS_SELECTED,0x0F);
+                ListView_SetItemState(hBL,0,LVIS_SELECTED|LVIS_FOCUSED,LVIS_SELECTED|LVIS_FOCUSED);
+              }
+              return TRUE;
+            }
+          }
           break;
         //Mouse Click: Toggle Flags
         case NM_DBLCLK:
@@ -1896,6 +1913,18 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
             goto EditApp;
           case VK_DELETE:
             goto DelApp;
+          case (WORD)'A':
+            if (GetKeyState(VK_CONTROL)&0x8000)
+            {
+              HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+              if(ListView_GetItemCount(hWL))
+              {
+                for (int n=0;n<ListView_GetItemCount(hWL);n++)
+                  ListView_SetItemState(hWL,n,LVIS_SELECTED,0x0F);
+                ListView_SetItemState(hWL,0,LVIS_SELECTED|LVIS_FOCUSED,LVIS_SELECTED|LVIS_FOCUSED);
+              }
+              return TRUE;
+            }
           }
           break;
         //Mouse Click: Toggle Flags
