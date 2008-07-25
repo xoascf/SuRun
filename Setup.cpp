@@ -1799,7 +1799,7 @@ EditApp:
       //Delete App Button
       case MAKELPARAM(IDC_DELETE,BN_CLICKED):
         {
-          HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
+DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           int cSel=ListView_GetSelectedCount(hWL);
           if (cSel>0) for (int n=0;n<ListView_GetItemCount(hWL);)
           {
@@ -1890,8 +1890,13 @@ EditApp:
           }
           return TRUE;
         case LVN_KEYDOWN:
-          if (((LPNMLVKEYDOWN)lParam)->wVKey==VK_F2)
+          switch (((LPNMLVKEYDOWN)lParam)->wVKey)
+          {
+          case VK_F2:
             goto EditApp;
+          case VK_DELETE:
+            goto DelApp;
+          }
           break;
         //Mouse Click: Toggle Flags
         case NM_DBLCLK:
