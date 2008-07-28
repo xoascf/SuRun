@@ -333,6 +333,30 @@ PTOKEN_PRIMARY_GROUP CreateTokenPrimaryGroup(PSID pSID)
   return pTPG;
 }
 
+PTOKEN_OWNER CreateTokenOwner(PSID pSID)
+{
+  if(!pSID) 
+    return NULL;
+  DWORD dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
+  PTOKEN_OWNER pTO = (PTOKEN_OWNER)malloc(dwTGlen);
+  LPBYTE pBase=(LPBYTE)pTO+sizeof(PSID);
+  memmove(pBase,pSID,GetLengthSid(pSID));
+  pTO->Owner=(PSID)pBase;
+  return pTO;
+}
+
+PTOKEN_DEFAULT_DACL CreateTokenDefDacl(PACL pACL)
+{
+  if(!pACL) 
+    return NULL;
+  DWORD dwlen=sizeof(PACL)+LocalSize(pACL);
+  PTOKEN_DEFAULT_DACL pTDACL = (PTOKEN_DEFAULT_DACL)malloc(dwlen);
+  LPBYTE pBase=(LPBYTE)pTDACL+sizeof(PACL);
+  memmove(pBase,pACL,LocalSize(pACL));
+  pTDACL->DefaultDacl=(PACL)pBase;
+  return pTDACL;
+}
+
 PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
 {
   DWORD nPrivs=pPriv->PrivilegeCount;
@@ -344,7 +368,7 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
     {
       bool bAdd=TRUE;
       for (DWORD p=0;p<pPriv->PrivilegeCount;p++)
-        if (memcmp(&pPriv->Privileges[p],&luid,sizeof(luid))==0)
+        if (memcmp(&pPriv->Privileges[p].Luid,&luid,sizeof(luid))==0)
         {
           bAdd=false;
           break;
@@ -368,14 +392,14 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
     {
       bool bAdd=TRUE;
       for (DWORD p=0;p<pPriv->PrivilegeCount;p++)
-        if (memcmp(&pPriv->Privileges[p],&luid,sizeof(luid))==0)
+        if (memcmp(&pPriv->Privileges[p].Luid,&luid,sizeof(luid))==0)
         {
           bAdd=false;
           break;
         }
       if(bAdd)
       {
-        memmove(&ptp->Privileges[nPrivs],&luid,sizeof(luid));
+        memmove(&ptp->Privileges[nPrivs].Luid,&luid,sizeof(luid));
         nPrivs++;
       }
     }
@@ -389,17 +413,17 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
     if(LookupPrivilegeName(0,&ptp->Privileges[p].Luid,s,&l))
     {
       if(_tcsicmp(s,SE_CHANGE_NOTIFY_NAME)==0)
-        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+        ptp->Privileges[p].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT|SE_PRIVILEGE_ENABLED;
       else if(_tcsicmp(s,SE_CREATE_GLOBAL_NAME)==0)
-        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+        ptp->Privileges[p].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT|SE_PRIVILEGE_ENABLED;
       else if(_tcsicmp(s,SE_LOAD_DRIVER_NAME)==0)
-        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED;
+        ptp->Privileges[p].Attributes=SE_PRIVILEGE_ENABLED;
       else if(_tcsicmp(s,SE_IMPERSONATE_NAME)==0)
-        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+        ptp->Privileges[p].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT|SE_PRIVILEGE_ENABLED;
       else if(_tcsicmp(s,SE_UNDOCK_NAME)==0)
-        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+        ptp->Privileges[p].Attributes=SE_PRIVILEGE_ENABLED;
       else if(_tcsicmp(s,SE_DEBUG_NAME)==0)
-        ptp->Privileges[nPrivs].Attributes=0;
+        ptp->Privileges[p].Attributes=0;
     }
   }
   return ptp;
@@ -418,7 +442,7 @@ HANDLE GetAdminToken(DWORD SessionID)
   PTOKEN_PRIVILEGES lpPrivToken = NULL;
   PTOKEN_PRIMARY_GROUP lpPriGrp = NULL;
   PTOKEN_DEFAULT_DACL  lpDaclToken = NULL;
-  PACL DefDACL=NULL;
+  PTOKEN_OWNER  pTO=NULL;
   __try
   {
     HANDLE hShell=GetSessionUserToken(SessionID);
@@ -449,6 +473,8 @@ HANDLE GetAdminToken(DWORD SessionID)
     SID_AND_ATTRIBUTES sia;
     sia.Sid=AdminSID;
     sia.Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_OWNER;
+    for(DWORD i=0;i<ptg->GroupCount;i++)
+      ptg->Groups[i].Attributes&=~SE_GROUP_OWNER;
     PTOKEN_GROUPS p = AddTokenGroups(ptg,&sia);
     if (!p)
       __leave;
@@ -456,6 +482,9 @@ HANDLE GetAdminToken(DWORD SessionID)
     ptg=p;
     //Set Admin SID as the Tokens Primary Group
     lpPriGrp = CreateTokenPrimaryGroup(AdminSID);
+    //Set Admin SID as the Token Owner
+    pTO = CreateTokenOwner(AdminSID);
+
     //Set Token User, Token Owner is set to 0 so token User is Token owner
     UserSID=GetTokenUserSID(hShell);
     TOKEN_USER userToken = {{UserSID, 0}};
@@ -474,8 +503,13 @@ HANDLE GetAdminToken(DWORD SessionID)
     //Set Default DACL, Deny user Access but Allow Admins access, so User 
     //running as admin can access this token but user running as user cannot
     lpDaclToken = (PTOKEN_DEFAULT_DACL)(GetFromToken(hShell, TokenDefaultDacl));
-    DefDACL=SetAdminDenyUserAccess(lpDaclToken->DefaultDacl,UserSID);
-    lpDaclToken->DefaultDacl=DefDACL;
+    PACL DefDACL=SetAdminDenyUserAccess(lpDaclToken->DefaultDacl,UserSID);
+    if(DefDACL)
+    {
+      free(lpDaclToken);
+      lpDaclToken=CreateTokenDefDacl(DefDACL);
+      LocalFree(DefDACL);
+    }
     //
     SECURITY_QUALITY_OF_SERVICE sqos = {sizeof(sqos), SecurityAnonymous, SECURITY_STATIC_TRACKING, FALSE};
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, &sqos};
@@ -483,9 +517,9 @@ HANDLE GetAdminToken(DWORD SessionID)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
     if (!ZwCreateToken)
       __leave;
-    NTSTATUS ntStatus = ZwCreateToken(&hUser,TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
-      &tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,ptg, 
-      lpPrivToken, 0, lpPriGrp, lpDaclToken, &tsrc);
+    NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
+      &tstat.AuthenticationId,0,&userToken,ptg, 
+      lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
 
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
@@ -525,8 +559,8 @@ HANDLE GetAdminToken(DWORD SessionID)
       free(lpPrivToken);
     if(lpPriGrp) 
       free(lpPriGrp);
-    if (DefDACL)
-      LocalFree(DefDACL);
+     if(pTO) 
+      free(pTO);
     if(lpDaclToken) 
       free(lpDaclToken);
   }
