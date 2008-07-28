@@ -240,9 +240,14 @@ BOOL RenameRegKey(HKEY hKeyRoot,LPTSTR sSrc,LPTSTR sDst)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name)
+BOOL DisablePrivilege(HANDLE hToken,LPCTSTR name)
 {
-  TOKEN_PRIVILEGES priv = {1,{0,0,SE_PRIVILEGE_ENABLED}};
+  return  EnablePrivilege(hToken,name,0);
+}
+
+BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name,DWORD how/*=SE_PRIVILEGE_ENABLED*/)
+{
+  TOKEN_PRIVILEGES priv = {1,{0,0,how}};
   LookupPrivilegeValue(0,name,&priv.Privileges[0].Luid);
   AdjustTokenPrivileges(hToken,FALSE,&priv,sizeof priv,0,0);
   return  GetLastError() == ERROR_SUCCESS;
