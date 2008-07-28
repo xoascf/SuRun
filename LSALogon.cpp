@@ -518,8 +518,9 @@ HANDLE GetAdminToken(DWORD SessionID)
     //ToDo: Get new AuthenticationId !! tstat.AuthenticationId is the one from
     //the limited users, so gpedit.msc will complain.
     //SYSTEM_LUID will result in a access denied ACL for the new process
+    //LUID AuthId=SYSTEM_LUID;
     NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
-      &tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,ptg, 
+      &tstat.AuthenticationId/*AuthId*/,&tstat.ExpirationTime,&userToken,ptg, 
       lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
