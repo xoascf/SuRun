@@ -386,7 +386,7 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
   {
     TCHAR s[MAX_PATH]={0};
     DWORD l=MAX_PATH;
-    if(LookupPrivilegeName(0,&ptp->Privileges[nPrivs].Luid,s,&l))
+    if(LookupPrivilegeName(0,&ptp->Privileges[p].Luid,s,&l))
     {
       if(_tcsicmp(s,SE_CHANGE_NOTIFY_NAME)==0)
         ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
