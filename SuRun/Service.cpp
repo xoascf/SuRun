@@ -932,14 +932,16 @@ DWORD LSAStartAdminProcess()
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
+        /*CREATE_SUSPENDED|*/CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
-        PSID los=GetSessionLogonSID(g_RunData.SessionID);
-        SetAdminDenyUserAccess(pi.hProcess,los);
-        SetAdminDenyUserAccess(pi.hThread,los);
-        free(los);
-        ResumeThread(pi.hThread);
+//        HANDLE hShell=GetSessionUserToken(g_RunData.SessionID);
+//        PSID sid=GetTokenUserSID(hShell);
+//        CloseHandle(hShell);
+//        SetAdminDenyUserAccess(pi.hProcess,sid);
+//        SetAdminDenyUserAccess(pi.hThread,sid);
+//        free(sid);
+//        ResumeThread(pi.hThread);
         if(bIsExplorer)
         {
           //Before Vista: wait for and kill Desktop Proxy
