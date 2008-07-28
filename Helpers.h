@@ -65,7 +65,8 @@ int inline SafeMsgBox(HWND w,LPTSTR m,LPTSTR c,DWORD f)
 };
 
 // Privilege stuff
-BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name);
+BOOL DisablePrivilege(HANDLE hToken,LPCTSTR name);
+BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name,DWORD how=SE_PRIVILEGE_ENABLED);
 BOOL EnablePrivilege(LPCTSTR name);
 
 //  AllowAccess
