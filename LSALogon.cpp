@@ -382,6 +382,26 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
     s+=wcslen(s)+1;
   }
   ptp->PrivilegeCount=nPrivs;
+  for (DWORD p=0;p<ptp->PrivilegeCount;p++)
+  {
+    TCHAR s[MAX_PATH]={0};
+    DWORD l=MAX_PATH;
+    if(LookupPrivilegeName(0,&ptp->Privileges[nPrivs].Luid,s,&l))
+    {
+      if(_tcsicmp(s,SE_CHANGE_NOTIFY_NAME)==0)
+        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+      else if(_tcsicmp(s,SE_CREATE_GLOBAL_NAME)==0)
+        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+      else if(_tcsicmp(s,SE_LOAD_DRIVER_NAME)==0)
+        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED;
+      else if(_tcsicmp(s,SE_IMPERSONATE_NAME)==0)
+        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+      else if(_tcsicmp(s,SE_UNDOCK_NAME)==0)
+        ptp->Privileges[nPrivs].Attributes=SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+      else if(_tcsicmp(s,SE_DEBUG_NAME)==0)
+        ptp->Privileges[nPrivs].Attributes=0;
+    }
+  }
   return ptp;
 }
 
