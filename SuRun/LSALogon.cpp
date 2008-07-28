@@ -464,6 +464,8 @@ HANDLE GetAdminToken(DWORD SessionID)
     ptg=(PTOKEN_GROUPS)(GetFromToken(hShell, TokenGroups));
     if (ptg==NULL)
       __leave;
+    for(DWORD i=0;i<ptg->GroupCount;i++)
+      ptg->Groups[i].Attributes&=~SE_GROUP_OWNER;
     // Initialize Admin SID
     SID_IDENTIFIER_AUTHORITY sidAuth= SECURITY_NT_AUTHORITY;
     if (!AllocateAndInitializeSid(&sidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,
@@ -473,8 +475,6 @@ HANDLE GetAdminToken(DWORD SessionID)
     SID_AND_ATTRIBUTES sia;
     sia.Sid=AdminSID;
     sia.Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_OWNER;
-    for(DWORD i=0;i<ptg->GroupCount;i++)
-      ptg->Groups[i].Attributes&=~SE_GROUP_OWNER;
     PTOKEN_GROUPS p = AddTokenGroups(ptg,&sia);
     if (!p)
       __leave;
@@ -484,8 +484,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     lpPriGrp = CreateTokenPrimaryGroup(AdminSID);
     //Set Admin SID as the Token Owner
     pTO = CreateTokenOwner(AdminSID);
-
-    //Set Token User, Token Owner is set to 0 so token User is Token owner
+    //Set Token User
     UserSID=GetTokenUserSID(hShell);
     TOKEN_USER userToken = {{UserSID, 0}};
     //Privileges
@@ -511,16 +510,17 @@ HANDLE GetAdminToken(DWORD SessionID)
       LocalFree(DefDACL);
     }
     //
-    SECURITY_QUALITY_OF_SERVICE sqos = {sizeof(sqos), SecurityAnonymous, SECURITY_STATIC_TRACKING, FALSE};
-    OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, &sqos};
+    OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
     if (!ZwCreateToken)
       __leave;
+    //ToDo: Get new AuthenticationId !! tstat.AuthenticationId is the one from
+    //the limited users, so gpedit.msc will complain.
+    //SYSTEM_LUID will result in a access denied ACL for the new process
     NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
-      &tstat.AuthenticationId,0,&userToken,ptg, 
+      &tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,ptg, 
       lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
-
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
