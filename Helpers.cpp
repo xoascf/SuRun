@@ -425,15 +425,17 @@ PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCH
     DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
     return 0; 
   // Initialize EXPLICIT_ACCESS structures
-  // The ACE will allow Administrators full access to the object.
   EXPLICIT_ACCESS ea[2]={0};
-  ea[1].grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL;
-  ea[1].grfAccessMode = GRANT_ACCESS;
-  ea[1].Trustee.ptstrName  = (LPTSTR)AdminSID;
   // The ACE will deny the current User access to the object.
   ea[0].grfAccessPermissions = Permissions;
   ea[0].grfAccessMode = SET_ACCESS;
+  ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
   ea[0].Trustee.ptstrName  = (LPTSTR)UserSID;
+  // The ACE will allow Administrators full access to the object.
+  ea[1].grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL;
+  ea[1].grfAccessMode = GRANT_ACCESS;
+  ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea[1].Trustee.ptstrName  = (LPTSTR)AdminSID;
   // Create a new ACL that merges the new ACE
   // into the existing DACL.
   PACL pNewDACL=NULL;
