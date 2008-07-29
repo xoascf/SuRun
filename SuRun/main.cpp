@@ -43,18 +43,18 @@ extern RUNDATA g_RunData;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifdef _DEBUG
-#include "LSALogon.h"
-extern BOOL TestSetup();
-#endif _DEBUG
+//#ifdef _DEBUG
+//#include "LSALogon.h"
+//extern BOOL TestSetup();
+//#endif _DEBUG
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-#ifdef _DEBUG
-  GetAdminToken(0);
-  ExitProcess(0);
-  TestSetup();
-#endif _DEBUG
+//#ifdef _DEBUG
+//  GetAdminToken(0);
+//  ExitProcess(0);
+//  TestSetup();
+//#endif _DEBUG
   if(HandleServiceStuff())
     return 0;
   if (g_RunData.CliThreadId==GetCurrentThreadId())
