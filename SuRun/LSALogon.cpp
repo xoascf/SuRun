@@ -509,28 +509,31 @@ HANDLE GetAdminToken(DWORD SessionID)
     //
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
     //
-    LUID AuthId=SYSTEM_LUID;
-    if (LOBYTE(LOWORD(GetVersion()))>=6)
-    {
-      //Vista++ use users AuthenticationId
-      //Get Token statistics
-      TOKEN_STATISTICS tstat;
-      GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);    //Token expires in 100 Years
-      AuthId=tstat.AuthenticationId;
-    }
-    SYSTEMTIME st;
-    GetSystemTime(&st);
-    st.wYear+=100;
-    FILETIME ft;
-    SystemTimeToFileTime(&st,&ft);
+//    LUID AuthId=SYSTEM_LUID;
+//    if (LOBYTE(LOWORD(GetVersion()))>=6)
+//    {
+//      //Vista++ use users AuthenticationId
+//      //Get Token statistics
+//      TOKEN_STATISTICS tstat;
+//      GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);    //Token expires in 100 Years
+//      AuthId=tstat.AuthenticationId;
+//    }
+//    SYSTEMTIME st;
+//    GetSystemTime(&st);
+//    st.wYear+=100;
+//    FILETIME ft;
+//    SystemTimeToFileTime(&st,&ft);
+    //Get Token statistics for AuthenticationId and ExpirationTime
+    TOKEN_STATISTICS tstat;
+    GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);    //Token expires in 100 Years
     //Create the token
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
     if (!ZwCreateToken)
       __leave;
     NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,
-      TokenPrimary,&AuthId,(PLARGE_INTEGER)&ft,&userToken,ptg,lpPrivToken, 
-      pTO, lpPriGrp, lpDaclToken, &tsrc);
+      TokenPrimary,&tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,
+      ptg, lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
