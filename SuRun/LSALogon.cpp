@@ -510,7 +510,14 @@ HANDLE GetAdminToken(DWORD SessionID)
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
     //
     LUID AuthId=SYSTEM_LUID;
-    //Token expires in 100 Years
+    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    {
+      //Vista++ use users AuthenticationId
+      //Get Token statistics
+      TOKEN_STATISTICS tstat;
+      GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);    //Token expires in 100 Years
+      AuthId=tstat.AuthenticationId;
+    }
     SYSTEMTIME st;
     GetSystemTime(&st);
     st.wYear+=100;
