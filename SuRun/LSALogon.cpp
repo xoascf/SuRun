@@ -509,7 +509,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     //
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
     //
-    LUID AuthId=LOCALSERVICE_LUID;
+    LUID AuthId=SYSTEM_LUID;
     //Token expires in 100 Years
     SYSTEMTIME st;
     GetSystemTime(&st);
