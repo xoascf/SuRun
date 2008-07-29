@@ -1,10 +1,10 @@
 Done, to be tested:
 ---------------------------
 * Added Ctrl+A and Del hotkeys to users program list and Blacklist
+* SuRun gpedit.msc did not work!
 
 ToDo
 ---------------------
-* SuRun gpedit.msc does not fully work!
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
