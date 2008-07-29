@@ -457,9 +457,6 @@ HANDLE GetAdminToken(DWORD SessionID)
     DWORD n;
     GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n);
     strcpy(tsrc.SourceName,"SuRun");
-    //Get Token statistics
-    TOKEN_STATISTICS tstat;
-    GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);
     //Initialize TOKEN_GROUPS
     ptg=(PTOKEN_GROUPS)(GetFromToken(hShell, TokenGroups));
     if (ptg==NULL)
@@ -511,17 +508,22 @@ HANDLE GetAdminToken(DWORD SessionID)
     }
     //
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
+    //
+    LUID AuthId=LOCALSERVICE_LUID;
+    //Token expires in 100 Years
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    st.wYear+=100;
+    FILETIME ft;
+    SystemTimeToFileTime(&st,&ft);
+    //Create the token
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
     if (!ZwCreateToken)
       __leave;
-    //ToDo: Get new AuthenticationId !! tstat.AuthenticationId is the one from
-    //the limited users, so gpedit.msc will complain.
-    //SYSTEM_LUID will result in a access denied ACL for the new process
-    //LUID AuthId=SYSTEM_LUID;
-    NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,TokenPrimary, 
-      &tstat.AuthenticationId/*AuthId*/,&tstat.ExpirationTime,&userToken,ptg, 
-      lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
+    NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,
+      TokenPrimary,&AuthId,(PLARGE_INTEGER)&ft,&userToken,ptg,lpPrivToken, 
+      pTO, lpPriGrp, lpDaclToken, &tsrc);
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
