@@ -299,7 +299,7 @@ PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
   if(!pSrcTG) 
     return NULL;
   PTOKEN_GROUPS pDstTG = NULL;
-  DWORD dwTGlen=sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*(pSrcTG->GroupCount+1);
+  SIZE_T dwTGlen=sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*(pSrcTG->GroupCount+1);
   for(DWORD i=0;i<pSrcTG->GroupCount;i++)
     dwTGlen+=GetLengthSid(pSrcTG->Groups[i].Sid);
   dwTGlen+=GetLengthSid(pAdd->Sid);
@@ -325,7 +325,7 @@ PTOKEN_PRIMARY_GROUP CreateTokenPrimaryGroup(PSID pSID)
 {
   if(!pSID) 
     return NULL;
-  DWORD dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
+  SIZE_T dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
   PTOKEN_PRIMARY_GROUP pTPG = (PTOKEN_PRIMARY_GROUP)malloc(dwTGlen);
   LPBYTE pBase=(LPBYTE)pTPG+sizeof(PSID);
   memmove(pBase,pSID,GetLengthSid(pSID));
@@ -337,7 +337,7 @@ PTOKEN_OWNER CreateTokenOwner(PSID pSID)
 {
   if(!pSID) 
     return NULL;
-  DWORD dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
+  SIZE_T dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
   PTOKEN_OWNER pTO = (PTOKEN_OWNER)malloc(dwTGlen);
   LPBYTE pBase=(LPBYTE)pTO+sizeof(PSID);
   memmove(pBase,pSID,GetLengthSid(pSID));
@@ -349,7 +349,7 @@ PTOKEN_DEFAULT_DACL CreateTokenDefDacl(PACL pACL)
 {
   if(!pACL) 
     return NULL;
-  DWORD dwlen=sizeof(PACL)+LocalSize(pACL);
+  SIZE_T dwlen=sizeof(PACL)+LocalSize(pACL);
   PTOKEN_DEFAULT_DACL pTDACL = (PTOKEN_DEFAULT_DACL)malloc(dwlen);
   LPBYTE pBase=(LPBYTE)pTDACL+sizeof(PACL);
   memmove(pBase,pACL,LocalSize(pACL));
