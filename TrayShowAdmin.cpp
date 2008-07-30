@@ -98,7 +98,7 @@ BOOL StartTSAThread()
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
   CloseHandle(hPipe);
   Sleep(10);
-  for(n=0;(!g_TSAThreadRunning)&&(n<3);n++)
+  for(n=0;(!g_TSAThreadRunning)&&(n<100);n++)
     Sleep(100);
   return g_TSAThreadRunning;
 }
