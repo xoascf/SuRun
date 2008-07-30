@@ -88,29 +88,6 @@ BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName)
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// rename User
-//
-/////////////////////////////////////////////////////////////////////////////
-DWORD ChangeUserName(LPWSTR oldName,LPWSTR newName)
-{
-  TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(dn,_T("\\\\"));
-  _tcscat(dn,oldName);
-  PathRemoveFileSpec(dn);
-  TCHAR on[2*UNLEN+2]={0};
-  _tcscpy(on,oldName);
-  PathStripPath(on);
-  TCHAR nn[2*UNLEN+2]={0};
-  _tcscpy(nn,newName);
-  PathStripPath(nn);
-  USER_INFO_0 ui={0};
-  ui.usri0_name=nn;
-  DWORD dwErr=0;
-  return NetUserSetInfo(dn,on,0,(LPBYTE)&ui,&dwErr);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // AlterGroupMembership
 //
 //  Adds or removes "DOMAIN\User" from the local group "Group"
@@ -167,6 +144,10 @@ BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 //          DBGTrace3("IsInGroupDirect(%s,%s): User: %s mismatch",
 //            Group,DomainAndName,Members[i].lgrmi3_domainandname);
         }
+    }else
+    {
+      DBGTrace3("IsInGroupDirect(%s,%s): NetLocalGroupGetMembers failed: %s",
+        Group,DomainAndName,GetErrorNameStatic(status));
 		}
 	}while (status==ERROR_MORE_DATA);
 	NetApiBufferFree(Members);
@@ -203,8 +184,12 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
       Users=0;
     }else
     {
-//      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
-//        Group,DomainAndName,GetErrorNameStatic(status));
+      if (status==ERROR_ACCESS_DENIED)
+      {
+        //ToDo...
+      }
+      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
+        Group,DomainAndName,GetErrorNameStatic(status));
       return IsInGroupDirect(Group,DomainAndName);
     }
 	}
@@ -315,6 +300,15 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
 // User list
 //
 /////////////////////////////////////////////////////////////////////////////
+
+// Well known user groups for filling the list in LogonDlg
+const DWORD UserGroups[]=
+{
+  DOMAIN_ALIAS_RID_ADMINS,
+  DOMAIN_ALIAS_RID_POWER_USERS,
+  DOMAIN_ALIAS_RID_USERS,
+  DOMAIN_ALIAS_RID_GUESTS
+};
 
 USERLIST::USERLIST()
 {
@@ -483,6 +477,10 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
         res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
         if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
         {
+          if (res==ERROR_ACCESS_DENIED)
+          {
+            //ToDo...
+          }
           DBGTrace3("NetGroupGetUsers(%s,%s) failed: %s",dc,gn,GetErrorNameStatic(res));
           break;
         }
@@ -515,6 +513,10 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     res = NetLocalGroupGetMembers(0,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
+      if (res==ERROR_ACCESS_DENIED)
+      {
+        //ToDo...
+      }
       DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
       break;
     }
@@ -587,6 +589,10 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
     res = NetLocalGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
+      if (res==ERROR_ACCESS_DENIED)
+      {
+        //ToDo...
+      }
       DBGTrace1("NetLocalGroupEnum failed: %s",GetErrorNameStatic(res));
       return;
     }
@@ -606,6 +612,10 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
       res = NetGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
       if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
       {
+        if (res==ERROR_ACCESS_DENIED)
+        {
+          //ToDo...
+        }
         DBGTrace1("NetLocalGroupEnum failed: %s",GetErrorNameStatic(res));
         return;
       }
