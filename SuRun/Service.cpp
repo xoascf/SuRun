@@ -1101,7 +1101,7 @@ void SuRun(DWORD ProcessID)
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
     }
-    if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser||GetDefHideSuRun))
+    if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
     {
       //Just start the client process!
       KillProcess(g_RunData.KillPID);
