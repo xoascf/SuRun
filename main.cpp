@@ -50,6 +50,18 @@ extern RUNDATA g_RunData;
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
+  {
+  case 1:
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
+    break;
+  case 2:
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
+    break;
+  case 3:
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
+    break;
+  }
 //#ifdef _DEBUG
 //  GetAdminToken(0);
 //  ExitProcess(0);
