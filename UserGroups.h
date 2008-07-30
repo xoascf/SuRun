@@ -23,15 +23,6 @@
 // SuRun users group name
 #define SURUNNERSGROUP  _T("SuRunners")
 
-// Well known user groups for filling the list in LogonDlg
-const DWORD UserGroups[]=
-{
-  DOMAIN_ALIAS_RID_ADMINS,
-  DOMAIN_ALIAS_RID_POWER_USERS,
-  DOMAIN_ALIAS_RID_USERS,
-  DOMAIN_ALIAS_RID_GUESTS
-};
-
 // this Creates the local user group "SuRunners"
 void CreateSuRunnersGroup();
 
@@ -41,19 +32,13 @@ void DeleteSuRunnersGroup();
 // Get the name of a well known group
 BOOL GetGroupName(DWORD Rid,LPWSTR Name,PDWORD cchName);
 
-// rename User
-DWORD ChangeUserName(LPWSTR oldName,LPWSTR newName);
-
 // put/remove User "DomainAndName" in/from Group
 DWORD AlterGroupMember(LPCWSTR Group,LPCWSTR DomainAndName, BOOL bAdd);
 // put/remove User "DomainAndName" in/from Group GetGroupName("Rid")
 DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd);
 
-// is User "DomainAndName" member of Group?
-BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName);
 // is User "DomainAndName" member of Group GetGroupName("Rid")?
 BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName);
-
 // is User "DomainAndName" member of SuRunners?
 BOOL IsInSuRunners(LPCWSTR DomainAndName);
 
