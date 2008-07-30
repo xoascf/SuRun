@@ -1,7 +1,6 @@
 Done, to be tested:
 ---------------------------
 * Added Ctrl+A and Del hotkeys to users program list and Blacklist
-* SuRun gpedit.msc did not work!
 
 ToDo
 ---------------------
