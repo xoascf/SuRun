@@ -329,7 +329,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -383,7 +383,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Entfernen"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Entfernen >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -392,12 +392,12 @@ BEGIN
     LTEXT           "Wollen Sie SuRun jetzt entfernen?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
     CONTROL         "Behalte SuRun Einstellungen",IDC_KEEPREGISTRY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,50,108,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,50,336,10
     CONTROL         "Lösche 'SuRunners' Gruppe",IDC_DELSURUNNERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,64,105,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,64,336,10
     CONTROL         "Mache Mitglieder der 'SuRunners' Gruppe zu Administratoren",
                     IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    207,10
+                    336,10
     PUSHBUTTON      "&Abbrechen",IDCANCEL,215,105,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -1080,7 +1080,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1108,7 +1108,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "Remove SuRun"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Remove >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1117,12 +1117,12 @@ BEGIN
     LTEXT           "Do you want to uninstall SuRun now?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
     CONTROL         "Keep SuRun Settings",IDC_KEEPREGISTRY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,50,108,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,50,317,10
     CONTROL         "Delete Group 'SuRunners'",IDC_DELSURUNNERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,64,105,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,64,317,10
     CONTROL         "Make members of 'SuRunners' to local Administrators",
                     IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    207,10
+                    317,10
     PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -1727,7 +1727,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1755,7 +1755,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Deïnstalleren"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Deïnstalleren >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1764,12 +1764,12 @@ BEGIN
     LTEXT           "Wilt u SuRun deïnstalleren?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
     CONTROL         "SuRun instellingen behouden",IDC_KEEPREGISTRY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,18,50,108,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,50,337,10
     CONTROL         "Gebruikersgroep 'SuRunners' opheffen",IDC_DELSURUNNERS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,64,105,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,64,337,10
     CONTROL         "Voeg gebruikers in de groep 'SuRunners' toe aan Administrators",
                     IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    207,10
+                    337,10
     PUSHBUTTON      "&Annuleren",IDCANCEL,215,105,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -1808,7 +1808,8 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun Uitsluitingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,233,8
+    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,233,
+                    8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
                     LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
@@ -1852,7 +1853,8 @@ BEGIN
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
     EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,142,9,NOT WS_GROUP
+    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,
+                    142,9,NOT WS_GROUP
     LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord",
                     IDC_STATIC,83,71,114,17
     COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
@@ -1983,8 +1985,8 @@ BEGIN
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Importeer Uitsluitingenlijst",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
     CONTROL         "Importeer gebruikers en instellingen van de 'SuRunners' groep",
