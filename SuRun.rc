@@ -869,7 +869,7 @@ BEGIN
                     IDC_STATIC,31,83,335,17
     LTEXT           "Activating this option, in some rare cases, can cause incompatibilities with some programs.\nIn case of such an incompatibility you can disable hooking of the program in the 'Blacklist' below.",
                     IDC_STATIC,31,100,335,17
-    LTEXT           "If an application does not work as usual after you activate one or both options above, you can disable SuRuns hooks into this program by putting it into the blacklist.",
+    LTEXT           "If an application does not work as usual after you activate one or both options above, you can disable SuRun's hooks into this program by putting it into the blacklist.",
                     IDC_STATIC,20,122,256,27
     PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,293,128,57,14
     CONTROL         "Try to detect if unknown applications need to start with eleveted rights.",
@@ -1088,9 +1088,9 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    LTEXT           "If you changed SuRuns context menu, please check the following option:",
+    LTEXT           "If you changed SuRun's context menu, please check the following option:",
                     IDC_KEEPREGST,14,41,335,8
-    CONTROL         "Keep SuRuns associations, as they are now",
+    CONTROL         "Keep SuRun's associations, as they are now",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     14,50,335,10
     LTEXT           "For security the following group policy must be activated:",
@@ -1216,7 +1216,7 @@ BEGIN
                     81,349,8
     GROUPBOX        "Convenience settings (These are Windows settings that you can adjust with SuRun)",
                     IDC_EXTOPT,3,99,370,79,WS_GROUP
-    CONTROL         "Replace Windows' 'Run as...' with SuRuns 'Run as...'",
+    CONTROL         "Replace Windows' 'Run as...' with SuRun's 'Run as...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,11,110,349,9
     CONTROL         "Allow 'SuRunners' to set (and show) the system time.",
@@ -1404,7 +1404,7 @@ BEGIN
     IDS_EMPTYPASS           "WARNING: The following Administrator accounts have no password:\n\n%s\nUsing SuRun is useless if you do not set a password for these accounts!"
     IDS_STARTMENUDIR        "SuRun"
     IDS_SURUNSTUCK          "SuRun is not responding!\n\nThis can be caused by a host intrusion protection system (HIPS)\nthat ist trying to tell you something.\n\nClick here to switch back to your desktop."
-    IDS_SWITCHBACK          "Click here to switch\nback to SuRuns Desktop."
+    IDS_SWITCHBACK          "Click here to switch\nback to SuRun's Desktop."
     IDS_APPOK               "The command line does not seem to work.\n\nAre you sure the command line is ok?\n(Did you quote spaces?)"
     IDS_GRPDESC             "Members of this group can use SuRun."
     IDS_ADDTOBLKLIST        "Add program not to hook"
@@ -1419,7 +1419,7 @@ BEGIN
     IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_ADMINSHELL          "The Windows Shell is currently running with administrative rights!\r\n\r\nYou need to log off and on before using SuRun."
     IDS_SIMPLESETUP         "Do yo want to reset all settings to recommended values for home users?"
-    IDS_NOADMIN2            "You (%s) have no permission to modify 'SuRun Settings'.\r\n\r\nEnter administrative credentials to change SuRuns options.\r\n\r\nOtherwise click 'Cancel'!"
+    IDS_NOADMIN2            "You (%s) have no permission to modify 'SuRun Settings'.\r\n\r\nEnter administrative credentials to change SuRun's options.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
     IDS_SETUP1              "Common Settings"
     IDS_SETUP2              "SuRunners group"
@@ -1432,7 +1432,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_DELSERVICE          "Deleting SuRun service"
-    IDS_DELREG              "Removing SuRuns registry settings"
+    IDS_DELREG              "Removing SuRun's registry settings"
     IDS_SR2ADMIN            "Putting '%s' to the local administrators group"
     IDS_DELSURUNNERS        "Deleting local group 'SuRunners'"
     IDS_INSTFAILED          "Installation failed!"
@@ -1465,7 +1465,7 @@ BEGIN
     IDS_SHNAME7             "Administrative Tools"
     IDS_SHNAME8             "My Documents"
     IDS_BEAUTIFIED          "%s\r\n[Meaning: %s]"
-    IDS_PW4SETUP            "To change SuRuns settings you need to enter your password."
+    IDS_PW4SETUP            "To change SuRun's settings you need to enter your password."
     IDS_REBOOT              "&Reboot"
 END
 
@@ -1735,7 +1735,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    LTEXT           "If you changed SuRuns context menu, please check the following option:",
+    LTEXT           "If you changed SuRun's context menu, please check the following option:",
                     IDC_KEEPREGST,14,41,335,8
     CONTROL         "SuRun snelkoppelingen behouden zoals ze zijn",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
