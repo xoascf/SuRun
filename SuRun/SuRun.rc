@@ -1808,8 +1808,7 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun Uitsluitingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,233,
-                    8
+    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,233,8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
                     LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
@@ -1853,8 +1852,7 @@ BEGIN
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
     EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,
-                    142,9,NOT WS_GROUP
+    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,142,9,NOT WS_GROUP
     LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord",
                     IDC_STATIC,83,71,114,17
     COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
@@ -1875,7 +1873,7 @@ BEGIN
     CONTROL         "Toon ""Start als Administrator"" in programma systeem-menu's",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     159,283,9
-    GROUPBOX        "Gebruiksgemak",IDC_STATIC,4,179,206,45
+    GROUPBOX        "Standaard/geavanceerd",IDC_STATIC,4,179,206,45
     CONTROL         "Toon geavanceerde instellingen voor ervaren gebruikers",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
                     191,186,10
@@ -1930,7 +1928,7 @@ IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Markeer programma's van gebruikers die geen 'SuRunner' zijn",
+    GROUPBOX        "Taakbalk-informatie voor programma's van niet-'SuRunners'",
                     IDC_STATIC,4,3,369,37
     LTEXT           "Toon gebruikersstatus voor actieve processen",
                     IDC_STATIC,14,15,191,8
@@ -1950,7 +1948,7 @@ BEGIN
     CONTROL         "SuRun verbergen voor alle gebruikers die geen lid zijn van de groep 'SuRunners'",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     76,346,8
-    GROUPBOX        "Vereenvoudigde bediening. (SuRun kan deze Windows-optie aanpassen.)",
+    GROUPBOX        "Gebruiksgemak. (Windows opties die SuRun kan aanpassen.)",
                     IDC_EXTOPT,4,94,369,74,WS_GROUP
     CONTROL         "Vervang Windows 'Uitvoeren als...' voor SuRun's 'Uitvoeren als...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
@@ -1967,7 +1965,7 @@ BEGIN
     CONTROL         "Niet automatisch opnieuw starten na installatie van Windows Updates",
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,11,155,346,9
-    GROUPBOX        "Windows Beveiliging. (SuRun kan deze Windows-beveiligingsoptie aanpassen.)",
+    GROUPBOX        "Windows protectie. (Windows functie die SuRun kan aanpassen.)",
                     IDC_STATIC,4,173,369,39
     CONTROL         "Markeer 'Administrators' i.p.v. 'Maker' als eigenaar van Administrators-bestanden.\nWAARSCHUWING: Indien niet geactiveerd, kunnen gebruikers bestanden en registersleutels van SuRun Administrators wijzigen!!",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
@@ -1985,8 +1983,8 @@ BEGIN
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Importeer Uitsluitingenlijst",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
     CONTROL         "Importeer gebruikers en instellingen van de 'SuRunners' groep",
