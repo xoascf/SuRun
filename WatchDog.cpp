@@ -227,7 +227,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
   SetProcWinStaDesk(0,SafeDesk);
   for(;;)
   {
-    //Switch to SuRuns desktop
+    //Switch to SuRun's desktop
     HDESK d=OpenDesktop(SafeDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
     SwitchDesktop(d);
     CloseDesktop(d);
@@ -258,7 +258,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
       //Turn on Hooks if they where on!
       SetUseIShExHook(bIShHk);
       SetUseIATHook(bIATHk);
-      //Switch back to SuRuns desktop
+      //Switch back to SuRun's desktop
       d=OpenDesktop(SafeDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
       SwitchDesktop(d);
       CloseDesktop(d);
