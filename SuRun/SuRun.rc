@@ -329,23 +329,25 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Update >>",IDOK,289,106,68,14
+    DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
                     25,SS_CENTERIMAGE
+    LTEXT           "Wenn Sie SuRuns Kontextmenü verändert haben, aktivieren Sie folgende Option:",
+                    IDC_KEEPREGST,14,41,335,8
     CONTROL         "Verknüpfungen mit SuRun beibehalten, wie sie sind",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    18,44,178,10
+                    14,50,335,10
     LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
-                    IDC_OWNGRPST,18,60,203,8
+                    IDC_OWNGRPST,14,64,335,8
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,215,106,68,14
+                    BS_MULTILINE | WS_TABSTOP,14,73,335,27
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
@@ -1078,23 +1080,25 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
+    DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
+    LTEXT           "If you changed SuRuns context menu, please check the following option:",
+                    IDC_KEEPREGST,14,41,335,8
     CONTROL         "Keep SuRuns associations, as they are now",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    18,44,176,10
+                    14,50,335,10
     LTEXT           "For security the following group policy must be activated:",
-                    IDC_OWNGRPST,18,60,203,8
+                    IDC_OWNGRPST,14,64,335,8
     CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
+                    BS_MULTILINE | WS_TABSTOP,14,73,335,27
+    PUSHBUTTON      "&Cancel",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
@@ -1476,7 +1480,6 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 // Dutch (Netherlands) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
@@ -1509,8 +1512,8 @@ BEGIN
     CONTROL         "Alleen bepaalde programma's met SuRun starten",
                     IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
                     41,202,10
-    CONTROL         "SuRun voor deze gebruiker verbergen",IDC_HIDESURUN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
+    CONTROL         "SuRun voor deze gebruiker verbergen",IDC_HIDESURUN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
     CONTROL         "Status op taakbalk tonen",IDC_TRAYSHOWADMIN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,252,30,137,10
     CONTROL         "Status m.b.v. 'Balloon-Tips' tonen",IDC_TRAYBALLOON,
@@ -1726,23 +1729,25 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "&Update >>",IDOK,289,105,68,14
+    DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
+    LTEXT           "If you changed SuRuns context menu, please check the following option:",
+                    IDC_KEEPREGST,14,41,335,8
     CONTROL         "SuRun snelkoppelingen behouden zoals ze zijn",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    18,44,176,10
+                    14,50,335,10
     LTEXT           "Het volgende veiligheidsbeleid moet worden ingesteld:",
-                    IDC_OWNGRPST,18,60,203,8
+                    IDC_OWNGRPST,14,64,335,8
     CONTROL         "Markeer 'Administrators' i.p.v. 'Maker' als eigenaar van Administrators-bestanden.\nWAARSCHUWING: Indien niet geactiveerd, kunnen gebruikers bestanden en registersleutels van SuRun Administrators wijzigen!!",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Annuleren",IDCANCEL,215,105,68,14
+                    BS_MULTILINE | WS_TABSTOP,14,73,335,27
+    PUSHBUTTON      "&Annuleren",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
@@ -1805,8 +1810,8 @@ STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SuRun Uitsluitingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,
-                    233,8
+    LTEXT           "De volgende programma's uitsluiten:",IDC_STATIC,7,4,233,
+                    8
     CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
                     LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
                     LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
@@ -1850,8 +1855,8 @@ BEGIN
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
     EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,142,
-                    9,NOT WS_GROUP
+    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,
+                    142,9,NOT WS_GROUP
     LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord",
                     IDC_STATIC,83,71,114,17
     COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
@@ -1892,7 +1897,7 @@ BEGIN
                     IDC_STATIC,10,3,361,229
     LTEXT           "Opties voor het automatisch met verhoogde rechten starten van programma's:",
                     IDC_STATIC,13,13,354,8
-    CONTROL        "Filter programma's die vanuit de Windows omgeving worden gestart",
+    CONTROL         "Filter programma's die vanuit de Windows omgeving worden gestart",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,26,331,10
     LTEXT           "Deze optie installeert een filter op programma's die door Windows gestart worden. SuRun kan dan proberen het automatisch met verhoogde rechten te starten.",
@@ -1982,8 +1987,8 @@ BEGIN
     EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Importeer SuRun instellingen",IDC_IMPSURUNSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
     CONTROL         "Importeer Uitsluitingenlijst",IDC_IMPBLACKLIST,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
     CONTROL         "Importeer gebruikers en instellingen van de 'SuRunners' groep",
