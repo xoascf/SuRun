@@ -357,7 +357,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -383,7 +383,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Entfernen"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Entfernen >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -771,13 +771,13 @@ BEGIN
     CONTROL         "Fade desktop in",IDC_FADEDESKTOP,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,23,283,11
     GROUPBOX        "Security",IDC_EXTOPT3,77,44,297,49,WS_GROUP
-    CONTROL         "Verify a users password",IDC_ASKPW,"Button",
+    CONTROL         "Users must enter their password",IDC_ASKPW,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,56,116,11
     EDITTEXT        IDC_ASKTIMEOUT,202,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
     LTEXT           "min grace period before asking again",IDC_STATIC,226,56,
                     143,11,NOT WS_GROUP
-    LTEXT           "Show Warning, if Administrators have no password to:",
+    LTEXT           "Show Warning, if Administrators have no password:",
                     IDC_STATIC,83,71,114,17
     COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
@@ -875,7 +875,7 @@ BEGIN
     CONTROL         "Try to detect if unknown applications need to start with eleveted rights.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,150,238,10
-    LTEXT           "If you disable this Option, SuRun will only start predefined programs automagically with elevated rights. Then no Setup (etc.) programs are detect and run administrative.",
+    LTEXT           "If you disable this Option, SuRun will only start predefined programs automagically with elevated rights. Then no Setup (etc.) programs are detected and run with administrative rights.",
                     IDC_STATIC,31,162,335,17
     CONTROL         "Show a message when a program has been started automagically",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
@@ -1055,7 +1055,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1108,7 +1108,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "Remove SuRun"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Remove >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1194,13 +1194,13 @@ IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Display an Icon in the taskbar notification area for non members of the 'SuRunners' group",
+    GROUPBOX        "Display an icon in the taskbar notification area for non members of the 'SuRunners' group",
                     IDC_STATIC,3,4,370,37
     LTEXT           "Display user status for the active program in the taskbar 'tray'",
                     IDC_STATIC,11,16,201,8
     COMBOBOX        IDC_TRAYSHOWADMIN,219,14,99,30,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Display balloon tips, for active programs, running with different user credentials",
+    CONTROL         "Display balloon tips for active programs running with different user credentials",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
                     27,349,10
     GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,3,46,
@@ -1216,7 +1216,7 @@ BEGIN
                     81,349,8
     GROUPBOX        "Convenience settings (These are Windows settings that you can adjust with SuRun)",
                     IDC_EXTOPT,3,99,370,79,WS_GROUP
-    CONTROL         "Replace Windows 'Run as...' with SuRuns 'Run as...'",
+    CONTROL         "Replace Windows' 'Run as...' with SuRuns 'Run as...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,11,110,349,9
     CONTROL         "Allow 'SuRunners' to set (and show) the system time.",
@@ -1701,7 +1701,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1755,7 +1755,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Deïnstalleren"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Deïnstalleren >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
