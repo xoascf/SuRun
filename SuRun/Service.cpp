@@ -1614,6 +1614,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             SetOwnerAdminGrp(1);
           //Hide Checkboxes, show Listbox
           ShowWindow(GetDlgItem(hwnd,IDC_RUNSETUP),SW_HIDE);
+          ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGST),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_KEEPREGISTRY),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_OWNERGROUP),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_OWNGRPST),SW_HIDE);
