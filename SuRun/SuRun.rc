@@ -1540,8 +1540,6 @@ FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
                     WS_TABSTOP,0,0,396,252
-    PUSHBUTTON      "Importeren...",IDC_IMPORT,8,256,50,14
-    PUSHBUTTON      "Exporteren...",IDC_EXPORT,65,256,50,14
     PUSHBUTTON      "&Toepassen",ID_APPLY,220,256,50,14
     DEFPUSHBUTTON   "&OK",IDOK,279,256,50,14
     PUSHBUTTON      "&Annuleren",IDCANCEL,338,256,50,14
