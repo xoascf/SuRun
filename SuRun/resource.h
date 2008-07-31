@@ -219,6 +219,8 @@
 #define IDC_OWNGRPST                    1070
 #define IDC_OPTNST                      1071
 #define IDC_TRAYSHOWADMIN               1072
+#define IDC_OWNGRPST2                   1072
+#define IDC_KEEPREGST                   1072
 #define IDC_TRAYBALLOON                 1073
 #define IDC_STOREPASS                   1074
 #define IDC_WARNADMIN                   1075
