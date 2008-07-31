@@ -357,7 +357,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -367,9 +367,9 @@ BEGIN
                     317,25,SS_CENTERIMAGE
     CONTROL         "Starte 'SuRun Einstellungen' nach der Installation",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
-                    171,10
+                    335,10
     LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
-                    IDC_OWNGRPST,18,60,203,8
+                    IDC_OWNGRPST,18,60,335,8
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
@@ -1055,7 +1055,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Install >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1064,9 +1064,9 @@ BEGIN
     LTEXT           "Do you want to install SuRun?",IDC_QUESTION,39,7,317,25,
                     SS_CENTERIMAGE
     CONTROL         "Start 'SuRun Settings' after installation",IDC_RUNSETUP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,171,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,335,10
     LTEXT           "For security the following group policy must be activated:",
-                    IDC_OWNGRPST,18,60,203,8
+                    IDC_OWNGRPST,18,60,335,8
     CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
@@ -1701,7 +1701,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1711,9 +1711,9 @@ BEGIN
                     SS_CENTERIMAGE
     CONTROL         "Na installatie 'SuRun instellingen' openen",
                     IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
-                    171,10
+                    335,10
     LTEXT           "Het volgende veiligheidsbeleid moet worden ingesteld:",
-                    IDC_OWNGRPST,18,60,203,8
+                    IDC_OWNGRPST,18,60,335,8
     CONTROL         "Markeer 'Administrators' i.p.v. 'Maker' als eigenaar van Administrators-bestanden.\nWAARSCHUWING: Indien niet geactiveerd, kunnen gebruikers bestanden en registersleutels van SuRun Administrators wijzigen!!",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
