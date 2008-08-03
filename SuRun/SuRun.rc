@@ -329,7 +329,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -337,7 +337,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt ersetzen?",IDC_QUESTION,40,7,316,
                     25,SS_CENTERIMAGE
-    LTEXT           "Wenn Sie SuRuns Kontextmenü verändert haben, aktivieren Sie folgende Option:",
+    LTEXT           "Falls Sie das Kontextmenü angepasst haben, aktivieren Sie folgende Option:",
                     IDC_KEEPREGST,14,41,335,8
     CONTROL         "Verknüpfungen mit SuRun beibehalten, wie sie sind",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
@@ -1080,7 +1080,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1088,7 +1088,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Do you want to replace SuRun?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    LTEXT           "If you changed SuRun's context menu, please check the following option:",
+    LTEXT           "If you modified the context menu, please check the following option:",
                     IDC_KEEPREGST,14,41,335,8
     CONTROL         "Keep SuRun's associations, as they are now",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
@@ -1727,7 +1727,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1735,7 +1735,7 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    LTEXT           "If you changed SuRun's context menu, please check the following option:",
+    LTEXT           "If you modified the context menu, please check the following option:",
                     IDC_KEEPREGST,14,41,335,8
     CONTROL         "SuRun snelkoppelingen behouden zoals ze zijn",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
