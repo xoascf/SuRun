@@ -7,8 +7,7 @@ SuRun...  Super User Run
 SuRun?
 ------------------------------------------------------------------------------
 
-SuRun eases using Windows 2000 or Windows XP with limited user rights.
-SuRun usually runs on Windows Vista too if you disable User Account Control.
+SuRun eases using Windows 2000 to Windows Vista with limited user rights.
 
 With SuRun you can start applications with elevated rights without needing
 administrator credentials.
@@ -20,16 +19,14 @@ SuRun then asks the user in a secure desktop if <app> should really be
 run with administrative rights. If the user acknowledges, SuRun will start 
 <app> AS THE CURRENT USER but WITH ADMINISTRATIVE RIGHTS.
 
-SuRun uses the same trick as SuDown: 
- * Put the user in the local Administrators user group
- * Start <app>
- * Remove the user from the local Administrators user group
+SuRun uses an own Windows service to start administrative processes. 
+It does not require nor store any user passwords.
 
 To use SuRun a user must be member of the local user group "SuRunners".
 If the user is no member of "SuRunners" and tries to use SuRun, (s)he will be 
 asked to join "SuRunners". The user must either be an administrator or enter 
 administrator credentials to join the SuRunners group.
-(SuRun does not store any administrative credentials!)
+(SuRun does not store any credentials!)
 
 Members of "SuRunners" can be restricted so that they must not change SuRuns 
 settings and to be able to only start predefined applications with elevated 
@@ -38,21 +35,21 @@ administrative rights without loosing control of the system. Also employees
 can be allowed to run several applications with elevated rights without being 
 able to change the system.
 
-SuRun installs a hook that appends "Run as admin..." and "Restart as admin..." 
-to the system menu of every application that does not run as administrator. 
-That enables doing things that you otherwise could not do, e.g. setting the 
-Windows clock by double clicking it in the task bar notification area would 
-normally display a "Access denied" Message and exit. With SuRun you are able 
-to right click the Caption, choose "Restart as admin..." and to finally set 
-the clock.
+SuRun installs a system wide hook that appends "Start as Administrator..." and 
+"Restart as Administrator..." to the system menu of every application that does 
+not run as administrator. That enables doing things that you otherwise could 
+not do, e.g. setting the Windows clock by double clicking it in the task bar 
+notification area would normally display a "Access denied" Message and exit. 
+With SuRun you are able to right click the Caption, choose "Restart as 
+Administrator..." and to finally set the clock.
 
-SuRun integrates with the windows shell and adds "Start as admin..." to the 
-Shell context menu of bat, cmd, cpl, exe, lnk, msi, msc and reg files. It also 
-adds "'SuRun cmd' here" and "'SuRun Explorer' here" to the context menu of 
+SuRun integrates with the windows shell and adds "Start as Administrator..." to 
+the Shell context menu of bat, cmd, cpl, exe, lnk, msi, msc and reg files. It 
+also adds "'SuRun cmd' here" and "'SuRun Explorer' here" to the context menu of 
 folders and "Control panel as administrator" to the Desktop context menu.
 
 SuRun tries to intercept the start of applications. If an application requires 
-administrative rights it it will be started so. 
+administrative rights it automatically can be started so. 
 SuRun presumes that an application requires administrative rights when:
 -it is in the Users List of applications to run with elevated rights
 -it has the extension msi or msc
@@ -65,7 +62,7 @@ SuRun presumes that an application requires administrative rights when:
  <*trustInfo>-><*security>-><*requestedPrivileges>-><*requestedExecutionLevel 
  level="requireAdministrator">
 
-SuRun can be configured with "SuRun Settings" in the control panel.
+SuRun can be configured with "SuRun Settings" from the Windows control panel.
 
 ------------------------------------------------------------------------------
 Why not use the built in "Run As..." Windows command?
@@ -108,10 +105,8 @@ Why use SuRun?
  users logon session. On that desktop it will ask the user for permission or 
  the password. The desktop is not accessible by user applications. Keyboard 
  and mouse hooks will also not work on that desktop.
-*SuRun does not leave the user in the administrators group.
- After creating the administrative process, SuRun removes the user from the 
- administrators group immediately. So spying even out the password would not 
- increase the chance that the system could be infected by malware.
+*SuRun does not require a password.
+*SuRun does not put nor leave the user in the administrators group.
 
 ------------------------------------------------------------------------------
 How to build the sources?
@@ -157,7 +152,7 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.0 - 2008-07-22:
+SuRun 1.2.0.0 - 2008-08-03:
 ---------------------------
 * SuRun does not need nor store user passwords any more.
   SuRun does not need to put SuRunners into the Admin group anymore for 
