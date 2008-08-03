@@ -1547,7 +1547,7 @@ END
 
 IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 171
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Programma instellingen"
+CAPTION "Programma-instellingen"
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,49,361,1
@@ -1622,7 +1622,7 @@ BEGIN
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
     ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Bevestig dat het programma met verhoogde rechten kan worden uitgevoerd.\r\n\r\nZo niet, druk dan 'Annuleren'!",
+    LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,6,127,47,46
@@ -1656,7 +1656,7 @@ BEGIN
     ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
                     NOT WS_BORDER
-    LTEXT           "Bevestig dat het programma met verhoogde rechten kan worden uitgevoerd.\r\n\r\nZo niet, druk dan 'Annuleren'!",
+    LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",
                     IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,6,127,47,46
@@ -1701,7 +1701,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1727,7 +1727,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1735,9 +1735,9 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    LTEXT           "If you modified the context menu, please check the following option:",
+    LTEXT           "SuRun context-menu instellingen:",
                     IDC_KEEPREGST,14,41,335,8
-    CONTROL         "SuRun snelkoppelingen behouden zoals ze zijn",
+    CONTROL         "SuRun context-menu's behouden zoals ze zijn",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     14,50,335,10
     LTEXT           "Het volgende veiligheidsbeleid moet worden ingesteld:",
@@ -1755,7 +1755,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Deïnstalleren"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Deïnstalleren >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1891,36 +1891,36 @@ IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    GROUPBOX        "Probeer bepaalde programma's automatisch met verhoogde rechten te starten",
+    GROUPBOX        "Probeer programma's automatisch met verhoogde rechten te starten",
                     IDC_STATIC,10,3,361,229
     LTEXT           "Opties voor het automatisch met verhoogde rechten starten van programma's:",
                     IDC_STATIC,13,13,354,8
-    CONTROL         "Filter programma's die vanuit de Windows omgeving worden gestart",
+    CONTROL         "Filter programma's die door Windows worden gestart",
                     IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,26,331,10
-    LTEXT           "Deze optie installeert een filter op programma's die door Windows gestart worden. SuRun kan dan proberen het automatisch met verhoogde rechten te starten.",
+    LTEXT           "Deze optie installeert een filter op programma's die door Windows gestart worden. SuRun kan dan proberen ze automatisch met verhoogde rechten te starten.",
                     IDC_STATIC,31,36,335,17
-    LTEXT           "Programma's of processen die buiten de Windows omgeving om gestart worden, blijven voor dit filter onopgemerkt. Activeer de volgende optie zodat SuRun deze ook kan ondervangen.",
+    LTEXT           "Programma's of processen die buiten Windows om gestart worden, blijven voor dit filter onopgemerkt. Activeer de volgende optie zodat SuRun deze ook kan ondervangen.",
                     IDC_STATIC,31,53,335,16
     CONTROL         "SuRun direct koppelen aan het starten van programma's.",
                     IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,74,341,10
-    LTEXT           "Is deze optie gedeactiveerd, dan kan SuRun sommige (bij Windows Vista vele) programma's niet automatisch met verhoogde rechten starten.",
+    LTEXT           "Zonder deze optie kan SuRun sommige (bij Windows Vista vele) programma's niet automatisch met verhoogde rechten starten.",
                     IDC_STATIC,31,83,335,17
     LTEXT           "Het activeren van deze optie kan in sommige gevallen problemen geven.\nDeze probleemgevallen kunt u in de lijst met SuRun Uitsluitingen opnemen.",
                     IDC_STATIC,31,100,335,17
-    LTEXT           "Indien een programma na activering van een van de bovenstaande opties niet meer naar behoren functioneren, dan kunt deze in de lijst met SuRun Uitsluitingen opnemen",
+    LTEXT           "Indien een programma na activering van een van de bovenstaande opties niet meer naar behoren functioneert, dan kunt u het in de lijst met SuRun Uitsluitingen opnemen",
                     IDC_STATIC,20,122,256,27
     PUSHBUTTON      "Uitsluitingen...",IDC_BLACKLIST,287,128,57,14
-    CONTROL         "Probeer te herkennen of onbekende programma's verhoogde rechten nodig hebben.",
+    CONTROL         "Probeer te ontdekken of onbekende programma's verhoogde rechten nodig hebben.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,152,344,10
-    LTEXT           "Het deactiveren van deze optie leidt ertoe dat SuRun alleen nog vooraf gespecificeerde programma's automatisch met verhoogde rechten zal starten. Setup programma's enzo worden dan niet meer herkent.",
+    LTEXT           "Zonder deze optie kan SuRun alleen nog vooraf gespecificeerde programma's automatisch met verhoogde rechten starten. Setup programma's enz. worden dan niet meer herkend.",
                     IDC_STATIC,31,162,335,17
-    CONTROL         "Toon een informatievenster wanneer SuRun een programma automatisch start",
+    CONTROL         "Informatievenster tonen wanneer SuRun een programma met verhoogde rechten start",
                     IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
                     BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Bij deze optie toont SuRun gedurende 20 seconden een pop-up venster rechtsonder op het Bureaublad met informatie over het gestarte programma.",
+    LTEXT           "Met deze optie toont SuRun gedurende 20 seconden een informatievenster over het gestarte programma rechtsonder op het Bureaublad.",
                     IDC_STATIC,31,198,335,17
     CTEXT           "LET OP: Deze instellingen zijn pas na de volgende Windows-aanmelding volledig van kracht",
                     IDC_STATIC,14,220,356,8
@@ -1936,7 +1936,7 @@ BEGIN
                     IDC_STATIC,14,15,191,8
     COMBOBOX        IDC_TRAYSHOWADMIN,213,13,99,30,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Toon informatie voor programma's die niet door de huidige gebruiker gestart zijn",
+    CONTROL         "Toon Balloon-Tips voor programma's die niet door de huidige gebruiker gestart zijn",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     26,346,10
     GROUPBOX        "Indien een gebruiker geen lid is van de groep 'SuRunners' en SuRun wil gebruiken:",
@@ -1950,7 +1950,7 @@ BEGIN
     CONTROL         "SuRun verbergen voor alle gebruikers die geen lid zijn van de groep 'SuRunners'",
                     IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
                     76,346,8
-    GROUPBOX        "Gebruiksgemak. (Windows opties die SuRun kan aanpassen.)",
+    GROUPBOX        "Gebruiksgemak. (Windows-functies die SuRun kan aanpassen.)",
                     IDC_EXTOPT,4,94,369,74,WS_GROUP
     CONTROL         "Vervang Windows 'Uitvoeren als...' voor SuRun's 'Uitvoeren als...'",
                     IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
@@ -2097,7 +2097,7 @@ BEGIN
     IDS_RUNRESTRICTED       "SuRun laat u (%s) slechts bepaalde programma's starten.\r\nHet is u niet toegestaan '%s' met verhoogde rechten te starten."
     IDS_SETUP1              "Algemene instellingen"
     IDS_SETUP2              "SuRunners groep"
-    IDS_SETUP3              "Programma uitvoering"
+    IDS_SETUP3              "Programma-uitvoering"
     IDS_SETUP4              "Geavanceerd"
     IDS_ASKAUTO             "Het programma:\r\n\r\n%s\r\n\r\nheeft voor de uitvoering verhoogde rechten nodig.\r\n\r\nDruk 'Annuleren' om het programma zonder verhoogde rechten te starten."
     IDS_STARTED             "Info:\r\n%s\r\nwordt met verhoogde rechten uitgevoerd."
