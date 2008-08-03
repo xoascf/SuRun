@@ -159,18 +159,19 @@ SuRun 1.2.0.0 - 2008-08-03:
   starting elevated Processes. SuRun does not need to use a helper process to 
   start the elevated process anymore.
   SuRun does not depend any more on the Secondary Logon Service.
-* SuRun works in Windows Vista side by side with UAC enabled
+  The new method of starting elevated processes also has one welcome side 
+  effect. All Network drives of the logged on user remain connected.
+* SuRun works in Windows Vista side by side with UAC
 * SuRun can Backup and Restore SuRun settings
 * SuRun can Export and Import a users program list
-* Implemented Explorer tricks so that you can start Explorer after an elevated 
+* SuRun uses tricks so that you can start Explorer after an elevated 
   Explorer runs. In Windows Vista SuRun uses Explorers command line switch 
   "/SEPARATE" to start elevated processes.
 * To avoid AutoRun startup delays SuRuns service is now loaded in the 
   "PlugPlay" service group, before the network is started.
-* Blacklist for Programs not to hook
-* New Settings Option to hide SuRun from all non SuRunners
+* SuRun has a Blacklist for Programs not to hook
 * New Settings Option to not detect Programs that require elevation
-* SuRun Settigs have a "Set recommended options for home users" Button. 
+* SuRun Settings have a "Set recommended options for home users" Button. 
 * Wildcards "*" and "?" are supported for commands in the users program list
 * When adding files to the users program list, SuRun adds automatic quotes.
 * Setup does a test run of added/edited commands
@@ -198,8 +199,8 @@ SuRun 1.2.0.0 - 2008-08-03:
 * FIX: When installing applications that require to reboot and to run a "Setup"
   on logon (XP SP3 is an example), SURUN asked to start that setup as Admin but 
   then it DID NOT SWITCH BACK TO THE USER'S DESKTOP 
-* IATHook only hooks modules that actually use "CreateProcess"
-* IATHook uses InterlockedExchangePointer for better stability
+* SuRun's IAT-Hook only hooks modules that actually use "CreateProcess"
+* SuRun's IAT-Hook uses InterlockedExchangePointer for better stability
 * Eclipse (JAVA) and SuRuns IAT Hook do not conflict anymore
 * The SuRun service uses uses a separate Thread to serve the Tray Icons
 
