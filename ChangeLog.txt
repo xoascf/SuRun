@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* FIX: File Open/Save Dialogs did not show all extensions in SuRun Setup.
 
 ToDo
 ---------------------
