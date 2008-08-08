@@ -486,6 +486,8 @@ struct
 
 static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 {
+  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
+  ImpersonateLoggedOnUser(hTok);
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
@@ -499,8 +501,6 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrTitle        = CResStr(g_AppOpt.OfnTitle);
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
-  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
-  ImpersonateLoggedOnUser(hTok);
   BOOL bRet=GetOpenFileName(&ofn);
   RevertToSelf();
   CloseHandle(hTok);
@@ -1196,6 +1196,8 @@ void ExportSettings(LPCTSTR ini)
 
 static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
 {
+  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
+  ImpersonateLoggedOnUser(hTok);
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
@@ -1209,8 +1211,6 @@ static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrTitle        = 0;
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN|OFN_OVERWRITEPROMPT;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
-  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
-  ImpersonateLoggedOnUser(hTok);
   BOOL bRet=GetSaveFileName(&ofn);
   RevertToSelf();
   CloseHandle(hTok);
@@ -1290,6 +1290,8 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 
 static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
 {
+  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
+  ImpersonateLoggedOnUser(hTok);
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
@@ -1303,8 +1305,6 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   ofn.lpstrTitle        = 0;
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
-  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
-  ImpersonateLoggedOnUser(hTok);
   BOOL bRet=GetOpenFileName(&ofn);
   RevertToSelf();
   CloseHandle(hTok);
