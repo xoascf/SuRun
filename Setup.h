@@ -204,17 +204,17 @@
 #define GetHideFromUser(u)    GetUsrOption(u,_T("HideFromUser"),0)
 #define SetHideFromUser(u,h)  SetUsrOption(u,_T("HideFromUser"),h,0)
 
-#define HideSuRun(u)          GetUsrOption(u,_T("HideFromUser"),IsInSuRunners(u)?0:GetDefHideSuRun)
+#define HideSuRun(u,Grps)   ((Grps&IS_IN_ADMINS)?1:GetUsrOption(u,_T("HideFromUser"),\
+                              (Grps&IS_IN_SURUNNERS)?0:GetDefHideSuRun))
 
 #define GetReqPw4Setup(u)    GetUsrOption(u,_T("ReqPw4Setup"),0)
 #define SetReqPw4Setup(u,b)  SetUsrOption(u,_T("ReqPw4Setup"),b,0)
 
-inline bool ShowTray(LPCTSTR u)
+inline BOOL ShowTray(LPCTSTR u,BOOL bSuRunner,BOOL bAdmin)
 {
-  if (IsInSuRunners(u))
-    return (!HideSuRun(u)) && (GetUserTSA(u)>0);
-  bool bAdmin=IsInAdmins(u)!=0;
-  if (GetDefHideSuRun &&(!bAdmin))
+  if (bSuRunner)
+    return (!GetHideFromUser(u)) && (GetUserTSA(u)>0);
+  if ((!bAdmin) && GetDefHideSuRun)
     return false;
   switch (GetShowTrayAdmin & (~TSA_TIPS))
   {
@@ -228,12 +228,11 @@ inline bool ShowTray(LPCTSTR u)
   return false;
 }
 
-inline bool ShowBalloon(LPCTSTR u)
+inline BOOL ShowBalloon(LPCTSTR u,BOOL bSuRunner,BOOL bAdmin)
 {
-  if (IsInSuRunners(u))
-    return (!HideSuRun(u)) && (GetUserTSA(u)==2);
-  bool bAdmin=IsInAdmins(u)!=0;
-  if (GetDefHideSuRun && (!bAdmin))
+  if (bSuRunner)
+    return (!GetHideFromUser(u)) && (GetUserTSA(u)==2);
+  if ((!bAdmin) && GetDefHideSuRun)
     return false;
   DWORD tsa=GetShowTrayAdmin;
   if((tsa & TSA_TIPS)==0)
