@@ -1882,8 +1882,7 @@ bool HandleServiceStuff()
           if(!TSA)
             InitTrayShowAdmin();
           TSA=TRUE;
-          if (!ProcessTrayShowAdmin())
-            Sleep(333);
+          Sleep(ProcessTrayShowAdmin()?55:333);
         }else
 #endif _SR32
         {
