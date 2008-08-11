@@ -279,12 +279,12 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //////////////////////////////////////////////////////////////////////////////
 void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut) 
 {
-  if (HideSuRun(g_RunData.UserName)&&(!IsInAdmins(g_RunData.UserName)))
+  if ((!g_CliIsInAdmins) && GetHideFromUser(g_RunData.UserName))
     return;
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
   PathAppend(cmd,L"SuRun.exe");
-  HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
+  HANDLE hUser=GetSessionUserToken(g_RunData.SessionID);
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb	= sizeof(si);
@@ -326,13 +326,13 @@ void TestEmptyAdminPasswords()
   case APW_ALL:
     break;
   case APW_NR_SR_ADMIN:
-    if (IsInSuRunners(g_RunData.UserName)
+    if (g_CliIsInSuRunners
       &&(!GetRestrictApps(g_RunData.UserName))
       &&(!GetNoRunSetup(g_RunData.UserName)))
       break;
     goto ChkAdmin;
   case APW_SURUN_ADMIN:
-    if (IsInSuRunners(g_RunData.UserName))
+    if (g_CliIsInSuRunners)
       break;
   case APW_ADMIN:
 ChkAdmin:
@@ -442,7 +442,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               continue;
             }
             //Only SuRunners can use the hooks
-            if (!IsInSuRunners(g_RunData.UserName))
+            if (!g_CliIsInSuRunners)
             {
               ResumeClient(RETVAL_SX_NOTINLIST);
               continue;
@@ -663,15 +663,14 @@ DWORD PrepareSuRun()
   RegDelVal(HKLM,PASSWKEY,g_RunData.UserName);//Delete Password, keep time
   //Ask For Password?
   PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
-  BOOL bIsSuRunner=IsInSuRunners(g_RunData.UserName);
-  if((!bIsSuRunner) && GetNoConvUser)
+  if((!g_CliIsInSuRunners) && GetNoConvUser)
     return RETVAL_ACCESSDENIED;
   if (!PwOk)
     DeletePassword(g_RunData.UserName);
   else
   if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-  if (HideSuRun(g_RunData.UserName)&&(!IsInAdmins(g_RunData.UserName)))
+  if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
     return RETVAL_CANCELLED;
   //Create the new desktop
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
@@ -679,12 +678,13 @@ DWORD PrepareSuRun()
   __try
   {
     //secure desktop created...
-    if (!BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
+    if ((!g_CliIsInSuRunners)
+      && (!BecomeSuRunner(g_RunData.UserName,g_CliIsInAdmins,TRUE,0)))
       return RETVAL_CANCELLED;
-    if (!bIsSuRunner)
+    if (!g_CliIsInSuRunners)
     {
       PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
-      bIsSuRunner=TRUE;
+      g_RunData.Groups=IS_IN_SURUNNERS;
     }
     //Is User Restricted?
     DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
@@ -795,13 +795,14 @@ BOOL Setup()
   if (g_CliIsAdmin)
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   //If no users should become SuRunners, ask for Admin credentials
-  if (GetNoConvUser && (!IsInSuRunners(g_RunData.UserName)))
+  if ((!g_CliIsInSuRunners) && GetNoConvUser)
   {
     if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
-  if (BeOrBecomeSuRunner(g_RunData.UserName,TRUE,0))
+  if (g_CliIsInSuRunners 
+    || BecomeSuRunner(g_RunData.UserName,g_CliIsInAdmins,TRUE,0))
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   return false;
 }
@@ -1085,7 +1086,7 @@ void SuRun(DWORD ProcessID)
       //Create the new desktop
       ResumeClient(RETVAL_OK);
       //check if SuRun Setup is hidden for user name
-      if (HideSuRun(g_RunData.UserName) && (!IsInAdmins(g_RunData.UserName)))
+      if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
         return;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
       {
@@ -1493,7 +1494,20 @@ BOOL InstallService()
     if (!DeleteService(true))
       return FALSE;
     //Wait until "SuRun /SYSMENUHOOK" has exited:
-    Sleep(2000);
+    CTimeOut t(11000);
+    for(;;)
+    {
+      if(t.TimedOut())
+        break;
+      HANDLE m=CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
+      if (GetLastError()!=ERROR_ALREADY_EXISTS)
+      {
+        CloseHandle(m);
+        break;
+      }
+      CloseHandle(m);
+      Sleep(200);
+    }
   }
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CREATE_SERVICE);
   if (hdlSCM==0) 
@@ -1840,6 +1854,7 @@ bool HandleServiceStuff()
       GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
       GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
       GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
+      g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName);
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
@@ -1852,10 +1867,13 @@ bool HandleServiceStuff()
 #ifndef _SR32
       StartTSAThread();
 #endif _SR32
-      if ((!ShowTray(g_RunData.UserName))&& IsAdmin())
+      if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+        && IsAdmin())
         return ExitProcess(0),true;
-      if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName))
-        && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+      if ( (!GetUseIATHook) 
+        && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+        && (!GetRestartAsAdmin) 
+        && (!GetStartAsAdmin))
         return ExitProcess(0),true;
       InstallSysMenuHook();
 #ifdef _WIN64
@@ -1874,15 +1892,24 @@ bool HandleServiceStuff()
       }
 #endif _WIN64
       bool TSA=FALSE;
-      while (CheckServiceStatus()==SERVICE_RUNNING)
+      CTimeOut t(10000);
+      for (;;)
       {
+        if (t.TimedOut())
+        {
+          if(CheckServiceStatus()!=SERVICE_RUNNING)
+            break;
+          g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName);
+          t.Set(10000);
+        }
 #ifndef _SR32
-        if (ShowTray(g_RunData.UserName))
+        if (ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
         {
           if(!TSA)
             InitTrayShowAdmin();
           TSA=TRUE;
-          Sleep(ProcessTrayShowAdmin()?55:333);
+          Sleep(ProcessTrayShowAdmin(ShowBalloon(g_RunData.UserName,
+            g_CliIsInAdmins,g_CliIsInSuRunners))?55:333);
         }else
 #endif _SR32
         {
@@ -1891,8 +1918,10 @@ bool HandleServiceStuff()
           TSA=FALSE;
           Sleep(1000);
         }
-        if ( (!GetUseIATHook) && (!ShowTray(g_RunData.UserName)) 
-          && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+        if ( (!GetUseIATHook) 
+          && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners)) 
+          && (!GetRestartAsAdmin) 
+          && (!GetStartAsAdmin))
           break;
       }
       if(TSA)
