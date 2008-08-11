@@ -51,7 +51,11 @@ typedef struct
   bool  bShlExHook;
   bool  beQuiet;
   bool  bRunAs;
+  DWORD Groups;         //IS_IN_ADMINS,IS_IN_SURUNNERS
 }RUNDATA;
+
+#define g_CliIsInAdmins    ((g_RunData.Groups&IS_IN_ADMINS)!=0)
+#define g_CliIsInSuRunners ((g_RunData.Groups&IS_IN_SURUNNERS)!=0)
 
 extern bool g_CliIsAdmin;
 
