@@ -136,13 +136,9 @@ BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
         {
           if (wcscmp(Members[i].lgrmi3_domainandname, DomainAndName)==0)
           {
-//            DBGTrace3("IsInGroupDirect(%s,%s): User: %s SUCCESS!",
-//              Group,DomainAndName,Members[i].lgrmi3_domainandname);
             NetApiBufferFree(Members);
             return TRUE;
           }
-//          DBGTrace3("IsInGroupDirect(%s,%s): User: %s mismatch",
-//            Group,DomainAndName,Members[i].lgrmi3_domainandname);
         }
     }else
     {
@@ -172,13 +168,9 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
       {
         if(wcsicmp(Users[i].lgrui0_name, Group)==0)
         {
-//          DBGTrace3("IsInGroup(%s,%s): User: %s SUCCESS!",
-//            Group,DomainAndName,Users[i].lgrui0_name);
           NetApiBufferFree(Users);
           return TRUE;
         }
-//        DBGTrace3("IsInGroup(%s,%s): User: %s mismatch",
-//          Group,DomainAndName,Users[i].lgrui0_name);
       }
       NetApiBufferFree(Users);
       Users=0;
@@ -221,16 +213,62 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName)
   return FALSE;
 }
 
+DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
+{
+  //CTimeLog l(L"IsInGroup(%s,%s)",Group,DomainAndName);
+  DWORD cchAG=GNLEN;
+  WCHAR AGroup[GNLEN+1]={0};
+  GetGroupName(DOMAIN_ALIAS_RID_ADMINS,AGroup,&cchAG);
+  DWORD dwRet=0;
+  if(!GetUseSuRunGrp)
+    dwRet|=IS_IN_SURUNNERS;
+  //try to find user in local group
+  NET_API_STATUS status;
+	{
+    LPLOCALGROUP_USERS_INFO_0 Users = 0;
+    DWORD num = 0;
+    DWORD total = 0;
+    DWORD_PTR resume = 0;
+    status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
+      (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
+		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
+    {
+      for(DWORD i = 0; (i<total); i++) 
+      {
+        if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
+          dwRet|=IS_IN_ADMINS;
+        if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
+          dwRet|=IS_IN_SURUNNERS;
+      }
+      NetApiBufferFree(Users);
+      Users=0;
+    }else
+    {
+      if (status==ERROR_ACCESS_DENIED)
+      {
+        //ToDo...
+      }
+      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
+        Group,DomainAndName,GetErrorNameStatic(status));
+      if(IsInGroupDirect(AGroup,DomainAndName))
+        dwRet|=IS_IN_ADMINS;
+      if(IsInGroupDirect(SURUNNERSGROUP,DomainAndName))
+        dwRet|=IS_IN_SURUNNERS;
+    }
+	}
+  if ((dwRet&IS_IN_SURUNNERS)==0)
+    DelUsrSettings(DomainAndName);
+  return dwRet;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  BeOrBecomeSuRunner: check, if User is member of SuRunners, 
-//      if not, try to join him
+//  BecomeSuRunner
+// 
 //////////////////////////////////////////////////////////////////////////////
-BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
+BOOL BecomeSuRunner(LPCTSTR UserName,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd)
 {
   //Is User member of SuRunners?
-  if (IsInSuRunners(UserName))
-    return TRUE;
   CResStr sCaption(IDS_APPNAME);
   if(bHimSelf)
   {
@@ -239,7 +277,7 @@ BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd)
     _tcscat(sCaption,L")");
   }
   //Is User member of Administrators?
-  if (IsInAdmins(UserName))
+  if (bIsInAdmins)
   {
     //Whoops...need to become a User!
     if(SafeMsgBox(hwnd,
@@ -419,7 +457,7 @@ static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
 
 void USERLIST::Add(LPCWSTR UserName)
 {
-  if ((m_bSkipAdmins) && IsInAdmins(UserName))
+  if (m_bSkipAdmins && IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
     return;
   int j=0;
   for(;j<nUsers;j++)
