@@ -65,6 +65,10 @@ HINSTANCE   l_hInst     = NULL;
 TCHAR       l_User[514] = {0};
 BOOL        l_IsAdmin   = FALSE;
 BOOL        l_bSetHook  = TRUE;
+DWORD       l_Groups    = 0;
+
+#define     l_IsInAdmins    ((l_Groups&IS_IN_ADMINS)!=0)
+#define     l_IsInSuRunners ((l_Groups&IS_IN_SURUNNERS)!=0)
 
 UINT        WM_SYSMH0   = 0;
 UINT        WM_SYSMH1   = 0;
@@ -389,7 +393,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
   //Non SuRunners don't need the Shell Extension!
-  if ((!IsInSuRunners(l_User))||HideSuRun(l_User))
+  if ((!l_IsInSuRunners)||GetHideFromUser(l_User))
     return NOERROR;
   //Non Admins don't need the Shell Extension!
   if (!l_bSetHook)
@@ -528,7 +532,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (l_IsAdmin)
     return S_FALSE;
   //Non SuRunners don't need the ShellExec Hook!
-  if ((!IsInSuRunners(l_User)))
+  if ((!l_IsInSuRunners))
     return S_FALSE;
   if (!pei)
   {
@@ -652,20 +656,20 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 
 LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
 { 
+  BOOL noCPL=HideSuRun(l_User,l_Groups);
   switch (uMsg) 
   { 
   case CPL_INIT:
-    if (HideSuRun(l_User)&&(!IsInAdmins(l_User)))
+    if (noCPL)
       return FALSE;
     return TRUE; 
   case CPL_GETCOUNT:
-    //Non SuRunners don't need the Shell Extension!
-    if (HideSuRun(l_User)&&(!IsInAdmins(l_User)))
+    if (noCPL)
       return 0;
     return 1; 
   case CPL_INQUIRE:
     {
-      if (HideSuRun(l_User)&&(!IsInAdmins(l_User)))
+      if (noCPL)
         return 1;
       LPCPLINFO cpli=(LPCPLINFO)lParam2; 
       cpli->lData = 0; 
@@ -676,7 +680,7 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
     }
   case CPL_DBLCLK:    // application icon double-clicked 
     {
-      if (HideSuRun(l_User)&&(!IsInAdmins(l_User)))
+      if (noCPL)
         return 1;
       TCHAR fSuRunExe[4096];
       GetSystemWindowsDirectory(fSuRunExe,4096);
@@ -950,6 +954,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
+  l_Groups=IsInSuRunnersOrAdmins(l_User);
   InitializeCriticalSection(&l_SxHkCs);
   //Resources
 #ifdef _DEBUG_ENU
