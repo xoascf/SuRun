@@ -3,6 +3,6 @@
 DWORD WINAPI TSAThreadProc(void* p);
 
 void InitTrayShowAdmin();
-BOOL ProcessTrayShowAdmin();
+BOOL ProcessTrayShowAdmin(BOOL bBalloon);
 void CloseTrayShowAdmin();
 BOOL StartTSAThread();
