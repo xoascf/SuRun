@@ -215,7 +215,7 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName)
 
 DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
 {
-  //CTimeLog l(L"IsInGroup(%s,%s)",Group,DomainAndName);
+  CTimeLog l(L"IsInSuRunnersOrAdmins(%s)",DomainAndName);
   DWORD cchAG=GNLEN;
   WCHAR AGroup[GNLEN+1]={0};
   GetGroupName(DOMAIN_ALIAS_RID_ADMINS,AGroup,&cchAG);
@@ -224,38 +224,36 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
     dwRet|=IS_IN_SURUNNERS;
   //try to find user in local group
   NET_API_STATUS status;
-	{
-    LPLOCALGROUP_USERS_INFO_0 Users = 0;
-    DWORD num = 0;
-    DWORD total = 0;
-    DWORD_PTR resume = 0;
-    status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
-      (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
-		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
+  LPLOCALGROUP_USERS_INFO_0 Users = 0;
+  DWORD num = 0;
+  DWORD total = 0;
+  DWORD_PTR resume = 0;
+  status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
+    (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
+	if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
+  {
+    for(DWORD i = 0; (i<total); i++) 
     {
-      for(DWORD i = 0; (i<total); i++) 
-      {
-        if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
-          dwRet|=IS_IN_ADMINS;
-        else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
-          dwRet|=IS_IN_SURUNNERS;
-      }
-      NetApiBufferFree(Users);
-      Users=0;
-    }else
-    {
-      if (status==ERROR_ACCESS_DENIED)
-      {
-        //ToDo...
-      }
-      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
-        Group,DomainAndName,GetErrorNameStatic(status));
-      if(IsInGroupDirect(AGroup,DomainAndName))
+      if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
         dwRet|=IS_IN_ADMINS;
-      if(IsInGroupDirect(SURUNNERSGROUP,DomainAndName))
+      else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
         dwRet|=IS_IN_SURUNNERS;
     }
-	}
+    NetApiBufferFree(Users);
+    Users=0;
+  }else
+  {
+    if (status==ERROR_ACCESS_DENIED)
+    {
+      //ToDo...
+    }
+    DBGTrace2("NetUserGetLocalGroups(%s): NetUserGetLocalGroups failed: %s",
+      DomainAndName,GetErrorNameStatic(status));
+    if(IsInGroupDirect(AGroup,DomainAndName))
+      dwRet|=IS_IN_ADMINS;
+    if(IsInGroupDirect(SURUNNERSGROUP,DomainAndName))
+      dwRet|=IS_IN_SURUNNERS;
+  }
   if ((dwRet&IS_IN_SURUNNERS)==0)
     DelUsrSettings(DomainAndName);
   return dwRet;
