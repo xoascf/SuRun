@@ -1763,7 +1763,9 @@ EditApp:
         {
           zero(g_SD->NewUser);
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
-          if (g_SD->NewUser[0] && BeOrBecomeSuRunner(g_SD->NewUser,FALSE,hwnd))
+          if (g_SD->NewUser[0] 
+            && (!IsInSuRunners(g_SD->NewUser))
+            && BecomeSuRunner(g_SD->NewUser,IsInAdmins(g_SD->NewUser)!=0,FALSE,hwnd))
           {
             g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,TRUE);
             UpdateUserList(hwnd,g_SD->NewUser);
