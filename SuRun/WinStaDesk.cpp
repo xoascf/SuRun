@@ -113,28 +113,9 @@ void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk)
 
 void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant)
 {
-	BYTE tgs[4096];
-	DWORD cbtgs = sizeof tgs;
-	if (!GetTokenInformation(htok,TokenGroups,tgs,cbtgs,&cbtgs))
-  {
-    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
+	PSID psidLogonSession=GetLogonSid(htok);
+	if (!psidLogonSession)
     return;
-  }
-	const TOKEN_GROUPS* ptgs = (TOKEN_GROUPS*)(tgs);
-	const SID_AND_ATTRIBUTES* it = ptgs->Groups;
-	const SID_AND_ATTRIBUTES* end = it + ptgs->GroupCount;
-	while (end!=it)
-	{
-		if ((it->Attributes & SE_GROUP_LOGON_ID)==SE_GROUP_LOGON_ID)
-			break;
-		++it;
-	}
-	if (end==it)
-  {
-    DBGTrace("UNEXPECTED: No Logon SID in TokenGroups");
-    return;
-  }
-	void* psidLogonSession = it->Sid;
   HWINSTA hws = WinSta?OpenWindowStation(WinSta,0,MAXIMUM_ALLOWED):0;
 	if (WinSta && (!hws))
   {
@@ -223,6 +204,7 @@ void SetAccessToWinDesk(HANDLE htok,LPCTSTR WinSta,LPCTSTR Desk,BOOL bGrant)
     if(hws)
       CloseWindowStation(hws);
 	}
+  free(psidLogonSession);
 }
 
 void GrantUserAccessToDesktop(HDESK hDesk)
