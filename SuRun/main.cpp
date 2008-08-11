@@ -88,6 +88,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
   //UserName
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+  //Groups
+  g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName);
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
@@ -97,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     LPTSTR args=_tcsdup(PathGetArgs(GetCommandLine()));
     LPTSTR Args=args;
     //Parse direct commands:
-    if (HideSuRun(g_RunData.UserName))
+    if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
       g_RunData.beQuiet=TRUE;
     while (Args[0]=='/')
     {
@@ -146,7 +148,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!bRunSetup)
     {
       //If shell is Admin but User is SuRunner, the Shell must be restarted
-      if (IsInSuRunners(g_RunData.UserName) && bShellIsadmin)
+      if (g_CliIsInSuRunners && bShellIsadmin)
       {
         //Complain if shell user is an admin!
         SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
