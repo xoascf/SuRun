@@ -39,12 +39,18 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd);
 
 // is User "DomainAndName" member of Group GetGroupName("Rid")?
 BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName);
+
 // is User "DomainAndName" member of SuRunners?
 BOOL IsInSuRunners(LPCWSTR DomainAndName);
-
 #define IsInAdmins(u) IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u)
-//  BeOrBecomeSuRunner: check, if User is SuRunner if not, try to join him
-BOOL BeOrBecomeSuRunner(LPCTSTR UserName,BOOL bHimSelf,HWND hwnd);
+
+#define IS_IN_ADMINS    1
+#define IS_IN_SURUNNERS 2
+DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName);
+
+
+//  BecomeSuRunner: check, if User is SuRunner if not, try to join him
+BOOL BecomeSuRunner(LPCTSTR UserName,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd);
 
 // User list
 //
