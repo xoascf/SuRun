@@ -279,9 +279,9 @@ void InitTrayShowAdmin()
   g_NotyData.uTimeout=10000;
 }
 
-BOOL ProcessTrayShowAdmin()
+BOOL ProcessTrayShowAdmin(BOOL bBalloon)
 {
-  g_BallonTips=ShowBalloon(g_RunData.UserName);
+  g_BallonTips=bBalloon!=0;
   DisplayIcon();
   MSG msg;
   int count=0;
