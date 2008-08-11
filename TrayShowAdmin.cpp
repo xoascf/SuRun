@@ -285,7 +285,7 @@ BOOL ProcessTrayShowAdmin()
   DisplayIcon();
   MSG msg;
   int count=0;
-  while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<100))
+  while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<10))
   {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
