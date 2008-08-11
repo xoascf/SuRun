@@ -112,7 +112,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu(hmenu) 
         && (!l_IsAdmin)
-        && (!HideSuRun(l_User)))
+        && (!GetHideFromUser(l_User)))
       {
         int i=0;
         if( GetRestartAsAdmin 
