@@ -237,7 +237,7 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
       {
         if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
           dwRet|=IS_IN_ADMINS;
-        if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
+        else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
           dwRet|=IS_IN_SURUNNERS;
       }
       NetApiBufferFree(Users);
