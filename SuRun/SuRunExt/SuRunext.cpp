@@ -954,7 +954,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
-  l_Groups=IsInSuRunnersOrAdmins(l_User);
   InitializeCriticalSection(&l_SxHkCs);
   //Resources
 #ifdef _DEBUG_ENU
@@ -966,6 +965,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //IAT Hook:
   if (l_bSetHook)
   {
+    l_Groups=IsInSuRunnersOrAdmins(l_User);
     //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[4096];
     GetSystemWindowsDirectory(fSuRunExe,4096);
