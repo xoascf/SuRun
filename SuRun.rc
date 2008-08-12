@@ -329,7 +329,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1080,7 +1080,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Update"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Update >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1293,8 +1293,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,0
- PRODUCTVERSION 1,2,0,0
+ FILEVERSION 1,2,0,1
+ PRODUCTVERSION 1,2,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1312,14 +1312,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 2, 0, 0\0"
+            VALUE "FileVersion", "1, 2, 0, 1\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 2, 0, 0\0"
+            VALUE "ProductVersion", "1, 2, 0, 1\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1701,7 +1701,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1735,8 +1735,8 @@ BEGIN
     ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,40,7,316,25,
                     SS_CENTERIMAGE
-    LTEXT           "SuRun context-menu instellingen:",
-                    IDC_KEEPREGST,14,41,335,8
+    LTEXT           "SuRun context-menu instellingen:",IDC_KEEPREGST,14,41,
+                    335,8
     CONTROL         "SuRun context-menu's behouden zoals ze zijn",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     14,50,335,10
@@ -1755,7 +1755,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun Deïnstalleren"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Deïnstalleren >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
