@@ -62,11 +62,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
     break;
   }
-//#ifdef _DEBUG
+#ifdef _DEBUG
 //  GetAdminToken(0);
-//  ExitProcess(0);
 //  TestSetup();
-//#endif _DEBUG
+//  UserIsInSuRunnersOrAdmins();
+//  ExitProcess(0);
+#endif _DEBUG
   if(HandleServiceStuff())
     return 0;
   if (g_RunData.CliThreadId==GetCurrentThreadId())
@@ -89,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   //UserName
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
   //Groups
-  g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName);
+  g_RunData.Groups=UserIsInSuRunnersOrAdmins();
   //Current Directory
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
