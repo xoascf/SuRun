@@ -63,12 +63,11 @@ UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 
 HINSTANCE   l_hInst     = NULL;
 TCHAR       l_User[514] = {0};
-BOOL        l_IsAdmin   = FALSE;
 BOOL        l_bSetHook  = TRUE;
 DWORD       l_Groups    = 0;
 
-#define     l_IsInAdmins    ((l_Groups&IS_IN_ADMINS)!=0)
-#define     l_IsInSuRunners ((l_Groups&IS_IN_SURUNNERS)!=0)
+#define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
+#define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
 
 UINT        WM_SYSMH0   = 0;
 UINT        WM_SYSMH1   = 0;
@@ -393,7 +392,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
   //Non SuRunners don't need the Shell Extension!
-  if ((!l_IsInSuRunners)||GetHideFromUser(l_User))
+  if ((!l_IsSuRunner)||GetHideFromUser(l_User))
     return NOERROR;
   //Non Admins don't need the Shell Extension!
   if (!l_bSetHook)
@@ -532,7 +531,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (l_IsAdmin)
     return S_FALSE;
   //Non SuRunners don't need the ShellExec Hook!
-  if ((!l_IsInSuRunners))
+  if ((!l_IsSuRunner))
     return S_FALSE;
   if (!pei)
   {
@@ -930,7 +929,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
   TCHAR fMod[MAX_PATH];
   GetModuleFileName(0,fMod,MAX_PATH);
-  l_IsAdmin=IsAdmin();
+  l_Groups=UserIsInSuRunnersOrAdmins();
   DWORD PID=GetCurrentProcessId();
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
@@ -950,7 +949,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   //Process Attach:
   DisableThreadLibraryCalls(hInstDLL);
-  GetProcessUserName(GetCurrentProcessId(),l_User);
+  GetProcessUserName(PID,l_User);
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
@@ -965,7 +964,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //IAT Hook:
   if (l_bSetHook)
   {
-    l_Groups=IsInSuRunnersOrAdmins(l_User);
     //Do not set hooks into SuRun or Admin Processes!
     TCHAR fSuRunExe[4096];
     GetSystemWindowsDirectory(fSuRunExe,4096);
