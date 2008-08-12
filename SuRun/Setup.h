@@ -210,7 +210,7 @@
 #define GetReqPw4Setup(u)    GetUsrOption(u,_T("ReqPw4Setup"),0)
 #define SetReqPw4Setup(u,b)  SetUsrOption(u,_T("ReqPw4Setup"),b,0)
 
-inline BOOL ShowTray(LPCTSTR u,BOOL bSuRunner,BOOL bAdmin)
+inline BOOL ShowTray(LPCTSTR u,BOOL bAdmin,BOOL bSuRunner)
 {
   if (bSuRunner)
     return (!GetHideFromUser(u)) && (GetUserTSA(u)>0);
@@ -228,7 +228,7 @@ inline BOOL ShowTray(LPCTSTR u,BOOL bSuRunner,BOOL bAdmin)
   return false;
 }
 
-inline BOOL ShowBalloon(LPCTSTR u,BOOL bSuRunner,BOOL bAdmin)
+inline BOOL ShowBalloon(LPCTSTR u,BOOL bAdmin,BOOL bSuRunner)
 {
   if (bSuRunner)
     return (!GetHideFromUser(u)) && (GetUserTSA(u)==2);
