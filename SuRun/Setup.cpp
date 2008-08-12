@@ -324,7 +324,7 @@ typedef struct _SETUPDATA
     MinH=400;
     OrgUser=User;
     SessID=SessionID;
-    Users.SetSurunnersUsers(User,FALSE);
+    Users.SetSurunnersUsers(User,SessionID,FALSE);
     CurUser=-1;
     int i;
     for (i=0;i<Users.GetCount();i++)
@@ -389,12 +389,12 @@ static void AddUsers(HWND hwnd,BOOL bDomainUsers)
 {
   HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
   USERLIST ul;
-  ul.SetGroupUsers(L"*",bDomainUsers);
+  ul.SetGroupUsers(L"*",g_SD->SessID,bDomainUsers);
   ListView_DeleteAllItems(hUL);
   for (int i=0;i<ul.GetCount();i++) 
   {
     LVITEM item={LVIF_TEXT,i,0,0,0,ul.GetUserName(i),0,0,0,0};
-    if (!IsInSuRunners(item.pszText))
+    if (!IsInSuRunners(item.pszText,g_SD->SessID))
       ListView_InsertItem(hUL,&item);
   }
   ListView_SortItemsEx(hUL,UsrListSortProc,hUL);
@@ -486,8 +486,7 @@ struct
 
 static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 {
-  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
-  ImpersonateLoggedOnUser(hTok);
+  CImpersonateSessionUser ilu(g_SD->SessID);
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
@@ -502,8 +501,6 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
-  RevertToSelf();
-  CloseHandle(hTok);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   if (PathFileExists(FileName))
@@ -1196,8 +1193,7 @@ void ExportSettings(LPCTSTR ini)
 
 static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
 {
-  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
-  ImpersonateLoggedOnUser(hTok);
+  CImpersonateSessionUser ilu(g_SD->SessID);
   #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
@@ -1212,8 +1208,6 @@ static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN|OFN_OVERWRITEPROMPT;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetSaveFileName(&ofn);
-  RevertToSelf();
-  CloseHandle(hTok);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
@@ -1290,9 +1284,8 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 
 static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
 {
-  HANDLE hTok=GetSessionUserToken(g_SD->SessID);
-  ImpersonateLoggedOnUser(hTok);
-  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+  CImpersonateSessionUser ilu(g_SD->SessID);
+#define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
   int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
@@ -1306,8 +1299,6 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
-  RevertToSelf();
-  CloseHandle(hTok);
   if (HideExt!=-1)
     SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
@@ -1408,7 +1399,7 @@ void SetUseSuRuners(BOOL bUse)
   else
     DeleteSuRunnersGroup();
   DelAllUsrSettings;
-  g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,false);
+  g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,g_SD->SessID,false);
   UpdateUserList(g_SD->hTabCtrl[1],u);
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_ADDUSER),bUse);
   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_DELUSER),bUse);
@@ -1764,10 +1755,11 @@ EditApp:
           zero(g_SD->NewUser);
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
           if (g_SD->NewUser[0] 
-            && (!IsInSuRunners(g_SD->NewUser))
-            && BecomeSuRunner(g_SD->NewUser,IsInAdmins(g_SD->NewUser)!=0,FALSE,hwnd))
+            && (!IsInSuRunners(g_SD->NewUser,g_SD->SessID))
+            && BecomeSuRunner(g_SD->NewUser,g_SD->SessID,
+                        IsInAdmins(g_SD->NewUser,g_SD->SessID)!=0,FALSE,hwnd))
           {
-            g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,TRUE);
+            g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,g_SD->SessID,TRUE);
             UpdateUserList(hwnd,g_SD->NewUser);
             zero(g_SD->NewUser);
           }
@@ -1787,7 +1779,7 @@ EditApp:
           case IDNO:
             AlterGroupMember(SURUNNERSGROUP,u,0);
             DelUsrSettings(u);
-            g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,TRUE);
+            g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,g_SD->SessID,TRUE);
             UpdateUserList(hwnd,g_SD->OrgUser);
             break;
           }
