@@ -343,7 +343,7 @@ ChkAdmin:
     return;
   }
   USERLIST u;
-  u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,false);
+  u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,g_RunData.SessionID,false);
   TCHAR un[4096]={0};
   for (int i=0;i<u.GetCount();i++) if (PasswordOK(u.GetUserName(i),0,TRUE))
   {
@@ -670,6 +670,7 @@ DWORD PrepareSuRun()
   else
   if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+  g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
     return RETVAL_CANCELLED;
   //Create the new desktop
@@ -679,7 +680,7 @@ DWORD PrepareSuRun()
   {
     //secure desktop created...
     if ((!g_CliIsInSuRunners)
-      && (!BecomeSuRunner(g_RunData.UserName,g_CliIsInAdmins,TRUE,0)))
+      && (!BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,TRUE,0)))
       return RETVAL_CANCELLED;
     if (!g_CliIsInSuRunners)
     {
@@ -780,7 +781,7 @@ BOOL Setup()
   //check if user name may not run setup:
   if (GetNoRunSetup(g_RunData.UserName))
   {
-    if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
+    if(!LogonAdmin(g_RunData.SessionID,IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
@@ -797,12 +798,12 @@ BOOL Setup()
   //If no users should become SuRunners, ask for Admin credentials
   if ((!g_CliIsInSuRunners) && GetNoConvUser)
   {
-    if(!LogonAdmin(IDS_NOADMIN2,g_RunData.UserName))
+    if(!LogonAdmin(g_RunData.SessionID,IDS_NOADMIN2,g_RunData.UserName))
       return FALSE;
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
   if (g_CliIsInSuRunners 
-    || BecomeSuRunner(g_RunData.UserName,g_CliIsInAdmins,TRUE,0))
+    || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,TRUE,0))
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   return false;
 }
@@ -1064,7 +1065,7 @@ void SuRun(DWORD ProcessID)
   {
     if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
     {
-      if (!RunAsLogon(g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
+      if (!RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
       {
         DeleteSafeDesktop(GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
@@ -1337,7 +1338,9 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   PathQuoteSpaces(ModName);
   TCHAR User[UNLEN+GNLEN+2]={0};
   GetProcessUserName(GetCurrentProcessId(),User);
-  if (IsInSuRunners(User) && (CheckServiceStatus()==SERVICE_RUNNING))
+  DWORD dwSess=0;
+  ProcessIdToSessionId(GetCurrentProcessId(),&dwSess);
+  if (IsInSuRunners(User,dwSess) && (CheckServiceStatus()==SERVICE_RUNNING))
   {
     DBGTrace2("RunThisAsAdmin %s is SuRunner: starting %s with SuRun",User,cmd);
     TCHAR SvcFile[4096];
@@ -1472,7 +1475,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     if (g_bSR2Admins)
     {
       USERLIST SuRunners;
-      SuRunners.SetSurunnersUsers(0,FALSE);
+      SuRunners.SetSurunnersUsers(0,-1,FALSE);
       for (int i=0;i<SuRunners.GetCount();i++)
       {
         InstLog(CResStr(IDS_SR2ADMIN,SuRunners.GetUserName(i)));
@@ -1853,8 +1856,9 @@ bool HandleServiceStuff()
       g_RunData.CliThreadId=GetCurrentThreadId();
       GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
       GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
-      GetProcessUserName(GetCurrentProcessId(),g_RunData.UserName);
-      g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName);
+      GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+      ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
+      g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
@@ -1899,7 +1903,7 @@ bool HandleServiceStuff()
         {
           if(CheckServiceStatus()!=SERVICE_RUNNING)
             break;
-          g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName);
+          g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
           t.Set(10000);
         }
 #ifndef _SR32
