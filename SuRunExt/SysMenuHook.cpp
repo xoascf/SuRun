@@ -47,7 +47,9 @@ HHOOK       g_hookMenu  = NULL;
 
 extern HINSTANCE l_hInst; //the local Dll instance
 extern TCHAR     l_User[514];  //the Process user Name
-extern BOOL      l_IsAdmin;  //the Process user is an Admin
+extern DWORD     l_Groups;
+#define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
+#define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
 
 
 extern UINT      WM_SYSMH0;
