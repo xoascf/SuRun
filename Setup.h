@@ -204,7 +204,7 @@
 #define GetHideFromUser(u)    GetUsrOption(u,_T("HideFromUser"),0)
 #define SetHideFromUser(u,h)  SetUsrOption(u,_T("HideFromUser"),h,0)
 
-#define HideSuRun(u,Grps)   ((Grps&IS_IN_ADMINS)?1:GetUsrOption(u,_T("HideFromUser"),\
+#define HideSuRun(u,Grps)   ((Grps&IS_IN_ADMINS)?0:GetUsrOption(u,_T("HideFromUser"),\
                               (Grps&IS_IN_SURUNNERS)?0:GetDefHideSuRun))
 
 #define GetReqPw4Setup(u)    GetUsrOption(u,_T("ReqPw4Setup"),0)
