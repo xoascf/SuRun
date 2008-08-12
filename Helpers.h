@@ -150,10 +150,13 @@ public:
     if (SessionID!=-1)
     {
       m_Token=GetSessionUserToken(SessionID);
-      if (!ImpersonateLoggedOnUser(m_Token))
+      if(m_Token)
       {
-        CloseHandle(m_Token);
-        m_Token=0;
+        if (!ImpersonateLoggedOnUser(m_Token))
+        {
+          CloseHandle(m_Token);
+          m_Token=0;
+        }
       }
     }
   }
