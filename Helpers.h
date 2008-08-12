@@ -112,6 +112,9 @@ PTOKEN_GROUPS	GetTokenGroups(HANDLE hToken);
 // GetLogonSid
 PSID GetLogonSid(HANDLE hToken);
 
+//UserIsInSuRunnersOrAdmins
+DWORD UserIsInSuRunnersOrAdmins();
+
 //  GetSessionUserToken
 HANDLE GetSessionUserToken(DWORD SessID);
 
@@ -135,6 +138,35 @@ public:
   bool  TimedOut();
 protected:
   DWORD m_EndTime;
+};
+
+// CImpersonateSessionUser
+class CImpersonateSessionUser
+{
+public:
+  CImpersonateSessionUser(DWORD SessionID)
+  {
+    m_Token=0;
+    if (SessionID!=-1)
+    {
+      m_Token=GetSessionUserToken(SessionID);
+      if (!ImpersonateLoggedOnUser(m_Token))
+      {
+        CloseHandle(m_Token);
+        m_Token=0;
+      }
+    }
+  }
+  ~CImpersonateSessionUser()
+  {
+    if (m_Token)
+    {
+      RevertToSelf();
+      CloseHandle(m_Token);
+    }
+  }
+protected:
+  HANDLE m_Token;
 };
 
 // strwldcmp returns true if s matches pattern case insensitive
