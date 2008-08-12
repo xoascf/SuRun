@@ -150,94 +150,27 @@ BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 	return FALSE;
 }
 
-BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName)
+BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName,DWORD SessionId)
 {	
   //CTimeLog l(L"IsInGroup(%s,%s)",Group,DomainAndName);
-  //try to find user in local group
-  NET_API_STATUS status;
-	{
-    LPLOCALGROUP_USERS_INFO_0 Users = 0;
-    DWORD num = 0;
-    DWORD total = 0;
-    DWORD_PTR resume = 0;
-    status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
-      (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
-		if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
-    {
-      for(DWORD i = 0; (i<total); i++) 
-      {
-        if(wcsicmp(Users[i].lgrui0_name, Group)==0)
-        {
-          NetApiBufferFree(Users);
-          return TRUE;
-        }
-      }
-      NetApiBufferFree(Users);
-      Users=0;
-    }else
-    {
-      if (status==ERROR_ACCESS_DENIED)
-      {
-        //ToDo...
-      }
-      DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
-        Group,DomainAndName,GetErrorNameStatic(status));
-      return IsInGroupDirect(Group,DomainAndName);
-    }
-	}
-	return FALSE;
-}
-
-BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName)
-{
-  DWORD cchG=GNLEN;
-  WCHAR Group[GNLEN+1]={0};
-  if (!GetGroupName(Rid,Group,&cchG))
-    return FALSE;
-  return IsInGroup(Group,DomainAndName);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// IsInSuRunners
-//
-//  Checks if "DOMAIN\User" is a member of the SuRunners localgroup
-/////////////////////////////////////////////////////////////////////////////
-BOOL IsInSuRunners(LPCWSTR DomainAndName)
-{
-  if(!GetUseSuRunGrp)
-    return TRUE;
-  if (IsInGroup(SURUNNERSGROUP,DomainAndName))
-    return TRUE;
-  DelUsrSettings(DomainAndName);
-  return FALSE;
-}
-
-DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
-{
-  CTimeLog l(L"IsInSuRunnersOrAdmins(%s)",DomainAndName);
-  DWORD cchAG=GNLEN;
-  WCHAR AGroup[GNLEN+1]={0};
-  GetGroupName(DOMAIN_ALIAS_RID_ADMINS,AGroup,&cchAG);
-  DWORD dwRet=0;
-  if(!GetUseSuRunGrp)
-    dwRet|=IS_IN_SURUNNERS;
   //try to find user in local group
   NET_API_STATUS status;
   LPLOCALGROUP_USERS_INFO_0 Users = 0;
   DWORD num = 0;
   DWORD total = 0;
   DWORD_PTR resume = 0;
+  CImpersonateSessionUser ilu(SessionId);
   status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
     (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
 	if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
   {
     for(DWORD i = 0; (i<total); i++) 
     {
-      if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
-        dwRet|=IS_IN_ADMINS;
-      else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
-        dwRet|=IS_IN_SURUNNERS;
+      if(wcsicmp(Users[i].lgrui0_name, Group)==0)
+      {
+        NetApiBufferFree(Users);
+        return TRUE;
+      }
     }
     NetApiBufferFree(Users);
     Users=0;
@@ -247,12 +180,77 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
     {
       //ToDo...
     }
-    DBGTrace2("NetUserGetLocalGroups(%s): NetUserGetLocalGroups failed: %s",
-      DomainAndName,GetErrorNameStatic(status));
-    if(IsInGroupDirect(AGroup,DomainAndName))
-      dwRet|=IS_IN_ADMINS;
-    if(IsInGroupDirect(SURUNNERSGROUP,DomainAndName))
+    DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
+      Group,DomainAndName,GetErrorNameStatic(status));
+    return IsInGroupDirect(Group,DomainAndName);
+  }
+	return FALSE;
+}
+
+BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName,DWORD SessionId)
+{
+  DWORD cchG=GNLEN;
+  WCHAR Group[GNLEN+1]={0};
+  if (!GetGroupName(Rid,Group,&cchG))
+    return FALSE;
+  return IsInGroup(Group,DomainAndName,SessionId);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// IsInSuRunners
+//
+//  Checks if "DOMAIN\User" is a member of the SuRunners localgroup
+/////////////////////////////////////////////////////////////////////////////
+BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionId)
+{
+  if(!GetUseSuRunGrp)
+    return TRUE;
+  if (IsInGroup(SURUNNERSGROUP,DomainAndName,SessionId))
+    return TRUE;
+  DelUsrSettings(DomainAndName);
+  return FALSE;
+}
+
+DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
+{
+  //CTimeLog l(L"IsInSuRunnersOrAdmins(%s)",DomainAndName);
+  DWORD dwRet=0;
+  {
+    CImpersonateSessionUser ilu(SessionID);
+    DWORD cchAG=GNLEN;
+    WCHAR AGroup[GNLEN+1]={0};
+    GetGroupName(DOMAIN_ALIAS_RID_ADMINS,AGroup,&cchAG);
+    if(!GetUseSuRunGrp)
       dwRet|=IS_IN_SURUNNERS;
+    //try to find user in local group
+    NET_API_STATUS status;
+    LPLOCALGROUP_USERS_INFO_0 Users = 0;
+    DWORD num = 0;
+    DWORD total = 0;
+    DWORD_PTR resume = 0;
+    status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
+      (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
+    if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
+    {
+      for(DWORD i = 0; (i<total); i++) 
+      {
+        if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
+          dwRet|=IS_IN_ADMINS;
+        else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
+          dwRet|=IS_IN_SURUNNERS;
+      }
+      NetApiBufferFree(Users);
+      Users=0;
+    }else
+    {
+      DBGTrace2("NetUserGetLocalGroups(%s): NetUserGetLocalGroups failed: %s",
+        DomainAndName,GetErrorNameStatic(status));
+      if(IsInGroupDirect(AGroup,DomainAndName))
+        dwRet|=IS_IN_ADMINS;
+      if(IsInGroupDirect(SURUNNERSGROUP,DomainAndName))
+        dwRet|=IS_IN_SURUNNERS;
+    }
   }
   if ((dwRet&IS_IN_SURUNNERS)==0)
     DelUsrSettings(DomainAndName);
@@ -264,7 +262,7 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName)
 //  BecomeSuRunner
 // 
 //////////////////////////////////////////////////////////////////////////////
-BOOL BecomeSuRunner(LPCTSTR UserName,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd)
+BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd)
 {
   //Is User member of SuRunners?
   CResStr sCaption(IDS_APPNAME);
@@ -315,7 +313,7 @@ BOOL BecomeSuRunner(LPCTSTR UserName,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd)
       SafeMsgBox(hwnd,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
-  if (bHimSelf && (!LogonAdmin(IDS_NOSURUNNER)))
+  if (bHimSelf && (!LogonAdmin(SessionID,IDS_NOSURUNNER)))
     return FALSE;
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
@@ -391,8 +389,9 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
   return 0;
 }
 
-void USERLIST::SetUsualUsers(BOOL bScanDomain)
+void USERLIST::SetUsualUsers(DWORD SessionId,BOOL bScanDomain)
 {
+  CImpersonateSessionUser ilu(SessionId);
   for (int i=0;i<nUsers;i++)
     if(User[i].UserBitmap)
       DeleteObject(User[i].UserBitmap);
@@ -403,8 +402,9 @@ void USERLIST::SetUsualUsers(BOOL bScanDomain)
     AddGroupUsers(UserGroups[g],bScanDomain);
 }
 
-void USERLIST::SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
+void USERLIST::SetGroupUsers(LPWSTR GroupName,DWORD SessionId,BOOL bScanDomain)
 {
+  CImpersonateSessionUser ilu(SessionId);
   for (int i=0;i<nUsers;i++)
     if(User[i].UserBitmap)
       DeleteObject(User[i].UserBitmap);
@@ -417,23 +417,23 @@ void USERLIST::SetGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     AddGroupUsers(GroupName,bScanDomain);
 }
 
-void USERLIST::SetGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain)
+void USERLIST::SetGroupUsers(DWORD WellKnownGroup,DWORD SessionId,BOOL bScanDomain)
 {
   DWORD GNLen=GNLEN;
   WCHAR GroupName[GNLEN+1];
   if (GetGroupName(WellKnownGroup,GroupName,&GNLen))
-    SetGroupUsers(GroupName,bScanDomain);
+    SetGroupUsers(GroupName,SessionId,bScanDomain);
 }
 
-void USERLIST::SetSurunnersUsers(LPCTSTR CurUser,BOOL bScanDomain)
+void USERLIST::SetSurunnersUsers(LPCTSTR CurUser,DWORD SessionId,BOOL bScanDomain)
 {
   if(GetUseSuRunGrp)
-    SetGroupUsers(SURUNNERSGROUP,bScanDomain);
+    SetGroupUsers(SURUNNERSGROUP,SessionId,bScanDomain);
   else
   {
     //Add all users
     m_bSkipAdmins=TRUE;
-    SetGroupUsers(_T("*"),bScanDomain);
+    SetGroupUsers(_T("*"),SessionId,bScanDomain);
     if (CurUser && *CurUser)
       Add(CurUser);
     m_bSkipAdmins=FALSE;
@@ -455,7 +455,7 @@ static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
 
 void USERLIST::Add(LPCWSTR UserName)
 {
-  if (m_bSkipAdmins && IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName))
+  if (m_bSkipAdmins && IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName,-1))
     return;
   int j=0;
   for(;j<nUsers;j++)
