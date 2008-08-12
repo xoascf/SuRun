@@ -539,13 +539,13 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...)
+BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
-  p.Users.SetUsualUsers(FALSE);
+  p.Users.SetUsualUsers(SessionId,FALSE);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -562,30 +562,30 @@ DWORD ValidateCurrentUser(LPTSTR User,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...)
+BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
-  p.Users.SetUsualUsers(FALSE);
+  p.Users.SetUsualUsers(SessionId,FALSE);
   p.bRunAs=TRUE;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...)
+BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,true,false);
-  p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,FALSE);
+  p.Users.SetGroupUsers(SessionId,DOMAIN_ALIAS_RID_ADMINS,FALSE);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL LogonAdmin(int IDmsg,...)
+BOOL LogonAdmin(DWORD SessionId,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
@@ -593,7 +593,7 @@ BOOL LogonAdmin(int IDmsg,...)
   TCHAR U[UNLEN+GNLEN+2]={0};
   TCHAR P[PWLEN]={0};
   LOGONDLGPARAMS p(S,U,P,false,true,false);
-  p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,FALSE);
+  p.Users.SetGroupUsers(SessionId,DOMAIN_ALIAS_RID_ADMINS,FALSE);
   BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                     0,DialogProc,(LPARAM)&p);
   zero(U);
