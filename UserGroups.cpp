@@ -176,10 +176,6 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName,DWORD SessionId)
     Users=0;
   }else
   {
-    if (status==ERROR_ACCESS_DENIED)
-    {
-      //ToDo...
-    }
     DBGTrace3("IsInGroup(%s,%s): NetUserGetLocalGroups failed: %s",
       Group,DomainAndName,GetErrorNameStatic(status));
     return IsInGroupDirect(Group,DomainAndName);
@@ -513,10 +509,6 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
         res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
         if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
         {
-          if (res==ERROR_ACCESS_DENIED)
-          {
-            //ToDo...
-          }
           DBGTrace3("NetGroupGetUsers(%s,%s) failed: %s",dc,gn,GetErrorNameStatic(res));
           break;
         }
@@ -549,10 +541,6 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     res = NetLocalGroupGetMembers(0,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
-      if (res==ERROR_ACCESS_DENIED)
-      {
-        //ToDo...
-      }
       DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
       break;
     }
@@ -625,10 +613,6 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
     res = NetLocalGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
-      if (res==ERROR_ACCESS_DENIED)
-      {
-        //ToDo...
-      }
       DBGTrace1("NetLocalGroupEnum failed: %s",GetErrorNameStatic(res));
       return;
     }
@@ -648,10 +632,6 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
       res = NetGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
       if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
       {
-        if (res==ERROR_ACCESS_DENIED)
-        {
-          //ToDo...
-        }
         DBGTrace1("NetLocalGroupEnum failed: %s",GetErrorNameStatic(res));
         return;
       }
