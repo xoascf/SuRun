@@ -23,13 +23,13 @@
 // Check is a password for a user is correct
 BOOL PasswordOK(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword);
 
-BOOL Logon(LPTSTR User,LPTSTR Password,int IDmsg,...);
+BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
 DWORD ValidateCurrentUser(LPTSTR User,int IDmsg,...);
 
-BOOL RunAsLogon(LPTSTR User,LPTSTR Password,int IDmsg,...);
+BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
 
-BOOL LogonAdmin(LPTSTR User,LPTSTR Password,int IDmsg,...);
-BOOL LogonAdmin(int IDmsg,...);
+BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
+BOOL LogonAdmin(DWORD SessionId,int IDmsg,...);
 
 DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...);
 
