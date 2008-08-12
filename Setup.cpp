@@ -487,9 +487,6 @@ struct
 static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
-  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
-  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
-  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
@@ -501,12 +498,9 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_NOVALIDATE|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
-  if (HideExt!=-1)
-    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   if (PathFileExists(FileName))
     PathQuoteSpaces(FileName);
   return bRet;
-  #undef ExpAdvReg
 }
 
 INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
@@ -1194,9 +1188,6 @@ void ExportSettings(LPCTSTR ini)
 static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
-  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
-  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
-  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
@@ -1208,10 +1199,7 @@ static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN|OFN_OVERWRITEPROMPT;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetSaveFileName(&ofn);
-  if (HideExt!=-1)
-    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
-  #undef ExpAdvReg
 }
 
 void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
@@ -1285,9 +1273,6 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
-#define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
-  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
-  SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",0);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
@@ -1299,10 +1284,7 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
-  if (HideExt!=-1)
-    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
-  #undef ExpAdvReg
 }
 
 INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
