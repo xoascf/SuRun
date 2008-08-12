@@ -36,11 +36,10 @@
 
 extern HINSTANCE l_hInst;
 extern TCHAR     l_User[514];  //the Process user Name
-extern BOOL      l_IsAdmin;  //the Process user is an Admin
 
 extern DWORD     l_Groups;
-#define     l_IsInAdmins    ((l_Groups&IS_IN_ADMINS)!=0)
-#define     l_IsInSuRunners ((l_Groups&IS_IN_SURUNNERS)!=0)
+#define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
+#define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
 
 //Function Prototypes:
 typedef HMODULE (WINAPI* lpLoadLibraryA)(LPCSTR);
@@ -372,7 +371,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   if(l_IsAdmin)
     return RETVAL_SX_NOTINLIST;
   {
-    if (!l_IsInSuRunners)
+    if (!l_IsSuRunner)
       return RETVAL_SX_NOTINLIST;
   }
   EnterCriticalSection(&g_HookCs);
