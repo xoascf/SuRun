@@ -1978,6 +1978,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 ApplyChanges:
       SetUseIShExHook(IsDlgButtonChecked(hwnd,IDC_SHEXHOOK));
       SetUseIATHook(IsDlgButtonChecked(hwnd,IDC_IATHOOK));
+      SetTestReqAdmin(IsDlgButtonChecked(hwnd,IDC_REQADMIN));
       SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
       return TRUE;
     }//WM_DESTROY
