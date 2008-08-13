@@ -456,7 +456,8 @@ HANDLE GetAdminToken(DWORD SessionID)
     TOKEN_SOURCE tsrc = {0};
     DWORD n;
     GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n);
-    strcpy(tsrc.SourceName,"SuRun");
+    //No need to set SourceName here. WinLogon will close Processes with this token
+    //strcpy(tsrc.SourceName,"SuRun");
     //Initialize TOKEN_GROUPS
     ptg=(PTOKEN_GROUPS)(GetFromToken(hShell, TokenGroups));
     if (ptg==NULL)
