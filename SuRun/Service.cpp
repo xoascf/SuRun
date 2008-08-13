@@ -878,8 +878,8 @@ DWORD LSAStartAdminProcess()
   }
   SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
   PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName,0,0,0,0,0};
-  if(LoadUserProfile(hAdmin,&ProfInf))
+  PROFILEINFO ProfInf = {sizeof(ProfInf),PI_NOUI,g_RunData.UserName,0,0,0,0,0};
+  if((!g_RunData.bRunAs) || LoadUserProfile(hAdmin,&ProfInf))
   {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
@@ -983,7 +983,8 @@ DWORD LSAStartAdminProcess()
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hAdmin,ProfInf.hProfile);...
+    if (g_RunData.bRunAs && (RetVal!=RETVAL_OK))
+      UnloadUserProfile(hAdmin,ProfInf.hProfile);
   }
   CloseHandle(hAdmin);
   return RetVal;
@@ -993,51 +994,46 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   HANDLE hUser=GetProcessUserToken(ProcId);
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
-  if(LoadUserProfile(hUser,&ProfInf))
+  void* Env=0;
+  if (CreateEnvironmentBlock(&Env,hUser,FALSE))
   {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hUser,FALSE))
+    STARTUPINFO si={0};
+    PROCESS_INFORMATION pi={0};
+    si.cb	= sizeof(si);
+    //Do not inherit Desktop from calling process, use Tokens Desktop
+    TCHAR WinstaDesk[MAX_PATH];
+    _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+    si.lpDesktop = WinstaDesk;
+    //CreateProcessAsUser will only work from an NT System Account since the
+    //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+    EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+    EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+    if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+          CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
     {
-      STARTUPINFO si={0};
-      PROCESS_INFORMATION pi={0};
-      si.cb	= sizeof(si);
-      //Do not inherit Desktop from calling process, use Tokens Desktop
-      TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
-      si.lpDesktop = WinstaDesk;
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-            CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
+      CloseHandle(pi.hThread);
+      CloseHandle(pi.hProcess);
+      RetVal=RETVAL_OK;
+      //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
+      if((g_RunData.RetPID)&&(g_RunData.RetPtr))
       {
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-        RetVal=RETVAL_OK;
-        //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
-        if((g_RunData.RetPID)&&(g_RunData.RetPtr))
+        pi.hThread=0;
+        pi.hProcess=0;
+        HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
+        if (hProcess)
         {
-          pi.hThread=0;
-          pi.hProcess=0;
-          HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
-          if (hProcess)
-          {
-            SIZE_T n;
-            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-              DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-              cmd,GetLastErrorNameStatic());
-            CloseHandle(hProcess);
-          }else
-            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+          SIZE_T n;
+          if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
+            DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
             cmd,GetLastErrorNameStatic());
-        }
-      }else
-        DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
-      DestroyEnvironmentBlock(Env);
-    }
-    UnloadUserProfile(hUser,ProfInf.hProfile);
+          CloseHandle(hProcess);
+        }else
+          DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
+          cmd,GetLastErrorNameStatic());
+      }
+    }else
+      DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
+    DestroyEnvironmentBlock(Env);
   }
   CloseHandle(hUser);
   return RetVal;
