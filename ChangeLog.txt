@@ -1,8 +1,11 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.2.0.1 - 2008-08-12:
+SuRun 1.2.0.1 - 2008-08-13:
 ---------------------------
+* FIX: Option "Try to detect if unknown applications need to start with 
+  elevated rights." did not work
+* SuRun /RUNAS did not load the users HKEY_CURRENT_USER
 * FIX: Extensively reduced calls to LSA (lsass.exe)
 * FIX: All User/Group functions now use impersonation
 * FIX: The Tray Icon caused ~400 context switches per second and thus 2% CPU 
@@ -10,17 +13,13 @@ SuRun 1.2.0.1 - 2008-08-12:
 
 ToDo
 ---------------------
-* SuRun /RUNAS does not load user registry
-* SuRun does not set "Try to detect if unknown applications need to start with 
-  eleveted rights."
-
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
 
 To be done in future:
 ---------------------
-* Winlogon-Setup apps block SuRuns Desktop
+* RunOnce apps block SuRuns Desktop
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
