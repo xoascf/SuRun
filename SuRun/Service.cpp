@@ -878,7 +878,7 @@ DWORD LSAStartAdminProcess()
   }
   SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
   PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName};
+  PROFILEINFO ProfInf = {sizeof(ProfInf),0,g_RunData.UserName,0,0,0,0,0};
   if(LoadUserProfile(hAdmin,&ProfInf))
   {
     void* Env=0;
@@ -983,7 +983,7 @@ DWORD LSAStartAdminProcess()
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hAdmin,ProfInf.hProfile);
+    UnloadUserProfile(hAdmin,ProfInf.hProfile);...
   }
   CloseHandle(hAdmin);
   return RetVal;
@@ -1340,31 +1340,31 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
   GetProcessUserName(GetCurrentProcessId(),User);
   DWORD dwSess=0;
   ProcessIdToSessionId(GetCurrentProcessId(),&dwSess);
-//  if (IsInSuRunners(User,dwSess) && (CheckServiceStatus()==SERVICE_RUNNING))
-//  {
-//    DBGTrace2("RunThisAsAdmin %s is SuRunner: starting %s with SuRun",User,cmd);
-//    TCHAR SvcFile[4096];
-//    GetSystemWindowsDirectory(SvcFile,4096);
-//    PathAppend(SvcFile,_T("SuRun.exe"));
-//    PathQuoteSpaces(SvcFile);
-//    _stprintf(cmdLine,_T("%s /QUIET %s %s"),SvcFile,ModName,cmd);
-//    STARTUPINFO si={0};
-//    PROCESS_INFORMATION pi;
-//    si.cb = sizeof(si);
-//    if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-//    {
-//      CloseHandle(pi.hThread);
-//      DWORD ExitCode=-1;
-//      if (WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
-//        GetExitCodeProcess(pi.hProcess,&ExitCode);
-//      CloseHandle(pi.hProcess);
-//      if (ExitCode!=RETVAL_OK)
-//        return FALSE;
-//      WaitFor(CheckServiceStatus()==WaitStat);
-//    }else
-//      DBGTrace2("RunThisAsAdmin CreateProcess(%s) failed: %s",
-//                cmd,GetLastErrorNameStatic());
-//  }
+  if (IsInSuRunners(User,dwSess) && (CheckServiceStatus()==SERVICE_RUNNING))
+  {
+    DBGTrace2("RunThisAsAdmin %s is SuRunner: starting %s with SuRun",User,cmd);
+    TCHAR SvcFile[4096];
+    GetSystemWindowsDirectory(SvcFile,4096);
+    PathAppend(SvcFile,_T("SuRun.exe"));
+    PathQuoteSpaces(SvcFile);
+    _stprintf(cmdLine,_T("%s /QUIET %s %s"),SvcFile,ModName,cmd);
+    STARTUPINFO si={0};
+    PROCESS_INFORMATION pi;
+    si.cb = sizeof(si);
+    if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+    {
+      CloseHandle(pi.hThread);
+      DWORD ExitCode=-1;
+      if (WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
+        GetExitCodeProcess(pi.hProcess,&ExitCode);
+      CloseHandle(pi.hProcess);
+      if (ExitCode!=RETVAL_OK)
+        return FALSE;
+      WaitFor(CheckServiceStatus()==WaitStat);
+    }else
+      DBGTrace2("RunThisAsAdmin CreateProcess(%s) failed: %s",
+                cmd,GetLastErrorNameStatic());
+  }
   _stprintf(cmdLine,_T("%s %s"),ModName,cmd);
   if (!RunAsAdmin(cmdLine,nResId))
     return FALSE;
