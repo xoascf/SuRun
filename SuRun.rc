@@ -872,7 +872,7 @@ BEGIN
     LTEXT           "If an application does not work as usual after you activate one or both options above, you can disable SuRun's hooks into this program by putting it into the blacklist.",
                     IDC_STATIC,20,122,256,27
     PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,293,128,57,14
-    CONTROL         "Try to detect if unknown applications need to start with eleveted rights.",
+    CONTROL         "Try to detect if unknown applications need to start with elevated rights.",
                     IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,20,150,238,10
     LTEXT           "If you disable this Option, SuRun will only start predefined programs automagically with elevated rights. Then no Setup (etc.) programs are detected and run with administrative rights.",
