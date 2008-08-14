@@ -207,7 +207,10 @@ BOOL RunAs(LPCWSTR lpCmdLine,LPCWSTR szUser,LPCWSTR szPassword)
   PathRemoveFileSpec(dn);
   if (!CreateProcessWithLogonW(un,dn,szPassword,1,0,(LPWSTR)lpCmdLine,
         CREATE_UNICODE_ENVIRONMENT,0,CurDir,&si,&pi))
+  {
+    //MessageBox(0,GetLastErrorNameStatic(),0,0);
     return false;
+  }
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
   return TRUE;
