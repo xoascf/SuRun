@@ -71,6 +71,7 @@ BOOL EnablePrivilege(LPCTSTR name);
 
 //  AllowAccess
 void AllowAccess(HANDLE hObject);
+void AllowAccess(LPTSTR FileName);
 void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow);
 void SetRegistryTreeAccess(LPTSTR KeyName,DWORD Rid,bool bAllow);
 BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account);
