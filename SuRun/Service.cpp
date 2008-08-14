@@ -1682,22 +1682,15 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           OSVERSIONINFO oie;
           oie.dwOSVersionInfoSize=sizeof(oie);
           if (LOBYTE(LOWORD(GetVersion()))<6)
-          {
             //2k/XP Reboot required for WinLogon Notification
             SetDlgItemText(hwnd,IDOK,CResStr(IDS_REBOOT));
-            ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
-            EnableWindow(GetDlgItem(hwnd,IDOK),1);
-            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
-            SetFocus(GetDlgItem(hwnd,IDOK));
-          }else 
-          {
+          else 
             //Vista++ display LogOff 
-            SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CLOSE));
-            SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
             SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
-            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
-            SetFocus(GetDlgItem(hwnd,IDOK));
-          }
+          SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CLOSE));
+          SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
+          SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
+          SetFocus(GetDlgItem(hwnd,IDOK));
           return TRUE;
         }
       case MAKELPARAM(IDCANCEL,BN_CLICKED): //Close Dlg
