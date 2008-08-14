@@ -1411,25 +1411,27 @@ void SetRecommendedSettings()
   EnableWindow(GetDlgItem(h,IDC_ASKTIMEOUT),0);
   
   h=g_SD->hTabCtrl[1]; 
-  EnableWindow(GetDlgItem(h,IDC_RUNSETUP),1);
-  EnableWindow(GetDlgItem(h,IDC_REQPW4SETUP),1);
-  EnableWindow(GetDlgItem(h,IDC_RESTRICTED),1);
-  EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
-  EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
-  EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
-  CheckDlgButton(h,IDC_RUNSETUP,1);
-  CheckDlgButton(h,IDC_REQPW4SETUP,0);
-  CheckDlgButton(h,IDC_RESTRICTED,0);
-  CheckDlgButton(h,IDC_HIDESURUN,0);
-  CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
-  CheckDlgButton(h,IDC_TRAYBALLOON,!IsWin2k());
-  //CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
-  //SetUseSuRuners(TRUE);
-  
-  int User=g_SD->CurUser;
-  for (g_SD->CurUser=0;g_SD->CurUser<g_SD->Users.GetCount();g_SD->CurUser++)
-    SaveUserFlags();
-  g_SD->CurUser=User;
+  if (g_SD->Users.GetCount())
+  {
+    EnableWindow(GetDlgItem(h,IDC_RUNSETUP),1);
+    EnableWindow(GetDlgItem(h,IDC_REQPW4SETUP),1);
+    EnableWindow(GetDlgItem(h,IDC_RESTRICTED),1);
+    EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
+    EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
+    EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
+    CheckDlgButton(h,IDC_RUNSETUP,1);
+    CheckDlgButton(h,IDC_REQPW4SETUP,0);
+    CheckDlgButton(h,IDC_RESTRICTED,0);
+    CheckDlgButton(h,IDC_HIDESURUN,0);
+    CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
+    CheckDlgButton(h,IDC_TRAYBALLOON,!IsWin2k());
+    //CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
+    //SetUseSuRuners(TRUE);
+    int User=g_SD->CurUser;
+    for (g_SD->CurUser=0;g_SD->CurUser<g_SD->Users.GetCount();g_SD->CurUser++)
+      SaveUserFlags();
+    g_SD->CurUser=User;
+  }
 
   h=g_SD->hTabCtrl[2];
   CheckDlgButton(h,IDC_SHEXHOOK,1);
