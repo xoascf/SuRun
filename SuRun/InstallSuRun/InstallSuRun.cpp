@@ -54,7 +54,11 @@ bool ResToTmp(LPCTSTR Section,LPCTSTR ResName)
   if (!f)
     return UnlockResource(hResLd),FreeResource(hResLd),false;
   bool res=fwrite(pRes,Siz,1,f)==1;
-  return fclose(f),UnlockResource(hResLd),FreeResource(hResLd),res;
+  fclose(f);
+  AllowAccess(tmp);
+  UnlockResource(hResLd);
+  FreeResource(hResLd);
+  return res;
 };
 
 void RunTmp(LPSTR cmd)
