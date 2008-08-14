@@ -156,7 +156,7 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
     if ( ResToTmp("EXE_FILE","SuRun.exe")
       && ResToTmp("EXE_FILE","SuRunExt.dll"))
     {
-      RunTmp("SuRun.exe /USERINST");
+      RunTmp("SuRunIst\\SuRun.exe /USERINST");
       DelTmpFile("SuRunIst\\SuRun.exe");
       DelTmpFile("SuRunIst\\SuRunExt.dll");
       DelTmpFile("SuRunIst");
