@@ -204,7 +204,7 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionId)
     return TRUE;
   if (IsInGroup(SURUNNERSGROUP,DomainAndName,SessionId))
     return TRUE;
-  DelUsrSettings(DomainAndName);
+  //DelUsrSettings(DomainAndName);
   return FALSE;
 }
 
@@ -248,8 +248,8 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
         dwRet|=IS_IN_SURUNNERS;
     }
   }
-  if ((dwRet&IS_IN_SURUNNERS)==0)
-    DelUsrSettings(DomainAndName);
+//  if ((dwRet&IS_IN_SURUNNERS)==0)
+//    DelUsrSettings(DomainAndName);
   return dwRet;
 }
 
