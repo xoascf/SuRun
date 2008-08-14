@@ -193,7 +193,7 @@ void DelTmpFiles()
   PathRemoveBackslash(tmp);
   PathAppend(tmp,"SuRunIst");
   PathUnquoteSpaces(tmp);
-  sprintf(s,"command.com /c rd /s /q %s",tmp);
+  sprintf(s,"cmd.exe /c rd /s /q %s",tmp);
   SetRegStr(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce","Delete SuRunInst",s);
 }
 
