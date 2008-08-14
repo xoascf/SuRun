@@ -206,7 +206,7 @@ BOOL RunAs(LPCWSTR lpCmdLine,LPCWSTR szUser,LPCWSTR szPassword)
   _tcscpy(dn,szUser);
   PathRemoveFileSpec(dn);
   if (!CreateProcessWithLogonW(un,dn,szPassword,1,0,(LPWSTR)lpCmdLine,
-        CREATE_UNICODE_ENVIRONMENT|LOGON_WITH_PROFILE,0,CurDir,&si,&pi))
+        CREATE_UNICODE_ENVIRONMENT,0,CurDir,&si,&pi))
     return false;
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
