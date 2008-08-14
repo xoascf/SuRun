@@ -20,6 +20,40 @@
 
 typedef UINT (WINAPI* GETSYSWOW64DIRA)(LPSTR, UINT);
 
+#include <lmerr.h>
+#pragma comment(lib,"Shlwapi.lib")
+#pragma warning(disable : 4996)
+
+void GetErrorName(int ErrorCode,LPTSTR s)
+{
+  HMODULE hModule = NULL;
+  LPTSTR MessageBuffer=0;
+  DWORD dwFormatFlags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM ;
+  if(ErrorCode >= NERR_BASE && ErrorCode <= MAX_NERR) 
+  {
+    hModule = LoadLibraryEx("netmsg.dll",NULL,LOAD_LIBRARY_AS_DATAFILE);
+    if(hModule != NULL)
+      dwFormatFlags |= FORMAT_MESSAGE_FROM_HMODULE;
+  }
+  FormatMessage(dwFormatFlags,hModule,ErrorCode,MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &MessageBuffer,0,NULL);
+  if(hModule != NULL)
+    FreeLibrary(hModule);
+  sprintf(s,"%d(0x%08X): %s",ErrorCode,ErrorCode,MessageBuffer);
+  LocalFree(MessageBuffer);
+}
+
+static TCHAR err[4096];
+LPCTSTR GetErrorNameStatic(int ErrorCode)
+{
+  GetErrorName(ErrorCode,err);
+  return err;
+}
+
+LPCTSTR GetLastErrorNameStatic()
+{
+  return GetErrorNameStatic(GetLastError());
+}
+
 void AllowAccess(LPTSTR FileName)
 {
   DWORD dwRes;
@@ -95,7 +129,6 @@ bool ResToTmp(LPCTSTR Section,LPCTSTR ResName)
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
   PathAppend(tmp,"SuRunIst");
-  SetCurrentDirectory(tmp);
   CreateDirectory(tmp,0);
   AllowAccess(tmp);
   PathAppend(tmp,ResName);
@@ -114,8 +147,9 @@ void RunTmp(LPSTR cmd)
 {
   CHAR tmp[4096];
   GetTempPath(MAX_PATH,tmp);
-  SetCurrentDirectory(tmp);
   PathRemoveBackslash(tmp);
+  PathAppend(tmp,"SuRunIst");
+  SetCurrentDirectory(tmp);
   PathAppend(tmp,cmd);
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
@@ -124,6 +158,9 @@ void RunTmp(LPSTR cmd)
   {
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
+  }else
+  {
+    MessageBox(0,GetLastErrorNameStatic(),0,0);
   }
 }
 
@@ -132,6 +169,7 @@ void DelTmpFile(LPCSTR File)
   CHAR tmp[4096];
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
+  PathAppend(tmp,"SuRunIst");
   PathAppend(tmp,File);
   MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
 }
@@ -145,22 +183,22 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE64_FILE","SuRun32.bin")
       && ResToTmp("EXE64_FILE","SuRunExt32.dll"))
     {
-      RunTmp("SuRunIst\\SuRun.exe /USERINST");
-      DelTmpFile("SuRunIst");
-      DelTmpFile("SuRunIst\\SuRun32.bin");
-      DelTmpFile("SuRunIst\\SuRunExt32.dll");
-      DelTmpFile("SuRunIst\\SuRun.exe");
-      DelTmpFile("SuRunIst\\SuRunExt.dll");
+      RunTmp("SuRun.exe /USERINST");
+      DelTmpFile(0);
+      DelTmpFile("SuRun32.bin");
+      DelTmpFile("SuRunExt32.dll");
+      DelTmpFile("SuRun.exe");
+      DelTmpFile("SuRunExt.dll");
     }
   }else //Win32
   {
     if ( ResToTmp("EXE_FILE","SuRun.exe")
       && ResToTmp("EXE_FILE","SuRunExt.dll"))
     {
-      RunTmp("SuRunIst\\SuRun.exe /USERINST");
-      DelTmpFile("SuRunIst");
-      DelTmpFile("SuRunIst\\SuRun.exe");
-      DelTmpFile("SuRunIst\\SuRunExt.dll");
+      RunTmp("SuRun.exe /USERINST");
+      DelTmpFile(0);
+      DelTmpFile("SuRun.exe");
+      DelTmpFile("SuRunExt.dll");
     }
   }
 	return 0;
