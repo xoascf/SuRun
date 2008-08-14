@@ -95,6 +95,7 @@ bool ResToTmp(LPCTSTR Section,LPCTSTR ResName)
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
   PathAppend(tmp,"SuRunIst");
+  SetCurrentDirectory(tmp);
   CreateDirectory(tmp,0);
   AllowAccess(tmp);
   PathAppend(tmp,ResName);
