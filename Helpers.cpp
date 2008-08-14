@@ -322,6 +322,62 @@ Cleanup:
     FreeSid(pEveryoneSID);
 }
 
+void AllowAccess(LPTSTR FileName)
+{
+  DWORD dwRes;
+  PACL pOldDACL = NULL, pNewDACL = NULL;
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  EXPLICIT_ACCESS ea;
+  SID_IDENTIFIER_AUTHORITY SIDAuthWorld = SECURITY_WORLD_SID_AUTHORITY;
+  PSID pEveryoneSID = NULL;
+  if (NULL == FileName) 
+    return;
+  // Get a pointer to the existing DACL.
+  dwRes = GetNamedSecurityInfo(FileName, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,  NULL, NULL, &pOldDACL, NULL, &pSD);
+  if (ERROR_SUCCESS != dwRes) 
+  { 
+    DBGTrace1( "GetNamedSecurityInfo Error %s\n", GetErrorName(dwRes));
+    goto Cleanup; 
+  }  
+  // Create a well-known SID for the Everyone group.
+  if(! AllocateAndInitializeSid( &SIDAuthWorld, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0, &pEveryoneSID) ) 
+  {
+    DBGTrace1( "AllocateAndInitializeSid Error %s\n", GetLastErrorName() );
+    return;
+  }
+  // Initialize an EXPLICIT_ACCESS structure for an ACE.
+  // The ACE will allow Users read access to the key.
+  memset(&ea,0,sizeof(EXPLICIT_ACCESS));
+  ea.grfAccessPermissions = FILE_ALL_ACCESS;
+  ea.grfAccessMode = SET_ACCESS;
+  ea.grfInheritance= SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+  ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+  ea.Trustee.ptstrName  = (LPTSTR) pEveryoneSID;
+  // Create a new ACL that merges the new ACE
+  // into the existing DACL.
+  dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
+  if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1( "SetEntriesInAcl Error %s\n", GetErrorName(dwRes));
+    goto Cleanup; 
+  }  
+  // Attach the new ACL as the object's DACL.
+  dwRes = SetNamedSecurityInfo(FileName, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,  NULL, NULL, pNewDACL, NULL);
+  if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1( "SetNamedSecurityInfo Error %s\n", GetErrorName(dwRes));
+    goto Cleanup; 
+  }  
+Cleanup:
+  if(pSD != NULL) 
+    LocalFree((HLOCAL) pSD); 
+  if(pNewDACL != NULL) 
+    LocalFree((HLOCAL) pNewDACL); 
+  if(pEveryoneSID)
+    FreeSid(pEveryoneSID);
+}
+
 void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow)
 {
   DWORD dwRes;
