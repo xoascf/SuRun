@@ -8,7 +8,7 @@ SuRun 1.2.0.1 - 2008-08-13:
   clicking one of these boxes, SuRun Settings were terminated abnormally.
 * FIX: InstallSuRun did not delete Temp files when it was started with limited 
   rights because MoveFileEx had no write access to HKLM.
-* FIX: InstallSuRun sometimes did not work whe run from the Desktop of an 
+* FIX: InstallSuRun sometimes did not work when run from the Desktop of an 
   limited user because access permissions denied access for Administrators.
 * FIX: Option "Try to detect if unknown applications need to start with 
   elevated rights." did not work
