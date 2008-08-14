@@ -145,11 +145,11 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE64_FILE","SuRunExt32.dll"))
     {
       RunTmp("SuRunIst\\SuRun.exe /USERINST");
+      DelTmpFile("SuRunIst");
       DelTmpFile("SuRunIst\\SuRun32.bin");
       DelTmpFile("SuRunIst\\SuRunExt32.dll");
       DelTmpFile("SuRunIst\\SuRun.exe");
       DelTmpFile("SuRunIst\\SuRunExt.dll");
-      DelTmpFile("SuRunIst");
     }
   }else //Win32
   {
@@ -157,9 +157,9 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE_FILE","SuRunExt.dll"))
     {
       RunTmp("SuRunIst\\SuRun.exe /USERINST");
+      DelTmpFile("SuRunIst");
       DelTmpFile("SuRunIst\\SuRun.exe");
       DelTmpFile("SuRunIst\\SuRunExt.dll");
-      DelTmpFile("SuRunIst");
     }
   }
 	return 0;
