@@ -94,6 +94,9 @@ bool ResToTmp(LPCTSTR Section,LPCTSTR ResName)
   CHAR tmp[4096];
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
+  PathAppend(tmp,"SuRunIst");
+  CreateDirectory(tmp,0);
+  AllowAccess(tmp);
   PathAppend(tmp,ResName);
   FILE* f=fopen(tmp,"wb");
   if (!f)
@@ -141,11 +144,12 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE64_FILE","SuRun32.bin")
       && ResToTmp("EXE64_FILE","SuRunExt32.dll"))
     {
-      RunTmp("SuRun.exe /USERINST");
-      DelTmpFile("SuRun32.bin");
-      DelTmpFile("SuRunExt32.dll");
-      DelTmpFile("SuRun.exe");
-      DelTmpFile("SuRunExt.dll");
+      RunTmp("SuRunIst\\SuRun.exe /USERINST");
+      DelTmpFile("SuRunIst\\SuRun32.bin");
+      DelTmpFile("SuRunIst\\SuRunExt32.dll");
+      DelTmpFile("SuRunIst\\SuRun.exe");
+      DelTmpFile("SuRunIst\\SuRunExt.dll");
+      DelTmpFile("SuRunIst");
     }
   }else //Win32
   {
@@ -153,8 +157,9 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE_FILE","SuRunExt.dll"))
     {
       RunTmp("SuRun.exe /USERINST");
-      DelTmpFile("SuRun.exe");
-      DelTmpFile("SuRunExt.dll");
+      DelTmpFile("SuRunIst\\SuRun.exe");
+      DelTmpFile("SuRunIst\\SuRunExt.dll");
+      DelTmpFile("SuRunIst");
     }
   }
 	return 0;
