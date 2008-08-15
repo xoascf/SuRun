@@ -204,7 +204,8 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionId)
     return TRUE;
   if (IsInGroup(SURUNNERSGROUP,DomainAndName,SessionId))
     return TRUE;
-  //DelUsrSettings(DomainAndName);
+  //DBGTrace1("IsInSuRunners(%s): Not in SuRunners! ->DelUsrSettings",DomainAndName);
+  DelUsrSettings(DomainAndName);
   return FALSE;
 }
 
@@ -240,7 +241,7 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
       Users=0;
     }else
     {
-      DBGTrace2("NetUserGetLocalGroups(%s): NetUserGetLocalGroups failed: %s",
+      DBGTrace2("IsInSuRunnersOrAdmins(%s): NetUserGetLocalGroups failed: %s",
         DomainAndName,GetErrorNameStatic(status));
       if(IsInGroupDirect(AGroup,DomainAndName))
         dwRet|=IS_IN_ADMINS;
@@ -248,8 +249,11 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
         dwRet|=IS_IN_SURUNNERS;
     }
   }
-//  if ((dwRet&IS_IN_SURUNNERS)==0)
-//    DelUsrSettings(DomainAndName);
+  if ((dwRet&IS_IN_SURUNNERS)==0)
+  {
+    //DBGTrace1("IsInSuRunnersOrAdmins(%s): Not in SuRunners! ->DelUsrSettings",DomainAndName);
+    DelUsrSettings(DomainAndName);
+  }
   return dwRet;
 }
 
