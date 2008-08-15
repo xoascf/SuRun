@@ -34,10 +34,6 @@
 #pragma comment(lib,"Gdi32.lib")
 #pragma comment(lib,"comctl32.lib")
 
-#ifdef _DEBUG
-//#define _DEBUGLOGON
-#endif _DEBUG
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Logon Helper
@@ -393,6 +389,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       CheckDlgButton(hwnd,IDC_ALWAYSOK,(p->UsrFlags&FLAG_DONTASK)?1:0);
       SendDlgItemMessage(hwnd,IDC_AUTOCANCEL,PBM_SETRANGE,0,MAKELPARAM(0,p->MaxTimeOut));
       SendDlgItemMessage(hwnd,IDC_AUTOCANCEL,PBM_SETPOS,0,0);
+
       if((!GetUseIShExHook) && (!GetUseIATHook))
         EnableWindow(GetDlgItem(hwnd,IDC_SHELLEXECOK),0);
       SetUserBitmap(hwnd);
@@ -623,7 +620,7 @@ DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
-#ifdef _DEBUGLOGON
+#ifdef _DEBUG
 BOOL TestLogonDlg()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
@@ -633,13 +630,13 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
-  BOOL l=RunAsLogon(User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  BOOL l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
+  l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+  l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
@@ -651,13 +648,13 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 
-  l=Logon(User,Password,IDS_ASKAUTO);
+  l=Logon(0,User,Password,IDS_ASKAUTO);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
+  l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+  l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
@@ -669,13 +666,13 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
   
-  l=Logon(User,Password,IDS_ASKAUTO);
+  l=Logon(0,User,Password,IDS_ASKAUTO);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(IDS_NOADMIN2,L"BRUNS\\NixDu");
+  l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(User,Password,IDS_NOSURUNNER);
+  l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonCurrentUser(User,Password,0,IDS_ASKOK,L"cmd");
@@ -689,5 +686,4 @@ BOOL TestLogonDlg()
   return TRUE;
 }
 
-BOOL xDbgLogOn=TestLogonDlg();
-#endif _DEBUGLOGON
+#endif _DEBUG
