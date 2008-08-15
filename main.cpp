@@ -63,12 +63,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     break;
   }
 #ifdef _DEBUG
-  HKEY hkcu=0;
-  RegOpenKey(HKCU,0,&hkcu);
+//  HKEY hkcu=0;
+//  RegOpenKey(HKCU,0,&hkcu);
 //  GetAdminToken(0);
 //  TestSetup();
 //  UserIsInSuRunnersOrAdmins();
-  ExitProcess(0);
+//  ExitProcess(0);
 #endif _DEBUG
   if(HandleServiceStuff())
     return 0;
