@@ -43,10 +43,11 @@ extern RUNDATA g_RunData;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 //#include "LSALogon.h"
 //extern BOOL TestSetup();
-//#endif _DEBUG
+//extern BOOL TestLogonDlg();
+#endif _DEBUG
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
@@ -67,6 +68,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  RegOpenKey(HKCU,0,&hkcu);
 //  GetAdminToken(0);
 //  TestSetup();
+//  TestLogonDlg();
 //  UserIsInSuRunnersOrAdmins();
 //  ExitProcess(0);
 #endif _DEBUG
