@@ -1072,7 +1072,8 @@ void SuRun(DWORD ProcessID)
     }else
     {
       ResumeClient(RETVAL_CANCELLED);
-      SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      if (!g_RunData.beQuiet)
+        SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
       return;
     }
   }else //if (!g_RunData.bRunAs)
@@ -1096,7 +1097,10 @@ void SuRun(DWORD ProcessID)
         }
         DeleteSafeDesktop(GetFadeDesk);
       }else
-        SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      {
+        if (!g_RunData.beQuiet)
+          SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      }
       return;
     }
     if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
@@ -1112,8 +1116,9 @@ void SuRun(DWORD ProcessID)
     {
       if (RetVal==RETVAL_NODESKTOP)
       {
-        ResumeClient(RETVAL_CANCELLED);
-        SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+        ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
+        if (!g_RunData.beQuiet)
+          SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
         return;
       }
       if ( g_RunData.bShlExHook
