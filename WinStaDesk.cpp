@@ -295,7 +295,7 @@ public:
   bool IsValid();
   void CleanUp();
   void FadeOut();
-  void SwitchToOwnDesk();
+  BOOL SwitchToOwnDesk();
   void SwitchToUserDesk();
   HWND GetDeskWnd(){return m_Screen.hWnd();};
 private:
@@ -400,12 +400,14 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
   m_bOk=TRUE;
 }
 
-void CRunOnNewDeskTop::SwitchToOwnDesk()
+BOOL CRunOnNewDeskTop::SwitchToOwnDesk()
 {
+  BOOL bRet=SwitchDesktop(m_hdeskUser);
   //Switch to the new Desktop
-  if (!SwitchDesktop(m_hdeskUser))
+  if (!bRet)
     DBGTrace1("CRunOnNewDeskTop::SwitchDesktop failed: %s",GetLastErrorNameStatic());
   m_Screen.FadeIn();
+  return bRet;
 }
 
 void CRunOnNewDeskTop::SwitchToUserDesk()
@@ -533,7 +535,11 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
       DBGTrace("CreateSafeDesktop error could not create WatchDog Process");
   }else
     DBGTrace2("CreateEvent(%s) failed: %s",WATCHDOG_EVENT_NAME,GetLastErrorNameStatic());
-  rond->SwitchToOwnDesk();
+  if(!rond->SwitchToOwnDesk())
+  {
+    DeleteSafeDesktop(false);
+    return false;
+  }
   if (pi.hThread)
   {
     ResumeThread(pi.hThread);
