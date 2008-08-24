@@ -28,7 +28,9 @@ ToDo
 
 To be done in future:
 ---------------------
-* RunOnce apps block SuRuns Desktop
+* Integrate "Kafu" functions
+* Integrate "Nero Burning Rights" functions
+* RunOnce apps (Outlook Express\Setup50.exe) block SuRuns Desktop
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
