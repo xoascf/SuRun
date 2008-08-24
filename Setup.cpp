@@ -112,7 +112,11 @@ DWORD GetRegListFlags(HKEY HKR,LPCTSTR SubKey,LPCTSTR CmdLine,DWORD Default)
 
 DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default)
 {
-  return GetRegListFlags(HKLM,WHTLSTKEY(User),CmdLine,Default);
+  DWORD dwRet=GetRegListFlags(HKLM,WHTLSTKEY(User),CmdLine,Default);
+  if (dwRet!=Default)
+    return dwRet;
+  //Add known Windows stuff
+  return dwRet;
 }
 
 BOOL IsInWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag)
