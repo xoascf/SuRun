@@ -378,7 +378,7 @@ CRunOnNewDeskTop::CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,
   m_hDeskSwitch=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
   if (!m_hDeskSwitch)
   {
-    DBGTrace1("CRunOnNewDeskTop::OpenInputDesktop failed: %s",GetLastErrorNameStatic());
+    DBGTrace1("CRunOnNewDeskTop::OpenDesktop failed: %s",GetLastErrorNameStatic());
     return;
   }
   //Set Interactive Desktop as current Desktop to get the Desktop Bitmap
