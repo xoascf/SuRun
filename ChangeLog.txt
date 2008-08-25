@@ -3,6 +3,7 @@ Done, to be tested:
 
 SuRun 1.2.0.1 - 2008-08-17:
 ---------------------------
+* RunOnce apps (Outlook Express\Setup50.exe) did block SuRuns Desktop
 * FIX: If SuRun initially cannot switch to the users desktop, it instantly 
   presses CANCEL.
 * FIX: Clicking "Set recommended options for home users" with no users in the 
@@ -32,7 +33,6 @@ To be done in future:
 ---------------------
 * Integrate "Kafu" functions
 * Integrate "Nero Burning Rights" functions
-* RunOnce apps (Outlook Express\Setup50.exe) block SuRuns Desktop
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
