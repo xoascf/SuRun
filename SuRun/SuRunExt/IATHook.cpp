@@ -80,7 +80,7 @@ typedef std::list<HMODULE> ModList;
 
 ModList g_ModList;
 
-//Hook Descriptor
+//Hook Descriptor class
 class CHookDescriptor
 {
 public:
