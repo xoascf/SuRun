@@ -402,10 +402,19 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
-        if ((_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)&&(g_RunData.KillPID==0xFFFFFFFF))
+        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0))
         {
           TestEmptyAdminPasswords();
           CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
+          continue;
+        }
+        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/IMPORT "),8)==0))
+        {
+          GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+          //Double check if User is Admin!
+          if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
+            ImportSettings(PathGetArgs(g_RunData.cmdLine));
+          ResumeClient(RETVAL_OK);
           continue;
         }
         if (!g_RunData.bRunAs)
