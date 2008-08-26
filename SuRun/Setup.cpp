@@ -1274,6 +1274,11 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
     for (int u=0;ImportUser(ini,u);u++);
 }
 
+void ImportSettings(LPCTSTR ini)
+{
+  ImportSettings(ini,true,true,true);
+}
+
 static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
