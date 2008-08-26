@@ -3,6 +3,8 @@ Done, to be tested:
 
 SuRun 1.2.0.1 - 2008-08-17:
 ---------------------------
+* InstallSuRun.exe passes command line to surun.exe
+* NEW command line switch /IMPORT <ini>
 * RunOnce apps (Outlook Express\Setup50.exe) did block SuRuns Desktop
 * FIX: If SuRun initially cannot switch to the users desktop, it instantly 
   presses CANCEL.
@@ -23,8 +25,6 @@ SuRun 1.2.0.1 - 2008-08-17:
 
 ToDo
 ---------------------
-* "SuRun Explorer" does not update its display (Set IATHook->EnumWindows)
-* Add Command line switches /INSTALL /IMPORT to (Install)SuRun.exe
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
