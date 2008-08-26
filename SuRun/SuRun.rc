@@ -739,6 +739,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_INSTSUCCESS3        "Das System muss neu gestartet werden!"
     IDS_HIDESELF            "Wollen Sie SuRun wirklich vor sich selbst verstecken?\n\nSie können danach keine SuRun-Einstellungen mehr verändern."
+    IDS_NOIMPORT            "Sie müssen Mitglied der lokalen Administratorengruppe\nsein, um SuRuns Einstellungen zu importieren."
 END
 
 #endif    // German (Germany) resources
@@ -1473,6 +1474,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
     IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
+    IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
 END
 
 #endif    // English (U.S.) resources
@@ -2147,6 +2149,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_INSTSUCCESS3        "De computer moet opnieuw starten!"
     IDS_HIDESELF            "Wilt u SuRun voor UZELF verbergen?\n\nSuRun instellingen kunnen hierna niet meer worden gewijzigd."
+    IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
 END
 
 #endif    // Dutch (Netherlands) resources
