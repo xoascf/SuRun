@@ -99,6 +99,7 @@
 #define IDS_REBOOT                      95
 #define IDS_INSTSUCCESS3                96
 #define IDS_HIDESELF                    97
+#define IDS_NOIMPORT                    98
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
