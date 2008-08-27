@@ -8,7 +8,7 @@ SuRun 1.2.0.1 - 2008-08-27:
 * NEW command line switch /RESTORE <SuRunSettings>. You need to be a real 
   Administrator to restore SuRun settings.
 * Command line switch "/INSTALL" accepts <SuRunSettings> parameter.
-  To silently deploy SuRun run "InstallSuRun /INSTALL <SuRunSettings>"
+  E.g. to silently deploy SuRun run "InstallSuRun /INSTALL MySuRunSetup.INI".
   You need to be a real Administrator to deploy SuRun.
 * RunOnce apps (Outlook Express\Setup50.exe) did block SuRuns Desktop
 * FIX: If SuRun initially cannot switch to the users desktop, it instantly 
@@ -30,13 +30,10 @@ SuRun 1.2.0.1 - 2008-08-27:
 
 ToDo
 ---------------------
-* "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
-* "Show Warning for Admins with empty passwords" does not work with predefined 
-  Admin on XP Home
+* Console SuRun support
 
 To be done in future:
 ---------------------
-* Integrate "Kafu" functions
 * Integrate "Nero Burning Rights" functions
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * make context menu entries dynamically with ShellExt 
@@ -45,7 +42,6 @@ To be done in future:
 
 Deferred Whishlist:
 ---------------------
-* Console SuRun support
 * Intercept "rundll32.exe newdev.dll,": 
     needs CredUI hack for XP/2k3; ok with 2k and Vista
     use "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File 
