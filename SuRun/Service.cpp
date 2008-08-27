@@ -1846,7 +1846,7 @@ bool HandleServiceStuff()
       GetSystemWindowsDirectory(CMD,4096);
       PathAppend(CMD,L"SuRun.exe");
       PathQuoteSpaces(CMD);
-      _tcscat(CMD,L" /INSTALL ");
+      _tcscat(CMD,L" /RESTORE ");
       _tcscat(CMD,cmd.argv(2));
       STARTUPINFO si={0};
       PROCESS_INFORMATION pi;
