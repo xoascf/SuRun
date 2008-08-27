@@ -1075,8 +1075,12 @@ BOOL ImportUserWhiteList(LPCTSTR ini,LPCTSTR User,LPCTSTR WLKEY,LPCTSTR WLFKEY)
     {
       DWORD d=0;
       IMPORTVAL(WLFKEY,i,d,ini);
+      DBGTrace3("%s: %s=%x",WLKEY,cmd,d)
       if (GetRegInt(HKLM,key,cmd,-1)==-1)
+      {
         SetRegInt(HKLM,key,cmd,d);
+        DBGTrace3("%s: %s=%x ok",WLKEY,cmd,d);
+      }
     }else
       break;
   }
