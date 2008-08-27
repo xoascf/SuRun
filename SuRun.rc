@@ -621,7 +621,7 @@ IDI_SRADMIN             ICON    DISCARDABLE     "res\\SrAdmin.ico"
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Gebrauch:\r\n\tSuRun.exe Programm [Parameter]\r\noder\tSuRun.exe /SETUP"
+    IDS_USAGE               "Gebrauch:\r\nSuRun Programm [Parameter]\r\nSuRun /RUNAS Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Der Befehl:\r\n\r\n%s\r\n\r\nsoll mit erhöhten Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
@@ -1356,7 +1356,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Usage:\r\n\tSuRun.exe program [parameters]\r\nor\tSuRun.exe /Setup"
+    IDS_USAGE               "Usage:\r\nSuRun program [parameters]\r\nSuRun /RUNAS program [parameters]\r\nSuRun /SETUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "The command:\r\n\r\n%s\r\n\r\nis about to be executed with administrative privileges."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
@@ -2031,7 +2031,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Gebruik:\r\n\tSuRun.exe programma [parameters]\r\nof\tSuRun.exe /SETUP"
+    IDS_USAGE               "Gebruik:\r\nSuRun programma [parameters]\r\nSuRun /RUNAS programma [parameters]\r\nSuRun /SETUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "De opdracht:\r\n\r\n%s\r\n\r\nwordt met verhoogde rechten uitgevoerd."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Fout!\r\n\r\nBeveiligd Bureaublad kon niet worden aangemaakt!"
