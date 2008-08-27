@@ -152,6 +152,34 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.1 - 2008-08-27:
+---------------------------
+* InstallSuRun.exe passes command line to SuRun.exe, so "InstallSuRun /INSTALL" 
+  will silently install SuRun on a system
+* NEW command line switch /RESTORE <SuRunSettings>. 
+  One needs to be a real Administrator to restore SuRun settings.
+* Command line switch "/INSTALL" accepts <SuRunSettings> parameter.
+  E.g. to silently deploy SuRun run "InstallSuRun /INSTALL MySuRunSetup.INI".
+  One needs to be a real Administrator to deploy SuRun.
+* "RunOnce" apps (that are executed by Explorer while the WinLogon Desktop 
+  is still active) that seemed to require administrative privileges (e.g. 
+  C:\Program files\Outlook Express\Setup50.exe) did block SuRuns Desktop.
+* FIX: Clicking "Set recommended options for home users" with no users in the 
+  SuRunners group enabled the check boxes of SuRun Settings Page 2. When then 
+  clicking one of these boxes, SuRun Settings were terminated abnormally.
+* FIX: InstallSuRun did not delete Temp files when it was started with limited 
+  rights because MoveFileEx had no write access to HKLM.
+* FIX: InstallSuRun sometimes did not work when run from the Desktop of an 
+  limited user because access permissions denied access for Administrators.
+* FIX: "Try to detect if unknown applications need to start with 
+  elevated rights." could not be turned off.
+* FIX: SuRun /RUNAS did not load the correct HKEY_CURRENT_USER
+* Calls to LSA (lsass.exe) were extensively reduced.
+* All User/Group functions now use impersonation. So they should not fail 
+  anymore on domain computers.
+* FIX: The Tray Icon caused ~400 context switches per second and thus ~2% CPU 
+    Load on "slow" machines.
+
 SuRun 1.2.0.0 - 2008-08-03:
 ---------------------------
 * SuRun does not need nor store user passwords any more.
