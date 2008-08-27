@@ -408,13 +408,20 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
           continue;
         }
-        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/IMPORT "),8)==0))
+        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/RESTORE "),9)==0))
         {
           GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
           //Double check if User is Admin!
           if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
-            ImportSettings(PathGetArgs(g_RunData.cmdLine));
-          ResumeClient(RETVAL_OK);
+          {
+            ImportSettings(&g_RunData.cmdLine[9]);
+            ResumeClient(RETVAL_OK);
+          }
+          else
+          {
+            ResumeClient(RETVAL_OK);
+            SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+          }
           continue;
         }
         if (!g_RunData.bRunAs)
@@ -1821,12 +1828,25 @@ bool HandleServiceStuff()
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 #endif _DEBUG_ENU
   CCmdLine cmd(0);
-  if ((cmd.argc()==3)&&(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0))
+  if (cmd.argc()==3)
   {
-    SuRun(wcstol(cmd.argv(2),0,10));
-    DeleteSafeDesktop(false);
-    ExitProcess(~GetCurrentProcessId());
-    return true;
+    //Service GUI run in Users WindowStation
+    if(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0)
+    {
+      SuRun(wcstol(cmd.argv(2),0,10));
+      DeleteSafeDesktop(false);
+      ExitProcess(~GetCurrentProcessId());
+      return true;
+    }
+    //Install
+    if (_tcsicmp(cmd.argv(1),_T("/INSTALL"))==0)
+    {
+      InstallService();
+      ImportSettings(cmd.argv(2));
+      ExitProcess(0);
+      return true;
+    }
+
   }
   if (cmd.argc()==2)
   {
