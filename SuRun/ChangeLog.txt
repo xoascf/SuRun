@@ -31,12 +31,13 @@ SuRun 1.2.0.1 - 2008-08-27:
 ToDo
 ---------------------
 * Console SuRun support
+* Integrate "Nero Burning Rights" functions
 
 To be done in future:
 ---------------------
-* Integrate "Nero Burning Rights" functions
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
-* make context menu entries dynamically with ShellExt 
+* Hide/Show all context menu entries consistently
+* make all context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
 * use MD5-Hash for "Always Yes" programs
 
