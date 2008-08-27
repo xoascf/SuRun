@@ -1842,7 +1842,21 @@ bool HandleServiceStuff()
     if (_tcsicmp(cmd.argv(1),_T("/INSTALL"))==0)
     {
       InstallService();
-      ImportSettings(cmd.argv(2));
+      TCHAR CMD[4096]={0};
+      GetSystemWindowsDirectory(CMD,4096);
+      PathAppend(CMD,L"SuRun.exe");
+      PathQuoteSpaces(CMD);
+      _tcscat(CMD,L" /INSTALL ");
+      _tcscat(CMD,cmd.argv(2));
+      STARTUPINFO si={0};
+      PROCESS_INFORMATION pi;
+      si.cb = sizeof(si);
+      if (CreateProcess(NULL,CMD,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+      {
+        CloseHandle(pi.hThread);
+        WaitForSingleObject(pi.hProcess,INFINITE);
+        CloseHandle(pi.hProcess);
+      }
       ExitProcess(0);
       return true;
     }
