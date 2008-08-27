@@ -148,9 +148,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       {
         g_RunData.KillPID=wcstol(Args,0,10);
         Args=PathGetArgs(Args);
-      }else if (!_wcsicmp(c,L"/IMPORT"))
+      }else if (!_wcsicmp(c,L"/RESTORE"))
       {
-        if (!g_RunData.Groups&IS_IN_ADMINS)
+        if (!(g_RunData.Groups&IS_IN_ADMINS))
         {
           SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP);
           return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
