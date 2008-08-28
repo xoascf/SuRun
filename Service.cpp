@@ -274,6 +274,34 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  MyCPAU
+// 
+//////////////////////////////////////////////////////////////////////////////
+BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
+  LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+  BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+  LPCTSTR lpCurrentDirectory,LPSTARTUPINFO lpStartupInfo,
+  LPPROCESS_INFORMATION lpProcessInformation)
+{
+  BOOL bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
+    lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+    lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+  if ((!bOK)&&(GetLastError()==ERROR_ACCESS_DENIED))
+  {
+    //Impersonation required for EFS and CreateProcessAsUser
+    ImpersonateLoggedOnUser(hToken);
+    BOOL bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
+      lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+      lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+    DWORD le=GetLastError();
+    RevertToSelf();
+    SetLastError(le);
+  }
+  return bOK;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  ShowTrayWarning
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -296,13 +324,9 @@ void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut)
   //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
   EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
   EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-  //Impersonation required for EFS and CreateProcessAsUser
-  ImpersonateLoggedOnUser(hUser);
-  BOOL bOK=CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-    CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,NULL,NULL,&si,&pi);
-  RevertToSelf();
   //Show ToolTip "<Program> is running elevated"...
-  if (bOK)
+  if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,
+    CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,NULL,NULL,&si,&pi))
   {
     //Tell SuRun to Say something:
     RUNDATA rd=g_RunData;
@@ -953,12 +977,8 @@ DWORD LSAStartAdminProcess()
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      //Impersonation required for EFS and CreateProcessAsUser
-      ImpersonateLoggedOnUser(hAdmin);
-      BOOL bOK=CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi);
-      RevertToSelf();
-      if (bOK)
+      if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
+          CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         if(bIsExplorer)
@@ -1032,12 +1052,8 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
     //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
     EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
     EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-    //Impersonation required for EFS and CreateProcessAsUser
-    ImpersonateLoggedOnUser(hUser);
-    BOOL bOK=CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-          CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi);
-    RevertToSelf();
-    if (bOK)
+    if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,Env,
+               g_RunData.CurDir,&si,&pi))
     {
       CloseHandle(pi.hThread);
       CloseHandle(pi.hProcess);
