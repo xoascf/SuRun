@@ -283,6 +283,10 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
   LPCTSTR lpCurrentDirectory,LPSTARTUPINFO lpStartupInfo,
   LPPROCESS_INFORMATION lpProcessInformation)
 {
+  //CreateProcessAsUser will only work from an NT System Account since the
+  //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
+  EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+  EnablePrivilege(SE_INCREASE_QUOTA_NAME);
   BOOL bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
     lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
     lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
@@ -320,10 +324,6 @@ void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut)
   TCHAR WinstaDesk[MAX_PATH];
   _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
   si.lpDesktop = WinstaDesk;
-  //CreateProcessAsUser will only work from an NT System Account since the
-  //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-  EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-  EnablePrivilege(SE_INCREASE_QUOTA_NAME);
   //Show ToolTip "<Program> is running elevated"...
   if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,
     CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,NULL,NULL,&si,&pi))
@@ -973,10 +973,6 @@ DWORD LSAStartAdminProcess()
           _tcscpy(g_RunData.cmdLine,cmd);
         }
       }
-      //CreateProcessAsUser will only work from an NT System Account since the
-      //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-      EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-      EnablePrivilege(SE_INCREASE_QUOTA_NAME);
       if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
           CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
@@ -1048,10 +1044,6 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
     TCHAR WinstaDesk[MAX_PATH];
     _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
     si.lpDesktop = WinstaDesk;
-    //CreateProcessAsUser will only work from an NT System Account since the
-    //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
-    EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-    EnablePrivilege(SE_INCREASE_QUOTA_NAME);
     if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,Env,
                g_RunData.CurDir,&si,&pi))
     {
