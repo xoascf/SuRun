@@ -294,7 +294,7 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
   {
     //Impersonation required for EFS and CreateProcessAsUser
     ImpersonateLoggedOnUser(hToken);
-    BOOL bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
+    bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     DWORD le=GetLastError();
