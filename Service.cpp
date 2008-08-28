@@ -296,9 +296,13 @@ void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut)
   //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
   EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
   EnablePrivilege(SE_INCREASE_QUOTA_NAME);
+  //Impersonation required for EFS and CreateProcessAsUser
+  ImpersonateLoggedOnUser(hUser);
+  BOOL bOK=CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+    CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,NULL,NULL,&si,&pi);
+  RevertToSelf();
   //Show ToolTip "<Program> is running elevated"...
-  if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-    CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|DETACHED_PROCESS,NULL,NULL,&si,&pi))
+  if (bOK)
   {
     //Tell SuRun to Say something:
     RUNDATA rd=g_RunData;
@@ -949,8 +953,12 @@ DWORD LSAStartAdminProcess()
       //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
       EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
       EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-      if (CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-        CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
+      //Impersonation required for EFS and CreateProcessAsUser
+      ImpersonateLoggedOnUser(hAdmin);
+      BOOL bOK=CreateProcessAsUser(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
+        CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi);
+      RevertToSelf();
+      if (bOK)
       {
         DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         if(bIsExplorer)
@@ -1024,8 +1032,12 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
     //Privilege SE_ASSIGNPRIMARYTOKEN_NAME is not present elsewhere
     EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
     EnablePrivilege(SE_INCREASE_QUOTA_NAME);
-    if (CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
-          CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
+    //Impersonation required for EFS and CreateProcessAsUser
+    ImpersonateLoggedOnUser(hUser);
+    BOOL bOK=CreateProcessAsUser(hUser,NULL,cmd,NULL,NULL,FALSE,
+          CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi);
+    RevertToSelf();
+    if (bOK)
     {
       CloseHandle(pi.hThread);
       CloseHandle(pi.hProcess);
