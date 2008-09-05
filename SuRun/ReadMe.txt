@@ -152,8 +152,9 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.1 - 2008-08-27:
+SuRun 1.2.0.1 - 2008-09-05:
 ---------------------------
+* SuRun also shows "Start as Administrator" on the recycle bin folder
 * InstallSuRun.exe passes command line to SuRun.exe, so "InstallSuRun /INSTALL" 
   will silently install SuRun on a system
 * NEW command line switch /RESTORE <SuRunSettings>. 
