@@ -693,12 +693,14 @@ DWORD WINAPI InitHookProc(void* p)
   if (g_IATInit)
     return 0;
 //  Sleep(10);
+  orgGPA=GetProcAddress;
   InitializeCriticalSection(&g_HookCs);
   g_IATInit=TRUE;
   if (!GetUseIATHook)
     return 0;
   EnterCriticalSection(&g_HookCs);
-  orgGPA=GetProcAddress;
+  for(int i=0;i<countof(hdt);i++)
+    PROC p=hdt[i]->OrgFunc();
   HookModules();
   LeaveCriticalSection(&g_HookCs);
   return 0;
