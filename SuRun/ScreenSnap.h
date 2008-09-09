@@ -23,16 +23,36 @@
 #pragma once
 #include <WINDOWS.h>
 #include <TCHAR.h>
-#include "DBGTrace.H"
 
 //Globals: (for better speed!)
 static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
 //The (roughly Gausian) matrix is not multiplied, it is shifted to gain speed
 static DWORD g_m8rx[3][3]={{0,1,0},{1,2,1},{0,1,0}};
 //Simplified 3x3 Gausian blur
+inline void Blur(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
+{
+  DWORD x,y,cx,cy,c1,c2,c3;
+  COLORREF Src;
+  for (y=1;y<h-1;y++)
+    for (x=1;x<w-1;x++)
+    {
+      c1=c2=c3=0;
+      for (cy=0;cy<3;cy++)
+        for (cx=0;cx<3;cx++)
+        {
+          Src=pSrc[(x+cx-1)+(y+cy-1)*w];
+          c1+=(Src&0xFF)<<g_m8rx[cx][cy];
+          Src>>=8;
+          c2+=(Src&0xFF)<<g_m8rx[cx][cy];
+          Src>>=8;
+          c3+=(Src&0xFF)<<g_m8rx[cx][cy];
+        }
+      pDst[x+y*w]=((c1>>5)&0xFF)+(((c2>>5)&0xFF)<<8)+(((c3>>5)&0xFF)<<16);
+    }
+}
+
 inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
 {
-  CTimeLog l(_T("Blur %dx%d"),w,h);
   HBITMAP hbbm=0;
   g_bmi32.bmiHeader.biHeight=h;
   g_bmi32.bmiHeader.biWidth=w;
@@ -50,28 +70,7 @@ inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
   COLORREF* pDst=(COLORREF*)calloc(g_bmi32.bmiHeader.biSizeImage,1);
   if (pDst!=NULL)
   {
-    {
-      CTimeLog l(_T("Blur Kernel %dx%d"),w,h);
-      DWORD x,y,cx,cy,c1,c2,c3;
-      COLORREF Src,Dst;
-      for (y=1;y<h-1;y++)
-        for (x=1;x<w-1;x++)
-        {
-          Dst=c1=c2=c3=0;
-          for (cy=0;cy<3;cy++)
-            for (cx=0;cx<3;cx++)
-            {
-              Src=pSrc[(x+cx-1)+(y+cy-1)*w];
-              c1+=(Src&0xFF)<<g_m8rx[cx][cy];
-              Src>>=8;
-              c2+=(Src&0xFF)<<g_m8rx[cx][cy];
-              Src>>=8;
-              c3+=(Src&0xFF)<<g_m8rx[cx][cy];
-            }
-          pDst[x+y*w]=((c1>>5)&0xFF)+(((c2>>5)&0xFF)<<8)+(((c3>>5)&0xFF)<<16);
-        }
-
-    }
+    Blur(pDst,pSrc,w,h);
     hbbm=CreateCompatibleBitmap(DC,w,h);
     SetDIBits(DC,hbbm,0,w,pDst,&g_bmi32,DIB_RGB_COLORS);
     free(pDst);
