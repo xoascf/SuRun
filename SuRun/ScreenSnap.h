@@ -23,19 +23,25 @@
 #pragma once
 #include <WINDOWS.h>
 #include <TCHAR.h>
+#include "DBGTrace.H"
 
 //Globals: (for better speed!)
 static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
 //The (roughly Gausian) matrix is not multiplied, it is shifted to gain speed
-static int g_m8rx[3][3]={{5,4,5},{4,3,4},{5,4,5}};
+//static int g_m8rx[3][3]={{5,4,5},{4,3,4},{5,4,5}};
+static int g_m8rx[3][3]={{4,3,4},{3,2,3},{4,3,4}};
 //The Mask is applied after each shift to multiply all three colors of a pixel 
 //at once
-static int g_msk [3][3]={{0x00070707,0x000F0F0F,0x00070707},
-                         {0x000F0F0F,0x001F1F1F,0x000F0F0F},
-                         {0x00070707,0x000F0F0F,0x00070707}};
+//static int g_msk [3][3]={{0x07070707,0x0F0F0F0F,0x07070707},
+//                         {0x0F0F0F0F,0x1F1F1F1F,0x0F0F0F0F},
+//                         {0x07070707,0x0F0F0F0F,0x07070707}};
+static int g_msk [3][3]={{0x0F0F0F0F,0x1F1F1F1F,0x0F0F0F0F},
+                         {0x1F1F1F1F,0x3F3F3F3F,0x1F1F1F1F},
+                         {0x0F0F0F0F,0x1F1F1F1F,0x0F0F0F0F}};
 //Simplified 3x3 Gausian blur
 inline HBITMAP Blur(HBITMAP hbm,int w,int h)
 {
+  //CTimeLog l(_T("Blur %dx%d"),w,h);
   HBITMAP hbbm=0;
   g_bmi32.bmiHeader.biHeight=h;
   g_bmi32.bmiHeader.biWidth=w;
@@ -53,11 +59,23 @@ inline HBITMAP Blur(HBITMAP hbm,int w,int h)
   COLORREF* pDst=(COLORREF*)calloc(g_bmi32.bmiHeader.biSizeImage,1);
   if (pDst!=NULL)
   {
-    for (int y=0;y<h;y++)
-      for (int x=0;x<w;x++)
-        for (int cx=max(0,1-x);cx<min(3,w-x);cx++)
-          for (int cy=max(0,1-y);cy<min(3,h-y);cy++)
-            pDst[x+y*w]+=(pSrc[(x+cx-1)+(y+cy-1)*w]>>g_m8rx[cx][cy])& g_msk[cx][cy];
+    {
+      //CTimeLog l(_T("Blur Kernel %dx%d"),w,h);
+      int x,y,cx,cy;
+      COLORREF Dst;
+      for (y=1;y<h-1;y++)
+        for (x=1;x<w-1;x++)
+        {
+          Dst=0;
+          for (cy=0;cy<3;cy++)
+            for (cx=0;cx<3;cx++)
+            {
+              Dst+=(pSrc[(x+cx-1)+(y+cy-1)*w]>>g_m8rx[cx][cy])& g_msk[cx][cy];
+            }
+          pDst[x+y*w]=(Dst>>1)&0x7F7F7F7F;
+        }
+
+    }
     hbbm=CreateCompatibleBitmap(DC,w,h);
     SetDIBits(DC,hbbm,0,w,pDst,&g_bmi32,DIB_RGB_COLORS);
     free(pDst);
@@ -159,6 +177,7 @@ public:
       {
         m_blurbm=Blur(m_bm,m_dx,m_dy);
         DeleteObject(m_bm);
+        InvalidateRect(m_hWndTrans,0,true);
       }
       m_bm=0;
     }
