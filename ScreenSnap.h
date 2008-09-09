@@ -28,20 +28,11 @@
 //Globals: (for better speed!)
 static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
 //The (roughly Gausian) matrix is not multiplied, it is shifted to gain speed
-//static int g_m8rx[3][3]={{5,4,5},{4,3,4},{5,4,5}};
-static int g_m8rx[3][3]={{4,3,4},{3,2,3},{4,3,4}};
-//The Mask is applied after each shift to multiply all three colors of a pixel 
-//at once
-//static int g_msk [3][3]={{0x07070707,0x0F0F0F0F,0x07070707},
-//                         {0x0F0F0F0F,0x1F1F1F1F,0x0F0F0F0F},
-//                         {0x07070707,0x0F0F0F0F,0x07070707}};
-static int g_msk [3][3]={{0x0F0F0F0F,0x1F1F1F1F,0x0F0F0F0F},
-                         {0x1F1F1F1F,0x3F3F3F3F,0x1F1F1F1F},
-                         {0x0F0F0F0F,0x1F1F1F1F,0x0F0F0F0F}};
+static DWORD g_m8rx[3][3]={{0,1,0},{1,2,1},{0,1,0}};
 //Simplified 3x3 Gausian blur
-inline HBITMAP Blur(HBITMAP hbm,int w,int h)
+inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
 {
-  //CTimeLog l(_T("Blur %dx%d"),w,h);
+  CTimeLog l(_T("Blur %dx%d"),w,h);
   HBITMAP hbbm=0;
   g_bmi32.bmiHeader.biHeight=h;
   g_bmi32.bmiHeader.biWidth=w;
@@ -60,19 +51,24 @@ inline HBITMAP Blur(HBITMAP hbm,int w,int h)
   if (pDst!=NULL)
   {
     {
-      //CTimeLog l(_T("Blur Kernel %dx%d"),w,h);
-      int x,y,cx,cy;
-      COLORREF Dst;
+      CTimeLog l(_T("Blur Kernel %dx%d"),w,h);
+      DWORD x,y,cx,cy,c1,c2,c3;
+      COLORREF Src,Dst;
       for (y=1;y<h-1;y++)
         for (x=1;x<w-1;x++)
         {
-          Dst=0;
+          Dst=c1=c2=c3=0;
           for (cy=0;cy<3;cy++)
             for (cx=0;cx<3;cx++)
             {
-              Dst+=(pSrc[(x+cx-1)+(y+cy-1)*w]>>g_m8rx[cx][cy])& g_msk[cx][cy];
+              Src=pSrc[(x+cx-1)+(y+cy-1)*w];
+              c1+=(Src&0xFF)<<g_m8rx[cx][cy];
+              Src>>=8;
+              c2+=(Src&0xFF)<<g_m8rx[cx][cy];
+              Src>>=8;
+              c3+=(Src&0xFF)<<g_m8rx[cx][cy];
             }
-          pDst[x+y*w]=(Dst>>1)&0x7F7F7F7F;
+          pDst[x+y*w]=((c1>>5)&0xFF)+(((c2>>5)&0xFF)<<8)+(((c3>>5)&0xFF)<<16);
         }
 
     }
