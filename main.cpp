@@ -49,8 +49,18 @@ extern RUNDATA g_RunData;
 //extern BOOL TestLogonDlg();
 #endif _DEBUG
 
+//#include "ScreenSnap.h"
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+//  CBlurredScreen b;
+//  b.Init();
+//  b.Show(false);
+//  DWORD t=GetTickCount();
+//  while (GetTickCount()-t<1000)
+//    b.MsgLoop();
+//  b.Done();
+//  ExitProcess(0);
+  
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
   case 1:
