@@ -23,33 +23,40 @@
 #pragma once
 #include <WINDOWS.h>
 #include <TCHAR.h>
+#include "DBGTrace.H"
 
-//Globals: (for better speed!)
-static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
-//The (roughly Gausian) matrix is not multiplied, it is shifted to gain speed
-static DWORD g_m8rx[3][3]={{0,1,0},{1,2,1},{0,1,0}};
 //Simplified 3x3 Gausian blur
 inline void Blur(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
 {
-  DWORD x,y,cx,cy,c1,c2,c3;
-  COLORREF Src;
+//  CTimeLog l(_T("Blur %dx%d"),w,h);
+  DWORD x,y,c1,c2;
   for (y=1;y<h-1;y++)
     for (x=1;x<w-1;x++)
     {
-      c1=c2=c3=0;
-      for (cy=0;cy<3;cy++)
-        for (cx=0;cx<3;cx++)
-        {
-          Src=pSrc[(x+cx-1)+(y+cy-1)*w];
-          c1+=(Src&0xFF)<<g_m8rx[cx][cy];
-          Src>>=8;
-          c2+=(Src&0xFF)<<g_m8rx[cx][cy];
-          Src>>=8;
-          c3+=(Src&0xFF)<<g_m8rx[cx][cy];
-        }
-      pDst[x+y*w]=((c1>>5)&0xFF)+(((c2>>5)&0xFF)<<8)+(((c3>>5)&0xFF)<<16);
+      c1 =(pSrc[x-1+(y-1)*w]&0x00FF00FF);
+      c2 =(pSrc[x-1+(y-1)*w]&0x0000FF00);
+      c1+=(pSrc[x+(y-1)*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x+(y-1)*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x+1+(y-1)*w]&0x00FF00FF);
+      c2+=(pSrc[x+1+(y-1)*w]&0x0000FF00);
+      c1+=(pSrc[x-1+y*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x-1+y*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x+y*w]&0x00FF00FF)<<2;
+      c2+=(pSrc[x+y*w]&0x0000FF00)<<2;
+      c1+=(pSrc[x+1+y*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x+1+y*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x-1+(y+1)*w]&0x00FF00FF);
+      c2+=(pSrc[x-1+(y+1)*w]&0x0000FF00);
+      c1+=(pSrc[x+(y+1)*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x+(y+1)*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x+1+(y+1)*w]&0x00FF00FF);
+      c2+=(pSrc[x+1+(y+1)*w]&0x0000FF00);
+      pDst[x+y*w]=((c1>>5)&0x00FF00FF)+((c2>>5)&0x0000FF00);
     }
 }
+
+//Globals: (for better speed!)
+static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
 
 inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
 {
