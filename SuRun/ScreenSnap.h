@@ -220,6 +220,7 @@ private:
   static DWORD WINAPI BlurProc(void* p)
   {
     SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
+    Sleep(200);
     CBlurredScreen* bs=(CBlurredScreen*)p;  
     bs->m_blurbm=Blur(bs->m_bm,bs->m_dx,bs->m_dy);
     SetLayeredWindowAttributes(bs->m_hWndTrans,0,0,LWA_ALPHA);
