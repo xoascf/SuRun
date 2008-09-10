@@ -1290,7 +1290,7 @@ void InstallRegistry()
     SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
     //Trash
     SetRegStr(HKCR,TRSREG,L"",MenuStr);
-    SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, /root, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
+    SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_ADDCPL));
