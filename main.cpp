@@ -47,6 +47,7 @@ extern RUNDATA g_RunData;
 //#include "LSALogon.h"
 //extern BOOL TestSetup();
 //extern BOOL TestLogonDlg();
+//extern DWORD LSAStartAdminProcess();
 #endif _DEBUG
 
 //#include "ScreenSnap.h"
@@ -80,6 +81,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  TestSetup();
 //  TestLogonDlg();
 //  UserIsInSuRunnersOrAdmins();
+//  _tcscpy(g_RunData.UserName,_T("BRUNS\\Kay"));
+//  _tcscpy(g_RunData.CurDir,_T("C:\\Windows"));
+//  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+//  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
+//  ResolveCommandLine(L"control",g_RunData.CurDir,g_RunData.cmdLine);
+//  LSAStartAdminProcess() ;
 //  ExitProcess(0);
 #endif _DEBUG
   if(HandleServiceStuff())
