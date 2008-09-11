@@ -152,6 +152,11 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.3 - 2008-09-11:
+---------------------------
+* FIX: Starting Explorer (Control Panel etc) as Administrator did only work, if 
+  Folder Options->"Launch folder windows in a separate process" was activated.
+
 SuRun 1.2.0.2 - 2008-09-10:
 ---------------------------
 * SuRuns blurred screen background looks nicer
