@@ -923,7 +923,7 @@ DWORD LSAStartAdminProcess()
   SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
   PROCESS_INFORMATION pi={0};
   PROFILEINFO ProfInf = {sizeof(ProfInf),PI_NOUI,g_RunData.UserName,0,0,0,0,0};
-  if((!g_RunData.bRunAs) || LoadUserProfile(hAdmin,&ProfInf))
+  if(LoadUserProfile(hAdmin,&ProfInf))
   {
     void* Env=0;
     if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
@@ -1023,7 +1023,7 @@ DWORD LSAStartAdminProcess()
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    if (g_RunData.bRunAs && (RetVal!=RETVAL_OK))
+    if ((!g_RunData.bRunAs)||(RetVal!=RETVAL_OK))
       UnloadUserProfile(hAdmin,ProfInf.hProfile);
   }
   CloseHandle(hAdmin);
