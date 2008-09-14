@@ -206,13 +206,19 @@ void DelTmpFiles()
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
 {
-  if ((!ResToTmp("EXE_FILE","SuRun.exe"))
-    ||(!ResToTmp("EXE_FILE","SuRunExt.dll")))
-    return -1;
   if(IsWow64()) //Win64
-    if ((!ResToTmp("EXE64_FILE","SuRun32.bin"))
+  {
+    if ((!ResToTmp("EXE64_FILE","SuRun.exe"))
+      ||(!ResToTmp("EXE64_FILE","SuRunExt.dll"))
+      ||(!ResToTmp("EXE64_FILE","SuRun32.bin"))
       ||(!ResToTmp("EXE64_FILE","SuRunExt32.dll")))
       return -1;
+  }else 
+  {
+    if ((!ResToTmp("EXE_FILE","SuRun.exe"))
+      ||(!ResToTmp("EXE_FILE","SuRunExt.dll")))
+      return -1;
+  }
   LPTSTR args=PathGetArgs(GetCommandLine());
   if (args)
     RunTmp("SuRun.exe",args);
