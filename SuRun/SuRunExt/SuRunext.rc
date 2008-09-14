@@ -99,8 +99,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,3
- PRODUCTVERSION 1,2,0,3
+ FILEVERSION 1,2,0,4
+ PRODUCTVERSION 1,2,0,4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -118,14 +118,14 @@ BEGIN
             VALUE "Comments", "Based on SuDown http://sudown.sourceforge.net and Tianmiao Hu's gvim extension\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "Shell extension for SuRun\0"
-            VALUE "FileVersion", "1, 2, 0, 3\0"
+            VALUE "FileVersion", "1, 2, 0, 4\0"
             VALUE "InternalName", "SuRun right-click menu extension\0"
             VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun Context Menu Extension\0"
             VALUE "OriginalFilename", "SuRunExt.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuRun Context Menu Extension\0"
-            VALUE "ProductVersion", "1, 2, 0, 3\0"
+            VALUE "ProductVersion", "1, 2, 0, 4\0"
             VALUE "SpecialBuild", "\0"
         END
     END
