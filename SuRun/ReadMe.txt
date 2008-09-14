@@ -152,6 +152,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.4 - 2008-09-14:
+---------------------------
+* YetAnotherStupidBug, InstallSuRun installed the 32 Bit SuRun on Windows x64.
+
 SuRun 1.2.0.3 - 2008-09-11:
 ---------------------------
 * FIX: Starting Explorer (Control Panel etc) as Administrator did only work, if 
