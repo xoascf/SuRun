@@ -204,6 +204,7 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch (msg)
   {
+  case WM_LBUTTONDOWN:
   case WM_CLOSE:
     {
       KillTimer(m_hWnd,1);
