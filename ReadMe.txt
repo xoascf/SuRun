@@ -152,6 +152,10 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.5 - 2008-09-16:
+---------------------------
+* A click on a Tray-Message-Window now closes it
+
 SuRun 1.2.0.4 - 2008-09-14:
 ---------------------------
 * YetAnotherStupidBug, InstallSuRun installed the 32 Bit SuRun on Windows x64.
