@@ -19,6 +19,7 @@
 #include "Helpers.h"
 #include "LSA_laar.h"
 #include "DBGTrace.h"
+#include "setup.h"
 
 #pragma comment(lib,"Advapi32.lib")
 #pragma comment(lib,"Kernel32.lib")
@@ -480,11 +481,11 @@ HANDLE GetAdminToken(DWORD SessionID)
     ptg=p;
     //Set Admin SID as the Tokens Primary Group
     lpPriGrp = CreateTokenPrimaryGroup(AdminSID);
-    //Set Admin SID as the Token Owner
-    pTO = CreateTokenOwner(AdminSID);
     //Set Token User
     UserSID=GetTokenUserSID(hShell);
     TOKEN_USER userToken = {{UserSID, 0}};
+    //Set Admin SID as the Token Owner
+    pTO = CreateTokenOwner(GetOwnerAdminGrp?AdminSID:UserSID);
     //Privileges
     lpPrivToken = (PTOKEN_PRIVILEGES)(GetFromToken(hShell, TokenPrivileges));
     //merge Privileges of User and Admin
