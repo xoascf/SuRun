@@ -29,6 +29,8 @@ SuRun Changes:
 SuRun 1.2.0.5 - 2008-09-16:
 ---------------------------
 * A click on a Tray-Message-Window now closes it
+* SuRun did not honor Windows' Object creator owner policy
+* SuRuns blurred Background now shows transluent windows
 
 SuRun 1.2.0.4 - 2008-09-14:
 ---------------------------
