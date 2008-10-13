@@ -115,7 +115,7 @@ public:
     HDC MemDC=CreateCompatibleDC(dc);
     m_bm=CreateCompatibleBitmap(dc,m_dx,m_dy);
     (HBITMAP)SelectObject(MemDC,m_bm);
-    BitBlt(MemDC,0,0,m_dx,m_dy,dc,0,0,SRCCOPY);
+    BitBlt(MemDC,0,0,m_dx,m_dy,dc,0,0,SRCCOPY|CAPTUREBLT);
     DeleteDC(MemDC);
     ReleaseDC(0,dc);
   }
