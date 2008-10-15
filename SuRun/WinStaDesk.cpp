@@ -502,7 +502,11 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   if (IsLocalSystem())
     SetUnhandledExceptionFilter(ExceptionFilter);
   //Every "secure" Desktop has its own name:
-  CResStr DeskName(L"SRD_%04x",GetTickCount());
+//#ifndef _DEBUG
+//  CResStr DeskName(L"SRD_%04x",GetTickCount());
+//#else _DEBUG
+  CResStr DeskName(L"Winlogon");
+//#endif _DEBUG
   //Create Desktop
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   g_RunOnNewDesk=rond;
@@ -571,14 +575,16 @@ void DeleteSafeDesktop(bool bFade)
     SetUnhandledExceptionFilter(NULL);
 }
 
-//int TestBS()
-//{
-//  CreateSafeDesktop(_T("WinSta0"),_T("Default"),true,true);
-//  DWORD t=GetTickCount();
-//  while (GetTickCount()-t<6000)
-//    g_RunOnNewDesk->m_Screen.MsgLoop();
-//  DeleteSafeDesktop(true);
-//  ExitProcess(0);
-//  return 1;
-//}
+#ifdef _DEBUG
+int TestBS()
+{
+  CreateSafeDesktop(_T("WinSta0"),_T("Default"),true,true);
+  DWORD t=GetTickCount();
+  while (GetTickCount()-t<6000)
+    g_RunOnNewDesk->m_Screen.MsgLoop();
+  DeleteSafeDesktop(true);
+  ExitProcess(0);
+  return 1;
+}
+#endif _DEBUG
 
