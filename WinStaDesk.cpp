@@ -505,7 +505,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
 //#ifndef _DEBUG
 //  CResStr DeskName(L"SRD_%04x",GetTickCount());
 //#else _DEBUG
-  CResStr DeskName(L"Disconnect");
+  CResStr DeskName(L"Winlogon");
 //#endif _DEBUG
   //Create Desktop
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
