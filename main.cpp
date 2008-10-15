@@ -48,6 +48,7 @@ extern RUNDATA g_RunData;
 //extern BOOL TestSetup();
 //extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
+extern int TestBS();
 #endif _DEBUG
 
 //#include "ScreenSnap.h"
@@ -78,6 +79,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  HKEY hkcu=0;
 //  RegOpenKey(HKCU,0,&hkcu);
 //  GetAdminToken(0);
+//  TestBS();
 //  TestSetup();
 //  TestLogonDlg();
 //  UserIsInSuRunnersOrAdmins();
