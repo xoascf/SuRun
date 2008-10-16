@@ -163,6 +163,7 @@ public:
       _T("ScreenWnd"),WS_VISIBLE|WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
       m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
+    SetWindowPos(m_hWnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOREDRAW);
     RedrawWindow(m_hWnd,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
     if((!bWin2k)&& bFadeIn)
     {
@@ -171,6 +172,7 @@ public:
         wc.lpszClassName,_T("ScreenWnd"),WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
         m_dx,m_dy,m_hWnd,0,wc.hInstance,0);
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
+      SetWindowPos(m_hWndTrans,m_hWnd,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOREDRAW);
     }else
     {
       m_hWndTrans=m_hWnd;
@@ -266,9 +268,18 @@ private:
       SetCursor(LoadCursor(0,IDC_WAIT));
       return TRUE;
     case WM_MOUSEACTIVATE:
-      if (LOWORD(lParam)==HTCAPTION)
-        return MA_NOACTIVATEANDEAT;
-	    return MA_NOACTIVATE;
+      {
+        if (LOWORD(lParam)==HTCAPTION)
+          return MA_NOACTIVATEANDEAT;
+        if (LOWORD(lParam)==HTSYSMENU)
+        {
+          if (m_hWnd)
+            SetWindowPos(m_hWnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE);
+          if(m_hWndTrans)
+            SetWindowPos(m_hWndTrans,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE);
+        }
+        return MA_NOACTIVATE;
+      }
     }
     return DefWindowProc(hwnd,msg,wParam,lParam);
   }
