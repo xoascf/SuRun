@@ -19,7 +19,6 @@
 #include <shlwapi.h>
 #include <userenv.h>
 #include "WinStaDesk.h"
-#include "ScreenSnap.h"
 #include "Setup.h"
 #include "Helpers.h"
 #include "ResStr.h"
@@ -284,30 +283,6 @@ void DenyUserAccessToDesktop(HDESK hDesk)
   LocalFree((HLOCAL)pNewDACL); 
 	LocalFree((HLOCAL)pSD); 
 }
-
-//This class creates a new desktop with a darkened blurred image of the 
-//current dektop as background.
-class CRunOnNewDeskTop
-{
-public:
-  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,LPCTSTR UserDesk,bool bCreateBkWnd,bool bFadeIn);
-  ~CRunOnNewDeskTop();
-  bool IsValid();
-  void CleanUp();
-  void FadeOut();
-  BOOL SwitchToOwnDesk();
-  void SwitchToUserDesk();
-  HWND GetDeskWnd(){return m_Screen.hWnd();};
-private:
-  bool    m_bOk;
-  HWINSTA m_hwinstaSave;
-  HWINSTA m_hwinstaUser;
-  HDESK   m_hdeskSave;
-  HDESK   m_hdeskUser;
-  HDESK   m_hDeskSwitch;
-public:
-  CBlurredScreen m_Screen;
-};
 
 CRunOnNewDeskTop* g_RunOnNewDesk=NULL;
 
