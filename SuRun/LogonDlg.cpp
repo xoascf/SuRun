@@ -326,8 +326,21 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
   {
+  case WM_ACTIVATEAPP:
+    if ((wParam==TRUE) && g_RunOnNewDesk)
+    {
+      HWND wd=g_RunOnNewDesk->GetDeskWnd();
+      if (wd)
+        SendMessage(wd,WM_MOUSEACTIVATE,0,HTSYSMENU);
+      SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
+      SetForegroundWindow(hwnd);
+      return TRUE;
+    }
+    break;
   case WM_INITDIALOG:
     {
+      SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
+      SetForegroundWindow(hwnd);
       LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
       SetWindowLongPtr(hwnd,GWLP_USERDATA,lParam);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
