@@ -22,6 +22,35 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include "ScreenSnap.h"
+
+//This class creates a new desktop with a darkened blurred image of the 
+//current dektop as background.
+class CRunOnNewDeskTop
+{
+public:
+  CRunOnNewDeskTop(LPCTSTR WinStaName,LPCTSTR DeskName,LPCTSTR UserDesk,bool bCreateBkWnd,bool bFadeIn);
+  ~CRunOnNewDeskTop();
+  bool IsValid();
+  void CleanUp();
+  void FadeOut();
+  BOOL SwitchToOwnDesk();
+  void SwitchToUserDesk();
+  HWND GetDeskWnd(){return m_Screen.hWnd();};
+private:
+  bool    m_bOk;
+  HWINSTA m_hwinstaSave;
+  HWINSTA m_hwinstaUser;
+  HDESK   m_hdeskSave;
+  HDESK   m_hdeskUser;
+  HDESK   m_hDeskSwitch;
+public:
+  CBlurredScreen m_Screen;
+};
+
+extern CRunOnNewDeskTop* g_RunOnNewDesk;
+
 // WindowStation Desktop Names:
 
 //Call SetEvent(g_WatchDogEvent) in a WM_TIMER for a period of less than two 
