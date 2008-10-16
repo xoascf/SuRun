@@ -2147,8 +2147,21 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
 {
   switch(msg)
   {
+  case WM_ACTIVATEAPP:
+    if ((wParam==TRUE) && g_RunOnNewDesk)
+    {
+      HWND wd=g_RunOnNewDesk->GetDeskWnd();
+      if (wd)
+        SendMessage(wd,WM_MOUSEACTIVATE,0,HTSYSMENU);
+      SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
+      SetForegroundWindow(hwnd);
+      return TRUE;
+    }
+    break;
   case WM_INITDIALOG:
     {
+      SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
+      SetForegroundWindow(hwnd);
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
         (LPARAM)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,32,32,0));
