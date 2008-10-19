@@ -1383,6 +1383,9 @@ LPCTSTR GetVersionString()
         Ver->dwProductVersionLS>>16 & 0x0000FFFF,
         Ver->dwProductVersionLS     & 0x0000FFFF);
       free(VerInfo);
+#ifdef BetaVer
+        _tcscat(verstr,BetaVer);
+#endif BetaVer
       return verstr;
     }
     free(VerInfo);
