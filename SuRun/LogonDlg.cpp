@@ -335,6 +335,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
       SetForegroundWindow(hwnd);
       return TRUE;
+    }else
+    if (wParam==FALSE)
+    {
+      EndDialog(hwnd,0);
+      return TRUE;
     }
     break;
   case WM_INITDIALOG:
