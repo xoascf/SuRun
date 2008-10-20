@@ -17,6 +17,7 @@
 #include <tchar.h>
 #include <aclapi.h>
 #include <shlwapi.h>
+#include <psapi.h>
 #include <userenv.h>
 #include "WinStaDesk.h"
 #include "Setup.h"
@@ -24,6 +25,7 @@
 #include "ResStr.h"
 #include "DBGTrace.h"
 
+#pragma comment(lib,"psapi.lib")
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Userenv.lib")
 
@@ -459,6 +461,32 @@ LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
 HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
 HANDLE g_WatchDogThread=NULL;
+
+BOOL WeMustClose()
+{
+  HWND w=GetForegroundWindow();
+  if (!w)
+    return FALSE;
+  DWORD pid=0;
+  GetWindowThreadProcessId(w,&pid);
+  HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
+  if (!hProcess)
+    return TRUE;
+  DWORD d;
+  HMODULE hMod;
+  TCHAR f1[MAX_PATH];
+  TCHAR f2[MAX_PATH];
+  if (!GetModuleFileName(0,f1,MAX_PATH))
+    return CloseHandle(hProcess),TRUE;
+  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
+    return CloseHandle(hProcess),TRUE;
+  if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
+    return CloseHandle(hProcess),TRUE;
+  CloseHandle(hProcess);
+  if(_tcsicmp(f1,f2)!=0)
+    return TRUE;
+  return FALSE;
+}
 
 static DWORD WINAPI WDEventProc(void* p)
 {
