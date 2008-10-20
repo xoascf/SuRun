@@ -230,6 +230,9 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
       case WM_CONTEXTMENU:
         DisplayMenu(hwnd);
         return 0;
+      case WM_LBUTTONDBLCLK:
+        ShellExecute(0,_T("open"),_T("SuRun.exe"),_T("/SETUP"),0,SW_SHOWNORMAL);
+        return 0;
       }
     }
     break;
