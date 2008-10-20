@@ -24,6 +24,7 @@
 #include <lm.h>
 #include <commctrl.h>
 #include <shlwapi.h>
+#include <psapi.h>
 #include "Setup.h"
 #include "Helpers.h"
 #include "BlowFish.h"
@@ -38,6 +39,7 @@
 #pragma comment(lib,"comctl32.lib")
 #pragma comment(lib,"Comdlg32.lib")
 #pragma comment(lib,"shlwapi.lib")
+#pragma comment(lib,"psapi.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -2143,6 +2145,32 @@ ApplyChanges:
 // Main Setup Dialog Proc
 // 
 //////////////////////////////////////////////////////////////////////////////
+BOOL WeMustClose()
+{
+  HWND w=GetForegroundWindow();
+  if (!w)
+    return FALSE;
+  DWORD pid=0;
+  GetWindowThreadProcessId(w,&pid);
+  HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
+  if (!hProcess)
+    return TRUE;
+  DWORD d;
+  HMODULE hMod;
+  TCHAR f1[MAX_PATH];
+  TCHAR f2[MAX_PATH];
+  if (!GetModuleFileName(0,f1,MAX_PATH))
+    return CloseHandle(hProcess),TRUE;
+  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
+    return CloseHandle(hProcess),TRUE;
+  if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
+    return CloseHandle(hProcess),TRUE;
+  CloseHandle(hProcess);
+  if(_tcsicmp(f1,f2)!=0)
+    return TRUE;
+  return FALSE;
+}
+
 INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
   switch(msg)
@@ -2159,8 +2187,11 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     }else
     if (wParam==FALSE)
     {
-      g_SD->DlgExitCode=IDCANCEL;
-      EndDialog(hwnd,0);
+      if(WeMustClose())
+      {
+        g_SD->DlgExitCode=IDCANCEL;
+        EndDialog(hwnd,0);
+      }
       return TRUE;
     }
     break;
