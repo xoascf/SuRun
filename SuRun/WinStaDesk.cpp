@@ -465,7 +465,7 @@ static DWORD WINAPI WDEventProc(void* p)
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
   while (g_WatchDogEvent)
   {
-    SetEvent(g_WatchDogEvent);
+    //SetEvent(g_WatchDogEvent);
     Sleep(100);
   }
   return 0;
