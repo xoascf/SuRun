@@ -23,7 +23,7 @@
 //#define DoDBGTrace
 
 #ifdef _DEBUG 
-#define DoDBGTrace
+//#define DoDBGTrace
 #endif
 
 void TRACExA(LPCSTR s,...);
