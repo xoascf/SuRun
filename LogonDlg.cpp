@@ -320,6 +320,8 @@ void SetWindowSizes(HWND hDlg)
   }
 }
 
+extern BOOL WeMustClose();//Setup.cpp
+
 //DialogProc
 HBRUSH g_HintBrush=0;
 INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
@@ -338,8 +340,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }else
     if (wParam==FALSE)
     {
-      EndDialog(hwnd,0);
-      return TRUE;
+      if (WeMustClose())
+      {
+        EndDialog(hwnd,0);
+        return TRUE;
+      }
     }
     break;
   case WM_INITDIALOG:
