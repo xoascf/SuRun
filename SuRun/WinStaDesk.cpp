@@ -462,11 +462,33 @@ HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
 HANDLE g_WatchDogThread=NULL;
 
+// callback function for window enumeration
+static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
+{
+  // no top level window, or invisible?
+  if ((GetWindow(hwnd,GW_OWNER))||(!IsWindowVisible(hwnd)))
+    return TRUE;
+  TCHAR s[4096]={0};
+  if ((!InternalGetWindowText(hwnd,s,countof(s)))||(s[0]==0))
+    return TRUE;
+  DWORD dwID;
+  GetWindowThreadProcessId(hwnd, &dwID) ;
+  if(dwID==(DWORD)lParam)
+  {
+    DBGTrace1("Closing Window %x",hwnd);
+    PostMessage(hwnd,WM_CLOSE,0,0) ;
+  }
+  return TRUE ;
+}
+
 BOOL WeMustClose()
 {
   HWND w=GetForegroundWindow();
   if (!w)
+  {
+    DBGTrace("SuRun: No foreground Window!");
     return FALSE;
+  }
   DWORD pid=0;
   GetWindowThreadProcessId(w,&pid);
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
@@ -484,16 +506,26 @@ BOOL WeMustClose()
     return CloseHandle(hProcess),TRUE;
   CloseHandle(hProcess);
   if(_tcsicmp(f1,f2)!=0)
+  {
+    DBGTrace2("SuRun GUI must be closed (\"%s\"!=\"%s\")",f1,f1);
     return TRUE;
+  }
   return FALSE;
 }
 
 static DWORD WINAPI WDEventProc(void* p)
 {
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
+  //Messages work on the same WinSta/Desk only
+  SetProcWinStaDesk(0,L"Winlogon");
   while (g_WatchDogEvent)
   {
     SetEvent(g_WatchDogEvent);
+    if(WeMustClose())
+    {
+      DBGTrace("SuRun GUI must be closed");
+      EnumWindows(CloseAppEnum,(LPARAM)GetCurrentProcessId());
+    }
     Sleep(100);
   }
   return 0;
@@ -504,12 +536,8 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   DeleteSafeDesktop(false);
   if (IsLocalSystem())
     SetUnhandledExceptionFilter(ExceptionFilter);
-  //Every "secure" Desktop has its own name:
-//#ifndef _DEBUG
-//  CResStr DeskName(L"SRD_%04x",GetTickCount());
-//#else _DEBUG
+  //SuRun misuses WinLogons Desktop
   CResStr DeskName(L"Winlogon");
-//#endif _DEBUG
   //Create Desktop
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   g_RunOnNewDesk=rond;
