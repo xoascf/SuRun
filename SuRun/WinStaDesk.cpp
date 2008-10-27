@@ -462,6 +462,42 @@ HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
 HANDLE g_WatchDogThread=NULL;
 
+//#define WM_LOGONNOTIFY      0x004C
+//#define LOCK_WORKSTATION    5
+//#define UNLOCK_WORKSTATION  6
+//
+//static BOOL CALLBACK GetSASWndProc(HWND w,LPARAM p)
+//{
+//  TCHAR cn[MAX_PATH]={0};
+//  GetClassName(w,cn,MAX_PATH);
+//  if (_tcscmp(cn,_T("SAS window class"))==0)
+//  {
+//    *((HWND*)p)=w;
+//    return FALSE;
+//  }
+//  return TRUE;
+//}
+//
+//void LockWndSta()
+//{
+//  SetProcWinStaDesk(0,L"Winlogon");
+//  HWND w=0;
+//  EnumWindows(GetSASWndProc,(LPARAM)&w);
+//  if (w==0)
+//    return;
+//  PostMessage(w,WM_LOGONNOTIFY,LOCK_WORKSTATION,0);
+//}
+//
+//void UnLockWndSta()
+//{
+//  SetProcWinStaDesk(0,L"Winlogon");
+//  HWND w=0;
+//  EnumWindows(GetSASWndProc,(LPARAM)&w);
+//  if (w==0)
+//    return;
+//  PostMessage(w,WM_LOGONNOTIFY,UNLOCK_WORKSTATION,0);
+//}
+
 // callback function for window enumeration
 static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
 {
@@ -580,11 +616,13 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
   }
+//  LockWndSta();
   return true;
 }
 
 void DeleteSafeDesktop(bool bFade)
 {
+//  UnLockWndSta();
   if(g_WatchDogProcess)
   {
     TerminateProcess(g_WatchDogProcess,0);
