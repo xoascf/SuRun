@@ -179,3 +179,10 @@ protected:
 // '*' any "zero or more" characters in s match
 // e.G. strwldcmp("Test me","t*S*") strwldcmp("Test me","t?S*e") would match
 bool strwldcmp(LPCTSTR s, LPCTSTR pattern) ;
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+//Show Window on primary Monitor
+// 
+/////////////////////////////////////////////////////////////////////////////
+void BringToPrimaryMonitor(HWND hWnd);
