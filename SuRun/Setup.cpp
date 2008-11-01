@@ -415,6 +415,7 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
+      BringToPrimaryMonitor(hwnd);
       HWND hUL=GetDlgItem(hwnd,IDC_USERLIST);
       SendMessage(hUL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
       LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
@@ -512,6 +513,7 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   switch(msg)
   {
   case WM_INITDIALOG:
+    BringToPrimaryMonitor(hwnd);
     SetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName);
     if (g_AppOpt.OfnTitle==IDS_ADDFILETOLIST)
     {
@@ -632,6 +634,7 @@ INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
+      BringToPrimaryMonitor(hwnd);
       HWND hBL=GetDlgItem(hwnd,IDC_BLACKLIST);
       SendMessage(hBL,LVM_SETEXTENDEDLISTVIEWSTYLE,0,LVS_EX_INFOTIP);
       LVCOLUMN col={LVCF_WIDTH,0,22,0,0,0,0,0};
@@ -1306,6 +1309,7 @@ INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
+      BringToPrimaryMonitor(hwnd);
       CheckDlgButton(hwnd,IDC_IMPSURUNSETTINGS,1);
       CheckDlgButton(hwnd,IDC_IMPBLACKLIST,1);
       CheckDlgButton(hwnd,IDC_IMPUSRSETTINGS,1);
@@ -2160,6 +2164,7 @@ INT_PTR CALLBACK MainSetupDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam
     break;
   case WM_INITDIALOG:
     {
+      BringToPrimaryMonitor(hwnd);
       SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
       SetForegroundWindow(hwnd);
       SendMessage(hwnd,WM_SETICON,ICON_BIG,
