@@ -12,6 +12,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -97,6 +100,65 @@
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
 				OutputFile="ReleaseUsr32/SuRun32.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="SuRun32 Unicode Release|x64"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -207,14 +269,8 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="x64 Unicode Release|Win32"
-			OutputDirectory=".\ReleaseUx64"
-			IntermediateDirectory=".\ReleaseUx64"
+			Name="Unicode Release|x64"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -230,50 +286,21 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName=".\ReleaseUx64/SuRun.tlb"
-				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHsc /Wp64 "
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\ReleaseUx64/SuRun.pch"
-				AssemblerListingLocation=".\ReleaseUx64/"
-				ObjectFile=".\ReleaseUx64/"
-				ProgramDataBaseFileName=".\ReleaseUx64/"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1031"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1&gt;NUL 2&gt;NUL&#x0D;&#x0A;if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1&gt;NUL 2&gt;NUL&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089 /machine:AMD64 "
-				AdditionalDependencies="bufferoverflowu.lib"
-				OutputFile=".\ReleaseUx64/SuRun.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\ReleaseUx64/SuRun.pdb"
-				SubSystem="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -286,8 +313,6 @@
 			/>
 			<Tool
 				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
-				OutputFile=".\ReleaseUx64/SuRun.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -398,6 +423,228 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Unicode Debug|x64"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="x64 Unicode Release|Win32"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="x64 Unicode Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="3"
+				TypeLibraryName=".\ReleaseUx64/SuRun.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/EHsc /Wp64 "
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="0"
+				PrecompiledHeaderFile=".\ReleaseUx64/SuRun.pch"
+				AssemblerListingLocation=".\ReleaseUx64/"
+				ObjectFile=".\ReleaseUx64/"
+				ProgramDataBaseFileName=".\ReleaseUx64/"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1031"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+				CommandLine="if exist $(OutDir)\SuRun.exe del /f $(OutDir)\SuRun.exe 1&gt;NUL 2&gt;NUL&#x0D;&#x0A;if exist $(OutDir)\SuRun.exe $(OutDir)\SuRun.exe /DeleteService 1&gt;NUL 2&gt;NUL&#x0D;&#x0A;"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/IGNORE:4089 /machine:AMD64 "
+				AdditionalDependencies="bufferoverflowu.lib"
+				ShowProgress="0"
+				OutputFile=".\ReleaseUx64/SuRun.exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				GenerateManifest="false"
+				IgnoreDefaultLibraryNames=""
+				ProgramDatabaseFile=".\ReleaseUx64/SuRun.pdb"
+				SubSystem="2"
+				TerminalServerAware="2"
+				SwapRunFromNet="false"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\ReleaseUx64/SuRun.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -426,7 +673,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -434,7 +681,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -462,7 +709,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -470,7 +717,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -498,7 +745,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -506,7 +753,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -534,7 +781,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -542,7 +789,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -570,7 +817,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -578,7 +825,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -606,7 +853,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -614,7 +861,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -642,7 +889,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -650,7 +897,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -678,7 +925,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -686,7 +933,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -714,7 +961,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -722,7 +969,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -750,7 +997,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -758,7 +1005,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -786,7 +1033,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -794,7 +1041,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -822,7 +1069,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -830,7 +1077,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -858,7 +1105,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
@@ -866,7 +1113,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
@@ -894,7 +1141,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -902,7 +1149,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -930,7 +1177,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -938,7 +1185,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -966,7 +1213,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -974,7 +1221,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1002,7 +1249,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1010,7 +1257,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1038,7 +1285,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="x64 Unicode Release|Win32"
+					Name="Unicode Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1046,7 +1293,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Unicode Debug|Win32"
+					Name="x64 Unicode Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
