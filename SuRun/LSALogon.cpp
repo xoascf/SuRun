@@ -301,7 +301,8 @@ PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
     return NULL;
   PTOKEN_GROUPS pDstTG = NULL;
   SIZE_T dwTGlen=sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*(pSrcTG->GroupCount+1);
-  for(DWORD i=0;i<pSrcTG->GroupCount;i++)
+  DWORD i;
+  for(i=0;i<pSrcTG->GroupCount;i++)
     dwTGlen+=GetLengthSid(pSrcTG->Groups[i].Sid);
   dwTGlen+=GetLengthSid(pAdd->Sid);
   pDstTG=(PTOKEN_GROUPS)malloc(dwTGlen);
