@@ -1,0 +1,77 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstallSuRun", "InstallSuRun\InstallSuRun.vcproj", "{41A21179-4FA1-468C-9BCC-5361B16820E5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuRun", "SuRun.vcproj", "{E2D9F51D-F6C6-4CA4-850D-400750170DE1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D} = {FA077C5B-83CD-456F-BEC8-C9E4C889352D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuRunExt", "SuRunExt\SuRunExt.vcproj", "{FA077C5B-83CD-456F-BEC8-C9E4C889352D}"
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 4
+		SccProjectUniqueName0 = InstallSuRun\\InstallSuRun.vcproj
+		SccLocalPath0 = .
+		SccProjectFilePathRelativizedFromConnection0 = InstallSuRun\\
+		SccProjectUniqueName1 = SuRun.vcproj
+		SccLocalPath1 = .
+		SccProjectUniqueName2 = SuRunExt\\SuRunExt.vcproj
+		SccLocalPath2 = .
+		SccProjectFilePathRelativizedFromConnection2 = SuRunExt\\
+		SccProjectName3 = \u0022$/SuRun\u0022,\u0020TSQCAAAA
+		SccLocalPath3 = .
+		SccProvider3 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		SuRun32 Unicode Release|Win32 = SuRun32 Unicode Release|Win32
+		Unicode Debug|Win32 = Unicode Debug|Win32
+		Unicode Release|Win32 = Unicode Release|Win32
+		x64 Unicode Release|Win32 = x64 Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Debug|Win32.Build.0 = Debug|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Release|Win32.ActiveCfg = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Release|Win32.Build.0 = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.SuRun32 Unicode Release|Win32.ActiveCfg = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.SuRun32 Unicode Release|Win32.Build.0 = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.Unicode Release|Win32.Build.0 = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.x64 Unicode Release|Win32.ActiveCfg = Release|Win32
+		{41A21179-4FA1-468C-9BCC-5361B16820E5}.x64 Unicode Release|Win32.Build.0 = Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Debug|Win32.Build.0 = Unicode Debug|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Release|Win32.ActiveCfg = x64 Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Release|Win32.Build.0 = x64 Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.SuRun32 Unicode Release|Win32.ActiveCfg = SuRun32 Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.SuRun32 Unicode Release|Win32.Build.0 = SuRun32 Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.x64 Unicode Release|Win32.ActiveCfg = x64 Unicode Release|Win32
+		{E2D9F51D-F6C6-4CA4-850D-400750170DE1}.x64 Unicode Release|Win32.Build.0 = x64 Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Debug|Win32.Build.0 = Unicode Debug|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Release|Win32.ActiveCfg = SuRun32 Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Release|Win32.Build.0 = SuRun32 Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.SuRun32 Unicode Release|Win32.ActiveCfg = SuRun32 Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.SuRun32 Unicode Release|Win32.Build.0 = SuRun32 Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.x64 Unicode Release|Win32.ActiveCfg = x64 Unicode Release|Win32
+		{FA077C5B-83CD-456F-BEC8-C9E4C889352D}.x64 Unicode Release|Win32.Build.0 = x64 Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
