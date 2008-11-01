@@ -79,7 +79,8 @@ int FindSCClose(HMENU m)
 {
   //return position of SC_CLOSE in menu.
   //Insert Separator before SC_CLOSE if no separator precedes it
-  for (int i=0;i<GetMenuItemCount(m)&&(GetMenuItemID(m,i)!=SC_CLOSE);i++);
+  int i;
+  for (i=0;i<GetMenuItemCount(m)&&(GetMenuItemID(m,i)!=SC_CLOSE);i++);
   if(i && ((GetMenuItemType(m,i-1)&MFT_SEPARATOR)==0))
     InsertMenu(m,i++,MF_SEPARATOR|MF_BYPOSITION,WM_SYSMH0,0);
   return i;
