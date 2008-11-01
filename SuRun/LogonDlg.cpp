@@ -339,6 +339,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     break;
   case WM_INITDIALOG:
     {
+      BringToPrimaryMonitor(hwnd);
       SetWindowPos(hwnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
       SetForegroundWindow(hwnd);
       LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)lParam;
