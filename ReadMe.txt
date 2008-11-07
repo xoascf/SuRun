@@ -116,12 +116,13 @@ SuRuns supports the following command line:
 "SuRun [options] [<program>]" to start <program> as Administrator.
 
 options:
-  /QUIET              do not display an messages
-  /RUNAS <program>    start <program> as different user
-  /RESTORE <file>     restore "SuRun Settings" from <file>
-  /SETUP              start "SuRun Settings"
+  /BACKUP <file>      backup "SuRun Settings" to <file>
   /INSTALL            Install SuRun unattended
   /INSTALL <file>     Install SuRun unattended and do "SuRun /RESTORE <file>"
+  /QUIET              do not display an messages
+  /RESTORE <file>     restore "SuRun Settings" from <file>
+  /RUNAS <program>    start <program> as different user
+  /SETUP              start "SuRun Settings"
   /UNINSTALL          remove SuRun from the system
 
 Below are some SuRun command lines for common Windows tasks:
