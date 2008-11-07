@@ -342,11 +342,6 @@ BEGIN
     CONTROL         "Verknüpfungen mit SuRun beibehalten, wie sie sind",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     14,50,335,10
-    LTEXT           "Folgende Sicherheits-Richtlinie sollte unbedingt aktiviert werden:",
-                    IDC_OWNGRPST,14,64,335,8
-    CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer unter SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,14,73,335,27
     PUSHBUTTON      "&Abbrechen",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -740,6 +735,7 @@ BEGIN
     IDS_INSTSUCCESS3        "Das System muss neu gestartet werden!"
     IDS_HIDESELF            "Wollen Sie SuRun wirklich vor sich selbst verstecken?\n\nSie können danach keine SuRun-Einstellungen mehr verändern."
     IDS_NOIMPORT            "Sie müssen Mitglied der lokalen Administratorengruppe\nsein, um SuRuns Einstellungen zu importieren."
+    IDS_NOEXPORT            "Sie müssen Mitglied der lokalen Administratorengruppe\nsein, um SuRuns Einstellungen zu exportieren."
 END
 
 #endif    // German (Germany) resources
@@ -1094,11 +1090,6 @@ BEGIN
     CONTROL         "Keep SuRun's associations, as they are now",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     14,50,335,10
-    LTEXT           "For security the following group policy must be activated:",
-                    IDC_OWNGRPST,14,64,335,8
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,14,73,335,27
     PUSHBUTTON      "&Cancel",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -1475,6 +1466,7 @@ BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
     IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
     IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
+    IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
 END
 
 #endif    // English (U.S.) resources
@@ -1742,11 +1734,6 @@ BEGIN
     CONTROL         "SuRun context-menu's behouden zoals ze zijn",
                     IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     14,50,335,10
-    LTEXT           "Het volgende veiligheidsbeleid moet worden ingesteld:",
-                    IDC_OWNGRPST,14,64,335,8
-    CONTROL         "Markeer 'Administrators' i.p.v. 'Maker' als eigenaar van Administrators-bestanden.\nWAARSCHUWING: Indien niet geactiveerd, kunnen gebruikers bestanden en registersleutels van SuRun Administrators wijzigen!!",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,14,73,335,27
     PUSHBUTTON      "&Annuleren",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
                     LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
@@ -2150,6 +2137,7 @@ BEGIN
     IDS_INSTSUCCESS3        "De computer moet opnieuw starten!"
     IDS_HIDESELF            "Wilt u SuRun voor UZELF verbergen?\n\nSuRun instellingen kunnen hierna niet meer worden gewijzigd."
     IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
+    IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
 END
 
 #endif    // Dutch (Netherlands) resources
