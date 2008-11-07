@@ -452,7 +452,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
           continue;
         }
-        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/SAVE "),9)==0))
+        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/BACKUP "),8)==0))
         {
           GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
           //Double check if User is Admin!
