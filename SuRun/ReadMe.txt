@@ -109,6 +109,39 @@ Why use SuRun?
 *SuRun does not put nor leave the user in the administrators group.
 
 ------------------------------------------------------------------------------
+Command line switches
+------------------------------------------------------------------------------
+SuRuns supports the following command line:
+
+"SuRun [options] [<program>]" to start <program> as Administrator.
+
+options:
+  /QUIET              do not display an messages
+  /RUNAS <program>    start <program> as different user
+  /RESTORE <file>     restore "SuRun Settings" from <file>
+  /SETUP              start "SuRun Settings"
+  /INSTALL            Install SuRun unattended
+  /INSTALL <file>     Install SuRun unattended and do "SuRun /RESTORE <file>"
+  /UNINSTALL          remove SuRun from the system
+
+Below are some SuRun command lines for common Windows tasks:
+  Automatic Updates:    "surun wuaucpl.cpl"
+  Computer Management:  "surun compmgmt.msc"
+  Date and Time:        "surun timedate.cpl"
+  Network Connections:	"surun ncpa.cpl"
+  Security Center:	    "surun wscui.cpl"
+  Software:	            "surun appwiz.cpl"
+  System Properties:    "surun sysdm.cpl"
+
+Some applications do not work with SuRun when started with the limited current
+user account credentials. These must be started with the credentials of a real 
+Administrator account using "SuRun /RUNAS":
+  Group Policy:         "surun /runas gpedit.msc"
+  Local Policy:         "surun /runas secpol.msc"
+  User accounts:        "surun /runas nusrmgr.cpl"
+  Windows Update:	      "surun /runas wupdmgr.exe"
+
+------------------------------------------------------------------------------
 How to build the sources?
 ------------------------------------------------------------------------------
 
