@@ -100,6 +100,7 @@
 #define IDS_INSTSUCCESS3                96
 #define IDS_HIDESELF                    97
 #define IDS_NOIMPORT                    98
+#define IDS_NOEXPORT                    99
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
