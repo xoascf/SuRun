@@ -452,6 +452,22 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
           continue;
         }
+        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/SAVE "),9)==0))
+        {
+          GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+          //Double check if User is Admin!
+          if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
+          {
+            ExportSettings(&g_RunData.cmdLine[9]);
+            ResumeClient(RETVAL_OK);
+          }
+          else
+          {
+            ResumeClient(RETVAL_OK);
+            SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+          }
+          continue;
+        }
         if (!g_RunData.bRunAs)
         {
           DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
