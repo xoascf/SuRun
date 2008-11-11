@@ -450,6 +450,26 @@ HANDLE GetAdminToken(DWORD SessionID)
     HANDLE hShell=GetSessionUserToken(SessionID);
     if(!hShell) 
       __leave;
+    //Is the Shell token a Vista Split token?
+    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    {
+      //Vista UAC: Try to get the elevated token!
+      TOKEN_ELEVATION_TYPE et;
+      DWORD dwSize=sizeof(et);
+      if (GetTokenInformation(hShell,(TOKEN_INFORMATION_CLASS)TokenElevationType,
+                              &et,dwSize,&dwSize)
+        &&(et==TokenElevationTypeLimited))
+      {
+        TOKEN_LINKED_TOKEN lt = {0}; 
+        HANDLE hAdmin=0;
+        dwSize = sizeof(lt); 
+        if (GetTokenInformation(hShell,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
+                                &lt,dwSize,&dwSize)
+          && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
+            SecurityImpersonation,TokenPrimary,&hUser)) 
+          __leave;
+      }
+    }
     //Copy Logon SID from the Shell Process of SessionID:
     LogonSID=GetLogonSid(hShell);
     if(!LogonSID)
