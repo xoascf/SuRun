@@ -1264,7 +1264,7 @@ DWORD UserIsInSuRunnersOrAdmins()
   PSID SuRunnersSID=GetAccountSID(SURUNNERSGROUP);
   DWORD dwRet=0;
   for(UINT i=0;i<ptg->GroupCount;i++)
-    if((ptg->Groups[i].Attributes & SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY)
+    if((ptg->Groups[i].Attributes & (SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY))
       &&(IsValidSid(ptg->Groups[i].Sid)))
     {
       if(EqualSid(ptg->Groups[i].Sid,AdminSID))
