@@ -1155,6 +1155,7 @@ void SuRun(DWORD ProcessID)
       }
       return;
     }
+    //ToDo: check for Split Admin!!!!!
     if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
     {
       //Just start the client process!
