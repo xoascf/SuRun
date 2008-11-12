@@ -143,14 +143,16 @@ BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
   if (LOBYTE(LOWORD(GetVersion()))<6)
     return FALSE;
   BOOL   bRet = FALSE;
-  if((hToken!=NULL) || OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+  HANDLE hT=hToken;
+  if((hT!=NULL) || OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
   {
     TOKEN_ELEVATION_TYPE elevationType;
     DWORD dwSize;
     if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenElevationType,
                             &elevationType,sizeof(elevationType),&dwSize))
       bRet=elevationType==TokenElevationTypeLimited;
-    CloseHandle(hToken);
+    if (hT==NULL)
+      CloseHandle(hToken);
   }
   return bRet;
 };
