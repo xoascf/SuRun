@@ -138,13 +138,12 @@ typedef enum _TOKEN_ELEVATION_TYPE
 } TOKEN_ELEVATION_TYPE, *PTOKEN_ELEVATION_TYPE;
 #endif TokenElevationType
 
-BOOL IsSplitAdmin()
+BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
 {
   if (LOBYTE(LOWORD(GetVersion()))<6)
     return FALSE;
   BOOL   bRet = FALSE;
-  HANDLE hToken;
-  if(OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+  if((hToken!=NULL) || OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
   {
     TOKEN_ELEVATION_TYPE elevationType;
     DWORD dwSize;
