@@ -101,6 +101,8 @@
 #define IDS_HIDESELF                    97
 #define IDS_NOIMPORT                    98
 #define IDS_NOEXPORT                    99
+#define IDS_ASKSURUNNER2                45
+#define IDS_ASKSURUNNER3                46
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
