@@ -1252,10 +1252,10 @@ DWORD UserIsInSuRunnersOrAdmins()
   HANDLE hToken=NULL;
   if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken))
     return 0;
+	PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
   DWORD dwRet=0;
   if(IsSplitAdmin(hToken))
     dwRet|=IS_SPLIT_ADMIN;
-	PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
   CloseHandle(hToken);
   if (!ptg)
     return 0;
