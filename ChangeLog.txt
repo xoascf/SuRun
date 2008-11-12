@@ -1,7 +1,5 @@
 Done, to be tested:
 ---------------------------
-* No "owner of created objects" on Update
-* new command line option "/BACKUP <file>"
 * VISTA: Split Admins get the elevated token
 * VISTA: When UAC is enabled and Admins are put into SuRunners, they are NOT 
     removed from "Administrators"
@@ -30,6 +28,17 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.6 beta 4 - 2008-11-12:
+----------------------------------
+* "'Administrators' instead of 'Object creator' as default owner for objects 
+  created by administrators." policy is left as it is on SuRun Update
+* new command line option "/BACKUP <file>"
+* VISTA: SuRun works for UAC-Administrators. If a UAC-Administrator is in 
+  SuRunners he/she can use SuRun as normal SuRunner.
+* VISTA: When UAC is enabled and Admins are put into SuRunners, they are NOT 
+    removed from "Administrators"
+* VISTA: Split Admins get the elevated token
 
 SuRun 1.2.0.6 beta 3 - 2008-11-01:
 ----------------------------------
