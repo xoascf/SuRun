@@ -262,7 +262,7 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
 //  BecomeSuRunner
 // 
 //////////////////////////////////////////////////////////////////////////////
-BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd)
+BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,bool bIsSplitAdmin,BOOL bHimSelf,HWND hwnd)
 {
   //Is User member of SuRunners?
   CResStr sCaption(IDS_APPNAME);
@@ -273,7 +273,7 @@ BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,BOOL bHimS
     _tcscat(sCaption,L")");
   }
   //Is User member of Administrators?
-  if (bIsInAdmins)
+  if (bIsInAdmins && (!bIsSplitAdmin))
   {
     //Whoops...need to become a User!
     if(SafeMsgBox(hwnd,
@@ -313,7 +313,12 @@ BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,BOOL bHimS
       SafeMsgBox(hwnd,CBigResStr(IDS_LOGOFFON),sCaption,MB_ICONINFORMATION);
     return TRUE;
   }
-  if (bHimSelf && (!LogonAdmin(SessionID,IDS_NOSURUNNER)))
+  //Vista, leave user in Admins to not affect UAC
+  if(bIsSplitAdmin && (SafeMsgBox(hwnd,
+      CBigResStr((bHimSelf?IDS_ASKSURUNNER2:IDS_ASKSURUNNER3),UserName),
+          sCaption,MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION)==IDNO))
+    return FALSE;
+  if ((!bIsSplitAdmin) && bHimSelf && (!LogonAdmin(SessionID,IDS_NOSURUNNER)))
     return FALSE;
   DWORD dwRet=(AlterGroupMember(SURUNNERSGROUP,UserName,1)!=0);
   if (dwRet && (dwRet!=ERROR_MEMBER_IN_ALIAS))
