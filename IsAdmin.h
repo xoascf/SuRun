@@ -17,7 +17,7 @@
 BOOL IsAdmin(HANDLE hToken=NULL);
 
 //returns true if the user has a non piviliged split token
-BOOL IsSplitAdmin();
+BOOL IsSplitAdmin(HANDLE hToken=NULL);
 
 // return true if you are running as local system
 bool IsLocalSystem();
