@@ -46,11 +46,12 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionID);
 
 #define IS_IN_ADMINS    1
 #define IS_IN_SURUNNERS 2
+#define IS_SPLIT_ADMIN  4
 DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID);
 
 
 //  BecomeSuRunner: check, if User is SuRunner if not, try to join him
-BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,BOOL bHimSelf,HWND hwnd);
+BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,bool bIsSplitAdmin,BOOL bHimSelf,HWND hwnd);
 
 // User list
 //
