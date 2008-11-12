@@ -1134,8 +1134,9 @@ BOOL ImportUser(LPCTSTR ini,int nUser)
   return TRUE;
 }
 
-void ExportSettings(LPCTSTR ini)
+void ExportSettings(LPTSTR ini)
 {
+  PathUnquoteSpaces(ini);
   DeleteFile(ini);
   CResStr SuRunKey(_T("SuRun"));
   WritePrivateProfileString(SuRunKey,_T("Version"),GetVersionString(),ini);
@@ -1281,8 +1282,9 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
     for (int u=0;ImportUser(ini,u);u++);
 }
 
-void ImportSettings(LPCTSTR ini)
+void ImportSettings(LPTSTR ini)
 {
+  PathUnquoteSpaces(ini);
   ImportSettings(ini,true,true,true);
 }
 
