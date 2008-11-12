@@ -266,6 +266,10 @@ inline BOOL ShowBalloon(LPCTSTR u,BOOL bAdmin,BOOL bSuRunner)
 
 #define SRGetWinUpd4All     (GetShExtSetting(L"ShowWindowsUpdateForAll",0)!=0)
 
+#define UACEnabled        (GetRegInt(HKLM,\
+                            _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"),\
+                            _T("EnableLUA"),0)!=0)
+
 #define GetWinUpd4All     (GetRegInt(HKLM,\
                             _T("SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate"),\
                             _T("ElevateNonAdmins"),0)!=0)
