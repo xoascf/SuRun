@@ -233,8 +233,11 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
       for(DWORD i = 0; (i<total); i++) 
       {
         if(wcsicmp(Users[i].lgrui0_name,AGroup)==0)
+        {
           dwRet|=IS_IN_ADMINS;
-        else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
+          if (UACEnabled)
+            dwRet|=IS_SPLIT_ADMIN;
+        }else if(wcsicmp(Users[i].lgrui0_name,SURUNNERSGROUP)==0)
           dwRet|=IS_IN_SURUNNERS;
       }
       NetApiBufferFree(Users);
