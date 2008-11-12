@@ -1755,10 +1755,11 @@ EditApp:
         {
           zero(g_SD->NewUser);
           DialogBox(GetModuleHandle(0),MAKEINTRESOURCE(IDD_SELUSER),hwnd,SelUserDlgProc);
+          bool IsAdmin=IsInAdmins(g_SD->NewUser,g_SD->SessID)!=0;
+          bool IsSplitAdmin=IsAdmin&&UACEnabled;
           if (g_SD->NewUser[0] 
             && (!IsInSuRunners(g_SD->NewUser,g_SD->SessID))
-            && BecomeSuRunner(g_SD->NewUser,g_SD->SessID,
-                        IsInAdmins(g_SD->NewUser,g_SD->SessID)!=0,FALSE,hwnd))
+            && BecomeSuRunner(g_SD->NewUser,g_SD->SessID,IsAdmin,IsSplitAdmin,FALSE,hwnd))
           {
             g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,g_SD->SessID,TRUE);
             UpdateUserList(hwnd,g_SD->NewUser);
