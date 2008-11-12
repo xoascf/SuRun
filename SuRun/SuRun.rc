@@ -631,11 +631,13 @@ BEGIN
     IDS_MENUSTR             "Starte als Administrator"
     IDS_BUILTINADMIN        "Sie sind ein vordefinierter Administrator!\r\n\r\nSie können SuRun nicht benutzen, weil Sie nicht zum normalen Benutzer degradiert werden können."
     IDS_SURUNNER_OK         "Sie sind erfolgreich als Mitglied in die Gruppe ""SuRunners"" aufgenommen worden."
+    IDS_ASKSURUNNER2        "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nWollen Sie Mitglied der ""SuRunners"" Gruppe werden?\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_ASKSURUNNER1        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe und aus der Administratoren Gruppe ausgetragen wird?\r\n\r\nWenn Sie Ja wählen, ist %s KEIN ADMINISTRATOR mehr, sondern SuRunner."
+    IDS_ASKSURUNNER3        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe wird?"
     IDS_BUILTINADMIN1       "'%s' ist ein vordefinierter Administrator!\r\n\r\nEr kann SuRun nicht benutzen, weil er nicht zum normalen Benutzer degradiert werden kann."
     IDS_NOADD2USERS1        "Fehler!\r\n\r\n'%s' konnte nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Fehler!\r\n\r\n'%s' konnte nicht in die ""SuRunners"" Gruppe aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
@@ -1359,6 +1361,7 @@ BEGIN
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
     IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
+    IDS_ASKSURUNNER2        "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_MENUSTR             "Start as administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot use SuRun because you cannot act as normal user!"
     IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
@@ -1367,6 +1370,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
+    IDS_ASKSURUNNER3        "Do you want '%s' to become a 'SuRunners' member?"
     IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
     IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nPutting '%s' into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
@@ -2030,6 +2034,7 @@ BEGIN
     IDS_NOADMIN             "Fout!\r\n\r\nGebruiker %s is geen Administrator!"
     IDS_NOSURUNNER          "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nVoer naam en wachtwoord van de computerbeheerder in.\r\n\r\nOf druk 'Annuleren'!"
     IDS_ASKSURUNNER         "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nAls u JA drukt, wordt u toegevoegd aan de groep SuRunners en VERLIEST u uw ADMINISTRATOR STATUS.\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
+    IDS_ASKSURUNNER2        "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
     IDS_MENUSTR             "Start als Administrator"
     IDS_BUILTINADMIN        "U bent aangemeld als de ""ingebouwde"" Windows Administrator.\r\n\r\nU kunt SuRun zo niet gebruiken!"
     IDS_SURUNNER_OK         "U bent toegevoegd aan de gebruikersgroep ""SuRunners""."
@@ -2038,6 +2043,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_ASKSURUNNER1        "Wilt u dat '%s' aan de groep 'SuRunners' wordt toegevoegd?\r\n\r\nAls u JA drukt, zal '%s' zijn ADMINISTRATOR STATUS VERLIEZEN."
+    IDS_ASKSURUNNER3        "Wilt u dat '%s' aan de groep 'SuRunners' wordt toegevoegd?"
     IDS_BUILTINADMIN1       "'%s' is de ""ingebouwde"" Administrator.\r\n\r\nTDeze gebruiker kan SuRun niet gebruiken!"
     IDS_NOADD2USERS1        "Fout!\r\n\r\nKan '%s' niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nKan '%s' niet aan de groep ""SuRunners"" toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
