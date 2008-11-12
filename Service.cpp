@@ -730,7 +730,8 @@ DWORD PrepareSuRun()
   else
   if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
-  g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
+  g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID)
+                  |(g_RunData.Groups&IS_SPLIT_ADMIN);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
     return RETVAL_CANCELLED;
   //Create the new desktop
@@ -740,7 +741,7 @@ DWORD PrepareSuRun()
   {
     //secure desktop created...
     if ((!g_CliIsInSuRunners)
-      && (!BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,TRUE,0)))
+      && (!BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0)))
       return RETVAL_CANCELLED;
     if (!g_CliIsInSuRunners)
     {
@@ -863,7 +864,7 @@ BOOL Setup()
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
   if (g_CliIsInSuRunners 
-    || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,TRUE,0))
+    || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0))
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   return false;
 }
@@ -1155,7 +1156,6 @@ void SuRun(DWORD ProcessID)
       }
       return;
     }
-    //ToDo: check for Split Admin!!!!!
     if (g_CliIsAdmin && (GetNoConvAdmin||GetNoConvUser))
     {
       //Just start the client process!
