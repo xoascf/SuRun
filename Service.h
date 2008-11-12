@@ -55,6 +55,7 @@ typedef struct
 }RUNDATA;
 
 #define g_CliIsInAdmins    ((g_RunData.Groups&IS_IN_ADMINS)!=0)
+#define g_CliIsSplitAdmin  ((g_RunData.Groups&IS_SPLIT_ADMIN)!=0)
 #define g_CliIsInSuRunners ((g_RunData.Groups&IS_IN_SURUNNERS)!=0)
 
 extern bool g_CliIsAdmin;
