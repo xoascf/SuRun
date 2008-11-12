@@ -1939,7 +1939,7 @@ bool HandleServiceStuff()
       GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
       GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
       ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
-      g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
+      g_RunData.Groups=UserIsInSuRunnersOrAdmins();
       //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
       //if the hooks are still loaded
 
@@ -1984,7 +1984,7 @@ bool HandleServiceStuff()
         {
           if(CheckServiceStatus()!=SERVICE_RUNNING)
             break;
-          g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
+          g_RunData.Groups=UserIsInSuRunnersOrAdmins();
           t.Set(10000);
         }
 #ifndef _SR32
