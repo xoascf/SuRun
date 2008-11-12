@@ -3,10 +3,11 @@ Done, to be tested:
 * No "owner of created objects" on Update
 * new command line option "/BACKUP <file>"
 * VISTA: Split Admins get the elevated token
+* VISTA: When UAC is enabled and Admins are put into SuRunners, they are NOT 
+    removed from "Administrators"
 
 ToDo
 ---------------------
-* VISTA: Split Admins should see SuRuns Hooks
 * Console SuRun support
 * Integrate "Nero Burning Rights" functions
 
