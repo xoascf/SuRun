@@ -24,6 +24,7 @@
 #include <Tlhelp32.h>
 
 #include "Helpers.h"
+#include "IsAdmin.h"
 #include "lsa_laar.h"
 #include "UserGroups.h"
 #include "DBGTRace.h"
@@ -1251,6 +1252,9 @@ DWORD UserIsInSuRunnersOrAdmins()
   HANDLE hToken=NULL;
   if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken))
     return 0;
+  DWORD dwRet=0;
+  if(IsSplitAdmin(hToken))
+    dwRet|=IS_SPLIT_ADMIN;
 	PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
   CloseHandle(hToken);
   if (!ptg)
@@ -1262,7 +1266,6 @@ DWORD UserIsInSuRunnersOrAdmins()
     DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
     return free(ptg),0; 
   PSID SuRunnersSID=GetAccountSID(SURUNNERSGROUP);
-  DWORD dwRet=0;
   for(UINT i=0;i<ptg->GroupCount;i++)
     if((ptg->Groups[i].Attributes & (SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY))
       &&(IsValidSid(ptg->Groups[i].Sid)))
@@ -1272,10 +1275,10 @@ DWORD UserIsInSuRunnersOrAdmins()
       else if(SuRunnersSID && EqualSid(ptg->Groups[i].Sid,SuRunnersSID))
         dwRet|=IS_IN_SURUNNERS;
     }
-
   FreeSid(AdminSID);
   free(SuRunnersSID);
   free(ptg);
+  
 	return dwRet;
 }
 
