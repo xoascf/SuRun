@@ -31,11 +31,12 @@ SuRun Changes:
 
 SuRun 1.2.0.6 beta 5 - 2008-11-13:
 ----------------------------------
-* SuRuns IAT-Hook suspends all Threads i a process before modifying the IAT.
-  Hopefully this finally solves the Outlook 2007 and Eclips problems.
-* SuRun sends a lot more Messages to Widows Debug output if something fails 
-  while trying to start an elevated process. Hopefully this helps to fix the
-  Problems with SuRun in Domains.
+* SuRuns IAT-Hook suspends all Threads in a process before modifying the IAT.
+  Hopefully this finally solves the Outlook 2007 and Eclipse problems.
+* SuRun sends Messages to Widows Debug output if something fails while trying 
+  to start an elevated process. Hopefully this helps to fix the Problems with 
+  SuRun in Domains.
+* FIX: "SuRun /BACKUP" did not work at all!
 * FIX: "SuRun /BACKUP" and "SuRun /RESTORE" did not support "quoted" file names
 * "SuRun /RESTORE" now displays a "File not found" message
 
