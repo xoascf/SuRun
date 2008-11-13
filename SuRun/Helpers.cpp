@@ -738,7 +738,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
     //if path=="d:" -> "cd d:"
     if (!SetCurrentDirectory(path))
     {
-      DBGTrace2("SetCurrentDirectory(%s) failed",path,GetLastErrorNameStatic());
+      DBGTrace2("SetCurrentDirectory(%s) failed: %s",path,GetLastErrorNameStatic());
       return false;
     }
     //if path=="d:" -> "cd d:" -> "d:\documents"
