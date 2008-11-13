@@ -118,7 +118,7 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 /////////////////////////////////////////////////////////////////////////////
 BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
-  CTimeLog l(L"IsInGroupDirect(%s,%s)",Group,DomainAndName);
+  //CTimeLog l(L"IsInGroupDirect(%s,%s)",Group,DomainAndName);
 	DWORD result = 0;
 	NET_API_STATUS status;
 	LPLOCALGROUP_MEMBERS_INFO_3 Members = NULL;
@@ -154,6 +154,8 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName,DWORD SessionId)
 {	
   //CTimeLog l(L"IsInGroup(%s,%s)",Group,DomainAndName);
   //try to find user in local group
+  if ((!DomainAndName)||(*DomainAndName==0))
+    return FALSE;
   NET_API_STATUS status;
   LPLOCALGROUP_USERS_INFO_0 Users = 0;
   DWORD num = 0;
@@ -553,7 +555,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     res = NetLocalGroupGetMembers(0,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
-      DBGTrace1("NetLocalGroupGetMembers failed: %s",GetErrorNameStatic(res));
+      DBGTrace2("NetLocalGroupGetMembers(%s) failed: %s",GroupName,GetErrorNameStatic(res));
       break;
     }
     for(LOCALGROUP_MEMBERS_INFO_2* p=(LOCALGROUP_MEMBERS_INFO_2*)pBuff;dwRec>0;dwRec--,p++)
