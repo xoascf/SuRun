@@ -549,6 +549,14 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   if (!pei->lpFile)
   {
     DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
+#ifdef DoDBGTrace
+    DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+      L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+      pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+      pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
+      pei->lpClass,
+      pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+#endif DoDBGTrace
     return S_FALSE;
   }
   EnterCriticalSection(&l_SxHkCs);
