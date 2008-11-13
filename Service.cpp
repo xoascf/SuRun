@@ -120,7 +120,8 @@ DWORD CheckCliProcess(RUNDATA& rd)
     HANDLE hThread=OpenThread(THREAD_ALL_ACCESS,FALSE,rd.CliThreadId);
     if (hThread)
     {
-      if (!OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok))
+      if ((!OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok))
+        && (GetLastError()!=ERROR_NO_TOKEN))
         DBGTrace2("OpenThreadToken(%d) failed: %s",rd.CliThreadId,GetLastErrorNameStatic());
       CloseHandle(hThread);
     }
