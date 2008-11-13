@@ -106,8 +106,7 @@ void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk)
     {
       if (!SetThreadDesktop(hd))
         DBGTrace1("SetThreadDesktop failed: %s",GetLastErrorNameStatic());
-      if (!CloseDesktop(hd))
-        DBGTrace1("CloseDesktop failed: %s",GetLastErrorNameStatic());
+      CloseDesktop(hd);
     }
   }
 }
@@ -522,7 +521,7 @@ BOOL WeMustClose()
   HWND w=GetForegroundWindow();
   if (!w)
   {
-    DBGTrace("SuRun: No foreground Window!");
+    //DBGTrace("SuRun: No foreground Window!");
     return FALSE;
   }
   DWORD pid=0;
