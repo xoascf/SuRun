@@ -1031,7 +1031,7 @@ DWORD LSAStartAdminProcess()
       if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
           CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
-        DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
+        //DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
         if(bIsExplorer)
         {
           //Before Vista: wait for and kill Desktop Proxy
