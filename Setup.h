@@ -365,5 +365,5 @@ void ReplaceSuRunWithRunAs(HKEY hKey=HKCR);
 
 BOOL RunSetup(DWORD SessionID,LPCTSTR User);
 
-void ImportSettings(LPTSTR ini);
+bool ImportSettings(LPTSTR ini);
 void ExportSettings(LPTSTR ini);
