@@ -505,9 +505,9 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
       rpi.hThread=OpenThread(SYNCHRONIZE,false,rpi.dwThreadId);
       if(lppi)
         memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
-      DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
-        cmd,rpi.dwProcessId,rpi.hProcess,
-        rpi.dwThreadId,rpi.hThread);
+//      DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
+//        cmd,rpi.dwProcessId,rpi.hProcess,
+//        rpi.dwThreadId,rpi.hThread);
     }
   }
   LeaveCriticalSection(&g_HookCs);
