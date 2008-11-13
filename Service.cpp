@@ -491,13 +491,13 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           //Double check if User is Admin!
           if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
           {
-            ExportSettings(&g_RunData.cmdLine[9]);
+            ExportSettings(&g_RunData.cmdLine[8],g_RunData.SessionID,g_RunData.UserName);
             ResumeClient(RETVAL_OK);
           }
           else
           {
             ResumeClient(RETVAL_OK);
-            SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+            SafeMsgBox(0,CBigResStr(IDS_NOEXPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
           }
           continue;
         }
