@@ -636,7 +636,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       if (ExitCode==RETVAL_OK)
       {
         pei->hInstApp=(HINSTANCE)33;
-        DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",cmd);
+        //DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",cmd);
         //return valid PROCESS_INFORMATION!
         if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
           pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
