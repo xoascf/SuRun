@@ -244,7 +244,7 @@ BOOL RenameRegKey(HKEY hKeyRoot,LPTSTR sSrc,LPTSTR sDst)
 
 BOOL DisablePrivilege(HANDLE hToken,LPCTSTR name)
 {
-  return  EnablePrivilege(hToken,name,0);
+  return EnablePrivilege(hToken,name,0);
 }
 
 BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name,DWORD how/*=SE_PRIVILEGE_ENABLED*/)
@@ -292,10 +292,16 @@ void AllowAccess(HANDLE hObject)
   // Get a pointer to the existing DACL.
   dwRes = GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
   if (ERROR_SUCCESS != dwRes) 
+  {
+    DBGTrace1("GetSecurityInfo failed: %s",GetErrorNameStatic(dwRes));
     goto Cleanup; 
+  }
   // Create a well-known SID for the Everyone group.
   if(! AllocateAndInitializeSid( &SIDAuthWorld,1,SECURITY_WORLD_RID,0,0,0,0,0,0,0,&pEveryoneSID) ) 
+  {
+    DBGTrace1("AllocateAndInitializeSid failed: %s",GetLastErrorNameStatic());
     return;
+  }
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
   // The ACE will allow Everyone read access to the key.
   memset(&ea,0,sizeof(EXPLICIT_ACCESS));
@@ -309,11 +315,17 @@ void AllowAccess(HANDLE hObject)
   // into the existing DACL.
   dwRes = SetEntriesInAcl(1,&ea,pOldDACL,&pNewDACL);
   if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1("SetEntriesInAcl failed: %s",GetErrorNameStatic(dwRes));
     goto Cleanup; 
+  }
   // Attach the new ACL as the object's DACL.
   dwRes = SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
   if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1("SetSecurityInfo failed: %s",GetErrorNameStatic(dwRes));
     goto Cleanup; 
+  }
 Cleanup:
   if(pSD != NULL) 
     LocalFree((HLOCAL) pSD); 
@@ -337,13 +349,13 @@ void AllowAccess(LPTSTR FileName)
   dwRes = GetNamedSecurityInfo(FileName, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,  NULL, NULL, &pOldDACL, NULL, &pSD);
   if (ERROR_SUCCESS != dwRes) 
   { 
-    DBGTrace1( "GetNamedSecurityInfo Error %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "GetNamedSecurityInfo Error %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Create a well-known SID for the Everyone group.
   if(! AllocateAndInitializeSid( &SIDAuthWorld, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0, &pEveryoneSID) ) 
   {
-    DBGTrace1( "AllocateAndInitializeSid Error %s\n", GetLastErrorNameStatic());
+    DBGTrace1( "AllocateAndInitializeSid Error %s", GetLastErrorNameStatic());
     return;
   }
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
@@ -360,14 +372,14 @@ void AllowAccess(LPTSTR FileName)
   dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
   if (ERROR_SUCCESS != dwRes)  
   {
-    DBGTrace1( "SetEntriesInAcl Error %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "SetEntriesInAcl Error %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Attach the new ACL as the object's DACL.
   dwRes = SetNamedSecurityInfo(FileName, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,  NULL, NULL, pNewDACL, NULL);
   if (ERROR_SUCCESS != dwRes)  
   {
-    DBGTrace1( "SetNamedSecurityInfo Error %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "SetNamedSecurityInfo Error %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
 Cleanup:
@@ -392,7 +404,7 @@ void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow)
     NULL, NULL, &pOldDACL, NULL, &pSD);
   if (ERROR_SUCCESS != dwRes) 
   { 
-    DBGTrace1( "GetNamedSecurityInfo failed %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "GetNamedSecurityInfo failed %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
@@ -402,7 +414,7 @@ void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow)
   dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
   if (ERROR_SUCCESS != dwRes)  
   {
-    DBGTrace1( "SetEntriesInAcl failed %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "SetEntriesInAcl failed %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Attach the new ACL as the object's DACL.
@@ -410,7 +422,7 @@ void SetRegistryTreeAccess(LPTSTR KeyName,LPTSTR Account,bool bAllow)
     NULL, NULL, pNewDACL, NULL);
   if (ERROR_SUCCESS != dwRes)  
   {
-    DBGTrace1( "SetNamedSecurityInfo failed %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "SetNamedSecurityInfo failed %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
 Cleanup:
@@ -434,14 +446,14 @@ BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account)
     NULL, NULL, &pDACL, NULL, &pSD);
   if (ERROR_SUCCESS != dwRes) 
   { 
-    DBGTrace1( "GetNamedSecurityInfo failed %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "GetNamedSecurityInfo failed %s", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
   BuildTrusteeWithName(&tr,Account);
   if (GetEffectiveRightsFromAcl(pDACL,&tr,&am)!=ERROR_SUCCESS)
   {
-    DBGTrace1( "GetEffectiveRightsFromAcl failed %s\n", GetErrorNameStatic(dwRes));
+    DBGTrace1( "GetEffectiveRightsFromAcl failed %s", GetErrorNameStatic(dwRes));
     am=0;
   }
 Cleanup:
@@ -481,7 +493,10 @@ PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCH
   // Initialize Admin SID
   if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
     DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+  {
+    DBGTrace1( "GetEffectiveRightsFromAcl failed %s", GetLastErrorNameStatic());
     return 0; 
+  }
   // Initialize EXPLICIT_ACCESS structures
   EXPLICIT_ACCESS ea[2]={0};
   // The ACE will deny the current User access to the object.
@@ -497,7 +512,9 @@ PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCH
   // Create a new ACL that merges the new ACE
   // into the existing DACL.
   PACL pNewDACL=NULL;
-  SetEntriesInAcl(2,&ea[0],pOldDACL,&pNewDACL);
+  DWORD dwRes = SetEntriesInAcl(2,&ea[0],pOldDACL,&pNewDACL);
+  if (ERROR_SUCCESS != dwRes)  
+    DBGTrace1("SetEntriesInAcl failed: %s",GetErrorNameStatic(dwRes));
   if (AdminSID)
     FreeSid(AdminSID);
   return pNewDACL;
@@ -556,19 +573,35 @@ PSECURITY_DESCRIPTOR GetUserAccessSD()
   ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
   ea.Trustee.TrusteeType = TRUSTEE_IS_GROUP;
   ea.Trustee.ptstrName  = (LPTSTR) pUserSID;
-  if (ERROR_SUCCESS != SetEntriesInAcl(1,&ea,NULL,&pACL)) 
-    goto Cleanup;
+  DWORD dwRes = SetEntriesInAcl(1,&ea,NULL,&pACL);
+  if (ERROR_SUCCESS != dwRes)  
+  {
+    DBGTrace1("SetEntriesInAcl failed: %s",GetErrorNameStatic(dwRes));
+    goto Cleanup; 
+  }
   pSD = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR,SECURITY_DESCRIPTOR_MIN_LENGTH); 
   if (pSD == NULL) 
+  {
+    DBGTrace1("LocalAlloc failed: %s",GetLastErrorNameStatic());
     goto Cleanup; 
+  }
   if (!InitializeSecurityDescriptor(pSD,SECURITY_DESCRIPTOR_REVISION)) 
+  {
+    DBGTrace1("InitializeSecurityDescriptor failed: %s",GetLastErrorNameStatic());
     goto Cleanup; 
+  }
   if (!SetSecurityDescriptorDacl(pSD,TRUE,pACL,FALSE))
+  {
+    DBGTrace1("SetSecurityDescriptorDacl failed: %s",GetLastErrorNameStatic());
     goto Cleanup; 
+  }
   MakeSelfRelativeSD(pSD,pSDret,&SDlen);
   pSDret=(PSECURITY_DESCRIPTOR)LocalAlloc(LPTR,SDlen);
   if(!MakeSelfRelativeSD(pSD,pSDret,&SDlen))
+  {
+    DBGTrace1("MakeSelfRelativeSD failed: %s",GetLastErrorNameStatic());
     goto Cleanup;
+  }
   free(pUserSID);
   LocalFree(pACL);
   LocalFree(pSD);
@@ -612,7 +645,10 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
   UNIVERSAL_NAME_INFO* puni=(UNIVERSAL_NAME_INFO*)&UNCPath;
   DWORD dwErr=WNetGetUniversalName(path,UNIVERSAL_NAME_INFO_LEVEL,puni,&cb);
   if (dwErr!=NO_ERROR)
+  {
+    DBGTrace1("WNetGetUniversalName failed: %s",GetErrorNameStatic(dwErr));
     return FALSE;
+  }
   _tcscpy(path,puni->lpUniversalName);
   return TRUE;
 }
@@ -627,8 +663,8 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
 void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
   _tcscpy(Dst,path);
-  PathAppend(Dst,file);
-  PathAddExtension(Dst,ext);
+  CHK_BOOL_FN(PathAppend(Dst,file));
+  CHK_BOOL_FN(PathAddExtension(Dst,ext));
 }
 
 //Split path parts
@@ -636,7 +672,7 @@ void Split(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
   //Get Path
   _tcscpy(path,app);
-  PathRemoveFileSpec(path);
+  CHK_BOOL_FN(PathRemoveFileSpec(path));
   //Get File, Ext
   _tcscpy(file,app);
   PathStripPath(file);
@@ -651,8 +687,8 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
   {
     //relative path: make it absolute
     _tcscpy(app,CurDir);
-    PathAppend(app,path);
-    PathCanonicalize(path,app);
+    CHK_BOOL_FN(PathAppend(app,path));
+    CHK_BOOL_FN(PathCanonicalize(path,app));
     Combine(app,path,file,ext);
   }
   if ((path[0]=='\\'))
@@ -663,7 +699,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
         && (!PathIsDirectory(app));
     //Root of current drive
     _tcscpy(path,CurDir);
-    PathStripToRoot(path);
+    CHK_BOOL_FN(PathStripToRoot(path));
     Combine(app,path,file,ext);
   }
   if (path[0]==0)
@@ -675,7 +711,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
     {
       //Done!
       _tcscpy(app,path);
-      PathRemoveFileSpec(path);
+      CHK_BOOL_FN(PathRemoveFileSpec(path));
       return TRUE;
     }
     if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
@@ -688,7 +724,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
         //Done!
         _tcscpy(app,path);
         _tcscpy(ext,ExeExts[i]);
-        PathRemoveFileSpec(path);
+        CHK_BOOL_FN(PathRemoveFileSpec(path));
         return TRUE;
       }
     }
@@ -701,10 +737,13 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
     GetCurrentDirectory(countof(d),d);
     //if path=="d:" -> "cd d:"
     if (!SetCurrentDirectory(path))
+    {
+      DBGTrace2("SetCurrentDirectory(%s) failed",path,GetLastErrorNameStatic());
       return false;
+    }
     //if path=="d:" -> "cd d:" -> "d:\documents"
     GetCurrentDirectory(4096,path);
-    SetCurrentDirectory(d);
+    CHK_BOOL_FN(SetCurrentDirectory(d));
     Combine(app,path,file,ext);
   }
   // d:\path\file.ext ->PathFileExists
@@ -991,7 +1030,10 @@ bool GetSIDUserName(PSID sid,LPTSTR User,LPTSTR Domain/*=0*/)
   TCHAR uName[UNLEN+1],dName[UNLEN+1];
   DWORD uLen=UNLEN, dLen=UNLEN;
   if(!LookupAccountSid(NULL,sid,uName,&uLen,dName,&dLen,&snu))
+  {
+    DBGTrace1("LookupAccountSid failed: %s",GetLastErrorNameStatic());
     return FALSE;
+  }
   if(Domain==0)
   {
     _tcscpy(User, dName);
@@ -1011,12 +1053,20 @@ bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain/*=0*/)
   DWORD dwLen=0;
   if ((!GetTokenInformation(hUser, TokenUser,NULL,0,&dwLen))
     &&(GetLastError()!=ERROR_INSUFFICIENT_BUFFER))
+  {
+    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
     return false;
+  }
   TOKEN_USER* ptu=(TOKEN_USER*)malloc(dwLen);
   if(!ptu)
+  {
+    DBGTrace("malloc failed");
     return false;
+  }
   if(GetTokenInformation(hUser,TokenUser,(PVOID)ptu,dwLen,&dwLen))
      GetSIDUserName(ptu->User.Sid,User,Domain);
+  else
+    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
   free(ptu);
   return true;
 }
@@ -1041,11 +1091,16 @@ PSID GetTokenUserSID(HANDLE hToken)
       {
         dwLen=GetLengthSid(ptu->User.Sid);
         sid=(PSID)malloc(dwLen);
-        CopySid(dwLen,sid,ptu->User.Sid);
-      }
+        if (sid)
+          CopySid(dwLen,sid,ptu->User.Sid);
+        else
+          DBGTrace("malloc failed");
+      }else
+        DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
       free(ptu);
     }
-  }
+  }else
+    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
   return sid;
 }
 
@@ -1060,7 +1115,10 @@ PSID GetProcessUserSID(DWORD ProcessID)
   EnablePrivilege(SE_DEBUG_NAME);
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcessID);
   if (!hProc)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ProcessID,GetLastErrorNameStatic());
     return 0;
+  }
   HANDLE hToken;
   PSID sid=0;
   // Open impersonation token for process
@@ -1068,7 +1126,8 @@ PSID GetProcessUserSID(DWORD ProcessID)
   {
     sid=GetTokenUserSID(hToken);
     CloseHandle(hToken);
-  }
+  }else
+    DBGTrace2("OpenProcessToken(ID==%d) failed: %s",ProcessID,GetLastErrorNameStatic());
   CloseHandle(hProc);
   return sid;
 }
@@ -1084,7 +1143,10 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
   EnablePrivilege(SE_DEBUG_NAME);
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcessID);
   if (!hProc)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ProcessID,GetLastErrorNameStatic());
     return 0;
+  }
   HANDLE hToken;
   bool bRet=false;
   // Open impersonation token for process
@@ -1092,7 +1154,8 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
   {
     bRet=GetTokenUserName(hToken,User,Domain);
     CloseHandle(hToken);
-  }
+  }else
+    DBGTrace2("OpenProcessToken(ID==%d) failed: %s",ProcessID,GetLastErrorNameStatic());
   CloseHandle(hProc);
   return bRet;
 }
@@ -1108,12 +1171,21 @@ HANDLE GetShellProcessToken()
   DWORD ShellID=0;
   GetWindowThreadProcessId(GetShellWindow(),&ShellID);
   if (!ShellID)
+  {
+    DBGTrace1("GetWindowThreadProcessId failed: %s",GetLastErrorNameStatic());
     return 0;
+  }
   HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
   if (!hShell)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ShellID,GetLastErrorNameStatic());
     return 0;
+  }
   HANDLE hTok=0;
-  OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok);
+  if (!OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
+  {
+    DBGTrace2("OpenProcessToken(%d) failed: %s",ShellID,GetLastErrorNameStatic());
+  }
   CloseHandle(hShell);
   return hTok;
 }
@@ -1154,7 +1226,10 @@ DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1)
   //ToolHelp
   HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
   if (hSnap==INVALID_HANDLE_VALUE)
+  {
+    DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
     return 0; 
+  }
   DWORD dwRet=0;
   PROCESSENTRY32 pe={0};
   pe.dwSize = sizeof(PROCESSENTRY32);
@@ -1191,8 +1266,13 @@ PTOKEN_GROUPS	GetTokenGroups(HANDLE hToken)
 	GetTokenInformation(hToken, TokenGroups, NULL, cbBuffer, &cbBuffer);
 	if (cbBuffer)
 		ptgGroups=(PTOKEN_GROUPS)malloc(cbBuffer);
+  else
+    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
   if (ptgGroups)
-    GetTokenInformation(hToken,TokenGroups,ptgGroups,cbBuffer,&cbBuffer);
+  {
+    CHK_BOOL_FN(GetTokenInformation(hToken,TokenGroups,ptgGroups,cbBuffer,&cbBuffer));
+  }else
+    DBGTrace("malloc failed");
   return ptgGroups;
 }
 
@@ -1208,6 +1288,7 @@ PSID FindLogonSID(PTOKEN_GROUPS	ptg)
     if(((ptg->Groups[i].Attributes & SE_GROUP_LOGON_ID)==SE_GROUP_LOGON_ID)
       &&(IsValidSid(ptg->Groups[i].Sid)))
         return ptg->Groups[i].Sid;
+  DBGTrace("FindLogonSID: No Logon SID found!");
   return 0;
 }
 
@@ -1251,7 +1332,10 @@ DWORD UserIsInSuRunnersOrAdmins()
 {
   HANDLE hToken=NULL;
   if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken))
+  {
+    DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
     return 0;
+  }
 	PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
   DWORD dwRet=0;
   if(IsSplitAdmin(hToken))
@@ -1264,7 +1348,10 @@ DWORD UserIsInSuRunnersOrAdmins()
   // Initialize Admin SID
   if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
     DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+  {
+    DBGTrace1("AllocateAndInitializeSid failed: %s",GetLastErrorNameStatic());
     return free(ptg),0; 
+  }
   PSID SuRunnersSID=GetAccountSID(SURUNNERSGROUP);
   for(UINT i=0;i<ptg->GroupCount;i++)
     if((ptg->Groups[i].Attributes & (SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY))
@@ -1326,17 +1413,20 @@ HANDLE GetSessionUserToken(DWORD SessID)
     EnablePrivilege(SE_DEBUG_NAME);
     HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ShellID);
     if (!hProc)
+    {
+      DBGTrace2("OpenProcess(%d) failed: %s",ShellID,GetLastErrorNameStatic());
       return 0;
+    }
     // Open impersonation token for Shell process
-    OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-                          |TOKEN_ASSIGN_PRIMARY,&hToken);
+    CHK_BOOL_FN(OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+                          |TOKEN_ASSIGN_PRIMARY,&hToken));
     CloseHandle(hProc);
     if(!hToken)
       return 0;
   }
   HANDLE hTokenDup=NULL;
-  DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
-                          TokenPrimary,&hTokenDup); 
+  CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+                          TokenPrimary,&hTokenDup)); 
   CloseHandle(hToken);
   return hTokenDup;
 }
