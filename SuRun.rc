@@ -631,13 +631,31 @@ BEGIN
     IDS_MENUSTR             "Starte als Administrator"
     IDS_BUILTINADMIN        "Sie sind ein vordefinierter Administrator!\r\n\r\nSie können SuRun nicht benutzen, weil Sie nicht zum normalen Benutzer degradiert werden können."
     IDS_SURUNNER_OK         "Sie sind erfolgreich als Mitglied in die Gruppe ""SuRunners"" aufgenommen worden."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DELUSER             "Sie wollen Benutzer '%s' aus der lokalen Bentuzergruppe SuRunners austragen.\r\n\r\nAlle Benutzerspezifischen SuRun Einstellungen werden gelöscht.\r\n\r\nSoll dieser Bentuzer danach in die Gruppe der lokalen Administratoren aufgenommen werden?"
+    IDS_CANCEL              "Abbrechen (%d)"
+    IDS_NOADD2USERS         "Fehler!\r\n\r\nSie konnten nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
+    IDS_NOREMADMINS         "Fehler!\r\n\r\nSie konnten nicht aus der Gruppe der Administratoren ausgetragen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
+    IDS_ADMINSHELL          "Die Windows Shell läuft mit Administrator-Rechten!\r\n\r\nSie können SuRun erst benutzen, nachdem Sie sich ab- und wieder anmelden."
+    IDS_SIMPLESETUP         "Wollen sie alle Einstellungen auf für Heimanwender empfohlene Werte setzen?"
+    IDS_NOADMIN2            "Sie (%s) sind nicht berechtigt, 'SuRun Einstellungen' zu verändern.\r\n\r\nSie müssen das Kennwort eines Administrators eingeben, um SuRuns Optionen zu verändern.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
+    IDS_RUNRESTRICTED       "SuRun ist für Sie (%s) so konfiguriert, dass Sie damit nur bestimmte Programme starten dürfen.\r\nSie sind nicht berechtigt, '%s' mit SuRun zu starten."
+    IDS_SETUP1              "Allgemein"
+    IDS_SETUP2              "SuRunners-Gruppe"
+    IDS_SETUP3              "Programmfilter"
+    IDS_SETUP4              "Erweitert"
+    IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen.\r\n\r\nWenn Sie  'Abbrechen' wählen, wird das Programm ohne erhöhte Rechte gestartet."
     IDS_ASKSURUNNER2        "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nWollen Sie Mitglied der ""SuRunners"" Gruppe werden?\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
+    IDS_ASKSURUNNER3        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe wird?"
+    IDS_STARTED             "Info:\r\n%s\r\nwird mit erhöhten Rechten ausgeführt."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_ASKSURUNNER1        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe und aus der Administratoren Gruppe ausgetragen wird?\r\n\r\nWenn Sie Ja wählen, ist %s KEIN ADMINISTRATOR mehr, sondern SuRunner."
-    IDS_ASKSURUNNER3        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe wird?"
     IDS_BUILTINADMIN1       "'%s' ist ein vordefinierter Administrator!\r\n\r\nEr kann SuRun nicht benutzen, weil er nicht zum normalen Benutzer degradiert werden kann."
     IDS_NOADD2USERS1        "Fehler!\r\n\r\n'%s' konnte nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Fehler!\r\n\r\n'%s' konnte nicht in die ""SuRunners"" Gruppe aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
@@ -651,6 +669,7 @@ BEGIN
     IDS_REMCPL              "Entferne 'SuRun Einstellungen' aus der Systemsteuerung"
     IDS_DELFILE             "Lösche Datei '%s'"
     IDS_DELFILEBOOT         "Datei '%s' wird beim nächsten Systemstart gelöscht"
+    IDS_IMPORTFAIL          "Wiederherstellung fehlgeschlagen.\r\nDatei %s nicht gefunden."
     IDS_COPYFILE            "Kopiere Datei '%s' nach '%s'"
 END
 
@@ -672,24 +691,6 @@ BEGIN
     IDS_GRPDESC             "Mitglieder dieser Gruppe können SuRun benutzen"
     IDS_ADDTOBLKLIST        "Ausnahme hinzufügen"
     IDS_ADDFILETOLIST       "Geben Sie Dateinamen und Kommandozeilenparameter an"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELUSER             "Sie wollen Benutzer '%s' aus der lokalen Bentuzergruppe SuRunners austragen.\r\n\r\nAlle Benutzerspezifischen SuRun Einstellungen werden gelöscht.\r\n\r\nSoll dieser Bentuzer danach in die Gruppe der lokalen Administratoren aufgenommen werden?"
-    IDS_CANCEL              "Abbrechen (%d)"
-    IDS_NOADD2USERS         "Fehler!\r\n\r\nSie konnten nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Fehler!\r\n\r\nSie konnten nicht aus der Gruppe der Administratoren ausgetragen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
-    IDS_ADMINSHELL          "Die Windows Shell läuft mit Administrator-Rechten!\r\n\r\nSie können SuRun erst benutzen, nachdem Sie sich ab- und wieder anmelden."
-    IDS_SIMPLESETUP         "Wollen sie alle Einstellungen auf für Heimanwender empfohlene Werte setzen?"
-    IDS_NOADMIN2            "Sie (%s) sind nicht berechtigt, 'SuRun Einstellungen' zu verändern.\r\n\r\nSie müssen das Kennwort eines Administrators eingeben, um SuRuns Optionen zu verändern.\r\n\r\nAnsonsten drücken Sie ""Abbruch""."
-    IDS_RUNRESTRICTED       "SuRun ist für Sie (%s) so konfiguriert, dass Sie damit nur bestimmte Programme starten dürfen.\r\nSie sind nicht berechtigt, '%s' mit SuRun zu starten."
-    IDS_SETUP1              "Allgemein"
-    IDS_SETUP2              "SuRunners-Gruppe"
-    IDS_SETUP3              "Programmfilter"
-    IDS_SETUP4              "Erweitert"
-    IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen.\r\n\r\nWenn Sie  'Abbrechen' wählen, wird das Programm ohne erhöhte Rechte gestartet."
-    IDS_STARTED             "Info:\r\n%s\r\nwird mit erhöhten Rechten ausgeführt."
 END
 
 STRINGTABLE DISCARDABLE 
@@ -1361,7 +1362,6 @@ BEGIN
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
     IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
-    IDS_ASKSURUNNER2        "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_MENUSTR             "Start as administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot use SuRun because you cannot act as normal user!"
     IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
@@ -1369,8 +1369,27 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
+    IDS_DELUSER             "You want to remove the user '%s' from the local SuRunners group.\r\n\r\nAll user specific SuRun settings will be deleted.\r\n\r\nDo you want to join the user to the local administrators group?"
+    IDS_CANCEL              "Cancel (%d)"
+    IDS_NOADD2USERS         "Error!\r\n\r\nPutting your account into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
+    IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
+    IDS_ADMINSHELL          "The Windows Shell is currently running with administrative rights!\r\n\r\nYou need to log off and on before using SuRun."
+    IDS_SIMPLESETUP         "Do yo want to reset all settings to recommended values for home users?"
+    IDS_NOADMIN2            "You (%s) have no permission to modify 'SuRun Settings'.\r\n\r\nEnter administrative credentials to change SuRun's options.\r\n\r\nOtherwise click 'Cancel'!"
+    IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
+    IDS_SETUP1              "Common Settings"
+    IDS_SETUP2              "SuRunners group"
+    IDS_SETUP3              "Execution hooks"
+    IDS_SETUP4              "Advanced"
+    IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
+    IDS_ASKSURUNNER2        "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_ASKSURUNNER3        "Do you want '%s' to become a 'SuRunners' member?"
+    IDS_STARTED             "Info:\r\n%s\r\nis running with elevated rights."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
     IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
     IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nPutting '%s' into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
@@ -1384,6 +1403,7 @@ BEGIN
     IDS_REMCPL              "removing 'SuRun Settings' from control panel"
     IDS_DELFILE             "Deleting file '%s'"
     IDS_DELFILEBOOT         "File '%s' will be removed on the next system start"
+    IDS_IMPORTFAIL          "Restore failed!\r\nFile %s not found."
     IDS_COPYFILE            "Copying file '%s' to '%s'"
 END
 
@@ -1405,24 +1425,6 @@ BEGIN
     IDS_GRPDESC             "Members of this group can use SuRun."
     IDS_ADDTOBLKLIST        "Add program not to hook"
     IDS_ADDFILETOLIST       "Enter file name and command line"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELUSER             "You want to remove the user '%s' from the local SuRunners group.\r\n\r\nAll user specific SuRun settings will be deleted.\r\n\r\nDo you want to join the user to the local administrators group?"
-    IDS_CANCEL              "Cancel (%d)"
-    IDS_NOADD2USERS         "Error!\r\n\r\nPutting your account into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
-    IDS_ADMINSHELL          "The Windows Shell is currently running with administrative rights!\r\n\r\nYou need to log off and on before using SuRun."
-    IDS_SIMPLESETUP         "Do yo want to reset all settings to recommended values for home users?"
-    IDS_NOADMIN2            "You (%s) have no permission to modify 'SuRun Settings'.\r\n\r\nEnter administrative credentials to change SuRun's options.\r\n\r\nOtherwise click 'Cancel'!"
-    IDS_RUNRESTRICTED       "SuRun options restrict You (%s) to run specified applications only.\r\nYou are not permitted to start '%s' with elevated rights."
-    IDS_SETUP1              "Common Settings"
-    IDS_SETUP2              "SuRunners group"
-    IDS_SETUP3              "Execution hooks"
-    IDS_SETUP4              "Advanced"
-    IDS_ASKAUTO             "The application:\r\n\r\n%s\r\n\r\nseems to require elevated rights to run properly.\r\n\r\nIf you press 'Cancel' the application will be started without elevated rights."
-    IDS_STARTED             "Info:\r\n%s\r\nis running with elevated rights."
 END
 
 STRINGTABLE DISCARDABLE 
@@ -2034,7 +2036,6 @@ BEGIN
     IDS_NOADMIN             "Fout!\r\n\r\nGebruiker %s is geen Administrator!"
     IDS_NOSURUNNER          "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nVoer naam en wachtwoord van de computerbeheerder in.\r\n\r\nOf druk 'Annuleren'!"
     IDS_ASKSURUNNER         "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nAls u JA drukt, wordt u toegevoegd aan de groep SuRunners en VERLIEST u uw ADMINISTRATOR STATUS.\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
-    IDS_ASKSURUNNER2        "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
     IDS_MENUSTR             "Start als Administrator"
     IDS_BUILTINADMIN        "U bent aangemeld als de ""ingebouwde"" Windows Administrator.\r\n\r\nU kunt SuRun zo niet gebruiken!"
     IDS_SURUNNER_OK         "U bent toegevoegd aan de gebruikersgroep ""SuRunners""."
@@ -2042,8 +2043,27 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_ASKSURUNNER1        "Wilt u dat '%s' aan de groep 'SuRunners' wordt toegevoegd?\r\n\r\nAls u JA drukt, zal '%s' zijn ADMINISTRATOR STATUS VERLIEZEN."
+    IDS_DELUSER             "U wilt gebruiker '%s' verwijderen uit de groep SuRunners.\r\n\r\nAlle gebruikersinstellingen zullen worden gewist.\r\n\r\nWilt u dat de gebruiker wordt toegevoegd aan de groep Administrators?"
+    IDS_CANCEL              "Annuleren (%d)"
+    IDS_NOADD2USERS         "Fout!\r\n\r\nKan uw gebruikersnaam niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
+    IDS_NOREMADMINS         "Fout!\r\n\r\nKan uw gebruikersnaam niet van de groep Administrators verwijderen.\r\nWindows foutmelding:\r\n\r\n%s"
+    IDS_ADMINSHELL          "De Windows omgeving draait momenteel met Administrator-rechten!\r\n\r\nU moet opnieuw aanmelden om SuRun te kunnen gebruiken."
+    IDS_SIMPLESETUP         "Aanbevolen instellingen voor regulier gebruik toepassen?"
+    IDS_NOADMIN2            "U (%s) mag de 'SuRun instellingen' niet wijzigen.\r\n\r\nVoer de naam en het wachtwoord van de computerbeheerder in.\r\n\r\nOf druk op 'Annuleren'!"
+    IDS_RUNRESTRICTED       "SuRun laat u (%s) slechts bepaalde programma's starten.\r\nHet is u niet toegestaan '%s' met verhoogde rechten te starten."
+    IDS_SETUP1              "Algemene instellingen"
+    IDS_SETUP2              "SuRunners groep"
+    IDS_SETUP3              "Programma-uitvoering"
+    IDS_SETUP4              "Geavanceerd"
+    IDS_ASKAUTO             "Het programma:\r\n\r\n%s\r\n\r\nheeft voor de uitvoering verhoogde rechten nodig.\r\n\r\nDruk 'Annuleren' om het programma zonder verhoogde rechten te starten."
+    IDS_ASKSURUNNER2        "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
     IDS_ASKSURUNNER3        "Wilt u dat '%s' aan de groep 'SuRunners' wordt toegevoegd?"
+    IDS_STARTED             "Info:\r\n%s\r\nwordt met verhoogde rechten uitgevoerd."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ASKSURUNNER1        "Wilt u dat '%s' aan de groep 'SuRunners' wordt toegevoegd?\r\n\r\nAls u JA drukt, zal '%s' zijn ADMINISTRATOR STATUS VERLIEZEN."
     IDS_BUILTINADMIN1       "'%s' is de ""ingebouwde"" Administrator.\r\n\r\nTDeze gebruiker kan SuRun niet gebruiken!"
     IDS_NOADD2USERS1        "Fout!\r\n\r\nKan '%s' niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nKan '%s' niet aan de groep ""SuRunners"" toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
@@ -2057,6 +2077,7 @@ BEGIN
     IDS_REMCPL              "Verwijderen 'SuRun instellingen' van het configuratiescherm"
     IDS_DELFILE             "Verwijderen bestand '%s'"
     IDS_DELFILEBOOT         "Bestand '%s' wordt tijdens de volgende computerstart verwijderd"
+    IDS_IMPORTFAIL          "Restore failed!\r\nFile %s not found."
     IDS_COPYFILE            "Kopiëer bestand '%s' naar '%s'"
 END
 
@@ -2078,24 +2099,6 @@ BEGIN
     IDS_GRPDESC             "Leden van deze groep kunnen SuRun gebruiken."
     IDS_ADDTOBLKLIST        "Program aan uitsluitingenlijst toevoegen"
     IDS_ADDFILETOLIST       "Voer bestandsnaam en opdracht in"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELUSER             "U wilt gebruiker '%s' verwijderen uit de groep SuRunners.\r\n\r\nAlle gebruikersinstellingen zullen worden gewist.\r\n\r\nWilt u dat de gebruiker wordt toegevoegd aan de groep Administrators?"
-    IDS_CANCEL              "Annuleren (%d)"
-    IDS_NOADD2USERS         "Fout!\r\n\r\nKan uw gebruikersnaam niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Fout!\r\n\r\nKan uw gebruikersnaam niet van de groep Administrators verwijderen.\r\nWindows foutmelding:\r\n\r\n%s"
-    IDS_ADMINSHELL          "De Windows omgeving draait momenteel met Administrator-rechten!\r\n\r\nU moet opnieuw aanmelden om SuRun te kunnen gebruiken."
-    IDS_SIMPLESETUP         "Aanbevolen instellingen voor regulier gebruik toepassen?"
-    IDS_NOADMIN2            "U (%s) mag de 'SuRun instellingen' niet wijzigen.\r\n\r\nVoer de naam en het wachtwoord van de computerbeheerder in.\r\n\r\nOf druk op 'Annuleren'!"
-    IDS_RUNRESTRICTED       "SuRun laat u (%s) slechts bepaalde programma's starten.\r\nHet is u niet toegestaan '%s' met verhoogde rechten te starten."
-    IDS_SETUP1              "Algemene instellingen"
-    IDS_SETUP2              "SuRunners groep"
-    IDS_SETUP3              "Programma-uitvoering"
-    IDS_SETUP4              "Geavanceerd"
-    IDS_ASKAUTO             "Het programma:\r\n\r\n%s\r\n\r\nheeft voor de uitvoering verhoogde rechten nodig.\r\n\r\nDruk 'Annuleren' om het programma zonder verhoogde rechten te starten."
-    IDS_STARTED             "Info:\r\n%s\r\nwordt met verhoogde rechten uitgevoerd."
 END
 
 STRINGTABLE DISCARDABLE 
