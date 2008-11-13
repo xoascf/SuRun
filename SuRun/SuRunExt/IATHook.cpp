@@ -321,7 +321,7 @@ DWORD Hook(HMODULE hMod)
           {
             //Suspend all Threads except this one
             HANDLE hSnap=CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD,0);
-            if (hSnap)
+            if (hSnap!=INVALID_HANDLE_VALUE)
             {
               THREADENTRY32 te={0};
               te.dwSize=sizeof(THREADENTRY32);
@@ -349,7 +349,7 @@ DWORD Hook(HMODULE hMod)
             //Hook IAT
             DWORD dwRet=HookIAT(hMod,pID);
             //Resume all Threads except this one
-            if (hSnap)
+            if (hSnap!=INVALID_HANDLE_VALUE)
             {
               THREADENTRY32 te={0};
               te.dwSize=sizeof(THREADENTRY32);
