@@ -49,6 +49,8 @@
 #define IDS_SETUP3                      42
 #define IDS_SETUP4                      43
 #define IDS_ASKAUTO                     44
+#define IDS_ASKSURUNNER2                45
+#define IDS_ASKSURUNNER3                46
 #define IDS_STARTED                     47
 #define IDS_ASKSURUNNER1                48
 #define IDS_BUILTINADMIN1               49
@@ -64,6 +66,7 @@
 #define IDS_REMCPL                      59
 #define IDS_DELFILE                     60
 #define IDS_DELFILEBOOT                 61
+#define IDS_IMPORTFAIL                  62
 #define IDS_COPYFILE                    63
 #define IDS_DELSERVICE                  64
 #define IDS_DELREG                      65
@@ -101,8 +104,6 @@
 #define IDS_HIDESELF                    97
 #define IDS_NOIMPORT                    98
 #define IDS_NOEXPORT                    99
-#define IDS_ASKSURUNNER2                45
-#define IDS_ASKSURUNNER3                46
 #define IDI_MAINICON                    100
 #define IDD_LOGONDLG                    101
 #define IDD_DIALOG1                     104
