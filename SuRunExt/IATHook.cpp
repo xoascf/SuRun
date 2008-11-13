@@ -18,6 +18,7 @@
 #include <Psapi.h>
 #include <ShlWapi.h>
 #include <LMCons.h>
+#include <Tlhelp32.h>
 
 #include <list>
 #include <algorithm>
@@ -317,7 +318,63 @@ DWORD Hook(HMODULE hMod)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           if(NeedHookFn(DllName,(char*)pBN->Name,(void*)pThunk->u1.Function))
-            return HookIAT(hMod,pID);
+          {
+            //Suspend all Threads except this one
+            HANDLE hSnap=CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD,0);
+            if (hSnap)
+            {
+              THREADENTRY32 te={0};
+              te.dwSize=sizeof(THREADENTRY32);
+              if(Thread32First(hSnap,&te))
+              {
+                do 
+                { 
+                  if ((te.th32OwnerProcessID == GetCurrentProcessId()) 
+                    &&(te.th32ThreadID!=GetCurrentThreadId()))
+                  { 
+                    HANDLE hT=OpenThread(THREAD_SUSPEND_RESUME,0,te.th32ThreadID);
+                    if(hT)
+                    {
+                      if (SuspendThread(hT)==-1)
+                        DBGTrace2("SuspendThread(ID==%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
+                      CloseHandle(hT);
+                    }else
+                      DBGTrace2("OpenThread(%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
+                  } 
+                } while (Thread32Next(hSnap,&te)); 
+              }else
+                DBGTrace1("Thread32First failed: %s",GetLastErrorNameStatic());
+            }else
+              DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
+            //Hook IAT
+            DWORD dwRet=HookIAT(hMod,pID);
+            //Resume all Threads except this one
+            if (hSnap)
+            {
+              THREADENTRY32 te={0};
+              te.dwSize=sizeof(THREADENTRY32);
+              if(Thread32First(hSnap,&te))
+              {
+                do 
+                { 
+                  if ((te.th32OwnerProcessID == GetCurrentProcessId()) 
+                    &&(te.th32ThreadID!=GetCurrentThreadId()))
+                  { 
+                    HANDLE hT=OpenThread(THREAD_SUSPEND_RESUME,0,te.th32ThreadID);
+                    if(hT)
+                    {
+                      if (ResumeThread(hT)==-1)
+                        DBGTrace2("ResumeThread(ID==%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
+                      CloseHandle(hT);
+                    }else
+                      DBGTrace2("OpenThread(%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
+                  } 
+                } while (Thread32Next(hSnap,&te)); 
+              }else
+                DBGTrace1("Thread32First failed: %s",GetLastErrorNameStatic());
+            }
+            return dwRet;
+          }
         }
     }//if(DoHookDll(DllName))
   }//for(;pID->Name;pID++) 
