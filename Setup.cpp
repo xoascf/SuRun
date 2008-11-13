@@ -1197,6 +1197,17 @@ void ExportSettings(LPTSTR ini)
     ExportUser(ini,g_SD->Users.GetUserName(u),u);
 }
 
+void ExportSettings(LPTSTR ini,DWORD SessionID,LPCTSTR User)
+{
+  if (g_SD)
+    return;
+  SETUPDATA sd(SessionID,User);
+  g_SD=&sd;
+  ExportSettings(ini);
+  g_SD=0;
+}
+
+
 static BOOL GetINIFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
