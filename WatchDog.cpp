@@ -216,10 +216,10 @@ BOOL ShowWatchDogDlg(HANDLE WatchDogEvent)
 void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
 {
 #ifdef DoDBGTrace
-  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
-  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
-  DBGTrace4("DoWatchDog(%s,%s) on %s\\%s",
-    SafeDesk,UserDesk,g_RunData.WinSta,g_RunData.Desk);
+//  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+//  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
+//  DBGTrace4("DoWatchDog(%s,%s) on %s\\%s",
+//    SafeDesk,UserDesk,g_RunData.WinSta,g_RunData.Desk);
 #endif DoDBGTrace
   HANDLE WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
   if (!WatchDogEvent)
