@@ -903,8 +903,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if(dwReason==DLL_PROCESS_DETACH)
   {
 #ifdef DoDBGTrace
-    DBGTrace5("Detach(hInst=%x) %d:%s[%s], Admin=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),l_IsAdmin);
+//    DBGTrace5("Detach(hInst=%x) %d:%s[%s], Admin=%d",
+//      hInstDLL,PID,fMod,GetCommandLine(),l_IsAdmin);
 #endif DoDBGTrace
     EnterCriticalSection(&l_SxHkCs);
     LeaveCriticalSection(&l_SxHkCs);
@@ -941,15 +941,15 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 #ifdef DoDBGTrace
     if(IsInBlackList(fMod))
       DBGTrace1("%s is blacklisted! No Hook!",fMod);
-    DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
+//    DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
+//      hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
 #endif DoDBGTrace
     if(l_bSetHook && GetUseIATHook)
       LoadHooks();
   }
 #ifdef DoDBGTrace
-  else
-    DBGTrace4("Attach(hInst=%x) %d:%s[%s], ADMIN",hInstDLL,PID,fMod,GetCommandLine());
+//  else
+//    DBGTrace4("Attach(hInst=%x) %d:%s[%s], ADMIN",hInstDLL,PID,fMod,GetCommandLine());
 #endif DoDBGTrace
   //DevInst
 //  if(!l_IsAdmin)
