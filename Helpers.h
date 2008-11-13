@@ -16,7 +16,7 @@
 #define countof(b) sizeof(b)/sizeof(b[0])
 #define zero(x) memset(&x,0,sizeof(x))
 
-#define CHK_BOOL_FN(p) if(!p) DBGTrace2("%s failed: %s",#p,GetLastErrorNameStatic());
+#define CHK_BOOL_FN(p) if(!p) DBGTrace2("%s failed: %s",_T(#p),GetLastErrorNameStatic());
 
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT
