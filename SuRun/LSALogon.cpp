@@ -104,7 +104,10 @@ MSV1_0_INTERACTIVE_LOGON* GetLogonRequest(LPWSTR domain,LPWSTR user,LPWSTR pass,
   MSV1_0_INTERACTIVE_LOGON* pRequest =
     (MSV1_0_INTERACTIVE_LOGON*)malloc(*pcbRequest);
   if (!pRequest) 
+  {
+    DBGTrace("malloc failed");
     return 0;
+  }
   pRequest->MessageType = MsV1_0InteractiveLogon;
   char* p = (char*)(pRequest + 1); // point right past MSV1_0_INTERACTIVE_LOGON
   LPWSTR pDom  = (LPWSTR)(p);
@@ -127,7 +130,10 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
   LSA_OPERATIONAL_MODE SecurityMode;
   LSASTR(ProcName,"Winlogon");
   if (LsaRegisterLogonProcess(&ProcName,&hLSA,&SecurityMode))
+  {
+    DBGTrace("LsaRegisterLogonProcess failed");
     return 0;
+  }
   TOKEN_SOURCE tsrc;
   QUOTA_LIMITS Quotas;
   PMSV1_0_INTERACTIVE_PROFILE* pProf=0;
@@ -153,7 +159,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
     {
       DWORD n=0;
       //Copy TokenSource from the Shell Process of SessionID:
-      GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n);
+      CHK_BOOL_FN(GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n));
       strcpy(tsrc.SourceName,"SuRun");
       //Copy Logon SID from the Shell Process of SessionID:
       LogonSID=GetLogonSid(hShell);
@@ -165,16 +171,25 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
     SID_IDENTIFIER_AUTHORITY sidAuth = SECURITY_NT_AUTHORITY;
     if (!AllocateAndInitializeSid(&sidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,
       DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+    {
+      DBGTrace1("AllocateAndInitializeSid failed %s",GetLastErrorNameStatic());
       __leave;
+    }
     //Local SID
     SID_IDENTIFIER_AUTHORITY IdentifierAuthority=SECURITY_LOCAL_SID_AUTHORITY;
     if (!AllocateAndInitializeSid(&IdentifierAuthority,1,SECURITY_LOCAL_RID,
       0,0,0,0,0,0,0,&LocalSid))
+    {
+      DBGTrace1("AllocateAndInitializeSid failed %s",GetLastErrorNameStatic());
       __leave;
+    }
     //Initialize TOKEN_GROUPS
     ptg=(PTOKEN_GROUPS)malloc(sizeof(DWORD)+3*sizeof(SID_AND_ATTRIBUTES));
     if (ptg==NULL)
+    {
+      DBGTrace("malloc failed");
       __leave;
+    }
     ptg->GroupCount=bNoAdmin?2:3;
     ptg->Groups[0].Sid=LogonSID;
     ptg->Groups[0].Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED
@@ -193,14 +208,20 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
     LSASTR(PackageName,AUTH_PACKAGE);
     DWORD AuthPackageId=0;
     if ((LsaLookupAuthenticationPackage(hLSA,&PackageName,&AuthPackageId))!=STATUS_SUCCESS)
+    {
+      DBGTrace("LsaLookupAuthenticationPackage failed");
       __leave;
+    }
     LUID LogonLuid={0};
     NTSTATUS SubStatus=0;
     Status=LsaLogonUser(hLSA,&ProcName,Interactive,AuthPackageId,AuthInfo,
       AuthInfoSize,ptg,&tsrc,(PVOID*)&pProf,
       &ProfLen,&LogonLuid,&hUser,&Quotas,&SubStatus);
     if (Status!=ERROR_SUCCESS)
+    {
+      DBGTrace("LsaLogonUser failed");
       __leave;
+    }
     if (LOBYTE(LOWORD(GetVersion()))>=6)
     {
       //Vista UAC: Get the elevated token!
@@ -279,9 +300,18 @@ LPVOID GetFromToken(HANDLE hToken, TOKEN_INFORMATION_CLASS tic)
   {
     bRet=GetTokenInformation(hToken,tic,0,0,&dw);
     if((bRet==FALSE) && (GetLastError()!=ERROR_INSUFFICIENT_BUFFER)) 
+    {
+      DBGTrace1("GetTokenInformation failed %s",GetLastErrorNameStatic());
       return NULL;
+    }
     lpData=(LPVOID)malloc(dw);
-    bRet=GetTokenInformation(hToken, tic, lpData, dw, &dw);
+    if (lpData)
+    {
+      bRet=GetTokenInformation(hToken, tic, lpData, dw, &dw);
+      if (!bRet)
+        DBGTrace1("GetTokenInformation failed %s",GetLastErrorNameStatic());
+    }else
+      DBGTrace("malloc failed");
   }
   __finally
   {
@@ -306,7 +336,11 @@ PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
     dwTGlen+=GetLengthSid(pSrcTG->Groups[i].Sid);
   dwTGlen+=GetLengthSid(pAdd->Sid);
   pDstTG=(PTOKEN_GROUPS)malloc(dwTGlen);
-
+  if (!pDstTG)
+  {
+    DBGTrace("malloc failed");
+    return 0;
+  }
   pDstTG->GroupCount=pSrcTG->GroupCount+1;
   SID_AND_ATTRIBUTES* pSA=(SID_AND_ATTRIBUTES*)pDstTG->Groups;
   LPBYTE pBase=(LPBYTE)pDstTG+sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*pDstTG->GroupCount;
@@ -329,6 +363,11 @@ PTOKEN_PRIMARY_GROUP CreateTokenPrimaryGroup(PSID pSID)
     return NULL;
   SIZE_T dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
   PTOKEN_PRIMARY_GROUP pTPG = (PTOKEN_PRIMARY_GROUP)malloc(dwTGlen);
+  if(!pTPG)
+  {
+    DBGTrace("malloc failed");
+    return 0;
+  }
   LPBYTE pBase=(LPBYTE)pTPG+sizeof(PSID);
   memmove(pBase,pSID,GetLengthSid(pSID));
   pTPG->PrimaryGroup=(PSID)pBase;
@@ -341,6 +380,11 @@ PTOKEN_OWNER CreateTokenOwner(PSID pSID)
     return NULL;
   SIZE_T dwTGlen=sizeof(PSID)+GetLengthSid(pSID);
   PTOKEN_OWNER pTO = (PTOKEN_OWNER)malloc(dwTGlen);
+  if(!pTO)
+  {
+    DBGTrace("malloc failed");
+    return 0;
+  }
   LPBYTE pBase=(LPBYTE)pTO+sizeof(PSID);
   memmove(pBase,pSID,GetLengthSid(pSID));
   pTO->Owner=(PSID)pBase;
@@ -353,6 +397,11 @@ PTOKEN_DEFAULT_DACL CreateTokenDefDacl(PACL pACL)
     return NULL;
   SIZE_T dwlen=sizeof(PACL)+LocalSize(pACL);
   PTOKEN_DEFAULT_DACL pTDACL = (PTOKEN_DEFAULT_DACL)malloc(dwlen);
+  if(!pTDACL)
+  {
+    DBGTrace("malloc failed");
+    return 0;
+  }
   LPBYTE pBase=(LPBYTE)pTDACL+sizeof(PACL);
   memmove(pBase,pACL,LocalSize(pACL));
   pTDACL->DefaultDacl=(PACL)pBase;
@@ -383,7 +432,10 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
   DWORD nBytes=sizeof(DWORD)+nPrivs*sizeof(LUID_AND_ATTRIBUTES);
   PTOKEN_PRIVILEGES ptp=(PTOKEN_PRIVILEGES)calloc(nBytes,1);
   if (!ptp)
+  {
+    DBGTrace("calloc failed");
     return 0;
+  }
   memmove(ptp,pPriv,sizeof(DWORD)+pPriv->PrivilegeCount*sizeof(LUID_AND_ATTRIBUTES));
   s=pAdd;
   nPrivs=pPriv->PrivilegeCount;
@@ -477,51 +529,76 @@ HANDLE GetAdminToken(DWORD SessionID)
     //Copy TokenSource from the Shell Process of SessionID:
     TOKEN_SOURCE tsrc = {0};
     DWORD n;
-    GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n);
+    CHK_BOOL_FN(GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n));
     //No need to set SourceName here. WinLogon will close Processes with this token
     //strcpy(tsrc.SourceName,"SuRun");
     //Initialize TOKEN_GROUPS
     ptg=(PTOKEN_GROUPS)(GetFromToken(hShell, TokenGroups));
     if (ptg==NULL)
+    {
+      DBGTrace("GetFromToken failed");
       __leave;
+    }
     for(DWORD i=0;i<ptg->GroupCount;i++)
       ptg->Groups[i].Attributes&=~SE_GROUP_OWNER;
     // Initialize Admin SID
     SID_IDENTIFIER_AUTHORITY sidAuth= SECURITY_NT_AUTHORITY;
     if (!AllocateAndInitializeSid(&sidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,
       DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+    {
+      DBGTrace1("AllocateAndInitializeSid failed %s",GetLastErrorNameStatic());
       __leave;
+    }
     //copy Admin Sid to token groups
     SID_AND_ATTRIBUTES sia;
     sia.Sid=AdminSID;
     sia.Attributes=SE_GROUP_MANDATORY|SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_OWNER;
     PTOKEN_GROUPS p = AddTokenGroups(ptg,&sia);
     if (!p)
+    {
+      DBGTrace("AddTokenGroups failed");
       __leave;
+    }
     free(ptg);
     ptg=p;
     //Set Admin SID as the Tokens Primary Group
     lpPriGrp = CreateTokenPrimaryGroup(AdminSID);
+    if(!lpPriGrp)
+      DBGTrace("CreateTokenPrimaryGroup failed");
     //Set Token User
     UserSID=GetTokenUserSID(hShell);
+    if(!UserSID)
+      DBGTrace("GetTokenUserSID failed");
     TOKEN_USER userToken = {{UserSID, 0}};
     //Set Admin SID as the Token Owner
     pTO = CreateTokenOwner(GetOwnerAdminGrp?AdminSID:UserSID);
+    if (!pTO)
+      DBGTrace("CreateTokenOwner failed");
     //Privileges
     lpPrivToken = (PTOKEN_PRIVILEGES)(GetFromToken(hShell, TokenPrivileges));
+    if (!lpPrivToken)
+      DBGTrace("GetFromToken failed");
     //merge Privileges of User and Admin
     WCHAR un[MAX_PATH+MAX_PATH+1]; 
-    GetSIDUserName(AdminSID,un);
+    if (!GetSIDUserName(AdminSID,un))
+      DBGTrace("GetSIDUserName failed");
     LPWSTR aRights=GetAccountPrivileges(un);
+    if (!aRights)
+      DBGTrace("GetAccountPrivileges failed");
     PTOKEN_PRIVILEGES priv=AddPrivileges(lpPrivToken,aRights);
     free(aRights);
     if (!priv)
+    {
+      DBGTrace("AddPrivileges failed");
       __leave;
+    }
     free(lpPrivToken);
     lpPrivToken=priv;
     //Set Default DACL, Deny user Access but Allow Admins access, so User 
     //running as admin can access this token but user running as user cannot
     lpDaclToken = (PTOKEN_DEFAULT_DACL)(GetFromToken(hShell, TokenDefaultDacl));
+    if (!lpDaclToken)
+      DBGTrace("GetFromToken failed");
     PACL DefDACL=SetAdminDenyUserAccess(lpDaclToken->DefaultDacl,UserSID);
     if(DefDACL)
     {
@@ -548,12 +625,15 @@ HANDLE GetAdminToken(DWORD SessionID)
 //    SystemTimeToFileTime(&st,&ft);
     //Get Token statistics for AuthenticationId and ExpirationTime
     TOKEN_STATISTICS tstat;
-    GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);    //Token expires in 100 Years
+    CHK_BOOL_FN(GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n));    
     //Create the token
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
     if (!ZwCreateToken)
+    {
+      DBGTrace1("GetProcAddress(ZwCreateToken) failed: %s",GetLastErrorNameStatic());
       __leave;
+    }
     NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,
       TokenPrimary,&tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,
       ptg, lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
