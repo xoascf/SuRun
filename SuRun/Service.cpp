@@ -111,7 +111,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,rd.CliProcessId);
   if (!hProcess)
   {
-    DBGTrace2("OpenProcess(%s) failed",rd.CliProcessId,GetLastErrorNameStatic());
+    DBGTrace2("OpenProcess(%d) failed: %s",rd.CliProcessId,GetLastErrorNameStatic());
     return 0;
   }
   //g_CliIsAdmin
@@ -121,12 +121,12 @@ DWORD CheckCliProcess(RUNDATA& rd)
     if (hThread)
     {
       if (!OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok))
-        DBGTrace2("OpenThreadToken(%s) failed",rd.CliThreadId,GetLastErrorNameStatic());
+        DBGTrace2("OpenThreadToken(%d) failed: %s",rd.CliThreadId,GetLastErrorNameStatic());
       CloseHandle(hThread);
     }
     if ((!hTok)&&(!OpenProcessToken(hProcess,TOKEN_DUPLICATE,&hTok)))
     {
-      DBGTrace2("OpenProcessToken(%s) failed",rd.CliProcessId,GetLastErrorNameStatic());
+      DBGTrace2("OpenProcessToken(%d) failed: %s",rd.CliProcessId,GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
     }
     g_CliIsAdmin=IsAdmin(hTok)!=0;
@@ -519,7 +519,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           {
             //Access denied!
             ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
-            //DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist
@@ -530,7 +530,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             {
               //Access denied!
               ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
-              //DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
+              DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
               continue;
             }
             //Only SuRunners can use the hooks
