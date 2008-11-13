@@ -18,12 +18,16 @@
 #pragma comment(lib,"winmm")
 #pragma warning(disable : 4996)
 
-#define BetaVer _T(" beta 4")
+#define BetaVer _T(" beta 5")
 
 //#define DoDBGTrace
+
+#ifdef BetaVer
+#define DoDBGTrace
+#endif
 
 #ifdef _DEBUG 
-//#define DoDBGTrace
+#define DoDBGTrace
 #endif
 
 void TRACExA(LPCSTR s,...);
