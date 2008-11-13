@@ -92,8 +92,7 @@ void SetProcWinStaDesk(LPCTSTR WinSta,LPCTSTR Desk)
     {
       if (!SetProcessWindowStation(hws))
         DBGTrace1("SetProcessWindowStation failed: %s",GetLastErrorNameStatic());
-      if (!CloseWindowStation(hws))
-        DBGTrace1("CloseWindowStation failed: %s",GetLastErrorNameStatic());
+      CloseWindowStation(hws);
     }
   }
   if (Desk)
