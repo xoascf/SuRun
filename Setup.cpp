@@ -1282,10 +1282,13 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
     for (int u=0;ImportUser(ini,u);u++);
 }
 
-void ImportSettings(LPTSTR ini)
+bool ImportSettings(LPTSTR ini)
 {
   PathUnquoteSpaces(ini);
+  if (!PathFileExists(ini))
+    return FALSE;
   ImportSettings(ini,true,true,true);
+  return TRUE;
 }
 
 static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
