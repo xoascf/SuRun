@@ -210,16 +210,16 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hMod,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hMod,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+////  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
@@ -685,16 +685,16 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
   if (hLibModule==l_hInst)
   {
 #ifdef DoDBGTrace
-    char fmod[MAX_PATH]={0};
-    {
-      GetModuleFileNameA(0,fmod,MAX_PATH);
-      PathStripPathA(fmod);
-      strcat(fmod,": ");
-      char* p=&fmod[strlen(fmod)];
-      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-      PathStripPathA(p);
-    }
-    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
+//    char fmod[MAX_PATH]={0};
+//    {
+//      GetModuleFileNameA(0,fmod,MAX_PATH);
+//      PathStripPathA(fmod);
+//      strcat(fmod,": ");
+//      char* p=&fmod[strlen(fmod)];
+//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//      PathStripPathA(p);
+//    }
+//    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif DoDBGTrace
     SetLastError(NOERROR);
     return true;
@@ -729,16 +729,16 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
     return;
   }
 #ifdef DoDBGTrace
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hLibModule,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
 #endif DoDBGTrace
   SetLastError(NOERROR);
   ExitThread(dwExitCode);
