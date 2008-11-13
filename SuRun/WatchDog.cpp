@@ -58,9 +58,9 @@ extern RUNDATA g_RunData;
 CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
 {
 #ifdef DoDBGTrace
-  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
-  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
-  DBGTrace2("CWDMsgWnd() on %s\\%s",g_RunData.WinSta,g_RunData.Desk);
+//  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+//  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
+//  DBGTrace2("CWDMsgWnd() on %s\\%s",g_RunData.WinSta,g_RunData.Desk);
 #endif DoDBGTrace
   m_Clicked=FALSE;
   LoadLibrary(_T("Shell32.dll"));//Load Shell Window Classes
