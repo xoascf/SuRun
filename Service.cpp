@@ -110,18 +110,25 @@ DWORD CheckCliProcess(RUNDATA& rd)
     return 0;
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,rd.CliProcessId);
   if (!hProcess)
+  {
+    DBGTrace2("OpenProcess(%s) failed",rd.CliProcessId,GetLastErrorNameStatic());
     return 0;
+  }
   //g_CliIsAdmin
   {
     HANDLE hTok=NULL;
     HANDLE hThread=OpenThread(THREAD_ALL_ACCESS,FALSE,rd.CliThreadId);
     if (hThread)
     {
-      OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok);
+      if (!OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok))
+        DBGTrace2("OpenThreadToken(%s) failed",rd.CliThreadId,GetLastErrorNameStatic());
       CloseHandle(hThread);
     }
     if ((!hTok)&&(!OpenProcessToken(hProcess,TOKEN_DUPLICATE,&hTok)))
+    {
+      DBGTrace2("OpenProcessToken(%s) failed",rd.CliProcessId,GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
+    }
     g_CliIsAdmin=IsAdmin(hTok)!=0;
     CloseHandle(hTok);
   }
@@ -133,11 +140,20 @@ DWORD CheckCliProcess(RUNDATA& rd)
     TCHAR f1[MAX_PATH];
     TCHAR f2[MAX_PATH];
     if (!GetModuleFileName(0,f1,MAX_PATH))
+    {
+      DBGTrace1("GetModuleFileName failed",GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
+    }
     if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
+    {
+      DBGTrace1("EnumProcessModules failed",GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
+    }
     if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
+    {
+      DBGTrace1("GetModuleFileNameEx failed",GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
+    }
     if(_tcsicmp(f1,f2)!=0)
     {
       DBGTrace2("Invalid Process! %s != %s !",f1,f2);
@@ -197,7 +213,10 @@ DWORD GetCsrssPid()
   DWORD dwRet=0;
   hProcessSnap =CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
   if(hProcessSnap == INVALID_HANDLE_VALUE)
+  {
+    DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
     return 0;
+  }
   pe32.dwSize = sizeof(PROCESSENTRY32);
   if(Process32First(hProcessSnap, &pe32))
   {
@@ -209,7 +228,8 @@ DWORD GetCsrssPid()
         break;
       }
     }while (Process32Next(hProcessSnap,&pe32));
-  }
+  }else
+    DBGTrace1("Process32First failed: %s",GetLastErrorNameStatic());
   CloseHandle(hProcessSnap);
   return dwRet;
 }
@@ -259,16 +279,19 @@ HANDLE GetProcessUserToken(DWORD ProcId)
   EnablePrivilege(SE_DEBUG_NAME);
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
   if (!hProc)
-    return hToken;
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ProcId,GetLastErrorNameStatic());
+    return 0;
+  }
   // Open impersonation token for process
-  OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-    |TOKEN_ASSIGN_PRIMARY,&hToken);
+  CHK_BOOL_FN(OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+                                     |TOKEN_ASSIGN_PRIMARY,&hToken));
   CloseHandle(hProc);
   if(!hToken)
-    return hToken;
+    return 0;
   HANDLE hUser=0;
-  DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
-    TokenPrimary,&hUser); 
+  CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+                                TokenPrimary,&hUser)); 
   return CloseHandle(hToken),hUser;
 }
 
@@ -292,6 +315,7 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
     lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
   if ((!bOK)&&(GetLastError()==ERROR_ACCESS_DENIED))
   {
+    DBGTrace1("WARNING: CreateProcessAsUser(%s) failed; SECOND TRY with Impersonation",lpCommandLine);
     //Impersonation required for EFS and CreateProcessAsUser
     ImpersonateLoggedOnUser(hToken);
     bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
@@ -299,8 +323,11 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     DWORD le=GetLastError();
     RevertToSelf();
+    if (!bOK)
+      DBGTrace2("CreateProcessAsUser(%s) failed: %s",lpCommandLine,GetErrorNameStatic(le));
     SetLastError(le);
-  }
+  }else
+    DBGTrace2("CreateProcessAsUser(%s) failed: %s",lpCommandLine,GetLastErrorNameStatic());
   return bOK;
 }
 
@@ -398,7 +425,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_ss.dwCurrentState     = SERVICE_START_PENDING; 
   g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
+  {
+    DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
     return; 
+  }
   //Steal token from csrss.exe to get SeCreateTokenPrivilege in Vista
   HANDLE hRunCsrss=GetProcessUserToken(GetCsrssPid());
   //Create Pipe:
@@ -442,7 +472,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           //Double check if User is Admin!
           if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
           {
-            ImportSettings(&g_RunData.cmdLine[9]);
+            if (!ImportSettings(&g_RunData.cmdLine[9]))
+              SafeMsgBox(0,CBigResStr(IDS_IMPORTFAIL,&g_RunData.cmdLine[9]),
+                        CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
             ResumeClient(RETVAL_OK);
           }
           else
@@ -700,17 +732,6 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
   return c1;
 }
 
-//int tx()
-//{
-//  TCHAR cmd[4096]={0};
-//  _tcscpy(cmd,L"C:\\Windows\\Exploer.exe /e, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{208D2C60-3AEA-1069-A2D7-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{871C5380-42A0-1069-A2EA-08002B30309D}");
-//  DBGTrace1("%s",BeautifyCmdLine(cmd));
-//
-//  ::ExitProcess(0);
-//  return 0;
-//}
-//int xtx=tx();
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  PrepareSuRun: Show Password/Permission Dialog on secure Desktop,
@@ -724,7 +745,10 @@ DWORD PrepareSuRun()
   //Ask For Password?
   PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
   if((!g_CliIsInSuRunners) && GetNoConvUser)
+  {
+    DBGTrace1("PrepareSuRun EXIT: User %s is no SuRunner, no auto convert",g_RunData.UserName);
     return RETVAL_ACCESSDENIED;
+  }
   if (!PwOk)
     DeletePassword(g_RunData.UserName);
   else
@@ -732,10 +756,16 @@ DWORD PrepareSuRun()
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
+  {
+    DBGTrace1("PrepareSuRun EXIT: SuRun is hidden for User %s",g_RunData.UserName);
     return RETVAL_CANCELLED;
+  }
   //Create the new desktop
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
+  {
+    DBGTrace("PrepareSuRun EXIT: CreateSafeDesktop failed");
     return RETVAL_NODESKTOP;
+  }
   __try
   {
     //secure desktop created...
@@ -815,13 +845,20 @@ DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
 {
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT|SC_MANAGER_ENUMERATE_SERVICE);
   if (hdlSCM==0) 
+  {
+    DBGTrace1("OpenSCManager failed: %s",GetLastErrorNameStatic());
     return FALSE;
+  }
   SC_HANDLE hdlServ = OpenService(hdlSCM,ServiceName,SERVICE_QUERY_STATUS);
   if (!hdlServ) 
+  {
+    DBGTrace1("OpenService failed: %s",GetLastErrorNameStatic());
     return CloseServiceHandle(hdlSCM),FALSE;
+  }
   SERVICE_STATUS ss={0};
   if (!QueryServiceStatus(hdlServ,&ss))
   {
+    DBGTrace1("QueryServiceStatus failed: %s",GetLastErrorNameStatic());
     CloseServiceHandle(hdlServ);
     return CloseServiceHandle(hdlSCM),FALSE;
   }
@@ -1042,7 +1079,8 @@ DWORD LSAStartAdminProcess()
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
     if ((!g_RunData.bRunAs)||(RetVal!=RETVAL_OK))
       UnloadUserProfile(hAdmin,ProfInf.hProfile);
-  }
+  }else
+    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
   CloseHandle(hAdmin);
   return RetVal;
 }
@@ -1101,13 +1139,19 @@ void SuRun(DWORD ProcessID)
 {
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
+  {
+    DBGTrace("FATAL: SuRun() not running as SYSTEM; EXIT!");
     return;
+  }
   zero(g_RunData);
   zero(g_RunPwd);
   RUNDATA RD={0};
   RD.CliProcessId=ProcessID;
   if(CheckCliProcess(RD)!=1)
+  {
+    DBGTrace("FATAL: SuRun() Client Process check failed; EXIT!");
     return;
+  }
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //RunAs...
   if (g_RunData.bRunAs)
@@ -1124,6 +1168,7 @@ void SuRun(DWORD ProcessID)
       DeleteSafeDesktop(false);
     }else
     {
+      DBGTrace("CreateSafeDesktop failed");
       ResumeClient(RETVAL_CANCELLED);
       if (!g_RunData.beQuiet)
         SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
