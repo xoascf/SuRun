@@ -672,7 +672,7 @@ void Split(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
   //Get Path
   _tcscpy(path,app);
-  CHK_BOOL_FN(PathRemoveFileSpec(path));
+  PathRemoveFileSpec(path);
   //Get File, Ext
   _tcscpy(file,app);
   PathStripPath(file);
