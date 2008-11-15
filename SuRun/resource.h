@@ -245,6 +245,7 @@
 #define IDC_IMPUSRSETTINGS              1093
 #define IDC_NOUSESURUNNERS              1094
 #define IDC_IMEXSTATIC                  1095
+#define IDC_SWITCHRUNAS                 1101
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -253,7 +254,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1099
+#define _APS_NEXT_CONTROL_VALUE         1102
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
