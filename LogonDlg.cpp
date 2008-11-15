@@ -222,10 +222,10 @@ SIZE CliSize(HWND w)
 int NX_Ctrls[]={IDC_SECICON,IDC_SECICON1,IDC_USERBITMAP,IDC_USRST,IDC_PWDST};
 //These controls are stretched on X-Resize
 int SX_Ctrls[]={IDC_WHTBK,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,IDC_DLGQUESTION,
-                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2,IDC_ALWAYSOK,
+                IDC_USER,IDC_PASSWORD,IDC_STOREPASS,IDC_HINT,IDC_HINT2,IDC_ALWAYSOK,
                 IDC_SHELLEXECOK,IDC_AUTOCANCEL};
 //These controls are moved on X-Resize
-int MX_Ctrls[]={IDCANCEL,IDOK,IDC_STOREPASS};
+int MX_Ctrls[]={IDCANCEL,IDOK};
 //These controls are not changed on Y-Resize
 int NY_Ctrls[]={IDC_SECICON};
 //These controls are stretched on Y-Resize
