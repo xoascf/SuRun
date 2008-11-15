@@ -796,6 +796,8 @@ DWORD PrepareSuRun()
         BeautifyCmdLine(g_RunData.cmdLine));
     }
     DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
+    if (l==8)
+      return RETVAL_SWITCHRUNAS;
     if((l&1)==0)
     {
       if (!GetNoRunSetup(g_RunData.UserName))
@@ -1157,6 +1159,7 @@ void SuRun(DWORD ProcessID)
   //RunAs...
   if (g_RunData.bRunAs)
   {
+DoRunAs:
     if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
     {
       if (!RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
@@ -1211,6 +1214,11 @@ void SuRun(DWORD ProcessID)
     }
     //Start execution
     RetVal=PrepareSuRun();
+    if (RetVal==RETVAL_SWITCHRUNAS)
+    {
+      g_RunData.bRunAs=TRUE;
+      goto DoRunAs;
+    }
     if (RetVal!=RETVAL_OK)
     {
       if (RetVal==RETVAL_NODESKTOP)
