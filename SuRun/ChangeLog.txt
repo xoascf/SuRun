@@ -6,6 +6,7 @@ Done, to be tested:
 
 ToDo
 ---------------------
+* Add MB_SYSTEMMODAL to SuRun Message Boxes!
 * Console SuRun support
 * make Safe Desktop CountDown switchable
 * Integrate "Nero Burning Rights" functions
