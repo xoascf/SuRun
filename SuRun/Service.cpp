@@ -762,7 +762,8 @@ DWORD PrepareSuRun()
     return RETVAL_CANCELLED;
   }
   //Create the new desktop
-  if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
+  bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
+  if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
   {
     DBGTrace("PrepareSuRun EXIT: CreateSafeDesktop failed");
     return RETVAL_NODESKTOP;
@@ -795,7 +796,7 @@ DWORD PrepareSuRun()
       l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
         BeautifyCmdLine(g_RunData.cmdLine));
     }
-    DeleteSafeDesktop(GetFadeDesk && ((l&1)==0));
+    DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if (l==8)
       return RETVAL_SWITCHRUNAS;
     if((l&1)==0)
@@ -1160,11 +1161,12 @@ void SuRun(DWORD ProcessID)
   if (g_RunData.bRunAs)
   {
 DoRunAs:
-    if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
+    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk;
+    if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
     {
       if (!RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
       {
-        DeleteSafeDesktop(GetFadeDesk);
+        DeleteSafeDesktop(bFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
         return;
       }
@@ -1188,7 +1190,8 @@ DoRunAs:
       //check if SuRun Setup is hidden for user name
       if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
         return;
-      if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,GetFadeDesk))
+      bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk;
+      if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
       {
         __try
         {
@@ -1197,7 +1200,7 @@ DoRunAs:
         {
           DBGTrace("FATAL: Exception in Setup()");
         }
-        DeleteSafeDesktop(GetFadeDesk);
+        DeleteSafeDesktop(bFadeDesk);
       }else
       {
         if (!g_RunData.beQuiet)
