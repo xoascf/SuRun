@@ -44,9 +44,11 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName,DWORD SessionID);
 BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionID);
 #define IsInAdmins(u,s) IsInGroup(DOMAIN_ALIAS_RID_ADMINS,u,s)
 
-#define IS_IN_ADMINS    1
-#define IS_IN_SURUNNERS 2
-#define IS_SPLIT_ADMIN  4
+#define IS_IN_ADMINS      1
+#define IS_IN_SURUNNERS   2
+#define IS_SPLIT_ADMIN    4
+#define IS_TERMINAL_USER  8
+
 DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID);
 
 
