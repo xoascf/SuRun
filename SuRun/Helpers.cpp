@@ -1340,6 +1340,8 @@ DWORD UserIsInSuRunnersOrAdmins()
   DWORD dwRet=0;
   if(IsSplitAdmin(hToken))
     dwRet|=IS_SPLIT_ADMIN;
+  if(GetSystemMetrics(SM_REMOTESESSION))
+    dwRet|=IS_TERMINAL_USER;
   CloseHandle(hToken);
   if (!ptg)
     return 0;
