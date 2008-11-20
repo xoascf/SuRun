@@ -188,7 +188,7 @@ void RunTmp(LPSTR cmd,LPCTSTR args=0)
     CloseHandle(pi.hProcess);
   }else
   {
-    MessageBox(0,GetLastErrorNameStatic(),0,0);
+    MessageBox(0,GetLastErrorNameStatic(),0,MB_SYSTEMMODAL);
   }
 }
 
