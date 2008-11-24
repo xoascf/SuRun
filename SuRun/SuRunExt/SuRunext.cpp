@@ -937,7 +937,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
-  InitializeCriticalSection(&l_SxHkCs);
+  InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
   //Resources
 #ifdef _DEBUG_ENU
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
