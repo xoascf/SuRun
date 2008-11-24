@@ -679,25 +679,33 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
   return hMOD;
 }
 
+BOOL g_IATInit=FALSE;
+
 BOOL WINAPI FreeLib(HMODULE hLibModule)
 {
   //The DLL must not be unloaded while the process is running!
   if (hLibModule==l_hInst)
   {
 #ifdef DoDBGTrace
-//    char fmod[MAX_PATH]={0};
-//    {
-//      GetModuleFileNameA(0,fmod,MAX_PATH);
-//      PathStripPathA(fmod);
-//      strcat(fmod,": ");
-//      char* p=&fmod[strlen(fmod)];
-//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-//      PathStripPathA(p);
-//    }
-//    TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])---------------------------------\n",fmod,hLibModule);
+    char fmod[MAX_PATH]={0};
+    {
+      GetModuleFileNameA(0,fmod,MAX_PATH);
+      PathStripPathA(fmod);
+      strcat(fmod,": ");
+      char* p=&fmod[strlen(fmod)];
+      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+      PathStripPathA(p);
+    }
+    if (g_IATInit)
+      TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])-----------",fmod,hLibModule);
+    else
+      TRACExA("SuRunExt32.dll: ALLOWING FreeLibrary (%s[%x])---------------------------------",fmod,hLibModule);
 #endif DoDBGTrace
-    SetLastError(NOERROR);
-    return true;
+    if (g_IATInit)
+    {
+      SetLastError(NOERROR);
+      return true;
+    }
   }
   SetLastError(NOERROR);
   EnterCriticalSection(&g_HookCs);
@@ -714,37 +722,33 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
 
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 {
-  //The DLL must not be unloaded while the process is running!
-  if (hLibModule!=l_hInst)
-  {
 #ifdef DoDBGTrace
-    if (!hkFrLibXT.OrgFunc())
-      DBGTrace("IATHook FATAL Warning! hkFrLibXT.orgFunc==0!");
-    if (hkFrLibXT.newFunc==hkFrLibXT.OrgFunc())
-      DBGTrace("IATHook FATAL Warning! hkFrLibXT.newFunc==hkFrLibXT.orgFunc!");
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hLibModule,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  if (g_IATInit && (hLibModule==l_hInst))
+    TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------",fmod,hLibModule);
+  else
+    TRACExA("SuRunExt32.dll: ALLOWING FreeLibAndExitThread (%s[%x])--------------",fmod,hLibModule);
 #endif DoDBGTrace
+  //The DLL must not be unloaded while the process is running!
+  if ((!g_IATInit) || (hLibModule!=l_hInst))
+  {
     EnterCriticalSection(&g_HookCs);
     LeaveCriticalSection(&g_HookCs);
     ((lpFreeLibraryAndExitThread)hkFrLibXT.OrgFunc())(hLibModule,dwExitCode);
     return;
   }
-#ifdef DoDBGTrace
-//  char fmod[MAX_PATH]={0};
-//  {
-//    GetModuleFileNameA(0,fmod,MAX_PATH);
-//    PathStripPathA(fmod);
-//    strcat(fmod,": ");
-//    char* p=&fmod[strlen(fmod)];
-//    GetModuleFileNameA(hLibModule,p,MAX_PATH);
-//    PathStripPathA(p);
-//  }
-//  TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------\n",fmod,hLibModule);
-#endif DoDBGTrace
   SetLastError(NOERROR);
   ExitThread(dwExitCode);
 }
 
-BOOL g_IATInit=FALSE;
 DWORD WINAPI InitHookProc(void* p)
 {
   if (g_IATInit)
@@ -775,6 +779,7 @@ void UnloadHooks()
     return;
   //Do not unload the hooks, but wait for the Critical Section
   EnterCriticalSection(&g_HookCs);
+  g_IATInit=FALSE;
   LeaveCriticalSection(&g_HookCs);
   DeleteCriticalSection(&g_HookCs);
 }
