@@ -143,6 +143,7 @@ typedef struct _LOGONDLGPARAMS
   int MaxTimeOut;
   DWORD UsrFlags;
   BOOL bRunAs;
+  BOOL AllowAsAdmin;
   _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags)
   {
     Msg=M;
@@ -154,6 +155,7 @@ typedef struct _LOGONDLGPARAMS
     TimeOut=MaxTimeOut;
     UsrFlags=UFlags;
     bRunAs=FALSE;
+    AllowAsAdmin=FALSE;
   }
 }LOGONDLGPARAMS;
 
@@ -408,6 +410,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         EnableWindow(GetDlgItem(hwnd,IDC_SHELLEXECOK),0);
       SetUserBitmap(hwnd);
       SetWindowSizes(hwnd);
+      EnableWindow(GetDlgItem(hwnd,IDC_ADMINRIGHTS),p->AllowAsAdmin);
       SetTimer(hwnd,2,1000,0);
       return FALSE;
     }//WM_INITDIALOG
@@ -578,7 +581,7 @@ DWORD ValidateCurrentUser(LPTSTR User,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
+BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,BOOL AllowAsAdmin,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
@@ -586,6 +589,7 @@ BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
   p.Users.SetUsualUsers(SessionId,FALSE);
   p.bRunAs=TRUE;
+  p.AllowAsAdmin=AllowAsAdmin;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
                   0,DialogProc,(LPARAM)&p);
 }
