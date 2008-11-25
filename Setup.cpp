@@ -179,7 +179,24 @@ DWORD GetBlackListFlags(LPCTSTR CmdLine,DWORD Default)
 
 BOOL IsInBlackList(LPCTSTR CmdLine)
 {
-  return GetBlackListFlags(CmdLine,-1)!=-1;
+  BOOL blf=GetBlackListFlags(CmdLine,-1);
+  if (blf!=-1)
+    return TRUE;
+  TCHAR s[4096]={0};
+  if(GetShortPathName(CmdLine,s,4096) && (_tcscmp(s,CmdLine)))
+  {
+    blf=GetBlackListFlags(s,-1);
+    if (blf!=-1)
+      return TRUE;
+  }
+  zero(s);
+  if (GetLongPathName(CmdLine,s,4096) && (_tcscmp(s,CmdLine)))
+  {
+    blf=GetBlackListFlags(s,-1);
+    if (blf!=-1)
+      return TRUE;
+  }
+  return FALSE;
 }
 
 BOOL AddToBlackList(LPCTSTR CmdLine)
@@ -492,6 +509,8 @@ struct
 static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
+  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
@@ -505,6 +524,8 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
   BOOL bRet=GetOpenFileName(&ofn);
   if (PathFileExists(FileName))
     PathQuoteSpaces(FileName);
+  if (HideExt!=-1)
+    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
 }
 
@@ -544,6 +565,8 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     case MAKELPARAM(IDC_SELFILE,BN_CLICKED):
       GetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName,4096);
       ChooseFile(hwnd,g_AppOpt.FileName);
+      if (g_AppOpt.OfnTitle!=IDS_ADDFILETOLIST)
+        PathUnquoteSpaces(g_AppOpt.FileName);
       SetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName);
       break;
     case MAKELPARAM(IDCANCEL,BN_CLICKED):
@@ -1305,6 +1328,8 @@ bool ImportSettings(LPTSTR ini)
 static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
 {
   CImpersonateSessionUser ilu(g_SD->SessID);
+  #define ExpAdvReg L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
+  int HideExt=GetRegInt(HKCU,ExpAdvReg,L"HideFileExt",-1);
   OPENFILENAME  ofn={0};
   ofn.lStructSize       = sizeof(OPENFILENAME);
   ofn.hwndOwner         = hwnd;
@@ -1316,6 +1341,8 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
   ofn.Flags             = OFN_ENABLESIZING|OFN_FORCESHOWHIDDEN;
   ofn.FlagsEx           = OFN_EX_NOPLACESBAR;
   BOOL bRet=GetOpenFileName(&ofn);
+  if (HideExt!=-1)
+    SetRegInt(HKCU,ExpAdvReg,L"HideFileExt",HideExt);
   return bRet;
 }
 
