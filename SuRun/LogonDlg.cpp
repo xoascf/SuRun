@@ -523,6 +523,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                     SaveRunAsPassword(p->User,User,Pass);
                   else
                     DeleteRunAsPassword(p->User,User);
+                  if(IsDlgButtonChecked(hwnd,IDC_STARTADMIN))
+                    ExitCode|=16;
                 }
                 _tcscpy(p->User,User);
                 _tcscpy(p->Password,Pass);
