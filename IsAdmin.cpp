@@ -140,7 +140,7 @@ typedef enum _TOKEN_ELEVATION_TYPE
 
 BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
 {
-  if (LOBYTE(LOWORD(GetVersion()))<6)
+  if (_winmajor<6)
     return FALSE;
   BOOL   bRet = FALSE;
   HANDLE hT=hToken;
