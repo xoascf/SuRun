@@ -897,7 +897,7 @@ BOOL Setup()
   if (g_CliIsAdmin)
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   //If no users should become SuRunners, ask for Admin credentials
-  //g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
+  g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if ((!g_CliIsInSuRunners) && GetNoConvUser)
   {
     if(!LogonAdmin(g_RunData.SessionID,IDS_NOADMIN2,g_RunData.UserName))
