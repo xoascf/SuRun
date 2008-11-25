@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <lm.h>
+#include <dbghelp.h>
+#include <Tlhelp32.h>
 #include "WinStaDesk.h"
 #include "IsAdmin.h"
 #include "Helpers.h"
@@ -62,7 +64,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //    b.MsgLoop();
 //  b.Done();
 //  ExitProcess(0);
-  
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
   case 1:
