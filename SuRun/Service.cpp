@@ -796,9 +796,9 @@ DWORD PrepareSuRun()
       l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
         BeautifyCmdLine(g_RunData.cmdLine));
     }
-    DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if (l==8)
       return RETVAL_SWITCHRUNAS;
+    DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if((l&1)==0)
     {
       if (!GetNoRunSetup(g_RunData.UserName))
@@ -1161,16 +1161,16 @@ void SuRun(DWORD ProcessID)
   //RunAs...
   if (g_RunData.bRunAs)
   {
-DoRunAs:
-    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk;
-    if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
+    if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
+                          (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
     {
+DoRunAs:
       BOOL RALret=RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
                               IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine));
       bNoAdmin=(RALret&16)==0;
       if (!RALret)
       {
-        DeleteSafeDesktop(bFadeDesk);
+        DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
         return;
       }
