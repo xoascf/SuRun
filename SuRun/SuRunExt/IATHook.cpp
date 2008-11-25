@@ -252,9 +252,9 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 //                  fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt,
 //                  mbi.AllocationProtect,mbi.State,mbi.Type);
 //#endif DoDBGTrace
-                  pThunk->u1.Function = (DWORD_PTR)newFunc;
+//                  pThunk->u1.Function = (DWORD_PTR)newFunc;
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
-//                  InterlockedExchangePointer((VOID**)&pThunk->u1.Function,newFunc);
+                  InterlockedExchangePointer((VOID**)&pThunk->u1.Function,newFunc);
                   VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
                   nHooked++;
