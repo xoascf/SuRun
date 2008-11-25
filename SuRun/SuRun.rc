@@ -92,7 +92,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Bestätigung erforderlich"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -121,16 +121,16 @@ BEGIN
                     PBS_SMOOTH,0,207,289,9
 END
 
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 143
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 158
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Ausführen als.."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
     LTEXT           "Bitte identifizieren Sie sich als berechtigte Person:",
                     IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -142,10 +142,12 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,98,89,158,12,ES_AUTOHSCROLL
     CONTROL         "Kennwort speichern",IDC_STOREPASS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,98,104,158,10
-    DEFPUSHBUTTON   "OK",IDOK,150,116,52,14
-    PUSHBUTTON      "Abbrechen",IDCANCEL,204,116,52,14
+    CONTROL         "Mit gehobenen Rechten starten",IDC_ADMINRIGHTS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,98,116,158,10
+    DEFPUSHBUTTON   "OK",IDOK,150,131,52,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,204,131,52,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,134,263,9
+                    PBS_SMOOTH,0,149,263,9
 END
 
 IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -610,6 +612,22 @@ IDI_ADMIN               ICON    DISCARDABLE     "res\\Admin.ico"
 IDI_SHADMIN             ICON    DISCARDABLE     "res\\SHADMIN.ico"
 IDI_LISTICON7           ICON    DISCARDABLE     "res\\CancelWindows.ico"
 IDI_SRADMIN             ICON    DISCARDABLE     "res\\SrAdmin.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_RUNASDLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1128,12 +1146,12 @@ BEGIN
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 143
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 159
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Run as..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1147,12 +1165,14 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,98,90,158,12,ES_AUTOHSCROLL
     CONTROL         "remember password",IDC_STOREPASS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,98,104,158,10
-    DEFPUSHBUTTON   "OK",IDOK,153,116,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,206,116,50,14
+    CONTROL         "start with elevated rights",IDC_ADMINRIGHTS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,98,116,158,10
+    DEFPUSHBUTTON   "OK",IDOK,153,132,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,206,132,50,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,44
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,134,263,9
+                    PBS_SMOOTH,0,150,263,9
 END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
@@ -1777,12 +1797,12 @@ BEGIN
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 143
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 158
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Uitvoeren als..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1795,13 +1815,15 @@ BEGIN
     RTEXT           "&Wachtwoord:",IDC_PWDST,58,91,57,8
     EDITTEXT        IDC_PASSWORD,117,90,139,12,ES_AUTOHSCROLL
     CONTROL         "wachtwoord onthouden",IDC_STOREPASS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,117,104,116,10
-    DEFPUSHBUTTON   "OK",IDOK,153,116,50,14
-    PUSHBUTTON      "Annuleren",IDCANCEL,206,116,50,14
+                    BS_AUTOCHECKBOX | WS_TABSTOP,117,104,138,10
+    CONTROL         "met verhoogde rechten starten",IDC_ADMINRIGHTS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,117,116,140,10
+    DEFPUSHBUTTON   "OK",IDOK,153,131,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,206,131,50,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,44
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,134,263,9
+                    PBS_SMOOTH,0,149,263,9
 END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
@@ -2021,6 +2043,22 @@ BEGIN
 0x694e, 0x6d65, 0x6e61, 0x6564, 0x006e, 
     0
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_RUNASDLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 143
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
