@@ -222,7 +222,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       DBGTrace("LsaLogonUser failed");
       __leave;
     }
-    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    if (_winmajor>=6)
     {
       //Vista UAC: Get the elevated token!
       TOKEN_ELEVATION_TYPE et;
@@ -503,7 +503,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     if(!hShell) 
       __leave;
     //Is the Shell token a Vista Split token?
-    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    if (_winmajor>=6)
     {
       //Vista UAC: Try to get the elevated token!
       TOKEN_ELEVATION_TYPE et;
@@ -610,7 +610,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
     //
 //    LUID AuthId=SYSTEM_LUID;
-//    if (LOBYTE(LOWORD(GetVersion()))>=6)
+//    if (_winmajor>=6)
 //    {
 //      //Vista++ use users AuthenticationId
 //      //Get Token statistics
@@ -640,7 +640,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
-    if (LOBYTE(LOWORD(GetVersion()))>=6)
+    if (_winmajor>=6)
     {
       //Vista UAC: Set Integrity level!
       SID_IDENTIFIER_AUTHORITY siaMLA = {0,0,0,0,0,16}/*SECURITY_MANDATORY_LABEL_AUTHORITY*/;
