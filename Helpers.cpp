@@ -835,7 +835,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
-    if (LOBYTE(LOWORD(GetVersion()))<6)
+    if (_winmajor<6)
       //2k/XP: Control Panel is beneath "my computer"!
       wcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
     else
@@ -846,7 +846,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
-    if (LOBYTE(LOWORD(GetVersion()))<6)
+    if (_winmajor<6)
       //2k/XP: Control Panel is beneath "my computer"!
       wcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
     else
