@@ -6,6 +6,7 @@ ToDo
 * Console SuRun support
 * make Safe Desktop CountDown switchable
 * Integrate "Nero Burning Rights" functions
+* Add a flag to the program list to not ask for a passwort for certain programs
 
 To be done in future:
 ---------------------
