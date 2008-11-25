@@ -1008,7 +1008,7 @@ DWORD LSAStartAdminProcess(bool bNoAdmin)
       if(bIsExplorer)
       {
         //Before Vista: kill Desktop Proxy
-        if (LOBYTE(LOWORD(GetVersion()))<6)
+        if (_winmajor<6)
         {
           //To start control Panel and other Explorer children we need to tell 
           //Explorer to open folders in a new proecess
@@ -1038,7 +1038,7 @@ DWORD LSAStartAdminProcess(bool bNoAdmin)
         if(bIsExplorer)
         {
           //Before Vista: wait for and kill Desktop Proxy
-          if (LOBYTE(LOWORD(GetVersion()))<6)
+          if (_winmajor<6)
           {
             //Messages work on the same WinSta/Desk only
             SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
@@ -1318,7 +1318,7 @@ void InstallRegistry()
   SetRegStr(HKLM,UNINSTL,L"Publisher",L"Kay Bruns");
   SetRegStr(HKLM,UNINSTL,L"URLInfoAbout",L"http://kay-bruns.de/surun");
   SetRegStr(HKLM,UNINSTL,L"DisplayIcon",SuRunExe);
-  if (LOBYTE(LOWORD(GetVersion()))<6)
+  if (_winmajor<6)
   {
     //WinLogon Notification
     SetRegInt(HKLM,WINLOGONKEY,L"Asynchronous",0);
@@ -1429,7 +1429,7 @@ void RemoveRegistry()
   InstLog(CResStr(IDS_REMAUTORUN));
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",CResStr(IDS_SYSMENUEXT));
   //WinLogon Notification
-  if (LOBYTE(LOWORD(GetVersion()))<6)
+  if (_winmajor<6)
     DelRegKey(HKLM,WINLOGONKEY);
   //UnInstall
   InstLog(CResStr(IDS_REMUNINST));
@@ -1801,7 +1801,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTSUCCESS));
           //Show "need logoff"
           InstLog(_T(" "));
-          if (LOBYTE(LOWORD(GetVersion()))<6)
+          if (_winmajor<6)
             InstLog(CResStr(IDS_INSTSUCCESS3))
           else
             InstLog(CResStr(IDS_INSTSUCCESS2));
@@ -1811,7 +1811,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           //Cancel->Close; OK->Logoff
           OSVERSIONINFO oie;
           oie.dwOSVersionInfoSize=sizeof(oie);
-          if (LOBYTE(LOWORD(GetVersion()))<6)
+          if (_winmajor<6)
             //2k/XP Reboot required for WinLogon Notification
             SetDlgItemText(hwnd,IDOK,CResStr(IDS_REBOOT));
           else 
@@ -1831,7 +1831,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
         //ExitWindowsEx will not work here because we run as Admin
-        if (LOBYTE(LOWORD(GetVersion()))<6)
+        if (_winmajor<6)
         {
           //2k/XP Reboot required for WinLogon Notification
           //ExitWindowsEx(EWX_REBOOT|EWX_FORCE,SHTDN_REASON_MINOR_RECONFIG);
