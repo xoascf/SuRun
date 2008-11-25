@@ -135,7 +135,7 @@ static CHookDescriptor* hdt[]=
   &hkLdLibW, 
   &hkLdLibXA, 
   &hkLdLibXW, 
-  &hkGetPAdr, 
+//  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
@@ -212,16 +212,16 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hMod,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hMod,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
@@ -715,19 +715,19 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
   if (hLibModule==l_hInst)
   {
 #ifdef DoDBGTrace
-    char fmod[MAX_PATH]={0};
-    {
-      GetModuleFileNameA(0,fmod,MAX_PATH);
-      PathStripPathA(fmod);
-      strcat(fmod,": ");
-      char* p=&fmod[strlen(fmod)];
-      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-      PathStripPathA(p);
-    }
-    if (g_IATInit)
-      TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])-----------",fmod,hLibModule);
-    else
-      TRACExA("SuRunExt32.dll: ALLOWING FreeLibrary (%s[%x])---------------------------------",fmod,hLibModule);
+//    char fmod[MAX_PATH]={0};
+//    {
+//      GetModuleFileNameA(0,fmod,MAX_PATH);
+//      PathStripPathA(fmod);
+//      strcat(fmod,": ");
+//      char* p=&fmod[strlen(fmod)];
+//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//      PathStripPathA(p);
+//    }
+//    if (g_IATInit)
+//      TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])-----------",fmod,hLibModule);
+//    else
+//      TRACExA("SuRunExt32.dll: ALLOWING FreeLibrary (%s[%x])---------------------------------",fmod,hLibModule);
 #endif DoDBGTrace
     if (g_IATInit)
     {
@@ -751,22 +751,22 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 {
 #ifdef DoDBGTrace
-  if (hLibModule==l_hInst)
-  {
-    char fmod[MAX_PATH]={0};
-    {
-      GetModuleFileNameA(0,fmod,MAX_PATH);
-      PathStripPathA(fmod);
-      strcat(fmod,": ");
-      char* p=&fmod[strlen(fmod)];
-      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-      PathStripPathA(p);
-    }
-    if (g_IATInit)
-      TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------",fmod,hLibModule);
-    else
-      TRACExA("SuRunExt32.dll: ALLOWING FreeLibAndExitThread (%s[%x])--------------",fmod,hLibModule);
-  }
+//  if (hLibModule==l_hInst)
+//  {
+//    char fmod[MAX_PATH]={0};
+//    {
+//      GetModuleFileNameA(0,fmod,MAX_PATH);
+//      PathStripPathA(fmod);
+//      strcat(fmod,": ");
+//      char* p=&fmod[strlen(fmod)];
+//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//      PathStripPathA(p);
+//    }
+//    if (g_IATInit)
+//      TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------",fmod,hLibModule);
+//    else
+//      TRACExA("SuRunExt32.dll: ALLOWING FreeLibAndExitThread (%s[%x])--------------",fmod,hLibModule);
+//  }
 #endif DoDBGTrace
   //The DLL must not be unloaded while the process is running!
   if ((!g_IATInit) || (hLibModule!=l_hInst))
