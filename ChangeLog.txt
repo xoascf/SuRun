@@ -35,6 +35,9 @@ SuRun 1.2.0.6 beta 6 - 2008-11-25:
 * Blacklist "Add" Button does not set quotes
 * SuRun Confirmation Dialog supports switching to another User
 * On Vista SuRun does to not detect installers per default
+* FIX: SuRuns IATHook does not intercept calls to GetProcAddress() any more. 
+  This caused Outlook 2007 with Exchange Server and Windows Destkop Search 
+  to crash.
 
 SuRun 1.2.0.6 beta 5 - 2008-11-13:
 ----------------------------------
