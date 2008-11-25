@@ -653,7 +653,7 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
-  BOOL l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  BOOL l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,1,L"C:\\Windows\\Explorer.exe");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
