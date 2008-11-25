@@ -915,7 +915,7 @@ BOOL Setup()
 //  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdmin)
+HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs,bool bNoAdmin)
 {
   //Admin Token for SessionId
   HANDLE hUser=0;
@@ -927,7 +927,7 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bNoAdm
   PathRemoveFileSpec(dn);
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
-  if(bNoAdmin)
+  if(bRunAs)
     hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
   else
     hUser=GetAdminToken(SessionID);
@@ -966,11 +966,11 @@ BOOL CALLBACK KillProxyDesktopEnum(HWND hwnd, LPARAM lParam)
 }
 
 
-DWORD LSAStartAdminProcess() 
+DWORD LSAStartAdminProcess(bool bNoAdmin) 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //Get Admin User Token and Job object token
-  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
+  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs,bNoAdmin);
   //Clear Password
   zero(g_RunPwd);
   if (!hAdmin)
@@ -1141,6 +1141,7 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 //////////////////////////////////////////////////////////////////////////////
 void SuRun(DWORD ProcessID)
 {
+  bool bNoAdmin=FALSE;
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
   {
@@ -1164,7 +1165,10 @@ DoRunAs:
     bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk;
     if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
     {
-      if (!RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
+      BOOL RALret=RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
+                              IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine));
+      bNoAdmin=(RALret&16)==0;
+      if (!RALret)
       {
         DeleteSafeDesktop(bFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
@@ -1243,7 +1247,7 @@ DoRunAs:
   __try
   {
     KillProcess(g_RunData.KillPID);
-    RetVal=LSAStartAdminProcess();
+    RetVal=LSAStartAdminProcess(bNoAdmin);
   }__except(1)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
