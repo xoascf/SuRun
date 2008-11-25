@@ -1165,8 +1165,12 @@ void SuRun(DWORD ProcessID)
                           (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
     {
 DoRunAs:
+      BOOL AllowAsAdmin=(g_RunData.Groups&(IS_IN_SURUNNERS|IS_IN_ADMINS|IS_SPLIT_ADMIN))
+                       && (!GetRestrictApps(g_RunData.UserName));
       BOOL RALret=RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
-                              IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine));
+                              AllowAsAdmin,
+                              IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)
+                              );
       bNoAdmin=(RALret&16)==0;
       if (!RALret)
       {
