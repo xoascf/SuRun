@@ -85,12 +85,12 @@
 #define SetNoConvUser(b)  SetOption(_T("NoAutoUserToSuRunner"),b,0)
 
 //Test Manifest and file name of started files
-#define GetTestReqAdmin    (GetOption(_T("TestReqAdmin"),1)!=0)
-#define SetTestReqAdmin(b) SetOption(_T("TestReqAdmin"),b,1)
+#define GetTestReqAdmin    (GetOption(_T("TestReqAdmin"),(LOBYTE(LOWORD(GetVersion()))>=6)?0:1)!=0)
+#define SetTestReqAdmin(b) SetOption(_T("TestReqAdmin"),b,(LOBYTE(LOWORD(GetVersion()))>=6)?0:1)
 
 //Hide Expert settings
-#define GetHideExpertSettings    (GetOption(_T("HideExpertSettings"),(LOBYTE(LOWORD(GetVersion()))>=6)?0:1)!=0)
-#define SetHideExpertSettings(b) SetOption(_T("HideExpertSettings"),b,(LOBYTE(LOWORD(GetVersion()))>=6)?0:1)
+#define GetHideExpertSettings    (GetOption(_T("HideExpertSettings"),1)!=0)
+#define SetHideExpertSettings(b) SetOption(_T("HideExpertSettings"),b,1)
 
 //Show warning if Admin has no password to:
 #define APW_ALL         0
