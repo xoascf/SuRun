@@ -229,6 +229,7 @@
 #define IDC_TRAYBALLOON                 1073
 #define IDC_STOREPASS                   1074
 #define IDC_WARNADMIN                   1075
+#define IDC_ADMINRIGHTS                 1075
 #define IDC_AUTOCANCEL                  1077
 #define IDC_HIDESURUN                   1078
 #define IDC_REQPW4SETUP                 1079
