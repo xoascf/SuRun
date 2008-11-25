@@ -222,7 +222,7 @@ SIZE CliSize(HWND w)
 int NX_Ctrls[]={IDC_SECICON,IDC_SECICON1,IDC_USERBITMAP,IDC_USRST,IDC_PWDST};
 //These controls are stretched on X-Resize
 int SX_Ctrls[]={IDC_WHTBK,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,IDC_DLGQUESTION,
-                IDC_USER,IDC_PASSWORD,IDC_STOREPASS,IDC_HINT,IDC_HINT2,IDC_ALWAYSOK,
+                IDC_USER,IDC_PASSWORD,IDC_STOREPASS,IDC_ADMINRIGHTS,IDC_HINT,IDC_HINT2,IDC_ALWAYSOK,
                 IDC_SHELLEXECOK,IDC_AUTOCANCEL};
 //These controls are moved on X-Resize
 int MX_Ctrls[]={IDCANCEL,IDOK};
@@ -232,7 +232,7 @@ int NY_Ctrls[]={IDC_SECICON};
 int SY_Ctrls[]={IDC_WHTBK,IDC_DLGQUESTION};
 //These controls are moved on Y-Resize
 int MY_Ctrls[]={IDC_SECICON1,IDC_USERBITMAP,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,
-                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2,IDCANCEL,IDC_STOREPASS,IDOK,
+                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2,IDCANCEL,IDC_STOREPASS,IDC_ADMINRIGHTS,IDOK,
                 IDC_USRST,IDC_PWDST,IDC_ALWAYSOK,IDC_SHELLEXECOK,IDC_AUTOCANCEL};
 
 void MoveDlgCtrl(HWND hDlg,int nId,int x,int y,int dx,int dy)
@@ -523,7 +523,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                     SaveRunAsPassword(p->User,User,Pass);
                   else
                     DeleteRunAsPassword(p->User,User);
-                  if(IsDlgButtonChecked(hwnd,IDC_STARTADMIN))
+                  if(IsDlgButtonChecked(hwnd,IDC_ADMINRIGHTS))
                     ExitCode|=16;
                 }
                 _tcscpy(p->User,User);
