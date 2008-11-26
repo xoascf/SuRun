@@ -750,10 +750,17 @@ DWORD PrepareSuRun()
     DBGTrace1("PrepareSuRun EXIT: User %s is no SuRunner, no auto convert",g_RunData.UserName);
     return RETVAL_ACCESSDENIED;
   }
+  DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
+  bool bNotInList=f==-1;
+  if(bNotInList)
+    f=0;
   if (!PwOk)
+  {
     DeletePassword(g_RunData.UserName);
-  else
-  if (IsInWhiteList(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK))
+//    if (f&FLAG_NEVERASK)
+//      return RETVAL_OK;
+  }
+  else  if (f&FLAG_DONTASK)
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
@@ -780,10 +787,6 @@ DWORD PrepareSuRun()
       g_RunData.Groups=IS_IN_SURUNNERS;
     }
     //Is User Restricted?
-    DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
-    bool bNotInList=f==-1;
-    if(bNotInList)
-      f=0;
     if  (GetRestrictApps(g_RunData.UserName) && bNotInList)
       return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
     DWORD l=0;
