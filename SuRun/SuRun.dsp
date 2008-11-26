@@ -371,6 +371,10 @@ SOURCE=.\res\ico10607.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\neverquestion.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\NoAdmin.ico
 # End Source File
 # Begin Source File
