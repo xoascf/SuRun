@@ -333,7 +333,7 @@ typedef struct _SETUPDATA
   HWND HelpWnd;
   int DlgExitCode;
   HIMAGELIST ImgList;
-  int ImgIconIdx[8];
+  int ImgIconIdx[9];
   TCHAR NewUser[2*UNLEN+2];
   CDlgAnchor MainSetupAnchor;
   CDlgAnchor Setup2Anchor;
@@ -361,7 +361,7 @@ typedef struct _SETUPDATA
     UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
         IMAGE_ICON,48,48,0);
     ImgList=ImageList_Create(16,16,ILC_COLOR8,7,1);
-    for (i=0;i<8;i++)
+    for (i=0;i<9;i++)
     {
       HICON icon=(HICON)LoadImage(GetModuleHandle(0),
         MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
@@ -833,16 +833,16 @@ static void UpdateWhiteListFlags(HWND hWL)
     ListView_GetItemText(hWL,i,2,cmd,4096);
     int Flags=GetRegInt(HKLM,wlkey,cmd,0);
     LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,
-      g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)+(Flags&FLAG_AUTOCANCEL?4:0)],
-      0,0};
+                 g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)+(Flags&FLAG_AUTOCANCEL?4:0)],
+                 0,0};
     ListView_SetItem(hWL,&item);
     item.iSubItem=1;
     item.iImage=g_SD->ImgIconIdx[(Flags&FLAG_SHELLEXEC?0:1)+(Flags&FLAG_CANCEL_SX?6:0)];
     ListView_SetItem(hWL,&item);
   }
   ListView_SetColumnWidth(hWL,1,
-     (IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK)
-   ||IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK))?22:0);
+                         (IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK)
+                       ||IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_IATHOOK))?22:0);
   ListView_SetColumnWidth(hWL,2,LVSCW_AUTOSIZE_USEHEADER);
   InvalidateRect(hWL,0,TRUE);
 }
