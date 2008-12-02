@@ -99,14 +99,20 @@ BOOL PasswordOK(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword)
 
 static BYTE KEYPASS[16]={0x4f,0xc9,0x4d,0x14,0x63,0xa9,0x4d,0xe2,0x96,0x47,0x2b,0x6a,0xd6,0x80,0xd3,0xc2};
 
-void LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
+bool LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
   if (!GetSavePW)
-    return;
+    return false;
   CBlowFish bf;
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
   if (GetRegAny(HKLM,RAPASSKEY(RunAsUser),UserName,REG_BINARY,(BYTE*)Password,&nBytes))
+  {
+    if (nBytes==0)
+      return false;
     bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
+    return true;
+  }
+  return false;
 }
 
 void DeleteRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName)
@@ -190,9 +196,9 @@ static void SetUserBitmap(HWND hwnd)
   if (p->bRunAs)
   {
     TCHAR Pass[PWLEN+1]={0};
-    LoadRunAsPassword(p->User,User,Pass,PWLEN);
-    if(PasswordOK(User,Pass,false))
+    if (LoadRunAsPassword(p->User,User,Pass,PWLEN) && PasswordOK(User,Pass,false))
     {
+      zero(Pass);
       SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
       EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),false);
       CheckDlgButton(hwnd,IDC_STOREPASS,1);
@@ -565,6 +571,7 @@ BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false,false);
   p.Users.SetUsualUsers(SessionId,FALSE);
+  CImpersonateSessionUser cisu(SessionId);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -590,6 +597,7 @@ BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,BOOL AllowAsAdmin,in
   p.Users.SetUsualUsers(SessionId,FALSE);
   p.bRunAs=TRUE;
   p.AllowAsAdmin=AllowAsAdmin;
+  CImpersonateSessionUser cisu(SessionId);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -601,6 +609,7 @@ BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,true,false);
   p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,SessionId,FALSE);
+  CImpersonateSessionUser cisu(SessionId);
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -614,6 +623,7 @@ BOOL LogonAdmin(DWORD SessionId,int IDmsg,...)
   TCHAR P[PWLEN]={0};
   LOGONDLGPARAMS p(S,U,P,false,true,false);
   p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,SessionId,FALSE);
+  CImpersonateSessionUser cisu(SessionId);
   BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                     0,DialogProc,(LPARAM)&p);
   zero(U);
