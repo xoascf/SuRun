@@ -15,6 +15,7 @@
 #include <tchar.h>
 #include <sspi.h>
 #include "sspi_auth.h"
+#include "DBGTrace.h"
 
 typedef struct _AUTH_SEQ 
 {
@@ -89,7 +90,10 @@ BOOL GenClientContext(PAUTH_SEQ pAS,PSEC_WINNT_AUTH_IDENTITY pAuthIdentity,
     ss = _AcquireCredentialsHandle(NULL,_T("NTLM"),SECPKG_CRED_OUTBOUND,NULL,
       pAuthIdentity,NULL,NULL,&pAS->hcred,&tsExpiry);
     if (ss < 0) 
+    {
+      DBGTrace1("AcquireCredentialsHandle failed: %s",GetErrorNameStatic(ss));
       return FALSE;
+    }
     pAS->fHaveCredHandle = TRUE;
   }
   // Prepare output buffer
@@ -113,16 +117,25 @@ BOOL GenClientContext(PAUTH_SEQ pAS,PSEC_WINNT_AUTH_IDENTITY pAuthIdentity,
     NULL,0,0,SECURITY_NATIVE_DREP,pAS->fInitialized?&sbdIn:NULL,0,&pAS->hctxt,
     &sbdOut,&fContextAttr,&tsExpiry);
   if (ss < 0)  
+  {
+    DBGTrace1("InitializeSecurityContext failed: %s",GetErrorNameStatic(ss));
     return FALSE;
+  }
   pAS->fHaveCtxtHandle = TRUE;
   // If necessary, complete token
   if (ss == SEC_I_COMPLETE_NEEDED || ss == SEC_I_COMPLETE_AND_CONTINUE) 
   {
     if (!_CompleteAuthToken) 
+    {
+      DBGTrace("CompleteAuthToken not linked!");
       return FALSE;
+    }
     ss = _CompleteAuthToken(&pAS->hctxt,&sbdOut);
     if (ss < 0)  
+    {
+      DBGTrace1("CompleteAuthToken failed: %s",GetErrorNameStatic(ss));
       return FALSE;
+    }
   }
   *pcbOut = sbOut.cbBuffer;
   if (!pAS->fInitialized)
@@ -153,8 +166,11 @@ BOOL GenServerContext(PAUTH_SEQ pAS,PVOID pIn,DWORD cbIn,PVOID pOut,PDWORD pcbOu
   {
     ss = _AcquireCredentialsHandle(NULL,_T("NTLM"),SECPKG_CRED_INBOUND,NULL,
       NULL,NULL,NULL,&pAS->hcred,&tsExpiry);
-    if (ss < 0) 
+    if (ss < 0)  
+    {
+      DBGTrace1("AcquireCredentialsHandle failed: %s",GetErrorNameStatic(ss));
       return FALSE;
+    }
     pAS->fHaveCredHandle = TRUE;
   }
   // Prepare output buffer
@@ -174,16 +190,25 @@ BOOL GenServerContext(PAUTH_SEQ pAS,PVOID pIn,DWORD cbIn,PVOID pOut,PDWORD pcbOu
   ss = _AcceptSecurityContext(&pAS->hcred,pAS->fInitialized?&pAS->hctxt:NULL,
     &sbdIn,0,SECURITY_NATIVE_DREP,&pAS->hctxt,&sbdOut,&fContextAttr,&tsExpiry);
   if (ss < 0)  
+  {
+    DBGTrace1("AcceptSecurityContext failed: %s",GetErrorNameStatic(ss));
     return FALSE;
+  }
   pAS->fHaveCtxtHandle = TRUE;
   // If necessary, complete token
   if (ss == SEC_I_COMPLETE_NEEDED || ss == SEC_I_COMPLETE_AND_CONTINUE) 
   {
     if (!_CompleteAuthToken) 
+    {
+      DBGTrace("CompleteAuthToken not linked!");
       return FALSE;
+    }
     ss = _CompleteAuthToken(&pAS->hctxt,&sbdOut);
     if (ss < 0)  
+    {
+      DBGTrace1("CompleteAuthToken failed: %s",GetErrorNameStatic(ss));
       return FALSE;
+    }
   }
   *pcbOut = sbOut.cbBuffer;
   if (!pAS->fInitialized)
@@ -215,7 +240,10 @@ HANDLE SSPLogonUser(LPCTSTR szDomain,LPCTSTR szUser,LPCTSTR szPassword)
   {
     
     if (!LoadSecurityDll())
+    {
+      DBGTrace("SSPLogonUser: Exit because LoadSecurityDll failed!");
       return FALSE;
+    }
     // Get max token size
     _QuerySecurityPackageInfo(_T("NTLM"),&pSPI);
     cbMaxToken = pSPI->cbMaxToken;
