@@ -170,6 +170,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
   CloseHandle(hProcess);
   if (sizeof(RUNDATA)!=s)
     return 0;
+  ActivateKeyboardLayout(GetKeyboardLayout(g_RunData.CliThreadId),KLF_SETFORPROCESS);
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
     return 1;
   return 2;
