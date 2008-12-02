@@ -65,12 +65,18 @@ HANDLE GetUserToken(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword)
   }
 SecondTry:
   if (!LogonUser(un,dn,Password,LOGON32_LOGON_NETWORK,0,&hToken))
+  {
     if (GetLastError()==ERROR_PRIVILEGE_NOT_HELD)
+    {
       hToken=SSPLogonUser(dn,un,Password);
+    }else
+      DBGTrace3("LogonUser(%s,%s) failed: %s",un,dn,GetLastErrorNameStatic());
+  }
   //Windows sometimes reports an error if the user's password is empty, try again:
   if (bFirstTry && (hToken==NULL)&&((Password==NULL) || (*Password==NULL)))
   {
     bFirstTry=FALSE;
+    DBGTrace2("GetUserToken(%s,%s) Second Try...",un,dn);
     goto SecondTry;
   }
 //  DBGTrace4("GetUserToken(%s,%s,%s):%s",un,dn,Password,hToken?_T("SUCCEEDED."):_T("FAILED!"));
