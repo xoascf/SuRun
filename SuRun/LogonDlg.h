@@ -21,16 +21,16 @@
 #pragma once
 
 // Check is a password for a user is correct
-BOOL PasswordOK(LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword);
+BOOL PasswordOK(DWORD SessionId,LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword);
 
 BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
-DWORD ValidateCurrentUser(LPTSTR User,int IDmsg,...);
+DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,int IDmsg,...);
 
 BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,BOOL AllowAsAdmin,int IDmsg,...);
 
 BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
 BOOL LogonAdmin(DWORD SessionId,int IDmsg,...);
 
-DWORD LogonCurrentUser(LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...);
+DWORD LogonCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...);
 
-DWORD AskCurrentUserOk(LPTSTR User,DWORD UsrFlags,int IDmsg,...);
+DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...);
