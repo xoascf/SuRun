@@ -402,12 +402,13 @@ ChkAdmin:
   USERLIST u;
   u.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,g_RunData.SessionID,false);
   TCHAR un[4096]={0};
-  for (int i=0;i<u.GetCount();i++) if (PasswordOK(u.GetUserName(i),0,TRUE))
-  {
-    DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
-    _tcscat(un,u.GetUserName(i));
-    _tcscat(un,_T("\n"));
-  }
+  for (int i=0;i<u.GetCount();i++) 
+    if (PasswordOK(g_RunData.SessionID,u.GetUserName(i),0,TRUE))
+    {
+      DBGTrace1("Warning: %s is an empty password admin",u.GetUserName(i));
+      _tcscat(un,u.GetUserName(i));
+      _tcscat(un,_T("\n"));
+    }
   if(un[0])
     ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
 }
@@ -793,12 +794,14 @@ DWORD PrepareSuRun()
     DWORD l=0;
     if (!PwOk)
     {
-      l=LogonCurrentUser(g_RunData.UserName,g_RunPwd,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
-          BeautifyCmdLine(g_RunData.cmdLine));
+      l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
+                         g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+                         BeautifyCmdLine(g_RunData.cmdLine));
     }else
     {
-      l=AskCurrentUserOk(g_RunData.UserName,f,g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
-        BeautifyCmdLine(g_RunData.cmdLine));
+      l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,
+                         g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+                         BeautifyCmdLine(g_RunData.cmdLine));
     }
     if (l==8)
       return RETVAL_SWITCHRUNAS;
@@ -893,7 +896,7 @@ BOOL Setup()
   //check if user name needs to enter the password:
   if (GetReqPw4Setup(g_RunData.UserName))
   {
-    if(!ValidateCurrentUser(g_RunData.UserName,IDS_PW4SETUP))
+    if(!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP))
       return FALSE;
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
