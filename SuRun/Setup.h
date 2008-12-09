@@ -339,6 +339,20 @@ BOOL RemoveFromWhiteList(LPCTSTR User,LPCTSTR CmdLine);
 // 
 //////////////////////////////////////////////////////////////////////////////
 #define HKLSTKEY    SURUNKEY _T("\\DoNotHook")
+#define GetSROption(s,d)   GetRegInt(HKCR,SURUNKEY,s,d)
+#define SetSROption(s,v,d) if(GetSROption(s,d)!=v)\
+                             SetRegInt(HKCR,SURUNKEY,s,v)
+#define DelSROption(s)     RegDelVal(HKCR,SURUNKEY,s)
+
+#define GetCancelTimeOut        GetSROption(_T("CancelTimeOut"),40)
+#define SetCancelTimeOut(v)     SetSROption(_T("CancelTimeOut"),v,40)
+
+#define GetShowCancelTimeOut    (GetSROption(_T("ShowCancelTimeOut"),0)!=0)
+#define SetShowCancelTimeOut(v) SetSROption(_T("ShowCancelTimeOut"),v,0)
+
+#define GetUseCancelTimeOut     (GetSROption(_T("UseCancelTimeOut"),1)!=0)
+#define SetUseCancelTimeOut(v)  SetSROption(_T("UseCancelTimeOut"),v,1)
+
 BOOL IsInBlackList(LPCTSTR CmdLine);
 
 //////////////////////////////////////////////////////////////////////////////
