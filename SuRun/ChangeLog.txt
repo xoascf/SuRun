@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* NEW: Option to adjust, hide and disable the "Cancel" Timeout
 * RunAs-Logon-Dialog does not always check if Password is valid
 * Service uses the the user's keyboard layout
 * LogonUser uses impersonation
@@ -7,10 +8,8 @@ Done, to be tested:
 ToDo
 ---------------------
 * Add a flag to the program list to not ask for a passwort for certain programs
-* Make RunAs jump to a Admin account with saved password
 * Hotkes for "User..." in Ack-Dialogs
 * Console SuRun support
-* make Safe Desktop CountDown switchable
 * Integrate "Nero Burning Rights" functions
 
 To be done in future:
