@@ -64,8 +64,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
     LTEXT           "Bitte geben Sie ihr persönliches Kennwort ein, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie 'Abbrechen'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
@@ -80,7 +79,6 @@ BEGIN
     CONTROL         "Dieses Prog. immer autom. als Administrator starten",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "Benutzer...",IDC_SWITCHRUNAS,4,189,50,14
     DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
     PUSHBUTTON      "Abbrechen",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
@@ -99,8 +97,7 @@ BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
     ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Wählen Sie OK, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie Abbrechen!",
                     IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -114,19 +111,18 @@ BEGIN
     CONTROL         "Dieses Prog. immer autom. als Administrator starten",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "Benutzer...",IDC_SWITCHRUNAS,4,189,50,14
     PUSHBUTTON      "OK",IDOK,179,189,50,14
     DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
                     PBS_SMOOTH,0,207,289,9
 END
 
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 158
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 143
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Ausführen als.."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -142,12 +138,10 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,98,89,158,12,ES_AUTOHSCROLL
     CONTROL         "Kennwort speichern",IDC_STOREPASS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,98,104,158,10
-    CONTROL         "Mit gehobenen Rechten starten",IDC_ADMINRIGHTS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,98,116,158,10
-    DEFPUSHBUTTON   "OK",IDOK,150,131,52,14
-    PUSHBUTTON      "Abbrechen",IDCANCEL,204,131,52,14
+    DEFPUSHBUTTON   "OK",IDOK,150,117,52,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,204,117,52,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,149,263,9
+                    PBS_SMOOTH,0,135,263,9
 END
 
 IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -155,49 +149,56 @@ STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Sicherer Desktop",IDC_EXTOPT2,75,2,297,38,WS_GROUP
+    GROUPBOX        "Sicherer Desktop",IDC_EXTOPT2,75,2,297,50,WS_GROUP
     CONTROL         "Zeige unscharfen, abgedunkelten Benutzer-&Desktop als Hintergrund",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,13,283,9
     CONTROL         "Desktop 'einblenden'",IDC_FADEDESKTOP,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,25,283,9
-    GROUPBOX        "Sicherheit",IDC_STATIC,75,45,297,49
-    CONTROL         "&Benutzer-Kennwort abfragen",IDC_ASKPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
-    EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+    CONTROL         "Automatisch ""Abbrechen"" nach",IDC_USE_C_TO,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,38,117,9
+    EDITTEXT        IDC_CANCEL_TO,203,36,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min warten vor erneuter Abfrage",IDC_STATIC,225,57,142,
+    LTEXT           "s",IDC_STATIC,226,38,8,8
+    CONTROL         "Fortschritt anzeigen",IDC_SHOW_C_TO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,238,38,77,10
+    GROUPBOX        "Sicherheit",IDC_STATIC,75,53,297,49
+    CONTROL         "&Benutzer-Kennwort abfragen",IDC_ASKPW,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,65,116,9
+    EDITTEXT        IDC_ASKTIMEOUT,201,63,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min warten vor erneuter Abfrage",IDC_STATIC,225,65,142,
                     9,NOT WS_GROUP
     LTEXT           "Zeige Warnung bei Administratoren mit leeren Kennwörtern:",
-                    IDC_STATIC,83,71,114,17
-    COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
+                    IDC_STATIC,83,79,114,17
+    COMBOBOX        IDC_WARNADMIN,201,79,166,30,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Shell-Integration:",IDC_STATIC,75,99,297,75,WS_GROUP
+    GROUPBOX        "Shell-Integration:",IDC_STATIC,75,107,297,75,WS_GROUP
     CONTROL         "Zeige ""Systemsteuerung als Administrator"" im Kontext-Menü des Desktop",
                     IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    110,283,9
+                    118,283,9
     CONTROL         "Zeige ""'SuRun cmd' hier"" im Kontext-Menü für Ordner",
                     IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    122,283,9
+                    130,283,9
     CONTROL         "Zeige ""'SuRun Explorer' hier"" im Kontext-Menü für Ordner",
                     IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    134,283,9
+                    142,283,9
     CONTROL         "Zeige ""Neustart als Administrator"" im System-Menü von Programmen",
                     IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    83,146,283,9
+                    83,154,283,9
     CONTROL         "Zeige ""Start als Administrator"" im System-Menü von Programmen",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    159,283,9
-    GROUPBOX        "Hilfestellungen",IDC_STATIC,4,179,206,45
+                    167,283,9
+    GROUPBOX        "Hilfestellungen",IDC_STATIC,4,186,206,45
     CONTROL         "Zeige Einstellungen für erfahrene Benutzer",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
-                    191,186,10
+                    198,186,10
     PUSHBUTTON      "Empfohlene Einstellungen für Heimanwender vorgeben",
-                    IDC_SIMPLESETUP,12,204,192,14
-    GROUPBOX        "Datensicherung",IDC_STATIC,215,179,157,45
-    CTEXT           "Sämtliche SuRun Einstellungen",IDC_STATIC,217,191,152,8
-    PUSHBUTTON      "Sichern...",IDC_EXPORT,223,204,68,14
-    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,297,204,68,14
+                    IDC_SIMPLESETUP,12,211,192,14
+    GROUPBOX        "Datensicherung",IDC_STATIC,215,186,157,45
+    CTEXT           "Sämtliche SuRun Einstellungen",IDC_STATIC,217,198,152,8
+    PUSHBUTTON      "Sichern...",IDC_EXPORT,223,211,68,14
+    PUSHBUTTON      "Wiederherstellen...",IDC_IMPORT,297,211,68,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -356,7 +357,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -624,7 +625,7 @@ GUIDELINES DESIGNINFO DISCARDABLE
 BEGIN
     IDD_RUNASDLG, DIALOG
     BEGIN
-        BOTTOMMARGIN, 143
+        BOTTOMMARGIN, 128
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -785,48 +786,56 @@ STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Safe Desktop",IDC_EXTOPT2,77,0,297,39,WS_GROUP
+    GROUPBOX        "Safe Desktop",IDC_EXTOPT2,77,0,297,52,WS_GROUP
     CONTROL         "Show blurred user &desktop as background",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,11,283,11
     CONTROL         "Fade desktop in",IDC_FADEDESKTOP,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,23,283,11
-    GROUPBOX        "Security",IDC_EXTOPT3,77,44,297,49,WS_GROUP
-    CONTROL         "Users must enter their password",IDC_ASKPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,56,116,11
-    EDITTEXT        IDC_ASKTIMEOUT,202,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+    CONTROL         "Automatically press ""Cancel"" after",IDC_USE_C_TO,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,
+                    38,126,9
+    EDITTEXT        IDC_CANCEL_TO,213,36,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min grace period before asking again",IDC_STATIC,226,56,
+    LTEXT           "s",IDC_STATIC,236,38,8,8
+    CONTROL         "show timeout with progress bar",IDC_SHOW_C_TO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,250,38,119,10
+    GROUPBOX        "Security",IDC_EXTOPT3,77,56,297,49,WS_GROUP
+    CONTROL         "Users must enter their password",IDC_ASKPW,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,68,116,11
+    EDITTEXT        IDC_ASKTIMEOUT,202,67,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min grace period before asking again",IDC_STATIC,226,68,
                     143,11,NOT WS_GROUP
     LTEXT           "Show Warning, if Administrators have no password:",
-                    IDC_STATIC,83,71,114,17
-    COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
+                    IDC_STATIC,83,83,114,17
+    COMBOBOX        IDC_WARNADMIN,201,83,166,30,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Shell Integration",IDC_STATIC,75,98,297,75,WS_GROUP
+    GROUPBOX        "Shell Integration",IDC_STATIC,75,110,297,75,WS_GROUP
     CONTROL         "Show ""Control panel as administrator"" in the context menu of the desktop",
                     IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    108,283,11
+                    120,283,11
     CONTROL         "Show ""'SuRun cmd' here"" in the context menu of folders",
                     IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    121,283,11
+                    133,283,11
     CONTROL         "Show ""'SuRun Explorer' here"" in the context menu of folders",
                     IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    133,283,11
+                    145,283,11
     CONTROL         "Show ""Restart as administrator"" in the System menu of applications",
                     IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    83,145,283,11
+                    83,157,283,11
     CONTROL         "Show ""Start as administrator"" in the System menu of applications",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    158,283,11
-    GROUPBOX        "Convenience",IDC_STATIC,4,179,206,45
+                    170,283,11
+    GROUPBOX        "Convenience",IDC_STATIC,4,187,206,45
     CONTROL         "Show SuRun settings for experienced users",IDC_NOEXPERT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,190,185,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,198,185,10
     PUSHBUTTON      "Set recommended options for home users",IDC_SIMPLESETUP,
-                    14,203,185,14
-    GROUPBOX        "Backup",IDC_STATIC,215,179,157,45
-    CTEXT           "All SuRun Settings",IDC_STATIC,219,190,148,8
-    PUSHBUTTON      "Backup...",IDC_EXPORT,224,203,63,14
-    PUSHBUTTON      "Restore...",IDC_IMPORT,301,203,63,14
+                    14,211,185,14
+    GROUPBOX        "Backup",IDC_STATIC,215,187,157,45
+    CTEXT           "All SuRun Settings",IDC_STATIC,219,198,148,8
+    PUSHBUTTON      "Backup...",IDC_EXPORT,224,211,63,14
+    PUSHBUTTON      "Restore...",IDC_IMPORT,301,211,63,14
 END
 
 IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
@@ -994,8 +1003,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
     LTEXT           "If the application should be started with administrative rights, enter your password.\r\n\r\nIf not, press 'Cancel'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
@@ -1011,7 +1019,6 @@ BEGIN
     CONTROL         "Automagically run this program with elevated rights.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "User...",IDC_SWITCHRUNAS,4,189,50,14
     DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
@@ -1030,8 +1037,7 @@ BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
     ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "If the application should be started with administrative rights, press 'OK'.\r\n\r\nIf not, press 'Cancel'!",
                     IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -1046,7 +1052,6 @@ BEGIN
     CONTROL         "Automagically run this program with elevated rights.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "User...",IDC_SWITCHRUNAS,4,189,50,14
     PUSHBUTTON      "OK",IDOK,179,189,50,14
     DEFPUSHBUTTON   "Cancel",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
@@ -1147,12 +1152,12 @@ BEGIN
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 159
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 142
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Run as..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1166,14 +1171,12 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,98,90,158,12,ES_AUTOHSCROLL
     CONTROL         "remember password",IDC_STOREPASS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,98,104,158,10
-    CONTROL         "start with elevated rights",IDC_ADMINRIGHTS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,98,116,158,10
-    DEFPUSHBUTTON   "OK",IDOK,153,132,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,206,132,50,14
+    DEFPUSHBUTTON   "OK",IDOK,153,116,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,206,116,50,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,44
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,150,263,9
+                    PBS_SMOOTH,0,134,263,9
 END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
@@ -1644,8 +1647,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
     LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
@@ -1661,7 +1663,6 @@ BEGIN
     CONTROL         "Dit programma automatisch met verhoogde rechten uitvoeren.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,79,
                     174,209,10
-    PUSHBUTTON      "Gebruiker...",IDC_SWITCHRUNAS,4,189,50,14
     DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
     PUSHBUTTON      "Annuleren",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
@@ -1680,8 +1681,7 @@ BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
     ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    EDITTEXT        IDC_DLGQUESTION,7,8,274,52,ES_MULTILINE | ES_READONLY | 
-                    NOT WS_BORDER
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",
                     IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -1696,7 +1696,6 @@ BEGIN
     CONTROL         "Dit programma automatisch met verhoogde rechten uitvoeren.",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,71,
                     174,209,10
-    PUSHBUTTON      "Gebruiker...",IDC_SWITCHRUNAS,4,189,50,14
     PUSHBUTTON      "OK",IDOK,179,189,50,14
     DEFPUSHBUTTON   "Annuleren",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
@@ -1728,7 +1727,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1798,12 +1797,12 @@ BEGIN
                     WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 158
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 145
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Uitvoeren als..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1817,14 +1816,12 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,117,90,139,12,ES_AUTOHSCROLL
     CONTROL         "wachtwoord onthouden",IDC_STOREPASS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,117,104,138,10
-    CONTROL         "met verhoogde rechten starten",IDC_ADMINRIGHTS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,117,116,140,10
-    DEFPUSHBUTTON   "OK",IDOK,153,131,50,14
-    PUSHBUTTON      "Annuleren",IDCANCEL,206,131,50,14
+    DEFPUSHBUTTON   "OK",IDOK,153,118,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,206,118,50,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,7,73,47,44
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,149,263,9
+                    PBS_SMOOTH,0,136,263,9
 END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
@@ -1866,49 +1863,56 @@ STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Beveiligd Bureaublad",IDC_EXTOPT2,75,2,297,38,WS_GROUP
+    GROUPBOX        "Beveiligd Bureaublad",IDC_EXTOPT2,75,2,297,49,WS_GROUP
     CONTROL         "Scherm vervagen en Bureaublad in de achtergrond 'dimmen'",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
                     WS_TABSTOP,83,13,283,9
     CONTROL         "Bureaublad 'in- en uitvloeien'",IDC_FADEDESKTOP,"Button",
                     BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,25,283,9
-    GROUPBOX        "Beveiliging",IDC_STATIC,75,45,297,49
-    CONTROL         "&Gebruikerswachtwoord vragen",IDC_ASKPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,57,116,9
-    EDITTEXT        IDC_ASKTIMEOUT,201,55,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+    CONTROL         "Automatisch ""Annuleren"" na",IDC_USE_C_TO,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,38,114,9
+    EDITTEXT        IDC_CANCEL_TO,203,36,18,12,ES_CENTER | ES_AUTOHSCROLL | 
                     ES_NUMBER
-    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,57,
+    LTEXT           "s",IDC_STATIC,226,38,8,8
+    CONTROL         "show timeout progress bar",IDC_SHOW_C_TO,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,238,38,98,10
+    GROUPBOX        "Beveiliging",IDC_STATIC,75,55,297,49
+    CONTROL         "&Gebruikerswachtwoord vragen",IDC_ASKPW,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,67,116,9
+    EDITTEXT        IDC_ASKTIMEOUT,201,65,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "min. niet meer om wachtwoord vragen",IDC_STATIC,225,67,
                     142,9,NOT WS_GROUP
     LTEXT           "Toon waarschuwing bij Administrators zonder wachtwoord",
-                    IDC_STATIC,83,71,114,17
-    COMBOBOX        IDC_WARNADMIN,201,71,166,30,CBS_DROPDOWNLIST | 
+                    IDC_STATIC,83,81,114,17
+    COMBOBOX        IDC_WARNADMIN,201,81,166,30,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Systeem-Integratie:",IDC_STATIC,75,99,297,75,WS_GROUP
+    GROUPBOX        "Systeem-Integratie:",IDC_STATIC,75,109,297,75,WS_GROUP
     CONTROL         "Toon ""Configuratiescherm als Administrator"" in het Bureaublad context-menu",
                     IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    110,283,9
+                    120,283,9
     CONTROL         "Toon ""'SuRun cmd' hier"" in folder context-menu's",
                     IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    122,283,9
+                    132,283,9
     CONTROL         "Toon ""'SuRun Verkenner' hier"" in folder context-menu's",
                     IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    134,283,9
+                    144,283,9
     CONTROL         "Toon ""Opnieuw starten als Administrator"" in programma systeem-menu's",
                     IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    83,146,283,9
+                    83,156,283,9
     CONTROL         "Toon ""Start als Administrator"" in programma systeem-menu's",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    159,283,9
-    GROUPBOX        "Standaard/geavanceerd",IDC_STATIC,4,179,206,45
+                    169,283,9
+    GROUPBOX        "Standaard/geavanceerd",IDC_STATIC,4,187,206,45
     CONTROL         "Toon geavanceerde instellingen voor ervaren gebruikers",
                     IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,
-                    191,186,10
+                    199,186,10
     PUSHBUTTON      "Aanbevolen instellingen voor regulier gebruik",
-                    IDC_SIMPLESETUP,12,204,192,14
-    GROUPBOX        "Backup",IDC_STATIC,215,179,157,45
-    CTEXT           "Alle SuRun Instellingen",IDC_STATIC,217,191,152,8
-    PUSHBUTTON      "Opslaan...",IDC_EXPORT,223,204,68,14
-    PUSHBUTTON      "Laden...",IDC_IMPORT,297,204,68,14
+                    IDC_SIMPLESETUP,12,212,192,14
+    GROUPBOX        "Backup",IDC_STATIC,215,187,157,45
+    CTEXT           "Alle SuRun Instellingen",IDC_STATIC,217,199,152,8
+    PUSHBUTTON      "Opslaan...",IDC_EXPORT,223,212,68,14
+    PUSHBUTTON      "Laden...",IDC_IMPORT,297,212,68,14
 END
 
 IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -2056,7 +2060,7 @@ GUIDELINES DESIGNINFO DISCARDABLE
 BEGIN
     IDD_RUNASDLG, DIALOG
     BEGIN
-        BOTTOMMARGIN, 143
+        BOTTOMMARGIN, 130
     END
 END
 #endif    // APSTUDIO_INVOKED
