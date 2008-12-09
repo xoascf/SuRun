@@ -1164,7 +1164,10 @@ void ExportSettings(LPTSTR ini)
   EXPORTINT(SuRunKey,BlurDesk,ini);
   EXPORTINT(SuRunKey,FadeDesk,ini);
   EXPORTINT(SuRunKey,SavePW,ini);
-  
+  EXPORTINT(SuRunKey,UseCancelTimeOut,ini);
+  EXPORTINT(SuRunKey,CancelTimeOut,ini);
+  EXPORTINT(SuRunKey,ShowCancelTimeOut,ini);
+
   EXPORTINT(SuRunKey,PwTimeOut,ini);
   EXPORTINT(SuRunKey,AdminNoPassWarn,ini);
   
@@ -1253,6 +1256,11 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 
     IMPORTINT(SuRunKey,BlurDesk,ini);
     IMPORTINT(SuRunKey,FadeDesk,ini);
+  
+    IMPORTINT(SuRunKey,UseCancelTimeOut,ini);
+    IMPORTINT(SuRunKey,CancelTimeOut,ini);
+    IMPORTINT(SuRunKey,ShowCancelTimeOut,ini);
+
     IMPORTINT(SuRunKey,SavePW,ini);
     
     IMPORTINT(SuRunKey,PwTimeOut,ini);
@@ -1451,6 +1459,11 @@ void SetRecommendedSettings()
   HWND h=g_SD->hTabCtrl[0];
   CheckDlgButton(h,IDC_BLURDESKTOP,1);
   CheckDlgButton(h,IDC_FADEDESKTOP,1);
+  CheckDlgButton(h,IDC_USE_C_TO,1);
+  SetDlgItemInt(h,IDC_CANCEL_TO,40,0);
+  CheckDlgButton(h,IDC_SHOW_C_TO,0);
+  EnableWindow(GetDlgItem(h,IDC_CANCEL_TO),1);
+  EnableWindow(GetDlgItem(h,IDC_SHOW_C_TO),1);
   CheckDlgButton(h,IDC_ASKPW,0);
   SetDlgItemInt(h,IDC_ASKTIMEOUT,0,0);
   ComboBox_SetCurSel(GetDlgItem(h,IDC_WARNADMIN),APW_NR_SR_ADMIN);
@@ -1546,12 +1559,20 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-      SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
-      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,GetPwTimeOut,0);
+
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
       EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&&GetBlurDesk);
+
+      CheckDlgButton(hwnd,IDC_USE_C_TO,GetUseCancelTimeOut);
+      SendDlgItemMessage(hwnd,IDC_CANCEL_TO,EM_LIMITTEXT,2,0);
+      SetDlgItemInt(hwnd,IDC_CANCEL_TO,GetCancelTimeOut,0);
+      CheckDlgButton(hwnd,IDC_SHOW_C_TO,GetShowCancelTimeOut);
+      EnableWindow(GetDlgItem(hwnd,IDC_CANCEL_TO),IsDlgButtonChecked(hwnd,IDC_USE_C_TO));
+      EnableWindow(GetDlgItem(hwnd,IDC_SHOW_C_TO),IsDlgButtonChecked(hwnd,IDC_USE_C_TO));
       
+      SendDlgItemMessage(hwnd,IDC_ASKTIMEOUT,EM_LIMITTEXT,2,0);
+      SetDlgItemInt(hwnd,IDC_ASKTIMEOUT,GetPwTimeOut,0);
       BOOL bAsk=(!GetSavePW)||(GetPwTimeOut!=0);
       CheckDlgButton(hwnd,IDC_ASKPW,bAsk);
       EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),bAsk);
@@ -1581,6 +1602,10 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
       case MAKELPARAM(IDC_BLURDESKTOP,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k())&& IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
+        return TRUE;
+      case MAKELPARAM(IDC_USE_C_TO,BN_CLICKED):
+        EnableWindow(GetDlgItem(hwnd,IDC_CANCEL_TO),IsDlgButtonChecked(hwnd,IDC_USE_C_TO));
+        EnableWindow(GetDlgItem(hwnd,IDC_SHOW_C_TO),IsDlgButtonChecked(hwnd,IDC_USE_C_TO));
         return TRUE;
       case MAKELPARAM(IDC_ASKPW,BN_CLICKED):
         EnableWindow(GetDlgItem(hwnd,IDC_ASKTIMEOUT),IsDlgButtonChecked(hwnd,IDC_ASKPW));
@@ -1623,6 +1648,11 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 ApplyChanges:
       SetBlurDesk(IsDlgButtonChecked(hwnd,IDC_BLURDESKTOP));
       SetFadeDesk(IsDlgButtonChecked(hwnd,IDC_FADEDESKTOP));
+      
+      SetUseCancelTimeOut(IsDlgButtonChecked(hwnd,IDC_USE_C_TO));
+      SetCancelTimeOut(GetDlgItemInt(hwnd,IDC_CANCEL_TO,0,0));
+      SetShowCancelTimeOut(IsDlgButtonChecked(hwnd,IDC_SHOW_C_TO));
+
       if(IsDlgButtonChecked(hwnd,IDC_ASKPW))
       {
         SetPwTimeOut(GetDlgItemInt(hwnd,IDC_ASKTIMEOUT,0,0));
