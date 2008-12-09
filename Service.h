@@ -63,7 +63,6 @@ extern bool g_CliIsAdmin;
 //This is used to verify that SuRun.exe started by the user is the same as 
 //the Service process
 
-#define RETVAL_SWITCHRUNAS -3
 #define RETVAL_NODESKTOP   -2
 #define RETVAL_WAIT        -1
 #define RETVAL_OK           0
