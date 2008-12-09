@@ -206,7 +206,6 @@ static void SetUserBitmap(HWND hwnd)
     if (LoadRunAsPassword(p->User,User,Pass,PWLEN) 
       && PasswordOK(p->SessionId,User,Pass,false))
     {
-      zero(Pass);
       SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
       EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),false);
       CheckDlgButton(hwnd,IDC_STOREPASS,1);
