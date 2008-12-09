@@ -48,7 +48,7 @@ extern RUNDATA g_RunData;
 #ifdef _DEBUG
 //#include "LSALogon.h"
 //extern BOOL TestSetup();
-//extern BOOL TestLogonDlg();
+extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
 //extern int TestBS();
 #endif _DEBUG
@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetAdminToken(0);
 //  TestBS();
 //  TestSetup();
-//  TestLogonDlg();
+  TestLogonDlg();
 //  UserIsInSuRunnersOrAdmins();
 //  _tcscpy(g_RunData.UserName,_T("BRUNS\\Kay"));
 //  _tcscpy(g_RunData.CurDir,_T("C:\\Windows"));
