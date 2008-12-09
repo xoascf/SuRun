@@ -803,8 +803,6 @@ DWORD PrepareSuRun()
                          g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
                          BeautifyCmdLine(g_RunData.cmdLine));
     }
-    if (l==8)
-      return RETVAL_SWITCHRUNAS;
     DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if((l&1)==0)
     {
@@ -922,7 +920,7 @@ BOOL Setup()
 //  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs,bool bNoAdmin)
+HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs)
 {
   //Admin Token for SessionId
   HANDLE hUser=0;
@@ -935,7 +933,7 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
   if(bRunAs)
-    hUser=LSALogon(SessionID,un,dn,Password,bNoAdmin);
+    hUser=LSALogon(SessionID,un,dn,Password,true);
   else
     hUser=GetAdminToken(SessionID);
   return hUser;
@@ -973,11 +971,11 @@ BOOL CALLBACK KillProxyDesktopEnum(HWND hwnd, LPARAM lParam)
 }
 
 
-DWORD LSAStartAdminProcess(bool bNoAdmin) 
+DWORD LSAStartAdminProcess() 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //Get Admin User Token and Job object token
-  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs,bNoAdmin);
+  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
   //Clear Password
   zero(g_RunPwd);
   if (!hAdmin)
@@ -1148,7 +1146,6 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 //////////////////////////////////////////////////////////////////////////////
 void SuRun(DWORD ProcessID)
 {
-  bool bNoAdmin=FALSE;
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
   {
@@ -1171,15 +1168,8 @@ void SuRun(DWORD ProcessID)
     if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
                           (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
     {
-DoRunAs:
-      BOOL AllowAsAdmin=(g_RunData.Groups&(IS_IN_SURUNNERS|IS_IN_ADMINS|IS_SPLIT_ADMIN))
-                       && (!GetRestrictApps(g_RunData.UserName));
-      BOOL RALret=RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
-                              AllowAsAdmin,
-                              IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)
-                              );
-      bNoAdmin=(RALret&16)==0;
-      if (!RALret)
+      if (!RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
+                      IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
       {
         DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
@@ -1232,11 +1222,6 @@ DoRunAs:
     }
     //Start execution
     RetVal=PrepareSuRun();
-    if (RetVal==RETVAL_SWITCHRUNAS)
-    {
-      g_RunData.bRunAs=TRUE;
-      goto DoRunAs;
-    }
     if (RetVal!=RETVAL_OK)
     {
       if (RetVal==RETVAL_NODESKTOP)
@@ -1258,7 +1243,7 @@ DoRunAs:
   __try
   {
     KillProcess(g_RunData.KillPID);
-    RetVal=LSAStartAdminProcess(bNoAdmin);
+    RetVal=LSAStartAdminProcess();
   }__except(1)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
