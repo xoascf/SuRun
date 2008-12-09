@@ -637,7 +637,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   {
     CloseHandle(pi.hThread);
     DWORD ExitCode=ERROR_ACCESS_DENIED;
-    if((WaitForSingleObject(pi.hProcess,60000)==WAIT_OBJECT_0)
+    if((WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
       //ExitCode==-2 means that the program is not in the WhiteList
