@@ -415,9 +415,6 @@ ChkAdmin:
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
-#ifdef _DEBUG_ENU
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-#endif _DEBUG_ENU
   zero(g_RunPwd);
   //service main
   argc;//unused
@@ -761,9 +758,10 @@ DWORD PrepareSuRun()
     DeletePassword(g_RunData.UserName);
 //    if (f&FLAG_NEVERASK)
 //      return RETVAL_OK;
-  }
-  else  if (f&FLAG_DONTASK)
+  }else  if (f&FLAG_DONTASK)
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+  if(g_RunData.bShExNoSafeDesk)
+    return RETVAL_SX_NOTINLIST;
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
   {
@@ -1248,7 +1246,6 @@ void SuRun(DWORD ProcessID)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
   }
-  //Clear Password
   ResumeClient(RetVal);
 }
 
@@ -1925,9 +1922,6 @@ bool HandleServiceStuff()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
-#ifdef _DEBUG_ENU
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-#endif _DEBUG_ENU
   CCmdLine cmd(0);
   if (cmd.argc()==3)
   {
@@ -1961,7 +1955,6 @@ bool HandleServiceStuff()
       ExitProcess(0);
       return true;
     }
-
   }
   if (cmd.argc()==2)
   {
