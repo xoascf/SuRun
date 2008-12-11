@@ -154,17 +154,20 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         //If we run on a desktop we cannot switch from, bail out!
         HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
         if (!d)
-          return RETVAL_SX_NOTINLIST;
-        TCHAR dn[4096]={0};
-        DWORD dnl=4096;
-        if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
           g_RunData.bShExNoSafeDesk=TRUE;
         else
-          if ((_tcsicmp(dn,_T("Winlogon"))==0)
-            ||(_tcsicmp(dn,_T("Disconnect"))==0)
-            ||(_tcsicmp(dn,_T("Screen-saver"))==0))
+        {
+          TCHAR dn[4096]={0};
+          DWORD dnl=4096;
+          if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
             g_RunData.bShExNoSafeDesk=TRUE;
-        CloseDesktop(d);
+          else
+            if ((_tcsicmp(dn,_T("Winlogon"))==0)
+              ||(_tcsicmp(dn,_T("Disconnect"))==0)
+              ||(_tcsicmp(dn,_T("Screen-saver"))==0))
+              g_RunData.bShExNoSafeDesk=TRUE;
+            CloseDesktop(d);
+        }
       }else if (!_wcsicmp(c,L"/KILL"))
       {
         g_RunData.KillPID=wcstol(Args,0,10);
