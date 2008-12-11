@@ -34,7 +34,7 @@ typedef struct
   TCHAR UserName[UNLEN+UNLEN+2];
   TCHAR cmdLine[4096];
   TCHAR CurDir[4096];
-  DWORD KillPID; //SuRun->Service: Process Id to be killed
+  DWORD KillPID;        //SuRun->Service: Process Id to be killed
   union
   {
     struct
@@ -48,10 +48,11 @@ typedef struct
       DWORD TimeOut;    //Service->Tray Window timeout
     };
   };
-  bool  bShlExHook;
-  bool  beQuiet;
-  bool  bRunAs;
+  bool  bShlExHook;     //we're run from a hook
+  bool  beQuiet;        //No message boxes
+  bool  bRunAs;         //do a RunAs Logon
   DWORD Groups;         //IS_IN_ADMINS,IS_IN_SURUNNERS
+  bool  bShExNoSafeDesk;//if a safe desktop is required, cancel the request
 }RUNDATA;
 
 #define g_CliIsInAdmins    ((g_RunData.Groups&IS_IN_ADMINS)!=0)
