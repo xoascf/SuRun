@@ -158,12 +158,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         TCHAR dn[4096]={0};
         DWORD dnl=4096;
         if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
-          return RETVAL_SX_NOTINLIST;
+          g_RunData.bShExNoSafeDesk=TRUE;
+        else
+          if ((_tcsicmp(dn,_T("Winlogon"))==0)
+            ||(_tcsicmp(dn,_T("Disconnect"))==0)
+            ||(_tcsicmp(dn,_T("Screen-saver"))==0))
+            g_RunData.bShExNoSafeDesk=TRUE;
         CloseDesktop(d);
-        if ((_tcsicmp(dn,_T("Winlogon"))==0)
-          ||(_tcsicmp(dn,_T("Disconnect"))==0)
-          ||(_tcsicmp(dn,_T("Screen-saver"))==0))
-          return RETVAL_SX_NOTINLIST;
       }else if (!_wcsicmp(c,L"/KILL"))
       {
         g_RunData.KillPID=wcstol(Args,0,10);
