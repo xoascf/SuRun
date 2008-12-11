@@ -939,9 +939,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
   //Resources
-#ifdef _DEBUG_ENU
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-#endif _DEBUG_ENU
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   l_bSetHook=!l_IsAdmin;
