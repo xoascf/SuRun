@@ -1,11 +1,5 @@
 Done, to be tested:
 ---------------------------
-* NEW: Option to adjust, hide and disable the "Cancel" Timeout
-* NEW: Service uses the the user's keyboard layout
-* NEW: LogonUser uses impersonation
-* CHG: RunAs-Logon-Dialog does not always check if Password is valid
-* CHG: removed "SuRun /RunAs" support to start programs with elevated rights 
-* CHG: removed support of SuRun Confirmation Dialog to switch to "RunAs"
 
 ToDo
 ---------------------
@@ -33,6 +27,20 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.6 beta 7 - 2008-12-11:
+----------------------------------
+* FIX: If a safe Windows Desktop is active ("Winlogon", "Disconnect", 
+  "Screen-saver"), SuRun did automatically cancel all ShellExecute requests, 
+  even those that where marked as "always run elevated" and "no ask".
+  Now SuRun does correctly handle apps that are marked as "always run elevated"
+  and "no ask" and auto-cancels all requests that require SuRuns safe desktop.
+* NEW: Option to adjust, hide and disable the "Cancel" Timeout
+* NEW: Service uses the the user's keyboard layout
+* NEW: LogonUser uses impersonation
+* CHG: RunAs-Logon-Dialog does not always check if Password is valid
+* CHG: removed "SuRun /RunAs" support to start programs with elevated rights 
+* CHG: removed support of SuRun Confirmation Dialog to switch to "RunAs"
 
 SuRun 1.2.0.6 beta 6 - 2008-11-25:
 ----------------------------------
