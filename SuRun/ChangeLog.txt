@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* WatchDog process terminates itself if SuRuns Desktop is no longer running
 
 ToDo
 ---------------------
