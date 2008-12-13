@@ -232,7 +232,10 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
     SwitchDesktop(d);
     CloseDesktop(d);
     ResetEvent(WatchDogEvent);
-    if ((WaitForSingleObject(WatchDogEvent,2000)==WAIT_TIMEOUT)
+    DWORD WaitRes=WaitForSingleObject(WatchDogEvent,2000);
+    if ((WaitRes!=WAIT_TIMEOUT)&&(WaitRes!=WAIT_OBJECT_0))
+      ExitProcess(0);
+    if ((WaitRes==WAIT_TIMEOUT)
       && ShowWatchDogDlg(WatchDogEvent))
     {
       //Set Access to the user Desktop
