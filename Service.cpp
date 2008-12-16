@@ -326,10 +326,12 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
     DWORD le=GetLastError();
     RevertToSelf();
     if (!bOK)
-      DBGTrace2("CreateProcessAsUser(%s) failed: %s",lpCommandLine,GetErrorNameStatic(le));
+      DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
+        lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
     SetLastError(le);
   }else if (!bOK)
-    DBGTrace2("CreateProcessAsUser(%s) failed: %s",lpCommandLine,GetLastErrorNameStatic());
+    DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
+      lpCommandLine,lpEnvironment,lpCurrentDirectory,GetLastErrorNameStatic());
   return bOK;
 }
 
