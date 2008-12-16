@@ -315,15 +315,17 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
   BOOL bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
     lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
     lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-  if ((!bOK)&&(GetLastError()==ERROR_ACCESS_DENIED))
+  DWORD le=GetLastError();
+  if ((!bOK)&&((le==ERROR_ACCESS_DENIED)||(le==ERROR_DIRECTORY)))
   {
-    DBGTrace1("WARNING: CreateProcessAsUser(%s) failed; SECOND TRY with Impersonation",lpCommandLine);
+    DBGTrace4("WARNING: CreateProcessAsUser(%s,%s,%s) failed: %s; SECOND TRY with Impersonation",
+      lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
     //Impersonation required for EFS and CreateProcessAsUser
     ImpersonateLoggedOnUser(hToken);
     bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-    DWORD le=GetLastError();
+    le=GetLastError();
     RevertToSelf();
     if (!bOK)
       DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
@@ -331,7 +333,7 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
     SetLastError(le);
   }else if (!bOK)
     DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
-      lpCommandLine,lpEnvironment,lpCurrentDirectory,GetLastErrorNameStatic());
+      lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
   return bOK;
 }
 
