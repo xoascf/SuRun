@@ -39,6 +39,16 @@
 
 extern RUNDATA g_RunData;
 
+
+#ifdef BetaVer
+static void Crash()
+{
+  SafeMsgBox(0,L"Crashing!",CResStr(IDS_APPNAME),MB_ICONINFORMATION);
+  DWORD* p=NULL;
+  *p=GetTickCount();
+}
+#endif BetaVer
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // WinMain
@@ -132,11 +142,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
       if (*(Args-1)==' ')
         *(Args-1)=0;
+#ifdef BetaVer
       if (!_wcsicmp(c,L"/CRASH"))
       {
-        DWORD* p=0;
-        *p=1;
-      }else if (!_wcsicmp(c,L"/QUIET"))
+        Crash();
+      }else 
+#endif BetaVer
+      if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;
       }else if (!_wcsicmp(c,L"/RUNAS"))
