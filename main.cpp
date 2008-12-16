@@ -132,7 +132,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
       if (*(Args-1)==' ')
         *(Args-1)=0;
-      if (!_wcsicmp(c,L"/QUIET"))
+      if (!_wcsicmp(c,L"/CRASH"))
+      {
+        DWORD* p=0;
+        *p=1;
+      }else if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;
       }else if (!_wcsicmp(c,L"/RUNAS"))
