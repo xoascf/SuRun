@@ -1,5 +1,8 @@
 Done, to be tested:
 ---------------------------
+* FIX: When importing users SuRun removed all imported users from the local 
+    administrators group even when UAC is enabled. Now SuRun leaves UAC admins
+    in the local administrators group.
 
 ToDo
 ---------------------
