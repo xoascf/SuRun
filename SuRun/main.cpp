@@ -58,7 +58,7 @@ static void Crash()
 #ifdef _DEBUG
 //#include "LSALogon.h"
 //extern BOOL TestSetup();
-extern BOOL TestLogonDlg();
+//extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
 //extern int TestBS();
 #endif _DEBUG
@@ -66,14 +66,6 @@ extern BOOL TestLogonDlg();
 //#include "ScreenSnap.h"
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-//  CBlurredScreen b;
-//  b.Init();
-//  b.Show(false);
-//  DWORD t=GetTickCount();
-//  while (GetTickCount()-t<1000)
-//    b.MsgLoop();
-//  b.Done();
-//  ExitProcess(0);
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
   case 1:
@@ -92,7 +84,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetAdminToken(0);
 //  TestBS();
 //  TestSetup();
-  TestLogonDlg();
+//  TestLogonDlg();
+//  TCHAR Args[4096];
+//  ResolveCommandLine(L"C:\\WINDOWS\\system32\\control.exe appwiz.cpl,,3",L"C:\\Dokumente und Einstellungen\\Kay",Args);
 //  UserIsInSuRunnersOrAdmins();
 //  _tcscpy(g_RunData.UserName,_T("BRUNS\\Kay"));
 //  _tcscpy(g_RunData.CurDir,_T("C:\\Windows"));
@@ -237,6 +231,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         return RETVAL_ACCESSDENIED;
       }  
       ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
+      //DBGTrace3("ResolveCommandLine(%s,%s)= %s",Args,g_RunData.CurDir,g_RunData.cmdLine);
     }
     free(args);
   }
