@@ -828,10 +828,9 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     zero(args);
   }else
   //Control Panel special folder files:
-  if (((!fExist)
-    &&((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
-    && (args[0]==0))
-    ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"control")) && (!_wcsicmp(ext,L".exe"))))
+  if ((args[0]==0)
+    && ((!fExist)&&((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control")))
+    ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"control")) && (!_wcsicmp(ext,L".exe")))))
   {
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app,L"explorer.exe");
