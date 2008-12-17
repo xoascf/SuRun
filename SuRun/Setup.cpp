@@ -1125,7 +1125,8 @@ BOOL ImportUser(LPCTSTR ini,LPCTSTR USRKEY,LPCTSTR WLKEY,LPCTSTR WLFKEY)
     PathAppend(cn,User);
     _tcscpy(User,cn);
   }
-  AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,User,0);
+  if (!UACEnabled)
+    AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,User,0);
   AlterGroupMember(DOMAIN_ALIAS_RID_USERS,User,1);
   if (GetUseSuRunGrp)
   {
