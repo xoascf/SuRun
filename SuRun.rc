@@ -1389,7 +1389,7 @@ BEGIN
     IDS_LOGONFAILED         "Logon failed!\r\n\r\nCheck the users name and password and try again!\r\n\r\nNote that the user name and password are case sensitive."
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
     IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
-    IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
+    IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
     IDS_MENUSTR             "Start as administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot use SuRun because you cannot act as normal user!"
     IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
@@ -1417,7 +1417,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOOSE the ADMINISTRATOR STATUS."
+    IDS_ASKSURUNNER1        "Do you want '%s' to become a 'SuRunners' member?\r\n\r\nIf you press Yes, '%s' will become SuRunner and will LOSE the ADMINISTRATOR STATUS."
     IDS_BUILTINADMIN1       "'%s' is a ""built in"" Administrator.\r\n\r\nThis user cannot use SuRun because he cannot act as normal user!"
     IDS_NOADD2USERS1        "Error!\r\n\r\nPutting '%s' into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Error!\r\n\r\nPutting '%s' into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
