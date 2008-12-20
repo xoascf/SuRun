@@ -626,7 +626,7 @@ Cleanup:
 //  e.g. if you mapped \\Server\C$ to your drive Z:\ this function will
 //  convert Z:\Sound\MOD4WIN\TheBest to \\Server\C$\Sound\MOD4WIN\TheBest
 //  
-//  This conversion is required since you loose network connections when
+//  This conversion is required since you lose network connections when
 //  logging on as different user.
 //  
 //  NOTE1: The newly logged on user needs to have access permission to the
