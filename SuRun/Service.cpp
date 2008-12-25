@@ -1192,17 +1192,22 @@ void SuRun(DWORD ProcessID)
     //Setup?
     if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
     {
+      DBGTrace("SuRun Setup");
       //Create the new desktop
       ResumeClient(RETVAL_OK);
+      DBGTrace("Client resumed");
       //check if SuRun Setup is hidden for user name
       if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
         return;
       bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk;
       if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
       {
+        DBGTrace("Safe Desktop running");
         __try
         {
+          DBGTrace("Entering Setup");
           Setup();
+          DBGTrace("Setup done");
         }__except(1)
         {
           DBGTrace("FATAL: Exception in Setup()");
