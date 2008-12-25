@@ -197,8 +197,11 @@ LRESULT CALLBACK CWDMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
 /////////////////////////////////////////////////////////////////////////////
 
 //return true if user wants to switch
-BOOL ShowWatchDogDlg(HANDLE WatchDogEvent)
+BOOL ShowWatchDogDlg()
 {
+  HANDLE WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
+  if (!WatchDogEvent)
+    return false;
   BOOL bRet=FALSE;
   CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SURUNSTUCK),IDI_SHIELD2);
   while (WaitForSingleObject(WatchDogEvent,0)==WAIT_TIMEOUT)
@@ -208,6 +211,8 @@ BOOL ShowWatchDogDlg(HANDLE WatchDogEvent)
       bRet=TRUE;
       break;
     }
+    CloseHandle(WatchDogEvent);
+    WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
   }
   delete w;
   return bRet;
@@ -221,9 +226,6 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
 //  DBGTrace4("DoWatchDog(%s,%s) on %s\\%s",
 //    SafeDesk,UserDesk,g_RunData.WinSta,g_RunData.Desk);
 #endif DoDBGTrace
-  HANDLE WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
-  if (!WatchDogEvent)
-    return;
   SetProcWinStaDesk(0,SafeDesk);
   for(;;)
   {
@@ -231,12 +233,17 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
     HDESK d=OpenDesktop(SafeDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
     SwitchDesktop(d);
     CloseDesktop(d);
+    HANDLE WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
+    if (!WatchDogEvent)
+      return;
     ResetEvent(WatchDogEvent);
     DWORD WaitRes=WaitForSingleObject(WatchDogEvent,2000);
     if ((WaitRes!=WAIT_TIMEOUT)&&(WaitRes!=WAIT_OBJECT_0))
       ExitProcess(0);
+    CloseHandle(WatchDogEvent);
+    WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
     if ((WaitRes==WAIT_TIMEOUT)
-      && ShowWatchDogDlg(WatchDogEvent))
+      && ShowWatchDogDlg())
     {
       //Set Access to the user Desktop
       HANDLE hTok=0;
