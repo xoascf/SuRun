@@ -1,9 +1,5 @@
 Done, to be tested:
 ---------------------------
-* FIX: When importing users SuRun removed all imported users from the local 
-    administrators group even when UAC is enabled. Now SuRun leaves UAC admins
-    in the local administrators group.
-
 ToDo
 ---------------------
 * Add a flag to the program list to not ask for a passwort for certain programs
@@ -30,6 +26,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.6 beta 11 - 2008-12-25:
+-----------------------------------
+* FIX: When importing users SuRun removed all imported users from the local 
+    administrators group even when UAC is enabled. Now SuRun leaves UAC admins
+    in the local administrators group.
+* FIX: The SuRun function "HasRegistryKeyAccess" freed (LocalFree) a DACL 
+    pointer that was not allocated. That caused "SuRun /SETUP" to creash in 
+    Vista x64. SuRuns unhandled exception filter was not called by the System!
 
 SuRun 1.2.0.6 beta 10 - 2008-12-17:
 -----------------------------------
