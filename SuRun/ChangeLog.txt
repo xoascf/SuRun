@@ -2,6 +2,7 @@ Done, to be tested:
 ---------------------------
 ToDo
 ---------------------
+* Tray symbol does not reappear if Explorer is restarted
 * Add a flag to the program list to not ask for a passwort for certain programs
 * Hotkes for "User..." in Ack-Dialogs
 * Console SuRun support
