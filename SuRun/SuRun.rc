@@ -122,7 +122,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Ausführen als.."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -357,7 +357,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -436,24 +436,24 @@ BEGIN
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     LTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.\nWichtig: Enthält der Befehl Leerzeichen, muss er in Anführugszeichen stehen!",
                     IDC_STATIC,55,25,261,19
-    ICON            IDI_LISTICON2,IDC_STATIC,36,55,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,36,55,20,20,SS_REALSIZEIMAGE
     CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,55,300,10
-    ICON            IDI_LISTICON3,IDC_STATIC,36,68,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,36,68,20,20,SS_REALSIZEIMAGE
     CONTROL         "nicht fragen und das Programm immer mit erhöhten Rechten starten",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,68,300,10
-    ICON            IDI_LISTICON6,IDC_STATIC,36,81,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,36,81,20,20,SS_REALSIZEIMAGE
     CONTROL         "nicht fragen und das Programm NIE mit erhöhten Rechten starten",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,81,300,10
-    ICON            IDI_LISTICON1,IDC_STATIC,36,98,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,36,98,20,20,SS_REALSIZEIMAGE
     CONTROL         "nur fragen, falls das Programm erhöhte Rechte benötigt. (Manifest, 'Install.exe' etc.)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,98,300,10
-    ICON            IDI_LISTICON,IDC_STATIC,36,111,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,36,111,20,20,SS_REALSIZEIMAGE
     CONTROL         "Programm automagisch mit erhöhten Rechten starten",
                     IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,50,111,300,10
-    ICON            IDI_LISTICON7,IDC_STATIC,36,124,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,36,124,20,20,SS_REALSIZEIMAGE
     CONTROL         "Programm automagisch NIE mit erhöhten Rechten starten",
                     IDC_AUTO3,"Button",BS_AUTORADIOBUTTON,50,124,300,10
     DEFPUSHBUTTON   "&OK",IDOK,241,152,50,14,WS_GROUP
@@ -1157,7 +1157,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Run as..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1727,7 +1727,7 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installatie"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -1802,7 +1802,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Uitvoeren als..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
