@@ -170,7 +170,12 @@ static void DisplayIcon()
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
   }
-  Shell_NotifyIcon(NIM_MODIFY,&g_NotyData);
+  if (!Shell_NotifyIcon(NIM_MODIFY,&g_NotyData))
+  {
+    Shell_NotifyIcon(NIM_ADD,&g_NotyData);
+    g_NotyData.uVersion=NOTIFYICON_VERSION;
+    Shell_NotifyIcon(NIM_SETVERSION,&g_NotyData);
+  }
   DestroyIcon(OldIcon);
 };
 
@@ -274,11 +279,6 @@ void InitTrayShowAdmin()
   g_NotyData.uID   = 1;
   g_NotyData.uFlags= NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE;
   g_NotyData.uCallbackMessage = WM_USER+1758;
-  Shell_NotifyIcon(NIM_ADD,&g_NotyData);
-  
-
-  g_NotyData.uVersion=NOTIFYICON_VERSION;
-  Shell_NotifyIcon(NIM_SETVERSION,&g_NotyData);
   g_NotyData.uTimeout=10000;
 }
 
