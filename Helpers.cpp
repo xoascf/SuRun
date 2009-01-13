@@ -521,20 +521,28 @@ PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCH
 void SetAdminDenyUserAccess(HANDLE hObject,PSID UserSID,DWORD Permissions/*=SYNCHRONIZE*/)
 {
   if (NULL == hObject) 
+  {
+    DBGTrace("SetAdminDenyUserAccess failed(No Object)!");
     return; 
+  }
   PACL pOldDACL=NULL;
   PSECURITY_DESCRIPTOR pSD = NULL;
   // Get a pointer to the existing DACL.
-  if (0==GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD)) 
+  DWORD dwRes=GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
+  if (ERROR_SUCCESS==dwRes)  
   {
     PACL pNewDACL=SetAdminDenyUserAccess(pOldDACL,UserSID,Permissions/*=SYNCHRONIZE*/);
     // Attach the new ACL as the object's DACL.
     if (pNewDACL)
     {
-      SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
+      dwRes=SetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,pNewDACL,NULL);
+      if (ERROR_SUCCESS != dwRes)  
+        DBGTrace1("SetSecurityInfo failed: %s",GetErrorNameStatic(dwRes));
       LocalFree((HLOCAL)pNewDACL); 
-    }
-  }
+    }else
+      DBGTrace("SetAdminDenyUserAccess failed!");
+  }else
+    DBGTrace1("GetSecurityInfo failed: %s",GetErrorNameStatic(dwRes));
   if(pSD != NULL) 
     LocalFree((HLOCAL) pSD); 
 }
@@ -1262,14 +1270,15 @@ PTOKEN_GROUPS	GetTokenGroups(HANDLE hToken)
 	PTOKEN_GROUPS	ptgGroups = NULL;
 	GetTokenInformation(hToken, TokenGroups, NULL, cbBuffer, &cbBuffer);
 	if (cbBuffer)
-		ptgGroups=(PTOKEN_GROUPS)malloc(cbBuffer);
-  else
-    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
-  if (ptgGroups)
   {
-    CHK_BOOL_FN(GetTokenInformation(hToken,TokenGroups,ptgGroups,cbBuffer,&cbBuffer));
+    ptgGroups=(PTOKEN_GROUPS)malloc(cbBuffer);
+    if (ptgGroups)
+    {
+      CHK_BOOL_FN(GetTokenInformation(hToken,TokenGroups,ptgGroups,cbBuffer,&cbBuffer));
+    }else
+      DBGTrace("malloc failed");
   }else
-    DBGTrace("malloc failed");
+    DBGTrace1("GetTokenInformation failed: %s",GetLastErrorNameStatic());
   return ptgGroups;
 }
 
