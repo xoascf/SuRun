@@ -1,6 +1,8 @@
 Done, to be tested:
 ---------------------------
 * Tray symbol now reappears if Explorer is restarted
+* If SuRun uses Vistas Split-Admin token, it is now protected against access 
+  from the non-elevated user
 
 ToDo
 ---------------------
