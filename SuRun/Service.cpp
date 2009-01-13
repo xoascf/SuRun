@@ -1039,9 +1039,20 @@ DWORD LSAStartAdminProcess()
         }
       }
       if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
-          CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
+          CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
         //DBGTrace1("CreateProcessAsUser(%s) OK",g_RunData.cmdLine);
+        if (_winmajor>=6)
+        {
+          //Vista: Set SYNCHRONIZE only access for Logon SID
+          HANDLE hShell=GetSessionUserToken(g_RunData.SessionID);
+          PSID ShellSID=GetLogonSid(hShell);
+          SetAdminDenyUserAccess(pi.hProcess,ShellSID);
+          SetAdminDenyUserAccess(pi.hThread,ShellSID);
+          free(ShellSID);
+          CloseHandle(hShell);
+        }
+        ResumeThread(pi.hThread);
         if(bIsExplorer)
         {
           //Before Vista: wait for and kill Desktop Proxy
