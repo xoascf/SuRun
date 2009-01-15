@@ -49,7 +49,7 @@ BEGIN
             VALUE "FileDescription", "InstallSuRun\0"
             VALUE "FileVersion", "1, 2, 0, 6\0"
             VALUE "InternalName", "InstallSuRun\0"
-            VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
+            VALUE "LegalCopyright", "Copyright © 2007-09 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "InstallSuRun.exe\0"
             VALUE "PrivateBuild", "\0"
