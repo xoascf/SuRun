@@ -34,7 +34,11 @@ typedef struct
   TCHAR UserName[UNLEN+UNLEN+2];
   TCHAR cmdLine[4096];
   TCHAR CurDir[4096];
-  DWORD KillPID;        //SuRun->Service: Process Id to be killed
+  union
+  {
+    DWORD KillPID;        //SuRun->Service: Process Id to be killed
+    DWORD NewPID;         //Service->SuRun: Process Id of the newly started process
+  };
   union
   {
     struct
