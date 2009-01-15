@@ -125,13 +125,15 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   bool bRunSetup=FALSE;
   bool bRetPID=FALSE;
   bool bWaitPID=FALSE;
+  if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
+    g_RunData.beQuiet=TRUE;
   //cmdLine
   {
     LPTSTR args=_tcsdup(PathGetArgs(GetCommandLine()));
     LPTSTR Args=args;
+    while (Args[0]==L' ')
+      Args++;
     //Parse direct commands:
-    if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
-      g_RunData.beQuiet=TRUE;
     while (Args[0]=='/')
     {
       LPTSTR c=Args;
@@ -305,7 +307,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         {
           WaitForSingleObject(hProcess,INFINITE);
           CloseHandle(hProcess);
-        }
+        }else
+          DBGTrace2("OpenProcess(%d) failed: %s",g_RunData.NewPID,GetLastErrorNameStatic());
       }
       return bRetPID?g_RunData.NewPID:RETVAL_OK;
     }
