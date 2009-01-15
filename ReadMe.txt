@@ -113,7 +113,7 @@ Command line switches
 ------------------------------------------------------------------------------
 SuRuns supports the following command line:
 
-"SuRun [options] [<program>]" to start <program> as Administrator.
+"SuRun [options] [<program> [parameters]]" to start <program> as Administrator.
 
 options:
   /BACKUP <file>      backup "SuRun Settings" to <file>
@@ -121,9 +121,11 @@ options:
   /INSTALL <file>     Install SuRun unattended and do "SuRun /RESTORE <file>"
   /QUIET              do not display an messages
   /RESTORE <file>     restore "SuRun Settings" from <file>
+  /RETPID             return the process ID of the elevated process
   /RUNAS <program>    start <program> as different user
   /SETUP              start "SuRun Settings"
   /UNINSTALL          remove SuRun from the system
+  /WAIT               wait until the elevated process exits
 
 Below are some SuRun command lines for common Windows tasks:
   Automatic Updates:    "surun wuaucpl.cpl"
