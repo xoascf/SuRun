@@ -123,6 +123,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   GetCurrentDirectory(countof(g_RunData.CurDir),g_RunData.CurDir);
   NetworkPathToUNCPath(g_RunData.CurDir);
   bool bRunSetup=FALSE;
+  bool bRetPID=FALSE;
+  bool bWaitPID=FALSE;
   //cmdLine
   {
     LPTSTR args=_tcsdup(PathGetArgs(GetCommandLine()));
@@ -145,6 +147,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;
+      }else if (!_wcsicmp(c,L"/RETPID"))
+      {
+        bRetPID=TRUE;
+      }else if (!_wcsicmp(c,L"/WAIT"))
+      {
+        bWaitPID=TRUE;
       }else if (!_wcsicmp(c,L"/RUNAS"))
       {
         g_RunData.bRunAs=TRUE;
@@ -265,7 +273,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   for(int n=0;(g_RetVal==RETVAL_WAIT)&&(n<1000);n++)
     Sleep(60);
   if (bRunSetup)
-    return RETVAL_OK;
+    return g_RetVal;
   switch(g_RetVal)
   {
   case RETVAL_WAIT:
@@ -289,7 +297,18 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case RETVAL_CANCELLED:
     return RETVAL_CANCELLED;
   case RETVAL_OK:
-    return RETVAL_OK;
+    {
+      if (bWaitPID)
+      {
+        HANDLE hProcess=OpenProcess(SYNCHRONIZE,0,g_RunData.NewPID);
+        if(hProcess)
+        {
+          WaitForSingleObject(hProcess,INFINITE);
+          CloseHandle(hProcess);
+        }
+      }
+      return bRetPID?g_RunData.NewPID:RETVAL_OK;
+    }
   }
   return RETVAL_ACCESSDENIED;
 }
