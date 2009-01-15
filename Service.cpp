@@ -1072,6 +1072,7 @@ DWORD LSAStartAdminProcess()
         }
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
+        g_RunData.NewPID=pi.dwProcessId;
         RetVal=RETVAL_OK;
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         if((g_RunData.RetPID)&&(g_RunData.RetPtr))
@@ -1127,6 +1128,7 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
       CloseHandle(pi.hThread);
       CloseHandle(pi.hProcess);
       RetVal=RETVAL_OK;
+      g_RunData.NewPID=pi.dwProcessId;
       //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
       if((g_RunData.RetPID)&&(g_RunData.RetPtr))
       {
@@ -1229,7 +1231,7 @@ void SuRun(DWORD ProcessID)
     {
       //Just start the client process!
       KillProcess(g_RunData.KillPID);
-      ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine));
+      ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine),true);
       return;
     }
     //Start execution
@@ -1260,7 +1262,7 @@ void SuRun(DWORD ProcessID)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
   }
-  ResumeClient(RetVal);
+  ResumeClient(RetVal,true);
 }
 
 //////////////////////////////////////////////////////////////////////////////
