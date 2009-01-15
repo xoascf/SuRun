@@ -638,7 +638,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Gebrauch:\r\nSuRun Programm [Parameter]\r\nSuRun /RUNAS Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Gebrauch:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Der Befehl:\r\n\r\n%s\r\n\r\nsoll mit erhöhten Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
@@ -1353,7 +1353,7 @@ BEGIN
             VALUE "FileDescription", "SuperUserRun\0"
             VALUE "FileVersion", "1, 2, 0, 6\0"
             VALUE "InternalName", "SuRun\0"
-            VALUE "LegalCopyright", "Copyright © 2007,08 Kay Bruns\0"
+            VALUE "LegalCopyright", "Copyright © 2007-09 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
@@ -1378,7 +1378,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Usage:\r\nSuRun program [parameters]\r\nSuRun /RUNAS program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Usage:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "The command:\r\n\r\n%s\r\n\r\nis about to be executed with administrative privileges."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
@@ -2073,7 +2073,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_USAGE               "Gebruik:\r\nSuRun programma [parameters]\r\nSuRun /RUNAS programma [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Gebruik:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] programma [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "De opdracht:\r\n\r\n%s\r\n\r\nwordt met verhoogde rechten uitgevoerd."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Fout!\r\n\r\nBeveiligd Bureaublad kon niet worden aangemaakt!"
