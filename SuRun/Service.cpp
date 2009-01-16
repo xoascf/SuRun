@@ -760,7 +760,7 @@ DWORD PrepareSuRun()
   if (!PwOk)
   {
     DeletePassword(g_RunData.UserName);
-    if (f&FLAG_NEVERASK)
+    if ((f&(FLAG_DONTASK|FLAG_NEVERASK))==(FLAG_DONTASK|FLAG_NEVERASK))
       return RETVAL_OK;
   }else  if (f&FLAG_DONTASK)
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
