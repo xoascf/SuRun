@@ -437,14 +437,14 @@ BEGIN
     LTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.\nWichtig: Enthält der Befehl Leerzeichen, muss er in Anführugszeichen stehen!",
                     IDC_STATIC,55,25,261,19
     ICON            IDI_LISTICON2,IDC_STATIC,36,55,20,20,SS_REALSIZEIMAGE
-    CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf",
+    CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf (Standard)",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,50,55,300,10
     ICON            IDI_LISTICON3,IDC_STATIC,36,68,20,20,SS_REALSIZEIMAGE
-    CONTROL         "nicht fragen und das Programm immer mit erhöhten Rechten starten",
+    CONTROL         "Automatisch 'OK'. Programm mit erhöhten Rechten starten",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,50,68,300,10
     ICON            IDI_LISTICON6,IDC_STATIC,36,81,20,20,SS_REALSIZEIMAGE
-    CONTROL         "nicht fragen und das Programm NIE mit erhöhten Rechten starten",
+    CONTROL         "Automatisch 'Abbrechen'. Programm NIE mit erhöhten Rechten starten",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,50,81,300,10
     ICON            IDI_LISTICON1,IDC_STATIC,36,98,20,20,SS_REALSIZEIMAGE
     CONTROL         "nur fragen, falls das Programm erhöhte Rechte benötigt. (Manifest, 'Install.exe' etc.)",
