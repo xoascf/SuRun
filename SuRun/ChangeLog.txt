@@ -31,6 +31,8 @@ SuRun 1.2.0.6 beta 13 - 2009-01-22:
 * Changed program list flag descriptions for (hopefully) better understanding
 * SuRuns inter process communication automatically times out after 15 seconds 
   if a client app opens the service pipe without sending data (DOS attack)
+* FIX: If a program in the users automagic list was about to be started and 
+  the password timed out, SuRun asked the wrong question.
 * FIX: If ask for users password was enabled, SuRun Settings did not ask for 
   the password after the timeout.
 
