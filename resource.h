@@ -167,6 +167,7 @@
 #define IDC_RESTRICT2                   1013
 #define IDC_FADEDESKTOP                 1014
 #define IDC_NOASK3                      1015
+#define IDC_NOASK4                      1016
 #define IDC_USE_C_TO                    1015
 #define IDC_HINT                        1016
 #define IDC_HINT2                       1017
