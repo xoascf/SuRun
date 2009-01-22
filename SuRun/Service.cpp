@@ -923,7 +923,13 @@ BOOL Setup()
   }
   if (g_CliIsInSuRunners 
     || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0))
+  {
+    if ( GetSavePW 
+      && PasswordExpired(g_RunData.UserName)
+      && (!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP)))
+        return FALSE;
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
+  }
   return false;
 }
 
