@@ -449,6 +449,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     g_ss.dwWaitHint         = 0;
     SetServiceStatus(g_hSS,&g_ss);
     DBGTrace( "SuRun Service running");
+    CTimeOut cto;
     while (g_hPipe!=INVALID_HANDLE_VALUE)
     {
       //Wait for a connection
@@ -458,8 +459,15 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         break;
       DWORD nRead=0;
       RUNDATA rd={0};
-      //Read Client Process ID and command line
-      ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
+      //wait for available data in the pipe
+      cto.Set(15000);
+      while (PeekNamedPipe(g_hPipe,0,0,0,&nRead,0) 
+          && (!cto.TimedOut()) 
+          && (nRead<sizeof(rd)))
+        Sleep(2);
+      if (!cto.TimedOut())
+        //Read Client Process ID and command line
+        ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
       //Disconnect client
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
