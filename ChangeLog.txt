@@ -1,12 +1,9 @@
 Done, to be tested:
 ---------------------------
 
-
 ToDo
 ---------------------
-* Add a flag to the program list to not ask for a passwort for certain programs
 * Console SuRun support
-* Change Description for Program options (Auto OK/Cancel...)
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 
 To be done in future:
