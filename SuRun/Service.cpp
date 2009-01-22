@@ -465,7 +465,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           && (!cto.TimedOut()) 
           && (nRead<sizeof(rd)))
         Sleep(2);
-      if (!cto.TimedOut())
+      if (nRead>=sizeof(rd))
         //Read Client Process ID and command line
         ReadFile(g_hPipe,&rd,sizeof(rd),&nRead,0); 
       //Disconnect client
@@ -830,7 +830,7 @@ DWORD PrepareSuRun()
           //SuRun cmdline:
           SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_AUTOCANCEL,(l&2)!=0);
           if((l&2)!=0)
-            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,0);
+            SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK|FLAG_NEVERASK,0);
         }
       }
       return RETVAL_CANCELLED;
@@ -841,7 +841,9 @@ DWORD PrepareSuRun()
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_DONTASK,(l&2)!=0);
       if((l&2)!=0)
         SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,
-        g_RunData.bShlExHook?FLAG_CANCEL_SX:FLAG_AUTOCANCEL,0);
+                         g_RunData.bShlExHook?FLAG_CANCEL_SX:FLAG_AUTOCANCEL,0);
+      else
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_NEVERASK,0);
       SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
     }
     UpdLastRunTime(g_RunData.UserName);
