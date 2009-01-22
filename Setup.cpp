@@ -146,8 +146,14 @@ BOOL ToggleWhiteListFlag(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag)
   {
     d&=~Flag;
     if (Flag==FLAG_DONTASK)
-      d|=FLAG_AUTOCANCEL;
-    if (Flag==FLAG_SHELLEXEC)
+    {
+      if (d&FLAG_NEVERASK)
+      {
+        d&=~FLAG_NEVERASK;
+        d|=FLAG_AUTOCANCEL;
+      }else
+        d|=FLAG_DONTASK|FLAG_NEVERASK;
+    }else if (Flag==FLAG_SHELLEXEC)
       d|=FLAG_CANCEL_SX;
   }
   else
@@ -534,8 +540,9 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     SetDlgItemText(hwnd,IDC_FILENAME,g_AppOpt.FileName);
     if (g_AppOpt.OfnTitle==IDS_ADDFILETOLIST)
     {
-      CheckDlgButton(hwnd,IDC_NOASK1,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_AUTOCANCEL))==0);
-      CheckDlgButton(hwnd,IDC_NOASK2,(*g_AppOpt.Flags&FLAG_DONTASK)!=0);
+      CheckDlgButton(hwnd,IDC_NOASK1,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_NEVERASK|FLAG_AUTOCANCEL))==0);
+      CheckDlgButton(hwnd,IDC_NOASK2,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_NEVERASK))==FLAG_DONTASK);
+      CheckDlgButton(hwnd,IDC_NOASK4,(*g_AppOpt.Flags&(FLAG_DONTASK|FLAG_NEVERASK))==(FLAG_DONTASK|FLAG_NEVERASK));
       CheckDlgButton(hwnd,IDC_NOASK3,(*g_AppOpt.Flags&FLAG_AUTOCANCEL)!=0);
       
       CheckDlgButton(hwnd,IDC_AUTO1,(*g_AppOpt.Flags&(FLAG_SHELLEXEC|FLAG_CANCEL_SX))==0);
@@ -591,6 +598,8 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           *g_AppOpt.Flags|=FLAG_DONTASK;
         if (IsDlgButtonChecked(hwnd,IDC_NOASK3))
           *g_AppOpt.Flags|=FLAG_AUTOCANCEL;
+        if (IsDlgButtonChecked(hwnd,IDC_NOASK4))
+          *g_AppOpt.Flags|=FLAG_DONTASK|FLAG_NEVERASK;
         if (IsDlgButtonChecked(hwnd,IDC_AUTO2))
           *g_AppOpt.Flags|=FLAG_SHELLEXEC;
         if (IsDlgButtonChecked(hwnd,IDC_AUTO3))
@@ -833,7 +842,7 @@ static void UpdateWhiteListFlags(HWND hWL)
     ListView_GetItemText(hWL,i,2,cmd,4096);
     int Flags=GetRegInt(HKLM,wlkey,cmd,0);
     LVITEM item={LVIF_IMAGE,i,0,0,0,0,0,
-                 g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)+(Flags&FLAG_AUTOCANCEL?4:0)],
+                 g_SD->ImgIconIdx[2+(Flags&FLAG_DONTASK?1:0)+(Flags&FLAG_NEVERASK?5:0)+(Flags&FLAG_AUTOCANCEL?4:0)],
                  0,0};
     ListView_SetItem(hWL,&item);
     item.iSubItem=1;
