@@ -805,18 +805,18 @@ DWORD PrepareSuRun()
     if (!PwOk)
     {
       l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
-                         g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+                         (g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK,
                          BeautifyCmdLine(g_RunData.cmdLine));
     }else
     {
       l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,
-                         g_RunData.bShlExHook?IDS_ASKAUTO:IDS_ASKOK,
+                         (g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK,
                          BeautifyCmdLine(g_RunData.cmdLine));
     }
     DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if((l&1)==0)
     {
-      if (!GetNoRunSetup(g_RunData.UserName))
+      if (PwOk && (!GetNoRunSetup(g_RunData.UserName)))
       {
         //Cancel:
         if(g_RunData.bShlExHook)
@@ -924,8 +924,7 @@ BOOL Setup()
   if (g_CliIsInSuRunners 
     || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0))
   {
-    if ( GetSavePW 
-      && PasswordExpired(g_RunData.UserName)
+    if ( (!GetSavePW || PasswordExpired(g_RunData.UserName))
       && (!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP)))
         return FALSE;
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
