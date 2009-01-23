@@ -212,7 +212,7 @@ void DisplayMenu(HWND hWnd)
   AllowSetForegroundWindow(GetCurrentProcessId());
   SetForegroundWindow(hWnd);
   switch (TrackPopupMenu(hMenu,TPM_RIGHTALIGN|TPM_RETURNCMD|TPM_NONOTIFY|TPM_VERNEGANIMATION,
-    pt.x+1,pt.y+1,0,hWnd,NULL))
+    pt.x-1,pt.y-1,0,hWnd,NULL))
   {
   case MENU_SURUNSETUP:
     ShellExecute(0,_T("open"),_T("SuRun.exe"),_T("/SETUP"),0,SW_SHOWNORMAL);
