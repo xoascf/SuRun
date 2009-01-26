@@ -824,7 +824,9 @@ __declspec(dllexport) void InstallShellExt()
   //Desktop-Background-Hook
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+#ifdef DoDBGTrace
+  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+#endif DoDBGTrace
   //self Approval
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
             sGUID,L"SuRun Shell Extension");
@@ -849,7 +851,9 @@ __declspec(dllexport) void RemoveShellExt()
   //Desktop-Background-Hook
   DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
   DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
-  //DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
+#ifdef DoDBGTrace
+  DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
+#endif DoDBGTrace
   //ShellExecuteHook
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
   //self Approval
