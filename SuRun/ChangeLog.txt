@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* SuRuns context menu extension now checks if the user right clicks on his or 
+  on the common desktop for displaying "control panel as administrator"
 
 ToDo
 ---------------------
