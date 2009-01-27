@@ -405,7 +405,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     TCHAR s[4096]={0};
     SHGetFolderPath(0,CSIDL_DESKTOP,0,SHGFP_TYPE_CURRENT,s);
     m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
-    DBGTrace3("Compare Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
+    DBGTrace3("Compare user Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
     if(!m_pDeskClicked)
     {
       SHGetFolderPath(0,CSIDL_COMMON_DESKTOPDIRECTORY,0,SHGFP_TYPE_CURRENT,s);
