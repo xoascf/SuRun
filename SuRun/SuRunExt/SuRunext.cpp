@@ -406,6 +406,12 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     SHGetFolderPath(0,CSIDL_DESKTOP,0,SHGFP_TYPE_CURRENT,s);
     m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
     DBGTrace3("Compare Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
+    if(!m_pDeskClicked)
+    {
+      SHGetFolderPath(0,CSIDL_COMMON_DESKTOPDIRECTORY,0,SHGFP_TYPE_CURRENT,s);
+      m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
+      DBGTrace3("Compare common Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
+    }
   }else
   {
     FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
