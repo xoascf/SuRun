@@ -369,27 +369,27 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef DoDBGTrace
-  TCHAR Path[4096]={0};
-  if (pIDFolder)
-    SHGetPathFromIDList(pIDFolder,Path);
-  TCHAR FileClass[4096]={0};
-  if(hRegKey)
-    GetRegStr(hRegKey,0,L"",FileClass,4096);
-  TCHAR File[4096]={0};
-  if(pDataObj)
-  {
-    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-    STGMEDIUM stm;
-    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-    {
-      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
-      ReleaseStgMedium(&stm);
-    }
-  }
-  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-  if(pDataObj)
-    PrintDataObj(pDataObj);
+//  TCHAR Path[4096]={0};
+//  if (pIDFolder)
+//    SHGetPathFromIDList(pIDFolder,Path);
+//  TCHAR FileClass[4096]={0};
+//  if(hRegKey)
+//    GetRegStr(hRegKey,0,L"",FileClass,4096);
+//  TCHAR File[4096]={0};
+//  if(pDataObj)
+//  {
+//    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+//    STGMEDIUM stm;
+//    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+//    {
+//      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+//        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
+//      ReleaseStgMedium(&stm);
+//    }
+//  }
+//  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+//  if(pDataObj)
+//    PrintDataObj(pDataObj);
 #endif DoDBGTrace
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
@@ -405,12 +405,10 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     TCHAR s[4096]={0};
     SHGetFolderPath(0,CSIDL_DESKTOPDIRECTORY,0,SHGFP_TYPE_CURRENT,s);
     m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
-    DBGTrace3("Compare user Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
     if(!m_pDeskClicked)
     {
       SHGetFolderPath(0,CSIDL_COMMON_DESKTOPDIRECTORY,0,SHGFP_TYPE_CURRENT,s);
       m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
-      DBGTrace3("Compare common Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
     }
   }else
   {
@@ -448,18 +446,15 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   UINT id=idCmdFirst;
   if((CMF_DEFAULTONLY & uFlags)==0) 
   {
-    DBGTrace1("CShellExt::QueryContextMenu Desktop clicked == %d",m_pDeskClicked);
     if(m_pDeskClicked)
     {
       if (GetCtrlAsAdmin)
       {
-        DBGTrace("CShellExt::QueryContextMenu Inserting CplAsAdmin context Menu!");
         //right click target is folder background
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
         InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, CResStr(l_hInst,IDS_SURUN));
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      }else
-        DBGTrace("CShellExt::QueryContextMenu Control Panel as Admin is Disabled: No Menu is displayed!");
+      }
     }else
     if(m_ClickFolderName[0])
     {
@@ -467,26 +462,17 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       BOOL bExp=GetExpAsAdmin;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      else
-        DBGTrace("CShellExt::QueryContextMenu Folder Context Menus are disabled: No Menu is displayed!");
       //right click target is folder background
       if (bCmd)
-      {
-        DBGTrace("CShellExt::QueryContextMenu Inserting CmdAsAdmin context Menu!");
         InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNCMD));
-      }
       id++;
       if (bExp)
-      {
-        DBGTrace("CShellExt::QueryContextMenu Inserting ExplorerAsAdmin context Menu!");
         InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNEXP));
-      }
       id++;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
     }
-  }else
-    DBGTrace("CShellExt::QueryContextMenu CMF_DEFAULTONLY: No Menu is displayed!");
+  }
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
 }
 
@@ -494,11 +480,7 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
 {
   CResStr s(l_hInst,IDS_TOOLTIP);
   if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(s)))
-  {
-    DBGTrace1("CShellExt::GetCommandString==%s",s);
     wcscpy((LPWSTR)pszName,s);
-  }else
-    DBGTrace("CShellExt::GetCommandString");
   return NOERROR;
 }
 
@@ -650,7 +632,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   zero(rpi);
   _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
     GetCurrentProcessId(),&rpi,tmp);
-  //DBGTrace1("ShellExecuteHook AutoSuRun(%s) test",cmd);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
@@ -667,7 +648,6 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       if (ExitCode==RETVAL_OK)
       {
         pei->hInstApp=(HINSTANCE)33;
-        //DBGTrace1("ShellExecuteHook AutoSuRun(%s) success!",cmd);
         //return valid PROCESS_INFORMATION!
         if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
           pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
@@ -848,8 +828,8 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #ifdef DoDBGTrace
-  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+//  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+//  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #endif DoDBGTrace
   //self Approval
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
@@ -876,8 +856,8 @@ __declspec(dllexport) void RemoveShellExt()
   DelRegKey(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun");
   DelRegKey(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun");
 #ifdef DoDBGTrace
-  DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
-  DelRegKey(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun");
+//  DelRegKey(HKEY_CLASSES_ROOT,L"*\\shellex\\ContextMenuHandlers\\SuRun");
+//  DelRegKey(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun");
 #endif DoDBGTrace
   //ShellExecuteHook
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellExecuteHooks",sGUID);
