@@ -405,6 +405,7 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     TCHAR s[4096]={0};
     SHGetFolderPath(0,CSIDL_DESKTOP,0,SHGFP_TYPE_CURRENT,s);
     m_pDeskClicked=_tcsicmp(s,m_ClickFolderName)==0;
+    DBGTrace3("Compare Desktop folder (%s) to clicked folder(%s) == %d",s,m_ClickFolderName,m_pDeskClicked);
   }else
   {
     FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
@@ -441,15 +442,18 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   UINT id=idCmdFirst;
   if((CMF_DEFAULTONLY & uFlags)==0) 
   {
+    DBGTrace1("CShellExt::QueryContextMenu Desktop clicked == %d",m_pDeskClicked);
     if(m_pDeskClicked)
     {
       if (GetCtrlAsAdmin)
       {
+        DBGTrace("CShellExt::QueryContextMenu Inserting CplAsAdmin context Menu!");
         //right click target is folder background
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
         InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, CResStr(l_hInst,IDS_SURUN));
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-      }
+      }else
+        DBGTrace("CShellExt::QueryContextMenu Control Panel as Admin is Disabled: No Menu is displayed!");
     }else
     if(m_ClickFolderName[0])
     {
@@ -457,17 +461,26 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       BOOL bExp=GetExpAsAdmin;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+      else
+        DBGTrace("CShellExt::QueryContextMenu Folder Context Menus are disabled: No Menu is displayed!");
       //right click target is folder background
       if (bCmd)
+      {
+        DBGTrace("CShellExt::QueryContextMenu Inserting CmdAsAdmin context Menu!");
         InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNCMD));
+      }
       id++;
       if (bExp)
+      {
+        DBGTrace("CShellExt::QueryContextMenu Inserting ExplorerAsAdmin context Menu!");
         InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNEXP));
+      }
       id++;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
     }
-  }
+  }else
+    DBGTrace("CShellExt::QueryContextMenu CMF_DEFAULTONLY: No Menu is displayed!");
   return MAKE_HRESULT(SEVERITY_SUCCESS, 0, (USHORT)(id-idCmdFirst));
 }
 
@@ -475,7 +488,11 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
 {
   CResStr s(l_hInst,IDS_TOOLTIP);
   if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(s)))
+  {
+    DBGTrace1("CShellExt::GetCommandString==%s",s);
     wcscpy((LPWSTR)pszName,s);
+  }else
+    DBGTrace("CShellExt::GetCommandString");
   return NOERROR;
 }
 
