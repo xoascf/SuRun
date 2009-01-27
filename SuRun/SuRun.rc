@@ -438,17 +438,17 @@ BEGIN
     GROUPBOX        "Was tun, wenn das Programm ""Als Administrator"" gestartet werden soll?",
                     IDC_STATIC,16,43,330,64,WS_GROUP
     ICON            IDI_LISTICON2,IDC_STATIC,24,55,20,20,SS_REALSIZEIMAGE
-    CONTROL         "fragen ob das Programm mit erhöhten Rechten gestartet werden darf (Standard)",
+    CONTROL         "Fragen, ob das Programm mit erhöhten Rechten gestartet werden darf (Standard)",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,40,55,300,10
     ICON            IDI_LISTICON3,IDC_STATIC,24,68,20,20,SS_REALSIZEIMAGE
-    CONTROL         "Automatisch 'OK'. Programm mit erhöhten Rechten starten",
+    CONTROL         "Das Programm automatisch mit erhöhten Rechten starten",
                     IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,40,68,300,10
     ICON            IDI_LISTICON8,IDC_STATIC,24,81,20,20,SS_REALSIZEIMAGE
-    CONTROL         "Kennwort NICHT abragen, Automatisch 'OK'. Programm mit erhöhten Rechten starten",
+    CONTROL         "Das Programm automatisch mit erhöhten Rechten starten und Kennwort NICHT abragen",
                     IDC_NOASK4,"Button",BS_AUTORADIOBUTTON,40,81,300,10
     ICON            IDI_LISTICON6,IDC_STATIC,24,94,20,20,SS_REALSIZEIMAGE
-    CONTROL         "Automatisch 'Abbrechen'. Programm NIE mit erhöhten Rechten starten",
+    CONTROL         "Programm NIE mit erhöhten Rechten starten",
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,40,94,300,10
     GROUPBOX        "Wie soll SuRuns Programmfilter dieses Programm behandeln?",
                     IDC_STATIC,16,110,330,52,WS_GROUP
