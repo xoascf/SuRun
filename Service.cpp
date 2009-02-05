@@ -801,21 +801,20 @@ DWORD PrepareSuRun()
     }
     //Testing if User is restricted is already done in Service Main
     DWORD l=0;
+    //if Shell executes unknown app ask for AutoMagic, else ask for permission
+    int IDSMsg=(g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK;
     if (!PwOk)
     {
       if (f&FLAG_DONTASK)
-      {
-        //Program is ok, password expired: Only check password!
+        //Program is known but password expired: Only check password!
         l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP...);
-      }else
+      else
         l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
-                         (g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK,
-                         BeautifyCmdLine(g_RunData.cmdLine));
+                           IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
     }else //if (PwOk):
     {
       l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,
-                         (g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK,
-                         BeautifyCmdLine(g_RunData.cmdLine));
+                         IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
     }
     DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if((l&1)==0)
