@@ -467,6 +467,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     //Exit if ShellExecHook failed on "tmp"
     if(g_LastFailedCmd)
     {
+      ...ToDo:
       BOOL bExitNow=_tcsicmp(tmp,g_LastFailedCmd)==0;
       free(g_LastFailedCmd);
       g_LastFailedCmd=0;
