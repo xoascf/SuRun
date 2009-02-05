@@ -635,7 +635,7 @@ HANDLE GetAdminToken(DWORD SessionID)
       __leave;
     }
     NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,
-      TokenPrimary,&tstat.AuthenticationId,&tstat.ExpirationTime,&userToken,
+      TokenPrimary,&tstat.AuthenticationId/*AuthId*/,&tstat.ExpirationTime,&userToken,
       ptg, lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
