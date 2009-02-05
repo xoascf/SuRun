@@ -518,6 +518,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           bool bNotInList=wlf==-1;
           if(bNotInList)
             wlf=0;
+          //Restricted user that does not launch SuRuns Settings?
           if  (bNotInList 
             && GetRestrictApps(g_RunData.UserName) 
             && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
@@ -529,7 +530,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           //check if the requested App is Flagged with AutoCancel
           if (wlf&FLAG_AUTOCANCEL)
           {
-            //Access denied!
             ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
             DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
             continue;
@@ -540,8 +540,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             //check if the requested App is Flagged with AutoCancel
             if (wlf&FLAG_CANCEL_SX)
             {
-              //Access denied!
-              ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
+              ResumeClient(RETVAL_SX_NOTINLIST);
               DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
               continue;
             }
@@ -752,35 +751,37 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
 DWORD PrepareSuRun()
 {
   zero(g_RunPwd);
-  BOOL PwOk=FALSE;
   RegDelVal(HKLM,PASSWKEY,g_RunData.UserName);//Delete Password, keep time
-  //Ask For Password?
-  PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
   if((!g_CliIsInSuRunners) && GetNoConvUser)
   {
     DBGTrace1("PrepareSuRun EXIT: User %s is no SuRunner, no auto convert",g_RunData.UserName);
     return RETVAL_ACCESSDENIED;
   }
+  //Ask For Password?
+  BOOL PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
   DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
   bool bNotInList=f==-1;
   if(bNotInList)
     f=0;
   if (!PwOk)
   {
+    //Delete last password "ok" time
     DeletePassword(g_RunData.UserName);
+    //if "Never ask for a password", just run the program 
     if ((f&(FLAG_DONTASK|FLAG_NEVERASK))==(FLAG_DONTASK|FLAG_NEVERASK))
       return RETVAL_OK;
   }else  if (f&FLAG_DONTASK)
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
   if(g_RunData.bShExNoSafeDesk)
     return RETVAL_SX_NOTINLIST;
+  //Get real groups for the user: (Not just the groups from the Client Token)
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
   {
     DBGTrace1("PrepareSuRun EXIT: SuRun is hidden for User %s",g_RunData.UserName);
     return RETVAL_CANCELLED;
   }
-  //Create the new desktop
+  //Create the safe desktop
   bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
   {
@@ -789,25 +790,28 @@ DWORD PrepareSuRun()
   }
   __try
   {
-    //secure desktop created...
+    //safe desktop created...
     if ((!g_CliIsInSuRunners)
       && (!BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0)))
       return RETVAL_CANCELLED;
     if (!g_CliIsInSuRunners)
     {
       PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
-      g_RunData.Groups=IS_IN_SURUNNERS;
+      g_RunData.Groups|=IS_IN_SURUNNERS;
     }
-    //Is User Restricted?
-    if  (GetRestrictApps(g_RunData.UserName) && bNotInList)
-      return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+    //Testing if User is restricted is already done in Service Main
     DWORD l=0;
     if (!PwOk)
     {
-      l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
+      if (f&FLAG_DONTASK)
+      {
+        //Program is ok, password expired: Only check password!
+        l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP...);
+      }else
+        l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
                          (g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK,
                          BeautifyCmdLine(g_RunData.cmdLine));
-    }else
+    }else //if (PwOk):
     {
       l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,
                          (g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK,
