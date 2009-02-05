@@ -620,6 +620,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   
   ResolveCommandLine(tmp,CurDir,tmp);
   SetCurrentDirectory(cmd);
+
+  ...ToDo:
   free(g_LastFailedCmd);
   g_LastFailedCmd=0;
 
