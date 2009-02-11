@@ -418,9 +418,6 @@ DWORD HookModules()
 
 CRITICAL_SECTION g_HookCs;
 
-//For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
-extern LPTSTR g_LastFailedCmd; //defined in SuSunExt.cpp
-
 DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
                      DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
 {
@@ -464,22 +461,18 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     static WCHAR tmp[4096];
     zero(tmp);
     ResolveCommandLine(cmd,CurDir,tmp);
-    //Exit if ShellExecHook failed on "tmp"
-    if(g_LastFailedCmd)
-    {
-      ...ToDo:
-      BOOL bExitNow=_tcsicmp(tmp,g_LastFailedCmd)==0;
-      free(g_LastFailedCmd);
-      g_LastFailedCmd=0;
-      if(bExitNow)
-        return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
-    }
     GetSystemWindowsDirectoryW(cmd,countof(cmd));
     PathAppendW(cmd,L"SuRun.exe");
     PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
       return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
+    //Exit if ShellExecHook failed on "tmp"
+    static WCHAR tmp2[4096];
+    GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp2,4096);
+    RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
+    if(_tcsicmp(tmp,tmp2)==0)
+      return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
       GetCurrentProcessId(),&rpi,tmp);
   }
