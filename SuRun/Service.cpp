@@ -417,6 +417,50 @@ ChkAdmin:
     ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
 }
 
+static BOOL TestDirectServiceCommands()
+{
+  if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0))
+  {
+    TestEmptyAdminPasswords();
+    CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
+    return true;
+  }
+  if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/RESTORE "),9)==0))
+  {
+    GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+    //Double check if User is Admin!
+    if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
+    {
+      if (!ImportSettings(&g_RunData.cmdLine[9]))
+        SafeMsgBox(0,CBigResStr(IDS_IMPORTFAIL,&g_RunData.cmdLine[9]),
+                    CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+      ResumeClient(RETVAL_OK);
+    }else
+    {
+      ResumeClient(RETVAL_ACCESSDENIED);
+      SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    }
+    return true;
+  }
+  if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/BACKUP "),8)==0))
+  {
+    GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+    //Double check if User is Admin!
+    if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
+    {
+      ExportSettings(&g_RunData.cmdLine[8],g_RunData.SessionID,g_RunData.UserName);
+      ResumeClient(RETVAL_OK);
+    }
+    else
+    {
+      ResumeClient(RETVAL_ACCESSDENIED);
+      SafeMsgBox(0,CBigResStr(IDS_NOEXPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    }
+    return true;
+  }
+  return false;
+}
+
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
   zero(g_RunPwd);
@@ -472,46 +516,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       DisconnectNamedPipe(g_hPipe);
       if ((nRead==sizeof(RUNDATA)) && (CheckCliProcess(rd)==2))
       {
-        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0))
-        {
-          TestEmptyAdminPasswords();
-          CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
+        if (TestDirectServiceCommands())
           continue;
-        }
-        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/RESTORE "),9)==0))
-        {
-          GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-          //Double check if User is Admin!
-          if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
-          {
-            if (!ImportSettings(&g_RunData.cmdLine[9]))
-              SafeMsgBox(0,CBigResStr(IDS_IMPORTFAIL,&g_RunData.cmdLine[9]),
-                        CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-            ResumeClient(RETVAL_OK);
-          }
-          else
-          {
-            ResumeClient(RETVAL_OK);
-            SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-          }
-          continue;
-        }
-        if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/BACKUP "),8)==0))
-        {
-          GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-          //Double check if User is Admin!
-          if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
-          {
-            ExportSettings(&g_RunData.cmdLine[8],g_RunData.SessionID,g_RunData.UserName);
-            ResumeClient(RETVAL_OK);
-          }
-          else
-          {
-            ResumeClient(RETVAL_OK);
-            SafeMsgBox(0,CBigResStr(IDS_NOEXPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-          }
-          continue;
-        }
         if (!g_RunData.bRunAs)
         {
           DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
@@ -589,8 +595,8 @@ TryAgain:
             PROCESS_INFORMATION pi={0};
             DWORD stTime=timeGetTime();
             if (CreateProcessAsUser(hRunCsrss,NULL,cmd,NULL,NULL,FALSE,
-                  CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
-                  0,NULL,&si,&pi))
+                                    CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
+                                    0,NULL,&si,&pi))
             {
               bRunCount++;
               CloseHandle(pi.hThread);
@@ -807,7 +813,7 @@ DWORD PrepareSuRun()
     {
       if (f&FLAG_DONTASK)
         //Program is known but password expired: Only check password!
-        l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP...);
+        l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_ASKOK);
       else
         l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
                            IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
