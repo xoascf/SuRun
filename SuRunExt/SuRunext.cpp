@@ -74,9 +74,6 @@ DWORD       l_Groups    = 0;
 UINT        WM_SYSMH0   = 0;
 UINT        WM_SYSMH1   = 0;
 
-//For IAT-Hook IShellExecHook failed to start g_LastFailedCmd
-LPTSTR g_LastFailedCmd=0;
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // this class factory object creates context menu handlers for windows 32 shell
@@ -621,9 +618,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   ResolveCommandLine(tmp,CurDir,tmp);
   SetCurrentDirectory(cmd);
 
-  ...ToDo:
-  free(g_LastFailedCmd);
-  g_LastFailedCmd=0;
+  RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
 
   GetSystemWindowsDirectory(cmd,countof(cmd));
   PathAppend(cmd, _T("SuRun.exe"));
@@ -660,7 +655,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       {
         pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
         //Tell IAT-Hook to not check "tmp" again!
-        g_LastFailedCmd=_tcsdup(tmp);
+        SetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp);
       }
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
