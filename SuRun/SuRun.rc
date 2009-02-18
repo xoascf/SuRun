@@ -53,36 +53,45 @@ BEGIN
                     PBS_SMOOTH,0,134,263,9
 END
 
-IDD_CURUSRLOGON DIALOGEX 0, 0, 289, 215
+IDD_CURUSRLOGON DIALOGEX 0, 0, 289, 274
 STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Kennwort erforderlich"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
+    COMBOBOX        IDC_USER,100,129,182,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Das Programm immer als dieser Benutzer starten",
+                    IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,144,
+                    182,10
+    EDITTEXT        IDC_PASSWORD,100,155,182,12,ES_AUTOHSCROLL
+    CONTROL         "Kennwort speichern",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,100,171,182,10
+    LTEXT           "Wenn das Programm ""Als Administrator"" gestartet werden soll",
+                    IDC_STATIC,6,192,194,8
+    COMBOBOX        IDC_APP_OPT,5,203,277,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Wie sollen SuRuns Programmfilter dieses Programm behandeln",
+                    IDC_STATIC,6,219,198,8
+    COMBOBOX        IDC_HOOK_OPT,5,231,277,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,179,248,50,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,232,248,50,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "Bitte geben Sie ihr persönliches Kennwort ein, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie 'Abbrechen'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
                     SS_REALSIZEIMAGE,6,127,47,46
-    LTEXT           "&Benutzer:",IDC_USRST,64,137,33,8
-    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
-    LTEXT           "&Kennwort:",IDC_PWDST,64,151,35,8
-    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_AUTOHSCROLL
-    CONTROL         "Für dieses Programm nicht mehr fragen",IDC_ALWAYSOK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,163,182,10
-    CONTROL         "Dieses Prog. immer autom. als Administrator starten",
-                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    100,174,182,10
-    DEFPUSHBUTTON   "OK",IDOK,179,189,50,14
-    PUSHBUTTON      "Abbrechen",IDCANCEL,232,189,50,14
+    LTEXT           "&Benutzer:",IDC_USRST,64,131,33,8
+    LTEXT           "&Kennwort:",IDC_PWDST,64,157,35,8
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,207,289,9
+                    PBS_SMOOTH,0,265,289,9
 END
 
 IDD_CURUSRACK DIALOGEX 0, 0, 289, 215
@@ -90,7 +99,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Bestätigung erforderlich"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -108,10 +117,10 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
     CONTROL         "Für dieses Programm nicht mehr fragen",IDC_ALWAYSOK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,163,182,10
+    PUSHBUTTON      "OK",IDOK,179,189,50,14
     CONTROL         "Dieses Prog. immer autom. als Administrator starten",
                     IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     100,174,182,10
-    PUSHBUTTON      "OK",IDOK,179,189,50,14
     DEFPUSHBUTTON   "Abbrechen",IDCANCEL,232,189,50,14
     CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
                     PBS_SMOOTH,0,207,289,9
@@ -424,46 +433,56 @@ BEGIN
     DEFPUSHBUTTON   "&Fertig",IDOK,192,179,50,14
 END
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 267
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Programmoptionen"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
-    LTEXT           "Befehlszeile",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,242,361,1
+    LTEXT           "Befehlszeile",IDC_STATIC,7,7,45,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,55,7,261,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
     LTEXT           "Die Jokerzeichen '*' und '?' werden unterstützt.\nWichtig: Enthält der Befehl Leerzeichen, muss er in Anführugszeichen stehen!",
                     IDC_STATIC,55,23,261,19
     GROUPBOX        "Was tun, wenn das Programm ""Als Administrator"" gestartet werden soll?",
-                    IDC_STATIC,16,43,330,64,WS_GROUP
-    ICON            IDI_LISTICON2,IDC_STATIC,24,55,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON3,IDC_STATIC,24,68,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON8,IDC_STATIC,24,81,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON6,IDC_STATIC,24,94,21,20,SS_REALSIZEIMAGE
+                    IDC_STATIC,16,116,330,64,WS_GROUP
+    ICON            IDI_LISTICON2,IDC_STATIC,24,128,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,24,141,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON8,IDC_STATIC,24,154,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,24,167,21,20,SS_REALSIZEIMAGE
     CONTROL         "Fragen, ob das Programm mit erhöhten Rechten gestartet werden darf. (Standard)",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,40,55,300,10
+                    WS_TABSTOP,40,128,300,10
     CONTROL         "Das Programm automatisch mit erhöhten Rechten starten.",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,40,68,300,10
+                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,40,141,300,10
     CONTROL         "Das Programm automatisch mit erhöhten Rechten starten und Kennwort NIE abragen.",
-                    IDC_NOASK4,"Button",BS_AUTORADIOBUTTON,40,81,300,10
+                    IDC_NOASK4,"Button",BS_AUTORADIOBUTTON,40,154,300,10
     CONTROL         "Programm NIE mit erhöhten Rechten starten.",IDC_NOASK3,
-                    "Button",BS_AUTORADIOBUTTON,40,94,300,10
-    GROUPBOX        "Wie soll SuRuns Programmfilter dieses Programm behandeln?",
-                    IDC_STATIC,16,110,330,52,WS_GROUP
-    ICON            IDI_LISTICON1,IDC_STATIC,24,122,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON,IDC_STATIC,24,135,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON7,IDC_STATIC,24,148,21,20,SS_REALSIZEIMAGE
+                    "Button",BS_AUTORADIOBUTTON,40,167,300,10
+    GROUPBOX        "Wie sollen SuRuns Programmfilter dieses Programm behandeln?",
+                    IDC_STATIC,16,183,330,52,WS_GROUP
+    ICON            IDI_LISTICON1,IDC_STATIC,24,195,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,24,208,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,24,221,21,20,SS_REALSIZEIMAGE
     CONTROL         "Testen, ob das Programm erhöhte Rechte benötigt. (Standard)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,40,122,300,10
+                    WS_TABSTOP,40,195,300,10
     CONTROL         "Programm immer automagisch mit erhöhten Rechten starten.",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,40,135,300,10
+                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,40,208,300,10
     CONTROL         "Automagie AUS. Das Programm ignorieren.",IDC_AUTO3,
-                    "Button",BS_AUTORADIOBUTTON,40,148,300,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,176,50,14
+                    "Button",BS_AUTORADIOBUTTON,40,221,300,10
+    DEFPUSHBUTTON   "&OK",IDOK,241,249,50,14,WS_GROUP
+    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,249,50,14
+    EDITTEXT        IDC_PASSWORD,110,93,182,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_USER,110,64,182,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Das Programm immer als anderer Benutzer starten",
+                    IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,55,47,
+                    182,10
+    CONTROL         "Kennwort speichern",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,110,81,182,10
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,57,63,47,46
 END
 
 IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
@@ -632,6 +651,11 @@ BEGIN
     IDD_RUNASDLG, DIALOG
     BEGIN
         BOTTOMMARGIN, 128
+    END
+
+    IDD_APPOPTIONS, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 238
     END
 END
 #endif    // APSTUDIO_INVOKED
