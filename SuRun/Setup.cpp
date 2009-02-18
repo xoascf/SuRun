@@ -85,8 +85,9 @@ void UpdLastRunTime(LPTSTR UserName)
 //////////////////////////////////////////////////////////////////////////////
 
 //Common for GetWhiteListFlags and GetBlackListFlags
-DWORD GetRegListFlags(HKEY HKR,LPCTSTR SubKey,LPCTSTR CmdLine,DWORD Default)
+DWORD GetRegListFlagsAndCmd(HKEY HKR,LPCTSTR SubKey,LPCTSTR CmdLine,LPTSTR cmd,DWORD Default)
 {
+  cmd[0]=0;
   HKEY Key;
   if(RegOpenKeyEx(HKR,SubKey,0,KSAM(KEY_READ),&Key)!=ERROR_SUCCESS)
     return Default;
@@ -95,19 +96,24 @@ DWORD GetRegListFlags(HKEY HKR,LPCTSTR SubKey,LPCTSTR CmdLine,DWORD Default)
   DWORD t=REG_DWORD;
   if ((RegQueryValueEx(Key,CmdLine,0,&t,(BYTE*)&d,&sizd)==ERROR_SUCCESS)
     &&(t==REG_DWORD))
-    return RegCloseKey(Key),d;
-  TCHAR cmd[4096];
-  DWORD ccMax=countof(cmd);
+    return _tcscpy(cmd,CmdLine),RegCloseKey(Key),d;
+  DWORD ccMax=4096;
   sizd=sizeof(DWORD);
   for (int i=0;(RegEnumValue(Key,i,cmd,&ccMax,0,&t,(BYTE*)&d,&sizd)==ERROR_SUCCESS);i++)
   {
     if((t==REG_DWORD) && strwldcmp(CmdLine,cmd))
       return RegCloseKey(Key),d;
-    ccMax=countof(cmd);
+    ccMax=4096;
     sizd=sizeof(DWORD);
   }
-  RegCloseKey(Key);
-  return Default;
+  return RegCloseKey(Key),Default;
+}
+
+//Common for GetWhiteListFlags and GetBlackListFlags
+DWORD GetRegListFlags(HKEY HKR,LPCTSTR SubKey,LPCTSTR CmdLine,DWORD Default)
+{
+  TCHAR cmd[4096];
+  return GetRegListFlagsAndCmd(HKR,SubKey,CmdLine,cmd,Default);
 }
 
 DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default)
