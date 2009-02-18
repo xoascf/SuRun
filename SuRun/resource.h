@@ -150,9 +150,11 @@
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002
 #define IDC_DOMAIN                      1003
+#define IDC_APP_OPT                     1003
 #define IDC_USERBITMAP                  1004
 #define IDC_WHTBK                       1005
 #define IDC_SECICON                     1006
+#define IDC_HOOK_OPT                    1006
 #define IDC_NOASK1                      1007
 #define IDC_NOASK2                      1008
 #define IDC_AUTO1                       1009
@@ -167,8 +169,8 @@
 #define IDC_RESTRICT2                   1013
 #define IDC_FADEDESKTOP                 1014
 #define IDC_NOASK3                      1015
-#define IDC_NOASK4                      1016
 #define IDC_USE_C_TO                    1015
+#define IDC_NOASK4                      1016
 #define IDC_HINT                        1016
 #define IDC_HINT2                       1017
 #define IDC_HINTBK                      1018
@@ -247,6 +249,8 @@
 #define IDC_NOUSESURUNNERS              1094
 #define IDC_IMEXSTATIC                  1095
 #define IDC_SHOW_C_TO                   1102
+#define IDC_CHECK1                      1103
+#define IDC_CHECK2                      1104
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -255,7 +259,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1103
+#define _APS_NEXT_CONTROL_VALUE         1104
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
