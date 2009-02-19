@@ -215,7 +215,7 @@ BEGIN
                     182,10
     EDITTEXT        IDC_PASSWORD,100,155,182,12,ES_AUTOHSCROLL
     CONTROL         "Kennwort speichern",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,100,171,182,10
+                    WS_TABSTOP,100,171,95,10
     LTEXT           "Was tun, wenn das Programm ""Als Administrator"" gestartet werden soll",
                     IDC_STATIC,6,192,277,8
     COMBOBOX        IDC_APP_OPT,5,203,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | 
@@ -240,6 +240,7 @@ BEGIN
     LTEXT           "&Kennwort:",IDC_PWDST,64,157,35,8
     CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,265,
                     289,9
+    PUSHBUTTON      "Erweitert >>",IDC_EXTOPT,232,169,50,14
 END
 
 IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
