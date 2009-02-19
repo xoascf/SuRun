@@ -206,7 +206,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Kennwort erforderlich"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     COMBOBOX        IDC_USER,100,129,182,30,CBS_DROPDOWN | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
@@ -216,14 +216,14 @@ BEGIN
     EDITTEXT        IDC_PASSWORD,100,155,182,12,ES_AUTOHSCROLL
     CONTROL         "Kennwort speichern",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,100,171,182,10
-    LTEXT           "Wenn das Programm ""Als Administrator"" gestartet werden soll",
-                    IDC_STATIC,6,192,194,8
-    COMBOBOX        IDC_APP_OPT,5,203,277,30,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Wie sollen SuRuns Programmfilter dieses Programm behandeln",
-                    IDC_STATIC,6,219,198,8
-    COMBOBOX        IDC_HOOK_OPT,5,231,277,30,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Was tun, wenn das Programm ""Als Administrator"" gestartet werden soll",
+                    IDC_STATIC,6,192,277,8
+    COMBOBOX        IDC_APP_OPT,5,203,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "Wie sollen SuRuns Programmfilter dieses Programm behandeln?",
+                    IDC_STATIC,6,219,277,8
+    COMBOBOX        IDC_HOOK_OPT,5,231,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,179,248,50,14
     PUSHBUTTON      "Abbrechen",IDCANCEL,232,248,50,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
@@ -231,7 +231,7 @@ BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
     LTEXT           "Bitte geben Sie ihr persönliches Kennwort ein, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie 'Abbrechen'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -619,6 +619,46 @@ END
 //
 
 1                       24      MOVEABLE PURE   "res\\app.manifest"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_CURUSRLOGON DLGINIT
+BEGIN
+    IDC_APP_OPT, 0x403, 69, 0
+0x7246, 0x6761, 0x6e65, 0x202c, 0x626f, 0x6520, 0x2073, 0x696d, 0x2074, 
+0x7265, 0xf668, 0x7468, 0x6e65, 0x5220, 0x6365, 0x7468, 0x6e65, 0x6720, 
+0x7365, 0x6174, 0x7472, 0x7465, 0x7720, 0x7265, 0x6564, 0x206e, 0x6164, 
+0x6672, 0x202e, 0x5328, 0x6174, 0x646e, 0x7261, 0x2964, "\000" 
+    IDC_APP_OPT, 0x403, 42, 0
+0x7541, 0x6f74, 0x616d, 0x6974, 0x6373, 0x2068, 0x696d, 0x2074, 0x7265, 
+0xf668, 0x7468, 0x6e65, 0x5220, 0x6365, 0x7468, 0x6e65, 0x7320, 0x6174, 
+0x7472, 0x6e65, 0x002e, 
+    IDC_APP_OPT, 0x403, 64, 0
+0x7541, 0x6f74, 0x616d, 0x6974, 0x6373, 0x2068, 0x696d, 0x2074, 0x7265, 
+0xf668, 0x7468, 0x6e65, 0x5220, 0x6365, 0x7468, 0x6e65, 0x7320, 0x6174, 
+0x7472, 0x6e65, 0x202c, 0x654b, 0x6e6e, 0x6f77, 0x7472, 0x4e20, 0x4549, 
+0x6120, 0x7262, 0x6761, 0x6e65, 0x002e, 
+    IDC_APP_OPT, 0x403, 43, 0
+0x7250, 0x676f, 0x6172, 0x6d6d, 0x4e20, 0x4549, 0x6d20, 0x7469, 0x6520, 
+0x6872, 0x68f6, 0x6574, 0x206e, 0x6552, 0x6863, 0x6574, 0x206e, 0x7473, 
+0x7261, 0x6574, 0x2e6e, "\000" 
+    IDC_HOOK_OPT, 0x403, 50, 0
+0x6554, 0x7473, 0x6e65, 0x202c, 0x626f, 0x6520, 0x2073, 0x7265, 0xf668, 
+0x7468, 0x2065, 0x6552, 0x6863, 0x6574, 0x6220, 0x6e65, 0x74f6, 0x6769, 
+0x2e74, 0x2820, 0x7453, 0x6e61, 0x6164, 0x6472, 0x0029, 
+    IDC_HOOK_OPT, 0x403, 42, 0
+0x7541, 0x6f74, 0x616d, 0x6967, 0x6373, 0x2068, 0x696d, 0x2074, 0x7265, 
+0xf668, 0x7468, 0x6e65, 0x5220, 0x6365, 0x7468, 0x6e65, 0x7320, 0x6174, 
+0x7472, 0x6e65, 0x002e, 
+    IDC_HOOK_OPT, 0x403, 25, 0
+0x6144, 0x2073, 0x7250, 0x676f, 0x6172, 0x6d6d, 0x6920, 0x6e67, 0x726f, 
+0x6569, 0x6572, 0x2e6e, "\000" 
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
