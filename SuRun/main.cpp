@@ -140,12 +140,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
       if (*(Args-1)==' ')
         *(Args-1)=0;
-#ifdef BetaVer
-      if (!_wcsicmp(c,L"/CRASH"))
-      {
-        Crash();
-      }else 
-#endif BetaVer
+//#ifdef BetaVer
+//      if (!_wcsicmp(c,L"/CRASH"))
+//      {
+//        Crash();
+//      }else 
+//#endif BetaVer
       if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;
