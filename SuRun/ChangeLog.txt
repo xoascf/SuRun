@@ -1,11 +1,5 @@
 Done, to be tested:
 ---------------------------
-* SuRuns context menu extension now checks if the user right clicks on his or 
-  on the common desktop for displaying "control panel as administrator"
-* If IShellexecuteHook did not start a program elevated, the IATHook will not 
-  try to ask the user. The last command is stored in HKCU\Software\SuRun
-* When resolving a command line, SuRun also checks "HKCU/HKLM\Software\
-  Microsoft\Windows\CurrentVersion\App Paths". So "SuRun AcroRd32" now works.
 
 ToDo
 ---------------------
@@ -31,9 +25,20 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.6 rc 1 - 2009-02-24:
+-----------------------------------
+* SuRuns context menu extension now checks if the user "right clicks" on his
+  own or on the common desktop for displaying "control panel as administrator"
+* If IShellexecuteHook did not start a program elevated, the IATHook will not 
+  try to ask the user. The last command is stored in HKCU\Software\SuRun
+* When resolving a command line, SuRun also checks "HKCU/HKLM\Software\
+  Microsoft\Windows\CurrentVersion\App Paths". So "SuRun AcroRd32" now works.
+* Improved SuRun Icons by Hans Marino. Thanks!
+
 SuRun 1.2.0.6 beta 13 - 2009-01-22:
 -----------------------------------
-* new Application flag
+* new Application flag to never ask for a password, even if asking for 
+  passwords is enabled. This is for SuRun-AutoRun-Programs.
 * Changed program list flag descriptions for (hopefully) better understanding
 * SuRuns inter process communication automatically times out after 15 seconds 
   if a client app opens the service pipe without sending data (DOS attack)
