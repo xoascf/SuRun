@@ -188,6 +188,69 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.6 rc 1 - 2009-02-24:
+-----------------------------------
+* SuRuns context menu extension now checks if the user "right clicks" on his
+  own or on the common desktop for displaying "control panel as administrator"
+* If IShellexecuteHook did not start a program elevated, the IATHook will not 
+  try to ask the user. The last command is stored in HKCU\Software\SuRun
+* When resolving a command line, SuRun also checks "HKCU/HKLM\Software\
+  Microsoft\Windows\CurrentVersion\App Paths". So "SuRun AcroRd32" now works.
+* Improved SuRun Icons by Hans Marino. Thanks!
+* new Application flag to never ask for a password, even if asking for 
+  passwords is enabled. This is for SuRun-AutoRun-Programs.
+* Changed program list flag descriptions for (hopefully) better understanding
+* SuRuns inter-process-communication now times out after 15 seconds if a client 
+  app opens the service pipe without sending data (possible DOS attack).
+* FIX: If a program in the users automagic list was about to be started and 
+  the password timed out, SuRun asked the wrong question.
+* FIX: If ask for users password was enabled, SuRun Settings did not ask for 
+  the password after the timeout.
+* new Command line Option /WAIT. SuRun waits until the elevated process exits.
+* new Command line Option /RETPID. SuRun returns the Process ID of the 
+  elevated process. This is for using SuRun from your own program. You now can 
+  open a (SYNCHRONIZE) process handle wait for the started process to end.
+* Tray symbol now reappears if Explorer is restarted
+* If SuRun uses Vistas Split-Admin token, it protects started processes
+  against access from the non-elevated user
+* FIX: When importing users, SuRun removed all imported users from the local 
+    administrators group even if UAC was enabled. 
+    Now SuRun leaves UAC admins in the local administrators group.
+* FIX: The SuRun function "HasRegistryKeyAccess" freed (LocalFree) a DACL 
+    pointer that was not allocated. That caused "SuRun /SETUP" to crash in 
+    Vista x64. SuRuns unhandled exception filter was not called by the System!
+* FIX: SuRuns command line parser did not handle control panel applets correctly
+* WatchDog process terminates itself if SuRuns Desktop is no longer running
+* FIX: If a safe Windows Desktop is active ("Winlogon", "Disconnect", 
+  "Screen-saver"), SuRun did automatically cancel all Automagic requests, 
+  even those that where marked as "always run elevated" and "no ask".
+  Now SuRun does correctly handle apps that are marked as "always run elevated"
+  and "no ask" and auto-cancels all requests that require SuRuns safe desktop.
+* NEW: Option to adjust, hide and disable the "Cancel" Timeout.
+* NEW: Service uses the the user's keyboard layout
+* NEW: LogonUser uses impersonation.
+* SuRun does no Desktop fade in/out, when the user is in a Terminal session
+* BlackList Match filter does Long/Short file name conversion
+* FIX: Blacklist "Add" Button does not set quotes anymore.
+* VISTA: On Vista SuRun does to not detect installers per default.
+* FIX: SuRuns IATHook does not intercept calls to GetProcAddress() any more. 
+  This caused Outlook 2007 with Exchange Server and Windows Destkop Search 
+  to crash.
+* "SuRun /RESTORE" now displays a "File not found" message
+* "'Administrators' instead of 'Object creator' as default owner for objects 
+  created by administrators." policy is left as it is on SuRun Update
+* new command line option "/BACKUP <file>"
+* VISTA: SuRun works for UAC-Administrators. If a UAC-Administrator is in 
+  SuRunners he/she can use SuRun as normal SuRunner.
+* VISTA: When UAC is enabled and Admins are put into SuRunners, they are NOT 
+    removed from "Administrators"
+* VISTA: Split Admins get the elevated token
+* SuRun can be compiled using Visual C++ 8 (2005)
+* SuRuns GUI Windows are moved to the primary Monitor
+* SuRun uses Winlogons Desktop instead of creating an own one to avoid "Could 
+  not create safe desktop" errors.
+
+
 SuRun 1.2.0.5 - 2008-09-16:
 ---------------------------
 * A click on a Tray-Message-Window now closes it
