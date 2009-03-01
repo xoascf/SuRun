@@ -188,8 +188,8 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.6 rc 1 - 2009-02-24:
------------------------------------
+SuRun 1.2.0.6 - 2009-03-01:
+---------------------------
 * SuRuns context menu extension now checks if the user "right clicks" on his
   own or on the common desktop for displaying "control panel as administrator"
 * If IShellexecuteHook did not start a program elevated, the IATHook will not 
