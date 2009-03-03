@@ -571,7 +571,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   if (IsLocalSystem())
     SetUnhandledExceptionFilter(ExceptionFilter);
   //SuRun misuses WinLogons Desktop
-  CResStr DeskName(L"Winlogon");
+  CResStr DeskName((GetUseWinLogonDesk?L"Winlogon":L"SRD_%04x"),GetTickCount());
   //Create Desktop
   CRunOnNewDeskTop* rond=new CRunOnNewDeskTop(WinSta,DeskName,UserDesk,BlurDesk,bFade);
   g_RunOnNewDesk=rond;
