@@ -61,6 +61,8 @@
 #define GetFadeDesk       (GetOption(_T("FadeDesktop"),1)!=0)
 #define SetFadeDesk(b)    SetOption(_T("FadeDesktop"),b,1)
 
+#define GetUseWinLogonDesk  (GetOption(_T("UseWinLogonDesk"),1)!=0)
+#define SetUseWinLogonDesk(b) SetOption(_T("UseWinLogonDesk"),b,1)
 //Save or not Passwords in the registry
 #define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
 
