@@ -1212,6 +1212,7 @@ void ExportSettings(LPTSTR ini)
 //  EXPORTINT(SuRunKey,OwnerAdminGrp,ini);
   
   EXPORTINT(SuRunKey,ShowTrayAdmin,ini);
+  EXPORTINT(SuRunKey,UseWinLogonDesk,ini);
   
   EXPORTINT(SuRunKey,NoConvAdmin,ini);
   EXPORTINT(SuRunKey,NoConvUser,ini);
@@ -1314,6 +1315,7 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 //    }
 
     IMPORTINT(SuRunKey,ShowTrayAdmin,ini);
+    IMPORTINT(SuRunKey,UseWinLogonDesk,ini);
     
     IMPORTINT(SuRunKey,NoConvAdmin,ini);
     IMPORTINT(SuRunKey,NoConvUser,ini);
@@ -2120,6 +2122,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
+      CheckDlgButton(hwnd,IDC_NOLOGONDESK,GetUseWinLogonDesk==0);
       HKEY kra=0;
       if (0==RegOpenKeyEx(HKCR,L"exefile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra))
         RegCloseKey(kra);
@@ -2174,6 +2177,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     if (g_SD->DlgExitCode==IDOK) //User pressed OK, save settings
     {
 ApplyChanges:
+      SetUseWinLogonDesk(IsDlgButtonChecked(hwnd,IDC_NOLOGONDESK)==0);
       switch (IsDlgButtonChecked(hwnd,IDC_DORUNAS))
       {
       case BST_CHECKED:
