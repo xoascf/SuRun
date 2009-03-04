@@ -1,10 +1,10 @@
 Done:
 ---------------------
 * Double click in user list for "Edit"
-* Options for TSA to show for "all Users/Admins/No users"
 
 ToDo for next release:
 ---------------------
+* Options for TSA to show for "all Users/Admins/No users"
 ---
 * Polish resources
 
