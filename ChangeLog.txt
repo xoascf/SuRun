@@ -1,12 +1,5 @@
 Done, to be tested:
 ---------------------------
-* new Command line Option /WAIT. SuRun waits until the elevated process exits.
-* new Command line Option /RETPID. SuRun returns the Process ID of the 
-  elevated process.
-* Tray symbol now reappears if Explorer is restarted
-* If SuRun uses Vistas Split-Admin token, it is now protected against access 
-  from the non-elevated user
-
 ToDo
 ---------------------
 * Add a flag to the program list to not ask for a passwort for certain programs
@@ -32,6 +25,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.6 beta 11 - 2009-01-15:
+-----------------------------------
+* new Command line Option /WAIT. SuRun waits until the elevated process exits.
+* new Command line Option /RETPID. SuRun returns the Process ID of the 
+  elevated process.
+* Tray symbol now reappears if Explorer is restarted
+* If SuRun uses Vistas Split-Admin token, it is now protected against access 
+  from the non-elevated user
 
 SuRun 1.2.0.6 beta 11 - 2008-12-25:
 -----------------------------------
