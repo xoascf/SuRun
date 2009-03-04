@@ -1,13 +1,14 @@
 Done, to be tested:
 ---------------------------
-* SuRun does not store passwords any more
-* Setup Option "store psaawords" was changed to "Require user password" with
-  an optional grace period
+* SuRun does not store passwords any more. To start a user process, SuRun uses
+  zwCreateToken and to RunAs something LSALogonUser is used.
+* Setup Option to "store passwords" was changed to "Require user password" 
+  with an optional grace period
 * Empty Admin Password Warning did not show on NonAdmin/NonSuRunners 
   without Tray Icon
 * Settings Page 2 "Show Ballon Tips" was grayed out after "Set recommended 
   options for home users"
-* FIX: In WinX64 SuRun32 did not read SuRuns Settings (Wow6432Node)
+* FIX: In Windows x64 SuRun32 could not read SuRuns Settings (Wow6432Node)
 
 SuRun 1.1.9.0 - 2008-07-05: (beta)
 ---------------------------
