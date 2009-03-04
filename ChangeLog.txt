@@ -6,12 +6,12 @@ Done, to be tested:
 * Don't try to start automagically elevated "AsInvoker" Apps
 * SwitchDesktop back to user desktop failed after LockWindowStation
 * The "Could not create safe Desktop" message caused the WatchDog showing up
-* Fading blurred desktop in is now OFF by default
-* Safe Desktop is now created before the screenshot is done
-* CStayOnDesktop caused GPFs in Vista, WatchDog handles SwitchDesktop issues
-* CBlurredScreen uses a thread to create and fade in the blurred screen
+* Safe Desktop is now created before the screenshot is made
+* The WatchDog process now handles SwitchDesktop issues
+* SuRun now uses a separate thread to create and fade in the blurred screen
 * IATHook scans module for "CreateProcess" before hooking it
 * IATHook uses InterlockedExchangePointer for better stability
+* Eclipse (JAVA) and SuRuns IAT Hook conflict
 
 ToDo
 ---------------------
@@ -23,7 +23,6 @@ ToDo
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
 * TSA sometimes slows down the system
-* Eclipse (JAVA) and SuRuns IAT Hook conflict
 
 To be done in future:
 ---------------------
