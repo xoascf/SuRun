@@ -28,13 +28,31 @@ void AllowAccess(HANDLE hObject);
 //  NetworkPathToUNCPath
 BOOL NetworkPathToUNCPath(LPTSTR path);
 
+//Link Creation
+BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname);
+
+//DeleteDirectory ... all files and SubDirs
+bool DeleteDirectory(LPCTSTR DIR);
+
 //UserName:
 bool GetSIDUserName(PSID sid,LPTSTR Name);
 bool GetTokenUserName(HANDLE hUser,LPTSTR Name);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR Name);
 
-//Link Creation
-BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname);
+// GetTokenGroups
+PTOKEN_GROUPS	GetTokenGroups(HANDLE hToken);
 
-// DeleteDirectory ... all files and SubDirs
-bool DeleteDirectory(LPCTSTR DIR);
+// FindLogonSID
+PSID FindLogonSID(PTOKEN_GROUPS	ptg);
+
+// GetLogonSid
+PSID GetLogonSid(HANDLE hToken);
+
+//  GetProcessID
+DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1);
+
+//GetSessionTokenGroups
+HANDLE GetSessionUserToken(DWORD SessID);
+
+//GetSessionTokenGroups
+PTOKEN_GROUPS	GetSessionTokenGroups(DWORD SessionID);
