@@ -1,9 +1,3 @@
-Done:
-----
-* Admins again see Setup on Safe Desktop (Logoff!)
-* Removed Blurred Desktop flicker
-* SuRun Settings could show behind Safe Desktop background
-
 To be done in future:
 ---------------------
 * make context menu entries dynamically with ShellExt 
@@ -24,6 +18,18 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.0.6 - 2008-04-29:
+----------------------------
+* SuRun asks, if a user tries to restart the Windows Shell.
+* Removed "Administrators see SuRuns Setup Dialog on their desktop" feature for
+  two reasons: 
+  1. The Settings dialog for normal users sometimes came up behind the blurred 
+     background window. 
+  2. The settings dialog was not closed when an Admin did log off.
+* IAT-Hook is again off by default because of incompatibilities with self 
+  checking software. (E.G. Access and Outlook 2003)
+* Removed Blurred Desktop flicker
 
 SuRun 1.1.0.5 - 2008-04-23:
 ----------------------------
