@@ -16,11 +16,11 @@ Done, to be tested:
 * Eclipse (JAVA) and SuRuns IAT Hook do not conflict anymore
 * When asking to elevate a process, a "Cancel" count down progress bar is shown
 * Wildcards "*" and "?" are supported for applications
+* Option "Hide SuRun from user"
+* Option "Require user password for SuRun Settings"
 
 ToDo
 ---------------------
-* Configurable "Do not display messages" Option
-* "Require user password for SuRun Setings" Option
 * LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
 * Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
@@ -35,7 +35,6 @@ To be done in future:
 
 Deferred Whishlist:
 ---------------------
-* White list command line editor in "SuRun settings" with auto quotes
 * Console SuRun support
 * Connect Network drives for admin process: 
 * Intercept "rundll32.exe newdev.dll,": 
