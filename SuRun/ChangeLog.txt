@@ -25,6 +25,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.6 - 2009-03-01:
+-----------------------------------
+renamed "SuRun 1.2.0.6 rc 1"  to "SuRun 1.2.0.6"
+
 SuRun 1.2.0.6 rc 1 - 2009-02-24:
 -----------------------------------
 * SuRuns context menu extension now checks if the user "right clicks" on his
