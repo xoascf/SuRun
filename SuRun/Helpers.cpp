@@ -1213,7 +1213,7 @@ DWORD UserIsInSuRunnersOrAdmins()
     {
       if(EqualSid(ptg->Groups[i].Sid,AdminSID))
         dwRet|=IS_IN_ADMINS;
-      else if(EqualSid(ptg->Groups[i].Sid,SuRunnersSID))
+      else if(SuRunnersSID && EqualSid(ptg->Groups[i].Sid,SuRunnersSID))
         dwRet|=IS_IN_SURUNNERS;
     }
 
