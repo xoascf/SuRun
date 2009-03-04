@@ -10,6 +10,7 @@ ToDo
 
 To be done in future:
 ---------------------
+* Change Description for Program options (Auto OK/Cancel...)
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * Hide/Show all context menu entries consistently
