@@ -1,17 +1,16 @@
 Done, to be tested:
 ---------------------------
+* Tray symbol now reappears if Explorer is restarted
+
 ToDo
 ---------------------
-* Tray symbol does not reappear if Explorer is restarted
 * Add a flag to the program list to not ask for a passwort for certain programs
-* Hotkes for "User..." in Ack-Dialogs
 * Console SuRun support
-* Integrate "Nero Burning Rights" functions
+* Change Description for Program options (Auto OK/Cancel...)
+* Create a "Default" SuRunner for users that are not in "SuRunners"
 
 To be done in future:
 ---------------------
-* Change Description for Program options (Auto OK/Cancel...)
-* Create a "Default" SuRunner for users that are not in "SuRunners"
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * Hide/Show all context menu entries consistently
 * make all context menu entries dynamically with ShellExt 
