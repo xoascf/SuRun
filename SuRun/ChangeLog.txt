@@ -38,6 +38,7 @@ SuRun Changes:
 
 SuRun 1.1.0.3 - 2008-04-06: (small beta test)
 ----------------------------
+* SuRun warns the user after login if any administrators have empty passwords
 * Background Screen fades in and out
 * SuRuns "Run as..." and Administrator authentification respect group policies.
 * Changed Icons
