@@ -56,6 +56,9 @@ BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account);
 // SetAdminDenyUserAccess
 void SetAdminDenyUserAccess(HANDLE hObject);
 
+// GetUserAccessSD
+PSECURITY_DESCRIPTOR GetUserAccessSD();
+
 //  NetworkPathToUNCPath
 BOOL NetworkPathToUNCPath(LPTSTR path);
 
