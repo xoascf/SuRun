@@ -24,6 +24,7 @@
 #include <Tlhelp32.h>
 
 #include "Helpers.h"
+#include "ResStr.h"
 #include "IsAdmin.h"
 #include "lsa_laar.h"
 #include "UserGroups.h"
@@ -720,14 +721,37 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
       CHK_BOOL_FN(PathRemoveFileSpec(path));
       return TRUE;
     }
-    if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
     //Not found! Try all Extensions for Executables
+    if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
     // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
     {
       _stprintf(path,L"%s%s",file,ExeExts[i]);
       if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
       {
         //Done!
+        _tcscpy(app,path);
+        _tcscpy(ext,ExeExts[i]);
+        CHK_BOOL_FN(PathRemoveFileSpec(path));
+        return TRUE;
+      }
+    }
+    //Search AppPaths:
+    if (GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,app),0,path,4096)
+      ||GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,app),0,path,4096))
+    {
+      //Found!
+      _tcscpy(app,path);
+      CHK_BOOL_FN(PathRemoveFileSpec(path));
+      return TRUE;
+    }
+    //Not found! Try all Extensions for Executables
+    if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
+    {
+      _stprintf(path,L"%s%s",file,ExeExts[i]);
+      if (GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,path),0,path,4096)
+        ||GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,path),0,path,4096))
+      {
+        //Found!
         _tcscpy(app,path);
         _tcscpy(ext,ExeExts[i]);
         CHK_BOOL_FN(PathRemoveFileSpec(path));
@@ -775,6 +799,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
 // ResolveCommandLine: Based on SuDown (http://SuDown.sourceforge.net)
 //
 //////////////////////////////////////////////////////////////////////////////
+
 BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
 {
   //Application
