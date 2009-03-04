@@ -76,3 +76,17 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
 
 // GetVersionString
 LPCTSTR GetVersionString();
+
+// CTimeOut
+class CTimeOut
+{
+public:
+  CTimeOut();
+  CTimeOut(DWORD TimeOut);
+  void Set(DWORD TimeOut);
+  DWORD Rest();
+  bool  TimedOut();
+protected:
+  DWORD m_EndTime;
+};
+
