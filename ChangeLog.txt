@@ -34,7 +34,6 @@ SuRun 1.1.0.3 - 2008-04-11:
        names like "Explorer ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\
        ::{21EC2020-3AEA-1069-A2DD-08002B30309D}"
 * NEW: SuRun can replace Windows "Run as..." in context menu
-* NEW: User file list rules: "never start automatically"/"never start elevated"
 * NEW: Option to show a user status icon and balloon tips in the notification 
        area when the current application does not run as the logged on user
 * NEW: SuRun warns non restricted SuRunners and Administrators after login if 
