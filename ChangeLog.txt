@@ -1,12 +1,11 @@
 Done, to be tested:
 ---------------------------
-* VISTA: Split Admins get the elevated token
-* VISTA: When UAC is enabled and Admins are put into SuRunners, they are NOT 
-    removed from "Administrators"
+* SuRun Message Boxes are system modal.
+* SuRun does no Desktop fade in/out, when the user is in a Terminal session
 
 ToDo
 ---------------------
-* Add MB_SYSTEMMODAL to SuRun Message Boxes!
+
 * Console SuRun support
 * make Safe Desktop CountDown switchable
 * Integrate "Nero Burning Rights" functions
