@@ -78,6 +78,9 @@ PSID GetProcessUserSID(DWORD ProcessID);
 bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain=0);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
 
+//Shell stuff
+HANDLE GetShellProcessToken();
+
 // GetVersionString
 LPCTSTR GetVersionString();
 
