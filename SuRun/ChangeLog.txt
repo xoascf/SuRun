@@ -1,5 +1,6 @@
 Done:
 ---------------------
+* Administrators see SuRuns Setup Dialog on their desktop
 
 ToDo for next release:
 ---------------------
