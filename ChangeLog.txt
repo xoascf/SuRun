@@ -3,6 +3,8 @@ Done, to be tested:
 * "Hide SuRun from all non SuRunners" did also hide Setup from Administrators
 * Warning for SuRunners that want to hide SuRun from themselves
 * FIX: SuRun did not work with console processes
+* FIX: If "hide SuRun from all non SuRunners" was active, SuRun did by default 
+  hide from all Users
 
 ToDo
 ---------------------
@@ -52,7 +54,7 @@ SuRun 1.1.9.1 - 2008-07-07: (beta)
   zwCreateToken and to RunAs something LSALogonUser is used.
 * Setup Option to "store passwords" was changed to "Require user password" 
   with an optional grace period
-* New Settings Option to hide SuRun from all non SuRunners by default
+* New Settings Option to hide SuRun from all non SuRunners
 * New Settings Option to not detect Programs that require elevation
 * FIX: Empty Admin Password Warning did not show on NonAdmin/NonSuRunners 
   without Tray Icon
