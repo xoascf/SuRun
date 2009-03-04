@@ -25,6 +25,7 @@
 #define DoDBGTrace
 #endif
 
+void TRACExA(LPCSTR s,...);
 void TRACEx(LPCTSTR s,...);
 
 #ifdef DoDBGTrace
