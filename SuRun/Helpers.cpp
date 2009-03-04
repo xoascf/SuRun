@@ -28,6 +28,7 @@
 #pragma comment(lib,"Mpr.lib")
 #pragma comment(lib,"Shell32.lib")
 #pragma comment(lib,"ole32.lib")
+#pragma comment(lib,"Version.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -576,4 +577,40 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
   }
   CloseHandle(hProc);
   return bRet;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// GetVersionString
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+static TCHAR verstr[20]={0};
+LPCTSTR GetVersionString()
+{
+  if (verstr[0]!=0)
+    return verstr;
+  TCHAR FName[MAX_PATH];
+  GetModuleFileName(0,FName,MAX_PATH);
+  int cbVerInfo=GetFileVersionInfoSize(FName,0);
+  if (cbVerInfo)
+  {
+    void* VerInfo=malloc(cbVerInfo);
+    GetFileVersionInfo(FName,0,cbVerInfo,VerInfo);
+    VS_FIXEDFILEINFO* Ver;
+    UINT cbVer=sizeof(Ver);
+    VerQueryValue(VerInfo,_T("\\"),(void**)&Ver,&cbVer);
+    if (cbVer)
+    {
+      _stprintf(verstr,_T("%d.%d.%d.%d"),
+        Ver->dwProductVersionMS>>16 & 0x0000FFFF,
+        Ver->dwProductVersionMS     & 0x0000FFFF,
+        Ver->dwProductVersionLS>>16 & 0x0000FFFF,
+        Ver->dwProductVersionLS     & 0x0000FFFF);
+      free(VerInfo);
+      return verstr;
+    }
+    free(VerInfo);
+  }
+  return _T("");
 }
