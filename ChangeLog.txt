@@ -9,6 +9,10 @@ Done, to be tested:
 * Fading blurred desktop in is now OFF by default
 * Safe Desktop is now created before the screenshot is done
 * CStayOnDesktop caused GPFs in Vista, WatchDog handles SwitchDesktop issues
+* CBlurredScreen uses a thread to create and fade in the blurred screen
+* IATHook uses InterlockedExchangePointer
+* IATHook scans modules for CreateProcess before hooking
+* IATHook initializes to be hooked functions after DLLMain
 
 ToDo
 ---------------------
