@@ -22,6 +22,7 @@
 #define HKCR HKEY_CLASSES_ROOT
 #define HKCU HKEY_CURRENT_USER
 #define HKLM HKEY_LOCAL_MACHINE
+#define APP_PATHS L"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths"
 
 #ifdef _SR32
 #define KSAM(a) a|KEY_WOW64_64KEY
