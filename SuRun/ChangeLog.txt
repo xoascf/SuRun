@@ -1,8 +1,10 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.2.0.1 - 2008-08-13:
+SuRun 1.2.0.1 - 2008-08-17:
 ---------------------------
+* FIX: If SuRun initially cannot switch to the users desktop, it instantly 
+  presses CANCEL.
 * FIX: Clicking "Set recommended options for home users" with no users in the 
   SuRunners group enabled the check boxes of SuRun Settings Page 2. When then 
   clicking one of these boxes, SuRun Settings were terminated abnormally.
