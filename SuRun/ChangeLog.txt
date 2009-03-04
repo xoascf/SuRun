@@ -1,8 +1,14 @@
 Done, to be tested:
 ---------------------------
-* "Store Password" in RunAs-Dialog was not moved while Dialog reszing 
-* "SuRun /RunAs" did load the wrong user environment
+
+SuRun 1.1.9.3 - 2008-07-09: (beta)
+---------------------------
 * Blacklist for Programs not to hook
+* Setup-Page 3 revised
+* FIX: "Store Password" in RunAs-Dialog was not moved while Dialog reszing 
+* FIX: "SuRun /RunAs" did load the wrong user environment
+* FIX: Another try to display SuRun in the System Menu on the first click
+* FIX: The "Warning for Admins with empty passwords" did not alway show up
 
 ToDo
 ---------------------
