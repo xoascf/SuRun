@@ -487,6 +487,7 @@ void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
   _tcscpy(Dst,path);
   PathAppend(Dst,file);
   PathAddExtension(Dst,ext);
+  DBGTrace4("Combine(%s,%s,%s,%s)",Dst,path,file,ext);
 }
 
 //Split path parts
@@ -500,10 +501,12 @@ void Split(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
   PathStripPath(file);
   _tcscpy(ext,PathFindExtension(file));
   PathRemoveExtension(file);
+  DBGTrace4("Split(%s,%s,%s,%s)",app,path,file,ext);
 }
 
 BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
 {
+  DBGTrace5("QualifyPath(%s,%s,%s,%s,%s)",app,path,file,ext,CurDir);
   static LPTSTR ExeExts[]={L".exe",L".lnk",L".cmd",L".bat",L".com",L".pif"};
   if (path[0]=='.')
   {
@@ -590,6 +593,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   TCHAR app[4096]={0};
   TCHAR args[4096]={0};
   _tcscpy(args,CmdLine);
+  PathRemoveBlanks(args);
   //Clean up double spaces or unneeded quotes
   LPTSTR p=&args[0];
   while (p && *p)
