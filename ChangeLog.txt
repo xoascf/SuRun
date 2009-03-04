@@ -6,6 +6,7 @@ Done, to be tested:
 * Don't try to start automagically elevated "AsInvoker" Apps
 * SwitchDesktop back to user desktop failed after LockWindowStation
 * The "Could not create safe Desktop" message caused the WatchDog showing up
+* Fading blurred desktop in is now OFF by default
 
 ToDo
 ---------------------
