@@ -28,6 +28,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.6 beta 10 - 2008-12-17:
+-----------------------------------
+* SuRuns command line resolver did not handle control panel applets correctly
+* SuRuns Beta has a new option "/CRASH" to test DrWtsn32
+
 SuRun 1.2.0.6 beta 9 - 2008-12-16:
 ----------------------------------
 * MyCPAU uses impersonation if CreateProvessasUser returns ERROR_DIRECTORY
