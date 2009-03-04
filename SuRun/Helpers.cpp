@@ -112,7 +112,11 @@ BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax)
 {
   if (GetRegAny(HK,SubKey,Val,REG_SZ,(BYTE*)Str,&ccMax))
     return true;
-  return GetRegAny(HK,SubKey,Val,REG_EXPAND_SZ,(BYTE*)Str,&ccMax);
+  TCHAR s[4096];
+  DWORD n=4096;
+  if(GetRegAny(HK,SubKey,Val,REG_EXPAND_SZ,(BYTE*)&s,&n))
+    return ExpandEnvironmentStrings(s,Str,min(4096,ccMax)),TRUE;
+  return FALSE;
 }
 
 BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
@@ -158,6 +162,44 @@ BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
   }
   RegCloseKey(hEnumKey);
   RegDeleteKey(hKey, pszSubKey);
+  return TRUE;
+}
+
+void CopyRegKey(HKEY hSrc, HKEY hDst)
+{
+  LPTSTR s=(LPTSTR)malloc(512*sizeof(TCHAR));
+  BYTE* b=(BYTE*)malloc(8192);
+  DWORD i,nS,nB,t;
+  for(i=0,nS=512,nB=8192;0==RegEnumValue(hSrc,i,s,&nS,0,&t,b,&nB);nS=512,nB=8192,i++)
+    RegSetValueEx(hDst,s,0,t,b,nB);
+  free(b);
+  for(i=0,nS=512;0==RegEnumKey(hSrc,i,s,nS);i++)
+  {
+    HKEY newDst,newSrc;
+    if(0==RegOpenKey(hSrc,s,&newSrc))
+    {
+      if(0==RegCreateKey(hDst,s,&newDst))
+      {
+        CopyRegKey(newSrc,newDst);
+        RegCloseKey(newDst);
+      }
+      RegCloseKey(newSrc);
+    }
+  }
+  free(s);
+}
+
+BOOL RenameRegKey(HKEY hKeyRoot,LPTSTR sSrc,LPTSTR sDst)
+{
+  HKEY hSrc,hDst;
+  if(RegOpenKey(hKeyRoot,sSrc,&hSrc))
+    return FALSE;
+  if(RegCreateKey(hKeyRoot,sDst,&hDst))
+    return RegCloseKey(hSrc),FALSE;
+  CopyRegKey(hSrc,hDst);
+  RegCloseKey(hDst);
+  RegCloseKey(hSrc);
+  DelRegKey(hKeyRoot,sSrc);
   return TRUE;
 }
 
