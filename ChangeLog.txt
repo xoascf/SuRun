@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* No "owner of created obects" on Update
+* SuRun /EXPORT <file>
 
 ToDo
 ---------------------
