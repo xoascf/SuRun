@@ -3,9 +3,13 @@ Done, to be tested:
 
 SuRun 1.2.0.1 - 2008-08-13:
 ---------------------------
+* FIX: InstallSuRun did not delete Temp files when it was started with limited 
+  rights because MoveFileEx had no write access to HKLM.
+* FIX: InstallSuRun sometimes did not work whe run from the Desktop of an 
+  limited user because access permissions denied access for Administrators.
 * FIX: Option "Try to detect if unknown applications need to start with 
   elevated rights." did not work
-* SuRun /RUNAS did not load the users HKEY_CURRENT_USER
+* FIX: SuRun /RUNAS did not load the users HKEY_CURRENT_USER
 * FIX: Extensively reduced calls to LSA (lsass.exe)
 * FIX: All User/Group functions now use impersonation
 * FIX: The Tray Icon caused ~400 context switches per second and thus 2% CPU 
