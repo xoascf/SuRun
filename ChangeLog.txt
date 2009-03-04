@@ -1,3 +1,6 @@
+*Win64 "SuRun /SYSMEUHOOK" did not start SuRun32.bin (Mutex)
+
+
 To be done in future:
 ---------------------
 * Switchable Easy/Expert Settings
