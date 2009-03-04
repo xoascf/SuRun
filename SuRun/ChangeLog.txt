@@ -1,7 +1,7 @@
 Done, to be tested:
 ---------------------------
 * Store Password in RunAs-Dialog was not moved while Dialog reszing 
-* "SuRun /RunAs" did loed the wrong user environment
+* "SuRun /RunAs" did load the wrong user environment
 
 ToDo
 ---------------------
