@@ -12,6 +12,7 @@ Done, to be tested:
 * Button "Set recommended options for home users" sets Settings on all pages
   but only for selected user.
 * FIX: Tray Message Windows did not close after 20s
+* FIX: All elevated processes were started from %windir%\system32
 
 ToDo
 ---------------------
