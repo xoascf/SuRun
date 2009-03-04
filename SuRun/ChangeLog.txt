@@ -60,6 +60,8 @@ SuRun 1.1.9.0 - 2008-07-05: (beta)
 
 ToDo
 ---------------------
+* List of Programs not to hook
+* Warning for SuRunners that want hide hide SuRun from themselves
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * Move Message Windows with WM_SETTINGCHANGE
 * "Show Warning for Admins with empty passwords" does not work with predefined 
