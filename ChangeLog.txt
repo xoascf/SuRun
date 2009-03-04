@@ -6,6 +6,7 @@ Done, to be tested:
   SuRun does not need to put SuRunners into the Admin group anymore for 
   starting elevated Processes. SuRun does not need to use a helper process to 
   start the elevated process anymore.
+  SuRun does not depend any more on the Secondary Logon Service.
 * SuRun seems to work in Windows Vista side by side with UAC enabled
 * SuRun Settigs have a "Set recommended options for home users" Button. 
   Clicking this button causes SuRun to set all Options in the currently visible 
