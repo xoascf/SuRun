@@ -23,8 +23,6 @@
 #include <SHLWAPI.H>
 #pragma comment(lib,"ShlWapi.lib")
 
-#pragma warning(disable: 4996)
-
 class CCmdLine
 {
 public:
@@ -33,8 +31,7 @@ public:
     m_CmdLine=_tcsdup(GetCommandLine());
     m_Argc=0;
     //Count command line args and remove spaces
-    LPTSTR p=m_CmdLine;
-    for (;p && *p;m_Argc++)
+    for (LPTSTR p=m_CmdLine;p && *p;m_Argc++)
     {
       p=PathGetArgs(p);
       PathRemoveBlanks(p);
@@ -43,8 +40,7 @@ public:
     m_Args=(LPTSTR*)malloc(sizeof(LPTSTR)*m_Argc);
     //set argv pointers
     p=m_CmdLine;
-    int arg=0;
-    for (;arg<m_Argc;arg++)
+    for (int arg=0;arg<m_Argc;arg++)
     {
       //separate argv strings with '\0':
       if (arg)
