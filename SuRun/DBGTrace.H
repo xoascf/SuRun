@@ -18,7 +18,7 @@
 #pragma comment(lib,"winmm")
 #pragma warning(disable : 4996)
 
-#define DoDBGTrace
+//#define DoDBGTrace
 
 #ifdef _DEBUG 
 #define DoDBGTrace
