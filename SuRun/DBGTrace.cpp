@@ -64,3 +64,15 @@ void TRACEx(LPCTSTR s,...)
   OutputDebugString(S);
 }
 
+void TRACExA(LPCSTR s,...)
+{
+  char S[1024]={0};
+  int len=0;
+  va_list va;
+  va_start(va,s);
+  if (vsprintf(&S[len],s,va)>=1024)
+    DebugBreak();
+  va_end(va);
+  OutputDebugStringA(S);
+}
+
