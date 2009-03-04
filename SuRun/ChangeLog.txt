@@ -28,6 +28,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.6 beta 9 - 2008-12-16:
+----------------------------------
+* MyCPAU uses impersonation if CreateProvessasUser returns ERROR_DIRECTORY
+
 SuRun 1.2.0.6 beta 8 - 2008-12-16:
 ----------------------------------
 * WatchDog process terminates itself if SuRuns Desktop is no longer running
