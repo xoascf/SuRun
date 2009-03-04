@@ -26,6 +26,22 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.6 beta 3 - 2008-11-01:
+----------------------------------
+* SuRun can be compiled using Visual C++ 8 (2005)
+* SuRuns GUI Windows are moved to the primary Monitor
+	
+SuRun 1.2.0.6 beta 2 - 2008-10-23:
+----------------------------------
+* SuRuns GUI is closed when Winlogon shows up (e.G. if a user presses <WIN>+"L" 
+  while the SuRun GUI is active).
+
+SuRun 1.2.0.6 beta 1 - 2008-10-19:
+----------------------------------
+* SuRun uses Winlogons Desktop instead of creating an own one to avoid "Could 
+  not create safe desktop" errors.
+* SuRuns shows it's beta version number
+
 SuRun 1.2.0.5 - 2008-09-16:
 ---------------------------
 * A click on a Tray-Message-Window now closes it
