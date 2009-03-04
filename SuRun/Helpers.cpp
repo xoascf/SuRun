@@ -476,6 +476,265 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+//
+// QualifyPath
+//
+//////////////////////////////////////////////////////////////////////////////
+
+//Combine path parts
+void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
+{
+  _tcscpy(Dst,path);
+  PathAppend(Dst,file);
+  PathAddExtension(Dst,ext);
+}
+
+//Split path parts
+void Split(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext)
+{
+  //Get Path
+  _tcscpy(path,app);
+  PathRemoveFileSpec(path);
+  //Get File, Ext
+  _tcscpy(file,app);
+  PathStripPath(file);
+  _tcscpy(ext,PathFindExtension(file));
+  PathRemoveExtension(file);
+}
+
+BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
+{
+  static LPTSTR ExeExts[]={L".exe",L".lnk",L".cmd",L".bat",L".com",L".pif"};
+  if (path[0]=='.')
+  {
+    //relative path: make it absolute
+    _tcscpy(app,CurDir);
+    PathAppend(app,path);
+    PathCanonicalize(path,app);
+    Combine(app,path,file,ext);
+  }
+  if ((path[0]=='\\'))
+  {
+    if(path[1]=='\\')
+      //UNC path: must be fully qualified!
+      return PathFileExists(app)
+        && (!PathIsDirectory(app));
+    //Root of current drive
+    _tcscpy(path,CurDir);
+    PathStripToRoot(path);
+    Combine(app,path,file,ext);
+  }
+  if (path[0]==0)
+  {
+    _tcscpy(path,app);
+    LPCTSTR d[2]={(LPCTSTR)&CurDir,0};
+    // file.ext ->search in current dir and %path%
+    if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
+    {
+      //Done!
+      _tcscpy(app,path);
+      PathRemoveFileSpec(path);
+      return TRUE;
+    }
+    if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
+    //Not found! Try all Extensions for Executables
+    // file ->search (exe,bat,cmd,com,pif,lnk) in current dir, search %path%
+    {
+      _stprintf(path,L"%s%s",file,ExeExts[i]);
+      if ((PathFindOnPath(path,d))&&(!PathIsDirectory(path)))
+      {
+        //Done!
+        _tcscpy(app,path);
+        _tcscpy(ext,ExeExts[i]);
+        PathRemoveFileSpec(path);
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+  if (path[1]==':')
+  {
+    //if path=="d:" -> "cd d:"
+    if (!SetCurrentDirectory(path))
+      return false;
+    //if path=="d:" -> "cd d:" -> "d:\documents"
+    GetCurrentDirectory(4096,path);
+    Combine(app,path,file,ext);
+  }
+  // d:\path\file.ext ->PathFileExists
+  if (PathFileExists(app) && (!PathIsDirectory(app)))
+    return TRUE;
+  if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
+  //Not found! Try all Extensions for Executables
+  // file ->search (exe,bat,cmd,com,pif,lnk) in path
+  {
+    Combine(app,path,file,ExeExts[i]);
+    if ((PathFileExists(app))&&(!PathIsDirectory(app)))
+    {
+      //Done!
+      _tcscpy(ext,ExeExts[i]);
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// ResolveCommandLine: Based on SuDown (http://SuDown.sourceforge.net)
+//
+//////////////////////////////////////////////////////////////////////////////
+BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
+{
+  //Application
+  TCHAR app[4096]={0};
+  TCHAR args[4096]={0};
+  _tcscpy(args,CmdLine);
+  //Clean up double spaces or unneeded quotes
+  LPTSTR p=&args[0];
+  while (p && *p)
+  {
+    LPTSTR p1=PathGetArgs(p);
+    if(p1 && *p1)
+      *(p1-1)=0;
+    PathRemoveBlanks(p);
+    PathUnquoteSpaces(p);
+    PathQuoteSpaces(p);
+    _tcscat(app,p);
+    if (p1 && *p1)
+        _tcscat(app,_T(" "));
+    p=p1;
+  }
+  //Save parameters
+  _tcscpy(args,PathGetArgs(app));
+  PathRemoveArgs(app);
+  PathUnquoteSpaces(app);
+  NetworkPathToUNCPath(app);
+  BOOL fExist=PathFileExists(app);
+  //Split path parts
+  TCHAR path[4096];
+  TCHAR file[MAX_PATH+1];
+  TCHAR ext[MAX_PATH+1];
+  TCHAR SysDir[MAX_PATH+1];
+  GetSystemDirectory(SysDir,MAX_PATH);
+  Split(app,path,file,ext);
+  //Explorer(.exe)
+  if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
+  {
+    if (args[0]==0) 
+      wcscpy(args,L"/e,C:");
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app, L"explorer.exe");
+  }else 
+  //Msconfig(.exe) is not in path but found by windows
+  if ((!fExist)&&(!_wcsicmp(app,L"msconfig"))||(!_wcsicmp(app,L"msconfig.exe")))
+  {
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
+    if (!PathFileExists(app))
+      wcscpy(app,L"msconfig");
+    zero(args);
+  }else
+  //Control Panel special folder files:
+  if (((!fExist)
+    &&((!_wcsicmp(app,L"control.exe"))||(!_wcsicmp(app,L"control"))) 
+    && (args[0]==0))
+    ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"control")) && (!_wcsicmp(ext,L".exe"))))
+  {
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app,L"explorer.exe");
+    if (LOBYTE(LOWORD(GetVersion()))<6)
+      //2k/XP: Control Panel is beneath "my computer"!
+      wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+    else
+      //Vista: Control Panel is beneath desktop!
+      wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+  }else if (((!_wcsicmp(app,L"ncpa.cpl")) && (args[0]==0))
+    ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"ncpa")) && (!_wcsicmp(ext,L".cpl"))))
+  {
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app,L"explorer.exe");
+    if (LOBYTE(LOWORD(GetVersion()))<6)
+      //2k/XP: Control Panel is beneath "my computer"!
+      wcscpy(args,L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+    else
+      //Vista: Control Panel is beneath desktop!
+      wcscpy(args,L"::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+  }else 
+  //*.reg files
+  if (!_wcsicmp(ext, L".reg")) 
+  {
+    PathQuoteSpaces(app);
+    wcscpy(args,app);
+    GetSystemWindowsDirectory(app,4096);
+    PathAppend(app, L"regedit.exe");
+  }else
+  //Control Panel files  
+  if (!_wcsicmp(ext, L".cpl")) 
+  {
+    PathQuoteSpaces(app);
+    if (args[0] && app[0])
+      wcscat(app,L",");
+    wcscat(app,args);
+    wcscpy(args,L"shell32.dll,Control_RunDLLAsUser ");
+    wcscat(args,app);
+    GetSystemDirectory(app,4096);
+    PathAppend(app,L"rundll32.exe");
+  }else 
+  //Windows Installer files  
+  if (!_wcsicmp(ext, L".msi")) 
+  {
+    PathQuoteSpaces(app);
+    if (args[0] && app[0])
+    {
+      wcscat(app,L" ");
+      wcscat(app,args);
+      wcscpy(args,app);
+    }else
+    {
+      wcscpy(args,L"/i ");
+      wcscat(args,app);
+    }
+    GetSystemDirectory(app,4096);
+    PathAppend(app,L"msiexec.exe");
+  }else 
+  //Windows Management Console Sanp-In
+  if (!_wcsicmp(ext, L".msc")) 
+  {
+    if (path[0]==0)
+    {
+      GetSystemDirectory(path,4096);
+      PathAppend(path,app);
+      wcscpy(app,path);
+      zero(path);
+    }
+    PathQuoteSpaces(app);
+    if (args[0] && app[0])
+      wcscat(app,L" ");
+    wcscat(app,args);
+    wcscpy(args,app);
+    GetSystemDirectory(app,4096);
+    PathAppend(app,L"mmc.exe");
+  }else
+  //Try to fully qualify the executable:
+  if (!QualifyPath(app,path,file,ext,CurDir))
+  {
+    _tcscpy(app,CmdLine);
+    PathRemoveArgs(app);
+    PathUnquoteSpaces(app);
+    NetworkPathToUNCPath(app);
+    Split(app,path,file,ext);
+  }
+  wcscpy(cmd,app);
+  fExist=PathFileExists(app);
+  PathQuoteSpaces(cmd);
+  if (args[0] && app[0])
+    wcscat(cmd,L" ");
+  wcscat(cmd,args);
+  return fExist;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // 
 // CreateLink, creates a LNK file
 // 
