@@ -26,7 +26,7 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.3 - 2008-04-09:
+SuRun 1.1.0.3 - 2008-04-11:
 ----------------------------
 * NEW: "SuRuns Settings" appears in the control panels category view in
        "Performance and Maintenance"
