@@ -1,6 +1,7 @@
 Done, to be tested:
 ---------------------------
-* Added Edit-Dialog for Hook-Blacklist
+* Added mini Edit-Dialog for Hook-Blacklist
+* SuRun Settings dialog is now resizeable
 
 SuRun 1.1.9.3 - 2008-07-09: (beta)
 ---------------------------
