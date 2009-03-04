@@ -1,6 +1,7 @@
 Done:
 ---------------------
 * Initialize blurred desktop before and close it after calling SwitchDesktop
+* special icon for never run automagically
 
 ToDo for next release:
 ---------------------
@@ -8,9 +9,8 @@ ToDo for next release:
   "Run as..." does not really work: gray option out
   Balloon tips not supported: gray option out
 * TSA: Only for special SuRunners: Selectable in User-Dialog
-* special icon for never run automagically
-* Warn if any Admin account has no password!
 * Apply Button in Setup?
+* Warn if any Admin account has no password!
 
 * BUG report: Kaspersky and "SuRun /Setup"->User settings->Add/Edit App hangs
 * BUG report: RealVNC does not store settings
