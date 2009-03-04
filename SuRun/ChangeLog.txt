@@ -3,6 +3,7 @@ Done, to be tested:
 
 SuRun 1.1.9.8 - 2008-07-17: (beta)
 ---------------------------
+* Cosmetical changes of Settings page 3
 * Removed "Desktop directory not present" message when opening/saving files
 * Removed option "Do not use 'SuRunners' group"
 * Export/Import is split: 
