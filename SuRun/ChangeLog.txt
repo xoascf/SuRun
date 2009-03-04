@@ -23,11 +23,13 @@ Done, to be tested:
   Applications by sending WM_CLOSE to the top level widows of a process, 
   giving the process 5 seconds time to close and then terminating the process.
 * Tray Icon uses a separate Thread
+* SuRun uses LSALogonUser instead of CreateProcessWithLogonW. Processes started
+  by SuRun will be terminated by a WinLogon Notification handler in 
+  SuRunExt.dll when the user logs off.
 
 ToDo
 ---------------------
-* LSALogonUser, Thread Pool, "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
-* Ask to reboot on Win2k3-- after install
+* "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION
 * Switchable Easy/Expert Settings
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
