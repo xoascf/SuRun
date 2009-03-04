@@ -1,20 +1,16 @@
 Done, to be tested:
 ---------------------------
 
-* SuRuns Tray menu now closes when clicking outside
-
-SuRun 1.1.9.8 - 2008-07-17: (beta)
+SuRun 1.1.9.9 - 2008-07-17: (beta)
 ---------------------------
-* Cosmetical changes of Settings page 3
-* Removed "Desktop directory not present" message when opening/saving files
-* Removed option "Do not use 'SuRunners' group"
-* Export/Import is split: 
-  -On page 1 you can Import/Export all SuRun settings and SuRunners users
-  -On page 2 you can Import/Export the current users WhiteList and Settings
+* Cosmetical changes in Settings Dialog Pages 1 and 2
+* Removed Help-Button from SuRun Settings Page 2
+* FIX: When "Show SuRun settings for experienced users" was disabled, SuRun 
+  did always Set recommended defaults on Setup pages 3 and 4
+* FIX: SuRuns Tray menu now closes when clicking outside
 
 ToDo
 ---------------------
-* Export/Import SuRun settings
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
@@ -37,6 +33,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.8 - 2008-07-17: (beta)
+---------------------------
+* Cosmetical changes of Settings page 3
+* Removed "Desktop directory not present" message when opening/saving files
+* Removed option "Do not use 'SuRunners' group"
+* Export/Import is split: 
+  -On page 1 you can Import/Export all SuRun settings and SuRunners users
+  -On page 2 you can Import/Export the current users WhiteList and Settings
 
 SuRun 1.1.9.7b1 - 2008-07-16: (beta)
 ---------------------------
