@@ -7,6 +7,9 @@ ToDo for next release:
 * Setup->User settings->Add/Edit App:
   Separate Dialog with Path and Flags, File Dialog through "..." Button.
 * replace Shells "RunAs..."
+  find (HLCR\*\Shell\RunAs\Command)
+  replace (HLCR\*\Shell\SuRunAs\Command) Default = SuRun /RUNAS %Default%
+           HLCR\*\Shell\SuRunAs Default = "Ausführen als..."|"Run as..."
 ---
 * Polish resources
 
