@@ -20,6 +20,7 @@
 #include <stdarg.h>
 
 #include <lmerr.h>
+#include <strsafe.h>
 
 void GetErrorName(int ErrorCode,LPTSTR s)
 {
@@ -35,7 +36,7 @@ void GetErrorName(int ErrorCode,LPTSTR s)
   FormatMessage(dwFormatFlags,hModule,ErrorCode,MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &MessageBuffer,0,NULL);
   if(hModule != NULL)
     FreeLibrary(hModule);
-  _stprintf(s,_T("%d(0x%08X): %s"),ErrorCode,ErrorCode,MessageBuffer);
+  StringCchPrintf(s,4096,_T("%d(0x%08X): %s"),ErrorCode,ErrorCode,MessageBuffer);
   LocalFree(MessageBuffer);
 }
 
@@ -57,7 +58,7 @@ void TRACEx(LPCTSTR s,...)
   int len=0;
   va_list va;
   va_start(va,s);
-  if (_vstprintf(&S[len],s,va)>=1024)
+  if (StringCchVPrintf(&S[len],4096-len,s,va)>=1024)
     DebugBreak();
   va_end(va);
   OutputDebugString(S);
@@ -69,7 +70,7 @@ void TRACExA(LPCSTR s,...)
   int len=0;
   va_list va;
   va_start(va,s);
-  if (vsprintf(&S[len],s,va)>=1024)
+  if (StringCchVPrintfA(&S[len],1024-len,s,va)>=1024)
     DebugBreak();
   va_end(va);
   OutputDebugStringA(S);
