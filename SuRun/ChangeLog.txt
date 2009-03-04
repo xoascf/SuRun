@@ -26,6 +26,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.1.0.4 - 2008-04-11:
+----------------------------
+* FIX: (!!!) The "[Meaning: Explorer My Computer\Control Panel]" display
+       screwed up the command line causing SuRun to not work in many cases!
+
 SuRun 1.1.0.3 - 2008-04-11:
 ----------------------------
 * NEW: "SuRuns Settings" appears in the control panels category view in
