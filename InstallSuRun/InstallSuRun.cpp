@@ -184,6 +184,7 @@ void RunTmp(LPSTR cmd,LPCTSTR args=0)
   if (CreateProcess(NULL,tmp,0,0,FALSE,NORMAL_PRIORITY_CLASS,0,0,&si,&pi))
   {
     CloseHandle(pi.hThread);
+    WaitForSingleObject(pi.hProcess,INFINITE);
     CloseHandle(pi.hProcess);
   }else
   {
