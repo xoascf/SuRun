@@ -1,16 +1,7 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.5 - 2008-07-15: (beta)
----------------------------
-* SuRun Settings Dialog has four tabs. The last two can be hidden.
-* Implemented Explorer tricks so that you can start Explorer after an elevated 
-  Explorer runs. SuRun also does not set permanently the "SeparateProcess" 
-  registry entry. In Windows Vista SuRun uses Explorers command line switch 
-  "/SEPARATE" to start elevated processes.
-* To avoid AutoRun startup delays SuRuns service is now loaded in the 
-  "PlugPlay" service group, before the network is started.
-* Tray Message Windows placement has been improved.
+* Import/Export settings
 
 ToDo
 ---------------------
@@ -18,21 +9,6 @@ ToDo
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * "Show Warning for Admins with empty passwords" does not work with predefined 
   Admin on XP Home
-* "Add Standard App" button to add common Windows Apps to the AutoMagic list 
-  Network Settings
-    %WinDir%\explorer.exe *::{7007ACC7-3202-11D1-AAD2-00805FC1270E}
-  Computer Management
-    %WinDir%\system32\mmc.exe *%WinDir%\compmgmt.msc*
-  GPEdit.msc
-    %WinDir%\mmc.exe *%WinDir%\system32\gpedit.msc*
-  SecPol.msc
-    %WinDir%\mmc.exe *%WinDir%\system32\secpol.msc*
-  Sysdm.cpl
-    %WinDir%\rundll32.exe *shell32.dll,Control_RunDLL*SYSDM.CPL*
-  Safely Remove Hardware
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*hotplug.dll*
-  Add/Remove Programs
-    %WinDir%\system32\rundll32.exe *shell32.dll,Control_RunDLL*appwiz.cpl*
 
 To be done in future:
 ---------------------
@@ -52,6 +28,17 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.5 - 2008-07-15: (beta)
+---------------------------
+* SuRun Settings Dialog has now four tabs. The last two contain settings for 
+  experienced users and can be hidden.
+* Implemented Explorer tricks so that you can start Explorer after an elevated 
+  Explorer runs. In Windows Vista SuRun uses Explorers command line switch 
+  "/SEPARATE" to start elevated processes.
+* To avoid AutoRun startup delays SuRuns service is now loaded in the 
+  "PlugPlay" service group, before the network is started.
+* Tray Message Windows placement has been improved.
 
 SuRun 1.1.9.4 - 2008-07-12: (beta)
 ---------------------------
