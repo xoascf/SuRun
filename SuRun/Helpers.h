@@ -29,7 +29,7 @@ void AllowAccess(HANDLE hObject);
 BOOL NetworkPathToUNCPath(LPTSTR path);
 
 //Link Creation
-BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname);
+BOOL CreateLink(LPCTSTR fname,LPCTSTR lnk_fname,int iIcon);
 
 //DeleteDirectory ... all files and SubDirs
 bool DeleteDirectory(LPCTSTR DIR);
