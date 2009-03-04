@@ -170,15 +170,18 @@ BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
 
 LPWSTR AToW(LPCSTR aStr)
 {
-  if(!aStr)
+  //GetProcAddress()...HiWord==0 means use String as ResourceID
+  if(HIWORD(aStr)==0)
+    return 0;
+  if(*aStr==0)
     return 0;
   DWORD nChars=strlen(aStr);
   if (!nChars)
     return 0;
-  LPWSTR lpw=(LPWSTR)calloc(sizeof(WCHAR)*nChars,1);
+  LPWSTR lpw=(LPWSTR)calloc(sizeof(WCHAR)*(nChars+1),1);
   if(!lpw)
     return 0;
-  WideCharToMultiByte(CP_ACP,0,lpw,-1,(char*)aStr,nChars,NULL,NULL);
+  MultiByteToWideChar(CP_ACP,0,aStr,-1,lpw,nChars+1);
   return lpw;
 }
 
