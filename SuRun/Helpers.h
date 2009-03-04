@@ -18,6 +18,9 @@
 #define zero(x) memset(&x,0,sizeof(x))
 
 //  Registry Helper
+#define HKCR HKEY_CLASSES_ROOT
+#define HKLM HKEY_LOCAL_MACHINE
+
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD nBytes);
 BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes);
 
@@ -32,6 +35,14 @@ BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax);
 
 BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax);
 BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax);
+
+#define EmptyPWAllowed (GetRegInt(HKLM,\
+                          _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
+                          _T("limitblankpassworduse"),1)==0)
+
+#define AllowEmptyPW(b) SetRegInt(HKLM,\
+                          _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
+                          _T("limitblankpassworduse"),(b)==0)
 
 // Privilege stuff
 BOOL EnablePrivilege(HANDLE hToken,LPCTSTR name);
