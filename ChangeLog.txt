@@ -1,14 +1,6 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.11 - 2008-07-22: (rc1)
----------------------------
-* SuRun does not import, export nor set defaults for the Windows Settings
-* When uninstalling SuRun removes the Windows settings for "ElevateNonAdmins",
-  "NoAutoRebootWithLoggedOnUsers" and "'Administrators' instead of 'Object 
-  creator' as default owner for objects created by administrators." ONLY if
-  they have been set by SuRun.
-
 ToDo
 ---------------------
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
@@ -33,6 +25,14 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.11 - 2008-07-22: (rc1)
+---------------------------
+* SuRun does not import, export nor set defaults for the Windows Settings
+* When uninstalling SuRun removes the Windows settings for "ElevateNonAdmins",
+  "NoAutoRebootWithLoggedOnUsers" and "'Administrators' instead of 'Object 
+  creator' as default owner for objects created by administrators." ONLY if
+  they have been set by SuRun.
 
 SuRun 1.1.9.10 - 2008-07-18: (beta)
 ---------------------------
