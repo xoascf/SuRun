@@ -1,3 +1,5 @@
+*'SuRun Explorer' -> hier C:\WINDOWS\explorer.exe "/e,"C:\System Volume Information"" ?
+
 ToDo for next release:
 ---------------------
 * Polish resources
