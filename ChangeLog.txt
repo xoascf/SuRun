@@ -1,10 +1,15 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.2.0.1 - 2008-08-17:
+SuRun 1.2.0.1 - 2008-08-27:
 ---------------------------
-* InstallSuRun.exe passes command line to surun.exe
-* NEW command line switch /IMPORT <ini>
+* InstallSuRun.exe passes command line to SuRun.exe, so "InstallSuRun /INSTALL" 
+  will silently install SuRun on a system
+* NEW command line switch /RESTORE <SuRunSettings>. You need to be a real 
+  Administrator to restore SuRun settings.
+* Command line switch "/INSTALL" accepts <SuRunSettings> parameter.
+  To silently deploy SuRun run "InstallSuRun /INSTALL <SuRunSettings>"
+  You need to be a real Administrator to deploy SuRun.
 * RunOnce apps (Outlook Express\Setup50.exe) did block SuRuns Desktop
 * FIX: If SuRun initially cannot switch to the users desktop, it instantly 
   presses CANCEL.
