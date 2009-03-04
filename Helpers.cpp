@@ -95,6 +95,20 @@ BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value)
   return SetRegAny(HK,SubKey,ValName,REG_DWORD,(BYTE*)&Value,sizeof(DWORD));
 }
 
+__int64 GetRegInt64(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,__int64 Default)
+{
+  __int64 RetVal=0;
+  DWORD n=sizeof(RetVal);
+  if (GetRegAny(HK,SubKey,ValName,REG_BINARY,(BYTE*)&RetVal,&n))
+    return RetVal;
+  return Default;
+}
+
+BOOL SetRegInt64(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,__int64 Value)
+{
+  return SetRegAny(HK,SubKey,ValName,REG_BINARY,(BYTE*)&Value,sizeof(__int64));
+}
+
 BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax)
 {
   if (GetRegAny(HK,SubKey,Val,REG_SZ,(BYTE*)Str,&ccMax))
