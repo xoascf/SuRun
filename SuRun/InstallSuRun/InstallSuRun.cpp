@@ -54,6 +54,27 @@ LPCTSTR GetLastErrorNameStatic()
   return GetErrorNameStatic(GetLastError());
 }
 
+BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes)
+{
+  HKEY Key;
+  BOOL bKey=FALSE;
+  bKey=RegOpenKeyEx(HK,SubKey,0,KEY_WRITE,&Key)==ERROR_SUCCESS;
+  if (!bKey)
+    bKey=RegCreateKeyEx(HK,SubKey,0,0,0,KEY_WRITE,0,&Key,0)==ERROR_SUCCESS;
+  if (bKey)
+  {
+    LONG l=RegSetValueEx(Key,ValName,0,Type,Data,nBytes);
+    RegCloseKey(Key);
+    return l==ERROR_SUCCESS;
+  }
+  return FALSE;
+}
+
+BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
+{
+  return SetRegAny(HK,SubKey,ValName,REG_SZ,(BYTE*)Value,(DWORD)strlen(Value)*sizeof(TCHAR));
+}
+
 void AllowAccess(LPTSTR FileName)
 {
   DWORD dwRes;
@@ -164,14 +185,16 @@ void RunTmp(LPSTR cmd)
   }
 }
 
-void DelTmpFile(LPCSTR File)
+void DelTmpFiles()
 {
   CHAR tmp[4096];
+  CHAR s[4096];
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
   PathAppend(tmp,"SuRunIst");
-  PathAppend(tmp,File);
-  MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
+  PathUnquoteSpaces(tmp);
+  sprintf(s,"command.com /c rd /s /q %s",tmp);
+  SetRegStr(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce","Delete SuRunInst",s);
 }
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
@@ -184,11 +207,7 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE64_FILE","SuRunExt32.dll"))
     {
       RunTmp("SuRun.exe /USERINST");
-      DelTmpFile(0);
-      DelTmpFile("SuRun32.bin");
-      DelTmpFile("SuRunExt32.dll");
-      DelTmpFile("SuRun.exe");
-      DelTmpFile("SuRunExt.dll");
+      DelTmpFiles();
     }
   }else //Win32
   {
@@ -196,9 +215,7 @@ int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
       && ResToTmp("EXE_FILE","SuRunExt.dll"))
     {
       RunTmp("SuRun.exe /USERINST");
-      DelTmpFile(0);
-      DelTmpFile("SuRun.exe");
-      DelTmpFile("SuRunExt.dll");
+      DelTmpFiles();
     }
   }
 	return 0;
