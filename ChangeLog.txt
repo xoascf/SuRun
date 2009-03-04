@@ -1,6 +1,5 @@
 Done, to be tested:
 ---------------------------
-* WatchDog process terminates itself if SuRuns Desktop is no longer running
 
 ToDo
 ---------------------
@@ -28,6 +27,11 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.6 beta 8 - 2008-12-16:
+----------------------------------
+* WatchDog process terminates itself if SuRuns Desktop is no longer running
+* Enhanced Debug-Out for "MyCPAU"
 
 SuRun 1.2.0.6 beta 7 - 2008-12-11:
 ----------------------------------
