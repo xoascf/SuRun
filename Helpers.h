@@ -4,6 +4,9 @@
 #define zero(x) memset(&x,0,sizeof(x))
 
 //  Registry Helper
+BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD nBytes);
+BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes);
+
 BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey);
 BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName);
 
