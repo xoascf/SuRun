@@ -1,6 +1,8 @@
 Done, to be tested:
 ---------------------------
 
+* SuRuns Tray menu now closes when clicking outside
+
 SuRun 1.1.9.8 - 2008-07-17: (beta)
 ---------------------------
 * Cosmetical changes of Settings page 3
