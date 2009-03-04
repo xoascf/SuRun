@@ -8,6 +8,7 @@ ToDo
 
 To be done in future:
 ---------------------
+* Create a "Default" SuRunner for users that are not in "SuRunners"
 * Use Radio-Buttons for (normal/elevated) Auto-Magic
 * Hide/Show all context menu entries consistently
 * make all context menu entries dynamically with ShellExt 
@@ -25,8 +26,9 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.1 - 2008-08-27:
+SuRun 1.2.0.1 - 2008-09-05:
 ---------------------------
+* SuRun also shows "Start as Administrator" on the recycle bin folder
 * InstallSuRun.exe passes command line to SuRun.exe, so "InstallSuRun /INSTALL" 
   will silently install SuRun on a system
 * NEW command line switch /RESTORE <SuRunSettings>. 
