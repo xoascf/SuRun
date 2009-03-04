@@ -1,5 +1,6 @@
 To be done in future:
 ---------------------
+* Switchable Easy/Expert Settings
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
 * use MD5-Hash for "Always Yes" programs
@@ -26,9 +27,9 @@ SuRun 1.1.0.6 - 2008-04-29:
   two reasons: 
   1. The Settings dialog for normal users sometimes came up behind the blurred 
      background window. 
-  2. The settings dialog was not closed when an Admin did log off.
+  2. The settings dialog was not closed when an Administrator did log off.
 * IAT-Hook is again off by default because of incompatibilities with self 
-  checking software. (E.G. Access and Outlook 2003)
+  checking software. (E.G. Access 2003 and Outlook 2003)
 * Removed Blurred Desktop flicker
 
 SuRun 1.1.0.5 - 2008-04-23:
