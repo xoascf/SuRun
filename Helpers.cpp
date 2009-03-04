@@ -78,15 +78,9 @@ BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value)
 
 BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax)
 {
-  HKEY Key;
-  if (!RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
-    return FALSE;
-  ccMax=ccMax*sizeof(TCHAR);
-  DWORD dwType=0;
-  BOOL bRet=(RegQueryValueEx(Key,Val,0,&dwType,(BYTE*)Str,&ccMax)==0)
-          &&((dwType==REG_SZ)||(dwType==REG_EXPAND_SZ));
-  RegCloseKey(Key);
-  return bRet;
+  if (GetRegAny(HK,SubKey,Val,REG_SZ,(BYTE*)Str,ccMax))
+    return true;
+  return GetRegAny(HK,SubKey,Val,REG_EXPAND_SZ,(BYTE*)Str,ccMax);
 }
 
 BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
@@ -363,12 +357,14 @@ bool DeleteDirectory(LPCTSTR DIR)
     {
       _tcscpy(s,DIR);
       PathAppend(s,fd.cFileName);
-      if (PathIsDirectory(s)
-        && _tcscmp(fd.cFileName,_T("."))
-        && _tcscmp(fd.cFileName,_T("..")))
+      if (PathIsDirectory(s))
       {
-        SetFileAttributes(s,FILE_ATTRIBUTE_DIRECTORY);
-        bRet=bRet && DeleteDirectory(s);
+        if ( _tcscmp(fd.cFileName,_T("."))
+          && _tcscmp(fd.cFileName,_T("..")))
+        {
+          SetFileAttributes(s,FILE_ATTRIBUTE_DIRECTORY);
+          bRet=bRet && DeleteDirectory(s);
+        }
       }else
       {
         SetFileAttributes(s,FILE_ATTRIBUTE_NORMAL);
