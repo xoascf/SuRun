@@ -3,6 +3,8 @@ Done, to be tested:
 * Implemented Explorer tricks so that you can start Explorer after an elevated 
   Explorer runs. SuRun also does not set permanently the "SeparateProcess" 
   registry entry.
+* To avoid AutoRun startup delays SuRuns service is now loaded in the 
+  "PlugPlay" service group, before the network is started.
 
 SuRun 1.1.9.4 - 2008-07-12: (beta)
 ---------------------------
