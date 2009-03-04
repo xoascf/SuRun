@@ -1,11 +1,10 @@
 Done, to be tested:
 ---------------------------
-* Store Password in RunAs-Dialog was not moved while Dialog reszing 
+* "Store Password" in RunAs-Dialog was not moved while Dialog reszing 
 * "SuRun /RunAs" did load the wrong user environment
 
 ToDo
 ---------------------
-* SuRun cannot launch apps with Guest account and builtin Admin account
 * List of Programs not to hook
 * "SuRun /SYSMENUHOOK" must send WM_QUERYENDSESSION to elevated processes
 * Move Message Windows with WM_SETTINGCHANGE
