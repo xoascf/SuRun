@@ -1,7 +1,7 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.1.9.10 - 2008-07-17: (beta)
+SuRun 1.1.9.10 - 2008-07-18: (beta)
 ---------------------------
 * When Uninstalling SuRun, the Windows settings for Windows update and "Set 
   'Administrators' instead of 'Object creator' as default owner for objects 
