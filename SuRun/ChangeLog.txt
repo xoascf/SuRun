@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* "Hide SuRun from all non SuRunners" did also hide Setup from Administrators
 
 SuRun 1.1.9.1 - 2008-07-07: (beta)
 ---------------------------
