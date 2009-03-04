@@ -1,9 +1,15 @@
 *Win64 "SuRun /SYSMEUHOOK" did not start SuRun32.bin (Mutex)
 
 
+ToDo
+---------------------
+* "*" at the end of a command means "anything from here matches"
+* Switchable Easy/Expert Settings
+* Configurable "Do not display messages" Option
+* "Require user password for SuRun Setings" Option
+
 To be done in future:
 ---------------------
-* Switchable Easy/Expert Settings
 * make context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
 * use MD5-Hash for "Always Yes" programs
