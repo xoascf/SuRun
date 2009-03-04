@@ -1,13 +1,8 @@
 Done, to be tested:
 ---------------------------
-* SuRun Message Boxes are system modal.
-* SuRun does no Desktop fade in/out, when the user is in a Terminal session
-* BlackList with Long/Shrot file name conversion
-* Blacklist OPENFILENAME without quotes
 
 ToDo
 ---------------------
-* Vista: Set default option to not detect installers
 * Console SuRun support
 * make Safe Desktop CountDown switchable
 * Integrate "Nero Burning Rights" functions
@@ -31,6 +26,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.6 beta 6 - 2008-11-25:
+----------------------------------
+* SuRun Message Boxes are system modal
+* SuRun does no Desktop fade in/out, when the user is in a Terminal session
+* BlackList Match filter does Long/Short file name conversion
+* Blacklist "Add" Button does not set quotes
+* SuRun Confirmation Dialog supports switching to another User
+* On Vista SuRun does to not detect installers per default
 
 SuRun 1.2.0.6 beta 5 - 2008-11-13:
 ----------------------------------
