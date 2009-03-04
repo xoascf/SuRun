@@ -2,6 +2,8 @@ Done, to be tested:
 ---------------------------
 * SuRuns context menu extension now checks if the user right clicks on his or 
   on the common desktop for displaying "control panel as administrator"
+* If IShellexecuteHook did not start a program elevated, the IATHook will not 
+  try to ask the user. The last not executed command is stored in HKCU\Software\SuRun
 
 ToDo
 ---------------------
