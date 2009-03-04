@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* Added Edit-Dialog for Hook-Blacklist
 
 SuRun 1.1.9.3 - 2008-07-09: (beta)
 ---------------------------
