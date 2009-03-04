@@ -1495,3 +1495,23 @@ bool strwldcmp(LPCTSTR s, LPCTSTR pattern)
   }
   return *s==0;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+//Show Window on primary Monitor
+// 
+/////////////////////////////////////////////////////////////////////////////
+void BringToPrimaryMonitor(HWND hWnd)
+{
+  //Only top level windows
+  if (GetWindowLong(hWnd,GWL_STYLE)&WS_CHILD)
+    return;
+  RECT rd={0};
+  SystemParametersInfo(SPI_GETWORKAREA,0,&rd,0);
+  RECT rw={0};
+  GetWindowRect(hWnd,&rw);
+  OffsetRect(&rw,
+    (rd.left+rd.right-rw.right-rw.left)/2,
+    (rd.top+rd.bottom-rw.bottom-rw.top)/2);
+  MoveWindow(hWnd,rw.left,rw.top,rw.right-rw.left,rw.bottom-rw.top,true);
+}
