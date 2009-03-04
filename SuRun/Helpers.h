@@ -63,7 +63,7 @@ int inline SafeMsgBox(HWND w,LPTSTR m,LPTSTR c,DWORD f)
 {
   if(GetModuleHandle(TEXT("Shell32.dll"))==0)
     LoadLibrary(TEXT("Shell32.dll"));
-  return MessageBox(w,m,c,f);
+  return MessageBox(w,m,c,f|MB_SYSTEMMODAL);
 };
 
 // Privilege stuff
