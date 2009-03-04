@@ -7,7 +7,6 @@ SuRun 1.2.0.1 - 2008-08-12:
 * FIX: All User/Group functions now use impersonation
 * FIX: The Tray Icon caused ~400 context switches per second and thus 2% CPU 
     Load on "slow" machines
-* FIX: File Open/Save Dialogs did not show all extensions in SuRun Setup.
 
 ToDo
 ---------------------
