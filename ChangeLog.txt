@@ -1,5 +1,9 @@
 Done, to be tested:
 ---------------------------
+* SuRun automatically times out after 15 seconds if a client app opens the 
+  service pipe without sending data (possible DOS attack)
+* 
+
 ToDo
 ---------------------
 * Add a flag to the program list to not ask for a passwort for certain programs
