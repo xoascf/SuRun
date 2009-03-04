@@ -1,18 +1,8 @@
 Done, to be tested:
 ---------------------------
-* Added mini Edit-Dialog for Hook-Blacklist
 * SuRun Settings dialog is now resizeable
 * Tray Message Windows move when Display resolution changes
 * FIX: Tray Message Windows did not close after 20s
-
-SuRun 1.1.9.3 - 2008-07-09: (beta)
----------------------------
-* Blacklist for Programs not to hook
-* Setup-Page 3 revised
-* FIX: "Store Password" in RunAs-Dialog was not moved while Dialog reszing 
-* FIX: "SuRun /RunAs" did load the wrong user environment
-* FIX: Another try to display SuRun in the System Menu on the first click
-* FIX: The "Warning for Admins with empty passwords" did not alway show up
 
 ToDo
 ---------------------
@@ -53,6 +43,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.9.3 - 2008-07-09: (beta)
+---------------------------
+* Blacklist for Programs not to hook
+* Setup-Page 3 revised
+* FIX: "Store Password" in RunAs-Dialog was not moved while Dialog reszing 
+* FIX: "SuRun /RunAs" did load the wrong user environment
+* FIX: Another try to display SuRun in the System Menu on the first click
+* FIX: The "Warning for Admins with empty passwords" did not alway show up
 
 SuRun 1.1.9.2 - 2008-07-08: (beta)
 ---------------------------
