@@ -115,6 +115,18 @@ BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
   return false;
 }
 
+BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
+{
+  HKEY Key;
+  if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
+  {
+    BOOL bRet=(RegEnumValue(Key,Index,Str,&ccMax,0,0,0,0)==ERROR_SUCCESS);
+    RegCloseKey(Key);
+    return bRet;
+  }
+  return false;
+}
+
 BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey)
 {
   HKEY hEnumKey;
