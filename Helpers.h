@@ -48,6 +48,13 @@ BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax);
                           _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                           _T("limitblankpassworduse"),(b)==0)
 
+int inline SafeMsgBox(HWND w,LPTSTR m,LPTSTR c,DWORD f) 
+{
+  if(GetModuleHandle(TEXT("Shell32.dll"))==0)
+    LoadLibrary(TEXT("Shell32.dll"));
+  return MessageBox(w,m,c,f);
+};
+
 // String converter
 LPWSTR AToW(LPCSTR aStr);
 
