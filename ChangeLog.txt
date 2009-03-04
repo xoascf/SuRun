@@ -1,6 +1,6 @@
 Done:
 ---------------------
-* initialize/close blurred desktop before/after calling switchdesktop
+* Initialize blurred desktop before and close it after calling SwitchDesktop
 
 ToDo for next release:
 ---------------------
