@@ -92,6 +92,15 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
 //Shell stuff
 HANDLE GetShellProcessToken();
 
+// GetLogonSid
+PSID GetLogonSid(HANDLE hToken);
+
+//  GetSessionUserToken
+HANDLE GetSessionUserToken(DWORD SessID);
+
+//  GetSessionLogonSID
+PSID GetSessionLogonSID(DWORD SessionID);
+
 // GetVersionString
 LPCTSTR GetVersionString();
 
