@@ -24,6 +24,7 @@
 #include <Tlhelp32.h>
 
 #include "Helpers.h"
+#include "lsa_laar.h"
 #include "UserGroups.h"
 #include "DBGTRace.h"
 
@@ -1181,6 +1182,45 @@ PSID GetLogonSid(HANDLE hToken)
   }
   free(ptgGroups);
 	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// UserIsInSuRunnersOrAdmins
+// 
+//////////////////////////////////////////////////////////////////////////////
+
+DWORD UserIsInSuRunnersOrAdmins()
+{
+  HANDLE hToken=NULL;
+  if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken))
+    return 0;
+	PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
+  CloseHandle(hToken);
+  if (!ptg)
+    return 0;
+  SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
+  PSID AdminSID = NULL;
+  // Initialize Admin SID
+  if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
+    DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+    return free(ptg),0; 
+  PSID SuRunnersSID=GetAccountSID(SURUNNERSGROUP);
+  DWORD dwRet=0;
+  for(UINT i=0;i<ptg->GroupCount;i++)
+    if((ptg->Groups[i].Attributes & SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY)
+      &&(IsValidSid(ptg->Groups[i].Sid)))
+    {
+      if(EqualSid(ptg->Groups[i].Sid,AdminSID))
+        dwRet|=IS_IN_ADMINS;
+      else if(EqualSid(ptg->Groups[i].Sid,SuRunnersSID))
+        dwRet|=IS_IN_SURUNNERS;
+    }
+
+  FreeSid(AdminSID);
+  free(SuRunnersSID);
+  free(ptg);
+	return dwRet;
 }
 
 //////////////////////////////////////////////////////////////////////////////
