@@ -531,6 +531,7 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
   if (path[1]==':')
   {
     static TCHAR d[4096];
+    zero(d);
     GetCurrentDirectory(countof(d),d);
     //if path=="d:" -> "cd d:"
     if (!SetCurrentDirectory(path))
@@ -566,8 +567,10 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
 BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
 {
   //Application
-  static TCHAR app[4096]={0};
+  static TCHAR app[4096];
+  zero(app);
   static TCHAR args[4096]={0};
+  zero(args);
   _tcscpy(args,CmdLine);
   PathRemoveBlanks(args);
   //Clean up double spaces or unneeded quotes
@@ -596,6 +599,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   static TCHAR file[4096+1];
   static TCHAR ext[4096+1];
   static TCHAR SysDir[4096+1];
+  zero(path);
+  zero(file);
+  zero(ext);
+  zero(SysDir);
   GetSystemDirectory(SysDir,4096);
   Split(app,path,file,ext);
   //Explorer(.exe)
