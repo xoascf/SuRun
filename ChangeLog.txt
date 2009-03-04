@@ -2,6 +2,7 @@ Done, to be tested:
 ---------------------------
 * RunAs-Logon-Dialog does not always check if Password is valid
 * Service uses the the user's keyboard layout
+* LogonUser uses impersonation
 
 ToDo
 ---------------------
