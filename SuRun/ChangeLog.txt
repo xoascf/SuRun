@@ -2,14 +2,15 @@ Done:
 ---------------------
 * Initialize blurred desktop before and close it after calling SwitchDesktop
 * special icon for never run automagically
+* Apply Button in Setup
+* TSA only for SuRunners
+* TSA: Only for special SuRunners: (NoGo!):HKLM\Security\Username!
 
 ToDo for next release:
 ---------------------
 * Win2k: TSA-Icons->256 colors; 
   "Run as..." does not really work: gray option out
   Balloon tips not supported: gray option out
-* TSA: Only for special SuRunners: Selectable in User-Dialog
-* Apply Button in Setup?
 
 * Warn if any Admin account has no password!
 ---
