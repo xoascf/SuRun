@@ -459,8 +459,6 @@ BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account)
 Cleanup:
   if(pSD != NULL) 
     LocalFree((HLOCAL) pSD); 
-  if(pDACL != NULL) 
-    LocalFree((HLOCAL) pDACL); 
   return (am&KEY_WRITE)==KEY_WRITE;
 }
 
