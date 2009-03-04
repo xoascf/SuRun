@@ -39,14 +39,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD nBytes)
+BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
   if (RegOpenKeyEx(HK,SubKey,0,KEY_READ,&Key)==ERROR_SUCCESS)
   {
     DWORD dwType=Type;
-    DWORD l=nBytes;
-    BOOL bRet=(RegQueryValueEx(Key,ValName,NULL,&dwType,RetVal,&l)==ERROR_SUCCESS)
+    BOOL bRet=(RegQueryValueEx(Key,ValName,NULL,&dwType,RetVal,nBytes)==ERROR_SUCCESS)
             &&(dwType==Type);
       RegCloseKey(Key);
     return bRet;
@@ -85,7 +84,8 @@ BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName)
 DWORD GetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Default)
 {
   DWORD RetVal=0;
-  if (GetRegAny(HK,SubKey,ValName,REG_DWORD,(BYTE*)&RetVal,sizeof(RetVal)))
+  DWORD n=sizeof(RetVal);
+  if (GetRegAny(HK,SubKey,ValName,REG_DWORD,(BYTE*)&RetVal,&n))
     return RetVal;
   return Default;
 }
@@ -97,9 +97,9 @@ BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value)
 
 BOOL GetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR Val,LPTSTR Str,DWORD ccMax)
 {
-  if (GetRegAny(HK,SubKey,Val,REG_SZ,(BYTE*)Str,ccMax))
+  if (GetRegAny(HK,SubKey,Val,REG_SZ,(BYTE*)Str,&ccMax))
     return true;
-  return GetRegAny(HK,SubKey,Val,REG_EXPAND_SZ,(BYTE*)Str,ccMax);
+  return GetRegAny(HK,SubKey,Val,REG_EXPAND_SZ,(BYTE*)Str,&ccMax);
 }
 
 BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
