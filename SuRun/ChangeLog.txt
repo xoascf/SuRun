@@ -1,5 +1,16 @@
 ToDo for next release:
 ---------------------
+---
+* Kaspersky and "SuRun /Setup"->User settings->Add/Edit App hangs
+* RealVNC
+---
+* Setup->User settings->Add/Edit App:
+  Separate Dialog with Path and Flags, File Dialog through "..." Button.
+* Setup->User settings: Stop signs in first two columns
+* replace Shells "RunAs..."
+---
+* TrayShowAdmin->"SuRun /Sysmenuhook"(???)
+---
 * Polish resources
 
 To be done in future:
