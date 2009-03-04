@@ -149,7 +149,7 @@ bool ResToTmp(LPCTSTR Section,LPCTSTR ResName)
   CHAR tmp[4096];
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
-  PathAppend(tmp,"SuRunIst");
+  PathAppend(tmp,"SuRunInst");
   CreateDirectory(tmp,0);
   AllowAccess(tmp);
   PathAppend(tmp,ResName);
@@ -164,14 +164,20 @@ bool ResToTmp(LPCTSTR Section,LPCTSTR ResName)
   return res;
 };
 
-void RunTmp(LPSTR cmd)
+void RunTmp(LPSTR cmd,LPCTSTR args=0)
 {
   CHAR tmp[4096];
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
-  PathAppend(tmp,"SuRunIst");
+  PathAppend(tmp,"SuRunInst");
   SetCurrentDirectory(tmp);
   PathAppend(tmp,cmd);
+  if (args)
+  {
+    PathQuoteSpaces(tmp);
+    strcat(tmp," ");
+    strcat(tmp,args);
+  }
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb	= sizeof(si);
@@ -191,7 +197,7 @@ void DelTmpFiles()
   CHAR s[4096];
   GetTempPath(MAX_PATH,tmp);
   PathRemoveBackslash(tmp);
-  PathAppend(tmp,"SuRunIst");
+  PathAppend(tmp,"SuRunInst");
   PathUnquoteSpaces(tmp);
   sprintf(s,"cmd.exe /c rd /s /q %s",tmp);
   SetRegStr(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce","Delete SuRunInst",s);
@@ -199,24 +205,18 @@ void DelTmpFiles()
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
 {
+  if ((!ResToTmp("EXE_FILE","SuRun.exe"))
+    ||(!ResToTmp("EXE_FILE","SuRunExt.dll")))
+    return -1;
   if(IsWow64()) //Win64
-  {
-    if ( ResToTmp("EXE64_FILE","SuRun.exe")
-      && ResToTmp("EXE64_FILE","SuRunExt.dll")
-      && ResToTmp("EXE64_FILE","SuRun32.bin")
-      && ResToTmp("EXE64_FILE","SuRunExt32.dll"))
-    {
-      RunTmp("SuRun.exe /USERINST");
-      DelTmpFiles();
-    }
-  }else //Win32
-  {
-    if ( ResToTmp("EXE_FILE","SuRun.exe")
-      && ResToTmp("EXE_FILE","SuRunExt.dll"))
-    {
-      RunTmp("SuRun.exe /USERINST");
-      DelTmpFiles();
-    }
-  }
+    if ((!ResToTmp("EXE64_FILE","SuRun32.bin"))
+      ||(!ResToTmp("EXE64_FILE","SuRunExt32.dll")))
+      return -1;
+  LPTSTR args=PathGetArgs(GetCommandLine());
+  if (args)
+    RunTmp("SuRun.exe",args);
+  else
+    RunTmp("SuRun.exe /USERINST");
+  DelTmpFiles();
 	return 0;
 }
