@@ -336,13 +336,13 @@ void AllowAccess(LPTSTR FileName)
   dwRes = GetNamedSecurityInfo(FileName, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,  NULL, NULL, &pOldDACL, NULL, &pSD);
   if (ERROR_SUCCESS != dwRes) 
   { 
-    DBGTrace1( "GetNamedSecurityInfo Error %s\n", GetErrorName(dwRes));
+    DBGTrace1( "GetNamedSecurityInfo Error %s\n", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Create a well-known SID for the Everyone group.
   if(! AllocateAndInitializeSid( &SIDAuthWorld, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0, &pEveryoneSID) ) 
   {
-    DBGTrace1( "AllocateAndInitializeSid Error %s\n", GetLastErrorName() );
+    DBGTrace1( "AllocateAndInitializeSid Error %s\n", GetLastErrorNameStatic());
     return;
   }
   // Initialize an EXPLICIT_ACCESS structure for an ACE.
@@ -359,14 +359,14 @@ void AllowAccess(LPTSTR FileName)
   dwRes = SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
   if (ERROR_SUCCESS != dwRes)  
   {
-    DBGTrace1( "SetEntriesInAcl Error %s\n", GetErrorName(dwRes));
+    DBGTrace1( "SetEntriesInAcl Error %s\n", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
   // Attach the new ACL as the object's DACL.
   dwRes = SetNamedSecurityInfo(FileName, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,  NULL, NULL, pNewDACL, NULL);
   if (ERROR_SUCCESS != dwRes)  
   {
-    DBGTrace1( "SetNamedSecurityInfo Error %s\n", GetErrorName(dwRes));
+    DBGTrace1( "SetNamedSecurityInfo Error %s\n", GetErrorNameStatic(dwRes));
     goto Cleanup; 
   }  
 Cleanup:
