@@ -98,6 +98,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 #endif _DEBUG
   if(HandleServiceStuff())
     return 0;
+#ifdef DoDBGTrace
+  *((DWORD*)&g_RunData.CurDir[4090])=timeGetTime();
+#endif DoDBGTrace
   if (g_RunData.CliThreadId==GetCurrentThreadId())
   {
     //Started from services:
