@@ -393,7 +393,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           _stprintf(&c1[_tcslen(c1)],L"\r\n\t%s\t %d ms",
             g_RunTimeNames[i],g_RunTimes[i]-g_RunTimes[0]);
         }
-        SetDlgItemText(hwnd,IDC_DLGQUESTION,CBigResStr(L"%s\r\n%s\r\n\tGUI visible\t %d\r\n}",
+        SetDlgItemText(hwnd,IDC_DLGQUESTION,CBigResStr(L"%s\r\n%s\r\n\tGUI visible\t\t %d ms\r\n}",
           p->Msg,c1,timeGetTime()-g_RunTimes[0]));
       }
 #endif DoDBGTrace
