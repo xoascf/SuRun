@@ -79,6 +79,12 @@
 
 #endif _DEBUG
 
+#ifdef DoDBGTrace
+DWORD g_RunTimes[16]={0};
+LPCTSTR g_RunTimeNames[16]={0};
+DWORD g_nTimes=0;
+#define AddTime(s) { g_RunTimes[g_nTimes]=timeGetTime(); g_RunTimeNames[g_nTimes++]=_TEXT(s); }
+#endif DoDBGTrace
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Globals
@@ -729,7 +735,8 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
   zero(c1);
   _tcscpy(c1,cmd);
   bool bOk=false;
-  for (int i=0;i<countof(shn);i++)
+  int i=0;
+  for (i=0;i<countof(shn);i++)
   {
     LPTSTR c=_tcsstr(c1,shn[i].clsid);
     if(c)
@@ -756,6 +763,9 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
 //////////////////////////////////////////////////////////////////////////////
 DWORD PrepareSuRun()
 {
+#ifdef DoDBGTrace
+  AddTime("PrepareSuRun start")
+#endif DoDBGTrace
   zero(g_RunPwd);
   RegDelVal(HKLM,PASSWKEY,g_RunData.UserName);//Delete Password, keep time
   if((!g_CliIsInSuRunners) && GetNoConvUser)
@@ -781,7 +791,13 @@ DWORD PrepareSuRun()
   if(g_RunData.bShExNoSafeDesk)
     return RETVAL_SX_NOTINLIST;
   //Get real groups for the user: (Not just the groups from the Client Token)
+#ifdef DoDBGTrace
+  AddTime("IsInSuRunnersOrAdmins start")
+#endif DoDBGTrace
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
+#ifdef DoDBGTrace
+  AddTime("IsInSuRunnersOrAdmins done")
+#endif DoDBGTrace
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
   {
     DBGTrace1("PrepareSuRun EXIT: SuRun is hidden for User %s",g_RunData.UserName);
@@ -794,6 +810,9 @@ DWORD PrepareSuRun()
     DBGTrace("PrepareSuRun EXIT: CreateSafeDesktop failed");
     return RETVAL_NODESKTOP;
   }
+#ifdef DoDBGTrace
+  AddTime("CreateSafeDesktop done")
+#endif DoDBGTrace
   __try
   {
     //safe desktop created...
@@ -1185,6 +1204,10 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 //////////////////////////////////////////////////////////////////////////////
 void SuRun(DWORD ProcessID)
 {
+#ifdef DoDBGTrace
+  g_nTimes++;
+  AddTime("Client to service comm.")
+#endif DoDBGTrace
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
   {
@@ -1200,6 +1223,10 @@ void SuRun(DWORD ProcessID)
     DBGTrace("FATAL: SuRun() Client Process check failed; EXIT!");
     return;
   }
+#ifdef DoDBGTrace
+  g_RunTimes[0]=*((DWORD*)&g_RunData.CurDir[4090]);
+  AddTime("CheckClientProcess done")
+#endif DoDBGTrace
   if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
   {
     DWORD t=timeGetTime();
