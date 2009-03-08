@@ -23,6 +23,7 @@
 #pragma once
 #include <WINDOWS.h>
 #include <TCHAR.h>
+#include "setup.H"
 #include "DBGTrace.H"
 
 //Simplified 3x3 Gausian blur
@@ -55,6 +56,36 @@ inline void Blur(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
     }
 }
 
+//Simplified 3x3 Gausian blur
+inline void BlurBright(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
+{
+//  CTimeLog l(_T("Blur %dx%d"),w,h);
+  DWORD x,y,c1,c2;
+  for (y=1;y<h-1;y++)
+    for (x=1;x<w-1;x++)
+    {
+      c1 =(pSrc[x-1+(y-1)*w]&0x00FF00FF);
+      c2 =(pSrc[x-1+(y-1)*w]&0x0000FF00);
+      c1+=(pSrc[x+(y-1)*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x+(y-1)*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x+1+(y-1)*w]&0x00FF00FF);
+      c2+=(pSrc[x+1+(y-1)*w]&0x0000FF00);
+      c1+=(pSrc[x-1+y*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x-1+y*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x+y*w]&0x00FF00FF)<<2;
+      c2+=(pSrc[x+y*w]&0x0000FF00)<<2;
+      c1+=(pSrc[x+1+y*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x+1+y*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x-1+(y+1)*w]&0x00FF00FF);
+      c2+=(pSrc[x-1+(y+1)*w]&0x0000FF00);
+      c1+=(pSrc[x+(y+1)*w]&0x00FF00FF)<<1;
+      c2+=(pSrc[x+(y+1)*w]&0x0000FF00)<<1;
+      c1+=(pSrc[x+1+(y+1)*w]&0x00FF00FF);
+      c2+=(pSrc[x+1+(y+1)*w]&0x0000FF00);
+      pDst[x+y*w]=((c1>>6)&0x00FF00FF)+((c2>>6)&0x0000FF00)+0x40404040;
+    }
+}
+
 //Globals: (for better speed!)
 static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
 
@@ -77,7 +108,10 @@ inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
   COLORREF* pDst=(COLORREF*)calloc(g_bmi32.bmiHeader.biSizeImage,1);
   if (pDst!=NULL)
   {
-    Blur(pDst,pSrc,w,h);
+    if(GetUseWinLogonDesk)
+      Blur(pDst,pSrc,w,h);
+    else
+      BlurBright(pDst,pSrc,w,h);
     hbbm=CreateCompatibleBitmap(DC,w,h);
     SetDIBits(DC,hbbm,0,w,pDst,&g_bmi32,DIB_RGB_COLORS);
     free(pDst);
