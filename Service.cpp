@@ -458,20 +458,6 @@ static BOOL TestDirectServiceCommands()
     }
     return true;
   }
-  if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
-  {
-    DWORD t=timeGetTime();
-    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
-    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
-      SafeMsgBox(0,L"Failed to create Safe desktop!",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-    else
-    {
-      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK|MB_SERVICE_NOTIFICATION);
-      DeleteSafeDesktop(bFadeDesk);
-    }
-    ResumeClient(RETVAL_OK);
-    return true;
-  }
   return false;
 }
 
@@ -1212,6 +1198,20 @@ void SuRun(DWORD ProcessID)
   if(CheckCliProcess(RD)!=1)
   {
     DBGTrace("FATAL: SuRun() Client Process check failed; EXIT!");
+    return;
+  }
+  if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
+  {
+    DWORD t=timeGetTime();
+    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
+    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
+      SafeMsgBox(0,L"Failed to create Safe desktop!",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+    else
+    {
+      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK);
+      DeleteSafeDesktop(bFadeDesk);
+    }
+    ResumeClient(RETVAL_OK);
     return;
   }
   DWORD RetVal=RETVAL_ACCESSDENIED;
