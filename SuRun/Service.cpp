@@ -458,7 +458,7 @@ static BOOL TestDirectServiceCommands()
     }
     return true;
   }
-  if (_tcsnicmp(g_RunData.cmdLine,_T("/TESTBS"),7)==0)
+  if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
   {
     DWORD t=timeGetTime();
     bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
