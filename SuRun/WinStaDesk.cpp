@@ -611,6 +611,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   }
   if (pi.hThread)
   {
+    SetThreadPriority(pi.hThread,THREAD_PRIORITY_IDLE);
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
   }
