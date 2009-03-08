@@ -34,6 +34,14 @@
 #pragma comment(lib,"Gdi32.lib")
 #pragma comment(lib,"comctl32.lib")
 
+#ifndef SuRunEXT_EXPORTS
+#ifdef DoDBGTrace
+extern DWORD g_RunTimes[16];
+extern LPCTSTR g_RunTimeNames[16];
+extern DWORD g_nTimes;
+#define AddTime(s) { g_RunTimes[g_nTimes]=timeGetTime(); g_RunTimeNames[g_nTimes++]=_TEXT(s); }
+#endif DoDBGTrace
+#endif SuRunEXT_EXPORTS
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Logon Helper
@@ -375,6 +383,22 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,
           (WPARAM)CreateFont(-14,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
       SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
+#ifndef SuRunEXT_EXPORTS
+#ifdef DoDBGTrace
+      {
+        static TCHAR c1[4096];
+        _tcscpy(&c1[_tcslen(c1)],L"{\r\n\tElapsed Time from \"SuRun.exe\" start:");
+        for (DWORD i=1;i<g_nTimes;i++)
+        {
+          _stprintf(&c1[_tcslen(c1)],L"\r\n\t%s\t %d ms",
+            g_RunTimeNames[i],g_RunTimes[i]-g_RunTimes[0]);
+        }
+        SetDlgItemText(hwnd,IDC_DLGQUESTION,CBigResStr(L"%s\r\n%s\r\n\tGUI visible\t %d\r\n}",
+          p->Msg,c1,timeGetTime()-g_RunTimes[0]));
+      }
+#endif DoDBGTrace
+#endif SuRunEXT_EXPORTS
+      
       SetDlgItemText(hwnd,IDC_PASSWORD,p->Password);
       SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETPASSWORDCHAR,'*',0);
       BOOL bFoundUser=FALSE;
