@@ -466,7 +466,7 @@ static BOOL TestDirectServiceCommands()
       SafeMsgBox(0,L"Failed to create Safe desktop!",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     else
     {
-      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK);
+      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK|MB_SERVICE_NOTIFICATION);
       DeleteSafeDesktop(bFadeDesk);
     }
     ResumeClient(RETVAL_OK);
