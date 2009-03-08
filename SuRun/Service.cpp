@@ -795,9 +795,6 @@ DWORD PrepareSuRun()
   AddTime("IsInSuRunnersOrAdmins start")
 #endif DoDBGTrace
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
-#ifdef DoDBGTrace
-  AddTime("IsInSuRunnersOrAdmins done")
-#endif DoDBGTrace
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
   {
     DBGTrace1("PrepareSuRun EXIT: SuRun is hidden for User %s",g_RunData.UserName);
@@ -805,6 +802,9 @@ DWORD PrepareSuRun()
   }
   //Create the safe desktop
   bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
+#ifdef DoDBGTrace
+  AddTime("CreateSafeDesktop start")
+#endif DoDBGTrace
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
   {
     DBGTrace("PrepareSuRun EXIT: CreateSafeDesktop failed");
