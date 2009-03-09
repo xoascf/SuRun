@@ -275,8 +275,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   CloseHandle(hPipe);
   //Wait for max 60s for the Password...
-  for(int n=0;(g_RetVal==RETVAL_WAIT)&&(n<1000);n++)
-    Sleep(60);
+  CTimeOut to(60000);
+  while ((g_RetVal==RETVAL_WAIT)&&(!to.TimedOut()))
+    Sleep(20);
   if (bRunSetup)
     return g_RetVal;
   switch(g_RetVal)
