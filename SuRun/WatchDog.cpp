@@ -99,6 +99,7 @@ CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
   wc.lpfnWndProc=CWDMsgWnd::WindowProc;
   wc.lpszClassName=Classname;
   wc.hbrBackground=m_bkBrush;
+  wc.hCursor=LoadCursor(0,IDC_HAND);
   RegisterClass(&wc);
   m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE|WS_EX_TOPMOST,
     Classname,_T("SuRun"),WS_VISIBLE|WS_DLGFRAME,
