@@ -595,6 +595,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     _tcscat(SuRunExe,UserDesk);
     STARTUPINFO si={0};
     si.cb	= sizeof(si);
+    si.dwFlags=STARTF_FORCEOFFFEEDBACK;
     TCHAR WinstaDesk[MAX_PATH];
     _stprintf(WinstaDesk,_T("%s\\%s"),WinSta,UserDesk);
     si.lpDesktop = WinstaDesk;
