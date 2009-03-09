@@ -141,6 +141,7 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
   wc.lpfnWndProc=CTrayMsgWnd::WindowProc;
   wc.lpszClassName=Classname;
   wc.hbrBackground=m_bkBrush;
+  wc.hCursor=LoadCursor(0,IDC_HAND);
   RegisterClass(&wc);
   m_hWnd=CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE|WS_EX_TOPMOST,
     Classname,DlgTitle,WS_CAPTION|WS_SYSMENU|WS_BORDER,
