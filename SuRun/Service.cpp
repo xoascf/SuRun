@@ -79,12 +79,12 @@
 
 #endif _DEBUG
 
-#ifdef DoDBGTrace
-DWORD g_RunTimes[16]={0};
-LPCTSTR g_RunTimeNames[16]={0};
-DWORD g_nTimes=0;
-#define AddTime(s) { g_RunTimes[g_nTimes]=timeGetTime(); g_RunTimeNames[g_nTimes++]=_TEXT(s); }
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//DWORD g_RunTimes[16]={0};
+//LPCTSTR g_RunTimeNames[16]={0};
+//DWORD g_nTimes=0;
+//#define AddTime(s) { g_RunTimes[g_nTimes]=timeGetTime(); g_RunTimeNames[g_nTimes++]=_TEXT(s); }
+//#endif DoDBGTrace
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  Globals
@@ -587,6 +587,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             TCHAR WinstaDesk[MAX_PATH];
             _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
             si.lpDesktop = WinstaDesk;
+            si.dwFlags=STARTF_FORCEOFFFEEDBACK;
             TCHAR cmd[4096]={0};
             GetSystemWindowsDirectory(cmd,4096);
             PathAppend(cmd,L"SuRun.exe");
@@ -763,9 +764,9 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
 //////////////////////////////////////////////////////////////////////////////
 DWORD PrepareSuRun()
 {
-#ifdef DoDBGTrace
-  AddTime("PrepareSuRun start")
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//  AddTime("PrepareSuRun start")
+//#endif DoDBGTrace
   zero(g_RunPwd);
   RegDelVal(HKLM,PASSWKEY,g_RunData.UserName);//Delete Password, keep time
   if((!g_CliIsInSuRunners) && GetNoConvUser)
@@ -791,9 +792,9 @@ DWORD PrepareSuRun()
   if(g_RunData.bShExNoSafeDesk)
     return RETVAL_SX_NOTINLIST;
   //Get real groups for the user: (Not just the groups from the Client Token)
-#ifdef DoDBGTrace
-  AddTime("IsInSuRunnersOrAdmins start")
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//  AddTime("IsInSuRunnersOrAdmins start")
+//#endif DoDBGTrace
   g_RunData.Groups=IsInSuRunnersOrAdmins(g_RunData.UserName,g_RunData.SessionID);
   if (HideSuRun(g_RunData.UserName,g_RunData.Groups))
   {
@@ -802,17 +803,17 @@ DWORD PrepareSuRun()
   }
   //Create the safe desktop
   bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
-#ifdef DoDBGTrace
-  AddTime("CreateSafeDesktop start")
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//  AddTime("CreateSafeDesktop start")
+//#endif DoDBGTrace
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
   {
     DBGTrace("PrepareSuRun EXIT: CreateSafeDesktop failed");
     return RETVAL_NODESKTOP;
   }
-#ifdef DoDBGTrace
-  AddTime("CreateSafeDesktop done")
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//  AddTime("CreateSafeDesktop done")
+//#endif DoDBGTrace
   __try
   {
     //safe desktop created...
@@ -1204,10 +1205,10 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 //////////////////////////////////////////////////////////////////////////////
 void SuRun(DWORD ProcessID)
 {
-#ifdef DoDBGTrace
-  g_nTimes++;
-  AddTime("Client to service comm.")
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//  g_nTimes++;
+//  AddTime("Client to service comm.")
+//#endif DoDBGTrace
   //This is called from a separate process created by the service
   if (!IsLocalSystem())
   {
@@ -1223,24 +1224,24 @@ void SuRun(DWORD ProcessID)
     DBGTrace("FATAL: SuRun() Client Process check failed; EXIT!");
     return;
   }
-#ifdef DoDBGTrace
-  g_RunTimes[0]=*((DWORD*)&g_RunData.CurDir[4090]);
-  AddTime("CheckClientProcess done")
-#endif DoDBGTrace
-  if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
-  {
-    DWORD t=timeGetTime();
-    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
-    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
-      SafeMsgBox(0,L"Failed to create Safe desktop!",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-    else
-    {
-      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK);
-      DeleteSafeDesktop(bFadeDesk);
-    }
-    ResumeClient(RETVAL_OK);
-    return;
-  }
+//#ifdef DoDBGTrace
+//  g_RunTimes[0]=*((DWORD*)&g_RunData.CurDir[4090]);
+//  AddTime("CheckClientProcess done")
+//#endif DoDBGTrace
+//  if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
+//  {
+//    DWORD t=timeGetTime();
+//    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
+//    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
+//      SafeMsgBox(0,L"Failed to create Safe desktop!",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+//    else
+//    {
+//      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK);
+//      DeleteSafeDesktop(bFadeDesk);
+//    }
+//    ResumeClient(RETVAL_OK);
+//    return;
+//  }
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //RunAs...
   if (g_RunData.bRunAs)
