@@ -25,6 +25,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.7 Beta 5 - 2009-03-10:
+-----------------------------------
+* Moving the mouse over SuRuns Tray Message Windows show a Hand cursor
+* SuRun makes Windows turn off the "AppStarting" mouse cursor
+
 SuRun 1.2.0.6 - 2009-03-01:
 -----------------------------------
 renamed "SuRun 1.2.0.6 rc 1"  to "SuRun 1.2.0.6"
