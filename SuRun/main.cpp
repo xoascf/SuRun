@@ -63,6 +63,15 @@ static void Crash()
 //extern int TestBS();
 #endif _DEBUG
 
+static void HideAppStartCursor()
+{
+  HWND w=CreateWindow(_TEXT("Static"),0,0,0,0,0,0,0,0,0,0);
+  PostMessage(w,WM_QUIT,0,0);
+  MSG msg;
+  GetMessage(&msg,0,0,0);
+  DestroyWindow(w);
+}
+
 //#include "ScreenSnap.h"
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
@@ -96,6 +105,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  LSAStartAdminProcess() ;
 //  ExitProcess(0);
 #endif _DEBUG
+  HideAppStartCursor();
   if(HandleServiceStuff())
     return 0;
 #ifdef DoDBGTrace
@@ -259,7 +269,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   g_RetVal=RETVAL_WAIT;
   HANDLE hPipe=INVALID_HANDLE_VALUE;
   //retry if the pipe is busy: (max 240s)
-  for(int i=0;i<720;i++)
+  CTimeOut to(240000);
+  while (!to.TimedOut())
   {
     hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
     if(hPipe!=INVALID_HANDLE_VALUE)
@@ -275,9 +286,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
   CloseHandle(hPipe);
   //Wait for max 60s for the Password...
-  CTimeOut to(60000);
+  to.Set(60000);
   while ((g_RetVal==RETVAL_WAIT)&&(!to.TimedOut()))
-    Sleep(20);
+      Sleep(20);
   if (bRunSetup)
     return g_RetVal;
   switch(g_RetVal)
