@@ -113,7 +113,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 #endif DoDBGTrace
   if (g_RunData.CliThreadId==GetCurrentThreadId())
   {
-    //Started from services:
+    //Started from service:
     //Show ToolTip "<Program> is running elevated"...
     TrayMsgWnd(CResStr(IDS_APPNAME),g_RunData.cmdLine,g_RunData.IconId,g_RunData.TimeOut);
     return RETVAL_OK;
@@ -122,6 +122,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   g_RunData.CliProcessId=GetCurrentProcessId();
   //ThreadId
   g_RunData.CliThreadId=GetCurrentThreadId();
+  //Std-Handles
+  STARTUPINFO si={0};
+  GetStartupInfo(&si);
+  if(si.dwFlags&STARTF_USESTDHANDLES)
+  {
+  }
   //Session
   ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
   //WindowStation
