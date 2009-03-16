@@ -6,6 +6,10 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include <ShlWapi.h>
+
+#pragma comment(lib,"ShlWapi")
+
 
 void GetErrorName(int ErrorCode,LPTSTR s)
 {
@@ -42,6 +46,7 @@ void TRACEx(LPCTSTR s,...)
   va_end(va);
   OutputDebugString(S);
   _tprintf(S);
+  flushall();
 }
 
 DWORD WINAPI InProc(HANDLE hTx)
@@ -86,80 +91,97 @@ DWORD WINAPI ErrProc(HANDLE hRx)
   return -1;
 }
 
+static DWORD g_PipeInst=0;
+BOOL CreateTxPipe(HANDLE* hRead,HANDLE* hWrite)
+{
+  SECURITY_ATTRIBUTES sar={sizeof(SECURITY_ATTRIBUTES),NULL,TRUE/*inherit*/};
+  SECURITY_ATTRIBUTES saw={sizeof(SECURITY_ATTRIBUTES),NULL,FALSE/*inherit*/};
+  TCHAR PipeName[MAX_PATH];
+  _stprintf(PipeName,L"\\\\.\\pipe\\SuRunC%04X%04X",GetCurrentProcessId(),g_PipeInst++);
+  *hWrite=CreateNamedPipe(PipeName,
+      PIPE_ACCESS_OUTBOUND|FILE_FLAG_FIRST_PIPE_INSTANCE|FILE_FLAG_WRITE_THROUGH,
+      PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE|PIPE_WAIT,1,0,0,0,&saw);
+  if(*hWrite==INVALID_HANDLE_VALUE)
+    return false;
+  *hRead=CreateFile(PipeName,GENERIC_READ|SYNCHRONIZE,FILE_SHARE_READ|FILE_SHARE_WRITE,
+      &sar,OPEN_EXISTING,FILE_FLAG_WRITE_THROUGH,0);
+  if(*hRead==INVALID_HANDLE_VALUE)
+    return CloseHandle(*hWrite),*hWrite=INVALID_HANDLE_VALUE,false;
+  return true;
+}
+
+BOOL CreateRxPipe(HANDLE* hRead,HANDLE* hWrite)
+{
+  SECURITY_ATTRIBUTES sar={sizeof(SECURITY_ATTRIBUTES),NULL,FALSE/*inherit*/};
+  SECURITY_ATTRIBUTES saw={sizeof(SECURITY_ATTRIBUTES),NULL,TRUE/*inherit*/};
+  TCHAR PipeName[MAX_PATH];
+  _stprintf(PipeName,L"\\\\.\\pipe\\SuRunC%04X%04X",GetCurrentProcessId(),g_PipeInst++);
+  *hRead=CreateNamedPipe(PipeName,
+      PIPE_ACCESS_INBOUND|FILE_FLAG_FIRST_PIPE_INSTANCE|FILE_FLAG_WRITE_THROUGH,
+      PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE|PIPE_WAIT,1,0,0,0,&sar);
+  if(*hRead==INVALID_HANDLE_VALUE)
+    return false;
+  *hWrite=CreateFile(PipeName,GENERIC_WRITE|SYNCHRONIZE,FILE_SHARE_READ|FILE_SHARE_WRITE,
+      &saw,OPEN_EXISTING,FILE_FLAG_WRITE_THROUGH,0);
+  if(*hWrite==INVALID_HANDLE_VALUE)
+    return CloseHandle(*hRead),*hRead=INVALID_HANDLE_VALUE,false;
+  return true;
+}
+
 wmain( int argc, wchar_t *argv[ ], wchar_t *envp[ ] )
 {
-  if (argc==1)
+  HANDLE hInRx,hInTx,hInThread;
+  CreateTxPipe(&hInRx,&hInTx);
+  hInThread=CreateThread(NULL,0,InProc,(LPVOID)hInTx,0,0);
+  HANDLE hOutRx,hOutTx,hOutThread;
+  CreateRxPipe(&hOutRx,&hOutTx);
+  hOutThread=CreateThread(NULL,0,OutProc,(LPVOID)hOutRx,0,0);
+  HANDLE hErrRx,hErrTx,hErrThread;
+  CreateRxPipe(&hErrRx,&hErrTx);
+  hErrThread=CreateThread(NULL,0,ErrProc,(LPVOID)hErrRx,0,0);
+  
+  PROCESS_INFORMATION pi={0};
+  STARTUPINFO si={0};
+  si.cb	= sizeof(si);
+  si.dwFlags=STARTF_USESTDHANDLES|STARTF_FORCEOFFFEEDBACK;
+  si.hStdInput=hInRx;
+  si.hStdOutput=hOutTx;
+  si.hStdError=hErrTx;
+  
+  TCHAR cmd[4096]={0};
+  GetSystemWindowsDirectory(cmd,4096);
+  PathAppend(cmd,L"SuRun.exe");
+  PathQuoteSpaces(cmd);
+  _tcscat(cmd,L" /RetPID ");
+  _tcscat(cmd,PathGetArgs(GetCommandLine()));
+  
+  DWORD dwExCode=-1;
+  if (CreateProcess(NULL,cmd,NULL,NULL,TRUE,DETACHED_PROCESS,NULL,NULL,&si,&pi))
   {
-    SECURITY_ATTRIBUTES sa={sizeof(SECURITY_ATTRIBUTES),NULL,TRUE/*inherit*/};
-    HANDLE hInRx,hInThread;
-    {
-      HANDLE hInTx,hTmp;
-      CreatePipe(&hInRx,&hTmp,&sa,0);
-      DuplicateHandle(GetCurrentProcess(),hTmp,GetCurrentProcess(),&hInTx,0,
-                      FALSE/*don't inherit*/,DUPLICATE_SAME_ACCESS);
-      CloseHandle(hTmp);
-      DWORD tid;
-      hInThread=CreateThread(NULL,0,InProc,(LPVOID)hInTx,0,&tid);
-    }
-    HANDLE hOutTx,hOutThread;
-    {
-      HANDLE hOutRx,hTmp;
-      CreatePipe(&hTmp,&hOutTx,&sa,0);
-      DuplicateHandle(GetCurrentProcess(),hTmp,GetCurrentProcess(),&hOutRx,0,
-                      FALSE/*don't inherit*/,DUPLICATE_SAME_ACCESS);
-      CloseHandle(hTmp);
-      DWORD tid;
-      hOutThread=CreateThread(NULL,0,OutProc,(LPVOID)hOutRx,0,&tid);
-    }
-    HANDLE hErrTx,hErrThread;
-    {
-      HANDLE hErrRx,hTmp;
-      CreatePipe(&hTmp,&hErrTx,&sa,0);
-      DuplicateHandle(GetCurrentProcess(),hTmp,GetCurrentProcess(),&hErrRx,0,
-                      FALSE/*don't inherit*/,DUPLICATE_SAME_ACCESS);
-      CloseHandle(hTmp);
-      DWORD tid;
-      hErrThread=CreateThread(NULL,0,ErrProc,(LPVOID)hErrRx,0,&tid);
-    }
-
-    PROCESS_INFORMATION pi={0};
-    STARTUPINFO si={0};
-    si.cb	= sizeof(si);
-    si.dwFlags=STARTF_USESTDHANDLES/*|STARTF_USESHOWWINDOW*/|STARTF_FORCEOFFFEEDBACK;
-    //si.wShowWindow = SW_HIDE | SW_FORCEMINIMIZE;
-    si.hStdInput=hInRx;
-    si.hStdOutput=hOutTx;
-    si.hStdError=hErrTx;
-    TCHAR cmd[4096];
-    _stprintf(cmd,L"SuRunC.exe %d",GetCurrentProcessId());
-    TRACEx(L"SuRunC: Starting: %s\n",cmd);
-    if (!CreateProcess(NULL,cmd,NULL,NULL,TRUE,DETACHED_PROCESS,NULL,NULL,&si,&pi))
-      return FALSE;
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
-    DWORD dwExCode;
     GetExitCodeProcess(pi.hProcess,&dwExCode);
     CloseHandle(pi.hProcess);
-    CloseHandle(hInRx);
-    CloseHandle(hOutTx);
-    CloseHandle(hErrTx);
-    TerminateThread(hInThread,2);
-    TerminateThread(hOutThread,2);
-    TerminateThread(hErrThread,2);
-    CloseHandle(hInThread);
-    CloseHandle(hOutThread);
-    CloseHandle(hErrThread);
-    TRACEx(L"SuRunC: Process 1 exited with %d\n",dwExCode);
-    return 0;
+    pi.hProcess=OpenProcess(SYNCHRONIZE,0,dwExCode);
+    if(pi.hProcess)
+    {
+      WaitForSingleObject(pi.hProcess,INFINITE);
+      GetExitCodeProcess(pi.hProcess,&dwExCode);
+      CloseHandle(pi.hProcess);
+    }
   }
-  if (argc==2)
-  {
-    DWORD ProcID=_tcstol(argv[1],0,10);
-    TRACEx(L"SuRunC second stage: %d\n",ProcID);
-    Sleep(2500);
-    TRACEx(L"press a key\n");
-    TRACEx(L"key was %d\n",_gettchar());
-    return 1;
-  }
-	return 0;
+  TerminateThread(hInThread,2);
+  TerminateThread(hOutThread,2);
+  TerminateThread(hErrThread,2);
+  CloseHandle(hInThread);
+  CloseHandle(hOutThread);
+  CloseHandle(hErrThread);
+  CloseHandle(hInRx);
+  CloseHandle(hInTx);
+  CloseHandle(hOutRx);
+  CloseHandle(hOutTx);
+  CloseHandle(hErrRx);
+  CloseHandle(hErrTx);
+  return dwExCode;
+  CreateProcessAsUser()
 }
