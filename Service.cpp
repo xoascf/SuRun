@@ -2174,7 +2174,7 @@ bool HandleServiceStuff()
     //WatchDog
     if (_tcsicmp(cmd.argv(1),_T("/WATCHDOG"))==0)
     {
-      DoWatchDog(cmd.argv(2),cmd.argv(3),_tcstoul(cmd.argv(3),0,10));
+      DoWatchDog(cmd.argv(2),cmd.argv(3),_tcstoul(cmd.argv(4),0,10));
       ExitProcess(0);
       return true;
     }
