@@ -209,9 +209,16 @@ static bool ProcessRunning(DWORD PID)
 {
   HANDLE hProc=OpenProcess(SYNCHRONIZE,0,PID);
   if (!hProc)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",PID,GetLastErrorNameStatic());
     return false;
+  }
   DWORD WaitRes=WaitForSingleObject(hProc,0);
   CloseHandle(hProc);
+#ifdef DoDBGTrace
+  if(WaitRes==WAIT_TIMEOUT)
+    DBGTrace1("ProcessRunning failed: Wait result==%08X",WaitRes);
+#endif DoDBGTrace
   return WaitRes==WAIT_TIMEOUT;
 }
 
@@ -219,6 +226,7 @@ static void EnsureProcRunning(DWORD PID,LPCTSTR UserDesk)
 {
   if (!ProcessRunning(PID))
   {
+    DBGTrace1("SuRun GUI Process %d is not running: WatchDog exit!",PID);
     SwitchToDesk(UserDesk);
     ExitProcess(0);
   }
@@ -229,7 +237,10 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
   SetProcWinStaDesk(0,SafeDesk);
   g_WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
   if (!g_WatchDogEvent)
+  {
+    DBGTrace1("FATAL: Failed to open WatchDog Event: %s",GetLastErrorNameStatic());
     return;
+  }
   for(;;)
   {
     //Switch to SuRun's desktop
