@@ -585,11 +585,10 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   {
     TCHAR SuRunExe[4096];
     GetSystemWindowsDirectory(SuRunExe,4096);
-    PathAppend(SuRunExe,L"SuRun.exe /WATCHDOG");
-    _tcscat(SuRunExe,L" ");
-    _tcscat(SuRunExe,DeskName);
-    _tcscat(SuRunExe,L" ");
-    _tcscat(SuRunExe,UserDesk);
+    PathAppend(SuRunExe,L"SuRun.exe");
+    PathQuoteSpaces(SuRunExe);
+    _stprintf(&SuRunExe[_tcslen(SuRunExe)],L" /WATCHDOG %s %s %d",
+              DeskName,UserDesk,GetCurrentProcessId());
     STARTUPINFO si={0};
     si.cb	= sizeof(si);
     si.dwFlags=STARTF_FORCEOFFFEEDBACK;
