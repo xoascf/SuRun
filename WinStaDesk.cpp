@@ -565,8 +565,8 @@ static VOID CALLBACK WDTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTi
 bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
 {
   DeleteSafeDesktop(false);
-  if (IsLocalSystem())
-    SetUnhandledExceptionFilter(ExceptionFilter);
+//  if (IsLocalSystem())
+//    SetUnhandledExceptionFilter(ExceptionFilter);
   //SuRun misuses WinLogons Desktop
   CResStr DeskName((GetUseWinLogonDesk?L"Winlogon":L"SRD_%04x"),GetTickCount());
   //Create Desktop
@@ -580,15 +580,15 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   //Start watchdog process:
   PROCESS_INFORMATION pi={0};
   g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
-  g_WatchDogTimer=SetTimer(0,0,250,WDTimerProc);
+  g_WatchDogTimer=SetTimer(0,1,250,WDTimerProc);
   if (g_WatchDogEvent)
   {
-    TCHAR SuRunExe[4096];
+    TCHAR SuRunExe[4096]={0};
     GetSystemWindowsDirectory(SuRunExe,4096);
     PathAppend(SuRunExe,L"SuRun.exe");
     PathQuoteSpaces(SuRunExe);
     _stprintf(&SuRunExe[_tcslen(SuRunExe)],L" /WATCHDOG %s %s %d",
-              DeskName,UserDesk,GetCurrentProcessId());
+              (LPCTSTR)DeskName,UserDesk,GetCurrentProcessId());
     STARTUPINFO si={0};
     si.cb	= sizeof(si);
     si.dwFlags=STARTF_FORCEOFFFEEDBACK;
