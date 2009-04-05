@@ -122,12 +122,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   g_RunData.CliProcessId=GetCurrentProcessId();
   //ThreadId
   g_RunData.CliThreadId=GetCurrentThreadId();
-  //Std-Handles
-  STARTUPINFO si={0};
-  GetStartupInfo(&si);
-  if(si.dwFlags&STARTF_USESTDHANDLES)
-  {
-  }
   //Session
   ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
   //WindowStation
