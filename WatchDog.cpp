@@ -255,13 +255,13 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk)
       d=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
       SwitchDesktop(d);
       CloseDesktop(d);
+      //Show Window
+      CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD);
       //Turn off Hooks when displaying the user desktop!
       DWORD bIATHk=GetUseIATHook;
       DWORD bIShHk=GetUseIShExHook;
       SetUseIATHook(0);
       SetUseIShExHook(0);
-      //Show Window
-      CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD);
       while (w->MsgLoop())
         Sleep(10);
       delete w;
