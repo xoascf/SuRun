@@ -196,28 +196,40 @@ LRESULT CALLBACK CWDMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
 //
 //
 /////////////////////////////////////////////////////////////////////////////
+extern HANDLE g_WatchDogEvent;
 
 //return true if user wants to switch
 BOOL ShowWatchDogDlg()
 {
-  HANDLE WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
   BOOL bRet=FALSE;
   CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SURUNSTUCK),IDI_SHIELD2);
-  while (WatchDogEvent && WaitForSingleObject(WatchDogEvent,0)==WAIT_TIMEOUT)
+  while (g_WatchDogEvent && WaitForSingleObject(g_WatchDogEvent,0)==WAIT_TIMEOUT)
   {
-    CloseHandle(WatchDogEvent);
-    WatchDogEvent=0;
     if (!w->MsgLoop())
     {
       bRet=TRUE;
       break;
     }
-    WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
   }
-  if (WatchDogEvent)
-    CloseHandle(WatchDogEvent);
   delete w;
   return bRet;
+}
+
+static void SwitchToDesk(LPCTSTR Desk)
+{
+  HDESK d=OpenDesktop(Desk,0,FALSE,DESKTOP_SWITCHDESKTOP);
+  SwitchDesktop(d);
+  CloseDesktop(d);
+}
+
+static bool ProcessRunning(DWORD PID)
+{
+  HANDLE hProc=OpenProcess(SYNCHRONIZE,0,PID);
+  if (!hProc)
+    return false;
+  DWORD WaitRes=WaitForSingleObject(hProc,0);
+  CloseHandle(hProc);
+  return WaitRes==WAIT_TIMEOUT;
 }
 
 void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
@@ -229,32 +241,21 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
 //    SafeDesk,UserDesk,g_RunData.WinSta,g_RunData.Desk);
 #endif DoDBGTrace
   SetProcWinStaDesk(0,SafeDesk);
+  g_WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
+  if (!g_WatchDogEvent)
+    return;
   for(;;)
   {
     //Switch to SuRun's desktop
+    SwitchToDesk(SafeDesk);
+    if (!ProcessRunning(ParentPID))
     {
-      HDESK d=OpenDesktop(SafeDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
-      SwitchDesktop(d);
-      CloseDesktop(d);
+      SwitchToDesk(UserDesk);
+      ExitProcess(0);
     }
-    {
-      HANDLE hSuRun=OpenProcess(SYNCHRONIZE,0,ParentPID);
-      if ((!hSuRun)||(WaitForSingleObject(hSuRun,0)!=WAIT_TIMEOUT))
-        return;
-      CloseHandle(hSuRun);
-    }
-    DWORD WaitRes=WAIT_FAILED;
-    {
-      HANDLE WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
-      if (!WatchDogEvent)
-        return;
-      ResetEvent(WatchDogEvent);
-      WaitRes=WaitForSingleObject(WatchDogEvent,2000);
-      if ((WaitRes!=WAIT_TIMEOUT)&&(WaitRes!=WAIT_OBJECT_0))
-        ExitProcess(0);
-      CloseHandle(WatchDogEvent);
-    }
-    if ((WaitRes==WAIT_TIMEOUT) && ShowWatchDogDlg())
+    ResetEvent(g_WatchDogEvent);
+    if ((WaitForSingleObject(g_WatchDogEvent,2000)==WAIT_TIMEOUT) 
+      && ShowWatchDogDlg())
     {
       //Set Access to the user Desktop
       HANDLE hTok=0;
@@ -262,11 +263,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
       SetAccessToWinDesk(hTok,0,UserDesk,true);
       SetProcWinStaDesk(0,UserDesk);
       //Switch to the user desktop
-      {
-        HDESK d=OpenDesktop(UserDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
-        SwitchDesktop(d);
-        CloseDesktop(d);
-      }
+      SwitchToDesk(UserDesk);
       //Show Window
       CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD);
       //Turn off Hooks when displaying the user desktop!
@@ -282,11 +279,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
       SetUseIShExHook(bIShHk);
       SetUseIATHook(bIATHk);
       //Switch back to SuRun's desktop
-      {
-        HDESK d=OpenDesktop(SafeDesk,0,FALSE,DESKTOP_SWITCHDESKTOP);
-        SwitchDesktop(d);
-        CloseDesktop(d);
-      }
+      SwitchToDesk(SafeDesk);
       //Revoke access from user desktop
       SetProcWinStaDesk(0,SafeDesk);
       SetAccessToWinDesk(hTok,0,UserDesk,false);
