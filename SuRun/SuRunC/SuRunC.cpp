@@ -183,5 +183,4 @@ wmain( int argc, wchar_t *argv[ ], wchar_t *envp[ ] )
   CloseHandle(hErrRx);
   CloseHandle(hErrTx);
   return dwExCode;
-  CreateProcessAsUser()
 }
