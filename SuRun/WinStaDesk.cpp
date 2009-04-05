@@ -458,7 +458,7 @@ LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
 
 HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
-HANDLE g_WatchDogThread=NULL;
+UINT_PTR g_WatchDogTimer=0;
 
 //#define WM_LOGONNOTIFY      0x004C
 //#define LOCK_WORKSTATION    5
@@ -547,22 +547,19 @@ BOOL WeMustClose()
   return FALSE;
 }
 
-static DWORD WINAPI WDEventProc(void* p)
+static VOID CALLBACK WDTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
-  SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
-  //Messages work on the same WinSta/Desk only
-  SetProcWinStaDesk(0,L"Winlogon");
-  while (g_WatchDogEvent)
+  if(g_WatchDogEvent)
   {
     SetEvent(g_WatchDogEvent);
     if(WeMustClose())
     {
       DBGTrace("SuRun GUI must be closed");
+      KillTimer(0,g_WatchDogTimer);
       EnumWindows(CloseAppEnum,(LPARAM)GetCurrentProcessId());
     }
-    Sleep(100);
-  }
-  return 0;
+  }else
+    KillTimer(0,g_WatchDogTimer);
 }
 
 bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
@@ -583,7 +580,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   //Start watchdog process:
   PROCESS_INFORMATION pi={0};
   g_WatchDogEvent=CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
-  g_WatchDogThread=CreateThread(0,0,WDEventProc,0,0,0);
+  g_WatchDogTimer=SetTimer(0,0,250,WDTimerProc);
   if (g_WatchDogEvent)
   {
     TCHAR SuRunExe[4096];
@@ -637,9 +634,9 @@ void DeleteSafeDesktop(bool bFade)
   if(g_WatchDogEvent)
     CloseHandle(g_WatchDogEvent);
   g_WatchDogEvent=NULL;
-  if(g_WatchDogThread)
-    WaitForSingleObject(g_WatchDogThread,INFINITE);
-  g_WatchDogThread=NULL;
+  if (g_WatchDogTimer)
+    KillTimer(0,g_WatchDogTimer);
+  g_WatchDogTimer=0;
   if (IsLocalSystem())
     SetUnhandledExceptionFilter(NULL);
 }
