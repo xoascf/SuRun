@@ -12,4 +12,4 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk);
+void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID);
