@@ -168,8 +168,10 @@ wmain( int argc, wchar_t *argv[ ], wchar_t *envp[ ] )
       WaitForSingleObject(pi.hProcess,INFINITE);
       GetExitCodeProcess(pi.hProcess,&dwExCode);
       CloseHandle(pi.hProcess);
-    }
-  }
+    }else
+      TRACEx(L"OpenProcess(%d) failed: %s",dwExCode,GetLastErrorNameStatic());
+  }else
+    TRACEx(L"CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   TerminateThread(hInThread,2);
   TerminateThread(hOutThread,2);
   TerminateThread(hErrThread,2);
