@@ -25,6 +25,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.7 Beta 7 - 2009-04-05:
+-----------------------------------
+* Command line Parameters for programs to be started are no longer modified.
+
 SuRun 1.2.0.7 Beta 6 - 2009-04-05:
 -----------------------------------
 * SuRuns WatchDog event is set in a timer proc instead of a separate thread.
