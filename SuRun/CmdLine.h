@@ -50,9 +50,8 @@ public:
       m_Args[arg]=p;
       p=PathGetArgs(p);
     }
-    //Remove quotes
-    for (arg=0;arg<m_Argc;arg++)
-      PathUnquoteSpaces(m_Args[arg]);
+    //Remove quotes from first arg (command)
+    PathUnquoteSpaces(m_Args[0]);
   }
   ~CCmdLine()
   {
