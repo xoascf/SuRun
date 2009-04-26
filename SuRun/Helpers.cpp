@@ -805,27 +805,13 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   //Application
   static TCHAR app[4096];
   zero(app);
+  _tcscpy(app,CmdLine);
+  PathRemoveBlanks(app);
+  //Command line parameters
   static TCHAR args[4096]={0};
   zero(args);
-  _tcscpy(args,CmdLine);
-  PathRemoveBlanks(args);
-  //Clean up double spaces or unneeded quotes
-  LPTSTR p=&args[0];
-  while (p && *p)
-  {
-    LPTSTR p1=PathGetArgs(p);
-    if(p1 && *p1)
-      *(p1-1)=0;
-    PathRemoveBlanks(p);
-    PathUnquoteSpaces(p);
-    PathQuoteSpaces(p);
-    _tcscat(app,p);
-    if (p1 && *p1)
-        _tcscat(app,_T(" "));
-    p=p1;
-  }
-  //Save parameters
   _tcscpy(args,PathGetArgs(app));
+  PathRemoveBlanks(args);
   PathRemoveArgs(app);
   PathUnquoteSpaces(app);
   NetworkPathToUNCPath(app);
@@ -856,7 +842,6 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
     if (!PathFileExists(app))
       wcscpy(app,L"msconfig");
-    zero(args);
   }else
   //Control Panel special folder files:
   if ((args[0]==0)
