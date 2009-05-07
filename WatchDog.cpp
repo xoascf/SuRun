@@ -216,7 +216,7 @@ static bool ProcessRunning(DWORD PID)
   DWORD WaitRes=WaitForSingleObject(hProc,0);
   CloseHandle(hProc);
 #ifdef DoDBGTrace
-  if(WaitRes==WAIT_TIMEOUT)
+  if(WaitRes!=WAIT_TIMEOUT)
     DBGTrace1("ProcessRunning failed: Wait result==%08X",WaitRes);
 #endif DoDBGTrace
   return WaitRes==WAIT_TIMEOUT;
