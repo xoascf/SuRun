@@ -519,15 +519,22 @@ BOOL WeMustClose()
 {
   HWND w=GetForegroundWindow();
   if (!w)
-  {
-    //DBGTrace("SuRun: No foreground Window!");
     return FALSE;
-  }
   DWORD pid=0;
-  GetWindowThreadProcessId(w,&pid);
+  if ((!GetWindowThreadProcessId(w,&pid))||(!pid))
+  {
+    DBGTrace3("SuRun GUI must be closed (GetWindowThreadProcessId(%x,%d) failed %s)",
+              w,pid,GetLastErrorNameStatic());
+    return TRUE;
+  }
+  if (pid==GetCurrentProcessId())
+    return FALSE;
   HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid);
   if (!hProcess)
+  {
+    DBGTrace2("SuRun GUI must be closed (OpenProcess(%d) failed %s)",pid,GetLastErrorNameStatic());
     return TRUE;
+  }
   DWORD d;
   HMODULE hMod;
   TCHAR f1[MAX_PATH];
@@ -541,7 +548,7 @@ BOOL WeMustClose()
   CloseHandle(hProcess);
   if(_tcsicmp(f1,f2)!=0)
   {
-    DBGTrace2("SuRun GUI must be closed (\"%s\"!=\"%s\")",f1,f1);
+    DBGTrace2("SuRun GUI must be closed (\"%s\"!=\"%s\")",f1,f2);
     return TRUE;
   }
   return FALSE;
