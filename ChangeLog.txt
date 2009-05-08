@@ -1,6 +1,5 @@
 Done, to be tested:
 ---------------------------
-* FIX: SuRun SuRun 1.2.0.7 Beta 6,7 did close when the OpenFile-Dialog was open
 
 ToDo
 ---------------------
@@ -26,7 +25,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.7 Beta 7 - 2009-04-05:
+SuRun 1.2.0.7 Beta 8 - 2009-05-08:
+-----------------------------------
+* FIX: SuRun SuRun 1.2.0.7 Beta 6,7 did close when an OpenFile-Dialog was open
+
+SuRun 1.2.0.7 Beta 7 - 2009-04-26:
 -----------------------------------
 * Command line Parameters for programs to be started are no longer modified.
 
