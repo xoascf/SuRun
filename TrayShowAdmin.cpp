@@ -46,38 +46,44 @@ DWORD WINAPI TSAThreadProc(void* p)
   HANDLE hProc=OpenProcess(PROCESS_ALL_ACCESS,0,(DWORD)(DWORD_PTR)p);
   if (!hProc)
     return 0;
+  struct
+  {
+    DWORD CurProcId;
+    TCHAR CurUserName[UNLEN+GNLEN+2];
+    BOOL CurUserIsadmin;
+  }TSAData={0};
   DWORD PID=0;
-  g_TSAThreadRunning=TRUE;
-  WriteProcessMemory(hProc,&g_TSAThreadRunning,&g_TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
+  BOOL TSAThreadRunning=TRUE;
+  WriteProcessMemory(hProc,&TSAThreadRunning,&g_TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
   EnablePrivilege(SE_DEBUG_NAME);
   for(;;)
   {
     SIZE_T s;
     if ((WaitForSingleObject(hProc,333)==WAIT_OBJECT_0)
-     ||(!ReadProcessMemory(hProc,&g_TSAPID,&g_TSAData.CurProcId,sizeof(DWORD),&s))
+     ||(!ReadProcessMemory(hProc,&g_TSAPID,&TSAData.CurProcId,sizeof(DWORD),&s))
      ||(sizeof(DWORD)!=s))
       return CloseHandle(hProc),0;
-    if (g_TSAData.CurProcId!=PID)
+    if (TSAData.CurProcId!=PID)
     {
-      HANDLE h = OpenProcess(PROCESS_ALL_ACCESS,TRUE,g_TSAData.CurProcId);
+      HANDLE h = OpenProcess(PROCESS_ALL_ACCESS,TRUE,TSAData.CurProcId);
       if(h)
       {
         HANDLE hTok=0;
         if (OpenProcessToken(h,TOKEN_QUERY|TOKEN_DUPLICATE,&hTok))
         {
-          GetTokenUserName(hTok,g_TSAData.CurUserName);
-          g_TSAData.CurUserIsadmin=IsAdmin(hTok);
+          GetTokenUserName(hTok,TSAData.CurUserName);
+          TSAData.CurUserIsadmin=IsAdmin(hTok);
           CloseHandle(hTok);
-          if(WriteProcessMemory(hProc,&g_TSAData,&g_TSAData,sizeof(g_TSAData),&s)
+          if(WriteProcessMemory(hProc,&g_TSAData,&TSAData,sizeof(g_TSAData),&s)
             && (s==sizeof(g_TSAData)))
-            PID=g_TSAData.CurProcId;
+            PID=TSAData.CurProcId;
           else
             DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
         }else
           DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
         CloseHandle(h);
       }else
-        DBGTrace2("OpenProcess(%d) failed: %s",g_TSAData.CurProcId,GetLastErrorNameStatic());
+        DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurProcId,GetLastErrorNameStatic());
     }
   }
 }
