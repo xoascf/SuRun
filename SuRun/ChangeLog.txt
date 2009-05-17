@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* FIX: Tray symbol could show information for processes in other sessions
 
 ToDo
 ---------------------
