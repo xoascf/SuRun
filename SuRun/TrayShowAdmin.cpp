@@ -54,7 +54,7 @@ DWORD WINAPI TSAThreadProc(void* p)
   }TSAData={0};
   DWORD PID=0;
   BOOL TSAThreadRunning=TRUE;
-  WriteProcessMemory(hProc,&TSAThreadRunning,&g_TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
+  WriteProcessMemory(hProc,&g_TSAThreadRunning,&TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
   EnablePrivilege(SE_DEBUG_NAME);
   for(;;)
   {
