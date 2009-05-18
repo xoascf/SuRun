@@ -423,15 +423,42 @@ ChkAdmin:
     ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
 }
 
+typedef BOOL (WINAPI *WINSTACONN)(HANDLE hSvr,DWORD SessId,DWORD TargetSessId,
+                                        PWCHAR Password,BOOL bWait);
+WINSTACONN WinStationConnect;
+static BOOL SwitchToSession(DWORD SessionId)
+{
+//  HANDLE hUser=GetSessionUserToken(SessionId);
+//  if (!hUser)
+//    return FALSE;
+  if (!WinStationConnect)
+  {
+    HMODULE hWinSta = LoadLibraryW(L"winsta.dll");
+    if (!hWinSta) 
+      return FALSE;
+    WinStationConnect = (WINSTACONN)GetProcAddress(hWinSta,"WinStationConnectW");
+  }
+  if (!WinStationConnect) 
+    return FALSE;
+//  ImpersonateLoggedOnUser(hUser);
+  WTSDisconnectSession(0,WTS_CURRENT_SESSION,TRUE);
+  BOOL bRet=WinStationConnect(0,SessionId,-1,L"",TRUE);
+//  RevertToSelf();
+//  CloseHandle(hUser);
+  return bRet;
+}
+
 static BOOL TestDirectServiceCommands()
 {
-  if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0))
+  if (g_RunData.KillPID!=0xFFFFFFFF)
+    return false;
+  if (_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)
   {
     TestEmptyAdminPasswords();
     CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
     return true;
   }
-  if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/RESTORE "),9)==0))
+  if (_tcsnicmp(g_RunData.cmdLine,_T("/RESTORE "),9)==0)
   {
     GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
     //Double check if User is Admin!
@@ -448,7 +475,7 @@ static BOOL TestDirectServiceCommands()
     }
     return true;
   }
-  if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/BACKUP "),8)==0))
+  if (_tcsnicmp(g_RunData.cmdLine,_T("/BACKUP "),8)==0)
   {
     GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
     //Double check if User is Admin!
@@ -462,6 +489,11 @@ static BOOL TestDirectServiceCommands()
       ResumeClient(RETVAL_ACCESSDENIED);
       SafeMsgBox(0,CBigResStr(IDS_NOEXPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     }
+    return true;
+  }
+  if (_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO"),8)==0)
+  {
+    ResumeClient(SwitchToSession(_ttol(PathGetArgs(g_RunData.cmdLine)))?RETVAL_OK:RETVAL_ACCESSDENIED);
     return true;
   }
   return false;
