@@ -428,9 +428,9 @@ typedef BOOL (WINAPI *WINSTACONN)(HANDLE hSvr,DWORD SessId,DWORD TargetSessId,
 WINSTACONN WinStationConnect;
 static BOOL SwitchToSession(DWORD SessionId)
 {
-//  HANDLE hUser=GetSessionUserToken(SessionId);
-//  if (!hUser)
-//    return FALSE;
+  HANDLE hUser=GetSessionUserToken(SessionId);
+  if (!hUser)
+    return FALSE;
   if (!WinStationConnect)
   {
     HMODULE hWinSta = LoadLibraryW(L"winsta.dll");
@@ -440,11 +440,10 @@ static BOOL SwitchToSession(DWORD SessionId)
   }
   if (!WinStationConnect) 
     return FALSE;
-//  ImpersonateLoggedOnUser(hUser);
-  WTSDisconnectSession(0,WTS_CURRENT_SESSION,TRUE);
+  ImpersonateLoggedOnUser(hUser);
   BOOL bRet=WinStationConnect(0,SessionId,-1,L"",TRUE);
-//  RevertToSelf();
-//  CloseHandle(hUser);
+  RevertToSelf();
+  CloseHandle(hUser);
   return bRet;
 }
 
