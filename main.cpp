@@ -229,10 +229,16 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
           *(Args-1)=' ';
         Args=c;
         break;
+      }else if (!_wcsicmp(c,L"/SWITCHTO"))
+      {
+        g_RunData.KillPID=-1;
+        if (Args && (*(Args-1)==0))
+          *(Args-1)=' ';
+        Args=c;
+        break;
       }else
       {
-        //Usage
-        //SafeMsgBox(0,CBigResStr(IDS_USAGE),CResStr(IDS_APPNAME),MB_ICONSTOP);
+        //invalid direct argument
         return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
       }
     }
