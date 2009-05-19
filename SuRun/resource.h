@@ -139,6 +139,7 @@
 #define IDD_IMPORTSETTINGS              137
 #define IDD_CURUSRLOGON2                138
 #define IDD_APPOPTIONS2                 139
+#define IDD_FUSDLG                      140
 #define IDI_LISTICON                    200
 #define IDI_LISTICON1                   201
 #define IDI_LISTICON2                   202
