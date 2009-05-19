@@ -146,6 +146,15 @@ void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
     bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
 }
 
+bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
+{
+  TCHAR Pass[PWLEN+1]={0};
+  if (LoadRunAsPassword(RunAsUser,UserName,Pass,PWLEN) 
+    && PasswordOK(SessionId,UserName,Pass,true))
+    return zero(Pass),true;
+  return zero(Pass),false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Logon Dialog
@@ -382,7 +391,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       if (GetDlgItem(hwnd,IDC_HINT))
         SendDlgItemMessage(hwnd,IDC_HINT,WM_SETFONT,
           (WPARAM)CreateFont(-14,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
-      SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
+      if (p->Msg)
+        SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
 //#ifndef SuRunEXT_EXPORTS
 //#ifdef DoDBGTrace
 //      {
@@ -429,7 +439,9 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
       }else
         SetFocus(GetDlgItem(hwnd,IDCANCEL));
-      if ((!p->ForceAdminLogon)|| bFoundUser)
+      if (p->UserReadonly && p->bRunAs)
+          SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
+      else if ((!p->ForceAdminLogon)|| bFoundUser)
         SetDlgItemText(hwnd,IDC_USER,p->User);
       else
       {
@@ -568,8 +580,10 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                   else
                     DeleteRunAsPassword(p->User,User);
                 }
-                _tcscpy(p->User,User);
-                _tcscpy(p->Password,Pass);
+                if(p->User)
+                  _tcscpy(p->User,User);
+                if(p->Password)
+                  _tcscpy(p->Password,Pass);
                 CloseHandle(hUser);
                 zero(Pass);
                 EndDialog(hwnd,ExitCode);
@@ -617,6 +631,15 @@ DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,P,true,false,0,SessionId);
   p.Users.Add(User);
   return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
+                  0,DialogProc,(LPARAM)&p);
+}
+
+BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User)
+{
+  LOGONDLGPARAMS p(0,RunAsUser,0,true,false,0,SessionId);
+  p.Users.Add(User);
+  p.bRunAs=TRUE;
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_FUSDLG),
                   0,DialogProc,(LPARAM)&p);
 }
 
