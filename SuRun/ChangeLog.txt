@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* NEW: Implemented Fast User Swithing (SuRun /SwitchTo <[domain\]user|Session>)
 * FIX: Tray symbol could show information for processes in other sessions
 
 ToDo
