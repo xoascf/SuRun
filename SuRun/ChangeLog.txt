@@ -1,7 +1,5 @@
 Done, to be tested:
 ---------------------------
-* NEW: Implemented Fast User Swithing (SuRun /SwitchTo <[domain\]user|Session>)
-* FIX: Tray symbol could show information for processes in other sessions
 
 ToDo
 ---------------------
@@ -26,6 +24,13 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 Beta 9 - 2009-05-19:
+-----------------------------------
+* NEW: Implemented Fast User Swithing via command line parameters 
+  "SuRun /SwitchTo <[domain\]user|Session>". If that works on most systems, 
+  it will be wrapped with a Task-Switcher like GUI.
+* FIX: Tray symbol could show information for processes in other sessions
 
 SuRun 1.2.0.7 Beta 8 - 2009-05-08:
 -----------------------------------
