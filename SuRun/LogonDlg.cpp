@@ -439,6 +439,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
       }else
         SetFocus(GetDlgItem(hwnd,IDCANCEL));
+      //Fast User swithing always set IDC_USER Text to Users(0):
       if (p->UserReadonly && p->bRunAs)
           SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
       else if ((!p->ForceAdminLogon)|| bFoundUser)
