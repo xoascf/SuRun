@@ -173,6 +173,7 @@ typedef struct _LOGONDLGPARAMS
   int MaxTimeOut;
   DWORD UsrFlags;
   BOOL bRunAs;
+  BOOL bFUS;//Fast User switching
   DWORD SessionId;
   _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags,DWORD S)
   {
@@ -185,6 +186,7 @@ typedef struct _LOGONDLGPARAMS
     TimeOut=MaxTimeOut;
     UsrFlags=UFlags;
     bRunAs=FALSE;
+    bFUS=FALSE;
     SessionId=S;
   }
 }LOGONDLGPARAMS;
@@ -217,7 +219,7 @@ static void SetUserBitmap(HWND hwnd)
       SendMessage(hwnd,WM_GETICON,ICON_BIG,0));
   }
   //Password:
-  if (p->bRunAs)
+  if ((p->bRunAs)||(p->bFUS))
   {
     TCHAR Pass[PWLEN+1]={0};
     if (LoadRunAsPassword(p->User,User,Pass,PWLEN) 
@@ -440,7 +442,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       }else
         SetFocus(GetDlgItem(hwnd,IDCANCEL));
       //Fast User swithing always set IDC_USER Text to Users(0):
-      if (p->UserReadonly && p->bRunAs)
+      if (p->bFUS)
           SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
       else if ((!p->ForceAdminLogon)|| bFoundUser)
         SetDlgItemText(hwnd,IDC_USER,p->User);
@@ -562,7 +564,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             TCHAR Pass[PWLEN+1]={0};
             GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
             GetWindowText((HWND)GetDlgItem(hwnd,IDC_PASSWORD),Pass,PWLEN);
-            HANDLE hUser=GetUserToken(p->SessionId,User,Pass,(!p->ForceAdminLogon)&&(!p->bRunAs));
+            HANDLE hUser=GetUserToken(p->SessionId,User,Pass,p->bFUS||((!p->ForceAdminLogon)&&(!p->bRunAs)));
             if (hUser)
             {
               if ((p->ForceAdminLogon)&&(!IsAdmin(hUser)))
@@ -574,7 +576,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                 SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
               }else
               {
-                if (p->bRunAs)
+                if ((p->bRunAs)||(p->bFUS))
                 {
                   if(IsDlgButtonChecked(hwnd,IDC_STOREPASS))
                     SaveRunAsPassword(p->User,User,Pass);
@@ -639,7 +641,7 @@ BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User)
 {
   LOGONDLGPARAMS p(0,RunAsUser,0,true,false,0,SessionId);
   p.Users.Add(User);
-  p.bRunAs=TRUE;
+  p.bFUS=TRUE;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_FUSDLG),
                   0,DialogProc,(LPARAM)&p);
 }
