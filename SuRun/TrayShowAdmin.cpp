@@ -228,10 +228,32 @@ void DisplayMenu(HWND hWnd)
   g_BallonTips=bBTip;
 };
 
+int g_HotKeyID=0;
+
 LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
+//  //Hotkey stuff:
+//  case WM_CREATE:
+//    {
+//      g_HotKeyID=GlobalAddAtom(L"SuRunFUSHotKey");
+//      RegisterHotKey(hWnd,g_HotKeyID,MOD_WIN,(int)'S');
+//      break;
+//    }
+//  case WM_DESTROY:
+//    {
+//      UnregisterHotKey(hWnd,g_HotKeyID);
+//      GlobalDeleteAtom(g_HotKeyID);
+//      g_HotKeyID=0;
+//      break;
+//    }
+//  case WM_HOTKEY:
+//    if (wParam==g_HotKeyID)
+//    {
+//
+//    }
+//    break;
   case WM_USER+1758:
     {
       switch (lParam)
