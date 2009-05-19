@@ -149,8 +149,8 @@ void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
 bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
 {
   TCHAR Pass[PWLEN+1]={0};
-  if (LoadRunAsPassword(RunAsUser,UserName,Pass,PWLEN) 
-    && PasswordOK(SessionId,UserName,Pass,true))
+  LoadRunAsPassword(RunAsUser,UserName,Pass,PWLEN);
+    if (PasswordOK(SessionId,UserName,Pass,true))
     return zero(Pass),true;
   return zero(Pass),false;
 }
