@@ -423,30 +423,6 @@ ChkAdmin:
     ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
 }
 
-typedef BOOL (WINAPI *WINSTACONN)(HANDLE hSvr,DWORD SessId,DWORD TargetSessId,
-                                        PWCHAR Password,BOOL bWait);
-WINSTACONN WinStationConnect;
-static BOOL SwitchToSession(DWORD SessionId)
-{
-  HANDLE hUser=GetSessionUserToken(SessionId);
-  if (!hUser)
-    return FALSE;
-  if (!WinStationConnect)
-  {
-    HMODULE hWinSta = LoadLibraryW(L"winsta.dll");
-    if (!hWinSta) 
-      return FALSE;
-    WinStationConnect = (WINSTACONN)GetProcAddress(hWinSta,"WinStationConnectW");
-  }
-  if (!WinStationConnect) 
-    return FALSE;
-  ImpersonateLoggedOnUser(hUser);
-  BOOL bRet=WinStationConnect(0,SessionId,-1,L"",TRUE);
-  RevertToSelf();
-  CloseHandle(hUser);
-  return bRet;
-}
-
 static BOOL TestDirectServiceCommands()
 {
   if (g_RunData.KillPID!=0xFFFFFFFF)
@@ -488,11 +464,6 @@ static BOOL TestDirectServiceCommands()
       ResumeClient(RETVAL_ACCESSDENIED);
       SafeMsgBox(0,CBigResStr(IDS_NOEXPORT),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
     }
-    return true;
-  }
-  if (_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO"),8)==0)
-  {
-    ResumeClient(SwitchToSession(_ttol(PathGetArgs(g_RunData.cmdLine)))?RETVAL_OK:RETVAL_ACCESSDENIED);
     return true;
   }
   return false;
@@ -1229,6 +1200,19 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
   return RetVal;
 }
 
+static BOOL SwitchToSession(DWORD SessionId)
+{
+  HMODULE hWinSta = LoadLibraryW(L"winsta.dll");
+  if (!hWinSta) 
+    return FALSE;
+  typedef BOOL (WINAPI *WSCW)(HANDLE,DWORD,DWORD,PWCHAR,BOOL);
+  WSCW WinStationConnectW=(WSCW)GetProcAddress(hWinSta,"WinStationConnectW");
+  if (!WinStationConnectW) 
+    return FALSE;
+  BOOL bRet=WinStationConnectW(0,SessionId,-1,L"",TRUE);
+  return bRet;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  SuRun
@@ -1299,6 +1283,42 @@ void SuRun(DWORD ProcessID)
     }
   }else //if (!g_RunData.bRunAs)
   {
+    //Do Fast User Switching?
+    if(_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO "),10)==0)
+    {
+      TCHAR UserName[UNLEN+UNLEN+2];
+      DWORD SessID=wcstol(PathGetArgs(g_RunData.cmdLine),0,10);
+      {
+        HANDLE tSess=GetSessionUserToken(SessID);
+        GetTokenUserName(tSess,UserName);
+        CloseHandle(tSess);
+      }
+      if(!SavedPasswordOk(SessID,g_RunData.UserName,UserName))
+      {
+        if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
+          (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
+        {
+          if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,UserName))
+          {
+            DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
+            ResumeClient(RETVAL_CANCELLED);
+            return;
+          }
+          DeleteSafeDesktop(false);
+          //fall through
+        }else
+        {
+          DBGTrace("CreateSafeDesktop failed");
+          ResumeClient(RETVAL_CANCELLED);
+          if (!g_RunData.beQuiet)
+            SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
+          return;
+        }
+      }
+      ResumeClient(RETVAL_OK);
+      SwitchToSession(SessID);
+      return;
+    }
     //Setup?
     if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
     {
