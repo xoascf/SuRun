@@ -1213,6 +1213,71 @@ static BOOL SwitchToSession(DWORD SessionId)
   return bRet;
 }
 
+static DWORD DoFUS() //Do Fast User Switching
+{
+  TCHAR UserName[UNLEN+UNLEN+2];
+  DWORD SessID=wcstol(PathGetArgs(g_RunData.cmdLine),0,10)-1;
+  if (SessID==-1)
+  {
+    _tcsncpy(UserName,PathGetArgs(g_RunData.cmdLine),UNLEN+UNLEN);
+    DWORD n=0;
+    WTS_SESSION_INFO* si=0;
+    WTSEnumerateSessions(0,0,1,&si,&n);
+    if (si && n)
+    {
+      for (DWORD i=0;i<n;i++)
+      {
+        TCHAR* un=0;
+        TCHAR* dn=0;
+        DWORD unl=0;
+        DWORD dnl=0;
+        WTSQuerySessionInformation(0,si[i].SessionId,WTSUserName,&un,&unl);
+        WTSQuerySessionInformation(0,si[i].SessionId,WTSDomainName,&dn,&dnl);
+        CBigResStr undn(L"%s\\%s",dn,un);
+        WTSFreeMemory(dn);
+        dn=0;
+        if ((_tcsicmp(un,UserName)==0)||(_tcsicmp(undn,UserName)==0))
+        {
+          WTSFreeMemory(un);
+          SessID=si[i].SessionId;
+          break;
+        }
+        WTSFreeMemory(un);
+        un=0;
+      }
+      WTSFreeMemory(si);
+    }
+    if (SessID==-1)
+      return RETVAL_CANCELLED;
+  }
+  {
+    HANDLE tSess=GetSessionUserToken(SessID);
+    if (!tSess)
+      return RETVAL_CANCELLED;
+    GetTokenUserName(tSess,UserName);
+    CloseHandle(tSess);
+    if (!UserName[0])
+      return RETVAL_CANCELLED;
+  }
+  if (SessID==g_RunData.SessionID)
+    return RETVAL_OK;
+  if(!SavedPasswordOk(SessID,g_RunData.UserName,UserName))
+  {
+    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
+      (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
+      return RETVAL_CANCELLED;
+    if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,UserName))
+    {
+      DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
+      return RETVAL_CANCELLED;
+    }
+    DeleteSafeDesktop(false);
+  }
+  if (SwitchToSession(SessID))
+    return RETVAL_OK;
+  return RETVAL_CANCELLED;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  SuRun
@@ -1284,39 +1349,9 @@ void SuRun(DWORD ProcessID)
   }else //if (!g_RunData.bRunAs)
   {
     //Do Fast User Switching?
-    if(_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO "),10)==0)
+    if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO "),10)==0))
     {
-      TCHAR UserName[UNLEN+UNLEN+2];
-      DWORD SessID=wcstol(PathGetArgs(g_RunData.cmdLine),0,10);
-      {
-        HANDLE tSess=GetSessionUserToken(SessID);
-        GetTokenUserName(tSess,UserName);
-        CloseHandle(tSess);
-      }
-      if(!SavedPasswordOk(SessID,g_RunData.UserName,UserName))
-      {
-        if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
-          (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
-        {
-          if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,UserName))
-          {
-            DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
-            ResumeClient(RETVAL_CANCELLED);
-            return;
-          }
-          DeleteSafeDesktop(false);
-          //fall through
-        }else
-        {
-          DBGTrace("CreateSafeDesktop failed");
-          ResumeClient(RETVAL_CANCELLED);
-          if (!g_RunData.beQuiet)
-            SafeMsgBox(0,CBigResStr(IDS_NODESK),CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-          return;
-        }
-      }
-      ResumeClient(RETVAL_OK);
-      SwitchToSession(SessID);
+      ResumeClient(DoFUS());
       return;
     }
     //Setup?
