@@ -26,6 +26,8 @@ BOOL PasswordOK(DWORD SessionId,LPCTSTR User,LPCTSTR Password,bool AllowEmptyPas
 BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
 DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,int IDmsg,...);
 
+BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User);
+
 BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
 
 BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
@@ -34,3 +36,5 @@ BOOL LogonAdmin(DWORD SessionId,int IDmsg,...);
 DWORD LogonCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,DWORD UsrFlags,int IDmsg,...);
 
 DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...);
+
+bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName);
