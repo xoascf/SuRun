@@ -5,6 +5,8 @@ ToDo
 ---------------------
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
+* GUI for FUS
+* Checksums for "Always Yes" programs
 
 To be done in future:
 ---------------------
@@ -12,7 +14,6 @@ To be done in future:
 * Hide/Show all context menu entries consistently
 * make all context menu entries dynamically with ShellExt 
   (E.g.: msi with popup-menu)
-* use MD5-Hash for "Always Yes" programs
 
 Deferred Whishlist:
 ---------------------
