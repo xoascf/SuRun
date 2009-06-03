@@ -2089,7 +2089,7 @@ static void HandleHooks()
   CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
 #endif _WIN64
   if (GetLastError()==ERROR_ALREADY_EXISTS)
-    return ExitProcess(-1),true;
+    return;
   g_RunData.CliProcessId=GetCurrentProcessId();
   g_RunData.CliThreadId=GetCurrentThreadId();
   GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
@@ -2111,12 +2111,12 @@ static void HandleHooks()
 #endif _SR32
     if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
       && IsAdmin())
-      return ExitProcess(0),true;
+      return;
     if ( (!GetUseIATHook) 
       && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
       && (!GetRestartAsAdmin) 
       && (!GetStartAsAdmin))
-      return ExitProcess(0),true;
+      return;
     InstallSysMenuHook();
 #ifdef _WIN64
     {
@@ -2134,24 +2134,29 @@ static void HandleHooks()
     }
 #endif _WIN64
     bool TSA=FALSE;
-    CTimeOut t(10000);
+    CTimeOut t;
     for (;;)
     {
+      BOOL bShowTray=TRUE;
+      BOOL bBaloon=FALSE;
       if (t.TimedOut())
       {
         if(CheckServiceStatus()!=SERVICE_RUNNING)
           break;
         g_RunData.Groups=UserIsInSuRunnersOrAdmins();
+        bShowTray=ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
+        bBaloon=ShowBalloon(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
+        if ( (!GetUseIATHook) && (!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+          break;
         t.Set(10000);
       }
 #ifndef _SR32
-      if (ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+      if (bShowTray)
       {
         if(!TSA)
           InitTrayShowAdmin();
         TSA=TRUE;
-        Sleep(ProcessTrayShowAdmin(ShowBalloon(g_RunData.UserName,
-          g_CliIsInAdmins,g_CliIsInSuRunners))?55:333);
+        Sleep(ProcessTrayShowAdmin(bBaloon?55:333));
       }else
 #endif _SR32
       {
@@ -2160,11 +2165,6 @@ static void HandleHooks()
         TSA=FALSE;
         Sleep(1000);
       }
-      if ( (!GetUseIATHook) 
-        && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners)) 
-        && (!GetRestartAsAdmin) 
-        && (!GetStartAsAdmin))
-        break;
     }
     if(TSA)
       CloseTrayShowAdmin();
