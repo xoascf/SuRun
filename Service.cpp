@@ -2081,6 +2081,95 @@ BOOL UserUninstall()
     MAKEINTRESOURCE(IDD_UNINSTALL),0,InstallDlgProc)!=IDCANCEL;
 }
 
+static void HandleHooks()
+{
+#ifdef _WIN64
+  CreateMutex(NULL,true,_T("SuRun64_SysMenuHookIsRunning"));
+#else _WIN64
+  CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
+#endif _WIN64
+  if (GetLastError()==ERROR_ALREADY_EXISTS)
+    return ExitProcess(-1),true;
+  g_RunData.CliProcessId=GetCurrentProcessId();
+  g_RunData.CliThreadId=GetCurrentThreadId();
+  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
+  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
+  GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+  ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
+  g_RunData.Groups=UserIsInSuRunnersOrAdmins();
+  //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
+  //if the hooks are still loaded
+  
+  //In the first three Minutes after Sytstem start:
+  //Wait for the service to start
+  DWORD ss=CheckServiceStatus();
+  if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
+    while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
+      Sleep(1000);
+#ifndef _SR32
+    StartTSAThread();
+#endif _SR32
+    if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+      && IsAdmin())
+      return ExitProcess(0),true;
+    if ( (!GetUseIATHook) 
+      && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+      && (!GetRestartAsAdmin) 
+      && (!GetStartAsAdmin))
+      return ExitProcess(0),true;
+    InstallSysMenuHook();
+#ifdef _WIN64
+    {
+      TCHAR SuRun32Exe[4096];
+      GetSystemWindowsDirectory(SuRun32Exe,4096);
+      PathAppend(SuRun32Exe,L"SuRun32.bin /SYSMENUHOOK");
+      STARTUPINFO si={0};
+      PROCESS_INFORMATION pi;
+      si.cb = sizeof(si);
+      if (CreateProcess(NULL,SuRun32Exe,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
+      {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+      }
+    }
+#endif _WIN64
+    bool TSA=FALSE;
+    CTimeOut t(10000);
+    for (;;)
+    {
+      if (t.TimedOut())
+      {
+        if(CheckServiceStatus()!=SERVICE_RUNNING)
+          break;
+        g_RunData.Groups=UserIsInSuRunnersOrAdmins();
+        t.Set(10000);
+      }
+#ifndef _SR32
+      if (ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+      {
+        if(!TSA)
+          InitTrayShowAdmin();
+        TSA=TRUE;
+        Sleep(ProcessTrayShowAdmin(ShowBalloon(g_RunData.UserName,
+          g_CliIsInAdmins,g_CliIsInSuRunners))?55:333);
+      }else
+#endif _SR32
+      {
+        if(TSA)
+          CloseTrayShowAdmin();
+        TSA=FALSE;
+        Sleep(1000);
+      }
+      if ( (!GetUseIATHook) 
+        && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners)) 
+        && (!GetRestartAsAdmin) 
+        && (!GetStartAsAdmin))
+        break;
+    }
+    if(TSA)
+      CloseTrayShowAdmin();
+    UninstallSysMenuHook();
+}
 //////////////////////////////////////////////////////////////////////////////
 // 
 // HandleServiceStuff: called on App Entry before WinMain()
@@ -2144,92 +2233,7 @@ bool HandleServiceStuff()
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
-#ifdef _WIN64
-      CreateMutex(NULL,true,_T("SuRun64_SysMenuHookIsRunning"));
-#else _WIN64
-      CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
-#endif _WIN64
-      if (GetLastError()==ERROR_ALREADY_EXISTS)
-        return ExitProcess(-1),true;
-      g_RunData.CliProcessId=GetCurrentProcessId();
-      g_RunData.CliThreadId=GetCurrentThreadId();
-      GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
-      GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
-      GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-      ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
-      g_RunData.Groups=UserIsInSuRunnersOrAdmins();
-      //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
-      //if the hooks are still loaded
-
-      //In the first three Minutes after Sytstem start:
-      //Wait for the service to start
-      DWORD ss=CheckServiceStatus();
-      if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
-        while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
-            Sleep(1000);
-#ifndef _SR32
-      StartTSAThread();
-#endif _SR32
-      if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-        && IsAdmin())
-        return ExitProcess(0),true;
-      if ( (!GetUseIATHook) 
-        && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-        && (!GetRestartAsAdmin) 
-        && (!GetStartAsAdmin))
-        return ExitProcess(0),true;
-      InstallSysMenuHook();
-#ifdef _WIN64
-      {
-        TCHAR SuRun32Exe[4096];
-        GetSystemWindowsDirectory(SuRun32Exe,4096);
-        PathAppend(SuRun32Exe,L"SuRun32.bin /SYSMENUHOOK");
-        STARTUPINFO si={0};
-        PROCESS_INFORMATION pi;
-        si.cb = sizeof(si);
-        if (CreateProcess(NULL,SuRun32Exe,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-        {
-          CloseHandle(pi.hProcess);
-          CloseHandle(pi.hThread);
-        }
-      }
-#endif _WIN64
-      bool TSA=FALSE;
-      CTimeOut t(10000);
-      for (;;)
-      {
-        if (t.TimedOut())
-        {
-          if(CheckServiceStatus()!=SERVICE_RUNNING)
-            break;
-          g_RunData.Groups=UserIsInSuRunnersOrAdmins();
-          t.Set(10000);
-        }
-#ifndef _SR32
-        if (ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-        {
-          if(!TSA)
-            InitTrayShowAdmin();
-          TSA=TRUE;
-          Sleep(ProcessTrayShowAdmin(ShowBalloon(g_RunData.UserName,
-            g_CliIsInAdmins,g_CliIsInSuRunners))?55:333);
-        }else
-#endif _SR32
-        {
-          if(TSA)
-            CloseTrayShowAdmin();
-          TSA=FALSE;
-          Sleep(1000);
-        }
-        if ( (!GetUseIATHook) 
-          && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners)) 
-          && (!GetRestartAsAdmin) 
-          && (!GetStartAsAdmin))
-          break;
-      }
-      if(TSA)
-        CloseTrayShowAdmin();
-      UninstallSysMenuHook();
+      HandleHooks();
       ExitProcess(0);
       return true;
     }
