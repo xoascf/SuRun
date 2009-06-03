@@ -7,6 +7,7 @@ ToDo
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * GUI for FUS
 * Checksums for "Always Yes" programs
+* reduce registry access from "SuRun /SYSMENUHOOK"
 
 To be done in future:
 ---------------------
