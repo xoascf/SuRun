@@ -8,6 +8,7 @@ ToDo
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * GUI for FUS
 * Checksums for "Always Yes" programs
+* Windows 7 compatibility
 
 To be done in future:
 ---------------------
