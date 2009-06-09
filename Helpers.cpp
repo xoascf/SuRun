@@ -1175,36 +1175,6 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
   return bRet;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// 
-// GetShellProcessToken
-// 
-/////////////////////////////////////////////////////////////////////////////
-
-HANDLE GetShellProcessToken()
-{
-  DWORD ShellID=0;
-  GetWindowThreadProcessId(GetShellWindow(),&ShellID);
-  if (!ShellID)
-  {
-    DBGTrace1("GetWindowThreadProcessId failed: %s",GetLastErrorNameStatic());
-    return 0;
-  }
-  HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
-  if (!hShell)
-  {
-    DBGTrace2("OpenProcess(%d) failed: %s",ShellID,GetLastErrorNameStatic());
-    return 0;
-  }
-  HANDLE hTok=0;
-  if (!OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
-  {
-    DBGTrace2("OpenProcessToken(%d) failed: %s",ShellID,GetLastErrorNameStatic());
-  }
-  CloseHandle(hShell);
-  return hTok;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //  GetProcessID
@@ -1266,6 +1236,49 @@ DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1)
   }
   CloseHandle(hSnap);
   return dwRet;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// GetShellProcessToken
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+HANDLE GetShellProcessToken()
+{
+  DWORD ShellID=0;
+  GetWindowThreadProcessId(GetShellWindow(),&ShellID);
+  if (!ShellID)
+  {
+    DBGTrace2("GetWindowThreadProcessId(0x%X) failed: %s",GetShellWindow(),GetLastErrorNameStatic());
+
+    //Get the Shells Name
+    TCHAR Shell[MAX_PATH];
+    if (!GetRegStr(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Microsoft\\Windows NT\\")
+                   _T("CurrentVersion\\Winlogon"),_T("Shell"),Shell,MAX_PATH))
+      return 0;
+    PathRemoveArgs(Shell);
+    PathStripPath(Shell);
+    //Now get the Shells Process ID
+    ULONG s=-2;
+    ProcessIdToSessionId(GetCurrentProcessId(),&s);
+    ShellID=GetProcessID(Shell,s);
+    if (!ShellID)
+      return 0;
+  }
+  HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
+  if (!hShell)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ShellID,GetLastErrorNameStatic());
+    return 0;
+  }
+  HANDLE hTok=0;
+  if (!OpenProcessToken(hShell,TOKEN_DUPLICATE,&hTok))
+  {
+    DBGTrace2("OpenProcessToken(%d) failed: %s",ShellID,GetLastErrorNameStatic());
+  }
+  CloseHandle(hShell);
+  return hTok;
 }
 
 //////////////////////////////////////////////////////////////////////////////
