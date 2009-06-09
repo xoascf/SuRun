@@ -1264,7 +1264,10 @@ HANDLE GetShellProcessToken()
     ProcessIdToSessionId(GetCurrentProcessId(),&s);
     ShellID=GetProcessID(Shell,s);
     if (!ShellID)
+    {
+      DBGTrace2("GetProcessID(%s,%d) failed!",Shell,s);
       return 0;
+    }
   }
   HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
   if (!hShell)
