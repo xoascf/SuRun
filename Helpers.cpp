@@ -1251,23 +1251,7 @@ HANDLE GetShellProcessToken()
   if (!ShellID)
   {
     DBGTrace2("GetWindowThreadProcessId(0x%X) failed: %s",GetShellWindow(),GetLastErrorNameStatic());
-
-    //Get the Shells Name
-    TCHAR Shell[MAX_PATH];
-    if (!GetRegStr(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Microsoft\\Windows NT\\")
-                   _T("CurrentVersion\\Winlogon"),_T("Shell"),Shell,MAX_PATH))
-      return 0;
-    PathRemoveArgs(Shell);
-    PathStripPath(Shell);
-    //Now get the Shells Process ID
-    ULONG s=-2;
-    ProcessIdToSessionId(GetCurrentProcessId(),&s);
-    ShellID=GetProcessID(Shell,s);
-    if (!ShellID)
-    {
-      DBGTrace2("GetProcessID(%s,%d) failed!",Shell,s);
-      return 0;
-    }
+    return 0;
   }
   HANDLE hShell=OpenProcess(PROCESS_QUERY_INFORMATION,0,ShellID);
   if (!hShell)
