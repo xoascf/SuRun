@@ -1,6 +1,7 @@
 Done, to be tested:
 ---------------------------
 * reduce registry access from "SuRun /SYSMENUHOOK"
+* get rid of the "virtualized" status in Windows 7 (app.manifest).
 
 ToDo
 ---------------------
