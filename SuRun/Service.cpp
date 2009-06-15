@@ -2156,7 +2156,7 @@ static void HandleHooks()
         if(!TSA)
           InitTrayShowAdmin();
         TSA=TRUE;
-        Sleep(ProcessTrayShowAdmin(bBaloon?55:333));
+        Sleep(ProcessTrayShowAdmin(bBaloon)?55:333);
       }else
 #endif _SR32
       {
