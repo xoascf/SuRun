@@ -128,6 +128,8 @@ public:
   {
     m_hWnd=0;
     m_hWndTrans=0;
+    m_x=0;
+    m_y=0;
     m_dx=0;
     m_dy=0;
     m_bm=0;
@@ -143,13 +145,15 @@ public:
   HWND hWnd(){return m_hWndTrans;};
   void Init()
   {
+    m_x=GetSystemMetrics(SM_XVIRTUALSCREEN);
+    m_y=GetSystemMetrics(SM_YVIRTUALSCREEN);
     m_dx=GetSystemMetrics(SM_CXVIRTUALSCREEN);
     m_dy=GetSystemMetrics(SM_CYVIRTUALSCREEN);
     HDC dc=GetDC(0);
     HDC MemDC=CreateCompatibleDC(dc);
     m_bm=CreateCompatibleBitmap(dc,m_dx,m_dy);
     (HBITMAP)SelectObject(MemDC,m_bm);
-    BitBlt(MemDC,0,0,m_dx,m_dy,dc,0,0,SRCCOPY|CAPTUREBLT);
+    BitBlt(MemDC,0,0,m_dx,m_dy,dc,m_x,m_y,SRCCOPY|CAPTUREBLT);
     DeleteDC(MemDC);
     ReleaseDC(0,dc);
   }
@@ -194,7 +198,7 @@ public:
     wc.hInstance=GetModuleHandle(0);
     RegisterClass(&wc);
     m_hWnd=CreateWindowEx(WS_EX_NOACTIVATE,wc.lpszClassName,
-      _T("ScreenWnd"),WS_VISIBLE|WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
+      _T("ScreenWnd"),WS_VISIBLE|WS_POPUP|WS_DISABLED|WS_VISIBLE,m_x,m_y,
       m_dx,m_dy,0,0,wc.hInstance,0);
     SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);
     SetWindowPos(m_hWnd,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOREDRAW);
@@ -203,7 +207,7 @@ public:
     {
       MsgLoop();
       m_hWndTrans=CreateWindowEx(WS_EX_NOACTIVATE|WS_EX_LAYERED,
-        wc.lpszClassName,_T("ScreenWnd"),WS_POPUP|WS_DISABLED|WS_VISIBLE,0,0,
+        wc.lpszClassName,_T("ScreenWnd"),WS_POPUP|WS_DISABLED|WS_VISIBLE,m_x,m_y,
         m_dx,m_dy,m_hWnd,0,wc.hInstance,0);
       SetWindowLongPtr(m_hWndTrans,GWLP_USERDATA,(LONG_PTR)this);
       SetWindowPos(m_hWndTrans,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE|SWP_NOREDRAW);
@@ -319,6 +323,8 @@ private:
   }
   HWND m_hWnd;
   HWND m_hWndTrans;
+  int m_x;
+  int m_y;
   int m_dx;
   int m_dy;
   HBITMAP m_bm;
