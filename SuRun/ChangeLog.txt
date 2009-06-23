@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* the blurred background did not respect negative monitor area start values
 * reduce registry access from "SuRun /SYSMENUHOOK"
 * get rid of the "virtualized" status in Windows 7 (app.manifest).
 
