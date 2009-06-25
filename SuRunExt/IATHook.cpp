@@ -220,16 +220,16 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
-//  char fmod[MAX_PATH]={0};
-//  {
-//    GetModuleFileNameA(0,fmod,MAX_PATH);
-//    PathStripPathA(fmod);
-//    strcat(fmod,": ");
-//    char* p=&fmod[strlen(fmod)];
-//    GetModuleFileNameA(hMod,p,MAX_PATH);
-//    PathStripPathA(p);
-//  }
-//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hMod,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
@@ -255,11 +255,10 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
                 DWORD oldProt=PAGE_READWRITE;
                 if(VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function),PAGE_EXECUTE_WRITECOPY,&oldProt))
                 {
-//#ifdef DoDBGTrace
-//                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x MBI:(%X,%X,%X)\n",
-//                  fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt,
-//                  mbi.AllocationProtect,mbi.State,mbi.Type);
-//#endif DoDBGTrace
+#ifdef DoDBGTrace
+                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x\n",
+                  fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
+#endif DoDBGTrace
 //                  pThunk->u1.Function = (DWORD_PTR)newFunc;
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
                   InterlockedExchangePointer((VOID**)&pThunk->u1.Function,newFunc);
