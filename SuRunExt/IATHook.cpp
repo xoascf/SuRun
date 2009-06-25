@@ -262,7 +262,7 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 //                  pThunk->u1.Function = (DWORD_PTR)newFunc;
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
                   InterlockedExchangePointer((VOID**)&pThunk->u1.Function,newFunc);
-//                  VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
+                  VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
                   nHooked++;
                 }
