@@ -61,6 +61,8 @@ typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
                                         LPPROCESS_INFORMATION);
 
+typedef BOOL (WINAPI* lpSwitchDesk)(HDESK);
+
 //Forward decl:
 BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
@@ -76,6 +78,8 @@ FARPROC WINAPI GetProcAddr(HMODULE,LPCSTR);
 
 BOOL WINAPI FreeLib(HMODULE);
 VOID WINAPI FreeLibAndExitThread(HMODULE,DWORD);
+
+BOOL WINAPI SwitchDesk(HDESK);
 
 static lpGetProcAddress orgGPA=NULL;
 
@@ -121,11 +125,14 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
 
+static CHookDescriptor hkSwDesk  ("user32.dll","CreateProcessW",(PROC)SwitchDesk);
+
 //Functions that, if present in the IAT, cause the module to be hooked
 static CHookDescriptor* need_hdt[]=
 {
   &hkCrProcA, 
-  &hkCrProcW
+  &hkCrProcW,
+  &hkSwDesk,
 };
 
 //Functions that will be hooked
@@ -139,7 +146,8 @@ static CHookDescriptor* hdt[]=
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
-  &hkCrProcW
+  &hkCrProcW,
+  &hkSwDesk
 };
 
 //relative pointers in PE images
@@ -775,6 +783,27 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
   }
   SetLastError(NOERROR);
   ExitThread(dwExitCode);
+}
+
+BOOL WINAPI SwitchDesk(HDESK Desk)
+{
+  HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
+  if (!d)
+    return FALSE;
+  TCHAR dn[4096]={0};
+  DWORD dnl=4096;
+  if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
+  if (!d)
+    return FALSE;
+  if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
+  {
+    SetLastError(ERROR_ACCESS_DENIED);
+    return CloseDesktop(d),FALSE;
+  }
+  CloseDesktop(d);
+  if (hkSwDesk.OrgFunc())
+    return ((lpSwitchDesk)hkSwDesk.OrgFunc())(Desk);
+  return SwitchDesktop(Desk);
 }
 
 DWORD WINAPI InitHookProc(void* p)
