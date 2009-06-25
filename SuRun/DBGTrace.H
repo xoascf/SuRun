@@ -18,7 +18,7 @@
 #pragma comment(lib,"winmm")
 #pragma warning(disable : 4996)
 
-#define BetaVer _T(" Beta 9")
+#define BetaVer _T(" Beta 10")
 
 //#define DoDBGTrace
 
