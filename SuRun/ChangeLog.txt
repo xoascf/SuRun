@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* using AppInit_DLLs again!
 * IATHook now also hooks SwitchDesktop
 * the blurred background did not respect negative monitor area start values
 * reduce registry access from "SuRun /SYSMENUHOOK"
