@@ -125,7 +125,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PRO
 static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
 
-static CHookDescriptor hkSwDesk  ("user32.dll","CreateProcessW",(PROC)SwitchDesk);
+static CHookDescriptor hkSwDesk  ("user32.dll","SwitchDesktop",(PROC)SwitchDesk);
 
 //Functions that, if present in the IAT, cause the module to be hooked
 static CHookDescriptor* need_hdt[]=
