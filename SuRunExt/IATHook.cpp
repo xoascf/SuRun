@@ -220,16 +220,16 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hMod,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hMod,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
@@ -256,8 +256,8 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
                 if(VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function),PAGE_EXECUTE_WRITECOPY,&oldProt))
                 {
 #ifdef DoDBGTrace
-                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x\n",
-                  fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
+//                TRACExA("SuRunExt32.dll: HookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x\n",
+//                  fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
 #endif DoDBGTrace
 //                  pThunk->u1.Function = (DWORD_PTR)newFunc;
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
@@ -800,9 +800,19 @@ BOOL WINAPI SwitchDesk(HDESK Desk)
     return CloseDesktop(d),FALSE;
   }
   CloseDesktop(d);
+  BOOL bRet=FALSE;
+  EnterCriticalSection(&g_HookCs);
+#ifdef DoDBGTrace
+    if (!hkSwDesk.OrgFunc())
+      DBGTrace("IATHook FATAL Warning! hkSwDesk.orgFunc==0!");
+    if (hkSwDesk.newFunc==hkSwDesk.OrgFunc())
+      DBGTrace("IATHook FATAL Warning! hkSwDesk.newFunc==hkSwDesk.orgFunc!");
+#endif DoDBGTrace
   if (hkSwDesk.OrgFunc())
-    return ((lpSwitchDesk)hkSwDesk.OrgFunc())(Desk);
-  return SwitchDesktop(Desk);
+    bRet=((lpSwitchDesk)hkSwDesk.OrgFunc())(Desk);
+  bRet=SwitchDesktop(Desk);
+  LeaveCriticalSection(&g_HookCs);
+  return bRet;
 }
 
 DWORD WINAPI InitHookProc(void* p)
