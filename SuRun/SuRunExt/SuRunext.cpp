@@ -961,17 +961,17 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     PathQuoteSpaces(fSuRunExe);
     l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) && (!IsInBlackList(fMod));
 #ifdef DoDBGTrace
-    if(IsInBlackList(fMod))
-      DBGTrace1("%s is blacklisted! No Hook!",fMod);
-    DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
-      hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
+//    if(IsInBlackList(fMod))
+//      DBGTrace1("%s is blacklisted! No Hook!",fMod);
+//    DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
+//      hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
 #endif DoDBGTrace
     if(l_bSetHook && GetUseIATHook)
       LoadHooks();
   }
 #ifdef DoDBGTrace
-  else
-    DBGTrace4("Attach(hInst=%x) %d:%s[%s], ADMIN",hInstDLL,PID,fMod,GetCommandLine());
+//  else
+//    DBGTrace4("Attach(hInst=%x) %d:%s[%s], ADMIN",hInstDLL,PID,fMod,GetCommandLine());
 #endif DoDBGTrace
   //DevInst
 //  if(!l_IsAdmin)
