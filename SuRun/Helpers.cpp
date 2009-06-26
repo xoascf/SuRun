@@ -70,6 +70,23 @@ BOOL GetRegAnyPtr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVa
   return FALSE;
 }
 
+BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** RetVal,DWORD* nBytes)
+{
+  HKEY Key;
+  BOOL bRet=FALSE;
+  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  {
+    if ((RegQueryValueEx(Key,ValName,NULL,Type,0,nBytes)==ERROR_SUCCESS)&& nBytes)
+    {
+      *RetVal=(BYTE*)malloc(*nBytes);
+      if(*RetVal)
+        bRet=RegQueryValueEx(Key,ValName,NULL,Type,&RetVal,nBytes)==ERROR_SUCCESS;
+    }
+    RegCloseKey(Key);
+  }
+  return bRet;
+}
+
 BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes)
 {
   HKEY Key;
@@ -1512,15 +1529,32 @@ LPCTSTR GetVersionString()
 
 HBITMAP LoadUserBitmap(LPCTSTR UserName)
 {
+  TCHAR Pic[UNLEN+1];
+  _tcscpy(Pic,UserName);
+  PathStripPath(Pic);
+  if (_winmajor>=6)
+  {
+    //Vista: Load User bitmap from registry:
+    DWORD UserID=GetRegInt(HKLM,CResStr("SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),"",0);
+    if (UserID)
+    {
+      BYTE* bmp=0;
+      DWORD type=0;
+      DWORD nBytes=0;
+      if(GetRegAnyAlloc(HKLM,CResStr("SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),
+                        "UserTile",&type,&bmp,&nBytes))
+      {
+        
+      }
+      free(nBytes);
+    }
+  }
   TCHAR PicDir[4096];
   GetRegStr(HKEY_LOCAL_MACHINE,
     _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"),
     _T("Common AppData"),PicDir,4096);
   PathUnquoteSpaces(PicDir);
   PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
-  TCHAR Pic[UNLEN+1];
-  _tcscpy(Pic,UserName);
-  PathStripPath(Pic);
   PathAppend(PicDir,Pic);
   PathAddExtension(PicDir,_T(".bmp"));
   //DBGTrace1("LoadUserBitmap: %s",Pic);
