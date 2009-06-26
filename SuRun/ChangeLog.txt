@@ -1,8 +1,8 @@
 Done, to be tested:
 ---------------------------
 * IAT-Hook hooks new Windows7 dlls
-* using AppInit_DLLs again!
 * IATHook now also hooks SwitchDesktop
+* using AppInit_DLLs again!
 * the blurred background did not respect negative monitor area start values
 * reduce registry access from "SuRun /SYSMENUHOOK"
 * get rid of the "virtualized" status in Windows 7 (app.manifest).
