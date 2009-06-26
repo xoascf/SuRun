@@ -92,12 +92,14 @@ class CHookDescriptor
 {
 public:
   LPCSTR DllName;
+  LPCSTR Win7DllName;
   LPCSTR FuncName;
   PROC newFunc;
   PROC orgFunc;
-  CHookDescriptor(LPCSTR Dll,LPCSTR Func,PROC nFunc)
+  CHookDescriptor(LPCSTR Dll,LPCSTR Win7Dll,LPCSTR Func,PROC nFunc)
   {
     DllName=Dll;
+    Win7DllName=Win7Dll;
     FuncName=Func;
     newFunc=nFunc;
     orgFunc=0;
@@ -108,24 +110,27 @@ public:
       return orgFunc;
     if (!orgGPA)
       orgGPA=GetProcAddr;
-    orgFunc=orgGPA(GetModuleHandleA(DllName),FuncName);
+    if (Win7DllName)
+      orgFunc=orgGPA(GetModuleHandleA(Win7DllName),FuncName);
+    if (!orgFunc)
+      orgFunc=orgGPA(GetModuleHandleA(DllName),FuncName);
     return orgFunc;
   }
 }; 
 
 //Standard Hooks: These must be implemented!
-static CHookDescriptor hkLdLibA  ("kernel32.dll","LoadLibraryA",(PROC)LoadLibA);
-static CHookDescriptor hkLdLibW  ("kernel32.dll","LoadLibraryW",(PROC)LoadLibW);
-static CHookDescriptor hkLdLibXA ("kernel32.dll","LoadLibraryExA",(PROC)LoadLibExA);
-static CHookDescriptor hkLdLibXW ("kernel32.dll","LoadLibraryExW",(PROC)LoadLibExW);
-static CHookDescriptor hkGetPAdr ("kernel32.dll","GetProcAddress",(PROC)GetProcAddr);
-static CHookDescriptor hkFreeLib ("kernel32.dll","FreeLibrary",(PROC)FreeLib);
-static CHookDescriptor hkFrLibXT ("kernel32.dll","FreeLibraryAndExitThread",(PROC)FreeLibAndExitThread);
+static CHookDescriptor hkLdLibA  ("kernel32.dll",NULL,"LoadLibraryA",(PROC)LoadLibA);
+static CHookDescriptor hkLdLibW  ("kernel32.dll",NULL,"LoadLibraryW",(PROC)LoadLibW);
+static CHookDescriptor hkLdLibXA ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","LoadLibraryExA",(PROC)LoadLibExA);
+static CHookDescriptor hkLdLibXW ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","LoadLibraryExW",(PROC)LoadLibExW);
+static CHookDescriptor hkGetPAdr ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","GetProcAddress",(PROC)GetProcAddr);
+static CHookDescriptor hkFreeLib ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","FreeLibrary",(PROC)FreeLib);
+static CHookDescriptor hkFrLibXT ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","FreeLibraryAndExitThread",(PROC)FreeLibAndExitThread);
 //User Hooks:
-static CHookDescriptor hkCrProcA ("kernel32.dll","CreateProcessA",(PROC)CreateProcA);
-static CHookDescriptor hkCrProcW ("kernel32.dll","CreateProcessW",(PROC)CreateProcW);
+static CHookDescriptor hkCrProcA ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessA",(PROC)CreateProcA);
+static CHookDescriptor hkCrProcW ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessW",(PROC)CreateProcW);
 
-static CHookDescriptor hkSwDesk  ("user32.dll","SwitchDesktop",(PROC)SwitchDesk);
+static CHookDescriptor hkSwDesk  ("user32.dll",NULL,"SwitchDesktop",(PROC)SwitchDesk);
 
 //Functions that, if present in the IAT, cause the module to be hooked
 static CHookDescriptor* need_hdt[]=
@@ -157,7 +162,8 @@ static CHookDescriptor* hdt[]=
 BOOL DoHookDll(char* DllName)
 {
   for(int i=0;i<countof(hdt);i++)
-    if (stricmp(hdt[i]->DllName,DllName)==0)
+    if ((stricmp(hdt[i]->DllName,DllName)==0)
+      ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
       return true;
   return false;
 }
@@ -169,7 +175,8 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
     return 0;
   if(*DllName && *ImpName)
     for(int i=0;i<countof(hdt);i++)
-      if (stricmp(hdt[i]->DllName,DllName)==0)
+      if ((stricmp(hdt[i]->DllName,DllName)==0)
+        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
         {
           if(orgFunc)
@@ -185,7 +192,8 @@ PROC DoHookFn(char* DllName,PROC orgFunc)
     return 0;
   if(*DllName)
     for(int i=0;i<countof(hdt);i++)
-      if (stricmp(hdt[i]->DllName,DllName)==0)
+      if ((stricmp(hdt[i]->DllName,DllName)==0)
+        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
         if (hdt[i]->OrgFunc()==orgFunc)
           return hdt[i]->newFunc;
   return false;
@@ -197,7 +205,8 @@ PROC GetOrgFn(char* DllName,char* ImpName)
     return 0;
   if(*DllName && *ImpName)
     for(int i=0;i<countof(hdt);i++)
-      if (stricmp(hdt[i]->DllName,DllName)==0)
+      if ((stricmp(hdt[i]->DllName,DllName)==0)
+        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
         if (stricmp(hdt[i]->FuncName,ImpName)==0)
           return hdt[i]->OrgFunc();
   return false;
@@ -210,7 +219,8 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
     return 0;
   if(*DllName && *ImpName)
     for(int i=0;i<countof(need_hdt);i++)
-      if (stricmp(need_hdt[i]->DllName,DllName)==0)
+      if ((stricmp(need_hdt[i]->DllName,DllName)==0)
+        ||(need_hdt[i]->Win7DllName && (stricmp(need_hdt[i]->Win7DllName,DllName)==0)))
         if (stricmp(need_hdt[i]->FuncName,ImpName)==0)
           return need_hdt[i]->OrgFunc()==orgFunc;
   return false;
