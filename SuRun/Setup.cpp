@@ -971,10 +971,16 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_EDITAPP),false);
   }
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
-  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~(SS_TYPEMASK|SS_REALSIZEIMAGE|SS_CENTERIMAGE));
   if(bm)
   {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SIZE sz=g_SD->Users.GetUserBitmapSize(n);
+    RECT r;
+    GetClientRect(BmpIcon,&r);
+    if ((r.right-r.left<sz.cx)||(r.bottom-r.top<sz.cy))
+      SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZECONTROL);
+    else
+      SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
   }else
   {
