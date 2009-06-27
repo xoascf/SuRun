@@ -1535,8 +1535,9 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   if (_winmajor>=6)
   {
     //Vista: Load User bitmap from registry:
-    DWORD UserID=GetRegInt(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),L"",0);
-    if (UserID)
+    DWORD UserID=0;
+    if (GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),L"",&UserID,0,0)
+      &&  UserID)
     {
       BYTE* bmp=0;
       DWORD type=0;
