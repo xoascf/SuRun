@@ -11,6 +11,8 @@ Done, to be tested:
 
 ToDo
 ---------------------
+* GUI for SwitchToUser
+* less agressive "Admin with empty password" warning
 * Less annoying Admin-Bubbles
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
