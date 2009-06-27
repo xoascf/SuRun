@@ -1536,7 +1536,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   PathStripPath(Pic);
   if (_winmajor>=6)
   {
-    //Vista: Load User bitmap from registry:
+    //Vista++: Load User bitmap from registry:
     DWORD UserID=0;
     if (GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),L"",&UserID,0,0)
       &&  UserID)
@@ -1559,6 +1559,14 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
       if (hbm)
         return hbm;
     }
+    //User bitmap not in registry: try to load bitmap
+    HBITMAP bm=(HBITMAP)LoadImage(0,CResStr(L"C:\\Users\\All Users\\Microsoft\\User Account Pictures\\%s.bmp",Pic),
+                                  IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+    if (bm)
+      return bm;
+    //no success, load default user picture
+    return (HBITMAP)LoadImage(0,L"C:\\Users\\All Users\\Microsoft\\User Account Pictures\\user.bmp",
+                                IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
   }
   TCHAR PicDir[4096];
   GetRegStr(HKEY_LOCAL_MACHINE,
