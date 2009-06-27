@@ -237,6 +237,7 @@ public:
   }
   void FadeIn()
   {
+    m_hDesk=GetThreadDesktop(GetCurrentThreadId());
     if (m_hWndTrans && m_hWnd && m_bm && (m_Thread==NULL))
       m_Thread=CreateThread(0,0,BlurProc,this,0,0);
   }
@@ -262,6 +263,7 @@ private:
     SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
     Sleep(200);
     CBlurredScreen* bs=(CBlurredScreen*)p;  
+    SetThreadDesktop(bs->m_hDesk);
     bs->m_blurbm=Blur(bs->m_bm,bs->m_dx,bs->m_dy);
     SetLayeredWindowAttributes(bs->m_hWndTrans,0,0,LWA_ALPHA);
     RedrawWindow(bs->m_hWndTrans,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
@@ -330,4 +332,5 @@ private:
   HBITMAP m_bm;
   HBITMAP m_blurbm;
   HANDLE m_Thread;
+  HDESK m_hDesk;
 };
