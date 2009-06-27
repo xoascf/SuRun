@@ -61,12 +61,14 @@ BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DW
 BOOL GetRegAnyPtr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key);
+  if (dwRes==ERROR_SUCCESS)
   {
     BOOL bRet=RegQueryValueEx(Key,ValName,NULL,Type,RetVal,nBytes)==ERROR_SUCCESS;
     RegCloseKey(Key);
     return bRet;
-  }
+  }else
+    DBGTrace1("RegOpenKeyEx failed: %s",GetErrorNameStatic(dwRes));
   return FALSE;
 }
 
@@ -1532,7 +1534,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   TCHAR Pic[UNLEN+1];
   _tcscpy(Pic,UserName);
   PathStripPath(Pic);
-  if (_winmajor>=6)
+  //if (_winmajor>=6)
   {
     //Vista: Load User bitmap from registry:
     DWORD UserID=0;
