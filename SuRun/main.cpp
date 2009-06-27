@@ -56,11 +56,11 @@ static void Crash()
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-//#include "LSALogon.h"
-//extern BOOL TestSetup();
-//extern BOOL TestLogonDlg();
-//extern DWORD LSAStartAdminProcess();
-//extern int TestBS();
+#include "LSALogon.h"
+extern BOOL TestSetup();
+extern BOOL TestLogonDlg();
+extern DWORD LSAStartAdminProcess();
+extern int TestBS();
 #endif _DEBUG
 
 static void HideAppStartCursor()
@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetAdminToken(0);
 //  TestBS();
 //  TestSetup();
-//  TestLogonDlg();
+  TestLogonDlg();
 //  TCHAR Args[4096];
 //  ResolveCommandLine(L"C:\\WINDOWS\\system32\\control.exe appwiz.cpl,,3",L"C:\\Dokumente und Einstellungen\\Kay",Args);
 //  UserIsInSuRunnersOrAdmins();
