@@ -160,7 +160,6 @@ bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
 // Logon Dialog
 //
 /////////////////////////////////////////////////////////////////////////////
-
 typedef struct _LOGONDLGPARAMS
 {
   LPCTSTR Msg;
@@ -207,10 +206,16 @@ static void SetUserBitmap(HWND hwnd)
   }
   HBITMAP bm=p->Users.GetUserBitmap(User);
   HWND BmpIcon=GetDlgItem(hwnd,IDC_USERBITMAP);
-  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~SS_TYPEMASK);
+  DWORD dwStyle=GetWindowLong(BmpIcon,GWL_STYLE)&(~(SS_TYPEMASK|SS_REALSIZEIMAGE|SS_CENTERIMAGE));
   if(bm)
   {
-    SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
+    SIZE sz=p->Users.GetUserBitmapSize(User);
+    RECT r;
+    GetClientRect(BmpIcon,&r);
+    if ((r.right-r.left<sz.cx)||(r.bottom-r.top<sz.cy))
+      SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZECONTROL);
+    else
+      SetWindowLong(BmpIcon,GWL_STYLE,dwStyle|SS_BITMAP|SS_REALSIZEIMAGE|SS_CENTERIMAGE);
     SendMessage(BmpIcon,STM_SETIMAGE,IMAGE_BITMAP,(LPARAM)bm);
   }else
   {
@@ -721,6 +726,9 @@ BOOL TestLogonDlg()
   l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  
+  return 1;
+
   l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
