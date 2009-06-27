@@ -363,9 +363,7 @@ USERLIST::USERLIST()
 
 USERLIST::~USERLIST()
 {
-  for (int i=0;i<nUsers;i++)
-    if(User[i].UserBitmap)
-      DeleteObject(User[i].UserBitmap);
+  DeleteUserBitmaps();
   free(User);
 }
 
@@ -399,32 +397,86 @@ HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
   return 0;
 }
 
-void USERLIST::SetUsualUsers(DWORD SessionId,BOOL bScanDomain)
+SIZE USERLIST::GetUserBitmapSize(int nUser)
 {
-  CImpersonateSessionUser ilu(SessionId);
+  SIZE s={0};
+  if ((nUser<0)||(nUser>=nUsers))
+    return s;
+  return User[nUser].UserBitmapSize;
+}
+
+SIZE USERLIST::GetUserBitmapSize(LPTSTR UserName)
+{
+  TCHAR un[2*UNLEN+2];
+  _tcscpy(un,UserName);
+  PathStripPath(un);
+  for (int i=0;i<nUsers;i++) 
+  {
+    TCHAR UN[2*UNLEN+2]={0};
+    _tcscpy(UN,User[i].UserName);
+    PathStripPath(UN);
+    if (_tcsicmp(un,UN)==0)
+      return User[i].UserBitmapSize;
+  }
+  SIZE s={0};
+  return s;
+}
+
+void USERLIST::DeleteUserBitmaps()
+{
   for (int i=0;i<nUsers;i++)
     if(User[i].UserBitmap)
+    {
       DeleteObject(User[i].UserBitmap);
+      User[i].UserBitmap=0;
+      User[i].UserBitmapSize.cx=0;
+      User[i].UserBitmapSize.cy=0;
+    }
+}
+
+void USERLIST::LoadUserBitmaps()
+{
+  for (int i=0;i<nUsers;i++)
+  {
+    User[i].UserBitmap=LoadUserBitmap(User[i].UserName);
+    if(User[i].UserBitmap)
+    {
+      BITMAP b;
+      GetObject(User[i].UserBitmap,sizeof(BITMAP),&b);
+      User[i].UserBitmapSize.cx=b.bmWidth;
+      User[i].UserBitmapSize.cy=b.bmHeight;
+    }
+  }
+}
+
+void USERLIST::SetUsualUsers(DWORD SessionId,BOOL bScanDomain)
+{
+  DeleteUserBitmaps();
   free(User);
   User=0;
   nUsers=0;
-  for (int g=0;g<countof(UserGroups);g++)
-    AddGroupUsers(UserGroups[g],bScanDomain);
+  {
+    CImpersonateSessionUser ilu(SessionId);
+    for (int g=0;g<countof(UserGroups);g++)
+      AddGroupUsers(UserGroups[g],bScanDomain);
+  }
+  LoadUserBitmaps();
 }
 
 void USERLIST::SetGroupUsers(LPWSTR GroupName,DWORD SessionId,BOOL bScanDomain)
 {
-  CImpersonateSessionUser ilu(SessionId);
-  for (int i=0;i<nUsers;i++)
-    if(User[i].UserBitmap)
-      DeleteObject(User[i].UserBitmap);
+  DeleteUserBitmaps();
   free(User);
   User=0;
   nUsers=0;
-  if (_tcscmp(GroupName,_T("*"))==0)
-    AddAllUsers(bScanDomain);
-  else
-    AddGroupUsers(GroupName,bScanDomain);
+  {
+    CImpersonateSessionUser ilu(SessionId);
+    if (_tcscmp(GroupName,_T("*"))==0)
+      AddAllUsers(bScanDomain);
+    else
+      AddGroupUsers(GroupName,bScanDomain);
+  }
+  LoadUserBitmaps();
 }
 
 void USERLIST::SetGroupUsers(DWORD WellKnownGroup,DWORD SessionId,BOOL bScanDomain)
@@ -489,7 +541,6 @@ void USERLIST::Add(LPCWSTR UserName)
     User=UsrRealloc(User,nUsers+1);
 //  DBGTrace1("-->AddUser: %s",UserName);
   wcscpy(User[j].UserName,UserName);
-  User[j].UserBitmap=LoadUserBitmap(UserName);
   nUsers++;
   return;
 }
