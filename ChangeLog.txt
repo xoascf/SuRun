@@ -1,12 +1,13 @@
 Done, to be tested:
 ---------------------------
-* IAT-Hook hooks new Windows7 dlls
-* IATHook now also hooks SwitchDesktop
-* Vista user bitmap support (HKLM\SAM\SAM\Domains\Account\Users\<ID>,UserTile)
-* using AppInit_DLLs again!
-* the blurred background did not respect negative monitor area start values
-* reduce registry access from "SuRun /SYSMENUHOOK"
-* get rid of the "virtualized" status in Windows 7 (app.manifest).
+* NEW: IATHook now also hooks SwitchDesktop
+* NEW: Vista user bitmap support (HKLM\SAM\SAM\Domains\Account\Users\<ID>,UserTile)
+* CHG: SuRun uses AppInit_DLLs registry key again
+* CHG: Reduced registry access from "SuRun /SYSMENUHOOK"
+* FIX: Desktop background did not respect negative monitor area start values
+* Win7rc1: Got rid of the "virtualized" status with new app.manifest.
+* Win7rc1: IAT-Hook hooks new System dlls
+* Win7rc1: Screen-Fade did not work
 
 ToDo
 ---------------------
