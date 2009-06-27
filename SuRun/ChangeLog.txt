@@ -2,6 +2,7 @@ Done, to be tested:
 ---------------------------
 * IAT-Hook hooks new Windows7 dlls
 * IATHook now also hooks SwitchDesktop
+* Vista user bitmap support (HKLM\SAM\SAM\Domains\Account\Users\<ID>,UserTile)
 * using AppInit_DLLs again!
 * the blurred background did not respect negative monitor area start values
 * reduce registry access from "SuRun /SYSMENUHOOK"
