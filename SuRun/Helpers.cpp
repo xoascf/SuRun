@@ -1534,7 +1534,7 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   TCHAR Pic[UNLEN+1];
   _tcscpy(Pic,UserName);
   PathStripPath(Pic);
-  //if (_winmajor>=6)
+  if (_winmajor>=6)
   {
     //Vista: Load User bitmap from registry:
     DWORD UserID=0;
@@ -1548,9 +1548,9 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
       if(GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),
                         L"UserTile",&type,&bmp,&nBytes))
       {
-        BITMAPFILEHEADER* bmfh=(BITMAPFILEHEADER*)bmp;
-        BITMAPINFO* bmi=(BITMAPINFO*)(&bmp[sizeof(BITMAPFILEHEADER)]);
-        void* Bits=(void*)(&bmp[bmfh->bfOffBits]);
+        BITMAPFILEHEADER* bmfh=(BITMAPFILEHEADER*)(&bmp[16]);
+        BITMAPINFO* bmi=(BITMAPINFO*)(&bmp[16+sizeof(BITMAPFILEHEADER)]);
+        void* Bits=(void*)(&bmp[16+bmfh->bfOffBits]);
         HDC dc=GetDC(0);
         hbm=CreateDIBitmap(dc,&bmi->bmiHeader,CBM_INIT,Bits,bmi,DIB_RGB_COLORS);
         ReleaseDC(0,dc);
