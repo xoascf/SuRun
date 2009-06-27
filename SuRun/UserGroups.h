@@ -63,6 +63,7 @@ typedef struct
 {
   WCHAR UserName[UNLEN+UNLEN+2];
   HBITMAP UserBitmap;
+  SIZE UserBitmapSize;
 }USERDATA;
 
 class USERLIST
@@ -78,6 +79,8 @@ public:
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
+  SIZE GetUserBitmapSize(int nUser);
+  SIZE GetUserBitmapSize(LPTSTR UserName);
   int     GetCount(){return nUsers;};
   void Add(LPCWSTR UserName);
 private:
@@ -87,5 +90,7 @@ private:
   void AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
   void AddGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
   void AddAllUsers(BOOL bScanDomain);
+  void DeleteUserBitmaps();
+  void LoadUserBitmaps();
 };
 
