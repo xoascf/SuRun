@@ -80,7 +80,7 @@ BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** Re
     {
       *RetVal=(BYTE*)malloc(*nBytes);
       if(*RetVal)
-        bRet=RegQueryValueEx(Key,ValName,NULL,Type,&RetVal,nBytes)==ERROR_SUCCESS;
+        bRet=RegQueryValueEx(Key,ValName,NULL,Type,*RetVal,nBytes)==ERROR_SUCCESS;
     }
     RegCloseKey(Key);
   }
@@ -1535,18 +1535,26 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   if (_winmajor>=6)
   {
     //Vista: Load User bitmap from registry:
-    DWORD UserID=GetRegInt(HKLM,CResStr("SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),"",0);
+    DWORD UserID=GetRegInt(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),L"",0);
     if (UserID)
     {
       BYTE* bmp=0;
       DWORD type=0;
       DWORD nBytes=0;
-      if(GetRegAnyAlloc(HKLM,CResStr("SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),
-                        "UserTile",&type,&bmp,&nBytes))
+      HBITMAP hbm=0;
+      if(GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),
+                        L"UserTile",&type,&bmp,&nBytes))
       {
-        
+        BITMAPFILEHEADER* bmfh=(BITMAPFILEHEADER*)bmp;
+        BITMAPINFO* bmi=(BITMAPINFO*)(&bmp[sizeof(BITMAPFILEHEADER)]);
+        void* Bits=(void*)(&bmp[bmfh->bfOffBits]);
+        HDC dc=GetDC(0);
+        hbm=CreateDIBitmap(dc,&bmi->bmiHeader,CBM_INIT,Bits,bmi,DIB_RGB_COLORS);
+        ReleaseDC(0,dc);
       }
-      free(nBytes);
+      free(bmp);
+      if (hbm)
+        return hbm;
     }
   }
   TCHAR PicDir[4096];
