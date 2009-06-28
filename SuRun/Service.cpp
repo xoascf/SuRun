@@ -1248,16 +1248,28 @@ static DWORD DoFUS() //Do Fast User Switching
       WTSFreeMemory(si);
     }
     if (SessID==-1)
+    {
+      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON,UserName),CResStr(IDS_APPNAME),
+        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
       return RETVAL_CANCELLED;
+    }
   }
   {
     HANDLE tSess=GetSessionUserToken(SessID);
     if (!tSess)
+    {
+      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
+        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
       return RETVAL_CANCELLED;
+    }
     GetTokenUserName(tSess,UserName);
     CloseHandle(tSess);
     if (!UserName[0])
+    {
+      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
+        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
       return RETVAL_CANCELLED;
+    }
   }
   if (SessID==g_RunData.SessionID)
     return RETVAL_OK;
@@ -1275,7 +1287,7 @@ static DWORD DoFUS() //Do Fast User Switching
   }
   if (SwitchToSession(SessID))
     return RETVAL_OK;
-  return RETVAL_CANCELLED;
+  return RETVAL_ACCESSDENIED;
 }
 
 //////////////////////////////////////////////////////////////////////////////
