@@ -695,7 +695,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Benutzer wechseln..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -894,6 +894,8 @@ BEGIN
     IDS_HIDESELF            "Wollen Sie SuRun wirklich vor sich selbst verstecken?\n\nSie können danach keine SuRun-Einstellungen mehr verändern."
     IDS_NOIMPORT            "Sie müssen Mitglied der lokalen Administratorengruppe\nsein, um SuRuns Einstellungen zu importieren."
     IDS_NOEXPORT            "Sie müssen Mitglied der lokalen Administratorengruppe\nsein, um SuRuns Einstellungen zu exportieren."
+    IDS_NOTLOGGEDON         "Benutzerumschaltung nicht möglich:\n%s ist nicht angemeldet."
+    IDS_NOTLOGGEDON2        "Benutzerumschaltung nicht möglich:\nSitzung %d ist nicht angemeldet."
 END
 
 #endif    // German (Germany) resources
@@ -1134,7 +1136,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Run as..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1431,7 +1433,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Switch users..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1629,6 +1631,8 @@ BEGIN
     IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
     IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
     IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
+    IDS_NOTLOGGEDON         "Fast user switch not possible:\n%s is not logged on."
+    IDS_NOTLOGGEDON2        "Fast user switch not possible:\nSession %d is not logged on."
 END
 
 #endif    // English (U.S.) resources
@@ -1870,7 +1874,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Uitvoeren als..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -2167,7 +2171,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Switch users..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -2319,6 +2323,8 @@ BEGIN
     IDS_HIDESELF            "Wilt u SuRun voor UZELF verbergen?\n\nSuRun instellingen kunnen hierna niet meer worden gewijzigd."
     IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
     IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
+    IDS_NOTLOGGEDON         "Fast user switch not possible:\n%s is not logged on."
+    IDS_NOTLOGGEDON2        "Fast user switch not possible:\nSession %d is not logged on."
 END
 
 #endif    // Dutch (Netherlands) resources
