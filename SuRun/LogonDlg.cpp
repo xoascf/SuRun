@@ -306,8 +306,8 @@ SIZE GetDrawSize(HWND w)
   DrawText(MemDC,s,-1,&r,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
   //the size needed is sometimes too small
   //Tests have shown that 8 pixels added to cx would be enough
-  //I'll add 10 pixels to cx and pixels 4 to cx until I know a better way:
-  SIZE S={r.right-r.left+10,r.bottom-r.top+4};
+  //I'll add 20 pixels to cx and pixels 10 to cy until I know a better way:
+  SIZE S={r.right-r.left+20,r.bottom-r.top+10};
   //Limit the width to 90% of the screen width
   int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
   if (S.cx>maxDX)
@@ -322,7 +322,8 @@ SIZE GetDrawSize(HWND w)
     {
       S.cy=maxDY;
       SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
-    }
+    }else
+      SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_HSCROLL);
   }
   DeleteDC(MemDC);
   return S;
