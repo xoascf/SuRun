@@ -104,6 +104,114 @@ bool g_CliIsAdmin=FALSE;
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  Fast User Switching
+// 
+//////////////////////////////////////////////////////////////////////////////
+static BOOL SwitchToSession(DWORD SessionId)
+{
+  HMODULE hWinSta = LoadLibraryW(L"winsta.dll");
+  if (!hWinSta) 
+    return FALSE;
+  typedef BOOL (WINAPI *WSCW)(HANDLE,DWORD,DWORD,PWCHAR,BOOL);
+  WSCW WinStationConnectW=(WSCW)GetProcAddress(hWinSta,"WinStationConnectW");
+  if (!WinStationConnectW) 
+    return FALSE;
+  BOOL bRet=WinStationConnectW(0,SessionId,-1,L"",TRUE);
+  return bRet;
+}
+
+static DWORD DoFUS() //Do Fast User Switching
+{
+  TCHAR UserName[UNLEN+UNLEN+2];
+  DWORD SessID=wcstol(PathGetArgs(g_RunData.cmdLine),0,10)-1;
+  if (SessID==-1)
+  {
+    _tcsncpy(UserName,PathGetArgs(g_RunData.cmdLine),UNLEN+UNLEN);
+    DWORD n=0;
+    WTS_SESSION_INFO* si=0;
+    WTSEnumerateSessions(0,0,1,&si,&n);
+    if (si && n)
+    {
+      for (DWORD i=0;i<n;i++)
+      {
+        TCHAR* un=0;
+        TCHAR* dn=0;
+        DWORD unl=0;
+        DWORD dnl=0;
+        WTSQuerySessionInformation(0,si[i].SessionId,WTSUserName,&un,&unl);
+        WTSQuerySessionInformation(0,si[i].SessionId,WTSDomainName,&dn,&dnl);
+        CBigResStr undn(L"%s\\%s",dn,un);
+        WTSFreeMemory(dn);
+        dn=0;
+        if ((_tcsicmp(un,UserName)==0)||(_tcsicmp(undn,UserName)==0))
+        {
+          WTSFreeMemory(un);
+          SessID=si[i].SessionId;
+          break;
+        }
+        WTSFreeMemory(un);
+        un=0;
+      }
+      WTSFreeMemory(si);
+    }
+    if (SessID==-1)
+    {
+      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON,UserName),CResStr(IDS_APPNAME),
+        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
+      return RETVAL_CANCELLED;
+    }
+  }
+  {
+    HANDLE tSess=GetSessionUserToken(SessID);
+    if (!tSess)
+    {
+      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
+        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
+      return RETVAL_CANCELLED;
+    }
+    GetTokenUserName(tSess,UserName);
+    CloseHandle(tSess);
+    if (!UserName[0])
+    {
+      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
+        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
+      return RETVAL_CANCELLED;
+    }
+  }
+  if (SessID==g_RunData.SessionID)
+    return RETVAL_OK;
+  if(!SavedPasswordOk(SessID,g_RunData.UserName,UserName))
+  {
+    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
+      (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
+      return RETVAL_CANCELLED;
+    if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,UserName))
+    {
+      DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
+      return RETVAL_CANCELLED;
+    }
+    DeleteSafeDesktop(false);
+  }
+  if (SwitchToSession(SessID))
+    return RETVAL_OK;
+  return RETVAL_ACCESSDENIED;
+}
+
+static void ShowFUSGUI()
+{
+  if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
+    (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
+    return;
+  if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,g_RunData.UserName))
+  {
+    DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
+    return;
+  }
+  DeleteSafeDesktop(false);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 // CheckCliProcess:
 // 
 // checks if rd.CliProcessId is this exe and if rd is g_RunData of the calling
@@ -1200,96 +1308,6 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
   return RetVal;
 }
 
-static BOOL SwitchToSession(DWORD SessionId)
-{
-  HMODULE hWinSta = LoadLibraryW(L"winsta.dll");
-  if (!hWinSta) 
-    return FALSE;
-  typedef BOOL (WINAPI *WSCW)(HANDLE,DWORD,DWORD,PWCHAR,BOOL);
-  WSCW WinStationConnectW=(WSCW)GetProcAddress(hWinSta,"WinStationConnectW");
-  if (!WinStationConnectW) 
-    return FALSE;
-  BOOL bRet=WinStationConnectW(0,SessionId,-1,L"",TRUE);
-  return bRet;
-}
-
-static DWORD DoFUS() //Do Fast User Switching
-{
-  TCHAR UserName[UNLEN+UNLEN+2];
-  DWORD SessID=wcstol(PathGetArgs(g_RunData.cmdLine),0,10)-1;
-  if (SessID==-1)
-  {
-    _tcsncpy(UserName,PathGetArgs(g_RunData.cmdLine),UNLEN+UNLEN);
-    DWORD n=0;
-    WTS_SESSION_INFO* si=0;
-    WTSEnumerateSessions(0,0,1,&si,&n);
-    if (si && n)
-    {
-      for (DWORD i=0;i<n;i++)
-      {
-        TCHAR* un=0;
-        TCHAR* dn=0;
-        DWORD unl=0;
-        DWORD dnl=0;
-        WTSQuerySessionInformation(0,si[i].SessionId,WTSUserName,&un,&unl);
-        WTSQuerySessionInformation(0,si[i].SessionId,WTSDomainName,&dn,&dnl);
-        CBigResStr undn(L"%s\\%s",dn,un);
-        WTSFreeMemory(dn);
-        dn=0;
-        if ((_tcsicmp(un,UserName)==0)||(_tcsicmp(undn,UserName)==0))
-        {
-          WTSFreeMemory(un);
-          SessID=si[i].SessionId;
-          break;
-        }
-        WTSFreeMemory(un);
-        un=0;
-      }
-      WTSFreeMemory(si);
-    }
-    if (SessID==-1)
-    {
-      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON,UserName),CResStr(IDS_APPNAME),
-        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
-      return RETVAL_CANCELLED;
-    }
-  }
-  {
-    HANDLE tSess=GetSessionUserToken(SessID);
-    if (!tSess)
-    {
-      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
-        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
-      return RETVAL_CANCELLED;
-    }
-    GetTokenUserName(tSess,UserName);
-    CloseHandle(tSess);
-    if (!UserName[0])
-    {
-      SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
-        MB_ICONINFORMATION|MB_SERVICE_NOTIFICATION);
-      return RETVAL_CANCELLED;
-    }
-  }
-  if (SessID==g_RunData.SessionID)
-    return RETVAL_OK;
-  if(!SavedPasswordOk(SessID,g_RunData.UserName,UserName))
-  {
-    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
-      (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
-      return RETVAL_CANCELLED;
-    if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,UserName))
-    {
-      DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
-      return RETVAL_CANCELLED;
-    }
-    DeleteSafeDesktop(false);
-  }
-  if (SwitchToSession(SessID))
-    return RETVAL_OK;
-  return RETVAL_ACCESSDENIED;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  SuRun
@@ -1361,10 +1379,18 @@ void SuRun(DWORD ProcessID)
   }else //if (!g_RunData.bRunAs)
   {
     //Do Fast User Switching?
-    if ((g_RunData.KillPID==0xFFFFFFFF)&&(_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO "),10)==0))
+    if(g_RunData.KillPID==0xFFFFFFFF)
     {
-      ResumeClient(DoFUS());
-      return;
+      if (_tcsnicmp(g_RunData.cmdLine,_T("/SWITCHTO "),10)==0)
+      {
+        ResumeClient(DoFUS());
+        return;
+      }
+      if (_tcsicmp(g_RunData.cmdLine,_T("/FUSGUI"))==0)
+      {
+        ShowFUSGUI();
+        return;
+      }
     }
     //Setup?
     if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
@@ -2093,6 +2119,42 @@ BOOL UserUninstall()
     MAKEINTRESOURCE(IDD_UNINSTALL),0,InstallDlgProc)!=IDCANCEL;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// FUS Hotkey Thread
+// 
+//////////////////////////////////////////////////////////////////////////////
+DWORD WINAPI HKThreadProc(void* p)
+{
+  MSG msg={0};
+  //Create Message queue
+  PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+  if(RegisterHotKey(0,1,MOD_WIN,VK_LSHIFT))
+  {
+    while (GetMessage(&msg,0,WM_HOTKEY,WM_HOTKEY))
+    {
+      g_RunData.KillPID=0xFFFFFFFF;
+      _tcscpy(g_RunData.cmdLine,_T("/FUSGUI"));
+      HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+      if(hPipe!=INVALID_HANDLE_VALUE)
+      {
+        DWORD n=0;
+        WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
+        CloseHandle(hPipe);
+      }
+    }
+    UnregisterHotKey(0,1);
+  }else 
+    DBGTrace1("RegisterHotKey() failed: %s",GetLastErrorNameStatic());
+  return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+// SysmenuHook stuff
+// 
+//////////////////////////////////////////////////////////////////////////////
 static void HandleHooks()
 {
 #ifdef _WIN64
@@ -2119,69 +2181,77 @@ static void HandleHooks()
     while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
       Sleep(1000);
 #ifndef _SR32
-    StartTSAThread();
+  StartTSAThread();
 #endif _SR32
-    if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-      && IsAdmin())
-      return;
-    if ( (!GetUseIATHook) 
-      && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-      && (!GetRestartAsAdmin) 
-      && (!GetStartAsAdmin))
-      return;
-    InstallSysMenuHook();
+  if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+    && IsAdmin())
+    return;
+  if ( (!GetUseIATHook) 
+    && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+    && (!GetRestartAsAdmin) 
+    && (!GetStartAsAdmin))
+    return;
+  InstallSysMenuHook();
 #ifdef _WIN64
+  {
+    TCHAR SuRun32Exe[4096];
+    GetSystemWindowsDirectory(SuRun32Exe,4096);
+    PathAppend(SuRun32Exe,L"SuRun32.bin /SYSMENUHOOK");
+    STARTUPINFO si={0};
+    PROCESS_INFORMATION pi;
+    si.cb = sizeof(si);
+    if (CreateProcess(NULL,SuRun32Exe,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      TCHAR SuRun32Exe[4096];
-      GetSystemWindowsDirectory(SuRun32Exe,4096);
-      PathAppend(SuRun32Exe,L"SuRun32.bin /SYSMENUHOOK");
-      STARTUPINFO si={0};
-      PROCESS_INFORMATION pi;
-      si.cb = sizeof(si);
-      if (CreateProcess(NULL,SuRun32Exe,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-      {
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-      }
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
     }
+  }
 #endif _WIN64
-    bool TSA=FALSE;
-    CTimeOut t;
-    for (;;)
+  bool TSA=FALSE;
+  DWORD HkTID=0;
+  HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
+  CTimeOut t;
+  for (;;)
+  {
+    BOOL bShowTray=TRUE;
+    BOOL bBaloon=FALSE;
+    if (t.TimedOut())
     {
-      BOOL bShowTray=TRUE;
-      BOOL bBaloon=FALSE;
-      if (t.TimedOut())
-      {
-        if(CheckServiceStatus()!=SERVICE_RUNNING)
-          break;
-        g_RunData.Groups=UserIsInSuRunnersOrAdmins();
-        bShowTray=ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
-        bBaloon=ShowBalloon(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
-        if ( (!GetUseIATHook) && (!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
-          break;
-        t.Set(10000);
-      }
-#ifndef _SR32
-      if (bShowTray)
-      {
-        if(!TSA)
-          InitTrayShowAdmin();
-        TSA=TRUE;
-        Sleep(ProcessTrayShowAdmin(bBaloon)?55:333);
-      }else
-#endif _SR32
-      {
-        if(TSA)
-          CloseTrayShowAdmin();
-        TSA=FALSE;
-        Sleep(1000);
-      }
+      if(CheckServiceStatus()!=SERVICE_RUNNING)
+        break;
+      g_RunData.Groups=UserIsInSuRunnersOrAdmins();
+      bShowTray=ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
+      bBaloon=ShowBalloon(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
+      if ( (!GetUseIATHook) && (!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+        break;
+      t.Set(10000);
     }
-    if(TSA)
-      CloseTrayShowAdmin();
-    UninstallSysMenuHook();
+#ifndef _SR32
+    if (bShowTray)
+    {
+      if(!TSA)
+        InitTrayShowAdmin();
+      TSA=TRUE;
+      Sleep(ProcessTrayShowAdmin(bBaloon)?55:333);
+    }else
+#endif _SR32
+    {
+      if(TSA)
+        CloseTrayShowAdmin();
+      TSA=FALSE;
+      Sleep(1000);
+    }
+  }
+  if(TSA)
+    CloseTrayShowAdmin();
+  UninstallSysMenuHook();
+  if(WaitForSingleObject(hHkThread,0)==WAIT_TIMEOUT)
+    PostThreadMessage(HkTID,WM_QUIT,0,0);
+  if(WaitForSingleObject(hHkThread,1000)==WAIT_TIMEOUT)
+    TerminateThread(hHkThread,-1);
+  CloseHandle(hHkThread);
 }
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 // HandleServiceStuff: called on App Entry before WinMain()
