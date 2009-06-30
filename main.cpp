@@ -61,6 +61,7 @@ static void Crash()
 //extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
 //extern int TestBS();
+extern void ShowFUSGUI();
 #endif _DEBUG
 
 static void HideAppStartCursor()
@@ -88,6 +89,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     break;
   }
 #ifdef _DEBUG
+  ShowFUSGUI();
 //  HKEY hkcu=0;
 //  RegOpenKey(HKCU,0,&hkcu);
 //  GetAdminToken(0);
@@ -103,7 +105,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
 //  ResolveCommandLine(L"control",g_RunData.CurDir,g_RunData.cmdLine);
 //  LSAStartAdminProcess() ;
-//  ExitProcess(0);
+  ExitProcess(0);
 #endif _DEBUG
   HideAppStartCursor();
   if(HandleServiceStuff())
