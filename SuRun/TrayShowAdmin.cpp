@@ -228,7 +228,7 @@ void DisplayMenu(HWND hWnd)
   g_BallonTips=bBTip;
 };
 
-int g_HotKeyID=0;
+//int g_HotKeyID=0;
 
 LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
