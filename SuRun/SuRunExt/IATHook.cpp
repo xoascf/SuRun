@@ -230,16 +230,16 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
-//  char fmod[MAX_PATH]={0};
-//  {
-//    GetModuleFileNameA(0,fmod,MAX_PATH);
-//    PathStripPathA(fmod);
-//    strcat(fmod,": ");
-//    char* p=&fmod[strlen(fmod)];
-//    GetModuleFileNameA(hMod,p,MAX_PATH);
-//    PathStripPathA(p);
-//  }
-//  TRACExA("SuRunExt32.dll: HookIAT(%s[%x])\n",fmod,hMod);
+  char fmod[MAX_PATH]={0};
+  {
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    PathStripPathA(fmod);
+    strcat(fmod,": ");
+    char* p=&fmod[strlen(fmod)];
+    GetModuleFileNameA(hMod,p,MAX_PATH);
+    PathStripPathA(p);
+  }
+  TRACExA("SuRunExt32.dll: %sHookIAT(%s[%x])\n",(bUnHook?"Un":""),fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
