@@ -226,7 +226,7 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
   return false;
 }
 
-DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
+DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
@@ -255,7 +255,7 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
           PROC orgFunc = 0;
           PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&orgFunc);
           //PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
-          if (newFunc && orgFunc && (pThunk->u1.Function==(DWORD_PTR)orgFunc))
+          if (newFunc && orgFunc && (pThunk->u1.Function==(DWORD_PTR)(bUnHook?newFunc:orgFunc)))
           {
             __try
             {
@@ -271,7 +271,7 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 #endif DoDBGTrace
 //                  pThunk->u1.Function = (DWORD_PTR)newFunc;
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
-                  InterlockedExchangePointer((VOID**)&pThunk->u1.Function,newFunc);
+                  InterlockedExchangePointer((VOID**)&pThunk->u1.Function,(bUnHook?newFunc:orgFunc));
                   VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
                   nHooked++;
@@ -289,7 +289,7 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
   return nHooked;
 }
 
-DWORD Hook(HMODULE hMod)
+DWORD Hook(HMODULE hMod,bool bUnHook)
 {
   //Detect if a module is using CreateProcess, if yes, it needs to be hooked
   if(hMod==l_hInst)
@@ -366,7 +366,7 @@ DWORD Hook(HMODULE hMod)
             }else
               DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
             //Hook IAT
-            DWORD dwRet=HookIAT(hMod,pID);
+            DWORD dwRet=HookIAT(hMod,pID,bUnHook);
             //Resume all Threads except this one
             if (hSnap!=INVALID_HANDLE_VALUE)
             {
@@ -400,6 +400,15 @@ DWORD Hook(HMODULE hMod)
   return false;
 }
 
+DWORD UnhookModules()
+{
+  DWORD nHooked=0;
+  //Unhook hModules
+  for(ModList::iterator it=g_ModList.begin();it!=g_ModList.end();++it)
+    nHooked+=Hook(*it,TRUE);
+  return nHooked;
+}
+
 DWORD HookModules()
 {
   if (!GetUseIATHook)
@@ -424,7 +433,7 @@ DWORD HookModules()
     std::set_difference(hMod,hMod+n,g_ModList.begin(),g_ModList.end(),std::back_inserter(newMods));
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
-      nHooked+=Hook(*it);
+      nHooked+=Hook(*it,FALSE);
     //merge new hModules to list
     g_ModList.merge(newMods);
     free(hMod);
@@ -855,6 +864,7 @@ void UnloadHooks()
     return;
   //Do not unload the hooks, but wait for the Critical Section
   EnterCriticalSection(&g_HookCs);
+  UnhookModules();
   g_IATInit=FALSE;
   LeaveCriticalSection(&g_HookCs);
   DeleteCriticalSection(&g_HookCs);
