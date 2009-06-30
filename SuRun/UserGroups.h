@@ -83,6 +83,8 @@ public:
   SIZE GetUserBitmapSize(LPTSTR UserName);
   int     GetCount(){return nUsers;};
   void Add(LPCWSTR UserName);
+  void DeleteUserBitmaps();
+  void LoadUserBitmaps();
 private:
   int nUsers;
   USERDATA* User;
@@ -90,7 +92,5 @@ private:
   void AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain);
   void AddGroupUsers(DWORD WellKnownGroup,BOOL bScanDomain);
   void AddAllUsers(BOOL bScanDomain);
-  void DeleteUserBitmaps();
-  void LoadUserBitmaps();
 };
 
