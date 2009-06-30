@@ -197,17 +197,63 @@ static DWORD DoFUS() //Do Fast User Switching
   return RETVAL_ACCESSDENIED;
 }
 
-static void ShowFUSGUI()
+void ShowFUSGUI()
 {
+#ifndef _DEBUG
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
     (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
     return;
-  if(!ValidateFUSUser(g_RunData.SessionID,g_RunData.UserName,g_RunData.UserName))
+#endif _DEBUG
+  USERLIST ul;
   {
-    DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
-    return;
+    DWORD n=0;
+    WTS_SESSION_INFO* si=0;
+    WTSEnumerateSessions(0,0,1,&si,&n);
+    if (si)
+    {
+      for (DWORD i=0;i<n;i++)
+      {
+        TCHAR* un=0;
+        TCHAR* dn=0;
+        DWORD unl=0;
+        DWORD dnl=0;
+        WTSQuerySessionInformation(0,si[i].SessionId,WTSUserName,&un,&unl);
+        WTSQuerySessionInformation(0,si[i].SessionId,WTSDomainName,&dn,&dnl);
+        ul.Add(CBigResStr(L"%s\\%s",dn,un));
+        WTSFreeMemory(dn);
+        WTSFreeMemory(un);
+        dn=0;
+        un=0;
+      }
+      WTSFreeMemory(si);
+    }
   }
+#ifdef _DEBUG
+  ul.Add(L"KAY_ARBEIT\\Kay");
+  ul.Add(L"KAY_ARBEIT\\Administrator");
+  ul.Add(L"KAY_ARBEIT\\Nikki");
+  ul.Add(L"KAY_ARBEIT\\GastNutzer");
+  ul.Add(L"KAY_ARBEIT\\SuperUser");
+  ul.Add(L"KAY_ARBEIT1\\Kay");
+  ul.Add(L"KAY_ARBEIT1\\Administrator");
+  ul.Add(L"KAY_ARBEIT1\\Nikki");
+  ul.Add(L"KAY_ARBEIT1\\GastNutzer");
+  ul.Add(L"KAY_ARBEIT1\\SuperUser");
+  ul.Add(L"KAY_ARBEIT2\\Kay");
+  ul.Add(L"KAY_ARBEIT2\\Administrator");
+  ul.Add(L"KAY_ARBEIT2\\Nikki");
+  ul.Add(L"KAY_ARBEIT2\\GastNutzer");
+  ul.Add(L"KAY_ARBEIT2\\SuperUser");
+#endif _DEBUG
+  if (ul.GetCount())
+  {
+    ul.LoadUserBitmaps();
+    
+
+  }    
+#ifndef _DEBUG
   DeleteSafeDesktop(false);
+#endif _DEBUG
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2129,8 +2175,9 @@ DWORD WINAPI HKThreadProc(void* p)
 {
   MSG msg={0};
   //Create Message queue
+  ATOM HotKeyID=GlobalAddAtom(L"SuRunFUSHotKey");
   PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-  if(RegisterHotKey(0,1,MOD_WIN,VK_LSHIFT))
+  if(RegisterHotKey(0,HotKeyID,MOD_WIN,(int)'S'))
   {
     while (GetMessage(&msg,0,WM_HOTKEY,WM_HOTKEY))
     {
@@ -2144,7 +2191,8 @@ DWORD WINAPI HKThreadProc(void* p)
         CloseHandle(hPipe);
       }
     }
-    UnregisterHotKey(0,1);
+    UnregisterHotKey(0,HotKeyID);
+    GlobalDeleteAtom(HotKeyID);
   }else 
     DBGTrace1("RegisterHotKey() failed: %s",GetLastErrorNameStatic());
   return 0;
