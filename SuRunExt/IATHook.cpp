@@ -36,7 +36,6 @@
 #pragma comment(lib,"PSAPI.lib")
 
 extern HINSTANCE l_hInst;
-extern TCHAR     l_User[514];  //the Process user Name
 
 extern DWORD     l_Groups;
 #define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
@@ -894,7 +893,7 @@ void UnloadHooks()
     return;
   //Do not unload the hooks, but wait for the Critical Section
   EnterCriticalSection(&g_HookCs);
-  //UnhookModules();
+  UnhookModules();
   g_IATInit=FALSE;
   LeaveCriticalSection(&g_HookCs);
   DeleteCriticalSection(&g_HookCs);
