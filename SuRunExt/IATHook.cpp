@@ -255,7 +255,8 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
           PROC orgFunc = 0;
           PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&orgFunc);
           //PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
-          if (newFunc && orgFunc && (pThunk->u1.Function==(DWORD_PTR)(bUnHook?newFunc:orgFunc)))
+          if (newFunc && orgFunc 
+            && ((!bUnHook)||(pThunk->u1.Function==(DWORD_PTR)newFunc)))
           {
             __try
             {
