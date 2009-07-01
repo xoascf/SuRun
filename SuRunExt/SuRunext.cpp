@@ -60,11 +60,11 @@
 
 UINT g_cRefThisDll = 0;    // Reference count of this DLL.
 
-//DWORD g_LoadAppInitDLLs = 0;
-//
-//#ifdef _WIN64
-//DWORD g_LoadAppInit32DLLs = 0;
-//#endif _WIN64
+DWORD g_LoadAppInitDLLs = 0;
+
+#ifdef _WIN64
+DWORD g_LoadAppInit32DLLs = 0;
+#endif _WIN64
 
 #pragma data_seg()
 #pragma comment(linker, "/section:.SHDATA,RWS")
@@ -878,17 +878,17 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoOpenWith",L"");
   //Disable putting SuRun in the frequently used apps in the start menu
   SetRegStr(HKCR,L"Applications\\SuRun.exe",L"NoStartPage",L"");
-//  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
-//#ifdef _WIN64
-//  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
-//#endif _WIN64
-//  //add to AppInit_Dlls
-//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
-//  AddAppInit(AppInit,_T("SuRunExt.dll"));
-//#ifdef _WIN64
-//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
-//  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
-//#endif _WIN64
+  g_LoadAppInitDLLs=GetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),0);
+#ifdef _WIN64
+  g_LoadAppInit32DLLs=GetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),0);
+#endif _WIN64
+  //add to AppInit_Dlls
+  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+  AddAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+#endif _WIN64
 }
 
 
@@ -896,12 +896,12 @@ __declspec(dllexport) void RemoveShellExt()
 {
   //Clean up:
   //AppInit_Dlls
-//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
-//  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
-//#ifdef _WIN64
-//  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
-//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
-//#endif _WIN64
+  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),g_LoadAppInitDLLs);
+  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
+  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),g_LoadAppInit32DLLs);
+#endif _WIN64
   //Vista: Disable ShellExecHook?
   if (GetOption(L"DelIShellExecHookEnable",0)!=0)
     RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
@@ -972,6 +972,31 @@ __declspec(dllexport) void RemoveShellExt()
 //  return 0;
 //}
 
+DWORD WINAPI InitProc(void* p)
+{
+  GetProcessUserName(GetCurrentProcessId(),l_User);
+  //Resources
+  WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+  WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+  TCHAR fMod[MAX_PATH];
+  GetModuleFileName(0,fMod,MAX_PATH);
+  l_Groups=UserIsInSuRunnersOrAdmins();
+  l_bSetHook=!l_IsAdmin;
+  //IAT Hook:
+  if (l_bSetHook)
+  {
+    //Do not set hooks into SuRun or Admin Processes!
+    TCHAR fSuRunExe[4096];
+    GetSystemWindowsDirectory(fSuRunExe,4096);
+    PathAppend(fSuRunExe,L"SuRun.exe");
+    PathQuoteSpaces(fSuRunExe);
+    l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) && (!IsInBlackList(fMod));
+    if(l_bSetHook && GetUseIATHook)
+      LoadHooks();
+  }
+  return 0;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // DllMain
@@ -979,17 +1004,9 @@ __declspec(dllexport) void RemoveShellExt()
 //////////////////////////////////////////////////////////////////////////////
 BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
 {
-  TCHAR fMod[MAX_PATH];
-  GetModuleFileName(0,fMod,MAX_PATH);
-  l_Groups=UserIsInSuRunnersOrAdmins();
-  DWORD PID=GetCurrentProcessId();
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
-#ifdef DoDBGTrace
-//    DBGTrace5("Detach(hInst=%x) %d:%s[%s], Admin=%d",
-//      hInstDLL,PID,fMod,GetCommandLine(),l_IsAdmin);
-#endif DoDBGTrace
     EnterCriticalSection(&l_SxHkCs);
     LeaveCriticalSection(&l_SxHkCs);
     DeleteCriticalSection(&l_SxHkCs);
@@ -1001,37 +1018,11 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   //Process Attach:
   DisableThreadLibraryCalls(hInstDLL);
-  GetProcessUserName(PID,l_User);
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
-  //Resources
-  WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  l_bSetHook=!l_IsAdmin;
-  //IAT Hook:
-  if (l_bSetHook)
-  {
-    //Do not set hooks into SuRun or Admin Processes!
-    TCHAR fSuRunExe[4096];
-    GetSystemWindowsDirectory(fSuRunExe,4096);
-    PathAppend(fSuRunExe,L"SuRun.exe");
-    PathQuoteSpaces(fSuRunExe);
-    l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) && (!IsInBlackList(fMod));
-#ifdef DoDBGTrace
-//    if(IsInBlackList(fMod))
-//      DBGTrace1("%s is blacklisted! No Hook!",fMod);
-//    DBGTrace5("Attach(hInst=%x) %d:%s[%s], NOAdmin, SetHook=%d",
-//      hInstDLL,PID,fMod,GetCommandLine(),l_bSetHook);
-#endif DoDBGTrace
-    if(l_bSetHook && GetUseIATHook)
-      LoadHooks();
-  }
-#ifdef DoDBGTrace
-//  else
-//    DBGTrace4("Attach(hInst=%x) %d:%s[%s], ADMIN",hInstDLL,PID,fMod,GetCommandLine());
-#endif DoDBGTrace
+  CloseHandle(CreateThread(0,0,InitProc,0,0,0));
   //DevInst
 //  if(!l_IsAdmin)
 //  {
