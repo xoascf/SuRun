@@ -230,16 +230,16 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
-  char fmod[MAX_PATH]={0};
-  {
-    GetModuleFileNameA(0,fmod,MAX_PATH);
-    PathStripPathA(fmod);
-    strcat(fmod,": ");
-    char* p=&fmod[strlen(fmod)];
-    GetModuleFileNameA(hMod,p,MAX_PATH);
-    PathStripPathA(p);
-  }
-  TRACExA("SuRunExt32.dll: %sHookIAT(%s[%x])\n",(bUnHook?"Un":""),fmod,hMod);
+//  char fmod[MAX_PATH]={0};
+//  {
+//    GetModuleFileNameA(0,fmod,MAX_PATH);
+//    PathStripPathA(fmod);
+//    strcat(fmod,": ");
+//    char* p=&fmod[strlen(fmod)];
+//    GetModuleFileNameA(hMod,p,MAX_PATH);
+//    PathStripPathA(p);
+//  }
+//  TRACExA("SuRunExt32.dll: %sHookIAT(%s[%x])\n",(bUnHook?"Un":""),fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
@@ -268,12 +268,12 @@ DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
                 if(VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function),PAGE_EXECUTE_WRITECOPY,&oldProt))
                 {
 #ifdef DoDBGTrace
-                TRACExA("SuRunExt32.dll: %sHookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x\n",
-                  (bUnHook?"Un":""),fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
+//                TRACExA("SuRunExt32.dll: %sHookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x\n",
+//                  (bUnHook?"Un":""),fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
 #endif DoDBGTrace
 //                  pThunk->u1.Function = (DWORD_PTR)newFunc;
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
-                  InterlockedExchangePointer((VOID**)&pThunk->u1.Function,(bUnHook?newFunc:orgFunc));
+                InterlockedExchangePointer((VOID**)&pThunk->u1.Function,(bUnHook?orgFunc:newFunc));
                   VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
 //                  FlushInstructionCache(GetCurrentProcess(),&pThunk->u1.Function,sizeof(pThunk->u1.Function));
                   nHooked++;
@@ -567,7 +567,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-    TRACExA("SuRunExt32.dll: call to CreateProcA(%s,%s)",lpApplicationName,lpCommandLine);
+//    TRACExA("SuRunExt32.dll: call to CreateProcA(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
                            dwCreationFlags,lpProcessInformation);
@@ -593,7 +593,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-    TRACEx(L"SuRunExt32.dll: call to CreateProcW(%s,%s)",lpApplicationName,lpCommandLine);
+//    TRACEx(L"SuRunExt32.dll: call to CreateProcW(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
                            dwCreationFlags,lpProcessInformation);
@@ -615,7 +615,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 {
 #ifdef DoDBGTrace
-    TRACEx(L"SuRunExt32.dll: call to GetProcAddr(%s)",lpProcName);
+//    TRACEx(L"SuRunExt32.dll: call to GetProcAddr(%s)",lpProcName);
 #endif DoDBGTrace
   char f[MAX_PATH]={0};
   GetModuleFileNameA(hModule,f,MAX_PATH);
@@ -647,7 +647,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 {
 #ifdef DoDBGTrace
-    TRACExA("SuRunExt32.dll: call to LoadLibA(%s)",lpLibFileName);
+//    TRACExA("SuRunExt32.dll: call to LoadLibA(%s)",lpLibFileName);
 #endif DoDBGTrace
   if (g_IATInit)
   {
@@ -674,7 +674,7 @@ HMODULE WINAPI LoadLibA(LPCSTR lpLibFileName)
 HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 {
 #ifdef DoDBGTrace
-    TRACEx(L"SuRunExt32.dll: call to LoadLibW(%s)",lpLibFileName);
+//    TRACEx(L"SuRunExt32.dll: call to LoadLibW(%s)",lpLibFileName);
 #endif DoDBGTrace
   if (g_IATInit)
   {
@@ -701,7 +701,7 @@ HMODULE WINAPI LoadLibW(LPCWSTR lpLibFileName)
 HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
 #ifdef DoDBGTrace
-    TRACExA("SuRunExt32.dll: call to LoadLibExA(%s)",lpLibFileName);
+//    TRACExA("SuRunExt32.dll: call to LoadLibExA(%s)",lpLibFileName);
 #endif DoDBGTrace
   if (g_IATInit)
   {
@@ -728,7 +728,7 @@ HMODULE WINAPI LoadLibExA(LPCSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 {
 #ifdef DoDBGTrace
-    TRACEx(L"SuRunExt32.dll: call to LoadLibExW(%s)",lpLibFileName);
+//    TRACEx(L"SuRunExt32.dll: call to LoadLibExW(%s)",lpLibFileName);
 #endif DoDBGTrace
   if (g_IATInit)
   {
@@ -754,27 +754,27 @@ HMODULE WINAPI LoadLibExW(LPCWSTR lpLibFileName,HANDLE hFile,DWORD dwFlags)
 
 BOOL WINAPI FreeLib(HMODULE hLibModule)
 {
-#ifdef DoDBGTrace
-    TRACExA("SuRunExt32.dll: call to FreeLib()");
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//    TRACExA("SuRunExt32.dll: call to FreeLib()");
+//#endif DoDBGTrace
   //The DLL must not be unloaded while the process is running!
   if (hLibModule==l_hInst)
   {
-#ifdef DoDBGTrace
-    char fmod[MAX_PATH]={0};
-    {
-      GetModuleFileNameA(0,fmod,MAX_PATH);
-      PathStripPathA(fmod);
-      strcat(fmod,": ");
-      char* p=&fmod[strlen(fmod)];
-      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-      PathStripPathA(p);
-    }
-    if (g_IATInit)
-      TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])-----------",fmod,hLibModule);
-    else
-      TRACExA("SuRunExt32.dll: ALLOWING FreeLibrary (%s[%x])---------------------------------",fmod,hLibModule);
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//    char fmod[MAX_PATH]={0};
+//    {
+//      GetModuleFileNameA(0,fmod,MAX_PATH);
+//      PathStripPathA(fmod);
+//      strcat(fmod,": ");
+//      char* p=&fmod[strlen(fmod)];
+//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//      PathStripPathA(p);
+//    }
+//    if (g_IATInit)
+//      TRACExA("SuRunExt32.dll: BLOCKING FreeLibrary (%s[%x])-----------",fmod,hLibModule);
+//    else
+//      TRACExA("SuRunExt32.dll: ALLOWING FreeLibrary (%s[%x])---------------------------------",fmod,hLibModule);
+//#endif DoDBGTrace
     if (g_IATInit)
     {
       SetLastError(NOERROR);
@@ -796,27 +796,25 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
 
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 {
-#ifdef DoDBGTrace
-    TRACExA("SuRunExt32.dll: call to FreeLibAndExitThread()");
-#endif DoDBGTrace
-#ifdef DoDBGTrace
-  if (hLibModule==l_hInst)
-  {
-    char fmod[MAX_PATH]={0};
-    {
-      GetModuleFileNameA(0,fmod,MAX_PATH);
-      PathStripPathA(fmod);
-      strcat(fmod,": ");
-      char* p=&fmod[strlen(fmod)];
-      GetModuleFileNameA(hLibModule,p,MAX_PATH);
-      PathStripPathA(p);
-    }
-    if (g_IATInit)
-      TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------",fmod,hLibModule);
-    else
-      TRACExA("SuRunExt32.dll: ALLOWING FreeLibAndExitThread (%s[%x])--------------",fmod,hLibModule);
-  }
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//    TRACExA("SuRunExt32.dll: call to FreeLibAndExitThread()");
+//  if (hLibModule==l_hInst)
+//  {
+//    char fmod[MAX_PATH]={0};
+//    {
+//      GetModuleFileNameA(0,fmod,MAX_PATH);
+//      PathStripPathA(fmod);
+//      strcat(fmod,": ");
+//      char* p=&fmod[strlen(fmod)];
+//      GetModuleFileNameA(hLibModule,p,MAX_PATH);
+//      PathStripPathA(p);
+//    }
+//    if (g_IATInit)
+//      TRACExA("SuRunExt32.dll: BLOCKING FreeLibAndExitThread (%s[%x])---------------------------------",fmod,hLibModule);
+//    else
+//      TRACExA("SuRunExt32.dll: ALLOWING FreeLibAndExitThread (%s[%x])--------------",fmod,hLibModule);
+//  }
+//#endif DoDBGTrace
   //The DLL must not be unloaded while the process is running!
   if ((!g_IATInit) || (hLibModule!=l_hInst))
   {
@@ -834,9 +832,9 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 
 BOOL WINAPI SwitchDesk(HDESK Desk)
 {
-#ifdef DoDBGTrace
-    TRACExA("SuRunExt32.dll: call to SwitchDesk()");
-#endif DoDBGTrace
+//#ifdef DoDBGTrace
+//    TRACExA("SuRunExt32.dll: call to SwitchDesk()");
+//#endif DoDBGTrace
   HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
   if (!d)
     return FALSE;
