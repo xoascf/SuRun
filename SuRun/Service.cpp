@@ -205,6 +205,7 @@ void ShowFUSGUI()
     return;
 #endif _DEBUG
   USERLIST ul;
+  ul.Add(g_RunData.UserName);
   {
     DWORD n=0;
     WTS_SESSION_INFO* si=0;
@@ -229,26 +230,36 @@ void ShowFUSGUI()
     }
   }
 #ifdef _DEBUG
-  ul.Add(L"KAY_ARBEIT\\Kay");
-  ul.Add(L"KAY_ARBEIT\\Administrator");
-  ul.Add(L"KAY_ARBEIT\\Nikki");
-  ul.Add(L"KAY_ARBEIT\\GastNutzer");
-  ul.Add(L"KAY_ARBEIT\\SuperUser");
-  ul.Add(L"KAY_ARBEIT1\\Kay");
-  ul.Add(L"KAY_ARBEIT1\\Administrator");
-  ul.Add(L"KAY_ARBEIT1\\Nikki");
-  ul.Add(L"KAY_ARBEIT1\\GastNutzer");
-  ul.Add(L"KAY_ARBEIT1\\SuperUser");
-  ul.Add(L"KAY_ARBEIT2\\Kay");
-  ul.Add(L"KAY_ARBEIT2\\Administrator");
-  ul.Add(L"KAY_ARBEIT2\\Nikki");
-  ul.Add(L"KAY_ARBEIT2\\GastNutzer");
-  ul.Add(L"KAY_ARBEIT2\\SuperUser");
+  ul.Add(L"Kay");
+  ul.Add(L"Administrator");
+  ul.Add(L"Nikki");
+  ul.Add(L"GastNutzer");
+  ul.Add(L"SuperUser");
+  ul.Add(L"Kay1");
+  ul.Add(L"Administrator1");
+  ul.Add(L"Nikki1");
+  ul.Add(L"GastNutzer1");
+  ul.Add(L"SuperUser2");
+  ul.Add(L"Kay2");
+  ul.Add(L"Administrator2");
+  ul.Add(L"Nikki2");
+  ul.Add(L"GastNutzer2");
+  ul.Add(L"SuperUser2");
 #endif _DEBUG
   if (ul.GetCount())
   {
     ul.LoadUserBitmaps();
-    
+    int dx=ul.GetCount();
+    int dy=1;
+    if (dx>32)
+      dy=4;
+    else if (dx>17)
+      dy=3;
+    else if (dx>4)
+      dy=2;
+    dx=ul.GetCount()/dy;
+    int DX=(10+48+10)*dx;
+    int DY=(10+48+10)*dy;
 
   }    
 #ifndef _DEBUG
