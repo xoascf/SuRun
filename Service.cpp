@@ -2177,7 +2177,7 @@ DWORD WINAPI HKThreadProc(void* p)
   //Create Message queue
   ATOM HotKeyID=GlobalAddAtom(L"SuRunFUSHotKey");
   PeekMessage(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-  if(RegisterHotKey(0,HotKeyID,MOD_WIN,(int)'S'))
+  if(RegisterHotKey(0,HotKeyID,MOD_WIN,VK_ESCAPE))
   {
     while (GetMessage(&msg,0,WM_HOTKEY,WM_HOTKEY))
     {
