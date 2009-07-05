@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* IATHook crashed with unnamed modules
 
 ToDo
 ---------------------
