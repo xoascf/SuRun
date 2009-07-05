@@ -160,6 +160,8 @@ static CHookDescriptor* hdt[]=
 //returns true if DllName is one to be hooked up
 BOOL DoHookDll(char* DllName)
 {
+  if(IsBadReadPtr(DllName,1))
+    return FALSE;
   for(int i=0;i<countof(hdt);i++)
     if ((stricmp(hdt[i]->DllName,DllName)==0)
       ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
