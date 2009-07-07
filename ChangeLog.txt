@@ -1,7 +1,5 @@
 Done, to be tested:
 ---------------------------
-* IATHook crashed with unnamed modules
-
 ToDo
 ---------------------
 * GUI for SwitchToUser
@@ -30,6 +28,14 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 Beta 11 - 2009-07-07:
+-----------------------------------
+* FIX: SuRuns IAT-Hook does not suspend Threads anmore in a process before 
+  modifying the IAT. Suspending threads caused NTVDM to not work properly.
+* FIX: To make SuRunExt.dll "AppInit_DLLs" compatible, it now initializes in a 
+  separate thread. (Win x64 GPF'd)
+* FIX: IATHook GPF'd with unnamed modules
 
 SuRun 1.2.0.7 Beta 10 - 2009-06-28:
 -----------------------------------
