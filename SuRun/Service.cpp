@@ -2268,7 +2268,7 @@ static void HandleHooks()
 #endif _WIN64
   bool TSA=FALSE;
   DWORD HkTID=0;
-  HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
+  //HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
   CTimeOut t;
   for (;;)
   {
@@ -2304,11 +2304,11 @@ static void HandleHooks()
   if(TSA)
     CloseTrayShowAdmin();
   UninstallSysMenuHook();
-  if(WaitForSingleObject(hHkThread,0)==WAIT_TIMEOUT)
-    PostThreadMessage(HkTID,WM_QUIT,0,0);
-  if(WaitForSingleObject(hHkThread,1000)==WAIT_TIMEOUT)
-    TerminateThread(hHkThread,-1);
-  CloseHandle(hHkThread);
+//  if(WaitForSingleObject(hHkThread,0)==WAIT_TIMEOUT)
+//    PostThreadMessage(HkTID,WM_QUIT,0,0);
+//  if(WaitForSingleObject(hHkThread,1000)==WAIT_TIMEOUT)
+//    TerminateThread(hHkThread,-1);
+//  CloseHandle(hHkThread);
 }
 
 //////////////////////////////////////////////////////////////////////////////
