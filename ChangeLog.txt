@@ -1,20 +1,9 @@
 ToDo for next release:
 ---------------------
----
-* Kaspersky and "SuRun /Setup"->User settings->Add/Edit App hangs
-* RealVNC
----
-* TSA: IPC
+* BUG report: Kaspersky and "SuRun /Setup"->User settings->Add/Edit App hangs
+* BUG report: RealVNC does not store settings
 ---
 * Polish resources
-
-Done:
----------------------
-* Setup->User settings->Add/Edit App:
-  Separate Dialog with Path and Flags, File Dialog through "..." Button.
-* replace Shells "RunAs..."
-* Setup->User settings: Stop signs in first two columns
-* TrayShowAdmin->"SuRun /Sysmenuhook"
 
 To be done in future:
 ---------------------
@@ -38,14 +27,18 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.1.0.3 - 2008-03-30:
+SuRun 1.1.0.3 - 2008-04-02: (small beta test)
 ----------------------------
-* QnD Fix: When using Sandboxie and the IAT-Hook, starting a sandboxed 
-  program took about four minutes. 
+* FIX: When using Sandboxie and the IAT-Hook, starting a sandboxed program 
+  took about four minutes. 
 * FIX: "'Explorer here' as admin" did not open the folder, when it had spaces 
   in the name
 * FIX: A user who was not allowed to change SuRun settings, could start the
   control panel as admin and then change SuRuns settings.
+* NEW: User file list "Add" and "Edit" shows the rule flags in a dialog
+* NEW: Setup Option to replace Windows "Run as..."
+* NEW: User file list rules: "never start automatically"/"never start elevated"
+* Option to show a user status icon and balloon tips in the notification area
 
 SuRun 1.1.0.2 - 2008-03-19:
 ----------------------------
