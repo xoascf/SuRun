@@ -1,5 +1,3 @@
-*'SuRun Explorer' -> hier C:\WINDOWS\explorer.exe "/e,"C:\System Volume Information"" ?
-
 ToDo for next release:
 ---------------------
 * Polish resources
@@ -25,6 +23,24 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.1.0.3 - 2008-03-30:
+----------------------------
+* QnD Fix: When using Sandboxie and the IAT-Hook, starting a sandboxed 
+  program took about four minutes. 
+* FIX: "'Explorer here' as admin" did not open the folder, when it had spaces 
+  in the name
+* FIX: A user who was not allowed to change SuRun settings, could start the
+  control panel as admin and then change SuRuns settings.
+
+SuRun 1.1.0.2 - 2008-03-19:
+----------------------------
+* In a domain SuRun could not be used without being logged in to the domain. 
+
+SuRun 1.1.0.1 - 2008-03-11:
+----------------------------
+* The IShellExecuteHook did not work properly because SuRun did not initialize 
+  to zero the static variables it uses.
 
 SuRun 1.1.0.0 - 2008-03-10: (changes to SuRun 1.0.2.9)
 ----------------------------
