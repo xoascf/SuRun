@@ -7,10 +7,6 @@ Project: "InstallSuRun"=.\InstallSuRun\InstallSuRun.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    "$/SuRun/InstallSuRun", VLCDAAAA
-    .\installsurun
-    end source code control
 }}}
 
 Package=<4>
@@ -23,10 +19,6 @@ Project: "SuRun"=.\SuRun.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    "$/SuRun", TSQCAAAA
-    .
-    end source code control
 }}}
 
 Package=<4>
@@ -42,10 +34,6 @@ Project: "SuRunExt"=.\SuRunExt\SuRunExt.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    "$/SuRun/SuRunExt", IUQCAAAA
-    .\surunext
-    end source code control
 }}}
 
 Package=<4>
@@ -58,10 +46,6 @@ Global:
 
 Package=<5>
 {{{
-    begin source code control
-    "$/SuRun", TSQCAAAA
-    .
-    end source code control
 }}}
 
 Package=<3>
