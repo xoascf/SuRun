@@ -2270,10 +2270,10 @@ static void HandleHooks()
   DWORD HkTID=0;
   //HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
   CTimeOut t;
+  BOOL bShowTray=TRUE;
+  BOOL bBaloon=FALSE;
   for (;;)
   {
-    BOOL bShowTray=TRUE;
-    BOOL bBaloon=FALSE;
     if (t.TimedOut())
     {
       if(CheckServiceStatus()!=SERVICE_RUNNING)
