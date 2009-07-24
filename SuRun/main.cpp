@@ -87,6 +87,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case 3:
     SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
     break;
+  case 4:
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_SPANISH,SUBLANG_SPANISH_ARGENTINA),SORT_DEFAULT));
+    break;
   }
 #ifdef _DEBUG
   ShowFUSGUI();
