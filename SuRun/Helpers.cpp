@@ -525,7 +525,7 @@ PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCH
   // The ACE will allow Administrators full access to the object.
   ea[1].grfAccessPermissions = STANDARD_RIGHTS_ALL|SPECIFIC_RIGHTS_ALL;
   ea[1].grfAccessMode = GRANT_ACCESS;
-  ea[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea[1].Trustee.TrusteeForm = TRUSTEE_IS_SID;
   ea[1].Trustee.ptstrName  = (LPTSTR)AdminSID;
   // Create a new ACL that merges the new ACE
   // into the existing DACL.
@@ -551,7 +551,7 @@ void SetAdminDenyUserAccess(HANDLE hObject,PSID UserSID,DWORD Permissions/*=SYNC
   DWORD dwRes=GetSecurityInfo(hObject,SE_KERNEL_OBJECT,DACL_SECURITY_INFORMATION,NULL,NULL,&pOldDACL,NULL,&pSD);
   if (ERROR_SUCCESS==dwRes)  
   {
-    PACL pNewDACL=SetAdminDenyUserAccess(pOldDACL,UserSID,Permissions/*=SYNCHRONIZE*/);
+    PACL pNewDACL=SetAdminDenyUserAccess(pOldDACL,UserSID,Permissions);
     // Attach the new ACL as the object's DACL.
     if (pNewDACL)
     {
