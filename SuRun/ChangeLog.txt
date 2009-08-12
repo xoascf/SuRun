@@ -5,7 +5,7 @@ Done, to be tested:
 * Added Spanish/Argentina resources
 * Added "UPGRADE" to files that need admin rights
 * Installer requires reboot in Vista/Win7 because SuRun hooks service processes
-* FIX: Tray icon and Ballon tips were always shown
+* FIX: Tray icon and Ballon tips were always shown (since 1.2.0.7 Beta 11)
 
 ToDo
 ---------------------
