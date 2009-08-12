@@ -978,19 +978,25 @@ DWORD WINAPI InitProc(void* p)
   //Resources
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  TCHAR fMod[MAX_PATH];
-  GetModuleFileName(0,fMod,MAX_PATH);
   l_Groups=UserIsInSuRunnersOrAdmins();
-  l_bSetHook=!l_IsAdmin;
+  l_bSetHook=1;//!l_IsAdmin;
   //IAT Hook:
   if (l_bSetHook)
   {
     //Do not set hooks into SuRun or Admin Processes!
+    TCHAR fMod[MAX_PATH];
+    GetModuleFileName(0,fMod,MAX_PATH);
     TCHAR fSuRunExe[4096];
     GetSystemWindowsDirectory(fSuRunExe,4096);
     PathAppend(fSuRunExe,L"SuRun.exe");
     PathQuoteSpaces(fSuRunExe);
-    l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) && (!IsInBlackList(fMod));
+    TCHAR fWLOExe[4096];
+    GetSystemWindowsDirectory(fWLOExe,4096);
+    PathAppend(fWLOExe,L"winlogon.exe");
+    PathQuoteSpaces(fWLOExe);
+    l_bSetHook=(_tcsicmp(fMod,fSuRunExe)!=0) 
+            && (_tcsicmp(fMod,fWLOExe)!=0) 
+            && (!IsInBlackList(fMod));
     if(l_bSetHook && GetUseIATHook)
       LoadHooks();
   }

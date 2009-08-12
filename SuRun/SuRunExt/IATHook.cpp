@@ -60,12 +60,28 @@ typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
                                         LPPROCESS_INFORMATION);
 
+typedef BOOL (WINAPI* lpCreateProcessAsUserA)(HANDLE,LPCSTR,LPSTR,
+                                              LPSECURITY_ATTRIBUTES,
+                                              LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+                                              LPVOID,LPCSTR,LPSTARTUPINFOA,
+                                              LPPROCESS_INFORMATION);
+typedef BOOL (WINAPI* lpCreateProcessAsUserW)(HANDLE,LPCWSTR,LPWSTR,
+                                              LPSECURITY_ATTRIBUTES,
+                                              LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+                                              LPVOID,LPCWSTR,LPSTARTUPINFOW,
+                                              LPPROCESS_INFORMATION);
+
 typedef BOOL (WINAPI* lpSwitchDesk)(HDESK);
 
 //Forward decl:
 BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+                        BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
+
+BOOL WINAPI CreatePAUA(HANDLE,LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
+BOOL WINAPI CreatePAUW(HANDLE,LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
 HMODULE WINAPI LoadLibA(LPCSTR);
@@ -129,6 +145,9 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","api-ms-win-core-libraryloader-
 static CHookDescriptor hkCrProcA ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessW",(PROC)CreateProcW);
 
+static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
+static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessAsUserW",(PROC)CreatePAUW);
+
 static CHookDescriptor hkSwDesk  ("user32.dll",NULL,"SwitchDesktop",(PROC)SwitchDesk);
 
 //Functions that, if present in the IAT, cause the module to be hooked
@@ -136,6 +155,8 @@ static CHookDescriptor* need_hdt[]=
 {
   &hkCrProcA, 
   &hkCrProcW,
+  &hkCrPAUA, 
+  &hkCrPAUW,
   &hkSwDesk,
 };
 
@@ -147,10 +168,12 @@ static CHookDescriptor* hdt[]=
   &hkLdLibXA, 
   &hkLdLibXW, 
 //  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
-//  &hkFreeLib, 
-//  &hkFrLibXT, 
+  &hkFreeLib, 
+  &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
+  &hkCrPAUA, 
+  &hkCrPAUW,
   &hkSwDesk
 };
 
@@ -448,19 +471,14 @@ DWORD HookModules()
 CRITICAL_SECTION g_HookCs;
 
 DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
-                     DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
+                     DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi,
+                     HANDLE hUser=0)
 {
   if (!g_IATInit)
     return RETVAL_SX_NOTINLIST;
   if (!GetUseIATHook)
     return RETVAL_SX_NOTINLIST;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
-  if(l_IsAdmin)
-    return RETVAL_SX_NOTINLIST;
-  {
-    if (!l_IsSuRunner)
-      return RETVAL_SX_NOTINLIST;
-  }
   EnterCriticalSection(&g_HookCs);
   static TCHAR CurDir[4096];
   zero(CurDir);
@@ -511,15 +529,29 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   static PROCESS_INFORMATION pi;
   zero(pi);
   si.cb = sizeof(si);
-  // Start the child process.
+  BOOL bStarted=FALSE;
+  if (hUser==0)
+  {
+    // Start the child process.
 #ifdef DoDBGTrace
-  if (!hkCrProcW.OrgFunc())
-    DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
-  if (hkCrProcW.newFunc==hkCrProcW.OrgFunc())
-    DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
+    if (!hkCrProcW.OrgFunc())
+      DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
+    if (hkCrProcW.newFunc==hkCrProcW.OrgFunc())
+      DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
 #endif DoDBGTrace
-  if (((lpCreateProcessW)hkCrProcW.OrgFunc())
-    (NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi))
+    bStarted=((lpCreateProcessW)hkCrProcW.OrgFunc())(NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi);
+  }else
+  {
+    // Start the child process as user
+#ifdef DoDBGTrace
+    if (!hkCrPAUW.OrgFunc())
+      DBGTrace("IATHook FATAL Warning! hkCrProcW.orgFunc==0!");
+    if (hkCrPAUW.newFunc==hkCrPAUW.OrgFunc())
+      DBGTrace("IATHook FATAL Warning! hkCrProcW.newFunc==hkCrProcW.orgFunc!");
+#endif DoDBGTrace
+    bStarted=((lpCreateProcessAsUserW)hkCrPAUW.OrgFunc())(hUser,NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi);
+  }
+  if (bStarted)
   {
     CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
@@ -542,7 +574,8 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
 }
 
 DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
-                     DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi)
+                     DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi,
+                     HANDLE hUser=0)
 {
   if (!g_IATInit)
     return RETVAL_SX_NOTINLIST;
@@ -556,7 +589,7 @@ DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
   static WCHAR wCurDir[4096];
   zero(wCurDir);
   MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
-  DWORD dwRet=TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi);
+  DWORD dwRet=TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi,hUser);
   LeaveCriticalSection(&g_HookCs);
   return dwRet;
 }
@@ -570,8 +603,10 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
 #ifdef DoDBGTrace
 //    TRACExA("SuRunExt32.dll: call to CreateProcA(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
-  DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-                           dwCreationFlags,lpProcessInformation);
+  DWORD tas=RETVAL_SX_NOTINLIST;
+  if ((!l_IsAdmin) && l_IsSuRunner)
+    tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+                       dwCreationFlags,lpProcessInformation);
   if(tas==RETVAL_OK)
     return SetLastError(NOERROR),TRUE;
   if(tas==RETVAL_CANCELLED)
@@ -596,8 +631,10 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 #ifdef DoDBGTrace
 //    TRACEx(L"SuRunExt32.dll: call to CreateProcW(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
-  DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-                           dwCreationFlags,lpProcessInformation);
+  DWORD tas=RETVAL_SX_NOTINLIST;
+  if ((!l_IsAdmin) && l_IsSuRunner)
+    tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+                       dwCreationFlags,lpProcessInformation);
   if(tas==RETVAL_OK)
     return SetLastError(NOERROR),TRUE;
   if(tas==RETVAL_CANCELLED)
@@ -611,6 +648,97 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
   return ((lpCreateProcessW)hkCrProcW.OrgFunc())(lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+}
+
+static BOOL IsShellUser(HANDLE hToken)
+{
+  BOOL bRet=FALSE;
+  if (!IsAdmin(hToken))
+  {
+    DWORD SessionId=0;
+    DWORD siz=0;
+    if (GetTokenInformation(hToken,TokenSessionId,&SessionId,sizeof(DWORD),&siz))
+    {
+      HANDLE hShell=GetSessionUserToken(SessionId);
+      if (hShell)
+      {
+        PSID ShellSID=GetTokenUserSID(hShell);
+        if (ShellSID)
+        {
+          PSID UserSID=GetTokenUserSID(hToken);
+          if (UserSID)
+          {
+            bRet=EqualSid(UserSID,ShellSID);
+            free(UserSID);
+          }
+          free(ShellSID);
+        }
+        CloseHandle(hShell);
+      }
+    }
+  }
+  return bRet;
+}
+
+BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
+  //ToDo: *original function will call CreateProcess. SuRun must not ask twice!
+#ifdef DoDBGTrace
+//  TRACExA("SuRunExt32.dll: call to CreatePAUA(%s,%s)",lpApplicationName,lpCommandLine);
+#endif DoDBGTrace
+  if(IsShellUser(hToken))
+  {
+    DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+      dwCreationFlags,lpProcessInformation,hToken);
+    if(tas==RETVAL_OK)
+      return SetLastError(NOERROR),TRUE;
+    if(tas==RETVAL_CANCELLED)
+      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  }
+#ifdef DoDBGTrace
+  if (!hkCrPAUA.OrgFunc())
+    DBGTrace("IATHook FATAL Warning! hkCrPAUA.orgFunc==0!");
+  if (hkCrPAUA.newFunc==hkCrPAUA.OrgFunc())
+    DBGTrace("IATHook FATAL Warning! hkCrPAUA.newFunc==hkCrPAUA.orgFunc!");
+#endif DoDBGTrace
+  return ((lpCreateProcessAsUserA)hkCrPAUA.OrgFunc())(hToken,lpApplicationName,
+      lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,
+      dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+}
+
+
+BOOL WINAPI CreatePAUW(HANDLE hToken,LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+    LPCWSTR lpCurrentDirectory,LPSTARTUPINFOW lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
+#ifdef DoDBGTrace
+//  TRACEx(L"SuRunExt32.dll: call to CreatePAUW(%s,%s)",lpApplicationName,lpCommandLine);
+#endif DoDBGTrace
+  //ToDo: *original function may call CreateProcess. SuRun must not ask twice!
+  if(IsShellUser(hToken))
+  {
+    DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+      dwCreationFlags,lpProcessInformation,hToken);
+    if(tas==RETVAL_OK)
+      return SetLastError(NOERROR),TRUE;
+    if(tas==RETVAL_CANCELLED)
+      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  }
+#ifdef DoDBGTrace
+  if (!hkCrPAUW.OrgFunc())
+    DBGTrace("IATHook FATAL Warning! hkCrPAUW.orgFunc==0!");
+  if (hkCrPAUW.newFunc==hkCrPAUW.OrgFunc())
+    DBGTrace("IATHook FATAL Warning! hkCrPAUW.newFunc==hkCrPAUW.orgFunc!");
+#endif DoDBGTrace
+  return ((lpCreateProcessAsUserW)hkCrPAUW.OrgFunc())(hToken,lpApplicationName,
+      lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,
+      dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
 }
 
 FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
