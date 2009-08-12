@@ -1,5 +1,12 @@
 Done, to be tested:
 ---------------------------
+* IAT-Hook intercepts CreateProcessAsUser
+* SuRun also sets its hooks into admin/service processes
+* Added Spanish/Argentina resources
+* Added "UPGRADE" to files that need admin rights
+* Installer requires reboot in Vista/Win7 because SuRun hooks service processes
+* FIX: Tray icon and Ballon tips were always shown
+
 ToDo
 ---------------------
 * GUI for SwitchToUser

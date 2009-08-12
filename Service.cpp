@@ -2053,22 +2053,22 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTSUCCESS));
           //Show "need logoff"
           InstLog(_T(" "));
-          if (_winmajor<6)
+//          if (_winmajor<6)
             InstLog(CResStr(IDS_INSTSUCCESS3))
-          else
-            InstLog(CResStr(IDS_INSTSUCCESS2));
+//          else
+//            InstLog(CResStr(IDS_INSTSUCCESS2));
           //Enable OK, CANCEL
           EnableWindow(GetDlgItem(hwnd,IDOK),1);
           EnableWindow(GetDlgItem(hwnd,IDCANCEL),1);
           //Cancel->Close; OK->Logoff
           OSVERSIONINFO oie;
           oie.dwOSVersionInfoSize=sizeof(oie);
-          if (_winmajor<6)
+//          if (_winmajor<6)
             //2k/XP Reboot required for WinLogon Notification
             SetDlgItemText(hwnd,IDOK,CResStr(IDS_REBOOT));
-          else 
-            //Vista++ display LogOff 
-            SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
+//          else 
+//            //Vista++ display LogOff 
+//            SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
           SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CLOSE));
           SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
           SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
@@ -2083,16 +2083,16 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         return TRUE;
       case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
         //ExitWindowsEx will not work here because we run as Admin
-        if (_winmajor<6)
-        {
+//        if (_winmajor<6)
+//        {
           //2k/XP Reboot required for WinLogon Notification
           //ExitWindowsEx(EWX_REBOOT|EWX_FORCE,SHTDN_REASON_MINOR_RECONFIG);
           EnablePrivilege(SE_SHUTDOWN_NAME);
           InitiateSystemShutdown(0,0,0,true,true);
-        }
-        else
-          //Vista++ no WinLogon Notification, just LogOff
-          WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
+//        }
+//        else
+//          //Vista++ no WinLogon Notification, just LogOff
+//          WTSLogoffSession(WTS_CURRENT_SERVER_HANDLE,WTS_CURRENT_SESSION,0);
         EndDialog(hwnd,IDCONTINUE);
         return TRUE;
       case MAKELPARAM(IDIGNORE,BN_CLICKED): //Remove SuRun:

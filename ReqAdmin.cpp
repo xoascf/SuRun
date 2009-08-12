@@ -170,7 +170,8 @@ BOOL RequiresAdmin(LPCTSTR FileName)
           InfoDBGTrace1("RequiresAdmin(%s) Executable Extension!",FName);
           bReqAdmin=(_tcsstr(file,_T("INSTALL"))!=0)
             ||(_tcsstr(file,_T("SETUP"))!=0)
-            ||(_tcsstr(file,_T("UPDATE"))!=0);
+            ||(_tcsstr(file,_T("UPDATE"))!=0)
+            ||(_tcsstr(file,_T("UPGRADE"))!=0);
           if(bReqAdmin)
             InfoDBGTrace1("RequiresAdmin(%s) FileName match",file);
         }
