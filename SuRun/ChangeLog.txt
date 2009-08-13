@@ -1,9 +1,10 @@
 Done, to be tested:
 ---------------------------
-* IAT-Hook intercepts CreateProcessAsUser
-* SuRun also sets its hooks into admin/service processes
 * Added Spanish/Argentina resources
 * Added "UPGRADE" to files that need admin rights
+* SuRun also sets its hooks into admin/service processes
+* IAT-Hook intercepts CreateProcessAsUser
+* SuRun autodetects "rundll32,newdev.dll" to support installing new hardware
 * Installer requires reboot in Vista/Win7 because SuRun hooks service processes
 * FIX: Tray icon and Ballon tips were always shown (since 1.2.0.7 Beta 11)
 

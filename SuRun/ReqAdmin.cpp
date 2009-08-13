@@ -109,6 +109,7 @@ BOOL RequiresAdmin(LPCTSTR FileName)
   _tcscpy(FName,FileName);
   PathRemoveArgs(FName);
   PathUnquoteSpaces(FName);
+  InfoDBGTrace1("RequiresAdmin(%s)?",FName);
   BOOL bReqAdmin=FALSE;
   HINSTANCE hExe=LoadLibraryEx(FName,0,LOAD_LIBRARY_AS_DATAFILE);
   if (hExe)
@@ -149,19 +150,17 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       TCHAR ext[4096];
       GetSystemWindowsDirectory(ext,4096);
       _tcscpy(file,ext);
-      PathAppend(file,L"rundll32.exe newdev.dll,*");
-      bReqAdmin=strwldcmp(file,FileName)==0;
-      if(bReqAdmin)
+      PathAppend(file,L"system32\\rundll32.exe newdev.dll,*");
+      if(strwldcmp(FileName,file))
       {
         InfoDBGTrace1("RequiresAdmin(%s) New device wizard match",FileName);
         return true;
       }
       _tcscpy(file,ext);
-      PathAppend(file,L"rundll32.exe ");
+      PathAppend(file,L"system32\\rundll32.exe ");
       PathAppend(ext,L"newdev.dll,*");
       _tcscat(file,ext);
-      bReqAdmin=strwldcmp(file,FileName)==0;
-      if(bReqAdmin)
+      if(strwldcmp(FileName,file))
       {
         InfoDBGTrace1("RequiresAdmin(%s) New device wizard match",FileName);
         return true;

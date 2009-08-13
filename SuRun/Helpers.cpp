@@ -1363,21 +1363,14 @@ PSID GetLogonSid(HANDLE hToken)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD UserIsInSuRunnersOrAdmins()
+DWORD UserIsInSuRunnersOrAdmins(HANDLE hToken)
 {
-  HANDLE hToken=NULL;
-  if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken))
-  {
-    DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
-    return 0;
-  }
 	PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
   DWORD dwRet=0;
   if(IsSplitAdmin(hToken))
     dwRet|=IS_SPLIT_ADMIN;
   if(GetSystemMetrics(SM_REMOTESESSION))
     dwRet|=IS_TERMINAL_USER;
-  CloseHandle(hToken);
   if (!ptg)
     return 0;
   SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
@@ -1402,7 +1395,19 @@ DWORD UserIsInSuRunnersOrAdmins()
   FreeSid(AdminSID);
   free(SuRunnersSID);
   free(ptg);
-  
+	return dwRet;
+}
+
+DWORD UserIsInSuRunnersOrAdmins()
+{
+  HANDLE hToken=NULL;
+  if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&hToken))
+  {
+    DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
+    return 0;
+  }
+  DWORD dwRet=UserIsInSuRunnersOrAdmins(hToken);
+  CloseHandle(hToken);
 	return dwRet;
 }
 
@@ -1484,6 +1489,24 @@ PSID GetSessionLogonSID(DWORD SessionID)
   return p;
 }
 
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// GetProcessFileName
+// 
+/////////////////////////////////////////////////////////////////////////////
+
+DWORD GetProcessFileName(LPTSTR lpFilename,DWORD nSize)
+{
+  nSize=GetModuleFileName(0,lpFilename,nSize);
+  while ((lpFilename[0]==L'\\')||(lpFilename[0]==L'?'))
+  {
+    memmove(lpFilename,&lpFilename[1],nSize*sizeof(TCHAR));
+    nSize--;
+  }
+  return nSize;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // 
 // GetVersionString
@@ -1496,7 +1519,7 @@ LPCTSTR GetVersionString()
   if (verstr[0]!=0)
     return verstr;
   TCHAR FName[4096];
-  GetModuleFileName(0,FName,4096);
+  GetProcessFileName(FName,4096);
   int cbVerInfo=GetFileVersionInfoSize(FName,0);
   if (cbVerInfo)
   {

@@ -168,13 +168,13 @@ static CHookDescriptor* hdt[]=
   &hkLdLibXA, 
   &hkLdLibXW, 
 //  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
-  &hkFreeLib, 
-  &hkFrLibXT, 
+//  &hkFreeLib, 
+//  &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
   &hkCrPAUA, 
   &hkCrPAUW,
-  &hkSwDesk
+  &hkSwDesk,
 };
 
 //relative pointers in PE images
@@ -650,10 +650,11 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
 }
 
-static BOOL IsShellUser(HANDLE hToken)
+static BOOL IsShellAndSuRunner(HANDLE hToken)
 {
   BOOL bRet=FALSE;
-  if (!IsAdmin(hToken))
+  DWORD Groups=UserIsInSuRunnersOrAdmins(hToken);
+  if ((Groups&(IS_IN_ADMINS|IS_IN_SURUNNERS))==IS_IN_SURUNNERS)
   {
     DWORD SessionId=0;
     DWORD siz=0;
@@ -690,7 +691,7 @@ BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLin
 #ifdef DoDBGTrace
 //  TRACExA("SuRunExt32.dll: call to CreatePAUA(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
-  if(IsShellUser(hToken))
+  if(IsShellAndSuRunner(hToken))
   {
     DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
       dwCreationFlags,lpProcessInformation,hToken);
@@ -721,7 +722,7 @@ BOOL WINAPI CreatePAUW(HANDLE hToken,LPCWSTR lpApplicationName,LPWSTR lpCommandL
 //  TRACEx(L"SuRunExt32.dll: call to CreatePAUW(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   //ToDo: *original function may call CreateProcess. SuRun must not ask twice!
-  if(IsShellUser(hToken))
+  if(IsShellAndSuRunner(hToken))
   {
     DWORD tas=TestAutoSuRunW(lpApplicationName,lpCommandLine,lpCurrentDirectory,
       dwCreationFlags,lpProcessInformation,hToken);
@@ -962,22 +963,24 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 BOOL WINAPI SwitchDesk(HDESK Desk)
 {
 //#ifdef DoDBGTrace
-//    TRACExA("SuRunExt32.dll: call to SwitchDesk()");
+//  DBGTrace("SuRunExt32.dll: call to SwitchDesk()");
 //#endif DoDBGTrace
-  HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
-  if (!d)
-    return FALSE;
-  TCHAR dn[4096]={0};
-  DWORD dnl=4096;
-  if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
-  if (!d)
-    return FALSE;
-  if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
+  if ((!IsLocalSystem()) && (!l_IsAdmin))
   {
-    SetLastError(ERROR_ACCESS_DENIED);
-    return CloseDesktop(d),FALSE;
+    HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
+    if (!d)
+      return FALSE;
+    TCHAR dn[4096]={0};
+    DWORD dnl=4096;
+    if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
+      return CloseDesktop(d),FALSE;
+    CloseDesktop(d);
+    if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
+    {
+      SetLastError(ERROR_ACCESS_DENIED);
+      return CloseDesktop(d),FALSE;
+    }
   }
-  CloseDesktop(d);
   BOOL bRet=FALSE;
   EnterCriticalSection(&g_HookCs);
 #ifdef DoDBGTrace

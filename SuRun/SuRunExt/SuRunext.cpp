@@ -979,36 +979,26 @@ DWORD WINAPI InitProc(void* p)
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   l_Groups=UserIsInSuRunnersOrAdmins();
-  l_bSetHook=1;//!l_IsAdmin;
+  l_bSetHook=!l_IsAdmin;
   //IAT Hook:
   if (l_bSetHook)
   {
     TCHAR fMod[MAX_PATH];
     TCHAR fNoHook[4096];
-    GetModuleFileName(0,fMod,MAX_PATH);
+    GetProcessFileName(fMod,MAX_PATH);
     //Do not set hooks into SuRun!
     GetSystemWindowsDirectory(fNoHook,4096);
     PathAppend(fNoHook,L"SuRun.exe");
     PathQuoteSpaces(fNoHook);
     l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+//    //Do not set hooks into lsass!
+//    GetSystemWindowsDirectory(fNoHook,4096);
+//    PathAppend(fNoHook,L"SYSTEM32\\lsass.exe");
+//    PathQuoteSpaces(fNoHook);
+//    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
     //Do not set hooks into Winlogon!
     GetSystemWindowsDirectory(fNoHook,4096);
-    PathAppend(fNoHook,L"winlogon.exe");
-    PathQuoteSpaces(fNoHook);
-    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-    //Do not set hooks into csrss!
-    GetSystemWindowsDirectory(fNoHook,4096);
-    PathAppend(fNoHook,L"csrss.exe");
-    PathQuoteSpaces(fNoHook);
-    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-    //Do not set hooks into lsass!
-    GetSystemWindowsDirectory(fNoHook,4096);
-    PathAppend(fNoHook,L"lsass.exe");
-    PathQuoteSpaces(fNoHook);
-    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-    //Do not set hooks into smss!
-    GetSystemWindowsDirectory(fNoHook,4096);
-    PathAppend(fNoHook,L"smss.exe");
+    PathAppend(fNoHook,L"SYSTEM32\\winlogon.exe");
     PathQuoteSpaces(fNoHook);
     l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
     //Do not set hooks into blacklisted files!
