@@ -122,6 +122,7 @@ PTOKEN_GROUPS	GetTokenGroups(HANDLE hToken);
 PSID GetLogonSid(HANDLE hToken);
 
 //UserIsInSuRunnersOrAdmins
+DWORD UserIsInSuRunnersOrAdmins(HANDLE hToken);
 DWORD UserIsInSuRunnersOrAdmins();
 
 //  GetSessionUserToken
@@ -129,6 +130,9 @@ HANDLE GetSessionUserToken(DWORD SessID);
 
 //  GetSessionLogonSID
 PSID GetSessionLogonSID(DWORD SessionID);
+
+//  GetProcessFileName
+DWORD GetProcessFileName(LPTSTR lpFilename,DWORD nSize);
 
 // GetVersionString
 LPCTSTR GetVersionString();

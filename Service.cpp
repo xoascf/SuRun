@@ -311,7 +311,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     HMODULE hMod;
     TCHAR f1[MAX_PATH];
     TCHAR f2[MAX_PATH];
-    if (!GetModuleFileName(0,f1,MAX_PATH))
+    if (!GetProcessFileName(f1,MAX_PATH))
     {
       DBGTrace1("GetModuleFileName failed",GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
@@ -1710,7 +1710,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
 {
   TCHAR ModName[MAX_PATH];
   TCHAR cmdLine[4096];
-  GetModuleFileName(NULL,ModName,MAX_PATH);
+  GetProcessFileName(ModName,MAX_PATH);
   NetworkPathToUNCPath(ModName);
   PathQuoteSpaces(ModName);
   TCHAR User[UNLEN+GNLEN+2]={0};
@@ -1765,7 +1765,7 @@ void CopyToWinDir(LPCTSTR File)
 {
   TCHAR DstFile[4096];
   TCHAR SrcFile[4096];
-  GetModuleFileName(NULL,SrcFile,MAX_PATH);
+  GetProcessFileName(SrcFile,MAX_PATH);
   NetworkPathToUNCPath(SrcFile);
   PathRemoveFileSpec(SrcFile);
   PathAppend(SrcFile,File);
@@ -2242,13 +2242,10 @@ static void HandleHooks()
 #ifndef _SR32
   StartTSAThread();
 #endif _SR32
-  if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-    && IsAdmin())
+  if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners)) && IsAdmin())
     return;
-  if ( (!GetUseIATHook) 
-    && (!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-    && (!GetRestartAsAdmin) 
-    && (!GetStartAsAdmin))
+  if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
+    && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
     return;
   InstallSysMenuHook();
 #ifdef _WIN64
@@ -2281,7 +2278,7 @@ static void HandleHooks()
       g_RunData.Groups=UserIsInSuRunnersOrAdmins();
       bShowTray=ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
       bBaloon=ShowBalloon(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
-      if ( (!GetUseIATHook) && (!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
+      if ((!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
         break;
       t.Set(10000);
     }
@@ -2414,7 +2411,7 @@ bool HandleServiceStuff()
   {
     TCHAR fn[4096];
     TCHAR wd[4096];
-    GetModuleFileName(NULL,fn,4096);
+    GetProcessFileName(fn,4096);
     NetworkPathToUNCPath(fn);
     PathRemoveFileSpec(fn);
     PathRemoveBackslash(fn);

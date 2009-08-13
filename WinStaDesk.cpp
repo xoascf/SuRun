@@ -539,7 +539,7 @@ BOOL WeMustClose()
   HMODULE hMod;
   TCHAR f1[MAX_PATH];
   TCHAR f2[MAX_PATH];
-  if (!GetModuleFileName(0,f1,MAX_PATH))
+  if (!GetProcessFileName(f1,MAX_PATH))
     return CloseHandle(hProcess),TRUE;
   if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
     return CloseHandle(hProcess),TRUE;
