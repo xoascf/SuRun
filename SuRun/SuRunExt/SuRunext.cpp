@@ -952,6 +952,11 @@ DWORD WINAPI InitProc(void* p)
       PathAppend(fNoHook,L"SYSTEM32\\logonui.exe");
       PathQuoteSpaces(fNoHook);
       l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+      //Do not set hooks into userinit!
+      GetSystemWindowsDirectory(fNoHook,4096);
+      PathAppend(fNoHook,L"SYSTEM32\\userinit.exe");
+      PathQuoteSpaces(fNoHook);
+      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
       //Do not set hooks into Winlogon!
       GetSystemWindowsDirectory(fNoHook,4096);
       PathAppend(fNoHook,L"SYSTEM32\\winlogon.exe");
