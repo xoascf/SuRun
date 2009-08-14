@@ -627,7 +627,11 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
 
   GetSystemWindowsDirectory(cmd,countof(cmd));
+#ifndef _SR32
   PathAppend(cmd, _T("SuRun.exe"));
+#else _SR32
+  PathAppend(cmd, _T("SuRun32.bin"));
+#endif _SR32
   PathQuoteSpaces(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
@@ -937,7 +941,11 @@ DWORD WINAPI InitProc(void* p)
     GetProcessFileName(fMod,MAX_PATH);
     //Do not set hooks into SuRun!
     GetSystemWindowsDirectory(fNoHook,4096);
-    PathAppend(fNoHook,L"SuRun.exe");
+#ifndef _SR32
+    PathAppend(fNoHook, _T("SuRun.exe"));
+#else _SR32
+    PathAppend(fNoHook, _T("SuRun32.bin"));
+#endif _SR32
     PathQuoteSpaces(fNoHook);
     l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
     if(l_bSetHook)
