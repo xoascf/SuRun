@@ -82,8 +82,8 @@ DWORD WINAPI TSAThreadProc(void* p)
         }else
           DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
         CloseHandle(h);
-      }else
-        DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurProcId,GetLastErrorNameStatic());
+      }//else
+        //DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurProcId,GetLastErrorNameStatic());
     }
   }
 }

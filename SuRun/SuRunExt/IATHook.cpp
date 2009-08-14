@@ -168,8 +168,8 @@ static CHookDescriptor* hdt[]=
   &hkLdLibXA, 
   &hkLdLibXW, 
 //  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
-//  &hkFreeLib, 
-//  &hkFrLibXT, 
+  &hkFreeLib, 
+  &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
   &hkCrPAUA, 
@@ -364,60 +364,8 @@ DWORD Hook(HMODULE hMod,bool bUnHook)
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
           if(NeedHookFn(DllName,(char*)pBN->Name,(void*)pThunk->u1.Function))
           {
-//            //Suspend all Threads except this one
-//            HANDLE hSnap=CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD,0);
-//            if (hSnap!=INVALID_HANDLE_VALUE)
-//            {
-//              THREADENTRY32 te={0};
-//              te.dwSize=sizeof(THREADENTRY32);
-//              if(Thread32First(hSnap,&te))
-//              {
-//                do 
-//                { 
-//                  if ((te.th32OwnerProcessID == GetCurrentProcessId()) 
-//                    &&(te.th32ThreadID!=GetCurrentThreadId()))
-//                  { 
-//                    HANDLE hT=OpenThread(THREAD_SUSPEND_RESUME,0,te.th32ThreadID);
-//                    if(hT)
-//                    {
-//                      if (SuspendThread(hT)==-1)
-//                        DBGTrace2("SuspendThread(ID==%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
-//                      CloseHandle(hT);
-//                    }else
-//                      DBGTrace2("OpenThread(%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
-//                  } 
-//                } while (Thread32Next(hSnap,&te)); 
-//              }else
-//                DBGTrace1("Thread32First failed: %s",GetLastErrorNameStatic());
-//            }else
-//              DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
             //Hook IAT
             DWORD dwRet=HookIAT(hMod,pID,bUnHook);
-//            //Resume all Threads except this one
-//            if (hSnap!=INVALID_HANDLE_VALUE)
-//            {
-//              THREADENTRY32 te={0};
-//              te.dwSize=sizeof(THREADENTRY32);
-//              if(Thread32First(hSnap,&te))
-//              {
-//                do 
-//                { 
-//                  if ((te.th32OwnerProcessID == GetCurrentProcessId()) 
-//                    &&(te.th32ThreadID!=GetCurrentThreadId()))
-//                  { 
-//                    HANDLE hT=OpenThread(THREAD_SUSPEND_RESUME,0,te.th32ThreadID);
-//                    if(hT)
-//                    {
-//                      if (ResumeThread(hT)==-1)
-//                        DBGTrace2("ResumeThread(ID==%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
-//                      CloseHandle(hT);
-//                    }else
-//                      DBGTrace2("OpenThread(%d) failed: %s",te.th32ThreadID,GetLastErrorNameStatic());
-//                  } 
-//                } while (Thread32Next(hSnap,&te)); 
-//              }else
-//                DBGTrace1("Thread32First failed: %s",GetLastErrorNameStatic());
-//            }
             return dwRet;
           }
         }
@@ -653,6 +601,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 static BOOL IsShellAndSuRunner(HANDLE hToken)
 {
   BOOL bRet=FALSE;
+  if (l_IsAdmin && (!GetUseSVCHook))
+    return bRet;
   DWORD Groups=UserIsInSuRunnersOrAdmins(hToken);
   if ((Groups&(IS_IN_ADMINS|IS_IN_SURUNNERS))==IS_IN_SURUNNERS)
   {
@@ -1026,7 +976,7 @@ void UnloadHooks()
     return;
   //Do not unload the hooks, but wait for the Critical Section
   EnterCriticalSection(&g_HookCs);
-  UnhookModules();
+  //UnhookModules();
   g_IATInit=FALSE;
   LeaveCriticalSection(&g_HookCs);
   DeleteCriticalSection(&g_HookCs);

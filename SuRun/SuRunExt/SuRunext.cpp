@@ -372,27 +372,27 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef DoDBGTrace
-  TCHAR Path[4096]={0};
-  if (pIDFolder)
-    SHGetPathFromIDList(pIDFolder,Path);
-  TCHAR FileClass[4096]={0};
-  if(hRegKey)
-    GetRegStr(hRegKey,0,L"",FileClass,4096);
-  TCHAR File[4096]={0};
-  if(pDataObj)
-  {
-    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-    STGMEDIUM stm;
-    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-    {
-      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
-      ReleaseStgMedium(&stm);
-    }
-  }
-  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-  if(pDataObj)
-    PrintDataObj(pDataObj);
+//  TCHAR Path[4096]={0};
+//  if (pIDFolder)
+//    SHGetPathFromIDList(pIDFolder,Path);
+//  TCHAR FileClass[4096]={0};
+//  if(hRegKey)
+//    GetRegStr(hRegKey,0,L"",FileClass,4096);
+//  TCHAR File[4096]={0};
+//  if(pDataObj)
+//  {
+//    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+//    STGMEDIUM stm;
+//    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+//    {
+//      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+//        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
+//      ReleaseStgMedium(&stm);
+//    }
+//  }
+//  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+//  if(pDataObj)
+//    PrintDataObj(pDataObj);
 #endif DoDBGTrace
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
@@ -733,26 +733,29 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
   int RetVal=0;
   if(OpenProcessToken(hp,TOKEN_ALL_ACCESS,&ht))
   {
-    TOKEN_SOURCE tsrc;
-    DWORD n=0;
-    if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
+    if (!IsLocalSystem(ht))
     {
-      PSID tSID=GetLogonSid(ht);
-      if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
+      TOKEN_SOURCE tsrc;
+      DWORD n=0;
+      if (GetTokenInformation(ht,TokenSource,&tsrc,sizeof(tsrc),&n))
       {
-        if ((memcmp(&SrcId,&tsrc.SourceIdentifier,sizeof(LUID))==0)
-          &&(strcmp(tsrc.SourceName,"SuRun")==0))
+        PSID tSID=GetLogonSid(ht);
+        if (tSID && IsValidSid(tSID) && EqualSid(LogonSID,tSID))
         {
-          TerminateProcess(hp,0);
-          DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
-          RetVal=1;
-        }else
-          DBGTrace1("SuRunLogoffUser: PID:%d was NOT killed",PID);
+          if ((memcmp(&SrcId,&tsrc.SourceIdentifier,sizeof(LUID))==0)
+            &&(strcmp(tsrc.SourceName,"SuRun")==0))
+          {
+            TerminateProcess(hp,0);
+            DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
+            RetVal=1;
+          }//else
+            //DBGTrace1("SuRunLogoffUser: PID:%d was NOT killed",PID);
+        }//else
+          //DBGTrace1("Sid(%d) mismatch",PID);
+        free(tSID);
       }else
-        DBGTrace1("Sid(%d) mismatch",PID);
-      free(tSID);
-    }else
-      DBGTrace2("GetTokenInformation(%d) failed: %s",PID,GetLastErrorNameStatic());
+        DBGTrace2("GetTokenInformation(%d) failed: %s",PID,GetLastErrorNameStatic());
+    }
     CloseHandle(ht);
   }else
     DBGTrace2("OpenProcessToken(%d) failed: %s",PID,GetLastErrorNameStatic());
@@ -775,11 +778,7 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
   if(WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&ppi,&n) && n)
   {
     for (DWORD i=0;i<n;i++)
-    {
-      DBGTrace2("SuRunLogoffUser trying PID:%d \"%s\"",
-        ppi[i].ProcessId,ppi[i].pProcessName);
       KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,ppi[i].ProcessId);
-    }
     WTSFreeMemory(ppi);
   }else
   {
@@ -793,8 +792,6 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
       { 
         do
         {
-          DBGTrace2("SuRunLogoffUser trying PID:%d \"%s\"",
-            pe32.th32ProcessID,pe32.szExeFile);
           KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,pe32.th32ProcessID);
         }while (Process32Next(h, &pe32)); 
       } 
@@ -924,54 +921,6 @@ __declspec(dllexport) void RemoveShellExt()
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// NewDevProc:
-// 
-// Win2k: rundll32.exe newdev.dll,DevInstall USB\Vid_0451&Pid_3410\TUSB3410________
-//  ::ExitProcess(0), SuRun /newdev newdev.dll,DevInstall USB\Vid_0451&Pid_3410\TUSB3410________
-//        
-// WinXP  rundll32.exe newdev.dll,ClientSideInstall \\.\pipe\PNP_Device_Install_Pipe_0.{8182B56F-B591-4785-8A9A-72477416A865}
-//        CreateProcWithLogonW(rundll32.exe newdev.dll,DevInstall USB\Vid_0451&Pid_3410\TUSB3410________)
-//        
-//       Pipe:\\.\pipe\PNP_Device_Install_Pipe_0.{8182B56F-B591-4785-8A9A-72477416A865}
-//        ->DWORD len;
-//        ->wchar EventName[Len] 
-// 
-// Vista: rundll32.exe C:\Windows\system32\newdev.dll,pDiDeviceInstallAction \\.\pipe\PNP_Device_Install_Pipe_1.{a3312ee6-66f2-4163-94fb-403a447ab42b} "USB\VID_0451&PID_3410\TUSB3410________"
-//  ::ExitProcess(0), SuRun C:\Windows\system32\newdev.dll,pDiDeviceInstallAction \\.\pipe\PNP_Device_Install_Pipe_1.{a3312ee6-66f2-4163-94fb-403a447ab42b} "USB\VID_0451&PID_3410\TUSB3410________"
-//////////////////////////////////////////////////////////////////////////////
-//DWORD WINAPI NewDevProc(void* p)
-//{
-//  TCHAR cmd[MAX_PATH];
-//  GetSystemWindowsDirectory(cmd,MAX_PATH);
-//  PathAppend(cmd, _T("SuRun.exe"));
-//  PathQuoteSpaces(cmd);
-//  STARTUPINFO si;
-//  PROCESS_INFORMATION pi;
-//  ZeroMemory(&si, sizeof(si));
-//  si.cb = sizeof(si);
-//  if(_tcsnicmp(L"newdev.dll,ClientSideInstall",PathGetArgs(GetCommandLine()),28)==0)
-//  {
-//    //WinXP! Close the CredUI Dialog, wait for CreateProcessWithLogonW and 
-//    //start newdev.dll,DevInstall
-//  }else
-//  //if(_tcsnicmp(L"newdev.dll,DevInstall",PathGetArgs(GetCommandLine()),21)==0)
-//  {
-//    //Win2k! Kill the Process and run a new one:
-//    _stprintf(&cmd[wcslen(cmd)],L" /NEWDEV %s",PathGetArgs(GetCommandLine()));
-//    // Start the child process.
-//    if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
-//    {
-//      CloseHandle(pi.hThread );
-//      CloseHandle(pi.hProcess);
-//    }
-//    ExitProcess(0);
-//    return 0;
-//  }
-//  return 0;
-//}
-
 DWORD WINAPI InitProc(void* p)
 {
   GetProcessUserName(GetCurrentProcessId(),l_User);
@@ -979,7 +928,7 @@ DWORD WINAPI InitProc(void* p)
   WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
   l_Groups=UserIsInSuRunnersOrAdmins();
-  l_bSetHook=!l_IsAdmin;
+  l_bSetHook=(!l_IsAdmin)||GetUseSVCHook;
   //IAT Hook:
   if (l_bSetHook)
   {
@@ -991,20 +940,29 @@ DWORD WINAPI InitProc(void* p)
     PathAppend(fNoHook,L"SuRun.exe");
     PathQuoteSpaces(fNoHook);
     l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-//    //Do not set hooks into lsass!
-//    GetSystemWindowsDirectory(fNoHook,4096);
-//    PathAppend(fNoHook,L"SYSTEM32\\lsass.exe");
-//    PathQuoteSpaces(fNoHook);
-//    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-    //Do not set hooks into Winlogon!
-    GetSystemWindowsDirectory(fNoHook,4096);
-    PathAppend(fNoHook,L"SYSTEM32\\winlogon.exe");
-    PathQuoteSpaces(fNoHook);
-    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-    //Do not set hooks into blacklisted files!
-    l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
-    if(l_bSetHook && GetUseIATHook)
-      LoadHooks();
+    if(l_bSetHook)
+    {
+      //Do not set hooks into lsass!
+      GetSystemWindowsDirectory(fNoHook,4096);
+      PathAppend(fNoHook,L"SYSTEM32\\lsass.exe");
+      PathQuoteSpaces(fNoHook);
+      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+      //Do not set hooks into logonui!
+      GetSystemWindowsDirectory(fNoHook,4096);
+      PathAppend(fNoHook,L"SYSTEM32\\logonui.exe");
+      PathQuoteSpaces(fNoHook);
+      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+      //Do not set hooks into Winlogon!
+      GetSystemWindowsDirectory(fNoHook,4096);
+      PathAppend(fNoHook,L"SYSTEM32\\winlogon.exe");
+      PathQuoteSpaces(fNoHook);
+      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+      //Do not set hooks into blacklisted files!
+      l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
+      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
+      if(l_bSetHook && GetUseIATHook)
+        LoadHooks();
+    }
   }
   return 0;
 }
@@ -1035,19 +993,5 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
   CloseHandle(CreateThread(0,0,InitProc,0,0,0));
-  //DevInst
-//  if(!l_IsAdmin)
-//  {
-//    TCHAR f[4096];
-//    GetSystemDirectory(f,4096);
-//    PathAppend(f,L"rundll32.exe");
-//    PathQuoteSpaces(f);
-//    LPTSTR args=PathGetArgs(GetCommandLine());
-//    if((_tcsicmp(f,fMod)==0) &&(_tcsnicmp(L"newdev.dll,",args,11)==0))
-//    {
-//      if(GetInstallDevs(l_User))
-//        CloseHandle(CreateThread(0,0,NewDevProc,0,0,0));
-//    }
-//  }
   return TRUE;
 }

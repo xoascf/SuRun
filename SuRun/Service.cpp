@@ -590,6 +590,7 @@ ChkAdmin:
 
 static BOOL TestDirectServiceCommands()
 {
+  //
   if (g_RunData.KillPID!=0xFFFFFFFF)
     return false;
   if (_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)
@@ -633,6 +634,8 @@ static BOOL TestDirectServiceCommands()
   }
   return false;
 }
+
+DWORD LSAStartAdminProcess();//forward decl
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
@@ -729,14 +732,45 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               ResumeClient(RETVAL_SX_NOTINLIST);
               continue;
             }
-            if ((!(wlf&FLAG_SHELLEXEC))
+            if (!(wlf&FLAG_SHELLEXEC))
+            {
+              if (GetInstallDevs(g_RunData.UserName))
+              {
+                //check for new hardware wizard:
+                TCHAR s0[MAX_PATH];
+                TCHAR s1[MAX_PATH];
+                GetSystemWindowsDirectory(s1,4096);
+                _tcscpy(s0,s1);
+                PathAppend(s0,L"system32\\rundll32.exe newdev.dll,*");
+                if(strwldcmp(g_RunData.cmdLine,s0))
+                  goto StartDevMgr;
+                _tcscpy(s0,s1);
+                PathAppend(s0,L"system32\\rundll32.exe ");
+                PathAppend(s1,L"newdev.dll,*");
+                _tcscat(s0,s1);
+                if(strwldcmp(g_RunData.cmdLine,s0))
+                {
+StartDevMgr:      DWORD RetVal=RETVAL_ACCESSDENIED;
+                  __try
+                  {
+                    g_RunData.bShlExHook=FALSE;
+                    RetVal=LSAStartAdminProcess();
+                  }__except(1)
+                  {
+                    DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
+                  }
+                  ResumeClient(RetVal,true);
+                  continue;
+                }
+              }
               //check for requireAdministrator Manifest and
               //file names *setup*;*install*;*update*;*.msi;*.msc
-              && (!RequiresAdmin(g_RunData.cmdLine)))
-            {
-              ResumeClient(RETVAL_SX_NOTINLIST);
-              //DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-              continue;
+              if(!RequiresAdmin(g_RunData.cmdLine))
+              {
+                ResumeClient(RETVAL_SX_NOTINLIST);
+                //DBGTrace2("ShellExecute WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+                continue;
+              }
             }
             //DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
@@ -1754,8 +1788,12 @@ void DelFile(LPCTSTR File)
   if (PathFileExists(File) && (!DeleteFile(File)))
   {
     CBigResStr tmp(_T("%s.tmp"),File);
+    DeleteFile(tmp);
     while (_trename(File,tmp))
+    {
       _tcscat(tmp,L".tmp");
+      DeleteFile(tmp);
+    }
     InstLog(CBigResStr(IDS_DELFILEBOOT,(LPCTSTR)tmp));
     MoveFileEx(tmp,NULL,MOVEFILE_DELAY_UNTIL_REBOOT); 
   }
