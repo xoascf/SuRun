@@ -163,11 +163,8 @@ BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-bool IsLocalSystem()
+bool IsLocalSystem(HANDLE htok)
 {
-	HANDLE htok = 0;
-	if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&htok ))
-    return false;
   bool bIsLocalSystem=false;
   BYTE userSid[256];
   DWORD cb = sizeof(userSid);
@@ -183,6 +180,15 @@ bool IsLocalSystem()
       FreeSid(pLocalSystemSid);
     }
   }
+	return bIsLocalSystem;
+}
+
+bool IsLocalSystem()
+{
+	HANDLE htok = 0;
+	if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&htok ))
+    return false;
+  bool bIsLocalSystem=IsLocalSystem(htok);
   CloseHandle(htok);
 	return bIsLocalSystem;
 }

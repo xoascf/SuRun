@@ -20,6 +20,7 @@ BOOL IsAdmin(HANDLE hToken=NULL);
 BOOL IsSplitAdmin(HANDLE hToken=NULL);
 
 // return true if you are running as local system
+bool IsLocalSystem(HANDLE htok);
 bool IsLocalSystem();
 
 //Start a process with Admin cedentials and wait until it closed

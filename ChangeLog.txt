@@ -1,12 +1,5 @@
 Done, to be tested:
 ---------------------------
-* Added Spanish/Argentina resources
-* Added "UPGRADE" to files that need admin rights
-* SuRun also sets its hooks into admin/service processes
-* IAT-Hook intercepts CreateProcessAsUser
-* SuRun autodetects "rundll32,newdev.dll" to support installing new hardware
-* Installer requires reboot in Vista/Win7 because SuRun hooks service processes
-* FIX: Tray icon and Ballon tips were always shown (since 1.2.0.7 Beta 11)
 
 ToDo
 ---------------------
@@ -39,6 +32,16 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 Beta 12 - 2009-08-14:
+-----------------------------------
+* Added preliminary Spanish/Argentina resources
+* Added check for "*UPGRADE*" in file names that need admin rights
+* NEW: Option to set hooks into Admin/Service processes
+* NEW: IAT-Hook intercepts CreateProcessAsUser
+* NEW: Option to autodetect "rundll32,newdev.dll" for installing new hardware
+* Installer requires reboot in Vista/Win7 because SuRun hooks service processes
+* FIX: Tray icon and Ballon tips were always shown (since 1.2.0.7 Beta 11)
 
 SuRun 1.2.0.7 Beta 11 - 2009-07-07:
 -----------------------------------

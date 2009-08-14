@@ -812,6 +812,7 @@ static void SaveUserFlags()
     LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
     SetNoRunSetup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
     SetRestrictApps(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
+    SetInstallDevs(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HW_ADMIN)!=0);
     SetHideFromUser(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HIDESURUN)!=0);
     SetReqPw4Setup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_REQPW4SETUP)!=0);
     if(!IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
@@ -887,10 +888,12 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_IMPORT),1);
     EnableWindow(GetDlgItem(hwnd,IDC_EXPORT),1);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
+    EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
     CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(u));
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
     EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),1);
     CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(u));
+    CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(u));
     CheckDlgButton(hwnd,IDC_HIDESURUN,GetHideFromUser(u));
     if(GetNoRunSetup(u))
     {
@@ -923,12 +926,14 @@ static void UpdateUser(HWND hwnd)
       EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
       EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
       EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
       EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),0);
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_REQPW4SETUP,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
+      CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(u));
       CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
     }
     EnableWindow(hWL,true);
@@ -960,6 +965,7 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_IMPORT),0);
     EnableWindow(GetDlgItem(hwnd,IDC_EXPORT),0);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),false);
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),false);
     EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),false);
     EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),false);
@@ -1100,6 +1106,7 @@ void ExportUser(LPCTSTR ini,LPCTSTR User,int nUser)
   //Export user settings
   EXPORTINTu(USRKEY,NoRunSetup,User,ini);
   EXPORTINTu(USRKEY,RestrictApps,User,ini);
+  EXPORTINTu(USRKEY,InstallDevs,User,ini);
   EXPORTINTu(USRKEY,UserTSA,User,ini);
   EXPORTINTu(USRKEY,HideFromUser,User,ini);
   EXPORTINTu(USRKEY,ReqPw4Setup,User,ini);
@@ -1158,6 +1165,7 @@ BOOL ImportUser(LPCTSTR ini,LPCTSTR USRKEY,LPCTSTR WLKEY,LPCTSTR WLFKEY)
   DelUsrSettings(User);
   IMPORTINTu(USRKEY,NoRunSetup,User,ini);
   IMPORTINTu(USRKEY,RestrictApps,User,ini);
+  IMPORTINTu(USRKEY,InstallDevs,User,ini);
   IMPORTINTu(USRKEY,UserTSA,User,ini);
   IMPORTINTu(USRKEY,HideFromUser,User,ini);
   IMPORTINTu(USRKEY,ReqPw4Setup,User,ini);
@@ -1203,6 +1211,7 @@ void ExportSettings(LPTSTR ini)
   
   EXPORTINT(SuRunKey,UseIShExHook,ini);
   EXPORTINT(SuRunKey,UseIATHook,ini);
+  EXPORTINT(SuRunKey,UseSVCHook,ini);
   EXPORTINT(SuRunKey,TestReqAdmin,ini);
   EXPORTINT(SuRunKey,ShowAutoRuns,ini);
   
@@ -1299,6 +1308,7 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 
     IMPORTINT(SuRunKey,UseIShExHook,ini);
     IMPORTINT(SuRunKey,UseIATHook,ini);
+    IMPORTINT(SuRunKey,UseSVCHook,ini);
     IMPORTINT(SuRunKey,TestReqAdmin,ini);
     IMPORTINT(SuRunKey,ShowAutoRuns,ini);
 
@@ -1505,12 +1515,14 @@ void SetRecommendedSettings()
     EnableWindow(GetDlgItem(h,IDC_RUNSETUP),1);
     EnableWindow(GetDlgItem(h,IDC_REQPW4SETUP),1);
     EnableWindow(GetDlgItem(h,IDC_RESTRICTED),1);
+    EnableWindow(GetDlgItem(h,IDC_HW_ADMIN),GetUseSVCHook);
     EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k());
     CheckDlgButton(h,IDC_RUNSETUP,1);
     CheckDlgButton(h,IDC_REQPW4SETUP,0);
     CheckDlgButton(h,IDC_RESTRICTED,0);
+    
     CheckDlgButton(h,IDC_HIDESURUN,0);
     CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
     CheckDlgButton(h,IDC_TRAYBALLOON,!IsWin2k());
@@ -1518,7 +1530,10 @@ void SetRecommendedSettings()
     //SetUseSuRuners(TRUE);
     int User=g_SD->CurUser;
     for (g_SD->CurUser=0;g_SD->CurUser<g_SD->Users.GetCount();g_SD->CurUser++)
+    {
+      CheckDlgButton(h,IDC_HW_ADMIN,GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
       SaveUserFlags();
+    }
     g_SD->CurUser=User;
   }
 
@@ -1744,6 +1759,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       g_SD->Setup2Anchor.Add(IDC_ADDAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_EDITAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_DELETE,ANCHOR_BOTTOMRIGHT);
+      EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
       return TRUE;
     }//WM_INITDIALOG
   case WM_SIZE:
@@ -1951,6 +1967,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
           CheckDlgButton(hwnd,IDC_REQPW4SETUP,BST_UNCHECKED);
           CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
+          CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
           CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
         }else
         {
@@ -1959,6 +1976,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bBal);
           EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
           EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
+          CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
         }
         UpdateWhiteListFlags(GetDlgItem(hwnd,IDC_WHITELIST));
         return TRUE;
@@ -2069,8 +2087,11 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       CheckDlgButton(hwnd,IDC_SHEXHOOK,GetUseIShExHook);
       CheckDlgButton(hwnd,IDC_IATHOOK,GetUseIATHook);
+      CheckDlgButton(hwnd,IDC_SVCHOOK,GetUseSVCHook);
+      EnableWindow(GetDlgItem(g_SD->hTabCtrl[2],IDC_HW_ADMIN),GetUseSVCHook);
       CheckDlgButton(hwnd,IDC_SHOWTRAY,GetShowAutoRuns);
       CheckDlgButton(hwnd,IDC_REQADMIN,GetTestReqAdmin);
+      EnableWindow(GetDlgItem(hwnd,IDC_SVCHOOK),GetUseIATHook);
       BOOL bHook=GetUseIShExHook || GetUseIATHook;
       EnableWindow(GetDlgItem(hwnd,IDC_REQADMIN),bHook);
       EnableWindow(GetDlgItem(hwnd,IDC_BLACKLIST),bHook);
@@ -2087,8 +2108,10 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 ApplyChanges:
       SetUseIShExHook(IsDlgButtonChecked(hwnd,IDC_SHEXHOOK));
       SetUseIATHook(IsDlgButtonChecked(hwnd,IDC_IATHOOK));
+      SetUseSVCHook(IsDlgButtonChecked(hwnd,IDC_SVCHOOK));
       SetTestReqAdmin(IsDlgButtonChecked(hwnd,IDC_REQADMIN));
       SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
+      EnableWindow(GetDlgItem(g_SD->hTabCtrl[2],IDC_HW_ADMIN),GetUseSVCHook);
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:
@@ -2096,9 +2119,11 @@ ApplyChanges:
       switch (wParam)
       {
       case MAKELPARAM(IDC_IATHOOK,BN_CLICKED):
+      case MAKELPARAM(IDC_SVCHOOK,BN_CLICKED):
       case MAKELPARAM(IDC_SHEXHOOK,BN_CLICKED):
         {
           UpdateWhiteListFlags(GetDlgItem(g_SD->hTabCtrl[1],IDC_WHITELIST));
+          EnableWindow(GetDlgItem(hwnd,IDC_SVCHOOK),IsDlgButtonChecked(hwnd,IDC_IATHOOK));
           BOOL bHook=IsDlgButtonChecked(hwnd,IDC_SHEXHOOK)
                    ||IsDlgButtonChecked(hwnd,IDC_IATHOOK);
           EnableWindow(GetDlgItem(hwnd,IDC_REQADMIN),bHook);

@@ -47,7 +47,8 @@
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key);
+  if (dwRes==ERROR_SUCCESS)
   {
     DWORD dwType=Type;
     BOOL bRet=(RegQueryValueEx(Key,ValName,NULL,&dwType,RetVal,nBytes)==ERROR_SUCCESS)
@@ -67,8 +68,7 @@ BOOL GetRegAnyPtr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVa
     BOOL bRet=RegQueryValueEx(Key,ValName,NULL,Type,RetVal,nBytes)==ERROR_SUCCESS;
     RegCloseKey(Key);
     return bRet;
-  }else
-    DBGTrace1("RegOpenKeyEx failed: %s",GetErrorNameStatic(dwRes));
+  }
   return FALSE;
 }
 
@@ -76,7 +76,8 @@ BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** Re
 {
   HKEY Key;
   BOOL bRet=FALSE;
-  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key);
+  if (dwRes==ERROR_SUCCESS)
   {
     if ((RegQueryValueEx(Key,ValName,NULL,Type,0,nBytes)==ERROR_SUCCESS)&& nBytes)
     {
@@ -92,23 +93,24 @@ BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** Re
 BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes)
 {
   HKEY Key;
-  BOOL bKey=FALSE;
-  bKey=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key)==ERROR_SUCCESS;
-  if (!bKey)
-    bKey=RegCreateKeyEx(HK,SubKey,0,0,0,KSAM(KEY_WRITE),0,&Key,0)==ERROR_SUCCESS;
-  if (bKey)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key);
+  if (dwRes!=ERROR_SUCCESS)
+    dwRes=RegCreateKeyEx(HK,SubKey,0,0,0,KSAM(KEY_WRITE),0,&Key,0);
+  if (dwRes==ERROR_SUCCESS)
   {
     LONG l=RegSetValueEx(Key,ValName,0,Type,Data,nBytes);
     RegCloseKey(Key);
     return l==ERROR_SUCCESS;
-  }
+  }else
+    DBGTrace3("RegCreateKeyEx(%x,%s) failed: %s",HK,SubKey,GetErrorNameStatic(dwRes));
   return FALSE;
 }
 
 BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key)==ERROR_SUCCESS)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key);
+  if (dwRes==ERROR_SUCCESS)
   {
     BOOL bRet=RegDeleteValue(Key,ValName)==ERROR_SUCCESS;
     RegCloseKey(Key);
@@ -164,7 +166,8 @@ BOOL SetRegStr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,LPCTSTR Value)
 BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key);
+  if (dwRes==ERROR_SUCCESS)
   {
     BOOL bRet=(RegEnumKey(Key,Index,Str,ccMax)==ERROR_SUCCESS);
     RegCloseKey(Key);
@@ -176,7 +179,8 @@ BOOL RegEnum(HKEY HK,LPCTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax)
 {
   HKEY Key;
-  if (RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key)==ERROR_SUCCESS)
+  DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key);
+  if (dwRes==ERROR_SUCCESS)
   {
     BOOL bRet=(RegEnumValue(Key,Index,Str,&ccMax,0,0,0,0)==ERROR_SUCCESS);
     RegCloseKey(Key);

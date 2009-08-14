@@ -211,6 +211,7 @@
 #define IDC_STARTADMIN                  1040
 #define IDC_RUNSETUP                    1041
 #define IDC_RESTRICTED                  1042
+#define IDC_HW_ADMIN                    1043
 #define IDC_FILENAME                    1045
 #define IDC_USERLIST                    1046
 #define IDC_USERNAME                    1047
@@ -219,6 +220,7 @@
 #define IDC_IATHOOK                     1050
 #define IDC_SHOWTRAY                    1051
 #define IDC_NOCONVADMIN                 1052
+#define IDC_SVCHOOK                     1052
 #define IDC_NOCONVUSER                  1053
 #define IDC_RESTRICTNEW                 1054
 #define IDC_NOSETUPNEW                  1055

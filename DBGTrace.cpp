@@ -54,6 +54,35 @@ LPCTSTR GetLastErrorNameStatic()
   return GetErrorNameStatic(GetLastError());
 }
 
+static void WriteLogA(LPSTR S)
+{
+  char tmp[MAX_PATH];
+  GetTempPathA(MAX_PATH,tmp);
+  PathRemoveBackslashA(tmp);
+  PathAppendA(tmp,"SuRunLog.log");
+  FILE* f=fopen(tmp,"a+t");
+  if(f)
+  {
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    fprintf(f,"%02d:%02d:%02d.%03d [%d]: %s",st.wHour,st.wMinute,st.wSecond,
+      st.wMilliseconds,GetCurrentProcessId(),S);
+    fclose(f);
+  }
+}
+
+static void WriteLog(LPTSTR S)
+{
+#ifdef UNICODE
+  int len=(int)_tcslen(S);
+  char m[4096]={0};
+  WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
+  WriteLogA(m);
+#else UNICODE
+  WriteLogA(S);
+#endif UNICODE
+}
+
 void TRACEx(LPCTSTR s,...)
 {
   TCHAR S[4096]={0};
@@ -63,24 +92,20 @@ void TRACEx(LPCTSTR s,...)
   if (_vstprintf(&S[len],s,va)>=4096)
     DebugBreak();
   va_end(va);
-  char tmp[MAX_PATH];
-  GetTempPathA(MAX_PATH,tmp);
-  PathRemoveBackslashA(tmp);
-  PathAppendA(tmp,"SuRunLog.log");
-  FILE* f=fopen(tmp,"a+t");
-  if(f)
+  LPTSTR c0=_tcschr(S,':');
+  LPTSTR c1=_tcschr(S,'\\');
+  LPTSTR c2=_tcschr(S,'.');
+  LPTSTR c3=_tcschr(S,'(');
+  LPTSTR c4=_tcschr(S,')');
+  if((c0<c1)&&(c1<c2)&&(c2<c3)&&(c3<c4))
   {
-    int len=(int)_tcslen(S);
-#ifdef UNICODE
-    char m[4096]={0};
-    WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
-    fwrite(&m,1,len,f);
-#else UNICODE
-    fwrite(&S,1,len,f);
-#endif UNICODE
-    fclose(f);
+    *c2=0;
+    c0=_tcsrchr(c0,'\\')+1;
+    *c2='.';
+    memmove(S,c0,(_tcslen(c0)+1)*sizeof(TCHAR));
   }
   OutputDebugString(S);
+//  WriteLog(S);
 }
 
 void TRACExA(LPCSTR s,...)
@@ -92,16 +117,19 @@ void TRACExA(LPCSTR s,...)
   if (vsprintf(&S[len],s,va)>=1024)
     DebugBreak();
   va_end(va);
-  char tmp[MAX_PATH];
-  GetTempPathA(MAX_PATH,tmp);
-  PathRemoveBackslashA(tmp);
-  PathAppendA(tmp,"SuRunLog.log");
-  FILE* f=fopen(tmp,"a+t");
-  if(f)
+  LPSTR c0=strchr(S,':');
+  LPSTR c1=strchr(S,'\\');
+  LPSTR c2=strchr(S,'.');
+  LPSTR c3=strchr(S,'(');
+  LPSTR c4=strchr(S,')');
+  if((c0<c1)&&(c1<c2)&&(c2<c3)&&(c3<c4))
   {
-    fwrite(&S,sizeof(char),strlen(S),f);
-    fclose(f);
+    *c2=0;
+    c0=strrchr(c0,'\\')+1;
+    *c2='.';
+    memmove(S,c0,strlen(c0)+1);
   }
   OutputDebugStringA(S);
+//  WriteLogA(S);
 }
 

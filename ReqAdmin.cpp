@@ -148,23 +148,6 @@ BOOL RequiresAdmin(LPCTSTR FileName)
       //Split path parts
       TCHAR file[4096];
       TCHAR ext[4096];
-      GetSystemWindowsDirectory(ext,4096);
-      _tcscpy(file,ext);
-      PathAppend(file,L"system32\\rundll32.exe newdev.dll,*");
-      if(strwldcmp(FileName,file))
-      {
-        InfoDBGTrace1("RequiresAdmin(%s) New device wizard match",FileName);
-        return true;
-      }
-      _tcscpy(file,ext);
-      PathAppend(file,L"system32\\rundll32.exe ");
-      PathAppend(ext,L"newdev.dll,*");
-      _tcscat(file,ext);
-      if(strwldcmp(FileName,file))
-      {
-        InfoDBGTrace1("RequiresAdmin(%s) New device wizard match",FileName);
-        return true;
-      }
       //Get File, Ext
       _tcscpy(file,FName);
       _tcsupr(file);

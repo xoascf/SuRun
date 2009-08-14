@@ -125,8 +125,8 @@
 #define GetRestrictApps(u)    (GetUsrSetting(u,_T("RestrictApps"),0)!=0)
 #define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b,0)
 //SuRunner may install Devices
-//#define GetInstallDevs(u)      (GetUsrSetting(u,_T("AllowDevInst"),0)!=0)
-//#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("AllowDevInst"),b,0)
+#define GetInstallDevs(u)      (GetUsrSetting(u,_T("InstallDevs"),GetRestrictApps(u)==0)!=0)
+#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("InstallDevs"),b,0)
 
 //////////////////////////////////////////////////////////////////////////////
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID
@@ -148,6 +148,7 @@
 
 #define UseIShExHook    L"UseIShExHook"    //install IShellExecuteHook
 #define UseIATHook      L"UseIATHook"      //install IAT Hook
+#define UseSVCHook      L"UseSVCHook"      //install IAT Hook into services/admin processes
 #define UseRemoteThread L"UseRemoteThread" //use CreateRemoteThread
 
 #define ShowAutoRuns    L"ShowAutoRuns"    //use Show Message in Tray
@@ -178,6 +179,8 @@
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
 #define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
+#define GetUseSVCHook         (GetUseIATHook && (GetShExtSetting(UseSVCHook,0)!=0))
+#define SetUseSVCHook(b)       SetShExtSetting(UseSVCHook,b,0)
 
 //TrayMsg stuff
 #define GetShowAutoRuns       (GetShExtSetting(ShowAutoRuns,1)!=0)
