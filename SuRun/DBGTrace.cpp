@@ -64,7 +64,7 @@ static void WriteLogA(LPSTR S)
   if(f)
   {
     SYSTEMTIME st;
-    GetSystemTime(&st);
+    GetLocalTime(&st);
     fprintf(f,"%02d:%02d:%02d.%03d [%d]: %s",st.wHour,st.wMinute,st.wSecond,
       st.wMilliseconds,GetCurrentProcessId(),S);
     fclose(f);
@@ -105,7 +105,7 @@ void TRACEx(LPCTSTR s,...)
     memmove(S,c0,(_tcslen(c0)+1)*sizeof(TCHAR));
   }
   OutputDebugString(S);
-  WriteLog(S);
+//  WriteLog(S);
 }
 
 void TRACExA(LPCSTR s,...)
@@ -130,6 +130,6 @@ void TRACExA(LPCSTR s,...)
     memmove(S,c0,strlen(c0)+1);
   }
   OutputDebugStringA(S);
-  WriteLogA(S);
+//  WriteLogA(S);
 }
 

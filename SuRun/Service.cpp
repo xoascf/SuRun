@@ -379,34 +379,6 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
   return TRUE;
 }
 
-DWORD GetCsrssPid()
-{
-  HANDLE hProcessSnap = INVALID_HANDLE_VALUE;
-  PROCESSENTRY32 pe32={0};
-  DWORD dwRet=0;
-  hProcessSnap =CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-  if(hProcessSnap == INVALID_HANDLE_VALUE)
-  {
-    DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
-    return 0;
-  }
-  pe32.dwSize = sizeof(PROCESSENTRY32);
-  if(Process32First(hProcessSnap, &pe32))
-  {
-    do
-    {
-      if(_tcsicmp(L"csrss.exe",pe32.szExeFile)==0)
-      {
-        dwRet=pe32.th32ProcessID;
-        break;
-      }
-    }while (Process32Next(hProcessSnap,&pe32));
-  }else
-    DBGTrace1("Process32First failed: %s",GetLastErrorNameStatic());
-  CloseHandle(hProcessSnap);
-  return dwRet;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // 
 //  The Service:
@@ -588,6 +560,62 @@ ChkAdmin:
     ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  ServiceMain
+// 
+//////////////////////////////////////////////////////////////////////////////
+BOOL InjectIATHook(HANDLE hProc)
+{
+  HANDLE hThread=0;
+  __try
+  {
+    PROC pLoadLib=GetProcAddress(GetModuleHandleA("Kernel32"),"LoadLibraryA");
+    if(!pLoadLib)
+      return false;
+	  char* DllName="SuRunExt.dll";
+    size_t nDll=strlen(DllName)+1;
+	  void* RmteName=VirtualAllocEx(hProc,NULL,nDll,MEM_COMMIT,PAGE_READWRITE);
+	  if(RmteName==NULL)
+		  return DBGTrace1("InjectIATHook VirtualAllocEx failed: %s",GetLastErrorNameStatic()),false;
+	  WriteProcessMemory(hProc,RmteName,(void*)DllName,nDll,NULL);
+    __try
+    {
+      hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
+      if (hThread==0)
+        DBGTrace1("InjectIATHook CreateRemoteThread failed: %s",GetLastErrorNameStatic());
+    }__except(DBGTrace("SuRun: CreateRemoteThread Exeption!\n"),1)
+    {
+    }
+	  if (hThread!=NULL)
+    {
+      WaitForSingleObject(hThread,INFINITE);
+      CloseHandle(hThread);
+    }
+	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
+  }__except(DBGTrace("SuRun: InjectIATHook() Exeption!\n"),1)
+  {
+  }
+  return hThread!=0;
+}
+
+BOOL InjectIATHook(DWORD ProcId)
+{
+  HANDLE hProc=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE
+    |PROCESS_CREATE_THREAD|PROCESS_QUERY_INFORMATION,false,ProcId);
+  if (!hProc)
+    return DBGTrace2("InjectIATHook OpenProcess(%d) failed: %s",ProcId,GetLastErrorNameStatic()),false;
+  BOOL bRet=InjectIATHook(hProc);
+  CloseHandle(hProc);
+  return bRet;
+}
+
+BOOL InjectIATHook(LPTSTR ProcName)
+{
+  DWORD PID=GetProcessID(ProcName);
+  return PID?InjectIATHook(PID):(DBGTrace1("InjectIATHook GetProcessID(%s) failed",ProcName),FALSE);
+}
+
 static BOOL TestDirectServiceCommands()
 {
   //
@@ -635,8 +663,6 @@ static BOOL TestDirectServiceCommands()
   return false;
 }
 
-DWORD LSAStartAdminProcess();//forward decl
-
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
   zero(g_RunPwd);
@@ -653,8 +679,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
     return; 
   }
+  if ((_winmajor<6) && GetUseSVCHook)
+    InjectIATHook(L"services.exe");
   //Steal token from csrss.exe to get SeCreateTokenPrivilege in Vista
-  HANDLE hRunCsrss=GetProcessUserToken(GetCsrssPid());
+  HANDLE hRunCsrss=GetProcessUserToken(GetProcessID(L"csrss.exe"));
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -713,7 +741,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           if (wlf&FLAG_AUTOCANCEL)
           {
             ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
-            DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+            DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
             continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist
@@ -734,35 +762,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             }
             if (!(wlf&FLAG_SHELLEXEC))
             {
-              if (GetInstallDevs(g_RunData.UserName))
-              {
-                //check for new hardware wizard:
-                TCHAR s0[MAX_PATH];
-                TCHAR s1[MAX_PATH];
-                GetSystemWindowsDirectory(s1,4096);
-                _tcscpy(s0,s1);
-                PathAppend(s0,L"system32\\rundll32.exe newdev.dll,*");
-                if(strwldcmp(g_RunData.cmdLine,s0))
-                  goto StartDevMgr;
-                _tcscpy(s0,s1);
-                PathAppend(s0,L"system32\\rundll32.exe ");
-                PathAppend(s1,L"newdev.dll,*");
-                _tcscat(s0,s1);
-                if(strwldcmp(g_RunData.cmdLine,s0))
-                {
-StartDevMgr:      DWORD RetVal=RETVAL_ACCESSDENIED;
-                  __try
-                  {
-                    g_RunData.bShlExHook=FALSE;
-                    RetVal=LSAStartAdminProcess();
-                  }__except(1)
-                  {
-                    DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
-                  }
-                  ResumeClient(RetVal,true);
-                  continue;
-                }
-              }
               //check for requireAdministrator Manifest and
               //file names *setup*;*install*;*update*;*.msi;*.msc
               if(!RequiresAdmin(g_RunData.cmdLine))
@@ -1425,24 +1424,6 @@ void SuRun(DWORD ProcessID)
     DBGTrace("FATAL: SuRun() Client Process check failed; EXIT!");
     return;
   }
-//#ifdef DoDBGTrace
-//  g_RunTimes[0]=*((DWORD*)&g_RunData.CurDir[4090]);
-//  AddTime("CheckClientProcess done")
-//#endif DoDBGTrace
-//  if (_tcsnicmp(g_RunData.cmdLine,_T("--TESTBS"),7)==0)
-//  {
-//    DWORD t=timeGetTime();
-//    bool bFadeDesk=(!(g_RunData.Groups&IS_TERMINAL_USER)) && GetFadeDesk;
-//    if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
-//      SafeMsgBox(0,L"Failed to create Safe desktop!",CResStr(IDS_APPNAME),MB_ICONSTOP|MB_SERVICE_NOTIFICATION);
-//    else
-//    {
-//      SafeMsgBox(0,CResStr(L"Safe desktop created in %d ms.\r\nPress ok.",timeGetTime()-t),CResStr(IDS_APPNAME),MB_OK);
-//      DeleteSafeDesktop(bFadeDesk);
-//    }
-//    ResumeClient(RETVAL_OK);
-//    return;
-//  }
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //RunAs...
   if (g_RunData.bRunAs)
@@ -1544,6 +1525,47 @@ void SuRun(DWORD ProcessID)
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
   }
   ResumeClient(RetVal,true);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// 
+//  AppInitDlls:
+// 
+//////////////////////////////////////////////////////////////////////////////
+#define AppInit32 _T("SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows")
+#define AppInit   _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows")
+
+static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
+{
+  //remove from AppInit_Dlls
+  TCHAR s[4096]={0};
+  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+  LPTSTR p=_tcsstr(s,Dll);
+  if (p!=0)
+  {
+    LPTSTR p1=p+_tcslen(Dll);
+    if((*p1==' ')||(*p1==','))
+      p1++;
+    if (p!=s)
+      p--;
+    *p=0;
+    if (*(p1))
+      _tcscat(p,p1);
+    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+  }
+}
+
+static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
+{
+  TCHAR s[4096]={0};
+  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+  if (_tcsstr(s,Dll)==0)
+  {
+    if (s[0])
+      _tcscat(s,_T(","));
+    _tcscat(s,Dll);
+    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1667,6 +1689,13 @@ void InstallRegistry()
   SetRegStr(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl",SuRunExe);
   //Add SuRun CPL to "Performance and Maintenance"
   SetRegInt(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Extended Properties\\{305CA226-D286-468e-B848-2B2E8E697B74} 2",SuRunExe,5);
+  //add to AppInit_Dlls
+  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+  AddAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+#endif _WIN64
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1676,6 +1705,11 @@ void InstallRegistry()
 //////////////////////////////////////////////////////////////////////////////
 void RemoveRegistry()
 {
+  //AppInit_Dlls
+  RemoveAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+  RemoveAppInit(AppInit32,_T("SuRunExt32.dll"));
+#endif _WIN64
   if (!g_bKeepRegistry)
   {
     InstLog(CResStr(IDS_REMASSOC));

@@ -1211,7 +1211,7 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
 //  Shell process.
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1)
+DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID/*=-1*/)
 {
   if (SessID!=(DWORD)-1)
   {
