@@ -18,6 +18,8 @@
 
 #define CHK_BOOL_FN(p) if(!p) DBGTrace2("%s failed: %s",_T(#p),GetLastErrorNameStatic());
 
+#define IsWin2k ((_winmajor==5)&&(_winminor==0))
+
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT
 #define HKCU HKEY_CURRENT_USER
@@ -111,6 +113,9 @@ PSID GetTokenUserSID(HANDLE hToken);
 PSID GetProcessUserSID(DWORD ProcessID);
 bool GetTokenUserName(HANDLE hUser,LPTSTR User,LPTSTR Domain=0);
 bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
+
+//GetProcessID
+DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1);
 
 //Shell stuff
 HANDLE GetShellProcessToken();

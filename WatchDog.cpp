@@ -106,7 +106,7 @@ CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
     m_wr.left,m_wr.top,m_wr.right-m_wr.left,m_wr.bottom-m_wr.top,
     0,0,0,(LPVOID)this);
   if (!m_hWnd)
-    DBGTrace("No Window!")
+    DBGTrace("No Window!");
   else
     DBGTrace4("Window at %d,%d,%d,%d",m_wr.left,m_wr.top,m_wr.right-m_wr.left,m_wr.bottom-m_wr.top);
   SetWindowLongPtr(m_hWnd,GWLP_USERDATA,(LONG_PTR)this);

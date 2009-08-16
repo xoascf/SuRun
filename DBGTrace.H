@@ -35,32 +35,32 @@ void TRACEx(LPCTSTR s,...);
 
 #ifdef DoDBGTrace
 
-#define DBGTrace(msg)                             {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__);}
-#define DBGTrace1(msg,d1)                         {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1);}
-#define DBGTrace2(msg,d1,d2)                      {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2);}
-#define DBGTrace3(msg,d1,d2,d3)                   {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3);}
-#define DBGTrace4(msg,d1,d2,d3,d4)                {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4);}
-#define DBGTrace5(msg,d1,d2,d3,d4,d5)             {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5);}
-#define DBGTrace6(msg,d1,d2,d3,d4,d5,d6)          {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6);}
-#define DBGTrace7(msg,d1,d2,d3,d4,d5,d6,d7)       {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7);}
-#define DBGTrace8(msg,d1,d2,d3,d4,d5,d6,d7,d8)    {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8);}
-#define DBGTrace9(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9) {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8,d9);}
+#define DBGTrace(msg)                             TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__)
+#define DBGTrace1(msg,d1)                         TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1)
+#define DBGTrace2(msg,d1,d2)                      TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2)
+#define DBGTrace3(msg,d1,d2,d3)                   TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3)
+#define DBGTrace4(msg,d1,d2,d3,d4)                TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4)
+#define DBGTrace5(msg,d1,d2,d3,d4,d5)             TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5)
+#define DBGTrace6(msg,d1,d2,d3,d4,d5,d6)          TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6)
+#define DBGTrace7(msg,d1,d2,d3,d4,d5,d6,d7)       TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7)
+#define DBGTrace8(msg,d1,d2,d3,d4,d5,d6,d7,d8)    TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8)
+#define DBGTrace9(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9) TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8,d9)
 #define DBGTrace15(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15) \
   {TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15);}
 
 #else DoDBGTrace
 
-#define DBGTrace(msg)                             {(void)0;}
-#define DBGTrace1(msg,d1)                         {(void)0;}
-#define DBGTrace2(msg,d1,d2)                      {(void)0;}
-#define DBGTrace3(msg,d1,d2,d3)                   {(void)0;}
-#define DBGTrace4(msg,d1,d2,d3,d4)                {(void)0;}
-#define DBGTrace5(msg,d1,d2,d3,d4,d5)             {(void)0;}
-#define DBGTrace6(msg,d1,d2,d3,d4,d5,d6)          {(void)0;}
-#define DBGTrace7(msg,d1,d2,d3,d4,d5,d6,d7)       {(void)0;}
-#define DBGTrace8(msg,d1,d2,d3,d4,d5,d6,d7,d8)    {(void)0;}
-#define DBGTrace9(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9) {(void)0;}
-#define DBGTrace15(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15) {(void)0;}
+#define DBGTrace(msg)                             (void)0
+#define DBGTrace1(msg,d1)                         (void)0
+#define DBGTrace2(msg,d1,d2)                      (void)0
+#define DBGTrace3(msg,d1,d2,d3)                   (void)0
+#define DBGTrace4(msg,d1,d2,d3,d4)                (void)0
+#define DBGTrace5(msg,d1,d2,d3,d4,d5)             (void)0
+#define DBGTrace6(msg,d1,d2,d3,d4,d5,d6)          (void)0
+#define DBGTrace7(msg,d1,d2,d3,d4,d5,d6,d7)       (void)0
+#define DBGTrace8(msg,d1,d2,d3,d4,d5,d6,d7,d8)    (void)0
+#define DBGTrace9(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9) (void)0
+#define DBGTrace15(msg,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15) (void)0
 
 #endif DoDBGTrace 
 
