@@ -1335,7 +1335,8 @@ DWORD LSAStartAdminProcess()
             DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
             g_RunData.cmdLine,GetLastErrorNameStatic());
         }
-        if (g_RunData.bShlExHook)
+        if (g_RunData.bShlExHook
+        && ((GetCommonWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0)&FLAG_SHELLEXEC)==0))
           ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());

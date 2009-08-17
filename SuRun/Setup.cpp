@@ -116,12 +116,9 @@ DWORD GetRegListFlags(HKEY HKR,LPCTSTR SubKey,LPCTSTR CmdLine,DWORD Default)
   return GetRegListFlagsAndCmd(HKR,SubKey,CmdLine,cmd,Default);
 }
 
-DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default)
+DWORD GetCommonWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default)
 {
-  DWORD dwRet=GetRegListFlags(HKLM,WHTLSTKEY(User),CmdLine,Default);
-  if (dwRet!=Default)
-    return dwRet;
-  //Add known Windows stuff
+  DWORD dwRet=Default;
   if (GetInstallDevs(User))
   {
     //check for new hardware wizard:
@@ -136,12 +133,22 @@ DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default)
     {
       _tcscpy(s0,s1);
       PathAppend(s0,L"system32\\rundll32.exe ");
-      PathAppend(s1,L"newdev.dll,*");
+      PathAppend(s1,L"system32\\newdev.dll,*");
       _tcscat(s0,s1);
       if(strwldcmp(CmdLine,s0))
         dwRet=FLAG_DONTASK|FLAG_SHELLEXEC|FLAG_NEVERASK;
     }
   }
+  return dwRet;
+}
+
+DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default)
+{
+  DWORD dwRet=GetRegListFlags(HKLM,WHTLSTKEY(User),CmdLine,Default);
+  if (dwRet!=Default)
+    return dwRet;
+  //Add known Windows stuff
+  dwRet=GetCommonWhiteListFlags(User,CmdLine,Default);
   return dwRet;
 }
 

@@ -33,7 +33,7 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.7 Beta 12 - 2009-08-14:
+SuRun 1.2.0.7 Beta 12 - 2009-08-17:
 -----------------------------------
 * Added preliminary Spanish/Argentina resources
 * Added check for "*UPGRADE*" in file names that need admin rights

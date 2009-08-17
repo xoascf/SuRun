@@ -465,7 +465,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
       GetCurrentProcessId(),&rpi,tmp);
   }
-  //CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
+//  CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
   static STARTUPINFOW si;
   zero(si);
   static PROCESS_INFORMATION pi;
@@ -590,7 +590,7 @@ static BOOL IsShellAndSuRunner(HANDLE hToken)
           if (UserSID)
           {
             bRet=EqualSid(UserSID,ShellSID);
-            
+            DBGTrace1("IsShellAndSuRunner=%d",bRet);
             free(UserSID);
           }
           free(ShellSID);

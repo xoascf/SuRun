@@ -332,6 +332,7 @@ void UpdLastRunTime(LPTSTR UserName);
 #define FLAG_NEVERASK   0x20 //Never ask for password, even after password timeout
 
 BOOL IsInWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag);
+DWORD GetCommonWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default);
 DWORD GetWhiteListFlags(LPCTSTR User,LPCTSTR CmdLine,DWORD Default);
 BOOL AddToWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flags=0);
 BOOL SetWhiteListFlag(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag,bool Enable);
