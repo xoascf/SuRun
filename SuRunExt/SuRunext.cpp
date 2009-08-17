@@ -869,6 +869,9 @@ __declspec(dllexport) void RemoveShellExt()
 DWORD WINAPI InitProc(void* p)
 {
   int prio=GetThreadPriority(GetCurrentThread());
+  //Wait until all Loadlibrary Operations are done by setting the threads prio
+  //to lowest. [Windows NT does not run lower prio threads while higher prio 
+  //threads are redy to run]
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
   Sleep(1);
   SetThreadPriority(GetCurrentThread(),prio);
@@ -920,7 +923,7 @@ DWORD WINAPI InitProc(void* p)
       l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
       //Do not set hooks into blacklisted files!
       l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
-      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
+//      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
       if(l_bSetHook && GetUseIATHook)
         LoadHooks();
     }
