@@ -653,9 +653,6 @@ BOOL WINAPI CreatePAUW(HANDLE hToken,LPCWSTR lpApplicationName,LPWSTR lpCommandL
 
 FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 {
-#ifdef DoDBGTrace
-//    TRACEx(L"SuRunExt32.dll: call to GetProcAddr(%s)",lpProcName);
-#endif DoDBGTrace
   PROC p=0;
   if (HIWORD(lpProcName))
   {
@@ -665,8 +662,21 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
       PathStripPathA(f);
       p=DoHookFn(f,(char*)lpProcName,NULL);
       SetLastError(NOERROR);
+#ifdef DoDBGTrace
+      if (p)
+        TRACExA("SuRunExt32.dll: intercepting call to GetProcAddr(%s,%s)",f,lpProcName);
+#endif DoDBGTrace
     }
   }
+#ifdef DoDBGTrace
+  else
+  {
+    char f[MAX_PATH]={0};
+    GetModuleFileNameA(hModule,f,MAX_PATH);
+    PathStripPathA(f);
+    TRACExA("SuRunExt32.dll: call to GetProcAddr(%s,0x%x)",f,lpProcName);
+  }
+#endif DoDBGTrace
   if(!p)
     p=((lpGetProcAddress)hkGetPAdr.OrgFunc())(hModule,lpProcName);
   return p;
@@ -793,23 +803,24 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 BOOL WINAPI SwitchDesk(HDESK Desk)
 {
 #ifdef DoDBGTrace
-//  DBGTrace("SuRunExt32.dll: call to SwitchDesk()");
+  DBGTrace("SuRunExt32.dll: call to SwitchDesk()");
 #endif DoDBGTrace
   if ((!l_IsAdmin)&&(!IsLocalSystem()))
   {
     HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
     if (!d)
-      return FALSE;
+      return DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted"),FALSE;
     TCHAR dn[4096]={0};
     DWORD dnl=4096;
     if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
-      return CloseDesktop(d),FALSE;
+      return CloseDesktop(d),DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted2"),FALSE;
     CloseDesktop(d);
     if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
     {
       SetLastError(ERROR_ACCESS_DENIED);
-      return CloseDesktop(d),FALSE;
+      return CloseDesktop(d),DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted3"),FALSE;
     }
+    DBGTrace1("SuRunExt32.dll: SwitchDeskop(%s) from granted",dn);
   }
   BOOL bRet=FALSE;
   if (hkSwDesk.OrgFunc())
