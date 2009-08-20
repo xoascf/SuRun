@@ -167,7 +167,7 @@ static CHookDescriptor* hdt[]=
   &hkLdLibW, 
   &hkLdLibXA, 
   &hkLdLibXW, 
-//  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
+  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
@@ -656,11 +656,17 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 #ifdef DoDBGTrace
 //    TRACEx(L"SuRunExt32.dll: call to GetProcAddr(%s)",lpProcName);
 #endif DoDBGTrace
-  char f[MAX_PATH]={0};
-  GetModuleFileNameA(hModule,f,MAX_PATH);
-  PathStripPathA(f);
-  PROC p=DoHookFn(f,(char*)lpProcName,NULL);
-  SetLastError(NOERROR);
+  PROC p=0;
+  if (HIWORD(lpProcName))
+  {
+    char f[MAX_PATH]={0};
+    if(GetModuleFileNameA(hModule,f,MAX_PATH))
+    {
+      PathStripPathA(f);
+      p=DoHookFn(f,(char*)lpProcName,NULL);
+      SetLastError(NOERROR);
+    }
+  }
   if(!p)
     p=((lpGetProcAddress)hkGetPAdr.OrgFunc())(hModule,lpProcName);
   return p;
