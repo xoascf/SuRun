@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* reimplemented GetProcAddress hook in IAT-Hook to hook dynamically loaded 
+  SwitchDesktop apps(HotKeyz). Checked Outlook/Exchange server compatibility.
 
 ToDo
 ---------------------
