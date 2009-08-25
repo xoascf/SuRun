@@ -10,7 +10,8 @@ Done, to be tested:
 ToDo
 ---------------------
 * "Gregory Maynard-Hoare" (http://www.pagehosting.co.uk/rf) reported 
-  SetWindowsHookEx is able to run eleveted code!
+  SetWindowsHookEx is able to run elevated code!
+* SysMenuHook <-> PowerMenu issues
 * GUI for SwitchToUser
 * less agressive "Admin with empty password" warning
 * Less annoying Admin-Bubbles
