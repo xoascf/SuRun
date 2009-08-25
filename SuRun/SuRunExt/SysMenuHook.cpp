@@ -114,6 +114,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
     case WM_INITMENUPOPUP:
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu(hmenu) 
+        && (GetSystemMenu((HWND)wps->hwnd,FALSE)==hmenu)
         && (!l_IsAdmin)
         && (!GetHideFromUser(l_User)))
       {
