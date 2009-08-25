@@ -1,5 +1,8 @@
 Done, to be tested:
 ---------------------------
+* removed AppInit_Dlls
+* Changed "Reboot"->"Logoff" after install  in Vista++
+* Changed SysmenuHook to modify main sysmenu only, not popups
 * reimplemented GetProcAddress hook in IAT-Hook to hook dynamically loaded 
   SwitchDesktop apps(HotKeyz). Checked Outlook/Exchange server compatibility.
 
