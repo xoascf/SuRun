@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* steal token csrss->lsass
 * removed AppInit_Dlls
 * Changed "Reboot"->"Logoff" after install  in Vista++
 * Changed SysmenuHook to modify main sysmenu only, not popups
