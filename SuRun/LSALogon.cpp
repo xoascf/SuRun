@@ -16,6 +16,7 @@
 #include <windows.h>
 #include <ntsecapi.h>
 #include <tchar.h>
+#include <lm.h>
 #include "Helpers.h"
 #include "LSA_laar.h"
 #include "DBGTrace.h"
@@ -24,6 +25,7 @@
 #pragma comment(lib,"Advapi32.lib")
 #pragma comment(lib,"Kernel32.lib")
 #pragma comment(lib,"Secur32.lib ")
+#pragma comment(lib,"Rpcrt4.lib")
 
 #define AUTH_PACKAGE "MICROSOFT_AUTHENTICATION_PACKAGE_V1_0"
 
@@ -122,7 +124,7 @@ MSV1_0_INTERACTIVE_LOGON* GetLogonRequest(LPWSTR domain,LPWSTR user,LPWSTR pass,
   return pRequest;
 }
 
-HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
+HANDLE LSALogon(HANDLE SrcToken,LPWSTR UserName,LPWSTR Domain,
                 LPWSTR Password,bool bNoAdmin)
 {
   EnablePrivilege(SE_TCB_NAME);
@@ -154,17 +156,15 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
   // 
   __try
   {
-    HANDLE hShell=GetSessionUserToken(SessionID);
-    if (hShell)
+    if (SrcToken)
     {
       DWORD n=0;
       //Copy TokenSource from the Shell Process of SessionID:
-      CHK_BOOL_FN(GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n));
+      CHK_BOOL_FN(GetTokenInformation(SrcToken,TokenSource,&tsrc,sizeof(tsrc),&n));
       strcpy(tsrc.SourceName,"SuRun");
       //Copy Logon SID from the Shell Process of SessionID:
-      LogonSID=GetLogonSid(hShell);
-      CloseHandle(hShell);
-      hShell=0;
+      LogonSID=GetLogonSid(SrcToken);
+      CloseHandle(SrcToken);
     }else
       __leave;
     // Initialize Admin SID
@@ -265,6 +265,67 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       free(LogonSID);
   } // finally
   LsaDeregisterLogonProcess(hLSA);
+  return hUser;
+}
+
+HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
+                LPWSTR Password,bool bNoAdmin)
+{
+  HANDLE hShell=GetSessionUserToken(SessionID);
+  if (hShell)
+  {
+    HANDLE ht=LSALogon(hShell,UserName,Domain,Password,bNoAdmin);
+    CloseHandle(hShell);
+    return ht;
+  }
+  return NULL;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// GetTempAdminToken: create a new admin, log him on, get a Token, delete the admin
+//
+//////////////////////////////////////////////////////////////////////////////
+HANDLE GetTempAdminToken()
+{
+  ToDo!
+  FILETIME ft;
+  GetSystemTimeAsFileTime(&ft);
+  CResStr u(_T("SrTmpAdm_%X"),ft.dwLowDateTime);
+  LPWSTR p=0;
+  {
+    UUID id;
+    UuidCreate(&id);
+    UuidToString(&id,&p);
+  }
+  USER_INFO_2 ui2={0};
+  ui2.usri2_name=(LPTSTR)u;
+  ui2.usri2_password=(LPTSTR)p;
+  ui2.usri2_priv=USER_PRIV_USER;//NetUserAdd will fail on USER_PRIV_ADMIN
+  ui2.usri2_flags=UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
+  ui2.usri2_acct_expires = TIMEQ_FOREVER;
+  ui2.usri2_max_storage = USER_MAXSTORAGE_UNLIMITED;
+  ui2.usri2_code_page = GetACP();
+  DWORD dwerr=0;
+  NET_API_STATUS st=NetUserAdd(NULL,2,(LPBYTE)&ui2,&dwerr);
+  if (st!=NERR_Success)
+  {
+    DBGTrace4("NetUserAdd(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
+    return RpcStringFree(&p),NULL;
+  }
+  st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,u,1);
+  if (st)
+  {
+    DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)u,GetErrorNameStatic(st));
+    return RpcStringFree(&p),NULL;
+  }
+  HANDLE hUser=0;
+  if (!LogonUser(u,L".",p,LOGON32_LOGON_INTERACTIVE,0,&hUser))
+    DBGTrace3("LogonUser(%s,%s) failed: %s",(LPCTSTR)u,(LPCTSTR)p,GetLastErrorNameStatic());
+  RpcStringFree(&p);
+  st=NetUserDel(NULL,u);
+  if (st!=NERR_Success)
+    DBGTrace2("NetUserDel(%s) returned %s",(LPCTSTR)u,GetErrorNameStatic(st));
   return hUser;
 }
 
@@ -608,24 +669,12 @@ HANDLE GetAdminToken(DWORD SessionID)
     }
     //
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
-    //
-//    LUID AuthId=SYSTEM_LUID;
-//    if (_winmajor>=6)
-//    {
-//      //Vista++ use users AuthenticationId
-//      //Get Token statistics
-//      TOKEN_STATISTICS tstat;
-//      GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n);    //Token expires in 100 Years
-//      AuthId=tstat.AuthenticationId;
-//    }
-//    SYSTEMTIME st;
-//    GetSystemTime(&st);
-//    st.wYear+=100;
-//    FILETIME ft;
-//    SystemTimeToFileTime(&st,&ft);
     //Get Token statistics for AuthenticationId and ExpirationTime
     TOKEN_STATISTICS tstat;
     CHK_BOOL_FN(GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n));    
+    HANDLE hAdmin=GetTempAdminToken();
+    if (hAdmin)
+      CHK_BOOL_FN(GetTokenInformation(hAdmin,TokenStatistics,&tstat,sizeof(tstat),&n));
     //Create the token
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
