@@ -681,8 +681,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   }
   if ((_winmajor<6) && GetUseSVCHook)
     InjectIATHook(L"services.exe");
-  //Steal token from csrss.exe to get SeCreateTokenPrivilege in Vista
-  HANDLE hRunCsrss=GetProcessUserToken(GetProcessID(L"csrss.exe"));
+  //Steal token from LSAss.exe to get SeCreateTokenPrivilege in Vista
+  HANDLE hRunLSAss=GetProcessUserToken(GetProcessID(L"lsass.exe"));
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -776,11 +776,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
-        if (hRunCsrss)
+        if (hRunLSAss)
         {
           DWORD SessionID=0;
           ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
-          if(SetTokenInformation(hRunCsrss,TokenSessionId,&SessionID,sizeof(DWORD)))
+          if(SetTokenInformation(hRunLSAss,TokenSessionId,&SessionID,sizeof(DWORD)))
           {
             STARTUPINFO si={0};
             si.cb=sizeof(si);
@@ -801,7 +801,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 TryAgain:
             PROCESS_INFORMATION pi={0};
             DWORD stTime=timeGetTime();
-            if (CreateProcessAsUser(hRunCsrss,NULL,cmd,NULL,NULL,FALSE,
+            if (CreateProcessAsUser(hRunLSAss,NULL,cmd,NULL,NULL,FALSE,
                                     CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                                     0,NULL,&si,&pi))
             {
@@ -831,7 +831,7 @@ TryAgain:
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
-  CloseHandle(hRunCsrss);
+  CloseHandle(hRunLSAss);
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
   g_ss.dwCheckPoint       = 0;
