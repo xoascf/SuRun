@@ -11,7 +11,7 @@ ToDo
 ---------------------
 * "Gregory Maynard-Hoare" (http://www.pagehosting.co.uk/rf) reported 
   SetWindowsHookEx is able to run elevated code!
-* SysMenuHook <-> PowerMenu issues
+* RegNotifyChangeKeyValue()
 * GUI for SwitchToUser
 * less agressive "Admin with empty password" warning
 * Less annoying Admin-Bubbles

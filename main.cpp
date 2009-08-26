@@ -61,7 +61,8 @@ static void Crash()
 //extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
 //extern int TestBS();
-extern void ShowFUSGUI();
+extern void S
+howFUSGUI();
 #endif _DEBUG
 
 static void HideAppStartCursor()
@@ -77,55 +78,8 @@ extern HANDLE GetAdminToken(DWORD SessionID);
 #include <Userenv.h>
 
 //#include "ScreenSnap.h"
-DWORD StartAdminProcess() 
-{
-  DWORD RetVal=RETVAL_ACCESSDENIED;
-  DWORD SessionID=0;
-  //Get Admin User Token and Job object token
-  HANDLE hAdmin=GetAdminToken(SessionID);
-  //Clear Password
-  if (!hAdmin)
-  {
-    DBGTrace("FATAL: Could not create user token!");
-    return RetVal;
-  }
-  SetTokenInformation(hAdmin,TokenSessionId,&SessionID,sizeof(DWORD));
-  PROCESS_INFORMATION pi={0};
-  PROFILEINFO ProfInf = {sizeof(ProfInf),PI_NOUI,L"BRUNS\\Kay",0,0,0,0,0};
-  if(LoadUserProfile(hAdmin,&ProfInf))
-  {
-    void* Env=0;
-    if (CreateEnvironmentBlock(&Env,hAdmin,FALSE))
-    {
-      STARTUPINFO si={0};
-      si.cb	= sizeof(si);
-      //Do not inherit Desktop from calling process, use Tokens Desktop
-      TCHAR WinstaDesk[MAX_PATH];
-      _stprintf(WinstaDesk,_T("%s\\%s"),L"WinSta0",L"Default");
-      si.lpDesktop = WinstaDesk;
-      //Special handling for Explorer:
-      BOOL orgSP=1;
-      if (CreateProcessAsUser(hAdmin,NULL,L"C:\\Windows\\NotePad.exe",NULL,NULL,FALSE,
-          CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,Env,L"C:\\Windows",&si,&pi))
-      {
-        ResumeThread(pi.hThread);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-      }else
-        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-      DestroyEnvironmentBlock(Env);
-    }else
-      DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    UnloadUserProfile(hAdmin,ProfInf.hProfile);
-  }else
-    DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
-  CloseHandle(hAdmin);
-  return RetVal;
-}
-
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
-  StartAdminProcess();
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
   case 1:

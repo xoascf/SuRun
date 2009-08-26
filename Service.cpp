@@ -681,8 +681,9 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   }
   if ((_winmajor<6) && GetUseSVCHook)
     InjectIATHook(L"services.exe");
-  //Steal token from LSAss.exe to get SeCreateTokenPrivilege in Vista
-  HANDLE hRunLSAss=GetProcessUserToken(GetProcessID(L"lsass.exe"));
+  //Steal token from CSRSS.exe to get SeCreateTokenPrivilege in Vista
+  HANDLE hRunCSRSS=GetProcessUserToken(GetProcessID(L"CSRSS.exe"));
+  HANDLE hTmpAdmin=GetTempAdminToken();
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -776,11 +777,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
-        if (hRunLSAss)
+        if (hRunCSRSS)
         {
           DWORD SessionID=0;
           ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
-          if(SetTokenInformation(hRunLSAss,TokenSessionId,&SessionID,sizeof(DWORD)))
+          if(SetTokenInformation(hRunCSRSS,TokenSessionId,&SessionID,sizeof(DWORD)))
           {
             STARTUPINFO si={0};
             si.cb=sizeof(si);
@@ -801,12 +802,14 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 TryAgain:
             PROCESS_INFORMATION pi={0};
             DWORD stTime=timeGetTime();
-            if (CreateProcessAsUser(hRunLSAss,NULL,cmd,NULL,NULL,FALSE,
+            if (CreateProcessAsUser(hRunCSRSS,NULL,cmd,NULL,NULL,FALSE,
                                     CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                                     0,NULL,&si,&pi))
             {
               bRunCount++;
               CloseHandle(pi.hThread);
+              adfjhg
+              WriteProcessMemory(pi.hProcess,&g_hTmpAdmin,&hTmpAdmin,sizeof(HANDLE),&n)
               WaitForSingleObject(pi.hProcess,INFINITE);
               DWORD ex=0;
               GetExitCodeProcess(pi.hProcess,&ex);
@@ -831,7 +834,8 @@ TryAgain:
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
-  CloseHandle(hRunLSAss);
+  CloseHandle(hRunCSRSS);
+  CloseHandle(hTmpAdmin);
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
   g_ss.dwCheckPoint       = 0;
@@ -2341,19 +2345,27 @@ static void HandleHooks()
   DWORD HkTID=0;
   //HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
   CTimeOut t;
+  HKEY RegKey=0;
+  RegOpenKeyEx(HKCR,USROPTKEY(g_RunData.UserName),0,KSAM(KEY_READ),&RegKey);
+  HANDLE hEvent=CreateEvent(0,1,1,0);
   BOOL bShowTray=TRUE;
   BOOL bBaloon=FALSE;
   for (;;)
   {
-    if (t.TimedOut())
+    if (WaitForSingleObject(hEvent,0)==WAIT_OBJECT_0)
     {
-      if(CheckServiceStatus()!=SERVICE_RUNNING)
-        break;
-      g_RunData.Groups=UserIsInSuRunnersOrAdmins();
+      ResetEvent(hEvent);
       bShowTray=ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
       bBaloon=ShowBalloon(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
       if ((!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
         break;
+      RegNotifyChangeKeyValue(RegKey,1,REG_NOTIFY_CHANGE_NAME|REG_NOTIFY_CHANGE_LAST_SET,hEvent,TRUE);
+    }
+    if (t.TimedOut())
+    {
+      if(CheckServiceStatus()!=SERVICE_RUNNING)
+        break;
+      //g_RunData.Groups=UserIsInSuRunnersOrAdmins();
       t.Set(10000);
     }
 #ifndef _SR32
