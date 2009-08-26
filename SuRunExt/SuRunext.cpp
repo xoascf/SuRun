@@ -866,73 +866,75 @@ __declspec(dllexport) void RemoveShellExt()
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
+static HANDLE l_InitThread=0;
 DWORD WINAPI InitProc(void* p)
 {
+//  CTimeLog l(L"InitProc");
   int prio=0;
   TCHAR fMod[MAX_PATH];
   TCHAR fNoHook[4096];
-  __try
+  prio=GetThreadPriority(GetCurrentThread());
+  //Wait until all Loadlibrary Operations are done by setting the threads prio
+  //to lowest. [Windows NT does not run lower prio threads while higher prio 
+  //threads are redy to run]
+  SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
+  Sleep(1);
+  SetThreadPriority(GetCurrentThread(),prio);
+  //Resources
+  l_Groups=UserIsInSuRunnersOrAdmins();
+  //if (!l_IsAdmin)
+  GetProcessUserName(GetCurrentProcessId(),l_User);
+  l_bSetHook=1;//(!l_IsAdmin)||GetUseSVCHook;
+  //IAT Hook:
+  if (l_bSetHook)
   {
-    prio=GetThreadPriority(GetCurrentThread());
-    //Wait until all Loadlibrary Operations are done by setting the threads prio
-    //to lowest. [Windows NT does not run lower prio threads while higher prio 
-    //threads are redy to run]
-    SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);
-    Sleep(1);
-    SetThreadPriority(GetCurrentThread(),prio);
-    //Resources
-    l_Groups=UserIsInSuRunnersOrAdmins();
-    //if (!l_IsAdmin)
-    GetProcessUserName(GetCurrentProcessId(),l_User);
-    l_bSetHook=1;//(!l_IsAdmin)||GetUseSVCHook;
-    //IAT Hook:
-    if (l_bSetHook)
-    {
-      GetProcessFileName(fMod,MAX_PATH);
-      //Do not set hooks into SuRun!
-      GetSystemWindowsDirectory(fNoHook,4096);
+    GetProcessFileName(fMod,MAX_PATH);
+    //Do not set hooks into SuRun!
+    GetSystemWindowsDirectory(fNoHook,4096);
 #ifndef _SR32
-      PathAppend(fNoHook, _T("SuRun.exe"));
+    PathAppend(fNoHook, _T("SuRun.exe"));
 #else _SR32
-      PathAppend(fNoHook, _T("SuRun32.bin"));
+    PathAppend(fNoHook, _T("SuRun32.bin"));
 #endif _SR32
-      PathQuoteSpaces(fNoHook);
-      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-      if(l_bSetHook)
+    PathQuoteSpaces(fNoHook);
+    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+    if(l_bSetHook)
+    {
+      if (l_IsAdmin)
       {
-        //Do not set hooks into lsass!
+        //Admin process: Only set a hook into services.exe!
         GetSystemWindowsDirectory(fNoHook,4096);
-        PathAppend(fNoHook,L"SYSTEM32\\lsass.exe");
+        PathAppend(fNoHook,L"SYSTEM32\\services.exe");
         PathQuoteSpaces(fNoHook);
-        l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-        //Do not set hooks into logonui!
-        GetSystemWindowsDirectory(fNoHook,4096);
-        PathAppend(fNoHook,L"SYSTEM32\\logonui.exe");
-        PathQuoteSpaces(fNoHook);
-        l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-        //Do not set hooks into userinit!
-        GetSystemWindowsDirectory(fNoHook,4096);
-        PathAppend(fNoHook,L"SYSTEM32\\userinit.exe");
-        PathQuoteSpaces(fNoHook);
-        l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-        //Do not set hooks into Winlogon!
-        GetSystemWindowsDirectory(fNoHook,4096);
-        PathAppend(fNoHook,L"SYSTEM32\\winlogon.exe");
-        PathQuoteSpaces(fNoHook);
-        l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-        //Do not set hooks into blacklisted files!
-        l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
-        //      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
-        if(l_bSetHook && GetUseIATHook)
-          LoadHooks();
+        l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)==0);
       }
+//      //Do not set hooks into lsass!
+//      GetSystemWindowsDirectory(fNoHook,4096);
+//      PathAppend(fNoHook,L"SYSTEM32\\lsass.exe");
+//      PathQuoteSpaces(fNoHook);
+//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+//      //Do not set hooks into logonui!
+//      GetSystemWindowsDirectory(fNoHook,4096);
+//      PathAppend(fNoHook,L"SYSTEM32\\logonui.exe");
+//      PathQuoteSpaces(fNoHook);
+//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+//      //Do not set hooks into userinit!
+//      GetSystemWindowsDirectory(fNoHook,4096);
+//      PathAppend(fNoHook,L"SYSTEM32\\userinit.exe");
+//      PathQuoteSpaces(fNoHook);
+//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+//      //Do not set hooks into Winlogon!
+//      GetSystemWindowsDirectory(fNoHook,4096);
+//      PathAppend(fNoHook,L"SYSTEM32\\winlogon.exe");
+//      PathQuoteSpaces(fNoHook);
+//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+      //Do not set hooks into blacklisted files!
+      l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
+//      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
+      if(l_bSetHook && GetUseIATHook)
+        LoadHooks();
     }
   }
-  __except(1)
-  {
-    DBGTrace("FATAL: Exception in InitProc");
-  }
-  ExitThread(0);
   return 0;
 }
 
@@ -946,6 +948,15 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
+    if(l_InitThread)
+    {
+      if(WaitForSingleObject(l_InitThread,1000)==WAIT_TIMEOUT)
+      {
+        DBGTrace("WARNING: SuRunExt Terminating InitThread");
+        TerminateThread(l_InitThread,0);
+      }
+      l_InitThread=0;
+    }
     EnterCriticalSection(&l_SxHkCs);
     LeaveCriticalSection(&l_SxHkCs);
     DeleteCriticalSection(&l_SxHkCs);
@@ -961,6 +972,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
-  CloseHandle(CreateThread(0,0,InitProc,0,0,0));
+  l_InitThread=CreateThread(0,0,InitProc,0,0,0);
   return TRUE;
 }
