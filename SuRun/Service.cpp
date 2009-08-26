@@ -681,8 +681,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
     return; 
   }
-//  if ((_winmajor<6) && GetUseIATHook/*GetUseSVCHook*/)
-//    InjectIATHook(L"services.exe");
+  if ((_winmajor<6) && GetUseIATHook/*GetUseSVCHook*/)
+    InjectIATHook(L"services.exe");
   //Steal token from LSASS.exe to get SeCreateTokenPrivilege in Vista
   HANDLE hRunLSASS=GetProcessUserToken(GetProcessID(L"LSASS.exe"));
   HANDLE hTmpAdmin=GetTempAdminToken();
