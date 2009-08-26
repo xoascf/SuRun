@@ -557,7 +557,7 @@ ChkAdmin:
       _tcscat(un,_T("\n"));
     }
   if(un[0])
-    ShowTrayWarning(CBigResStr(IDS_EMPTYPASS,un),IDI_SHIELD2,0);
+    ShowTrayWarning(CBigResStr(EmptyPWAllowed?IDS_EMPTYPASS:IDS_EMPTYPASS2,un),IDI_SHIELD2,0);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -876,7 +876,7 @@ static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
   return TRUE ;
 }
 
-void KillProcess(DWORD PID)
+void KillProcess(DWORD PID,DWORD TimeOut=5000)
 {
   if (!PID)
     return;
@@ -889,7 +889,7 @@ void KillProcess(DWORD PID)
   g_bKilledOne=FALSE;
   EnumWindows(CloseAppEnum,(LPARAM)PID);
   //Give the Process time to close
-  if ((!g_bKilledOne) || (WaitForSingleObject(hProcess,5000)!=WAIT_OBJECT_0))
+  if ((!g_bKilledOne) || (WaitForSingleObject(hProcess,TimeOut)!=WAIT_OBJECT_0))
     TerminateProcess(hProcess,0);
   CloseHandle(hProcess);
 }
