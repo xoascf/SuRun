@@ -286,12 +286,23 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
 // GetTempAdminToken: create a new admin, log him on, get a Token, delete the admin
 //
 //////////////////////////////////////////////////////////////////////////////
-HANDLE GetTempAdminToken()
+BOOL DeleteTempAdmin()
 {
-  ToDo!
+  TCHAR u[UNLEN]={0};
+  GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
+  NET_API_STATUS st=NetUserDel(NULL,u);
+  if (st!=NERR_Success)
+    DBGTrace2("NetUserDel(%s) returned %s",(LPCTSTR)u,GetErrorNameStatic(st));
+  RegDelVal(HKLM,SURUNKEY,L"SuRunHelpUser");
+  return st==NERR_Success;
+}
+
+BOOL CreateTempAdmin()
+{
+  DeleteTempAdmin();
   FILETIME ft;
   GetSystemTimeAsFileTime(&ft);
-  CResStr u(_T("SrTmpAdm_%X"),ft.dwLowDateTime);
+  CResStr u(_T("SuRunHlp%X"),ft.dwLowDateTime);
   LPWSTR p=0;
   {
     UUID id;
@@ -302,7 +313,7 @@ HANDLE GetTempAdminToken()
   ui2.usri2_name=(LPTSTR)u;
   ui2.usri2_password=(LPTSTR)p;
   ui2.usri2_priv=USER_PRIV_USER;//NetUserAdd will fail on USER_PRIV_ADMIN
-  ui2.usri2_flags=UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
+  ui2.usri2_flags=UF_ACCOUNTDISABLE|UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
   ui2.usri2_acct_expires = TIMEQ_FOREVER;
   ui2.usri2_max_storage = USER_MAXSTORAGE_UNLIMITED;
   ui2.usri2_code_page = GetACP();
@@ -311,10 +322,53 @@ HANDLE GetTempAdminToken()
   if (st!=NERR_Success)
   {
     DBGTrace4("NetUserAdd(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
+    return RpcStringFree(&p),FALSE;
+  }
+  SetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u);
+  return TRUE;
+}
+
+HANDLE GetTempAdminToken()
+{
+  TCHAR u[UNLEN]={0};
+  GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
+  if (!u[0])
+  {
+DoRetry:
+    if(!CreateTempAdmin())
+      return 0;
+    GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
+  }
+  LPWSTR p=0;
+  {
+    UUID id;
+    UuidCreate(&id);
+    UuidToString(&id,&p);
+  }
+  USER_INFO_1003 ui1003={0};
+  ui1003.usri1003_password=(LPTSTR)p;
+  DWORD dwerr=0;
+  NET_API_STATUS st=NetUserSetInfo(NULL,u,1003,(BYTE*)&ui1003,&dwerr);
+  if (st==NERR_UserNotFound)
+    goto DoRetry;
+  if (st!=NERR_Success)
+  {
+    DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
+    return RpcStringFree(&p),NULL;
+  }
+  USER_INFO_1008 ui1008={0};
+  ui1008.usri1008_flags=UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
+  dwerr=0;
+  st=NetUserSetInfo(NULL,u,1008,(BYTE*)&ui1008,&dwerr);
+  if (st==NERR_UserNotFound)
+    goto DoRetry;
+  if (st!=NERR_Success)
+  {
+    DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
     return RpcStringFree(&p),NULL;
   }
   st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,u,1);
-  if (st)
+  if (st && (GetLastError()!=ERROR_MEMBER_IN_ALIAS))
   {
     DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)u,GetErrorNameStatic(st));
     return RpcStringFree(&p),NULL;
@@ -323,9 +377,17 @@ HANDLE GetTempAdminToken()
   if (!LogonUser(u,L".",p,LOGON32_LOGON_INTERACTIVE,0,&hUser))
     DBGTrace3("LogonUser(%s,%s) failed: %s",(LPCTSTR)u,(LPCTSTR)p,GetLastErrorNameStatic());
   RpcStringFree(&p);
-  st=NetUserDel(NULL,u);
+  st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,u,0);
+  if (st)
+  {
+    DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)u,GetErrorNameStatic(st));
+    return NULL;
+  }
+  ui1008.usri1008_flags=UF_ACCOUNTDISABLE|UF_LOCKOUT|UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
+  dwerr=0;
+  st=NetUserSetInfo(NULL,u,1008,(BYTE*)&ui1008,&dwerr);
   if (st!=NERR_Success)
-    DBGTrace2("NetUserDel(%s) returned %s",(LPCTSTR)u,GetErrorNameStatic(st));
+    DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
   return hUser;
 }
 

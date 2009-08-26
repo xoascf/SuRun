@@ -383,10 +383,7 @@ DWORD HookModules()
     return 0;
   HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,GetCurrentProcessId());
   if (!hProc)
-  {
-    DBGTrace("HookModules(): OpenProcess failed");
     return 0;
-  }
   DWORD Siz=0;
   DWORD nHooked=0;
   EnumProcessModules(hProc,0,0,&Siz);
@@ -417,9 +414,9 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
                      HANDLE hUser=0)
 {
   if (!g_IATInit)
-    return DBGTrace("NoIATHookInit->NoAutoSuRun"),RETVAL_SX_NOTINLIST;
+    return /*DBGTrace("NoIATHookInit->NoAutoSuRun"),*/RETVAL_SX_NOTINLIST;
   if (!GetUseIATHook)
-    return DBGTrace("NoIATHook->NoAutoSuRun"),RETVAL_SX_NOTINLIST;
+    return /*DBGTrace("NoIATHook->NoAutoSuRun"),*/RETVAL_SX_NOTINLIST;
   DWORD ExitCode=ERROR_ACCESS_DENIED;
   EnterCriticalSection(&g_HookCs);
   static TCHAR CurDir[4096];
@@ -455,13 +452,13 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
-      return DBGTrace("NoSuRunAutoSuRun"),LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
+      return /*DBGTrace("NoSuRunAutoSuRun"),*/LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
     //Exit if ShellExecHook failed on "tmp"
     static WCHAR tmp2[4096];
     GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp2,4096);
     RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
     if(_tcsicmp(tmp,tmp2)==0)
-      return DBGTrace("NoLastFailedCmdAutoSuRun"),LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
+      return /*DBGTrace("NoLastFailedCmdAutoSuRun"),*/LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
     wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
       GetCurrentProcessId(),&rpi,tmp);
   }
@@ -590,7 +587,7 @@ static BOOL IsShellAndSuRunner(HANDLE hToken)
           if (UserSID)
           {
             bRet=EqualSid(UserSID,ShellSID);
-            DBGTrace1("IsShellAndSuRunner=%d",bRet);
+            //DBGTrace1("IsShellAndSuRunner=%d",bRet);
             free(UserSID);
           }
           free(ShellSID);
@@ -663,19 +660,19 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
       p=DoHookFn(f,(char*)lpProcName,NULL);
       SetLastError(NOERROR);
 #ifdef DoDBGTrace
-      if (p)
-        TRACExA("SuRunExt32.dll: intercepting call to GetProcAddr(%s,%s)",f,lpProcName);
+//      if (p)
+//        TRACExA("SuRunExt32.dll: intercepting call to GetProcAddr(%s,%s)",f,lpProcName);
 #endif DoDBGTrace
     }
   }
 #ifdef DoDBGTrace
-  else
-  {
-    char f[MAX_PATH]={0};
-    GetModuleFileNameA(hModule,f,MAX_PATH);
-    PathStripPathA(f);
-    TRACExA("SuRunExt32.dll: call to GetProcAddr(%s,0x%x)",f,lpProcName);
-  }
+//  else
+//  {
+//    char f[MAX_PATH]={0};
+//    GetModuleFileNameA(hModule,f,MAX_PATH);
+//    PathStripPathA(f);
+//    TRACExA("SuRunExt32.dll: call to GetProcAddr(%s,0x%x)",f,lpProcName);
+//  }
 #endif DoDBGTrace
   if(!p)
     p=((lpGetProcAddress)hkGetPAdr.OrgFunc())(hModule,lpProcName);
@@ -803,24 +800,24 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 BOOL WINAPI SwitchDesk(HDESK Desk)
 {
 #ifdef DoDBGTrace
-  DBGTrace("SuRunExt32.dll: call to SwitchDesk()");
+//  DBGTrace("SuRunExt32.dll: call to SwitchDesk()");
 #endif DoDBGTrace
   if ((!l_IsAdmin)&&(!IsLocalSystem()))
   {
     HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
     if (!d)
-      return DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted"),FALSE;
+      return /*DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted"),*/FALSE;
     TCHAR dn[4096]={0};
     DWORD dnl=4096;
     if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
-      return CloseDesktop(d),DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted2"),FALSE;
+      return CloseDesktop(d),/*DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted2"),*/FALSE;
     CloseDesktop(d);
     if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
     {
       SetLastError(ERROR_ACCESS_DENIED);
-      return CloseDesktop(d),DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted3"),FALSE;
+      return CloseDesktop(d),/*DBGTrace("SuRunExt32.dll: SwitchDeskop interrupted3"),*/FALSE;
     }
-    DBGTrace1("SuRunExt32.dll: SwitchDeskop(%s) from granted",dn);
+    //DBGTrace1("SuRunExt32.dll: SwitchDeskop(%s) from granted",dn);
   }
   BOOL bRet=FALSE;
   if (hkSwDesk.OrgFunc())

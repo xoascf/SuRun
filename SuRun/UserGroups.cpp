@@ -25,6 +25,7 @@
 #include <lm.h>
 #include <malloc.h>
 #include "Helpers.h"
+#include "LSALogon.h"
 #include "ResStr.h"
 #include "UserGroups.h"
 #include "Setup.h"
@@ -53,6 +54,7 @@ void CreateSuRunnersGroup()
     DWORD error;
     NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
   }
+  CreateTempAdmin();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,6 +65,7 @@ void CreateSuRunnersGroup()
 void DeleteSuRunnersGroup()
 {
   NetLocalGroupDel(NULL,SURUNNERSGROUP);
+  DeleteTempAdmin();
 }
 
 /////////////////////////////////////////////////////////////////////////////
