@@ -116,6 +116,12 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
   wnd=GetForegroundWindow();
   if (!wnd)
     return -1;
+  HWND w=GetParent(wnd);
+  while (w)
+  {
+    wnd=w;
+    w=GetParent(wnd);
+  }
   GetWindowThreadProcessId(wnd,&g_TSAPID);
   _tcscpy(User,g_TSAData.CurUserName);
   if (!g_TSAData.CurProcId)
@@ -148,7 +154,7 @@ static void DisplayIcon()
   }
   if ((g_ForegroundWndIsAdmin==bIsFGAdm)
     && (_tcscmp(g_User,User)==0)
-    &&(g_FgWnd==FgWnd))
+    /*&&(g_FgWnd==FgWnd)*/)
     return;
   g_FgWnd=FgWnd;
   g_ForegroundWndIsAdmin=bIsFGAdm;
@@ -234,30 +240,19 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 {
   switch (message)
   {
-//  //Hotkey stuff:
-//  case WM_CREATE:
-//    {
-//      g_HotKeyID=GlobalAddAtom(L"SuRunFUSHotKey");
-//      RegisterHotKey(hWnd,g_HotKeyID,MOD_WIN,(int)'S');
-//      break;
-//    }
-//  case WM_DESTROY:
-//    {
-//      UnregisterHotKey(hWnd,g_HotKeyID);
-//      GlobalDeleteAtom(g_HotKeyID);
-//      g_HotKeyID=0;
-//      break;
-//    }
-//  case WM_HOTKEY:
-//    if (wParam==g_HotKeyID)
-//    {
-//
-//    }
-//    break;
   case WM_USER+1758:
     {
       switch (lParam)
       {
+      case NIN_BALLOONSHOW:
+        break;
+      case NIN_BALLOONHIDE:
+        //other App active
+      case NIN_BALLOONTIMEOUT:
+        //Click on [X] or TimeOut
+      case NIN_BALLOONUSERCLICK:
+        //Click in Balloon
+        break;
       case WM_LBUTTONDOWN:
       case WM_RBUTTONDOWN:
       case WM_CONTEXTMENU:
@@ -296,7 +291,8 @@ void InitTrayShowAdmin()
   WCLASS.lpfnWndProc  =&WndMainProc;
   RegisterClass(&WCLASS);
   g_NotyData.cbSize= sizeof(NOTIFYICONDATA);
-  g_NotyData.hWnd  = CreateWindowEx(0,CLASSNAME,_T("SuRunTrayShowAdmin"),
+  g_NotyData.hWnd  = CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE,
+                                    CLASSNAME,_T("SuRunTrayShowAdmin"),
                                     WS_POPUP,0,0,0,0,0,0,g_hInstance,NULL);
   g_NotyData.hIcon = (HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);

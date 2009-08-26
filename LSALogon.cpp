@@ -20,6 +20,7 @@
 #include "Helpers.h"
 #include "LSA_laar.h"
 #include "DBGTrace.h"
+#include "Resource.h"
 #include "setup.h"
 
 #pragma comment(lib,"Advapi32.lib")
@@ -306,6 +307,7 @@ BOOL CreateTempAdmin()
   ui2.usri2_acct_expires = TIMEQ_FOREVER;
   ui2.usri2_max_storage = USER_MAXSTORAGE_UNLIMITED;
   ui2.usri2_code_page = GetACP();
+  ui2.usri2_comment= (LPTSTR)CResStr(IDS_SRACCDESC);
   DWORD dwerr=0;
   NET_API_STATUS st=NetUserAdd(NULL,2,(LPBYTE)&ui2,&dwerr);
   if (st!=NERR_Success)
@@ -644,8 +646,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     TOKEN_SOURCE tsrc = {0};
     DWORD n;
     CHK_BOOL_FN(GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n));
-    //No need to set SourceName here. WinLogon will close Processes with this token
-    //strcpy(tsrc.SourceName,"SuRun");
+    strcpy(tsrc.SourceName,"SuRun");
     //Initialize TOKEN_GROUPS
     ptg=(PTOKEN_GROUPS)(GetFromToken(hShell, TokenGroups));
     if (ptg==NULL)

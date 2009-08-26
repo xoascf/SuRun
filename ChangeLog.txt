@@ -3,7 +3,6 @@ Done, to be tested:
 ToDo
 ---------------------
 * GUI for SwitchToUser
-* less agressive "Admin with empty password" warning
 * Less annoying Admin-Bubbles
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
@@ -38,6 +37,8 @@ SuRun 1.2.0.7 Beta 13 - 2009-08-26:
 * NEW: SuRun uses a local helper account to create the elevated token.
     Now the policy editor and and the user account management of the control 
     panel work for elevated SuRunners.
+* CHG: If blank password use is disabled, SuRun shows a less agressive 
+    "The following Administrator accounts have no password" warning
 * CHG: SuRun no more uses AppInit_DLLs registry key
 * CHG: Removed option "set a hook into services and administrative processes."
 * CHG: Installer does not require reboot in Vista++

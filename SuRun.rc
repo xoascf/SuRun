@@ -902,6 +902,8 @@ BEGIN
     IDS_NOEXPORT            "Sie müssen Mitglied der lokalen Administratorengruppe\nsein, um SuRuns Einstellungen zu exportieren."
     IDS_NOTLOGGEDON         "Benutzerumschaltung nicht möglich:\n%s ist nicht angemeldet."
     IDS_NOTLOGGEDON2        "Benutzerumschaltung nicht möglich:\nSitzung %d ist nicht angemeldet."
+    IDS_EMPTYPASS2          "WARNUNG: Folgende Administratoren haben kein Kennwort\n\n%s"
+    IDS_SRACCDESC           "Hilfskonto für SuRun"
 END
 
 #endif    // German (Germany) resources
@@ -1645,6 +1647,8 @@ BEGIN
     IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
     IDS_NOTLOGGEDON         "Fast user switch not possible:\n%s is not logged on."
     IDS_NOTLOGGEDON2        "Fast user switch not possible:\nSession %d is not logged on."
+    IDS_EMPTYPASS2          "WARNING: The following Administrator accounts have no password:\n\n%s"
+    IDS_SRACCDESC           "Helper account for SuRun"
 END
 
 #endif    // English (U.S.) resources
@@ -2343,6 +2347,8 @@ BEGIN
     IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
     IDS_NOTLOGGEDON         "Fast user switch not possible:\n%s is not logged on."
     IDS_NOTLOGGEDON2        "Fast user switch not possible:\nSession %d is not logged on."
+    IDS_EMPTYPASS2          "WAARSCHUWING: De volgende Administrator gebruikers hebben geen wachtwoord:\n\n%s"
+    IDS_SRACCDESC           "Helper account for SuRun"
 END
 
 #endif    // Dutch (Netherlands) resources
@@ -2910,52 +2916,6 @@ BEGIN
 END
 
 
-#ifndef _MAC
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,6
- PRODUCTVERSION 1,2,0,6
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "Comments", "SuRun, iniciar programas como administrador, basado en la idea de SuDown http://sudown.sourceforge.net\0"
-            VALUE "CompanyName", "http://kay-bruns.de\0"
-            VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 2, 0, 6\0"
-            VALUE "InternalName", "SuRun\0"
-            VALUE "LegalCopyright", "Derechos de Autor © 2007-09 Kay Bruns\0"
-            VALUE "LegalTrademarks", "SuRun\0"
-            VALUE "OriginalFilename", "SuRun.exe\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 2, 0, 6\0"
-            VALUE "SpecialBuild", "\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-#endif    // !_MAC
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
@@ -3102,6 +3062,8 @@ BEGIN
     IDS_HIDESELF            "Realmente quiere ocultar a SuRun de Ud. mismo?\n\nNo podra cambiar ajustes de SuRun luego de hacer esto."
     IDS_NOIMPORT            "Debe ser miembro del grupo local de administradores\npara importar las configuraciones de SuRun."
     IDS_NOEXPORT            "Debe ser miembro del grupo local de administradores\npara exportar las configuraciones de SuRun."
+    IDS_EMPTYPASS3          "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s"
+    IDS_SRACCDESC           "Helper account for SuRun"
 END
 
 #endif    // Spanish (Castilian) (unknown sub-lang: 0xB) resources

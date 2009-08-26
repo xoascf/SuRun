@@ -106,8 +106,11 @@
 #define IDS_NOEXPORT                    99
 #define IDI_MAINICON                    100
 #define IDS_NOTLOGGEDON                 100
+#define IDS_EMPTYPASS3                  100
 #define IDD_LOGONDLG                    101
 #define IDS_NOTLOGGEDON2                101
+#define IDS_EMPTYPASS2                  102
+#define IDS_SRACCDESC                   103
 #define IDD_DIALOG1                     104
 #define IDI_SHIELD                      104
 #define IDI_SHIELD2                     105
