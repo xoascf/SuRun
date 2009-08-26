@@ -2,8 +2,8 @@ Done, to be tested:
 ---------------------------
 ToDo
 ---------------------
+* Less annoying Admin-Bubbles (requires custom bubble tip window class)
 * GUI for SwitchToUser
-* Less annoying Admin-Bubbles
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * GUI for FUS
