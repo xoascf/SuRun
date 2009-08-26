@@ -812,6 +812,7 @@ TryAgain:
                                     0,NULL,&si,&pi))
             {
               bRunCount++;
+              SIZE_T n=0;
               WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&n);
               ResumeThread(pi.hThread);
               CloseHandle(pi.hThread);
