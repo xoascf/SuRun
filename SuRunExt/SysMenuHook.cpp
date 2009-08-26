@@ -90,6 +90,10 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if(nCode>=0)
   {
+    if (WM_SYSMH0==-2)
+      WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+    if (WM_SYSMH1==-2)
+      WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     #define wps ((CWPSTRUCT*)lParam)
     #define hmenu (HMENU)wps->wParam
     switch(wps->message)

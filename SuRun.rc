@@ -564,7 +564,7 @@ BEGIN
                     IDC_STATIC,31,96,335,17
     CONTROL         "Auch in Dienste und administrative Programme einhängen. (System-Neustart erforderlich!)",
                     IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,31,113,305,10
+                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,113,305,10
     LTEXT           "Sollte ein Programm nach Aktivieren einer der obigen Optionen nicht mehr wie gewohnt funktionieren, können sie unter 'Ausnahmen' festlegen, dass SuRun sich nicht in dieses Programm einhängt, um Programmstarts zu filtern",
                     IDC_STATIC,20,128,256,27
     PUSHBUTTON      "Ausnahmen...",IDC_BLACKLIST,287,134,57,14
@@ -1308,7 +1308,7 @@ BEGIN
                     IDC_STATIC,31,95,335,17
     CONTROL         "Also set a hook into services and administrative processes. (System restart required!)",
                     IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,31,113,305,10
+                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,113,305,10
     LTEXT           "If an application does not work as usual after you activate options above, you can disable SuRun's hooks into this program by putting it into the blacklist.",
                     IDC_STATIC,20,130,256,25
     PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,293,134,57,14
@@ -2052,7 +2052,7 @@ BEGIN
                     IDC_STATIC,31,92,335,17
     CONTROL         "Also set a hook into services and administrative processes. (System restart required!)",
                     IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,31,110,305,10
+                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,110,305,10
     LTEXT           "Indien een programma na activering van een van de bovenstaande opties niet meer naar behoren functioneert, dan kunt u het in de lijst met SuRun Uitsluitingen opnemen",
                     IDC_STATIC,20,122,256,27
     PUSHBUTTON      "Uitsluitingen...",IDC_BLACKLIST,287,128,57,14
@@ -2492,7 +2492,7 @@ BEGIN
                     IDC_STATIC,31,94,335,17
     CONTROL         "Also set a hook into services and administrative processes. (System restart required!)",
                     IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,31,112,305,10
+                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,112,305,10
     LTEXT           "Si una aplicacion no trabaja como lo haria normalmente luego de activar una o ambas opciones arriba, Ud. puede deshabilitar la intercepcion de SuRun en este programa ingresandolo en la Lista Negra.",
                     IDC_STATIC,20,125,256,27
     PUSHBUTTON      "Lista Negra...",IDC_BLACKLIST,293,131,57,14

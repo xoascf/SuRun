@@ -663,6 +663,8 @@ static BOOL TestDirectServiceCommands()
   return false;
 }
 
+extern TOKEN_STATISTICS g_AdminTStat;
+
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
   zero(g_RunPwd);
@@ -679,11 +681,14 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
     return; 
   }
-  if ((_winmajor<6) && GetUseSVCHook)
+  if ((_winmajor<6) && GetUseIATHook/*GetUseSVCHook*/)
     InjectIATHook(L"services.exe");
-  //Steal token from CSRSS.exe to get SeCreateTokenPrivilege in Vista
-  HANDLE hRunCSRSS=GetProcessUserToken(GetProcessID(L"CSRSS.exe"));
+  //Steal token from LSASS.exe to get SeCreateTokenPrivilege in Vista
+  HANDLE hRunLSASS=GetProcessUserToken(GetProcessID(L"LSASS.exe"));
   HANDLE hTmpAdmin=GetTempAdminToken();
+  TOKEN_STATISTICS tstat;
+  DWORD n=0;
+  CHK_BOOL_FN(GetTokenInformation(hTmpAdmin,TokenStatistics,&tstat,sizeof(tstat),&n));    
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -777,11 +782,11 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
         }//if (!g_RunData.bRunAs)
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
-        if (hRunCSRSS)
+        if (hRunLSASS)
         {
           DWORD SessionID=0;
           ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
-          if(SetTokenInformation(hRunCSRSS,TokenSessionId,&SessionID,sizeof(DWORD)))
+          if(SetTokenInformation(hRunLSASS,TokenSessionId,&SessionID,sizeof(DWORD)))
           {
             STARTUPINFO si={0};
             si.cb=sizeof(si);
@@ -802,14 +807,14 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 TryAgain:
             PROCESS_INFORMATION pi={0};
             DWORD stTime=timeGetTime();
-            if (CreateProcessAsUser(hRunCSRSS,NULL,cmd,NULL,NULL,FALSE,
-                                    CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
+            if (CreateProcessAsUser(hRunLSASS,NULL,cmd,NULL,NULL,FALSE,
+                                    CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT|HIGH_PRIORITY_CLASS,
                                     0,NULL,&si,&pi))
             {
               bRunCount++;
+              WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&n);
+              ResumeThread(pi.hThread);
               CloseHandle(pi.hThread);
-              adfjhg
-              WriteProcessMemory(pi.hProcess,&g_hTmpAdmin,&hTmpAdmin,sizeof(HANDLE),&n)
               WaitForSingleObject(pi.hProcess,INFINITE);
               DWORD ex=0;
               GetExitCodeProcess(pi.hProcess,&ex);
@@ -834,7 +839,7 @@ TryAgain:
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
-  CloseHandle(hRunCSRSS);
+  CloseHandle(hRunLSASS);
   CloseHandle(hTmpAdmin);
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 

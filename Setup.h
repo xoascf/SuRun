@@ -179,8 +179,8 @@
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
 #define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
-#define GetUseSVCHook         (GetUseIATHook && (GetShExtSetting(UseSVCHook,0)!=0))
-#define SetUseSVCHook(b)       SetShExtSetting(UseSVCHook,b,0)
+//#define GetUseSVCHook         (GetUseIATHook && (GetShExtSetting(UseSVCHook,0)!=0))
+//#define SetUseSVCHook(b)       SetShExtSetting(UseSVCHook,b,0)
 
 //TrayMsg stuff
 #define GetShowAutoRuns       (GetShExtSetting(ShowAutoRuns,1)!=0)

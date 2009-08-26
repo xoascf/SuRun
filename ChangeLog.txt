@@ -1,17 +1,7 @@
 Done, to be tested:
 ---------------------------
-* steal token csrss->lsass
-* removed AppInit_Dlls
-* Changed "Reboot"->"Logoff" after install  in Vista++
-* Changed SysmenuHook to modify main sysmenu only, not popups
-* reimplemented GetProcAddress hook in IAT-Hook to hook dynamically loaded 
-  SwitchDesktop apps(HotKeyz). Checked Outlook/Exchange server compatibility.
-
 ToDo
 ---------------------
-* "Gregory Maynard-Hoare" (http://www.pagehosting.co.uk/rf) reported 
-  SetWindowsHookEx is able to run elevated code!
-* RegNotifyChangeKeyValue()
 * GUI for SwitchToUser
 * less agressive "Admin with empty password" warning
 * Less annoying Admin-Bubbles
@@ -42,6 +32,21 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 Beta 13 - 2009-08-26:
+-----------------------------------
+* NEW: SuRun uses a local helper account to create the elevated token.
+    Now the policy editor and and the user account management of the control 
+    panel work for elevated SuRunners.
+* CHG: SuRun no more uses AppInit_DLLs registry key
+* CHG: Removed option "set a hook into services and administrative processes."
+* CHG: Installer does not require reboot in Vista++
+* CHG: The SuRun service injects SuRunExt.dll into services.exe to enable
+    installing hardware without entering an admin password on the user desktop
+* FIX: Reduced registry access from "SuRun /Sysmenuhook".
+* FIX: Changed SysmenuHook to modify main sysmenu only, not sub menus
+* FIX: Gregory Maynard-Hoare reported a vunerability, present in SuRun 1.2.0.0 
+    to SuRun 1.2.0.7b12. This was fixed with this Beta.
 
 SuRun 1.2.0.7 Beta 12 - 2009-08-17:
 -----------------------------------
