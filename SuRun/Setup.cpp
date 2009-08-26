@@ -901,7 +901,7 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_IMPORT),1);
     EnableWindow(GetDlgItem(hwnd,IDC_EXPORT),1);
     EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
-    EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
+    EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseIATHook/*GetUseSVCHook*/);
     CheckDlgButton(hwnd,IDC_RUNSETUP,!GetNoRunSetup(u));
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
     EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),1);
@@ -939,7 +939,7 @@ static void UpdateUser(HWND hwnd)
       EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
       EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
       EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),0);
-      EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
+      EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseIATHook/*GetUseSVCHook*/);
       EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),0);
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
@@ -1224,7 +1224,7 @@ void ExportSettings(LPTSTR ini)
   
   EXPORTINT(SuRunKey,UseIShExHook,ini);
   EXPORTINT(SuRunKey,UseIATHook,ini);
-  EXPORTINT(SuRunKey,UseSVCHook,ini);
+//  EXPORTINT(SuRunKey,UseSVCHook,ini);
   EXPORTINT(SuRunKey,TestReqAdmin,ini);
   EXPORTINT(SuRunKey,ShowAutoRuns,ini);
   
@@ -1321,7 +1321,7 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 
     IMPORTINT(SuRunKey,UseIShExHook,ini);
     IMPORTINT(SuRunKey,UseIATHook,ini);
-    IMPORTINT(SuRunKey,UseSVCHook,ini);
+//    IMPORTINT(SuRunKey,UseSVCHook,ini);
     IMPORTINT(SuRunKey,TestReqAdmin,ini);
     IMPORTINT(SuRunKey,ShowAutoRuns,ini);
 
@@ -1528,7 +1528,7 @@ void SetRecommendedSettings()
     EnableWindow(GetDlgItem(h,IDC_RUNSETUP),1);
     EnableWindow(GetDlgItem(h,IDC_REQPW4SETUP),1);
     EnableWindow(GetDlgItem(h,IDC_RESTRICTED),1);
-    EnableWindow(GetDlgItem(h,IDC_HW_ADMIN),GetUseSVCHook);
+    EnableWindow(GetDlgItem(h,IDC_HW_ADMIN),GetUseIATHook/*GetUseSVCHook*/);
     EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k);
@@ -1772,7 +1772,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       g_SD->Setup2Anchor.Add(IDC_ADDAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_EDITAPP,ANCHOR_BOTTOMRIGHT);
       g_SD->Setup2Anchor.Add(IDC_DELETE,ANCHOR_BOTTOMRIGHT);
-      EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
+      EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseIATHook/*GetUseSVCHook*/);
       return TRUE;
     }//WM_INITDIALOG
   case WM_SIZE:
@@ -2100,8 +2100,8 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
       CheckDlgButton(hwnd,IDC_SHEXHOOK,GetUseIShExHook);
       CheckDlgButton(hwnd,IDC_IATHOOK,GetUseIATHook);
-      CheckDlgButton(hwnd,IDC_SVCHOOK,GetUseSVCHook);
-      EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_HW_ADMIN),GetUseSVCHook);
+      //CheckDlgButton(hwnd,IDC_SVCHOOK,GetUseSVCHook);
+      //EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_HW_ADMIN),GetUseSVCHook);
       CheckDlgButton(hwnd,IDC_SHOWTRAY,GetShowAutoRuns);
       CheckDlgButton(hwnd,IDC_REQADMIN,GetTestReqAdmin);
       EnableWindow(GetDlgItem(hwnd,IDC_SVCHOOK),GetUseIATHook);
@@ -2121,10 +2121,10 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 ApplyChanges:
       SetUseIShExHook(IsDlgButtonChecked(hwnd,IDC_SHEXHOOK));
       SetUseIATHook(IsDlgButtonChecked(hwnd,IDC_IATHOOK));
-      SetUseSVCHook(IsDlgButtonChecked(hwnd,IDC_SVCHOOK));
+      //SetUseSVCHook(IsDlgButtonChecked(hwnd,IDC_SVCHOOK));
       SetTestReqAdmin(IsDlgButtonChecked(hwnd,IDC_REQADMIN));
       SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
-      EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_HW_ADMIN),GetUseSVCHook);
+      EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_HW_ADMIN),GetUseIATHook/*GetUseSVCHook*/);
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:

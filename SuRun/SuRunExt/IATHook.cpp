@@ -155,8 +155,8 @@ static CHookDescriptor* need_hdt[]=
 {
   &hkCrProcA, 
   &hkCrProcW,
-  &hkCrPAUA, 
-  &hkCrPAUW,
+//  &hkCrPAUA, 
+//  &hkCrPAUW,
   &hkSwDesk,
 };
 
@@ -167,14 +167,26 @@ static CHookDescriptor* hdt[]=
   &hkLdLibW, 
   &hkLdLibXA, 
   &hkLdLibXW, 
-  &hkGetPAdr, //This hook caused Outlook 2007 with WindowsDesktopSearch to crash
+//  &hkGetPAdr,
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
-  &hkCrPAUA, 
-  &hkCrPAUW,
+//  &hkCrPAUA, 
+//  &hkCrPAUW,
   &hkSwDesk,
+};
+
+static CHookDescriptor* sys_need_hdt[]=
+{
+  &hkCrPAUW,
+};
+
+static CHookDescriptor* sys_hdt[]=
+{
+  &hkFreeLib, 
+  &hkFrLibXT, 
+  &hkCrPAUW,
 };
 
 //relative pointers in PE images
@@ -185,10 +197,19 @@ BOOL DoHookDll(char* DllName)
 {
   if(IsBadReadPtr(DllName,1))
     return FALSE;
-  for(int i=0;i<countof(hdt);i++)
-    if ((stricmp(hdt[i]->DllName,DllName)==0)
-      ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-      return true;
+  if (l_IsAdmin)
+  {
+    for(int i=0;i<countof(sys_hdt);i++)
+      if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
+        ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
+        return true;
+  }else
+  {
+    for(int i=0;i<countof(hdt);i++)
+      if ((stricmp(hdt[i]->DllName,DllName)==0)
+        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
+        return true;
+  }
   return false;
 }
 
@@ -198,15 +219,31 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
   if(*DllName && *ImpName)
-    for(int i=0;i<countof(hdt);i++)
-      if ((stricmp(hdt[i]->DllName,DllName)==0)
-        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-        if (stricmp(hdt[i]->FuncName,ImpName)==0)
-        {
-          if(orgFunc)
-            *orgFunc=hdt[i]->OrgFunc();
-          return hdt[i]->newFunc;
-        }
+  {
+    if (l_IsAdmin)
+    {
+      for(int i=0;i<countof(sys_hdt);i++)
+        if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
+          ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
+          if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
+          {
+            if(orgFunc)
+              *orgFunc=sys_hdt[i]->OrgFunc();
+            return sys_hdt[i]->newFunc;
+          }
+    }else
+    {
+      for(int i=0;i<countof(hdt);i++)
+        if ((stricmp(hdt[i]->DllName,DllName)==0)
+          ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
+          if (stricmp(hdt[i]->FuncName,ImpName)==0)
+          {
+            if(orgFunc)
+              *orgFunc=hdt[i]->OrgFunc();
+            return hdt[i]->newFunc;
+          }
+    }
+  }
   return false;
 }
 
@@ -215,11 +252,23 @@ PROC DoHookFn(char* DllName,PROC orgFunc)
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(orgFunc,1))
     return 0;
   if(*DllName)
-    for(int i=0;i<countof(hdt);i++)
-      if ((stricmp(hdt[i]->DllName,DllName)==0)
-        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-        if (hdt[i]->OrgFunc()==orgFunc)
-          return hdt[i]->newFunc;
+  {
+    if (l_IsAdmin)
+    {
+      for(int i=0;i<countof(sys_hdt);i++)
+        if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
+          ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
+          if (sys_hdt[i]->OrgFunc()==orgFunc)
+            return sys_hdt[i]->newFunc;
+    }
+    {
+      for(int i=0;i<countof(hdt);i++)
+        if ((stricmp(hdt[i]->DllName,DllName)==0)
+          ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
+          if (hdt[i]->OrgFunc()==orgFunc)
+            return hdt[i]->newFunc;
+    }
+  }
   return false;
 }
 
@@ -228,11 +277,23 @@ PROC GetOrgFn(char* DllName,char* ImpName)
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
   if(*DllName && *ImpName)
-    for(int i=0;i<countof(hdt);i++)
-      if ((stricmp(hdt[i]->DllName,DllName)==0)
-        ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-        if (stricmp(hdt[i]->FuncName,ImpName)==0)
-          return hdt[i]->OrgFunc();
+  {
+    if (l_IsAdmin)
+    {
+      for(int i=0;i<countof(sys_hdt);i++)
+        if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
+          ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
+          if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
+            return sys_hdt[i]->OrgFunc();
+    }else
+    {
+      for(int i=0;i<countof(hdt);i++)
+        if ((stricmp(hdt[i]->DllName,DllName)==0)
+          ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
+          if (stricmp(hdt[i]->FuncName,ImpName)==0)
+            return hdt[i]->OrgFunc();
+    }
+  }
   return false;
 }
 
@@ -242,11 +303,23 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1)||IsBadReadPtr(ImpName,1))
     return 0;
   if(*DllName && *ImpName)
-    for(int i=0;i<countof(need_hdt);i++)
-      if ((stricmp(need_hdt[i]->DllName,DllName)==0)
-        ||(need_hdt[i]->Win7DllName && (stricmp(need_hdt[i]->Win7DllName,DllName)==0)))
-        if (stricmp(need_hdt[i]->FuncName,ImpName)==0)
-          return need_hdt[i]->OrgFunc()==orgFunc;
+  {
+    if (l_IsAdmin)
+    {
+      for(int i=0;i<countof(sys_need_hdt);i++)
+        if ((stricmp(sys_need_hdt[i]->DllName,DllName)==0)
+          ||(sys_need_hdt[i]->Win7DllName && (stricmp(sys_need_hdt[i]->Win7DllName,DllName)==0)))
+          if (stricmp(sys_need_hdt[i]->FuncName,ImpName)==0)
+            return sys_need_hdt[i]->OrgFunc()==orgFunc;
+    }else
+    {
+      for(int i=0;i<countof(need_hdt);i++)
+        if ((stricmp(need_hdt[i]->DllName,DllName)==0)
+          ||(need_hdt[i]->Win7DllName && (stricmp(need_hdt[i]->Win7DllName,DllName)==0)))
+          if (stricmp(need_hdt[i]->FuncName,ImpName)==0)
+            return need_hdt[i]->OrgFunc()==orgFunc;
+    }
+  }
   return false;
 }
 
@@ -568,8 +641,8 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 static BOOL IsShellAndSuRunner(HANDLE hToken)
 {
   BOOL bRet=FALSE;
-  if (l_IsAdmin && (!GetUseSVCHook))
-    return bRet;
+//  if (l_IsAdmin && (!GetUseSVCHook))
+//    return bRet;
   DWORD Groups=UserIsInSuRunnersOrAdmins(hToken);
   if ((Groups&(IS_IN_ADMINS|IS_IN_SURUNNERS))==IS_IN_SURUNNERS)
   {
@@ -837,8 +910,15 @@ DWORD WINAPI InitHookProc(void* p)
   if (!GetUseIATHook)
     return 0;
   EnterCriticalSection(&g_HookCs);
-  for(int i=0;i<countof(hdt);i++)
-    PROC p=hdt[i]->OrgFunc();
+  if (l_IsAdmin)
+  {
+    for(int i=0;i<countof(sys_hdt);i++)
+      PROC p=sys_hdt[i]->OrgFunc();
+  }else
+  {
+    for(int i=0;i<countof(hdt);i++)
+      PROC p=hdt[i]->OrgFunc();
+  }
   HookModules();
   LeaveCriticalSection(&g_HookCs);
   return 0;

@@ -124,7 +124,7 @@ MSV1_0_INTERACTIVE_LOGON* GetLogonRequest(LPWSTR domain,LPWSTR user,LPWSTR pass,
   return pRequest;
 }
 
-HANDLE LSALogon(HANDLE SrcToken,LPWSTR UserName,LPWSTR Domain,
+HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
                 LPWSTR Password,bool bNoAdmin)
 {
   EnablePrivilege(SE_TCB_NAME);
@@ -156,15 +156,17 @@ HANDLE LSALogon(HANDLE SrcToken,LPWSTR UserName,LPWSTR Domain,
   // 
   __try
   {
-    if (SrcToken)
+    HANDLE hShell=GetSessionUserToken(SessionID);
+    if (hShell)
     {
       DWORD n=0;
       //Copy TokenSource from the Shell Process of SessionID:
-      CHK_BOOL_FN(GetTokenInformation(SrcToken,TokenSource,&tsrc,sizeof(tsrc),&n));
+      CHK_BOOL_FN(GetTokenInformation(hShell,TokenSource,&tsrc,sizeof(tsrc),&n));
       strcpy(tsrc.SourceName,"SuRun");
       //Copy Logon SID from the Shell Process of SessionID:
-      LogonSID=GetLogonSid(SrcToken);
-      CloseHandle(SrcToken);
+      LogonSID=GetLogonSid(hShell);
+      CloseHandle(hShell);
+      hShell=0;
     }else
       __leave;
     // Initialize Admin SID
@@ -266,19 +268,6 @@ HANDLE LSALogon(HANDLE SrcToken,LPWSTR UserName,LPWSTR Domain,
   } // finally
   LsaDeregisterLogonProcess(hLSA);
   return hUser;
-}
-
-HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
-                LPWSTR Password,bool bNoAdmin)
-{
-  HANDLE hShell=GetSessionUserToken(SessionID);
-  if (hShell)
-  {
-    HANDLE ht=LSALogon(hShell,UserName,Domain,Password,bNoAdmin);
-    CloseHandle(hShell);
-    return ht;
-  }
-  return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -606,6 +595,8 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
   return ptp;
 }
 
+TOKEN_STATISTICS g_AdminTStat;
+
 HANDLE GetAdminToken(DWORD SessionID) 
 {
   if(!EnablePrivilege(SE_CREATE_TOKEN_NAME))
@@ -732,11 +723,9 @@ HANDLE GetAdminToken(DWORD SessionID)
     //
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
     //Get Token statistics for AuthenticationId and ExpirationTime
-    TOKEN_STATISTICS tstat;
-    CHK_BOOL_FN(GetTokenInformation(hShell,TokenStatistics,&tstat,sizeof(tstat),&n));    
-    HANDLE hAdmin=GetTempAdminToken();
-    if (hAdmin)
-      CHK_BOOL_FN(GetTokenInformation(hAdmin,TokenStatistics,&tstat,sizeof(tstat),&n));
+//    HANDLE hAdmin=GetTempAdminToken();
+//    if (hAdmin)
+//      CHK_BOOL_FN(GetTokenInformation(hAdmin,TokenStatistics,&tstat,sizeof(tstat),&n));
     //Create the token
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");
@@ -746,7 +735,7 @@ HANDLE GetAdminToken(DWORD SessionID)
       __leave;
     }
     NTSTATUS ntStatus = ZwCreateToken(&hUser,READ_CONTROL|TOKEN_ALL_ACCESS,&oa,
-      TokenPrimary,&tstat.AuthenticationId/*AuthId*/,&tstat.ExpirationTime,&userToken,
+      TokenPrimary,&g_AdminTStat.AuthenticationId,&g_AdminTStat.ExpirationTime,&userToken,
       ptg, lpPrivToken, pTO, lpPriGrp, lpDaclToken, &tsrc);
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)

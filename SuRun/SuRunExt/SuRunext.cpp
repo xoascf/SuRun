@@ -877,13 +877,9 @@ DWORD WINAPI InitProc(void* p)
   SetThreadPriority(GetCurrentThread(),prio);
   //Resources
   l_Groups=UserIsInSuRunnersOrAdmins();
-  if (!l_IsAdmin)
-  {
+  //if (!l_IsAdmin)
     GetProcessUserName(GetCurrentProcessId(),l_User);
-    WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-    WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-  }
-  l_bSetHook=(!l_IsAdmin)||GetUseSVCHook;
+  l_bSetHook=1;//(!l_IsAdmin)||GetUseSVCHook;
   //IAT Hook:
   if (l_bSetHook)
   {
