@@ -1,14 +1,15 @@
 Done, to be tested:
 ---------------------------
+
 ToDo
 ---------------------
-* Less annoying Admin-Bubbles (requires custom bubble tip window class)
 * GUI for SwitchToUser
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * GUI for FUS
 * Checksums for "Always Yes" programs
 * Windows 7 compatibility
+  Explorer is started via DCOM explorer.exe /FACTORY,{...
 * LOG-File for SuRun activity
 
 To be done in future:
@@ -31,6 +32,11 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 Beta 14 - 2009-08-27:
+-----------------------------------
+* Less annoying Balloon Tips
+* Tray icon status did not update while limited user program were active
 
 SuRun 1.2.0.7 Beta 13 - 2009-08-26:
 -----------------------------------
