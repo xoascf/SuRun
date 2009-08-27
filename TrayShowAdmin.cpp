@@ -161,7 +161,8 @@ static void DisplayIcon()
   g_FgWnd=FgWnd;
   g_ForegroundWndIsAdmin=bIsFGAdm;
   _tcscpy(g_User,User);
-  memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
+  if (g_TSAData.CurPID!=g_LastPID)
+    memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
   _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
   BOOL bDiffUser=_tcscmp(User,g_RunData.UserName);
   if (bIsFGAdm==-1)
@@ -256,7 +257,6 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
         break;
       case NIN_BALLOONHIDE:
         //other App active
-        g_LastPID=0;
         break;
       case NIN_BALLOONTIMEOUT:
         //Click on [X] or TimeOut
