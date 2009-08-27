@@ -154,7 +154,7 @@ static void DisplayIcon()
   }
   if ((g_ForegroundWndIsAdmin==bIsFGAdm)
     && (_tcscmp(g_User,User)==0)
-    /*&&(g_FgWnd==FgWnd)*/)
+    &&(g_FgWnd==FgWnd))
     return;
   g_FgWnd=FgWnd;
   g_ForegroundWndIsAdmin=bIsFGAdm;
