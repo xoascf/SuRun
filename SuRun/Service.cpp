@@ -685,10 +685,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     InjectIATHook(L"services.exe");
   //Steal token from LSASS.exe to get SeCreateTokenPrivilege in Vista
   HANDLE hRunLSASS=GetProcessUserToken(GetProcessID(L"LSASS.exe"));
-  HANDLE hTmpAdmin=GetTempAdminToken();
-  TOKEN_STATISTICS tstat;
-  DWORD n=0;
-  CHK_BOOL_FN(GetTokenInformation(hTmpAdmin,TokenStatistics,&tstat,sizeof(tstat),&n));    
   //Create Pipe:
   g_hPipe=CreateNamedPipe(ServicePipeName,
     PIPE_ACCESS_INBOUND|WRITE_DAC|FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -812,8 +808,18 @@ TryAgain:
                                     0,NULL,&si,&pi))
             {
               bRunCount++;
-              SIZE_T n=0;
-              WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&n);
+              if (!g_RunData.bRunAs)
+              {
+                HANDLE hTok=GetTempAdminToken(g_RunData.UserName);
+                TOKEN_STATISTICS tstat={0};
+                if (hTok)
+                {
+                  DWORD n=0;
+                  CHK_BOOL_FN(GetTokenInformation(hTok,TokenStatistics,&tstat,sizeof(tstat),&n));
+                }
+                SIZE_T N=0;
+                WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&N);
+              }
               ResumeThread(pi.hThread);
               CloseHandle(pi.hThread);
               WaitForSingleObject(pi.hProcess,INFINITE);
@@ -841,7 +847,7 @@ TryAgain:
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
   CloseHandle(hRunLSASS);
-  CloseHandle(hTmpAdmin);
+  DeleteTempAdminTokens();
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
   g_ss.dwCheckPoint       = 0;
@@ -978,14 +984,15 @@ DWORD PrepareSuRun()
 //  AddTime("PrepareSuRun start")
 //#endif DoDBGTrace
   zero(g_RunPwd);
-  RegDelVal(HKLM,PASSWKEY,g_RunData.UserName);//Delete Password, keep time
   if((!g_CliIsInSuRunners) && GetNoConvUser)
   {
     DBGTrace1("PrepareSuRun EXIT: User %s is no SuRunner, no auto convert",g_RunData.UserName);
     return RETVAL_ACCESSDENIED;
   }
+  BOOL PwExpired=PasswordExpired(g_RunData.UserName);
+  BOOL NoNeedPw=g_AdminTStat.AuthenticationId.HighPart||g_AdminTStat.AuthenticationId.LowPart;
   //Ask For Password?
-  BOOL PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
+  BOOL PwOk=GetSavePW &&(!PwExpired) && NoNeedPw;
   DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
   bool bNotInList=f==-1;
   if(bNotInList)
@@ -995,7 +1002,7 @@ DWORD PrepareSuRun()
     //Delete last password "ok" time
     DeletePassword(g_RunData.UserName);
     //if "Never ask for a password", just run the program 
-    if ((f&(FLAG_DONTASK|FLAG_NEVERASK))==(FLAG_DONTASK|FLAG_NEVERASK))
+    if (NoNeedPw && ((f&(FLAG_DONTASK|FLAG_NEVERASK))==(FLAG_DONTASK|FLAG_NEVERASK)))
       return RETVAL_OK;
   }else  if (f&FLAG_DONTASK)
     return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
@@ -1042,15 +1049,28 @@ DWORD PrepareSuRun()
     if (!PwOk)
     {
       if (f&FLAG_DONTASK)
+      {
         //Program is known but password expired: Only check password!
         l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_ASKOK);
-      else
+      }else
+      {
         l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
-                           IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+          IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+      }
+      if((!NoNeedPw)&&(l&1))
+      {
+        PwOk=TRUE;
+        SavePassword(g_RunData.UserName,g_RunPwd);
+        HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
+        DWORD n=0;
+        if (hUser)
+          CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
+        //Do not call CloseHandle(hUser)!
+      }
     }else //if (PwOk):
     {
       l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,
-                         IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+        IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
     }
     DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     if((l&1)==0)

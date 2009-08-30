@@ -54,7 +54,6 @@ void CreateSuRunnersGroup()
     DWORD error;
     NetLocalGroupAdd(NULL,1,(LPBYTE)&lgri1,&error);
   }
-  CreateTempAdmin();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -62,6 +61,21 @@ void CreateSuRunnersGroup()
 // DeleteSuRunnersGroup
 //
 /////////////////////////////////////////////////////////////////////////////
+BOOL DeleteTempAdmin() //SuRun 1.2.0.7 beta 13 used an own account, we need to delete that
+{
+  TCHAR u[UNLEN]={0};
+  GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
+  if (u[0])
+  {
+    RegDelVal(HKLM,SURUNKEY,L"SuRunHelpUser");
+    NET_API_STATUS st=NetUserDel(NULL,u);
+    if (st!=NERR_Success)
+      DBGTrace2("NetUserDel(%s) returned %s",(LPCTSTR)u,GetErrorNameStatic(st));
+    return st==NERR_Success;
+  }
+  return TRUE;
+}
+
 void DeleteSuRunnersGroup()
 {
   NetLocalGroupDel(NULL,SURUNNERSGROUP);

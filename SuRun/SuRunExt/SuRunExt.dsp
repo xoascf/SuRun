@@ -25,8 +25,6 @@ CFG=SURUNEXT - WIN32 UNICODE RELEASE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName ""$/SuRun/SuRunExt", IUQCAAAA"
-# PROP Scc_LocalPath "."
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe

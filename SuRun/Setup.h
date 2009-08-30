@@ -307,7 +307,9 @@ inline BOOL ShowBalloon(LPCTSTR u,BOOL bAdmin,BOOL bSuRunner)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
+void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes);
 void DeletePassword(LPTSTR UserName);
+void SavePassword(LPTSTR UserName,LPTSTR Password);
 
 //////////////////////////////////////////////////////////////////////////////
 // 
