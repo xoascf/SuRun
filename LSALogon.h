@@ -3,8 +3,9 @@
 HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
                 LPWSTR Password,bool bNoAdmin);
 
-BOOL CreateTempAdmin();
-BOOL DeleteTempAdmin();
-HANDLE GetTempAdminToken();
+HANDLE LogonAsAdmin(LPTSTR UserName,LPTSTR p);
+
+void DeleteTempAdminTokens();
+HANDLE GetTempAdminToken(LPTSTR UserName);
 
 HANDLE GetAdminToken(DWORD SessionID);

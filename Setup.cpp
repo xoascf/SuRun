@@ -45,10 +45,29 @@
 // 
 //////////////////////////////////////////////////////////////////////////////
 
+static BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,0xD1,0x62,0xB4,0x0A,0xE2};
+
+void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
+{
+  CBlowFish bf;
+  bf.Initialize(KEYPASS,sizeof(KEYPASS));
+  if (GetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
+    bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
+}
+
 void DeletePassword(LPTSTR UserName)
 {
-  RegDelVal(HKLM,PASSWKEY,UserName);//for Historical reasons!
+  RegDelVal(HKLM,PASSWKEY,UserName);
   RegDelVal(HKLM,TIMESKEY,UserName);
+}
+
+void SavePassword(LPTSTR UserName,LPTSTR Password)
+{
+  CBlowFish bf;
+  TCHAR pw[PWLEN];
+  bf.Initialize(KEYPASS,sizeof(KEYPASS));
+  SetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)pw,
+    bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
 }
 
 //////////////////////////////////////////////////////////////////////////////

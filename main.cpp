@@ -61,8 +61,7 @@ static void Crash()
 //extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
 //extern int TestBS();
-extern void S
-howFUSGUI();
+extern void ShowFUSGUI();
 #endif _DEBUG
 
 static void HideAppStartCursor()
@@ -96,7 +95,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     break;
   }
 #ifdef _DEBUG
-  ShowFUSGUI();
+//  ShowFUSGUI();
 //  HKEY hkcu=0;
 //  RegOpenKey(HKCU,0,&hkcu);
 //  GetAdminToken(0);

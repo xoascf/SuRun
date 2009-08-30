@@ -15,7 +15,9 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <ntsecapi.h>
+#include <shlwapi.h>
 #include <tchar.h>
+#include <malloc.h>
 #include <lm.h>
 #include "Helpers.h"
 #include "LSA_laar.h"
@@ -276,60 +278,115 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
 // GetTempAdminToken: create a new admin, log him on, get a Token, delete the admin
 //
 //////////////////////////////////////////////////////////////////////////////
-BOOL DeleteTempAdmin()
+class CTokenList
 {
-  TCHAR u[UNLEN]={0};
-  GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
-  NET_API_STATUS st=NetUserDel(NULL,u);
-  if (st!=NERR_Success)
-    DBGTrace2("NetUserDel(%s) returned %s",(LPCTSTR)u,GetErrorNameStatic(st));
-  RegDelVal(HKLM,SURUNKEY,L"SuRunHelpUser");
-  return st==NERR_Success;
+public:
+  CTokenList()
+  {
+    m_UserNames=NULL;
+    m_Tokens=NULL;
+    m_nTokens=NULL;
+  }
+  HANDLE Find(LPTSTR UserName)
+  {
+    LPTSTR n=m_UserNames;
+    for (DWORD i=0;i<m_nTokens;i++,n+=_tcslen(n)+1)
+      if (_tcsicmp(n,UserName)==0)
+        return m_Tokens[i];
+    return NULL;
+  }
+  void Add(LPTSTR UserName,HANDLE Token)
+  {
+    size_t siz=m_UserNames?_msize(m_UserNames):0;
+    m_UserNames=(LPTSTR)realloc(m_UserNames,siz+sizeof(TCHAR)*(_tcslen(UserName)+1));
+    _tcscpy(&m_UserNames[siz/sizeof(TCHAR)],UserName);
+    m_Tokens=(LPHANDLE)realloc(m_Tokens,(m_nTokens+1)*sizeof(HANDLE));
+    m_Tokens[m_nTokens]=Token;
+    m_nTokens++;
+  }
+  void RemoveAll()
+  {
+    free(m_UserNames);
+    m_UserNames=NULL;
+    for (DWORD i=0;i<m_nTokens;i++)
+      CloseHandle(m_Tokens[i]);
+    free(m_Tokens);
+    m_Tokens=NULL;
+    m_nTokens=NULL;
+  }
+protected:
+  LPTSTR m_UserNames;
+  LPHANDLE m_Tokens;
+  DWORD m_nTokens;
+};
+
+static CTokenList g_Tokens;
+
+void DeleteTempAdminTokens()
+{
+  g_Tokens.RemoveAll();
 }
 
-BOOL CreateTempAdmin()
+HANDLE LogonAsAdmin(LPTSTR UserName,LPTSTR p)
 {
-  DeleteTempAdmin();
-  FILETIME ft;
-  GetSystemTimeAsFileTime(&ft);
-  CResStr u(_T("SuRunHlp%X"),ft.dwLowDateTime);
-  LPWSTR p=0;
+  HANDLE hUser=0;
+  TCHAR u[2*UNLEN+2]={0};
+  TCHAR d[2*UNLEN+2]={0};
+  _tcscpy(u,UserName);
+  PathStripPath(u);
+  _tcscpy(d,UserName);
+  PathRemoveFileSpec(d);
+  DWORD st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,1);
+  bool bWasAdmin=st==ERROR_MEMBER_IN_ALIAS;
+  if ((!st)||bWasAdmin)
   {
-    UUID id;
-    UuidCreate(&id);
-    UuidToString(&id,&p);
-  }
-  USER_INFO_2 ui2={0};
-  ui2.usri2_name=(LPTSTR)u;
-  ui2.usri2_password=(LPTSTR)p;
-  ui2.usri2_priv=USER_PRIV_USER;//NetUserAdd will fail on USER_PRIV_ADMIN
-  ui2.usri2_flags=UF_ACCOUNTDISABLE|UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
-  ui2.usri2_acct_expires = TIMEQ_FOREVER;
-  ui2.usri2_max_storage = USER_MAXSTORAGE_UNLIMITED;
-  ui2.usri2_code_page = GetACP();
-  ui2.usri2_comment= (LPTSTR)CResStr(IDS_SRACCDESC);
-  DWORD dwerr=0;
-  NET_API_STATUS st=NetUserAdd(NULL,2,(LPBYTE)&ui2,&dwerr);
-  if (st!=NERR_Success)
-  {
-    DBGTrace4("NetUserAdd(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
-    return RpcStringFree(&p),FALSE;
-  }
-  SetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u);
-  return TRUE;
+    if (!LogonUser(u,d,p,LOGON32_LOGON_INTERACTIVE,0,&hUser))
+      DBGTrace3("LogonUser(%s,%s) failed: %s",(LPCTSTR)UserName,(LPCTSTR)p,GetLastErrorNameStatic());
+    if (!bWasAdmin)
+    {
+      st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
+      if (st)
+        DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)UserName,GetErrorNameStatic(st));
+    }
+  }else
+    DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)UserName,GetErrorNameStatic(st));
+  return hUser;
 }
 
-HANDLE GetTempAdminToken()
+HANDLE GetSavedPasswordUserToken(LPTSTR UserName)
 {
-  TCHAR u[UNLEN]={0};
-  GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
-  if (!u[0])
+  TCHAR p[PWLEN]={0};
+  LoadPassword(UserName,p,PWLEN);
+  if (!p[0])
+    return 0;
+  HANDLE hUser=LogonAsAdmin(UserName,p);
+  zero(p);
+  if (hUser)
+    g_Tokens.Add(UserName,hUser);
+  return hUser;
+}
+
+HANDLE GetTempAdminToken(LPTSTR UserName)
+{
+  HANDLE hUser=g_Tokens.Find(UserName);
+  if (hUser)
+    return hUser;
+  DWORD UserID=0;
+  BYTE* V=0;
+  DWORD nV=0;
+  DWORD Vtype=0;
+  TCHAR u[UNLEN+1];
+  _tcscpy(u,UserName);
+  PathStripPath(u);
+  //This will only work on local accounts!
+  if ((!GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",u),L"",&UserID,0,0))
+    || (UserID==0))
   {
-DoRetry:
-    if(!CreateTempAdmin())
-      return 0;
-    GetRegStr(HKLM,SURUNKEY,L"SuRunHelpUser",u,UNLEN);
+    //Domain users will have to enter their password.
+    return GetSavedPasswordUserToken(UserName);
   }
+  if(!GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",&Vtype,&V,&nV))
+    return 0;
   LPWSTR p=0;
   {
     UUID id;
@@ -341,44 +398,20 @@ DoRetry:
   DWORD dwerr=0;
   NET_API_STATUS st=NetUserSetInfo(NULL,u,1003,(BYTE*)&ui1003,&dwerr);
   if (st==NERR_UserNotFound)
-    goto DoRetry;
+    return RpcStringFree(&p),GetSavedPasswordUserToken(UserName);
   if (st!=NERR_Success)
   {
     DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
-    return RpcStringFree(&p),NULL;
-  }
-  USER_INFO_1008 ui1008={0};
-  ui1008.usri1008_flags=UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
-  dwerr=0;
-  st=NetUserSetInfo(NULL,u,1008,(BYTE*)&ui1008,&dwerr);
-  if (st==NERR_UserNotFound)
-    goto DoRetry;
-  if (st!=NERR_Success)
+  }else
   {
-    DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
-    return RpcStringFree(&p),NULL;
+    hUser=LogonAsAdmin(UserName,p);
   }
-  st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,u,1);
-  if (st && (GetLastError()!=ERROR_MEMBER_IN_ALIAS))
-  {
-    DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)u,GetErrorNameStatic(st));
-    return RpcStringFree(&p),NULL;
-  }
-  HANDLE hUser=0;
-  if (!LogonUser(u,L".",p,LOGON32_LOGON_INTERACTIVE,0,&hUser))
-    DBGTrace3("LogonUser(%s,%s) failed: %s",(LPCTSTR)u,(LPCTSTR)p,GetLastErrorNameStatic());
   RpcStringFree(&p);
-  st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,u,0);
-  if (st)
-  {
-    DBGTrace2("AlterGroupMember(%s) failed %s",(LPCTSTR)u,GetErrorNameStatic(st));
-    return NULL;
-  }
-  ui1008.usri1008_flags=UF_ACCOUNTDISABLE|UF_LOCKOUT|UF_NORMAL_ACCOUNT|UF_SCRIPT|UF_DONT_EXPIRE_PASSWD;
-  dwerr=0;
-  st=NetUserSetInfo(NULL,u,1008,(BYTE*)&ui1008,&dwerr);
-  if (st!=NERR_Success)
-    DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
+  if (!SetRegAny(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",Vtype,V,nV))
+    DBGTrace1("Fatal Error, could not restore user(%s) credentials!",UserName);
+  free(V);
+  if (hUser)
+    g_Tokens.Add(UserName,hUser);
   return hUser;
 }
 
@@ -597,10 +630,15 @@ PTOKEN_PRIVILEGES AddPrivileges(PTOKEN_PRIVILEGES pPriv,LPWSTR pAdd)
   return ptp;
 }
 
-TOKEN_STATISTICS g_AdminTStat;
+TOKEN_STATISTICS g_AdminTStat={0};
 
 HANDLE GetAdminToken(DWORD SessionID) 
 {
+  if ((g_AdminTStat.AuthenticationId.HighPart|g_AdminTStat.AuthenticationId.LowPart)==0)
+  {
+    DBGTrace("GetAdminToken failed because g_AdminTStat is not set!");
+    return FALSE;
+  }
   if(!EnablePrivilege(SE_CREATE_TOKEN_NAME))
     return FALSE;
   HANDLE hUser= NULL;
