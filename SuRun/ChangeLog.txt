@@ -21,22 +21,40 @@ To be done in future:
 
 Deferred Whishlist:
 ---------------------
-* icons for SuRuns contex menu entries
+* icons for SuRuns context menu entries
 * Intercept CreateProcessAsUser in services and check for programs started 
   with limited rights that need to be started as admin
-* Intercept "rundll32.exe newdev.dll,": 
-    needs CredUI hack for XP/2k3; ok with 2k and Vista
-    use "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File 
-    Execution Options\Rundll32.exe",Debugger,C:\Windows\SuRun.exe /AUTORUN
 
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.7 Beta 14 - 2009-08-27:
+SuRun 1.2.0.7 Beta 14 - 2009-08-30:
 -----------------------------------
-* Less annoying Balloon Tips
-* Tray icon status did not update while limited user program were active
+* CHG: Less annoying Balloon Tips
+* FIX: Tray icon status did not update while limited user program were active
+* FIX: Removed temp user account. This lead to wrong user names in WhoAmI etc.
+* CHG: SuRun needs an administrative logon session for every user who uses 
+  "Start as Administrator". The only way to get that well done ist to put that 
+  user into "Administrators" and log him on. This leads to the problem, that 
+  SuRun normally would need to know (and save!) the password of that user. 
+  To avoid that for users who are not joined to a domain, SuRun does the 
+  following:
+  * create backup of the user's password hash
+  * create a new random password for the user
+  * put the user to the Administrators group
+  * logon the user (this get's the token for "Start as administrator")
+  * remove the user from the administrators group
+  * restore the saved password hash
+  This is safe because:
+  * the user cannot logon himself as Admin, since he does not know the 
+    random password
+  * no password is stored in the registry
+  * SuRun never uses/knows the real user password
+
+  For domain users password hashes are not stored in the local registry. 
+  So SuRun cannot create a backup of the hash. Thus to use SuRun as a Domain
+  user you need to let SuRun store your password in the local registry.
 
 SuRun 1.2.0.7 Beta 13 - 2009-08-26:
 -----------------------------------
