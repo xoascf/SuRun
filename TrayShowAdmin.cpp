@@ -39,6 +39,7 @@ struct
 
 DWORD g_TSAPID=0;
 BOOL g_TSAThreadRunning=FALSE;
+HANDLE g_TSAEvent=0;
 
 //TSAThreadProc is called from Service!
 DWORD WINAPI TSAThreadProc(void* p)
@@ -55,15 +56,19 @@ DWORD WINAPI TSAThreadProc(void* p)
   DWORD PID=0;
   BOOL TSAThreadRunning=TRUE;
   WriteProcessMemory(hProc,&g_TSAThreadRunning,&TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
+  HANDLE hEvent=0;
+  SIZE_T s;
+  ReadProcessMemory(hProc,&g_TSAEvent,&hEvent,sizeof(HANDLE),&s);
+  DuplicateHandle(hProc,hEvent,GetCurrentProcess(),&hEvent,0,FALSE,DUPLICATE_SAME_ACCESS);
   EnablePrivilege(SE_DEBUG_NAME);
   for(;;)
   {
-    SIZE_T s;
-    if ((WaitForSingleObject(hProc,333)==WAIT_OBJECT_0)
+    if ((WaitForSingleObject(hProc,0)==WAIT_OBJECT_0)
+     ||(WaitForSingleObject(hEvent,INFINITE)!=WAIT_OBJECT_0)
      ||(!ReadProcessMemory(hProc,&g_TSAPID,&TSAData.CurPID,sizeof(DWORD),&s))
      ||(sizeof(DWORD)!=s))
       return CloseHandle(hProc),0;
-    if (TSAData.CurPID!=PID)
+    //if (TSAData.CurPID!=PID)
     {
       HANDLE h = OpenProcess(PROCESS_ALL_ACCESS,TRUE,TSAData.CurPID);
       if(h)
@@ -76,7 +81,10 @@ DWORD WINAPI TSAThreadProc(void* p)
           CloseHandle(hTok);
           if(WriteProcessMemory(hProc,&g_TSAData,&TSAData,sizeof(g_TSAData),&s)
             && (s==sizeof(g_TSAData)))
+          {
             PID=TSAData.CurPID;
+            ResetEvent(hEvent);
+          }
           else
             DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
         }else
@@ -100,6 +108,7 @@ BOOL StartTSAThread()
   HANDLE hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
   if(hPipe==INVALID_HANDLE_VALUE)
     return FALSE;
+  g_TSAEvent=CreateEvent(0,1,0,0);
   DWORD n=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
   CloseHandle(hPipe);
@@ -109,37 +118,46 @@ BOOL StartTSAThread()
   return g_TSAThreadRunning;
 }
 
-static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle)
+static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle,DWORD& CurPID)
 {
   if (!StartTSAThread())
     return -1;
-  wnd=GetForegroundWindow();
-  if (!wnd)
+  HWND Wnd=GetForegroundWindow();
+  if (!Wnd)
     return -1;
-  HWND w=GetParent(wnd);
+  HWND w=GetParent(Wnd);
   while (w)
   {
-    wnd=w;
-    w=GetParent(wnd);
+    Wnd=w;
+    w=GetParent(Wnd);
   }
-  GetWindowThreadProcessId(wnd,&g_TSAPID);
+  GetWindowThreadProcessId(Wnd,&g_TSAPID);
+  if (g_TSAPID!=g_TSAData.CurPID)
+  {
+    SetEvent(g_TSAEvent);
+    for(;g_TSAPID!=g_TSAData.CurPID;)
+      Sleep(10);
+  }
   _tcscpy(User,g_TSAData.CurUserName);
   if (!g_TSAData.CurPID)
     return -1;
+  wnd=Wnd;
+  CurPID=g_TSAData.CurPID;
   if (!InternalGetWindowText(wnd,WndTitle,MAX_PATH))
     _stprintf(WndTitle,L"Process %d",g_TSAData.CurPID);
   return g_TSAData.CurUserIsadmin;
 }
 
-static DWORD g_LastPID=0;
-
+static DWORD LastPID=0;
+static CTimeOut BalloonTimeOut(0);
 static void DisplayIcon()
 {
   HICON OldIcon=g_NotyData.hIcon;
   TCHAR User[MAX_PATH*2+2]={0};
   TCHAR WndTxt[MAX_PATH+1]={0};
   HWND FgWnd=0;
-  BOOL bIsFGAdm=ForegroundWndIsAdmin(User,FgWnd,WndTxt);
+  DWORD CurPID=0;
+  BOOL bIsFGAdm=ForegroundWndIsAdmin(User,FgWnd,WndTxt,CurPID);
   if (_tcslen(WndTxt)>64)
   {
     WndTxt[61]='.';
@@ -154,15 +172,21 @@ static void DisplayIcon()
     WndTxt[31]='.';
     WndTxt[32]=0;
   }
-  if ((g_ForegroundWndIsAdmin==bIsFGAdm)
+  BOOL bNoUpd=(g_ForegroundWndIsAdmin==bIsFGAdm)
     && (_tcscmp(g_User,User)==0)
-    &&(g_FgWnd==FgWnd))
+    &&(g_FgWnd==FgWnd);
+  if (BalloonTimeOut.TimedOut()&&(CurPID!=LastPID))
+    LastPID=0;
+  if ((BalloonTimeOut.TimedOut()||(CurPID!=LastPID))&&(g_NotyData.szInfo[0]))
+  {
+    memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
+    bNoUpd=FALSE;
+  }
+  if (bNoUpd)
     return;
   g_FgWnd=FgWnd;
   g_ForegroundWndIsAdmin=bIsFGAdm;
   _tcscpy(g_User,User);
-  if (g_TSAData.CurPID!=g_LastPID)
-    memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
   _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
   BOOL bDiffUser=_tcscmp(User,g_RunData.UserName);
   if (bIsFGAdm==-1)
@@ -174,9 +198,10 @@ static void DisplayIcon()
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,
       MAKEINTRESOURCE(bDiffUser?IDI_ADMIN:(g_CliIsAdmin?IDI_SHADMIN:IDI_SRADMIN)),
                             IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
-    if (g_BallonTips && bDiffUser && (g_TSAData.CurPID!=g_LastPID))
+    if (g_BallonTips && bDiffUser && (CurPID!=LastPID))
     {
-      g_LastPID=g_TSAData.CurPID;
+      LastPID=CurPID;
+      BalloonTimeOut.Set(20000);
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
     }
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
@@ -184,9 +209,10 @@ static void DisplayIcon()
   {
     g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOADMIN),
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
-    if (g_BallonTips && bDiffUser&& (g_TSAData.CurPID!=g_LastPID))
+    if (g_BallonTips && bDiffUser&& (CurPID!=LastPID))
     {
-      g_LastPID=g_TSAData.CurPID;
+      LastPID=CurPID;
+      BalloonTimeOut.Set(20000);
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
     }
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
