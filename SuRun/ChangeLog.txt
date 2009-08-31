@@ -29,17 +29,16 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.7 Beta 14 - 2009-08-30:
+SuRun 1.2.0.7 Beta 14 - 2009-08-31:
 -----------------------------------
 * CHG: Less annoying Balloon Tips
 * FIX: Tray icon status did not update while limited user program were active
 * FIX: Removed temp user account. This lead to wrong user names in WhoAmI etc.
-* CHG: SuRun needs an administrative logon session for every user who uses 
-  "Start as Administrator". The only way to get that well done ist to put that 
-  user into "Administrators" and log him on. This leads to the problem, that 
-  SuRun normally would need to know (and save!) the password of that user. 
-  To avoid that for users who are not joined to a domain, SuRun does the 
-  following:
+* CHG: SuRun needs to logon every user as administrator who uses "Start as 
+  Administrator". The only way to get that done right is to put that user 
+  temporarily into "Administrators". This leads to the problem, that SuRun 
+  normally would need to know (and save!) the password of that user. To avoid 
+  that for users who are not joined to a domain, SuRun does the following:
   * create backup of the user's password hash
   * create a new random password for the user
   * put the user to the Administrators group
@@ -55,6 +54,8 @@ SuRun 1.2.0.7 Beta 14 - 2009-08-30:
   For domain users password hashes are not stored in the local registry. 
   So SuRun cannot create a backup of the hash. Thus to use SuRun as a Domain
   user you need to let SuRun store your password in the local registry.
+  I currently try to change the encryption password for those users.
+  It should dependend on something that is stored on the PDC or in AD.
 
 SuRun 1.2.0.7 Beta 13 - 2009-08-26:
 -----------------------------------
