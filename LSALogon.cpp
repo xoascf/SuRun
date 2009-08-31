@@ -67,6 +67,58 @@ typedef struct _TOKEN_LINKED_TOKEN
 
 #endif TokenElevationType
 
+BOOL GetElevatedToken(HANDLE& hToken)
+{
+  if ((_winmajor<6)||(hToken==0))
+    return FALSE;
+  //Vista++ UAC: Get the elevated token!
+  TOKEN_ELEVATION_TYPE et;
+  DWORD dwSize=sizeof(et);
+  if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenElevationType,
+    &et,dwSize,&dwSize)
+    &&(et==TokenElevationTypeLimited))
+  {
+    TOKEN_LINKED_TOKEN lt = {0}; 
+    HANDLE hAdmin=0;
+    dwSize = sizeof(lt); 
+    if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
+                            &lt,dwSize,&dwSize))
+    {
+      if(DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
+                          SecurityImpersonation,TokenPrimary,&hAdmin)) 
+      {
+        CloseHandle(lt.LinkedToken);
+        CloseHandle(hToken);
+        hToken=hAdmin;
+        return TRUE;
+      }
+      CloseHandle(lt.LinkedToken);
+    }
+  }
+  return FALSE;
+}
+
+void SetHighIL(HANDLE hUser)
+{
+  if ((_winmajor<6)||(hUser==0))
+    return;
+  //Vista UAC: Set Integrity level!
+  SID_IDENTIFIER_AUTHORITY siaMLA = {0,0,0,0,0,16}/*SECURITY_MANDATORY_LABEL_AUTHORITY*/;
+  PSID  pSidIL = NULL;
+  typedef struct _TOKEN_MANDATORY_LABEL 
+  {
+    SID_AND_ATTRIBUTES Label;
+  } TOKEN_MANDATORY_LABEL, *PTOKEN_MANDATORY_LABEL;
+  TOKEN_MANDATORY_LABEL TIL = {0};
+  AllocateAndInitializeSid(&siaMLA,1,0x00003000L/*SECURITY_MANDATORY_HIGH_RID*/,
+    0,0,0,0,0,0,0,&pSidIL );
+  TIL.Label.Attributes = 0x00000020/*SE_GROUP_INTEGRITY*/;
+  TIL.Label.Sid        = pSidIL ;
+  SetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenIntegrityLevel,
+    &TIL,sizeof(TOKEN_MANDATORY_LABEL));
+  FreeSid(pSidIL);
+}
+
 #define LSASTR(s,S) LSA_STRING s; InitString(&s,S);
 
 void InitString(PLSA_STRING LsaString,LPSTR String)
@@ -227,28 +279,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       DBGTrace("LsaLogonUser failed");
       __leave;
     }
-    if (_winmajor>=6)
-    {
-      //Vista UAC: Get the elevated token!
-      TOKEN_ELEVATION_TYPE et;
-      DWORD dwSize=sizeof(et);
-      if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenElevationType,
-                              &et,dwSize,&dwSize)
-        &&(et==TokenElevationTypeLimited))
-      {
-        TOKEN_LINKED_TOKEN lt = {0}; 
-        HANDLE hAdmin=0;
-        dwSize = sizeof(lt); 
-        if (GetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
-                                &lt,dwSize,&dwSize)
-          && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
-            SecurityImpersonation,TokenPrimary,&hAdmin)) 
-        {
-          CloseHandle(hUser);
-          hUser=hAdmin;
-        }
-      }
-    }
+    GetElevatedToken(hUser);
   } // try
   __finally
   {
@@ -342,6 +373,11 @@ HANDLE LogonAsAdmin(LPTSTR UserName,LPTSTR p)
   {
     if (!LogonUser(u,d,p,LOGON32_LOGON_INTERACTIVE,0,&hUser))
       DBGTrace3("LogonUser(%s,%s) failed: %s",(LPCTSTR)UserName,(LPCTSTR)p,GetLastErrorNameStatic());
+    else
+    {
+      GetElevatedToken(hUser);
+      SetHighIL(hUser);
+    }
     if (!bWasAdmin)
     {
       st=AlterGroupMember(DOMAIN_ALIAS_RID_ADMINS,UserName,0);
@@ -657,24 +693,11 @@ HANDLE GetAdminToken(DWORD SessionID)
     if(!hShell) 
       __leave;
     //Is the Shell token a Vista Split token?
-    if (_winmajor>=6)
+    if(GetElevatedToken(hShell))
     {
-      //Vista UAC: Try to get the elevated token!
-      TOKEN_ELEVATION_TYPE et;
-      DWORD dwSize=sizeof(et);
-      if (GetTokenInformation(hShell,(TOKEN_INFORMATION_CLASS)TokenElevationType,
-                              &et,dwSize,&dwSize)
-        &&(et==TokenElevationTypeLimited))
-      {
-        TOKEN_LINKED_TOKEN lt = {0}; 
-        HANDLE hAdmin=0;
-        dwSize = sizeof(lt); 
-        if (GetTokenInformation(hShell,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
-                                &lt,dwSize,&dwSize)
-          && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
-            SecurityImpersonation,TokenPrimary,&hUser)) 
-          __leave;
-      }
+      hUser=hShell;
+      hShell=0;
+      __leave;
     }
     //Copy Logon SID from the Shell Process of SessionID:
     LogonSID=GetLogonSid(hShell);
@@ -779,24 +802,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     //0xc000005a invalid owner
     if(ntStatus != STATUS_SUCCESS)
       DBGTrace1("GetAdminToken ZwCreateToken Failed: 0x%08X",ntStatus);
-    if (_winmajor>=6)
-    {
-      //Vista UAC: Set Integrity level!
-      SID_IDENTIFIER_AUTHORITY siaMLA = {0,0,0,0,0,16}/*SECURITY_MANDATORY_LABEL_AUTHORITY*/;
-      PSID  pSidIL = NULL;
-      typedef struct _TOKEN_MANDATORY_LABEL 
-      {
-        SID_AND_ATTRIBUTES Label;
-      } TOKEN_MANDATORY_LABEL, *PTOKEN_MANDATORY_LABEL;
-      TOKEN_MANDATORY_LABEL TIL = {0};
-      AllocateAndInitializeSid(&siaMLA,1,0x00003000L/*SECURITY_MANDATORY_HIGH_RID*/,
-                                0,0,0,0,0,0,0,&pSidIL );
-      TIL.Label.Attributes = 0x00000020/*SE_GROUP_INTEGRITY*/;
-      TIL.Label.Sid        = pSidIL ;
-      SetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenIntegrityLevel,
-                          &TIL,sizeof(TOKEN_MANDATORY_LABEL));
-      FreeSid(pSidIL);
-    }
+    SetHighIL(hUser);
   }
   __finally
   {

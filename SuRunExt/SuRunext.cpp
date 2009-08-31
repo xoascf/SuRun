@@ -950,7 +950,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   {
     if(l_InitThread)
     {
-      if(WaitForSingleObject(l_InitThread,1000)==WAIT_TIMEOUT)
+      DWORD to=(GetThreadPriority(l_InitThread)==THREAD_PRIORITY_IDLE)?20:1000;
+      if(WaitForSingleObject(l_InitThread,to)==WAIT_TIMEOUT)
       {
         DBGTrace("WARNING: SuRunExt Terminating InitThread");
         TerminateThread(l_InitThread,0);
