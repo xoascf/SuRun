@@ -407,6 +407,7 @@ HANDLE GetTempAdminToken(LPTSTR UserName)
   HANDLE hUser=g_Tokens.Find(UserName);
   if (hUser)
     return hUser;
+  CTimeLog l(L"GetTempAdminToken(%s)",UserName);
   DWORD UserID=0;
   BYTE* V=0;
   DWORD nV=0;
