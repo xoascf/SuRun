@@ -205,6 +205,7 @@ __declspec(dllexport) BOOL InstallSysMenuHook()
 
 __declspec(dllexport) BOOL UninstallSysMenuHook()
 {
+  DBGTrace2("UninstallSysMenuHook init (%x,%x)",g_hookShell,g_hookMenu);
   BOOL bRet=TRUE;
   if (g_hookShell)
     bRet&=(UnhookWindowsHookEx(g_hookShell)!=0);
@@ -212,5 +213,6 @@ __declspec(dllexport) BOOL UninstallSysMenuHook()
   if(g_hookMenu)
     bRet&=(UnhookWindowsHookEx(g_hookMenu)!=0);
   g_hookMenu=NULL;
+  DBGTrace2("UninstallSysMenuHook exit (%x,%x)",g_hookShell,g_hookMenu);
   return bRet;
 }

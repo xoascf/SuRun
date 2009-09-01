@@ -53,7 +53,6 @@ DWORD WINAPI TSAThreadProc(void* p)
     TCHAR CurUserName[UNLEN+GNLEN+2];
     BOOL CurUserIsadmin;
   }TSAData={0};
-  DWORD PID=0;
   BOOL TSAThreadRunning=TRUE;
   WriteProcessMemory(hProc,&g_TSAThreadRunning,&TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
   HANDLE hEvent=0;
@@ -68,31 +67,44 @@ DWORD WINAPI TSAThreadProc(void* p)
      ||(!ReadProcessMemory(hProc,&g_TSAPID,&TSAData.CurPID,sizeof(DWORD),&s))
      ||(sizeof(DWORD)!=s))
       return CloseHandle(hProc),0;
-    //if (TSAData.CurPID!=PID)
+    //Special case: WM_QUERYENDSESSION
+    if(TSAData.CurPID==-1)
+    {
+      //ToDo:
+    }else
+    //Special case: WM_ENDSESSION
+    if(TSAData.CurPID==-2)
+    {
+      HANDLE hToken=0;
+      if ((_winmajor<6)&& OpenProcessToken(hProc,TOKEN_ALL_ACCESS,&hToken))
+      {
+        SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
+        TerminateAllSuRunnedProcesses(hToken);
+        SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+        CloseHandle(hToken);
+      }
+    }else
     {
       HANDLE h = OpenProcess(PROCESS_ALL_ACCESS,TRUE,TSAData.CurPID);
       if(h)
       {
+        _tcscpy(TSAData.CurUserName,_T("unknown"));
+        TSAData.CurUserIsadmin=FALSE;
         HANDLE hTok=0;
         if (OpenProcessToken(h,TOKEN_QUERY|TOKEN_DUPLICATE,&hTok))
         {
+          
           GetTokenUserName(hTok,TSAData.CurUserName);
           TSAData.CurUserIsadmin=IsAdmin(hTok);
           CloseHandle(hTok);
-          if(WriteProcessMemory(hProc,&g_TSAData,&TSAData,sizeof(g_TSAData),&s)
-            && (s==sizeof(g_TSAData)))
-          {
-            PID=TSAData.CurPID;
-            ResetEvent(hEvent);
-          }
-          else
-            DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
         }else
           DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
         CloseHandle(h);
       }//else
-        //DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurPID,GetLastErrorNameStatic());
+      //DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurPID,GetLastErrorNameStatic());
     }
+    WriteProcessMemory(hProc,&g_TSAData,&TSAData,sizeof(g_TSAData),&s);
+    ResetEvent(hEvent);
   }
 }
 
@@ -118,8 +130,21 @@ BOOL StartTSAThread()
   return g_TSAThreadRunning;
 }
 
+static void ShutDownSuRunProcesses()
+{
+  if (!StartTSAThread())
+    return;
+  g_TSAPID=-2;
+  SetEvent(g_TSAEvent);
+  for(;g_TSAPID!=g_TSAData.CurPID;)
+    Sleep(10);
+  g_TSAPID=0;
+}
+
 static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle,DWORD& CurPID)
 {
+  if ((g_TSAPID==-2)||(g_TSAPID==-1))
+    return -1;
   if (!StartTSAThread())
     return -1;
   HWND Wnd=GetForegroundWindow();
@@ -150,6 +175,7 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle,DWORD& Cu
 
 static DWORD LastPID=0;
 static CTimeOut BalloonTimeOut(0);
+static bool g_IconShown=FALSE;
 static void DisplayIcon()
 {
   HICON OldIcon=g_NotyData.hIcon;
@@ -223,6 +249,7 @@ static void DisplayIcon()
     g_NotyData.uVersion=NOTIFYICON_VERSION;
     Shell_NotifyIcon(NIM_SETVERSION,&g_NotyData);
   }
+  g_IconShown=TRUE;
   DestroyIcon(OldIcon);
 };
 
@@ -248,7 +275,11 @@ void DisplayMenu(HWND hWnd)
     //Close Balloon
     memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
     _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
-    Shell_NotifyIcon(NIM_MODIFY,&g_NotyData);
+    if(g_IconShown)
+    {
+      Shell_NotifyIcon(NIM_MODIFY,&g_NotyData);
+      g_IconShown=FALSE;
+    }
   }
   POINT pt;
   GetCursorPos(&pt);
@@ -275,6 +306,8 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 {
   switch (message)
   {
+  case WM_TIMER:
+    break;
   case WM_USER+1758:
     {
       switch (lParam)
@@ -303,6 +336,13 @@ LRESULT CALLBACK WndMainProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
   case WM_QUERYENDSESSION:
     {
       //ToDo: Warn, if SuRun processes are still running.
+    }
+    break;
+  case WM_ENDSESSION:
+    {
+      //ToDo: Warn, if SuRun processes are still running.
+      if (_winmajor<6)
+        ShutDownSuRunProcesses();
     }
     break;
   }
@@ -340,20 +380,30 @@ void InitTrayShowAdmin()
   g_NotyData.uFlags= NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE;
   g_NotyData.uCallbackMessage = WM_USER+1758;
   g_NotyData.uTimeout=10000;
+  SetTimer(g_NotyData.hWnd,1,333,0);
 }
 
-BOOL ProcessTrayShowAdmin(BOOL bBalloon)
+BOOL ProcessTrayShowAdmin(BOOL bShowTray,BOOL bBalloon)
 {
   g_BallonTips=bBalloon!=0;
-  DisplayIcon();
-  MSG msg;
-  int count=0;
-  while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<10))
+  if (bShowTray)
   {
+    DisplayIcon();
+  }else
+  {
+    if(g_IconShown)
+      Shell_NotifyIcon(NIM_DELETE,&g_NotyData);
+    g_IconShown=FALSE;
+  }
+  MSG msg;
+  do
+  {
+    if(!GetMessage(&msg,0,0,0))
+      return FALSE;
     TranslateMessage(&msg);
     DispatchMessage(&msg);
-  }
-  return count>0;
+  }while(PeekMessage(&msg,0,0,0,PM_NOREMOVE));
+  return TRUE;
 }
 
 void CloseTrayShowAdmin()

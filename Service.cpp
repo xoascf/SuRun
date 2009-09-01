@@ -880,7 +880,7 @@ static BOOL CALLBACK CloseAppEnum(HWND hwnd,LPARAM lParam )
     PostMessage(hwnd,WM_CLOSE,0,0) ;
     g_bKilledOne=TRUE;
   }
-  return TRUE ;
+  return TRUE;
 }
 
 void KillProcess(DWORD PID,DWORD TimeOut=5000)
@@ -2343,15 +2343,6 @@ static void HandleHooks()
   if ((ss==SERVICE_STOPPED)||(ss==SERVICE_START_PENDING))
     while ((GetTickCount()<3*60*1000)&&(CheckServiceStatus()!=SERVICE_RUNNING))
       Sleep(1000);
-#ifndef _SR32
-  StartTSAThread();
-#endif _SR32
-  if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners)) && IsAdmin())
-    return;
-  if ((!ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners))
-    && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
-    return;
-  InstallSysMenuHook();
 #ifdef _WIN64
   {
     TCHAR SuRun32Exe[4096];
@@ -2367,15 +2358,19 @@ static void HandleHooks()
     }
   }
 #endif _WIN64
-  bool TSA=FALSE;
   DWORD HkTID=0;
   //HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
   CTimeOut t;
   HKEY RegKey=0;
-  RegOpenKeyEx(HKCR,USROPTKEY(g_RunData.UserName),0,KSAM(KEY_READ),&RegKey);
+  RegOpenKeyEx(HKCR,L"CLSID\\" sGUID,0,KSAM(KEY_READ),&RegKey);
   HANDLE hEvent=CreateEvent(0,1,1,0);
   BOOL bShowTray=TRUE;
   BOOL bBaloon=FALSE;
+  BOOL bHooked=FALSE;
+  BOOL bAdmin=g_CliIsInAdmins;
+#ifndef _SR32
+  InitTrayShowAdmin();
+#endif _SR32
   for (;;)
   {
     if (WaitForSingleObject(hEvent,0)==WAIT_OBJECT_0)
@@ -2383,35 +2378,34 @@ static void HandleHooks()
       ResetEvent(hEvent);
       bShowTray=ShowTray(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
       bBaloon=ShowBalloon(g_RunData.UserName,g_CliIsInAdmins,g_CliIsInSuRunners);
-      if ((!bShowTray) && (!GetRestartAsAdmin) && (!GetStartAsAdmin))
-        break;
+      BOOL bHook=(!bAdmin)&&(GetRestartAsAdmin||GetStartAsAdmin||GetUseIATHook);
+      if (bHook && (!bHooked))
+      {
+        InstallSysMenuHook();
+        bHooked=TRUE;
+      }
+      else if (bHooked && (!bHook))
+      {
+        UninstallSysMenuHook();
+        bHooked=FALSE;
+      }
       RegNotifyChangeKeyValue(RegKey,1,REG_NOTIFY_CHANGE_NAME|REG_NOTIFY_CHANGE_LAST_SET,hEvent,TRUE);
     }
     if (t.TimedOut())
     {
       if(CheckServiceStatus()!=SERVICE_RUNNING)
         break;
-      //g_RunData.Groups=UserIsInSuRunnersOrAdmins();
       t.Set(10000);
     }
 #ifndef _SR32
-    if (bShowTray)
-    {
-      if(!TSA)
-        InitTrayShowAdmin();
-      TSA=TRUE;
-      Sleep(ProcessTrayShowAdmin(bBaloon)?55:333);
-    }else
-#endif _SR32
-    {
-      if(TSA)
-        CloseTrayShowAdmin();
-      TSA=FALSE;
-      Sleep(1000);
-    }
+    if(!ProcessTrayShowAdmin(bShowTray,bBaloon))
+      break;
   }
-  if(TSA)
-    CloseTrayShowAdmin();
+  CloseTrayShowAdmin();
+#else _SR32
+    Sleep(1000);
+  }
+#endif _SR32
   UninstallSysMenuHook();
 //  if(WaitForSingleObject(hHkThread,0)==WAIT_TIMEOUT)
 //    PostThreadMessage(HkTID,WM_QUIT,0,0);

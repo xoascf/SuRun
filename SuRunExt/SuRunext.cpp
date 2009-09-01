@@ -744,7 +744,7 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
             &&(strcmp(tsrc.SourceName,"SuRun")==0))
           {
             TerminateProcess(hp,0);
-            DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
+            //DBGTrace1("SuRunLogoffUser: PID:%d KILLED",PID);
             RetVal=1;
           }//else
             //DBGTrace1("SuRunLogoffUser: PID:%d was NOT killed",PID);
@@ -761,15 +761,14 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
   return RetVal;
 }
 
-//Winlogon Logoff event
-VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
+__declspec(dllexport) void TerminateAllSuRunnedProcesses(HANDLE hToken)
 {
   //Terminate all Processes that have the same logon SID and 
   //"SuRun" as the Token source name
-  PSID LogonSID=GetLogonSid(Info->hToken);
+  PSID LogonSID=GetLogonSid(hToken);
   TOKEN_SOURCE Logonsrc;
   DWORD n=0;
-  GetTokenInformation(Info->hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
+  GetTokenInformation(hToken,TokenSource,&Logonsrc,sizeof(Logonsrc),&n);
   //EnumProcesses does not work here! need to call WTSEnumerateProcesses
   n=0;
   WTS_PROCESS_INFO* ppi=0;
@@ -797,7 +796,12 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
     }
   }
   free(LogonSID);
-	return;
+}
+
+//Winlogon Logoff event
+VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
+{
+  TerminateAllSuRunnedProcesses(Info->hToken);
 }
 
 //////////////////////////////////////////////////////////////////////////////
