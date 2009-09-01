@@ -1605,7 +1605,7 @@ static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
 //  InstallRegistry
 // 
 //////////////////////////////////////////////////////////////////////////////
-bool g_bKeepRegistry=FALSE;
+BOOL g_bKeepRegistry=FALSE;
 bool g_bDelSuRunners=TRUE;
 bool g_bSR2Admins=FALSE;
 HWND g_InstLog=0;
@@ -2064,6 +2064,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       SendDlgItemMessage(hwnd,IDC_QUESTION,WM_SETFONT,
         (WPARAM)CreateFont(-24,0,0,0,FW_BOLD,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
       CheckDlgButton(hwnd,IDC_RUNSETUP,1);
+      g_bKeepRegistry=GetSROption(L"UpdKeepSettings",0);
       CheckDlgButton(hwnd,IDC_KEEPREGISTRY,g_bKeepRegistry);
       CheckDlgButton(hwnd,IDC_OWNERGROUP,1);
       if (GetOwnerAdminGrp)
@@ -2109,6 +2110,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           //Settings
           g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
+          SetSROption(L"UpdKeepSettings",(DWORD)g_bKeepRegistry,0);
           if (IsDlgButtonChecked(hwnd,IDC_OWNERGROUP))
             SetOwnerAdminGrp(1);
           //Hide Checkboxes, show Listbox
@@ -2203,6 +2205,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         {
           //Settings
           g_bKeepRegistry=(IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0);
+          SetSROption(L"UpdKeepSettings",(DWORD)g_bKeepRegistry,0);
           if (GetDlgItem(hwnd,IDC_DELSURUNNERS)) //Uninstall:
           {
             g_bDelSuRunners=(!g_bKeepRegistry) && (IsDlgButtonChecked(hwnd,IDC_DELSURUNNERS)!=0);
@@ -2247,6 +2250,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         }
       case MAKELPARAM(IDC_KEEPREGISTRY,BN_CLICKED):
         g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
+        SetSROption(L"UpdKeepSettings",(DWORD)g_bKeepRegistry,0);
         EnableWindow(GetDlgItem(hwnd,IDC_DELSURUNNERS),!g_bKeepRegistry);
         //fall through:
       case MAKELPARAM(IDC_DELSURUNNERS,BN_CLICKED):
