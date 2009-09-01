@@ -1,7 +1,5 @@
 Done, to be tested:
 ---------------------------
-* fixed TSA stuff
-
 ToDo
 ---------------------
 * GUI for SwitchToUser
@@ -29,6 +27,17 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 Beta 15 - 2009-09-01:
+-----------------------------------
+* FIX: Fixed some issues with SuRuns Tray symbol
+* CHG: In Windows before Vista, when the user logs off, SuRun closes all 
+  "Start as administrator"/"Run as..." programs. Thus the user management does 
+  not complain about the user registry being accessed while it is unloaded.
+* CHG: "SuRun /SYSMENUHOOK" will always keep running to be able to close all 
+  processes created by SuRun when receiving WM_ENDSESSION.
+* CHG: SuRun settings uncheck "Install new Hardware automagically as 
+  administrator" if IAT Hook is disabled
 
 SuRun 1.2.0.7 Beta 14 - 2009-08-31:
 -----------------------------------

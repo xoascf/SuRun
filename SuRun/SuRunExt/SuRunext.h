@@ -18,6 +18,7 @@ extern "C"
 {
 __declspec(dllexport) void RemoveShellExt();
 __declspec(dllexport) void InstallShellExt();
+__declspec(dllexport) void TerminateAllSuRunnedProcesses(HANDLE hToken);
 };
 
 // {2C7B6088-5A77-4d48-BE43-30337DCA9A86}

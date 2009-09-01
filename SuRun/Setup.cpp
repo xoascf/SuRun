@@ -844,7 +844,8 @@ static void SaveUserFlags()
     LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
     SetNoRunSetup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RUNSETUP)==0);
     SetRestrictApps(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_RESTRICTED)!=0);
-    SetInstallDevs(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HW_ADMIN)!=0);
+    if(GetUseIATHook)
+      SetInstallDevs(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HW_ADMIN)!=0);
     SetHideFromUser(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HIDESURUN)!=0);
     SetReqPw4Setup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_REQPW4SETUP)!=0);
     if(!IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
@@ -925,7 +926,7 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
     EnableWindow(GetDlgItem(hwnd,IDC_HIDESURUN),1);
     CheckDlgButton(hwnd,IDC_RESTRICTED,GetRestrictApps(u));
-    CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(u));
+    CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseIATHook && GetInstallDevs(u));
     CheckDlgButton(hwnd,IDC_HIDESURUN,GetHideFromUser(u));
     if(GetNoRunSetup(u))
     {
@@ -965,7 +966,7 @@ static void UpdateUser(HWND hwnd)
       CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_REQPW4SETUP,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
-      CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(u));
+      CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseIATHook && GetInstallDevs(u));
       CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
     }
     EnableWindow(hWL,true);
@@ -1563,7 +1564,7 @@ void SetRecommendedSettings()
     int User=g_SD->CurUser;
     for (g_SD->CurUser=0;g_SD->CurUser<g_SD->Users.GetCount();g_SD->CurUser++)
     {
-      CheckDlgButton(h,IDC_HW_ADMIN,GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
+      CheckDlgButton(h,IDC_HW_ADMIN,GetUseIATHook && GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
       SaveUserFlags();
     }
     g_SD->CurUser=User;
@@ -1999,7 +2000,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
           CheckDlgButton(hwnd,IDC_REQPW4SETUP,BST_UNCHECKED);
           CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
-          CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
+          CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseIATHook && GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
           CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
         }else
         {
@@ -2008,7 +2009,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bBal);
           EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
           EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
-          CheckDlgButton(hwnd,IDC_HW_ADMIN,GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
+          CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseIATHook && GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
         }
         UpdateWhiteListFlags(GetDlgItem(hwnd,IDC_WHITELIST));
         return TRUE;
@@ -2144,6 +2145,8 @@ ApplyChanges:
       SetTestReqAdmin(IsDlgButtonChecked(hwnd,IDC_REQADMIN));
       SetShowAutoRuns(IsDlgButtonChecked(hwnd,IDC_SHOWTRAY));
       EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_HW_ADMIN),GetUseIATHook/*GetUseSVCHook*/);
+      LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
+      CheckDlgButton(g_SD->hTabCtrl[1],IDC_HW_ADMIN,GetUseIATHook && GetInstallDevs(u));
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:
