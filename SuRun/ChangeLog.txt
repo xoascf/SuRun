@@ -1,43 +1,6 @@
 Done, to be tested:
 ---------------------------
 
-SuRun 1.2.0.7 - 2009-09-05:
----------------------------
-* NEW: Added preliminary Spanish/Argentina resources
-* NEW: Added check for "*UPGRADE*" in file names that need admin rights
-* NEW: IATHook now also hooks SwitchDesktop
-* NEW: SuRun supports user bitmaps in Vista and Windows 7 (HKLM\SAM\SAM\
-    Domains\Account\Users\<ID>,UserTile)
-* NEW: Implemented Fast User Swithing via command line parameters 
-    "SuRun /SwitchTo <[domain\]user|Session>".
-* CHG: "SuRun /SYSMENUHOOK" will always keep running to be able to close all 
-    processes created by SuRun when receiving WM_ENDSESSION
-* CHG: Less annoying Balloon Tips
-* CHG: SuRun needs to store the password of domain users
-* CHG: If blank password use is disabled, SuRun shows a less agressive 
-    "The following Administrator accounts have no password" warning
-* CHG: In Windows 2000, XP, 2003, the SuRun service injects SuRunExt.dll into 
-    services.exe to enable installing hardware without entering a password
-* CHG: Command line parameters for programs to be started are not modified
-* CHG: Hovering the mouse over SuRuns Tray Message Windows show a Hand cursor
-* CHG: SuRun makes Windows turn off the "AppStarting" mouse cursor
-* FIX: Reduced registry access from "SuRun /Sysmenuhook"
-* FIX: Changed SysmenuHook to modify main sysmenu only, not sub menus
-* FIX: Gregory Maynard-Hoare reported a vunerability, present in SuRun 1.2.0.0 
-    to SuRun 1.2.0.7b12. Any dll using hooks was injected (by the Windows OS!) 
-    into elevated processes started by SuRun. 
-    Thus any program could run elevated code.
-* FIX: SuRuns IAT-Hook does not suspend Threads anmore in a process before 
-    modifying the IAT. Suspending threads caused NTVDM to not work properly.
-* FIX: IAT-Hook hooks new System dlls in Windows 7
-* FIX: IATHook GPF'd with unnamed modules
-* FIX: Desktop background did not respect negative monitor area start values
-* CHG: Got rid of the "virtualized" status in Windows 7 with new app.manifest
-* FIX: Screen-Fade did not work in Windows 7
-* FIX: SuRuns WatchDog event is set in a timer proc instead of a separate thread.
-    This insures that if SuRuns GUI is blocked, the WathDog shows up.
-* FIX: SuRuns WatchDog did not terminate if SuRuns GUI was "killed"
-
 ToDo
 ---------------------
 * GUI for SwitchToUser
@@ -64,6 +27,41 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 rc 1 - 2009-09-05 (changes to SuRun 1.2.6.0):
+--------------------------------
+* NEW: Added preliminary Spanish resources
+* NEW: Added check for "*UPGRADE*" in file names that need admin rights
+* NEW: IATHook now also hooks SwitchDesktop
+* NEW: SuRun supports user bitmaps in Vista and Windows 7 (HKLM\SAM\SAM\
+    Domains\Account\Users\<ID>,UserTile)
+* NEW: Implemented Fast User Swithing via command line parameters 
+    "SuRun /SwitchTo <[domain\]user|Session>".
+* CHG: "SuRun /SYSMENUHOOK" will always keep running to be able to close all 
+    processes created by SuRun when receiving WM_ENDSESSION
+* CHG: Less annoying Balloon Tips
+* CHG: SuRun needs to store the password of domain users
+* CHG: If blank password use is disabled, SuRun shows a less agressive 
+    "The following Administrator accounts have no password" warning
+* CHG: In Windows 2000, XP, 2003, SuRun intercepts process creation from 
+    services.exe, to enable installing hardware without entering a password
+* CHG: Command line parameters for programs to be started are not modified
+* CHG: Hovering the mouse over SuRuns Tray Message Windows show a Hand cursor
+* CHG: SuRun makes Windows turn off the "AppStarting" mouse cursor
+* FIX: Reduced registry access from "SuRun /Sysmenuhook"
+* FIX: Changed SysmenuHook to modify main sysmenu only, not sub menus
+* FIX: Gregory Maynard-Hoare reported a vunerability, present in SuRun 1.2.0.0 
+    to SuRun 1.2.0.7b12. Any dll using hooks was (by the Windows OS!) injected 
+    into elevated processes started by SuRun. 
+    Thus any program could run elevated code.
+* FIX: IATHook GPF'd with unnamed modules
+* FIX: Made hooks NTVDM and Windows 7 compatible
+* FIX: Desktop background did not respect negative monitor area start values
+* CHG: Got rid of the "virtualized" status in Windows 7 with new app.manifest
+* FIX: Screen-Fade did not work in Windows 7
+* FIX: SuRuns WatchDog event is set in a timer proc instead of a separate thread.
+    This insures that if SuRuns GUI is blocked, the WathDog shows up.
+* FIX: SuRuns WatchDog did not terminate if SuRuns GUI was "killed"
 
 SuRun 1.2.0.7 Beta 15 - 2009-09-01:
 -----------------------------------

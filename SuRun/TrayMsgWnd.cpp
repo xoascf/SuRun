@@ -118,7 +118,7 @@ CTrayMsgWnd::CTrayMsgWnd(LPCTSTR DlgTitle,LPCTSTR Text,int IconId,DWORD TimeOut)
     m_wr.right=200;
     m_wr.bottom=800;
     DrawText(MemDC,Text,-1,&m_wr,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
-    //Limit the width the screen width
+    //Limit the width to the screen width
     int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)-40;
     if (m_wr.right-m_wr.left>maxDX)
     {

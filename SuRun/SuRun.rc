@@ -951,10 +951,10 @@ BEGIN
                     IDC_STATIC,55,23,261,19
     GROUPBOX        "What should SuRun do if this program is started ""As Administrator""?",
                     IDC_STATIC,16,43,330,64,WS_GROUP
-    ICON            IDI_LISTICON2,IDC_STATIC,24,55,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON3,IDC_STATIC,24,68,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON8,IDC_STATIC,24,81,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON6,IDC_STATIC,24,94,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,24,55,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,24,68,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON8,IDC_STATIC,24,81,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,24,94,20,20,SS_REALSIZEIMAGE
     CONTROL         "ask if this program can be started with elevated rights. (default)",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,40,55,300,10
@@ -966,9 +966,9 @@ BEGIN
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,40,94,300,10
     GROUPBOX        "How should SuRuns execution hooks handle this program?",
                     IDC_STATIC,16,110,330,52,WS_GROUP
-    ICON            IDI_LISTICON1,IDC_STATIC,24,122,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON,IDC_STATIC,24,135,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON7,IDC_STATIC,24,148,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,24,122,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,24,135,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,24,148,20,20,SS_REALSIZEIMAGE
     CONTROL         "Guess if the program needs elevated rights. (default)",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,40,122,300,10
@@ -977,7 +977,7 @@ BEGIN
     CONTROL         "No automagic. Ignore this program.",IDC_AUTO3,"Button",
                     BS_AUTORADIOBUTTON,40,148,300,10
     DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Abbrechen",IDCANCEL,304,176,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,304,176,50,14
 END
 
 IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
@@ -1447,7 +1447,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Switch users..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1459,7 +1459,7 @@ BEGIN
     RTEXT           "&User name:",IDC_USRST,62,77,42,8
     RTEXT           "&Password:",IDC_PWDST,62,91,42,8
     EDITTEXT        IDC_PASSWORD,107,89,149,12,ES_AUTOHSCROLL
-    CONTROL         "Kennwort speichern",IDC_STOREPASS,"Button",
+    CONTROL         "remember password",IDC_STOREPASS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,107,104,149,10
     DEFPUSHBUTTON   "OK",IDOK,150,117,52,14
     PUSHBUTTON      "Cancel",IDCANCEL,204,117,52,14
@@ -1652,6 +1652,50 @@ BEGIN
 END
 
 #endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Spanish (Castilian) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESP)
+#ifdef _WIN32
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_FUSDLG DIALOGEX 0, 0, 263, 143
+STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Switch users..."
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
+    ICON            IDI_SHIELD,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
+    LTEXT           "You need to enter the passwort for the user to switch to his/her logon session.",
+                    IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,73,47,44
+    RTEXT           "&Nombre de usuario:",IDC_USRST,62,77,42,8
+    RTEXT           "&Clave:",IDC_PWDST,62,91,42,8
+    EDITTEXT        IDC_PASSWORD,107,89,149,12,ES_AUTOHSCROLL
+    CONTROL         "recordar clave",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,107,104,149,10
+    DEFPUSHBUTTON   "Aceptar",IDOK,150,117,52,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,204,117,52,14
+    CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,135,
+                    263,9
+    EDITTEXT        IDC_USER,107,74,149,12,ES_AUTOHSCROLL
+END
+
+#endif    // Spanish (Castilian) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -2356,581 +2400,13 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Castilian) (unknown sub-lang: 0xB) resources
+// Spanish (Modern) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESS)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
 #ifdef _WIN32
-LANGUAGE LANG_SPANISH, 0xB
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
 #pragma code_page(1252)
 #endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
-BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Escritorio Seguro",IDC_EXTOPT2,77,0,297,52,WS_GROUP
-    CONTROL         "Mostrar escritorio &difuso como fondo",IDC_BLURDESKTOP,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,
-                    11,283,11
-    CONTROL         "Esfumar escritorio en",IDC_FADEDESKTOP,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,23,283,11
-    CONTROL         "Automaticamente presionar ""Cancelar""",IDC_USE_C_TO,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,
-                    38,126,9
-    EDITTEXT        IDC_CANCEL_TO,213,36,18,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "s",IDC_STATIC,236,38,8,8
-    CONTROL         "mostrar tiempo remanente con barra de progreso",
-                    IDC_SHOW_C_TO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,250,
-                    38,119,10
-    GROUPBOX        "Seguridad",IDC_EXTOPT3,77,56,297,49,WS_GROUP
-    CONTROL         "Usuarios deben introducir clave",IDC_ASKPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,68,116,11
-    EDITTEXT        IDC_ASKTIMEOUT,202,67,18,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "periodo de gracia en MINs antes de preguntar otra vez",
-                    IDC_STATIC,226,68,143,11,NOT WS_GROUP
-    LTEXT           "Mostrar alerta, si Administradores no tienen clave:",
-                    IDC_STATIC,83,83,114,17
-    COMBOBOX        IDC_WARNADMIN,201,83,166,30,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Integracion a la Consola",IDC_STATIC,75,110,297,75,
-                    WS_GROUP
-    CONTROL         "Mostrar ""Panel de Control como administrador"" en el menu contexto del escritorio",
-                    IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    120,283,11
-    CONTROL         "Mostrar ""'SuRun cmd' aqui"" en el menu contexto de las carpetas",
-                    IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    133,283,11
-    CONTROL         "Mostrar ""'SuRun Explorador' aqui"" en el menu contexto de las carpetas",
-                    IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    145,283,11
-    CONTROL         "Mostrar ""Reiniciar como administrador"" en el menu Sistema de las aplicaciones",
-                    IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    83,157,283,11
-    CONTROL         "Mostrar ""Start como administrador"" en el menu Sistema de las aplicaciones",
-                    IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
-                    170,283,11
-    GROUPBOX        "Conveniencia",IDC_STATIC,4,187,206,45
-    CONTROL         "Mostrar opciones de SuRun para usuarios experimentados",
-                    IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,
-                    198,185,10
-    PUSHBUTTON      "Aplicar opciones recomendadas para Usuarios comunes",
-                    IDC_SIMPLESETUP,14,211,185,14
-    GROUPBOX        "Respaldar",IDC_STATIC,215,187,157,45
-    CTEXT           "Todas las opciones de SuRun",IDC_STATIC,219,198,148,8
-    PUSHBUTTON      "Respaldar...",IDC_EXPORT,224,211,63,14
-    PUSHBUTTON      "Restablecer...",IDC_IMPORT,301,211,63,14
-END
-
-IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,4,2,40,37
-    LTEXT           "SuRunner",IDC_USRST,50,8,33,8
-    COMBOBOX        IDC_USER,86,5,192,217,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Agregar...",IDC_ADDUSER,281,4,50,14
-    PUSHBUTTON      "Borrar",IDC_DELUSER,334,4,50,14
-    CONTROL         "El usuario puede modificar las opciones de SuRun",
-                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,
-                    202,10
-    CONTROL         "Solicitar clave de usuario para las opciones de SuRun",
-                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
-                    29,202,10
-    CONTROL         "El Usuario puede iniciar aplicaciones con privilegios elevados solo si estan predefinidas",
-                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
-                    39,202,10
-    CONTROL         "Ocultar SuRun para este Usuario",IDC_HIDESURUN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
-    CONTROL         "Mostrar estado de Usuario en la Barra de Tareas",
-                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    252,29,137,10
-    CONTROL         "Mostrar estado de Usuario como 'Ayuda-Emergente'",
-                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    252,39,137,10
-    CONTROL         "Install new Hardware automagically as administrator",
-                    IDC_HW_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,49,
-                    201,10
-    GROUPBOX        "Lista de programas para el Usuario seleccionado (Los cambios son instantaneos, aun presionando el boton 'Cancelar').",
-                    IDS_GRPDESC,6,59,378,174
-    CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
-                    LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
-                    WS_TABSTOP,8,70,373,142
-    PUSHBUTTON      "Exportar...",IDC_EXPORT,55,216,50,14
-    PUSHBUTTON      "Importar...",IDC_IMPORT,109,216,50,14
-    PUSHBUTTON      "&Agregar...",IDC_ADDAPP,224,216,50,14
-    PUSHBUTTON      "&Editar...",IDC_EDITAPP,278,216,50,14
-    PUSHBUTTON      "&Borrar",IDC_DELETE,331,216,50,14
-    LTEXT           "Lista de Programas",IDC_IMEXSTATIC,9,219,43,8
-END
-
-IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
-BEGIN
-    GROUPBOX        "Intentar iniciar ciertos programas AUTOMATICAMENTE con privilegios elevados",
-                    IDC_STATIC,10,3,361,227
-    LTEXT           "Para iniciar automaticamente programas con privilegios elevados, al menos una de las siguientes dos opciones debe ser indicada:",
-                    IDC_STATIC,13,13,354,8
-    CONTROL         "Instalar filtro para interceptar la ejecucion de programa en la interfaz de usuario de Windows",
-                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,23,
-                    319,10
-    LTEXT           "Esta opcion instala un filtro de sistema que sera invocado cuando la consola de windows intente iniciar una aplicacion. SuRun puede luego decidir si inicia la aplicacion con privilegios elevados.",
-                    IDC_STATIC,31,33,335,17
-    LTEXT           "Esta opcion no puede detectar si un programa quiere crear un proceso directamente sin llamar a la consola. Si desea que SuRun sea capaz de interceptar la creacion de este proceso, necesita habilitar la opcion debajo.",
-                    IDC_STATIC,31,50,335,16
-    CONTROL         "Especificar una Intercepcion para todos los procesos que directamente ejecuten aplicaciones",
-                    IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,68,
-                    241,10
-    LTEXT           "Con esta opcion deshabilitada SuRun no podra iniciar procesos automaticamente (en Windows Vista muchos de ellos) con privilegios elevados.",
-                    IDC_STATIC,31,77,335,17
-    LTEXT           "Activando esta opcion, en algunos raros casos, puede causar incompatibilidad con algunos programas.\nEn caso de tal incompatibilidad se puede deshabilitar la intercepcion del programa en la 'Lista Negra' debajo.",
-                    IDC_STATIC,31,94,335,17
-    CONTROL         "Also set a hook into services and administrative processes. (System restart required!)",
-                    IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,112,305,10
-    LTEXT           "Si una aplicacion no trabaja como lo haria normalmente luego de activar una o ambas opciones arriba, Ud. puede deshabilitar la intercepcion de SuRun en este programa ingresandolo en la Lista Negra.",
-                    IDC_STATIC,20,125,256,27
-    PUSHBUTTON      "Lista Negra...",IDC_BLACKLIST,293,131,57,14
-    CONTROL         "Intentar detectar si aplicaciones desconocidas necesitan iniciarse con privilegios elevados.",
-                    IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,155,335,10
-    LTEXT           "Si Ud. deshabilita esta Opcion, SuRun solo iniciara los programas predefinidos automaticamente con privilegios elevados. De esta manera ningun programa de Intalacion (etc.) es detectado, ni corre con privilegios elevados.",
-                    IDC_STATIC,31,167,335,17
-    CONTROL         "Mostrar un mensaje cuando un programa ha sido iniciado automaticamente",
-                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    187,241,10
-    LTEXT           "Con esta opcion activa, SuRun mostrara una ventana con un mensaje, abajo a la derecha del escritorio, cuando un programa fue iniciado automaticamente con privilegios elevados. Este mensaje es desechado luego de 20 segundos.",
-                    IDC_STATIC,31,198,335,17
-    CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",
-                    IDC_STATIC,14,217,356,8
-END
-
-IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
-STYLE DS_ABSALIGN | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
-    WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "SuRun %s - Configuraciones"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
-                    WS_TABSTOP,0,0,396,252
-    PUSHBUTTON      "&Aplicar",ID_APPLY,220,256,50,14
-    DEFPUSHBUTTON   "&Guardar",IDOK,279,256,50,14
-    PUSHBUTTON      "&Cancelar",IDCANCEL,338,256,50,14
-END
-
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Opciones del programa"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
-    LTEXT           "Linea de comandos",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Comodines '*' y '?' estan soportados.\nIMPORTANTE: Si el comando contiene espacios, debe ser puesto entre comillas.",
-                    IDC_STATIC,55,23,261,19
-    GROUPBOX        "Que deberia hacer SuRun si este programa es iniciado ""como administrador""?",
-                    IDC_STATIC,16,43,330,64,WS_GROUP
-    ICON            IDI_LISTICON2,IDC_STATIC,24,55,20,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON3,IDC_STATIC,24,68,20,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON8,IDC_STATIC,24,81,20,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON6,IDC_STATIC,24,94,20,20,SS_REALSIZEIMAGE
-    CONTROL         "Preguntar si este programa puede ser iniciado con privilegios elevados. (por defecto)",
-                    IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,40,55,300,10
-    CONTROL         "Automaticamente iniciar este programa con privilegios elevados.",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,40,68,300,10
-    CONTROL         "Automaticamente iniciar este programa con privilegios elevados y nunca preguntar por una Clave.",
-                    IDC_NOASK4,"Button",BS_AUTORADIOBUTTON,40,81,300,10
-    CONTROL         "NUNCA iniciar este programa con privilegios elevados.",
-                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,40,94,300,10
-    GROUPBOX        "Como deberian las intercepciones de SuRun manipular este programa?",
-                    IDC_STATIC,16,110,330,52,WS_GROUP
-    ICON            IDI_LISTICON1,IDC_STATIC,24,122,20,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON,IDC_STATIC,24,135,20,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON7,IDC_STATIC,24,148,20,20,SS_REALSIZEIMAGE
-    CONTROL         "Adivinar si el programa necesita privilegios elevados. (por defecto)",
-                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,40,122,300,10
-    CONTROL         "Iniciar el programa automaticamente con privilegios elevados.",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,40,135,300,10
-    CONTROL         "No automatico. Ignorar este programa.",IDC_AUTO3,"Button",
-                    BS_AUTORADIOBUTTON,40,148,300,10
-    DEFPUSHBUTTON   "&Aceptar",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancelar",IDCANCEL,304,176,50,14
-END
-
-IDD_LOGONDLG DIALOGEX 0, 0, 263, 143
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "Autorizacion requerida"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Identificar a Ud. mismo como persona autorizada.",
-                    IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
-    LTEXT           "Si Ud. no esta seguro de lo que esto significa, presionar 'Cancelar'!",
-                    IDC_HINT2,58,70,198,8
-    RTEXT           "&Nombre de usuario:",IDC_USRST,58,84,37,8
-    RTEXT           "&Clave:",IDC_PWDST,58,98,37,8
-    COMBOBOX        IDC_USER,98,82,158,30,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PASSWORD,98,97,158,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Aceptar",IDOK,153,115,50,14
-    PUSHBUTTON      "Cancelar",IDCANCEL,206,115,50,14
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,73,47,44
-    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,134,263,9
-END
-
-IDD_CURUSRLOGON DIALOGEX 0, 0, 289, 215
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "Clave requerida"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
-    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
-    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Si la aplicacion deberia ser iniciada con privilegios administrativos, ingresar su clave.\r\n\r\nSi no, presionar 'Cancelar'!",
-                    IDC_HINT,48,74,234,43,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,6,127,47,46
-    RTEXT           "&Nombre de usuario:",IDC_USRST,64,137,33,8
-    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
-    RTEXT           "&Clave:",IDC_PWDST,64,151,35,8
-    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_AUTOHSCROLL
-    CONTROL         "No hacer esta pregunta otra vez para este programa",
-                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
-                    163,182,10
-    CONTROL         "Automaticamente correr este programa con privilegios elevados.",
-                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    100,174,182,10
-    DEFPUSHBUTTON   "Aceptar",IDOK,179,189,50,14
-    PUSHBUTTON      "Cancelar",IDCANCEL,232,189,50,14
-    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,207,289,9
-END
-
-IDD_CURUSRACK DIALOGEX 0, 0, 289, 215
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "Autorizacion requerida"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
-    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
-    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    LTEXT           "Si la aplicacion deberia ser iniciada con privilegios administrativos, Presionar 'Aceptar'.\r\n\r\nSi no, presionar 'Cancelar'!",
-                    IDC_HINT,48,73,234,44,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,6,127,47,46
-    RTEXT           "&Nombre de usuario:",IDC_USRST,64,137,33,8
-    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
-    RTEXT           "&Clave:",IDC_PWDST,64,151,35,8
-    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
-    CONTROL         "No hacer esta pregunta otra vez para este programa",
-                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
-                    163,182,10
-    CONTROL         "Automaticamente correr este programa con privilegios elevados.",
-                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    100,174,182,10
-    PUSHBUTTON      "Aceptar",IDOK,179,189,50,14
-    DEFPUSHBUTTON   "Cancelar",IDCANCEL,232,189,50,14
-    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,207,289,9
-END
-
-IDD_SELUSER DIALOG DISCARDABLE  0, 0, 247, 227
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Agregar usuario al grupo de SuRunners"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Por favor, seleccionar un usuario que deberia ser agregado al grupo de 'SuRunners':",
-                    IDC_STATIC,7,4,233,8
-    CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,15,233,141
-    CONTROL         "mostrar dominios de usuarios",IDC_ALLUSERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,7,157,233,10
-    LTEXT           "o especificar un dominio de usuario manualmente en la forma 'dominio\\usuario':",
-                    IDC_STATIC,7,171,233,8
-    EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,248,1
-    DEFPUSHBUTTON   "&Aceptar",IDOK,130,208,50,14
-    PUSHBUTTON      "&Cancelar",IDCANCEL,188,208,50,14
-END
-
-IDD_INSTALL DIALOGEX 0, 0, 364, 126
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
-    WS_CAPTION
-CAPTION "SuRun %s - Instalacion"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "&Instalar >>",IDOK,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
-    LTEXT           "Quiere instalar SuRun?",IDC_QUESTION,39,7,317,25,
-                    SS_CENTERIMAGE
-    CONTROL         "Iniciar 'Configuraciones de SuRun' luego de la instalacion",
-                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
-                    335,10
-    LTEXT           "Para seguridad la siguiente politica de grupo debe ser activada:",
-                    IDC_OWNGRPST,18,60,335,8
-    CONTROL         "Especificar 'Administradores' en vez de 'Object creator' como propietario por defecto para objetos credos por administradores.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Cancelar",IDCANCEL,215,105,68,14
-    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
-                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
-                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-END
-
-IDD_UPDATE DIALOGEX 0, 0, 364, 126
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
-    WS_CAPTION
-CAPTION "SuRun %s - Actualizacion"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "&Actualizar >>",IDOK,291,107,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
-    LTEXT           "Quiere reemplazar SuRun?",IDC_QUESTION,40,7,316,25,
-                    SS_CENTERIMAGE
-    LTEXT           "Si Ud. modifico el menu de contexto, por favor seleccione la siguiente opcion:",
-                    IDC_KEEPREGST,14,41,335,8
-    CONTROL         "Conservar las asociaciones de SuRun, tal como estan ahora",
-                    IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    14,50,335,10
-    PUSHBUTTON      "&Cancelar",IDCANCEL,217,107,68,14
-    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
-                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
-                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-END
-
-IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
-    WS_CAPTION
-CAPTION "Remover SuRun"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "&Remover >>",IDIGNORE,289,105,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
-    LTEXT           "Quiere desinstalar SuRun ahora?",IDC_QUESTION,39,7,317,
-                    25,SS_CENTERIMAGE
-    CONTROL         "Conservar configuraciones de SuRun",IDC_KEEPREGISTRY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,50,317,10
-    CONTROL         "Borrar Grupo 'SuRunners'",IDC_DELSURUNNERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,17,64,317,10
-    CONTROL         "Hacer Administradores locales miembros de 'SuRunners'",
-                    IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    317,10
-    PUSHBUTTON      "&Cancelar",IDCANCEL,215,105,68,14
-    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
-                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
-                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-END
-
-IDD_RUNASDLG DIALOGEX 0, 0, 263, 142
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "Ejecutar como..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
-    LTEXT           "Identificar a Ud. mismo como persona autorizada.",
-                    IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
-    RTEXT           "&Nombre de usuario:",IDC_USRST,58,77,37,8
-    COMBOBOX        IDC_USER,98,75,158,30,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    RTEXT           "&Clave:",IDC_PWDST,58,91,37,8
-    EDITTEXT        IDC_PASSWORD,98,90,158,12,ES_AUTOHSCROLL
-    CONTROL         "recordar clave",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,98,104,158,10
-    DEFPUSHBUTTON   "Aceptar",IDOK,153,116,50,14
-    PUSHBUTTON      "Cancelar",IDCANCEL,206,116,50,14
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,73,47,44
-    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
-                    PBS_SMOOTH,0,134,263,9
-END
-
-IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Lista Negra de Intercepcion"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "No interceptar las siguientes aplicaciones:",IDC_STATIC,
-                    7,4,233,8
-    CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
-                    LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
-                    WS_TABSTOP,7,15,233,141
-    CTEXT           "Comodines '*' y '?' estan soportados.",IDC_STATIC,8,160,
-                    233,10
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
-    PUSHBUTTON      "&Agregar...",IDC_ADDAPP,10,179,46,14
-    PUSHBUTTON      "&Editar",IDC_EDITAPP,60,179,50,14
-    PUSHBUTTON      "&Borrar",IDC_DELETE,114,179,50,14
-    DEFPUSHBUTTON   "&Listo",IDOK,192,179,50,14
-END
-
-IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Agregar programas a la Lista Negra"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,38,361,1
-    LTEXT           "Linea de comandos",-1,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Comodines '*' y '?' estan soportados.",-1,64,25,252,8
-    DEFPUSHBUTTON   "&Aceptar",IDOK,241,45,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancelar",IDCANCEL,304,45,50,14
-END
-
-IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
-BEGIN
-    GROUPBOX        "Mostrar un icono en el area de notificacion de la barra de tareas para no miembros del grupo 'SuRunners'",
-                    IDC_STATIC,3,4,370,37
-    LTEXT           "Mostrar estado de usuario para el programa activo en la 'bandeja' de la barra de tareas",
-                    IDC_STATIC,11,16,201,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,219,14,99,30,CBS_DROPDOWNLIST | 
-                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Mostrar notificaciones para programas activos corriendo con diferentes credenciales de usuario",
-                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    27,349,10
-    GROUPBOX        "Si un no usuario de 'SuRunners' usa SuRun:",IDC_STATIC,
-                    3,46,370,48
-    CONTROL         "Nunca preguntar a Administradores reales si quiere ser miembro de 'SuRunners'",
-                    IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    57,349,8
-    CONTROL         "Never ask anyone to become member of 'SuRunners'",
-                    IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    69,349,8
-    CONTROL         "Ocultar SuRun a los usuarios que no son miembros del Grupo 'SuRunners'",
-                    IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
-                    81,349,8
-    GROUPBOX        "Ajustes convenientes (Estas son configuraciones de Windows que Ud. puede ajustar con SuRun)",
-                    IDC_EXTOPT,3,99,370,79,WS_GROUP
-    CONTROL         "Reemplazar Windows' 'Ejecutar como...' con 'Ejecutar como...' de SuRun",
-                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,11,110,349,9
-    CONTROL         "Permitir a los 'SuRunners' modificar (y mostrar) la hora del sistema.",
-                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,123,349,11
-    CONTROL         "Permitir a los 'SuRunners' cambiar 'Opciones de Energia' y seleccionar esquemas de energia.",
-                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,137,349,11
-    CONTROL         "Mostrar notificaciones de actualizacion de Windows a todos los usuarios (si actualizaciones automaticas estan activadas).",
-                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,151,349,11
-    CONTROL         "No auto-reiniciar para instalaciones programadas de Actualizaciones Automaticas de Windows",
-                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,165,349,11
-    GROUPBOX        "Seguridad de Windows (Esta es una directiva de Windows que Ud. puede ajustar con SuRun)",
-                    IDC_STATIC,4,183,369,39
-    CONTROL         "Especificar 'Administradores' en vez de 'Object creator' como propietario por defecto para objetos credos por administradores.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
-                    BS_MULTILINE | WS_TABSTOP,11,193,349,26
-    CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",
-                    IDC_STATIC,6,224,365,8
-END
-
-IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Importar configuracion de SuRun"
-FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Nombre de archivo",-1,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
-    CONTROL         "Importar configuracion de SuRun",IDC_IMPSURUNSETTINGS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
-    CONTROL         "Importar Lista Negra de Intercepcion",IDC_IMPBLACKLIST,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
-    CONTROL         "Importar usuarios del grupo 'SuRunners' y sus configuraciones",
-                    IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    63,58,273,10
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
-    DEFPUSHBUTTON   "&Aceptar",IDOK,241,81,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancelar",IDCANCEL,304,81,50,14
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog Info
-//
-
-IDD_SETUP1 DLGINIT
-BEGIN
-    IDC_WARNADMIN, 0x403, 10, 0
-0x6c41, 0x206c, 0x7375, 0x7265, 0x0073, 
-    IDC_WARNADMIN, 0x403, 29, 0
-0x7553, 0x7552, 0x6e6e, 0x7265, 0x2073, 0x6e61, 0x2064, 0x6441, 0x696d, 
-0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
-    IDC_WARNADMIN, 0x403, 46, 0
-0x6e75, 0x6572, 0x7473, 0x6972, 0x7463, 0x6465, 0x5320, 0x5275, 0x6e75, 
-0x656e, 0x7372, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 0x7369, 0x7274, 
-0x7461, 0x726f, 0x2073, 0x2a28, 0x0029, 
-    IDC_WARNADMIN, 0x403, 15, 0
-0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
-    IDC_WARNADMIN, 0x403, 9, 0
-0x6f4e, 0x7520, 0x6573, 0x7372, "\000" 
-    0
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_SETUP1, DIALOG
-    BEGIN
-        RIGHTMARGIN, 374
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3065,6 +2541,590 @@ BEGIN
     IDS_EMPTYPASS3          "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s"
     IDS_SRACCDESC           "Helper account for SuRun"
 END
+
+#endif    // Spanish (Modern) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Spanish (Castilian) (unknown sub-lang: 0xB) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESS)
+#ifdef _WIN32
+LANGUAGE LANG_SPANISH, 0xB
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    ICON            IDI_SHIELD,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
+    GROUPBOX        "Escritorio Seguro",IDC_EXTOPT2,77,0,297,52,WS_GROUP
+    CONTROL         "Mostrar escritorio &difuso como fondo",IDC_BLURDESKTOP,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,
+                    11,283,11
+    CONTROL         "Esfumar escritorio en",IDC_FADEDESKTOP,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,23,283,11
+    CONTROL         "Autom. presionar Cancelar",IDC_USE_C_TO,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,38,97,9
+    EDITTEXT        IDC_CANCEL_TO,182,36,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "s",IDC_STATIC,205,38,8,8
+    CONTROL         "mostrar tiempo remanente con barra de progreso",
+                    IDC_SHOW_C_TO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,214,
+                    38,160,10
+    GROUPBOX        "Seguridad",IDC_EXTOPT3,77,56,297,49,WS_GROUP
+    CONTROL         "Usuarios deben introducir clave",IDC_ASKPW,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,68,116,11
+    EDITTEXT        IDC_ASKTIMEOUT,202,67,18,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "periodo de gracia en MINs",IDC_STATIC,226,68,143,11,NOT 
+                    WS_GROUP
+    LTEXT           "Mostrar alerta, si Administradores no tienen clave:",
+                    IDC_STATIC,83,83,114,17
+    COMBOBOX        IDC_WARNADMIN,201,83,166,30,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Integracion a la Consola",IDC_STATIC,75,110,297,75,
+                    WS_GROUP
+    CONTROL         "Mostrar ""Panel de Control como administrador"" en el menu contexto del escritorio",
+                    IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
+                    120,283,11
+    CONTROL         "Mostrar ""'SuRun cmd' aqui"" en el menu contexto de las carpetas",
+                    IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
+                    133,283,11
+    CONTROL         "Mostrar ""'SuRun Explorador' aqui"" en el menu contexto de las carpetas",
+                    IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
+                    145,283,11
+    CONTROL         "Mostrar ""Reiniciar como administrador"" en el menu Sistema de las aplicaciones",
+                    IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    83,157,283,11
+    CONTROL         "Mostrar ""Start como administrador"" en el menu Sistema de las aplicaciones",
+                    IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
+                    170,283,11
+    GROUPBOX        "Conveniencia",IDC_STATIC,4,187,206,45
+    CONTROL         "Mostrar opciones de SuRun para usuarios experimentados",
+                    IDC_NOEXPERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,198,
+                    198,10
+    PUSHBUTTON      "Aplicar opciones recomendadas para Usuarios comunes",
+                    IDC_SIMPLESETUP,14,211,185,14
+    GROUPBOX        "Respaldar",IDC_STATIC,215,187,157,45
+    CTEXT           "Todas las opciones de SuRun",IDC_STATIC,219,198,148,8
+    PUSHBUTTON      "Respaldar...",IDC_EXPORT,224,211,63,14
+    PUSHBUTTON      "Restablecer...",IDC_IMPORT,301,211,63,14
+END
+
+IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 390, 234
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,4,2,40,37
+    LTEXT           "SuRunner",IDC_USRST,50,8,33,8
+    COMBOBOX        IDC_USER,86,5,192,217,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Agregar...",IDC_ADDUSER,281,4,50,14
+    PUSHBUTTON      "Borrar",IDC_DELUSER,334,4,50,14
+    CONTROL         "El usuario puede modificar las opciones de SuRun",
+                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,19,
+                    202,10
+    CONTROL         "Solicitar clave de usuario para las opciones de SuRun",
+                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    29,202,10
+    CONTROL         "El Usuario puede iniciar programas solo si estan predefinidas",
+                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,
+                    39,202,10
+    CONTROL         "Ocultar SuRun para este Usuario",IDC_HIDESURUN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,252,19,137,10
+    CONTROL         "Estado de usuario en la barra de tareas",
+                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    252,29,137,10
+    CONTROL         "Estado de Usuario como 'Ayuda-Emergente'",
+                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    252,39,137,10
+    CONTROL         "Install new Hardware automagically as administrator",
+                    IDC_HW_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,49,
+                    201,10
+    GROUPBOX        "Lista de programas para el Usuario seleccionado (Los cambios son instantaneos, aun presionando el boton 'Cancelar').",
+                    IDS_GRPDESC,6,59,378,174
+    CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
+                    WS_TABSTOP,8,70,373,142
+    PUSHBUTTON      "Exportar...",IDC_EXPORT,55,216,50,14
+    PUSHBUTTON      "Importar...",IDC_IMPORT,109,216,50,14
+    PUSHBUTTON      "&Agregar...",IDC_ADDAPP,224,216,50,14
+    PUSHBUTTON      "&Editar...",IDC_EDITAPP,278,216,50,14
+    PUSHBUTTON      "&Borrar",IDC_DELETE,331,216,50,14
+    LTEXT           "Lista de Programas",IDC_IMEXSTATIC,9,219,43,8
+END
+
+IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Intentar iniciar ciertos programas AUTOMATICAMENTE con privilegios elevados",
+                    IDC_STATIC,10,3,361,227
+    LTEXT           "Para iniciar automaticamente programas con privilegios elevados, al menos una de las siguientes dos opciones debe ser indicada:",
+                    IDC_STATIC,13,13,354,8
+    CONTROL         "Instalar filtro para interceptar la ejecucion de programa en la interfaz de usuario de Windows",
+                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,23,
+                    319,10
+    LTEXT           "Esta opcion instala un filtro de sistema que sera invocado cuando la consola de windows intente iniciar una aplicacion. SuRun puede luego decidir si inicia la aplicacion con privilegios elevados.",
+                    IDC_STATIC,31,33,335,17
+    LTEXT           "Esta opcion no puede detectar si un programa quiere crear un proceso directamente. Si desea que SuRun sea capaz de interceptar la creacion de este proceso, necesita habilitar la opcion debajo.",
+                    IDC_STATIC,31,50,335,16
+    CONTROL         "Especificar una Intercepcion para todos los procesos que directamente ejecuten aplicaciones",
+                    IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,68,
+                    241,10
+    LTEXT           "Con esta opcion deshabilitada SuRun no podra iniciar procesos automaticamente (en Windows Vista muchos de ellos) con privilegios elevados.",
+                    IDC_STATIC,31,77,335,17
+    LTEXT           "Activando esta opcion, en algunos raros casos, puede causar incompatibilidad con algunos programas. En caso de tal incompatibilidad se puede deshabilitar la intercepcion del programa en la 'Lista Negra' debajo.",
+                    IDC_STATIC,31,94,335,17
+    CONTROL         "Also set a hook into services and administrative processes. (System restart required!)",
+                    IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
+                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,114,305,10
+    LTEXT           "Si una aplicacion no trabaja como lo haria normalmente luego de activar una o ambas opciones arriba, Ud. puede deshabilitar la intercepcion de SuRun en este programa ingresandolo en la Lista Negra.",
+                    IDC_STATIC,20,125,256,27
+    PUSHBUTTON      "Lista Negra...",IDC_BLACKLIST,293,131,57,14
+    CONTROL         "Intentar detectar si aplicaciones desconocidas necesitan iniciarse con privilegios elevados.",
+                    IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
+                    BS_MULTILINE | WS_TABSTOP,20,155,335,10
+    LTEXT           "Si Ud. deshabilita esta Opcion, SuRun solo iniciara los programas predefinidos automaticamente con privilegios elevados. De esta manera ningun programa de Instalacion (etc.) es detectado.",
+                    IDC_STATIC,31,167,335,17
+    CONTROL         "Mostrar un mensaje cuando un programa ha sido iniciado automaticamente",
+                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
+                    187,347,10
+    LTEXT           "Con esta opcion activa, SuRun mostrara una ventana con un mensaje, abajo a la derecha del escritorio, cuando un programa fue iniciado automaticamente con privilegios elevados.",
+                    IDC_STATIC,31,198,335,17
+    CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",
+                    IDC_STATIC,14,217,356,8
+END
+
+IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 396, 274
+STYLE DS_ABSALIGN | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "SuRun %s - Configuraciones"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Tab1",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | 
+                    WS_TABSTOP,0,0,396,252
+    PUSHBUTTON      "&Aplicar",ID_APPLY,220,256,50,14
+    DEFPUSHBUTTON   "&Guardar",IDOK,279,256,50,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,338,256,50,14
+END
+
+IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 361, 196
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Opciones del programa"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,361,1
+    LTEXT           "Linea de comandos",IDC_STATIC,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    LTEXT           "Comodines '*' y '?' estan soportados.\nIMPORTANTE: Si el comando contiene espacios, debe ser puesto entre comillas.",
+                    IDC_STATIC,55,23,261,19
+    GROUPBOX        "Que deberia hacer SuRun si este programa es iniciado ""como administrador""?",
+                    IDC_STATIC,16,43,330,64,WS_GROUP
+    ICON            IDI_LISTICON2,IDC_STATIC,24,55,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,24,68,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON8,IDC_STATIC,24,81,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,24,94,20,20,SS_REALSIZEIMAGE
+    CONTROL         "Preguntar si este programa puede ser iniciado con privilegios elevados. (por defecto)",
+                    IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,40,55,300,10
+    CONTROL         "Automaticamente iniciar este programa con privilegios elevados.",
+                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,40,68,300,10
+    CONTROL         "Autom. iniciar este programa con privilegios elevados y nunca preguntar por una Clave.",
+                    IDC_NOASK4,"Button",BS_AUTORADIOBUTTON,40,81,300,10
+    CONTROL         "NUNCA iniciar este programa con privilegios elevados.",
+                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,40,94,300,10
+    GROUPBOX        "Como deberian las intercepciones de SuRun manipular este programa?",
+                    IDC_STATIC,16,110,330,52,WS_GROUP
+    ICON            IDI_LISTICON1,IDC_STATIC,24,122,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,24,135,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,24,148,20,20,SS_REALSIZEIMAGE
+    CONTROL         "Adivinar si el programa necesita privilegios elevados. (por defecto)",
+                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,40,122,300,10
+    CONTROL         "Iniciar el programa automaticamente con privilegios elevados.",
+                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,40,135,300,10
+    CONTROL         "No automatico. Ignorar este programa.",IDC_AUTO3,"Button",
+                    BS_AUTORADIOBUTTON,40,148,300,10
+    DEFPUSHBUTTON   "&Aceptar",IDOK,241,176,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancelar",IDCANCEL,304,176,50,14
+END
+
+IDD_LOGONDLG DIALOGEX 0, 0, 263, 143
+STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Autorizacion requerida"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
+    ICON            IDI_SHIELD2,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Identificar a Ud. mismo como persona autorizada.",
+                    IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
+    LTEXT           "Si Ud. no esta seguro de lo que esto significa, presionar 'Cancelar'!",
+                    IDC_HINT2,58,70,198,8
+    RTEXT           "&Nombre de usuario:",IDC_USRST,58,84,37,8
+    RTEXT           "&Clave:",IDC_PWDST,58,98,37,8
+    COMBOBOX        IDC_USER,98,82,158,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_PASSWORD,98,97,158,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Aceptar",IDOK,153,115,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,206,115,50,14
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,73,47,44
+    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
+                    PBS_SMOOTH,0,134,263,9
+END
+
+IDD_CURUSRLOGON DIALOGEX 0, 0, 289, 215
+STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Clave requerida"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
+    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,290,1
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Si la aplicacion deberia ser iniciada con privilegios administrativos, ingresar su clave.\r\n\r\nSi no, presionar 'Cancelar'!",
+                    IDC_HINT,48,74,234,43,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,6,127,47,46
+    RTEXT           "&Nombre de usuario:",IDC_USRST,64,137,33,8
+    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
+    RTEXT           "&Clave:",IDC_PWDST,64,151,35,8
+    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_AUTOHSCROLL
+    CONTROL         "No hacer esta pregunta otra vez para este programa",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
+                    163,182,10
+    CONTROL         "Autom. correr este programa con privilegios elevados.",
+                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    100,174,182,10
+    DEFPUSHBUTTON   "Aceptar",IDOK,179,189,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,232,189,50,14
+    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
+                    PBS_SMOOTH,0,207,289,9
+END
+
+IDD_CURUSRACK DIALOGEX 0, 0, 289, 215
+STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Autorizacion requerida"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
+    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
+    LTEXT           "Si la aplicacion deberia ser iniciada con privilegios administrativos, Presionar 'Aceptar'.\r\n\r\nSi no, presionar 'Cancelar'!",
+                    IDC_HINT,48,73,234,44,SS_NOPREFIX
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,6,127,47,46
+    RTEXT           "&Nombre de usuario:",IDC_USRST,64,137,33,8
+    EDITTEXT        IDC_USER,100,135,182,12,WS_DISABLED
+    RTEXT           "&Clave:",IDC_PWDST,64,151,35,8
+    EDITTEXT        IDC_PASSWORD,100,149,182,12,ES_PASSWORD | WS_DISABLED
+    CONTROL         "No hacer esta pregunta otra vez para este programa",
+                    IDC_ALWAYSOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,
+                    163,182,10
+    CONTROL         "Autom. correr este programa con privilegios elevados.",
+                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    100,174,182,10
+    PUSHBUTTON      "Aceptar",IDOK,179,189,50,14
+    DEFPUSHBUTTON   "Cancelar",IDCANCEL,232,189,50,14
+    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
+                    PBS_SMOOTH,0,207,289,9
+END
+
+IDD_SELUSER DIALOG DISCARDABLE  0, 0, 280, 227
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Agregar usuario al grupo de SuRunners"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Por favor, seleccionar un usuario que deberia ser agregado al grupo de 'SuRunners':",
+                    IDC_STATIC,7,4,270,8
+    CONTROL         "List1",IDC_USERLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
+                    WS_BORDER | WS_TABSTOP,7,15,265,141
+    CONTROL         "mostrar dominios de usuarios",IDC_ALLUSERS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,157,233,10
+    LTEXT           "o especificar un dominio de usuario manualmente en la forma 'dominio\\usuario':",
+                    IDC_STATIC,7,171,263,8
+    EDITTEXT        IDC_USERNAME,7,183,265,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,280,1
+    DEFPUSHBUTTON   "&Aceptar",IDOK,163,208,50,14
+    PUSHBUTTON      "&Cancelar",IDCANCEL,221,208,50,14
+END
+
+IDD_INSTALL DIALOGEX 0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION
+CAPTION "SuRun %s - Instalacion"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Instalar >>",IDOK,289,105,68,14
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
+    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
+    LTEXT           "Quiere instalar SuRun?",IDC_QUESTION,39,7,317,25,
+                    SS_CENTERIMAGE
+    CONTROL         "Iniciar 'Configuraciones de SuRun' luego de la instalacion",
+                    IDC_RUNSETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,
+                    335,10
+    LTEXT           "Para seguridad la siguiente politica de grupo debe ser activada:",
+                    IDC_OWNGRPST,18,60,335,8
+    CONTROL         "Especificar 'Administradores' en vez de 'Object creator' como propietario por defecto para objetos credos por administradores.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,18,74,335,27
+    PUSHBUTTON      "&Cancelar",IDCANCEL,215,105,68,14
+    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
+                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+END
+
+IDD_UPDATE DIALOGEX 0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION
+CAPTION "SuRun %s - Actualizacion"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "&Actualizar >>",IDOK,291,107,68,14
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
+    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
+    LTEXT           "Quiere reemplazar SuRun?",IDC_QUESTION,40,7,316,25,
+                    SS_CENTERIMAGE
+    LTEXT           "Si Ud. modifico el menu de contexto, por favor seleccione la siguiente opcion:",
+                    IDC_KEEPREGST,14,41,335,8
+    CONTROL         "Conservar las asociaciones de SuRun, tal como estan ahora",
+                    IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    14,50,335,10
+    PUSHBUTTON      "&Cancelar",IDCANCEL,217,107,68,14
+    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
+                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+END
+
+IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
+    WS_CAPTION
+CAPTION "Remover SuRun"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "&Remover >>",IDIGNORE,289,105,68,14
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
+    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
+    LTEXT           "Quiere desinstalar SuRun ahora?",IDC_QUESTION,39,7,317,
+                    25,SS_CENTERIMAGE
+    CONTROL         "Conservar configuraciones de SuRun",IDC_KEEPREGISTRY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,50,317,10
+    CONTROL         "Borrar Grupo 'SuRunners'",IDC_DELSURUNNERS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,17,64,317,10
+    CONTROL         "Hacer Administradores locales miembros de 'SuRunners'",
+                    IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
+                    317,10
+    PUSHBUTTON      "&Cancelar",IDCANCEL,215,105,68,14
+    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
+                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
+END
+
+IDD_RUNASDLG DIALOGEX 0, 0, 263, 142
+STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
+    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY
+CAPTION "Ejecutar como..."
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
+    ICON            IDI_SHIELD,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Identificar a Ud. mismo como persona autorizada.",
+                    IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
+    RTEXT           "&Nombre de usuario:",IDC_USRST,58,77,37,8
+    COMBOBOX        IDC_USER,98,75,158,30,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    RTEXT           "&Clave:",IDC_PWDST,58,91,37,8
+    EDITTEXT        IDC_PASSWORD,98,90,158,12,ES_AUTOHSCROLL
+    CONTROL         "recordar clave",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,98,104,158,10
+    DEFPUSHBUTTON   "Aceptar",IDOK,153,116,50,14
+    PUSHBUTTON      "Cancelar",IDCANCEL,206,116,50,14
+    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
+                    SS_REALSIZEIMAGE,7,73,47,44
+    CONTROL         "Progress1",IDC_AUTOCANCEL,"msctls_progress32",
+                    PBS_SMOOTH,0,134,263,9
+END
+
+IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Lista Negra de Intercepcion"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "No interceptar las siguientes aplicaciones:",IDC_STATIC,
+                    7,4,233,8
+    CONTROL         "List1",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
+                    LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
+                    WS_TABSTOP,7,15,233,141
+    CTEXT           "Comodines '*' y '?' estan soportados.",IDC_STATIC,8,160,
+                    233,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,248,1
+    PUSHBUTTON      "&Agregar...",IDC_ADDAPP,10,179,46,14
+    PUSHBUTTON      "&Editar",IDC_EDITAPP,60,179,50,14
+    PUSHBUTTON      "&Borrar",IDC_DELETE,114,179,50,14
+    DEFPUSHBUTTON   "&Listo",IDOK,192,179,50,14
+END
+
+IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Agregar programas a la Lista Negra"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,38,361,1
+    LTEXT           "Linea de comandos",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    LTEXT           "Comodines '*' y '?' estan soportados.",-1,64,25,252,8
+    DEFPUSHBUTTON   "&Aceptar",IDOK,241,45,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancelar",IDCANCEL,304,45,50,14
+END
+
+IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 235
+STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX        "Mostrar un icono en el area de notificacion de la barra de tareas para no miembros del grupo 'SuRunners'",
+                    IDC_STATIC,3,4,370,37
+    LTEXT           "Estado de usuario para el programa activo en la 'bandeja' de la barra de tareas",
+                    IDC_STATIC,11,16,253,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,269,14,99,30,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Mostrar notificaciones para programas activos corriendo con diferentes credenciales de usuario",
+                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
+                    27,349,10
+    GROUPBOX        "Si un no usuario de 'SuRunners' usa SuRun:",IDC_STATIC,
+                    3,46,370,48
+    CONTROL         "Nunca preguntar a Administradores reales si quiere ser miembro de 'SuRunners'",
+                    IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
+                    57,349,8
+    CONTROL         "Never ask anyone to become member of 'SuRunners'",
+                    IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
+                    69,349,8
+    CONTROL         "Ocultar SuRun a los usuarios que no son miembros del Grupo 'SuRunners'",
+                    IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,
+                    81,349,8
+    GROUPBOX        "Ajustes convenientes (Estas son configuraciones de Windows que Ud. puede ajustar con SuRun)",
+                    IDC_EXTOPT,3,99,370,79,WS_GROUP
+    CONTROL         "Reemplazar Windows' 'Ejecutar como...' con 'Ejecutar como...' de SuRun",
+                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
+                    WS_TABSTOP,11,110,349,9
+    CONTROL         "Permitir a los 'SuRunners' modificar (y mostrar) la hora del sistema.",
+                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,123,349,11
+    CONTROL         "Permitir a los 'SuRunners' cambiar 'Opciones de Energia' y seleccionar esquemas de energia.",
+                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,137,349,11
+    CONTROL         "Mostrar notificaciones de actualizacion de Windows (si actualizaciones automaticas estan activadas).",
+                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,151,349,11
+    CONTROL         "No auto-reiniciar para instalaciones programadas de Actualizaciones Automaticas de Windows",
+                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,165,349,11
+    GROUPBOX        "Seguridad de Windows (Esta es una directiva de Windows que Ud. puede ajustar con SuRun)",
+                    IDC_STATIC,4,183,369,39
+    CONTROL         "Especificar 'Administradores' en vez de 'Object creator' como propietario por defecto para objetos credos por administradores.",
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    BS_MULTILINE | WS_TABSTOP,11,193,349,26
+    CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",
+                    IDC_STATIC,6,224,365,8
+END
+
+IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Importar configuracion de SuRun"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    LTEXT           "Nombre de archivo",-1,7,7,52,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
+    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,361,1
+    CONTROL         "Importar configuracion de SuRun",IDC_IMPSURUNSETTINGS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,32,273,10
+    CONTROL         "Importar Lista Negra de Intercepcion",IDC_IMPBLACKLIST,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,45,273,10
+    CONTROL         "Importar usuarios del grupo 'SuRunners' y sus configuraciones",
+                    IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    63,58,273,10
+    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,361,1
+    DEFPUSHBUTTON   "&Aceptar",IDOK,241,81,50,14,WS_GROUP
+    PUSHBUTTON      "&Cancelar",IDCANCEL,304,81,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SETUP1 DLGINIT
+BEGIN
+    IDC_WARNADMIN, 0x403, 10, 0
+0x6c41, 0x206c, 0x7375, 0x7265, 0x0073, 
+    IDC_WARNADMIN, 0x403, 29, 0
+0x7553, 0x7552, 0x6e6e, 0x7265, 0x2073, 0x6e61, 0x2064, 0x6441, 0x696d, 
+0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
+    IDC_WARNADMIN, 0x403, 46, 0
+0x6e75, 0x6572, 0x7473, 0x6972, 0x7463, 0x6465, 0x5320, 0x5275, 0x6e75, 
+0x656e, 0x7372, 0x7520, 0x646e, 0x4120, 0x6d64, 0x6e69, 0x7369, 0x7274, 
+0x7461, 0x726f, 0x2073, 0x2a28, 0x0029, 
+    IDC_WARNADMIN, 0x403, 15, 0
+0x6441, 0x696d, 0x696e, 0x7473, 0x6172, 0x6f74, 0x7372, "\000" 
+    IDC_WARNADMIN, 0x403, 9, 0
+0x6f4e, 0x7520, 0x6573, 0x7372, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_SETUP1, DIALOG
+    BEGIN
+        RIGHTMARGIN, 374
+    END
+
+    IDD_SELUSER, DIALOG
+    BEGIN
+        RIGHTMARGIN, 247
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 #endif    // Spanish (Castilian) (unknown sub-lang: 0xB) resources
 /////////////////////////////////////////////////////////////////////////////
