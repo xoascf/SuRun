@@ -1758,7 +1758,7 @@ void SR_PathQuoteSpacesW(LPWSTR p)
 {
   if (p && wcschr(p,L' '))
   {
-    int n = wcslen(p)+1;
+    size_t n = wcslen(p)+1;
     memmove(p+1,p,n*sizeof(WCHAR));
     p[0] = L'"';
     p[n] = L'"';
@@ -1795,7 +1795,7 @@ BOOL SR_PathAppendW(LPWSTR p,LPCWSTR a)
     a++;
   if(*a==0)
     return FALSE;
-  int n=wcslen(p);
+  size_t n=wcslen(p);
   if (n && (p[n-1]!=L'\\'))
   {
     p[n+1]=0;

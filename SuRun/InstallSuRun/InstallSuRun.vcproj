@@ -3,10 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="InstallSuRun"
-	ProjectGUID="{41A21179-4FA1-468C-9BCC-5361B16820E5}"
-	SccProjectName="&quot;$/SuRun&quot;, TSQCAAAA"
-	SccLocalPath=".."
-	SccProvider="MSSCCI:Microsoft Visual SourceSafe"
+	ProjectGUID="{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}"
 	>
 	<Platforms>
 		<Platform
@@ -202,7 +199,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="UPXing"
-				CommandLine="upx --lzma $(TargetPath)"
+				CommandLine="upx --lzma &quot;$(TargetPath)&quot;"
 			/>
 		</Configuration>
 	</Configurations>

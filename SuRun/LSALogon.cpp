@@ -424,7 +424,7 @@ HANDLE GetTempAdminToken(LPTSTR UserName)
   }
   if(!GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",&Vtype,&V,&nV))
     return 0;
-  LPWSTR p=0;
+  RPC_WSTR p=0;
   {
     UUID id;
     UuidCreate(&id);
@@ -441,7 +441,7 @@ HANDLE GetTempAdminToken(LPTSTR UserName)
     DBGTrace4("NetUserSetInfo(%s,%s,%d) returned %s",(LPCTSTR)u,(LPCTSTR)p,dwerr,GetErrorNameStatic(st));
   }else
   {
-    hUser=LogonAsAdmin(UserName,p);
+    hUser=LogonAsAdmin(UserName,(LPWSTR)p);
   }
   RpcStringFree(&p);
   if (!SetRegAny(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",Vtype,V,nV))
