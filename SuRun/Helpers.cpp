@@ -1500,15 +1500,31 @@ PSID GetSessionLogonSID(DWORD SessionID)
 // 
 /////////////////////////////////////////////////////////////////////////////
 
-DWORD GetProcessFileName(LPTSTR lpFilename,DWORD nSize)
+DWORD GetModuleFileNameAEx(HMODULE hMod,LPSTR lpFilename,DWORD nSize)
 {
-  nSize=GetModuleFileName(0,lpFilename,nSize);
-  while ((lpFilename[0]==L'\\')||(lpFilename[0]==L'?'))
+  nSize=GetModuleFileNameA(hMod,lpFilename,nSize);
+  while ((lpFilename[0]=='\\')||(lpFilename[0]=='?'))
   {
-    memmove(lpFilename,&lpFilename[1],nSize*sizeof(TCHAR));
+    memmove(lpFilename,&lpFilename[1],nSize*sizeof(CHAR));
     nSize--;
   }
   return nSize;
+}
+
+DWORD GetModuleFileNameWEx(HMODULE hMod,LPWSTR lpFilename,DWORD nSize)
+{
+  nSize=GetModuleFileNameW(hMod,lpFilename,nSize);
+  while ((lpFilename[0]==L'\\')||(lpFilename[0]==L'?'))
+  {
+    memmove(lpFilename,&lpFilename[1],nSize*sizeof(WCHAR));
+    nSize--;
+  }
+  return nSize;
+}
+
+DWORD GetProcessFileName(LPWSTR lpFilename,DWORD nSize)
+{
+  return GetModuleFileNameWEx(0,lpFilename,nSize);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1706,3 +1722,86 @@ void BringToPrimaryMonitor(HWND hWnd)
     (rd.top+rd.bottom-rw.bottom-rw.top)/2);
   MoveWindow(hWnd,rw.left,rw.top,rw.right-rw.left,rw.bottom-rw.top,true);
 }
+
+void SR_PathStripPathA(LPSTR p)
+{
+  //Find file name:
+  LPSTR f = p;
+  for (LPSTR P=p;*P;P++)
+  {
+    if (((P[0]=='\\')||(P[0]==':')||(P[0]=='/'))
+      &&(P[1])&&(P[1]!='\\')&&(P[1]!='/'))
+      f=P+1;
+  }
+  //Copy file name to front
+  if(f!=p)
+    memmove(p,f,strlen(f)+1);
+}
+
+void SR_PathStripPathW(LPWSTR p)
+{
+  //Find file name:
+  LPWSTR f = p;
+  for (LPWSTR P=p;*P;P++)
+  {
+    if (((P[0]==L'\\')||(P[0]==L':')||(P[0]==L'/'))
+      &&(P[1])&&(P[1]!=L'\\')&&(P[1]!=L'/'))
+      f=P+1;
+  }
+  //Copy file name to front
+  if(f!=p)
+    memmove(p,f,(wcslen(f)+1)*sizeof(WCHAR));
+}
+
+
+void SR_PathQuoteSpacesW(LPWSTR p)
+{
+  if (p && wcschr(p,L' '))
+  {
+    int n = wcslen(p)+1;
+    memmove(p+1,p,n*sizeof(WCHAR));
+    p[0] = L'"';
+    p[n] = L'"';
+    p[n+1] = 0;
+  }
+}
+
+LPTSTR SR_PathGetArgsW(LPCWSTR p)
+{
+  if (!p)
+    return 0;
+  for(BOOL bInQuot=FALSE;*p;p++)
+  {
+    switch(*p)
+    {
+    case L'"':
+      bInQuot=!bInQuot;
+      break;
+    case L' ':
+      if (!bInQuot)
+        return (LPTSTR)p+1;
+      break;
+    }
+  }
+  return (LPWSTR)p;
+}
+
+BOOL SR_PathAppendW(LPWSTR p,LPCWSTR a)
+{
+  if ((!p)||(!a))
+    return FALSE;
+  //Skip leading backslashes
+  while(*a==L'\\')
+    a++;
+  if(*a==0)
+    return FALSE;
+  int n=wcslen(p);
+  if (n && (p[n-1]!=L'\\'))
+  {
+    p[n+1]=0;
+    p[n]=L'\\';
+  }
+  wcscat(p,a);
+  return TRUE;
+}
+

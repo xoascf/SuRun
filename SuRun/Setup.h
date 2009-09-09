@@ -148,7 +148,7 @@
 
 #define UseIShExHook    L"UseIShExHook"    //install IShellExecuteHook
 #define UseIATHook      L"UseIATHook"      //install IAT Hook
-#define UseSVCHook      L"UseSVCHook"      //install IAT Hook into services/admin processes
+//#define UseSVCHook      L"UseSVCHook"      //install IAT Hook into services/admin processes
 #define UseRemoteThread L"UseRemoteThread" //use CreateRemoteThread
 
 #define ShowAutoRuns    L"ShowAutoRuns"    //use Show Message in Tray
@@ -179,7 +179,7 @@
 #define SetUseIShExHook(b)     SetShExtSetting(UseIShExHook,b,1)
 #define GetUseIATHook         (GetShExtSetting(UseIATHook,1)!=0)
 #define SetUseIATHook(b)       SetShExtSetting(UseIATHook,b,1)
-//#define GetUseSVCHook         (GetUseIATHook && (GetShExtSetting(UseSVCHook,0)!=0))
+#define GetUseSVCHook         ((_winmajor<6) && GetUseIATHook /*GetShExtSetting(UseSVCHook,0)!=0)*/)
 //#define SetUseSVCHook(b)       SetShExtSetting(UseSVCHook,b,0)
 
 //TrayMsg stuff

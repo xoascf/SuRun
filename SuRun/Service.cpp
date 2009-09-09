@@ -23,7 +23,6 @@
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
-#include <shlwapi.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <lm.h>
@@ -52,7 +51,6 @@
 #include "SuRunExt/SysMenuHook.h"
 
 #pragma comment(lib,"Wtsapi32.lib")
-#pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"AdvApi32.lib")
 #pragma comment(lib,"PSAPI.lib")
@@ -313,7 +311,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     TCHAR f2[MAX_PATH];
     if (!GetProcessFileName(f1,MAX_PATH))
     {
-      DBGTrace1("GetModuleFileName failed",GetLastErrorNameStatic());
+      DBGTrace1("GetProcessFileName failed",GetLastErrorNameStatic());
       return CloseHandle(hProcess),0;
     }
     if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
@@ -681,7 +679,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
     return; 
   }
-  if ((_winmajor<6) && GetUseIATHook/*GetUseSVCHook*/)
+  if (GetUseSVCHook)
     InjectIATHook(L"services.exe");
   //Steal token from LSASS.exe to get SeCreateTokenPrivilege in Vista
   HANDLE hRunLSASS=GetProcessUserToken(GetProcessID(L"LSASS.exe"));
@@ -2397,13 +2395,20 @@ static void HandleHooks()
     }
     if (t.TimedOut())
     {
-      if(CheckServiceStatus()!=SERVICE_RUNNING)
+      DWORD ss=CheckServiceStatus();
+      if(ss!=SERVICE_RUNNING)
+      {
+        DBGTrace1("SysmenuHook service not running(%X)==>Exit",ss);
         break;
+      }
       t.Set(10000);
     }
 #ifndef _SR32
     if(!ProcessTrayShowAdmin(bShowTray,bBaloon))
+    {
+      DBGTrace("SysmenuHook ProcessTrayShowAdmin returned FALSE==>Exit");
       break;
+    }
   }
   CloseTrayShowAdmin();
 #else _SR32
