@@ -3,7 +3,6 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <LMAccess.h>
-#include <SHLWAPI.H>
 #include <TCHAR.h>
 #include <stdio.h>
 #include "helpers.h"
@@ -14,7 +13,6 @@
 #include "resource.h"
 #include "DBGTrace.h"
 
-#pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"advapi32.lib")
 #pragma comment(lib,"Wtsapi32.lib")
 
@@ -398,10 +396,11 @@ BOOL ProcessTrayShowAdmin(BOOL bShowTray,BOOL bBalloon)
   MSG msg;
   do
   {
-    if(!GetMessage(&msg,0,0,0))
-      return FALSE;
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
+    if(GetMessage(&msg,0,0,0))
+    {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+    }
   }while(PeekMessage(&msg,0,0,0,PM_NOREMOVE));
   return TRUE;
 }

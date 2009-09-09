@@ -17,11 +17,11 @@
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
-#include <shlwapi.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <lm.h>
 #include <dbghelp.h>
+#include <shlwapi.h>
 #include <Tlhelp32.h>
 #include "WinStaDesk.h"
 #include "IsAdmin.h"
@@ -34,8 +34,8 @@
 #include "UserGroups.h"
 #include "Resource.h"
 
-#pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"netapi32.lib")
+#pragma comment(lib,"shlwapi")
 
 extern RUNDATA g_RunData;
 

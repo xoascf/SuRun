@@ -16,9 +16,6 @@
 
 #include <windows.h>
 #include <Psapi.h>
-#include <ShlWapi.h>
-#include <LMCons.h>
-#include <Tlhelp32.h>
 
 #include <list>
 #include <algorithm>
@@ -31,8 +28,6 @@
 #include "../Service.h"
 #include "../DBGTrace.h"
 
-#pragma comment(lib,"Advapi32.lib")
-#pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 
 extern HINSTANCE l_hInst;
@@ -60,11 +55,11 @@ typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
                                         LPPROCESS_INFORMATION);
 
-typedef BOOL (WINAPI* lpCreateProcessAsUserA)(HANDLE,LPCSTR,LPSTR,
-                                              LPSECURITY_ATTRIBUTES,
-                                              LPSECURITY_ATTRIBUTES,BOOL,DWORD,
-                                              LPVOID,LPCSTR,LPSTARTUPINFOA,
-                                              LPPROCESS_INFORMATION);
+//typedef BOOL (WINAPI* lpCreateProcessAsUserA)(HANDLE,LPCSTR,LPSTR,
+//                                              LPSECURITY_ATTRIBUTES,
+//                                              LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+//                                              LPVOID,LPCSTR,LPSTARTUPINFOA,
+//                                              LPPROCESS_INFORMATION);
 typedef BOOL (WINAPI* lpCreateProcessAsUserW)(HANDLE,LPCWSTR,LPWSTR,
                                               LPSECURITY_ATTRIBUTES,
                                               LPSECURITY_ATTRIBUTES,BOOL,DWORD,
@@ -79,8 +74,8 @@ BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
-BOOL WINAPI CreatePAUA(HANDLE,LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
-                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
+//BOOL WINAPI CreatePAUA(HANDLE,LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+//                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
 BOOL WINAPI CreatePAUW(HANDLE,LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
@@ -111,13 +106,15 @@ public:
   LPCSTR FuncName;
   PROC newFunc;
   PROC orgFunc;
-  CHookDescriptor(LPCSTR Dll,LPCSTR Win7Dll,LPCSTR Func,PROC nFunc)
+  LPCSTR HostDll;
+  CHookDescriptor(LPCSTR Dll,LPCSTR Win7Dll,LPCSTR Func,PROC nFunc,LPCSTR Host=NULL)
   {
     DllName=Dll;
     Win7DllName=Win7Dll;
     FuncName=Func;
     newFunc=nFunc;
     orgFunc=0;
+    HostDll=Host;
   }
   PROC OrgFunc()
   {
@@ -145,8 +142,10 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","api-ms-win-core-libraryloader-
 static CHookDescriptor hkCrProcA ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessW",(PROC)CreateProcW);
 
-static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
-static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessAsUserW",(PROC)CreatePAUW);
+//static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
+
+//Windows XP: only hook calls from umpnpmgr.dll to advapi32.dlls "CreateProcessAsUserW"
+static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessAsUserW",(PROC)CreatePAUW,"umpnpmgr.dll");
 
 static CHookDescriptor hkSwDesk  ("user32.dll",NULL,"SwitchDesktop",(PROC)SwitchDesk);
 
@@ -155,8 +154,6 @@ static CHookDescriptor* need_hdt[]=
 {
   &hkCrProcA, 
   &hkCrProcW,
-//  &hkCrPAUA, 
-//  &hkCrPAUW,
   &hkSwDesk,
 };
 
@@ -172,43 +169,43 @@ static CHookDescriptor* hdt[]=
   &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
-//  &hkCrPAUA, 
-//  &hkCrPAUW,
   &hkSwDesk,
 };
 
 static CHookDescriptor* sys_need_hdt[]=
 {
-  &hkCrPAUW,
+  &hkCrPAUW
 };
 
 static CHookDescriptor* sys_hdt[]=
 {
-  &hkFreeLib, 
-  &hkFrLibXT, 
-  &hkCrPAUW,
+  &hkCrPAUW
 };
 
 //relative pointers in PE images
 #define RelPtr(_T,pe,rpt) (_T)( (DWORD_PTR)(pe)+(DWORD_PTR)(rpt))
 
 //returns true if DllName is one to be hooked up
-BOOL DoHookDll(char* DllName)
+BOOL DoHookDll(char* DllName,char* HostDll)
 {
-  if(IsBadReadPtr(DllName,1))
+  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(HostDll,1))
     return FALSE;
   if (l_IsAdmin)
   {
     for(int i=0;i<countof(sys_hdt);i++)
       if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
         ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
-        return true;
+      {
+        return (sys_hdt[i]->HostDll==0) || (stricmp(sys_hdt[i]->HostDll,HostDll)==0);
+      }
   }else
   {
     for(int i=0;i<countof(hdt);i++)
       if ((stricmp(hdt[i]->DllName,DllName)==0)
         ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-        return true;
+      {
+        return (hdt[i]->HostDll==0) || (stricmp(hdt[i]->HostDll,HostDll)==0);
+      }
   }
   return false;
 }
@@ -323,25 +320,25 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
   return false;
 }
 
-DWORD HookIAT(HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
+DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
 //  char fmod[MAX_PATH]={0};
 //  {
 //    GetModuleFileNameA(0,fmod,MAX_PATH);
-//    PathStripPathA(fmod);
+//    SR_PathStripPathA(fmod);
 //    strcat(fmod,": ");
 //    char* p=&fmod[strlen(fmod)];
 //    GetModuleFileNameA(hMod,p,MAX_PATH);
-//    PathStripPathA(p);
+//    SR_PathStripPathA(p);
 //  }
 //  TRACExA("SuRunExt32.dll: %sHookIAT(%s[%x])\n",(bUnHook?"Un":""),fmod,hMod);
 #endif DoDBGTrace
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
-    if(DoHookDll(DllName))
+    if(DoHookDll(DllName,fMod))
     {
       PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
@@ -387,14 +384,15 @@ DWORD Hook(HMODULE hMod,bool bUnHook)
   //Detect if a module is using CreateProcess, if yes, it needs to be hooked
   if(hMod==l_hInst)
     return 0;
+  char fMod[MAX_PATH]={0};
+  GetModuleFileNameAEx(hMod,fMod,MAX_PATH);
   {
-    char f0[MAX_PATH]={0};
     char f1[MAX_PATH]={0};
-    GetModuleFileNameA(hMod,f0,MAX_PATH);
-    GetModuleFileNameA(l_hInst,f0,MAX_PATH);
-    if (stricmp(f0,f1)==0)
+    GetModuleFileNameAEx(l_hInst,f1,MAX_PATH);
+    if (stricmp(fMod,f1)==0)
       return 0;
   }
+  SR_PathStripPathA(fMod);
   // check "MZ" and DOS Header size
   if(IsBadReadPtr(hMod,sizeof(IMAGE_DOS_HEADER))
     || (((PIMAGE_DOS_HEADER)hMod)->e_magic!=IMAGE_DOS_SIGNATURE))
@@ -421,7 +419,7 @@ DWORD Hook(HMODULE hMod,bool bUnHook)
   for(;pID->Name;pID++) 
   {
     char* DllName=RelPtr(char*,hMod,pID->Name);
-    if(DoHookDll(DllName))
+    if(DoHookDll(DllName,fMod))
     {
       PIMAGE_THUNK_DATA pOrgThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->OriginalFirstThunk);
       PIMAGE_THUNK_DATA pThunk=RelPtr(PIMAGE_THUNK_DATA,hMod,pID->FirstThunk);
@@ -432,7 +430,7 @@ DWORD Hook(HMODULE hMod,bool bUnHook)
           if(NeedHookFn(DllName,(char*)pBN->Name,(void*)pThunk->u1.Function))
           {
             //Hook IAT
-            DWORD dwRet=HookIAT(hMod,pID,bUnHook);
+            DWORD dwRet=HookIAT(fMod,hMod,pID,bUnHook);
             return dwRet;
           }
         }
@@ -504,11 +502,11 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   if(lpApp)
   {
     wcscat(cmd,lpApp);
-    PathQuoteSpacesW(cmd);
+    SR_PathQuoteSpacesW(cmd);
     if (parms)
       //lpApplicationName and the first token of lpCommandLine are the same
       //we need to check this:
-      parms=PathGetArgsW(lpCmd);
+      parms=SR_PathGetArgsW(lpCmd);
     if (parms)
       wcscat(cmd,L" ");
   }
@@ -521,8 +519,8 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     zero(tmp);
     ResolveCommandLine(cmd,CurDir,tmp);
     GetSystemWindowsDirectoryW(cmd,countof(cmd));
-    PathAppendW(cmd,L"SuRun.exe");
-    PathQuoteSpacesW(cmd);
+    SR_PathAppendW(cmd,L"SuRun.exe");
+    SR_PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
       return /*DBGTrace("NoSuRunAutoSuRun"),*/LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
@@ -672,29 +670,29 @@ static BOOL IsShellAndSuRunner(HANDLE hToken)
   return bRet;
 }
 
-BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLine,
-    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
-    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
-    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
-    LPPROCESS_INFORMATION lpProcessInformation)
-{
-  //ToDo: *original function will call CreateProcess. SuRun must not ask twice!
-#ifdef DoDBGTrace
-//  TRACExA("SuRunExt32.dll: call to CreatePAUA(%s,%s)",lpApplicationName,lpCommandLine);
-#endif DoDBGTrace
-  if(IsShellAndSuRunner(hToken))
-  {
-    DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-      dwCreationFlags,lpProcessInformation,hToken);
-    if(tas==RETVAL_OK)
-      return SetLastError(NOERROR),TRUE;
-    if(tas==RETVAL_CANCELLED)
-      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-  }
-  return ((lpCreateProcessAsUserA)hkCrPAUA.OrgFunc())(hToken,lpApplicationName,
-      lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,
-      dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-}
+//BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLine,
+//    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+//    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+//    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
+//    LPPROCESS_INFORMATION lpProcessInformation)
+//{
+//  //ToDo: *original function will call CreateProcess. SuRun must not ask twice!
+//#ifdef DoDBGTrace
+////  TRACExA("SuRunExt32.dll: call to CreatePAUA(%s,%s)",lpApplicationName,lpCommandLine);
+//#endif DoDBGTrace
+//  if(IsShellAndSuRunner(hToken))
+//  {
+//    DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+//      dwCreationFlags,lpProcessInformation,hToken);
+//    if(tas==RETVAL_OK)
+//      return SetLastError(NOERROR),TRUE;
+//    if(tas==RETVAL_CANCELLED)
+//      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+//  }
+//  return ((lpCreateProcessAsUserA)hkCrPAUA.OrgFunc())(hToken,lpApplicationName,
+//      lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,
+//      dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+//}
 
 
 BOOL WINAPI CreatePAUW(HANDLE hToken,LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
@@ -729,7 +727,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
     char f[MAX_PATH]={0};
     if(GetModuleFileNameA(hModule,f,MAX_PATH))
     {
-      PathStripPathA(f);
+      SR_PathStripPathA(f);
       p=DoHookFn(f,(char*)lpProcName,NULL);
       SetLastError(NOERROR);
 #ifdef DoDBGTrace
@@ -743,7 +741,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
 //  {
 //    char f[MAX_PATH]={0};
 //    GetModuleFileNameA(hModule,f,MAX_PATH);
-//    PathStripPathA(f);
+//    SR_PathStripPathA(f);
 //    TRACExA("SuRunExt32.dll: call to GetProcAddr(%s,0x%x)",f,lpProcName);
 //  }
 #endif DoDBGTrace
@@ -899,16 +897,15 @@ BOOL WINAPI SwitchDesk(HDESK Desk)
   return bRet;
 }
 
-DWORD WINAPI InitHookProc(void* p)
+void LoadHooks()
 {
   if (g_IATInit)
-    return 0;
-//  Sleep(10);
+    return;
   orgGPA=GetProcAddress;
   InitializeCriticalSectionAndSpinCount(&g_HookCs,0x80000000);
   g_IATInit=TRUE;
   if (!GetUseIATHook)
-    return 0;
+    return;
   EnterCriticalSection(&g_HookCs);
   if (l_IsAdmin)
   {
@@ -921,13 +918,6 @@ DWORD WINAPI InitHookProc(void* p)
   }
   HookModules();
   LeaveCriticalSection(&g_HookCs);
-  return 0;
-}
-
-void LoadHooks()
-{
-//  CloseHandle(CreateThread(0,0,InitHookProc,0,0,0));
-  InitHookProc(0);
 }
 
 void UnloadHooks()
@@ -936,7 +926,8 @@ void UnloadHooks()
     return;
   //Do not unload the hooks, but wait for the Critical Section
   EnterCriticalSection(&g_HookCs);
-  //UnhookModules();
+  if (l_IsAdmin)
+    UnhookModules();
   g_IATInit=FALSE;
   LeaveCriticalSection(&g_HookCs);
   DeleteCriticalSection(&g_HookCs);

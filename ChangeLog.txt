@@ -28,7 +28,17 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.7 rc 1 - 2009-09-05 (changes to SuRun 1.2.6.0):
+SuRun 1.2.0.7 rc 2 - 2009-09-08 (changes to SuRun 1.2.0.7 rc 1):
+--------------------------------
+* FIX: "Install new Hardware automagically as administrator" is disabled and 
+    unchecked in Vista++
+* FIX: "SuRun /Sysmenuhook" did close on my laptop in cause of a WM_QUIT.
+* CHG: IATHook no longer needs ShlWapi.dll
+* CHG: IATHook only hooks CreateProcessAsUserW in umpnpmgr.dll in Services.exe
+* CHG: IATHook only initializes in a separate thread, if psapi.dll has not been 
+    loaded yet
+
+SuRun 1.2.0.7 rc 1 - 2009-09-05 (changes to SuRun 1.2.0.6):
 --------------------------------
 * NEW: Added preliminary Spanish resources
 * NEW: Added check for "*UPGRADE*" in file names that need admin rights

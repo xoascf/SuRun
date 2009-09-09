@@ -137,7 +137,9 @@ HANDLE GetSessionUserToken(DWORD SessID);
 PSID GetSessionLogonSID(DWORD SessionID);
 
 //  GetProcessFileName
-DWORD GetProcessFileName(LPTSTR lpFilename,DWORD nSize);
+DWORD GetModuleFileNameAEx(HMODULE hMod,LPSTR lpFilename,DWORD nSize);
+DWORD GetModuleFileNameWEx(HMODULE hMod,LPWSTR lpFilename,DWORD nSize);
+DWORD GetProcessFileName(LPWSTR lpFilename,DWORD nSize);
 
 // GetVersionString
 LPCTSTR GetVersionString();
@@ -203,3 +205,12 @@ bool strwldcmp(LPCTSTR s, LPCTSTR pattern) ;
 // 
 /////////////////////////////////////////////////////////////////////////////
 void BringToPrimaryMonitor(HWND hWnd);
+
+void SR_PathStripPathA(LPSTR p);
+void SR_PathStripPathW(LPWSTR p);
+void SR_PathQuoteSpacesW(LPWSTR p);
+LPTSTR SR_PathGetArgsW(LPCWSTR p);
+BOOL SR_PathAppendW(LPWSTR p,LPCWSTR a);
+
+
+

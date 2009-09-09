@@ -14,14 +14,12 @@
 #define WINVER       0x0500
 #include <windows.h>
 #include <TCHAR.h>
-#include <ShlWapi.h>
 #include "DBGTrace.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 
 #include <lmerr.h>
-#pragma comment(lib,"Shlwapi.lib")
 #pragma warning(disable : 4996)
 
 void GetErrorName(int ErrorCode,LPTSTR s)
@@ -54,35 +52,35 @@ LPCTSTR GetLastErrorNameStatic()
   return GetErrorNameStatic(GetLastError());
 }
 
-static void WriteLogA(LPSTR S)
-{
-  char tmp[MAX_PATH];
-  GetTempPathA(MAX_PATH,tmp);
-  PathRemoveBackslashA(tmp);
-  PathAppendA(tmp,"SuRunLog.log");
-  FILE* f=fopen(tmp,"a+t");
-  if(f)
-  {
-    SYSTEMTIME st;
-    GetLocalTime(&st);
-    fprintf(f,"%02d:%02d:%02d.%03d [%d]: %s",st.wHour,st.wMinute,st.wSecond,
-      st.wMilliseconds,GetCurrentProcessId(),S);
-    fclose(f);
-  }
-}
-
-static void WriteLog(LPTSTR S)
-{
-#ifdef UNICODE
-  int len=(int)_tcslen(S);
-  char m[4096]={0};
-  WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
-  WriteLogA(m);
-#else UNICODE
-  WriteLogA(S);
-#endif UNICODE
-}
-
+//static void WriteLogA(LPSTR S)
+//{
+//  char tmp[MAX_PATH];
+//  GetTempPathA(MAX_PATH,tmp);
+//  PathRemoveBackslashA(tmp);
+//  PathAppendA(tmp,"SuRunLog.log");
+//  FILE* f=fopen(tmp,"a+t");
+//  if(f)
+//  {
+//    SYSTEMTIME st;
+//    GetLocalTime(&st);
+//    fprintf(f,"%02d:%02d:%02d.%03d [%d]: %s",st.wHour,st.wMinute,st.wSecond,
+//      st.wMilliseconds,GetCurrentProcessId(),S);
+//    fclose(f);
+//  }
+//}
+//
+//static void WriteLog(LPTSTR S)
+//{
+//#ifdef UNICODE
+//  int len=(int)_tcslen(S);
+//  char m[4096]={0};
+//  WideCharToMultiByte(CP_UTF8,0,S,len,m,len,0,0);
+//  WriteLogA(m);
+//#else UNICODE
+//  WriteLogA(S);
+//#endif UNICODE
+//}
+//
 void TRACEx(LPCTSTR s,...)
 {
   TCHAR S[4096]={0};
