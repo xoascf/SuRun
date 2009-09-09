@@ -3,10 +3,10 @@
 <assemblyIdentity
     version="1.0.0.0"
     processorArchitecture="*"
-    name="SuRun.App"
+    name="InstallSuRun.App"
     type="win32"
 />
-  <description>SuRun</description>
+  <description>InstallSuRun</description>
   <dependency>
       <dependentAssembly>
           <assemblyIdentity
@@ -28,7 +28,7 @@
   <ms_asmv2:trustInfo xmlns:ms_asmv2="urn:schemas-microsoft-com:asm.v2">
     <ms_asmv2:security>
       <ms_asmv2:requestedPrivileges>
-        <ms_asmv2:requestedExecutionLevel level="asInvoker">
+        <ms_asmv2:requestedExecutionLevel level="requireAdministrator">
         </ms_asmv2:requestedExecutionLevel>
       </ms_asmv2:requestedPrivileges>
     </ms_asmv2:security>
