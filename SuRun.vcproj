@@ -3,10 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="SuRun"
-	ProjectGUID="{E2D9F51D-F6C6-4CA4-850D-400750170DE1}"
-	SccProjectName="&quot;$/SuRun&quot;, TSQCAAAA"
-	SccLocalPath="."
-	SccProvider="MSSCCI:Microsoft Visual SourceSafe"
+	ProjectGUID="{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}"
 	>
 	<Platforms>
 		<Platform
@@ -116,6 +113,7 @@
 		</Configuration>
 		<Configuration
 			Name="SuRun32 Unicode Release|x64"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -270,6 +268,7 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|x64"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -425,6 +424,7 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug|x64"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -484,6 +484,8 @@
 		</Configuration>
 		<Configuration
 			Name="x64 Unicode Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -605,13 +607,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089 /machine:AMD64 "
-				AdditionalDependencies="bufferoverflowu.lib"
+				AdditionalDependencies="LIBCMT.LIB KERNEL32.LIB"
 				ShowProgress="0"
 				OutputFile=".\ReleaseUx64/SuRun.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
-				IgnoreDefaultLibraryNames=""
+				IgnoreDefaultLibraryNames="LIBCMT.LIB"
 				ProgramDatabaseFile=".\ReleaseUx64/SuRun.pdb"
 				SubSystem="2"
 				TerminalServerAware="2"
