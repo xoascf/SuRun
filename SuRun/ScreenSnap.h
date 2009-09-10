@@ -108,10 +108,7 @@ inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
   COLORREF* pDst=(COLORREF*)calloc(g_bmi32.bmiHeader.biSizeImage,1);
   if (pDst!=NULL)
   {
-    if(GetUseWinLogonDesk)
-      Blur(pDst,pSrc,w,h);
-    else
-      BlurBright(pDst,pSrc,w,h);
+    Blur(pDst,pSrc,w,h);
     hbbm=CreateCompatibleBitmap(DC,w,h);
     SetDIBits(DC,hbbm,0,w,pDst,&g_bmi32,DIB_RGB_COLORS);
     free(pDst);

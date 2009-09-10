@@ -1,6 +1,6 @@
 ==============================================================================
 SuRun...  Super User Run
-                                                      by Kay Bruns (c) 2007,08
+                                                      by Kay Bruns (c) 2007-09
 ==============================================================================
 
 ------------------------------------------------------------------------------
@@ -20,13 +20,13 @@ run with administrative rights. If the user acknowledges, SuRun will start
 <app> AS THE CURRENT USER but WITH ADMINISTRATIVE RIGHTS.
 
 SuRun uses an own Windows service to start administrative processes. 
-It does not require nor store any user passwords.
+It does not require nor store any user passwords (in non domain scenarios).
 
 To use SuRun a user must be member of the local user group "SuRunners".
 If the user is no member of "SuRunners" and tries to use SuRun, (s)he will be 
 asked to join "SuRunners". The user must either be an administrator or enter 
 administrator credentials to join the SuRunners group.
-(SuRun does not store any credentials!)
+(SuRun does not store any administrator credentials!)
 
 Members of "SuRunners" can be restricted so that they must not change SuRuns 
 settings and to be able to only start predefined applications with elevated 
@@ -55,8 +55,8 @@ SuRun presumes that an application requires administrative rights when:
 -it has the extension msi or msc
 -it has the extension exe, cmd, lnk, com, pif or bat and the file name 
  contains install, setup or update
--it has a Vista RT_MANIFEST resource containing <*trustInfo>->
- <*security>-><*requestedPrivileges>-><*requestedExecutionLevel 
+-it has a MANIFEST resource containing <*trustInfo>-><*security>->
+ <*requestedPrivileges>-><*requestedExecutionLevel 
  level="requireAdministrator">
 -a file <appname>.manifest in the same folder as the application contains
  <*trustInfo>-><*security>-><*requestedPrivileges>-><*requestedExecutionLevel 
@@ -130,17 +130,17 @@ options:
 Below are some SuRun command lines for common Windows tasks:
   Automatic Updates:    "surun wuaucpl.cpl"
   Computer Management:  "surun compmgmt.msc"
+  Group Policy:         "surun gpedit.msc"
   Date and Time:        "surun timedate.cpl"
   Network Connections:	"surun ncpa.cpl"
   Security Center:	    "surun wscui.cpl"
   Software:	            "surun appwiz.cpl"
+  Local Policy:         "surun secpol.msc"
   System Properties:    "surun sysdm.cpl"
 
 Some applications do not work with SuRun when started with the limited current
 user account credentials. These must be started with the credentials of a real 
 Administrator account using "SuRun /RUNAS":
-  Group Policy:         "surun /runas gpedit.msc"
-  Local Policy:         "surun /runas secpol.msc"
   User accounts:        "surun /runas nusrmgr.cpl"
   Windows Update:	      "surun /runas wupdmgr.exe"
 
@@ -183,10 +183,55 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
   Unicode Release" and "SuRun - Win32 x64 Unicode Release" you can compile
   "InstallSuRun - Win32 Release" to build the Install container.
   (You'll need UPX 3.02 or newer in the %path%)
+  
+* To compile SuRun with Visual Studio 2005, you need to have the Plattform SDK
+  installed. Just run BuildSuRun.cmd, or open SuRun.sln and build "SuRun32 
+  Unicode Release|Win32", then "x64 Unicode Release|x64" and at last "Unicode 
+  Release|Win32"
 
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.7 - 2009-09-10 (changes to SuRun 1.2.0.6):
+--------------------------------
+* NEW: Added preliminary Spanish resources
+* NEW: Added check for "*UPGRADE*" in file names that need admin rights
+* NEW: SuRun supports user bitmaps in Vista and Windows 7 (HKLM\SAM\SAM\
+    Domains\Account\Users\<ID>,UserTile)
+* NEW: Implemented Fast User Swithing via command line parameters 
+    "SuRun /SwitchTo <[domain\]user|Session>".
+* CHG: "SuRun /SYSMENUHOOK" will always keep running to be able to close all 
+    processes created by SuRun when receiving WM_ENDSESSION
+* NEW: Added app.manifest to InstallSuRun for better Vista/Win7 compatibility
+* NEW: Added Vista/Win7 compatibility sections to app.manifest
+* NEW: Added command line compiling support for VC8 in BuildSuRun.cmd
+* NEW: IATHook now also hooks SwitchDesktop
+* CHG: Less annoying Balloon Tips
+* CHG: SuRun needs to store the password of domain users
+* CHG: If blank password use is disabled, SuRun shows a less agressive 
+    "The following Administrator accounts have no password" warning
+* CHG: In Windows 2000, XP, 2003, SuRun intercepts process creation from 
+    services.exe, to enable installing hardware without entering a password
+* CHG: Command line parameters for programs to be started are not modified
+* CHG: Hovering the mouse over SuRuns Tray Message Windows show a Hand cursor
+* CHG: SuRun makes Windows turn off the "AppStarting" mouse cursor
+* CHG: Got rid of the "virtualized" status in Windows 7 with new app.manifest
+* CHG: IATHook no longer needs ShlWapi.dll
+* FIX: IATHook GPF'd with unnamed modules
+* FIX: Made hooks NTVDM and Windows 7 compatible
+* FIX: Fixed compiling issues with VC8 (VS2005)
+* FIX: Reduced registry access from "SuRun /Sysmenuhook"
+* FIX: Changed System Menu Hook to modify main system menu only, not sub menus
+* FIX: Gregory Maynard-Hoare reported a vunerability, present in SuRun 1.2.0.0 
+    to SuRun 1.2.0.7b12. Any dll using hooks was (by the Windows OS!) injected 
+    into elevated processes started by SuRun. 
+    Thus any program could run elevated code.
+* FIX: Desktop background did not respect negative monitor area start values
+* FIX: Screen-Fade did not work in Windows 7
+* FIX: SuRuns WatchDog event is set in a timer proc instead of a separate thread.
+    This insures that if SuRuns GUI is blocked, the WathDog shows up.
+* FIX: SuRuns WatchDog did not terminate if SuRuns GUI was "killed"
 
 SuRun 1.2.0.6 - 2009-03-01:
 ---------------------------
