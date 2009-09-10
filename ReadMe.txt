@@ -124,6 +124,8 @@ options:
   /RETPID             return the process ID of the elevated process
   /RUNAS <program>    start <program> as different user
   /SETUP              start "SuRun Settings"
+  /SWITCHTO <User>    Switch Desktop to the session of "User"
+  /SWITCHTO <Session> Switch Desktop to logon session [0,1,2...]
   /UNINSTALL          remove SuRun from the system
   /WAIT               wait until the elevated process exits
 
