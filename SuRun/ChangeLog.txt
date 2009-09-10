@@ -1,5 +1,9 @@
 Done, to be tested:
 ---------------------------
+* NEW: Added app.manifest to InstallSuRun for better Vista/Win7 compatibility
+* NEW: Added Vista/Win7 compatibility sections to app.manifest
+* NEW: Added command line compiling support for VC8 in BuildSuRun.cmd
+* FIX: Fixed compiling issues with VC8 (VS2005)
 
 ToDo
 ---------------------
