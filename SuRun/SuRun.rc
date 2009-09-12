@@ -1447,7 +1447,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Switch users..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1476,8 +1476,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,7
- PRODUCTVERSION 1,2,0,7
+ FILEVERSION 1,2,0,8
+ PRODUCTVERSION 1,2,0,8
  FILEFLAGSMASK 0x0L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1495,14 +1495,14 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
-            VALUE "FileVersion", "1, 2, 0, 7\0"
+            VALUE "FileVersion", "1, 2, 0, 8\0"
             VALUE "InternalName", "SuRun\0"
             VALUE "LegalCopyright", "Copyright © 2007-09 Kay Bruns\0"
             VALUE "LegalTrademarks", "SuRun\0"
             VALUE "OriginalFilename", "SuRun.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "SuperUserRun\0"
-            VALUE "ProductVersion", "1, 2, 0, 7\0"
+            VALUE "ProductVersion", "1, 2, 0, 8\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -1674,7 +1674,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Switch users..."
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
@@ -1693,6 +1693,141 @@ BEGIN
     CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,135,
                     263,9
     EDITTEXT        IDC_USER,107,74,149,12,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] programa [parametros]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_ASKOK               "El comando:\r\n\r\n%s\r\n\r\nesta por ser ejecutado con privilegios elevados."
+    IDS_APPNAME             "SuRun"
+    IDS_NODESK              "Error!\r\n\r\nLa creacion de Escritorio fallo!"
+    IDS_SERVICE_NAME        "Servicio de Super User Run (SuRun)"
+    IDS_ASKRUNAS            "Por favor ingresar las credenciales para correr:\r\n\r\n%s"
+    IDS_UNINSTALLADMIN      "Necesita tener derechos administrativos para desinstalar SuRun.\r\n\r\nPor favor ingresar las credenciales de un Administrador para este sistema:"
+    IDS_INSTALLADMIN        "Necesita tener derechos administrativos para instalar SuRun.\r\n\r\nPor favor ingresar las credenciales de un Administrador para este sistema:"
+    IDS_LOGONFAILED         "Inicio de Sesion fallo!\r\n\r\nControlar el nombre de usuario y clave e intentar otra vez!\r\n\r\nNotar que el nombre de usuario y clave respetan mayusculas y minusculas."
+    IDS_NOADMIN             "Error!\r\n\r\nEl usuario %s no es Administrador!"
+    IDS_NOSURUNNER          "Necesita ser miembro del grupo de usuarios ""SuRunners"" para usar SuRun.\r\n\r\nIngresar credenciales administrativas para convertirse en miembro de ""SuRunners"".\r\n\r\nDe otra forma presione 'Cancelar'!"
+    IDS_ASKSURUNNER         "Necesita ser miembro del grupo de usuarios ""SuRunners"" para usar SuRun.\r\n\r\nQuiere convertirse en miembro de ""SuRunners""?\r\n\r\nSi presiona Aceptar, se convertira en SuRunner y PERDERA su ESTADO de ADMINISTRADOR.\r\n\r\nSi no esta seguro de lo que va a hacer, presione ""No""."
+    IDS_MENUSTR             "Iniciar como administrador"
+    IDS_BUILTINADMIN        "Ud. es un Administrador ""genuino"".\r\n\r\nNo puede usar SuRun porque no puede desempeñarse como usuario normal!"
+    IDS_SURUNNER_OK         "Ud. ha sido agregado al grupo de usuarios ""SuRunners"" satisfactoriamente."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DELUSER             "Quiere remover al usuario '%s' del grupo local SuRunners.\r\n\r\nTodas las configuraciones especificas de SuRun seran borradas.\r\n\r\nQuiere agregar al usuario al grupo local de administradores?"
+    IDS_CANCEL              "Cancelar (%d)"
+    IDS_NOADD2USERS         "Error!\r\n\r\nEl intento de colocar su cuenta en el grupo de usuarios comunes fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
+    IDS_NOREMADMINS         "Error!\r\n\r\nEl intento de remover su cuenta del grupo de administradores fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
+    IDS_ADMINSHELL          "La consola de Windows esta actualmente corriendo con derechos administrativos!\r\n\r\nNecesita cerrar y abrir sesion antes de usar SuRun."
+    IDS_SIMPLESETUP         "Quiere restablecer todos los ajustes a los valores recomendados para usuarios comunes?"
+    IDS_NOADMIN2            "(%s) no tiene permiso para modificar los 'Ajustes de SuRun'.\r\n\r\nIngresar credenciales administrativas para cambiar las opciones de SuRun.\r\n\r\nDe otra forma presione 'Cancelar'!"
+    IDS_RUNRESTRICTED       "Las opciones de SuRun lo restringen a Ud. (%s) para solo correr las aplicaciones especificadas.\r\nU. no esta permitido iniciar '%s' con privilegios elevados."
+    IDS_SETUP1              "Ajustes Comunes"
+    IDS_SETUP2              "Grupo SuRunners"
+    IDS_SETUP3              "Intercepciones de Ejecucion"
+    IDS_SETUP4              "Avanzado"
+    IDS_ASKAUTO             "La aplicacion:\r\n\r\n%s\r\n\r\nparece requerir privilegios elevados para correr apropiadamente.\r\n\r\nSi presiona 'Cancelar' la aplicacion sera iniciada sin privilegios elevados."
+    IDS_ASKSURUNNER2        "Necesita ser miembro del grupo de usuarios ""SuRunners"" para usar SuRun.\r\n\r\nQuiere convertirse en miembro de ""SuRunners""?\r\n\r\nSi no esta seguro de lo que va a hacer, presione ""No""."
+    IDS_ASKSURUNNER3        "Quiere convertir a '%s' en miembro de 'SuRunners'?"
+    IDS_STARTED             "Info:\r\n%s\r\nesta corriendo con privilegios elevados."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ASKSURUNNER1        "Quiere convertir a '%s' en miembro de 'SuRunners'?\r\n\r\nSi presiona Aceptar, '%s' se convertira en SuRunner y PERDERA el ESTADO de ADMINISTRADOR."
+    IDS_BUILTINADMIN1       "'%s' es un Administrador ""genuino"".\r\n\r\nEste usuario no puede usar SuRun porque no puede desempeñarse como usuario normal!"
+    IDS_NOADD2USERS1        "Error!\r\n\r\nEl intento de colocar a '%s' en el grupo de usuarios comunes fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
+    IDS_SURUNNER_ERR1       "Error!\r\n\r\nEl intento de colocar a '%s' en el grupo de usuarios ""SuRunners"" fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
+    IDS_ADDUNINST           "Guardando informacion para desinstalacion en el registro"
+    IDS_ADDAUTORUN          "Instalando autoejecucion para ""SuRun /SysmenuHook"""
+    IDS_ADDASSOC            "Instalando asociaciones de SuRun en el Registro"
+    IDS_ADDCPL              "Instalando 'Ajustes de SuRun' en el Panel de Control"
+    IDS_REMUNINST           "Removiendo informacion para desinstalacion del Registro"
+    IDS_REMAUTORUN          "Removiendo autoejecucion para ""SuRun /SysmenuHook"""
+    IDS_REMASSOC            "Removiendo asociaciones de SuRun del Registro"
+    IDS_REMCPL              "Removiendo 'Ajustes de SuRun' del Panel de Control"
+    IDS_DELFILE             "Borrando archivo '%s'"
+    IDS_DELFILEBOOT         "El archivo '%s' sera removido en el siguiente inicio de sistema"
+    IDS_IMPORTFAIL          "Restablecer fallo!\r\nEl archivo %s no se encontro."
+    IDS_COPYFILE            "Copiando el archivo '%s' a '%s'"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_SURUNNER_ERR        "Error!\r\n\r\nEl intento de colocar su cuenta en el grupo de usuarios ""SuRunners"" fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
+    IDS_LOGOFFON            "Ud. ha sido agregado a los ""SuRunners"" y removido del grupo de usuarios Administradores satisfactoriamente.\r\n\r\nPara contirnuar usando su computadora con privilegios de acceso limitados necesita cerrar y abrir la sesion."
+    IDS_SYSMENUEXT          "Extension de Menu de Sistema de SuRun"
+    IDS_SURUNINST           "Instalar como administrador"
+    IDS_SURUNUNINST         "Remover como administrador"
+    IDS_SURUNREPAIR         "Reparar como administrador"
+    IDS_CPLNAME             "Ajustes de SuRun"
+    IDS_RUNFAILED           "Error!\r\n\r\n%s\r\n\r\nno pudo ser iniciado."
+    IDS_EMPTYPASS           "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s\nUsar SuRun es inutil si Ud. no establece una clave para estas cuentas!"
+    IDS_STARTMENUDIR        "SuRun"
+    IDS_SURUNSTUCK          "SuRun no esta respondiendo!\n\nEsto puede ser causado por un sistema de proteccion de intrusos (HIPS)\nel cual esta tratando de comunicarle algo.\n\nPresione aqui para retornar a su escritorio."
+    IDS_SWITCHBACK          "Presione aqui para retornar\nal Escritorio de SuRun."
+    IDS_APPOK               "La linea de comandos parece no trabajar.\n\nEsta seguro que la linea de comandos esta bien?\n(Puso entre comillas los espacios?)"
+    IDS_GRPDESC             "Los miembros de este grupo pueden usar SuRun."
+    IDS_ADDTOBLKLIST        "Agregar programa a no interceptar"
+    IDS_ADDFILETOLIST       "Ingresar nombre de archivo y linea de comando"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_DELSERVICE          "Borrando servicio de SuRun"
+    IDS_DELREG              "Removiendo configuraciones de registro de SuRun"
+    IDS_SR2ADMIN            "Colocando '%s' al grupo local de administradores"
+    IDS_DELSURUNNERS        "Borrando el grupo local 'SuRunners'"
+    IDS_INSTFAILED          "Instalacion fallo!"
+    IDS_CLOSE               "&Cerrar"
+    IDS_INSTSUCCESS         "SuRun fue instalado satisfactoriamente"
+    IDS_INSTSUCCESS2        "Debe cerrar sesion antes de usar SuRun"
+    IDC_LOGOFF              "&Cerrar sesion"
+    IDC_INSTALL             "SuRun esta siendo instalado"
+    IDS_STARTSVC            "Iniciando el servicio de SuRun"
+    IDS_INSTSVC             "Instalando el servicio de SuRun"
+    IDC_UNINSTALL           "SuRun esta siendo removido"
+    IDS_UNINSTFAILED        "Desinstalacion fallo!"
+    IDS_UNINSTSUCCESS       "SuRun fue desinstalado"
+    IDS_RUNAS               "Ejecutar como..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_WARNADMIN           "Todos los usuarios"
+    IDS_WARNADMIN2          "SuRunners y Administradores"
+    IDS_WARNADMIN3          "SuRunners y Administradores no restringidos (*)"
+    IDS_WARNADMIN4          "Administradores"
+    IDS_WARNADMIN5          "No usuarios"
+    IDS_SHNAME1             "Mi PC"
+    IDS_SHNAME2             "Mis sitios de red"
+    IDS_SHNAME3             "Conexiones de red"
+    IDS_SHNAME4             "Panel de Control"
+    IDS_SHNAME5             "Papelera de reciclaje"
+    IDS_SHNAME6             "Fuentes"
+    IDS_SHNAME7             "Herramientas Administrativas"
+    IDS_SHNAME8             "Mis Documentos"
+    IDS_BEAUTIFIED          "%s\r\n[Significando: %s]"
+    IDS_PW4SETUP            "Para cambiar ajustes de SuRun necesita ingresar su clave."
+    IDS_REBOOT              "&Reiniciar"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_INSTSUCCESS3        "El sistema debe ser reiniciado!"
+    IDS_HIDESELF            "Realmente quiere ocultar a SuRun de Ud. mismo?\n\nNo podra cambiar ajustes de SuRun luego de hacer esto."
+    IDS_NOIMPORT            "Debe ser miembro del grupo local de administradores\npara importar las configuraciones de SuRun."
+    IDS_NOEXPORT            "Debe ser miembro del grupo local de administradores\npara exportar las configuraciones de SuRun."
+    IDS_EMPTYPASS3          "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s"
+    IDS_SRACCDESC           "Helper account for SuRun"
 END
 
 #endif    // Spanish (Castilian) resources
@@ -2400,153 +2535,6 @@ END
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Modern) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
-#ifdef _WIN32
-LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] programa [parametros]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
-    IDS_ASKOK               "El comando:\r\n\r\n%s\r\n\r\nesta por ser ejecutado con privilegios elevados."
-    IDS_APPNAME             "SuRun"
-    IDS_NODESK              "Error!\r\n\r\nLa creacion de Escritorio fallo!"
-    IDS_SERVICE_NAME        "Servicio de Super User Run (SuRun)"
-    IDS_ASKRUNAS            "Por favor ingresar las credenciales para correr:\r\n\r\n%s"
-    IDS_UNINSTALLADMIN      "Necesita tener derechos administrativos para desinstalar SuRun.\r\n\r\nPor favor ingresar las credenciales de un Administrador para este sistema:"
-    IDS_INSTALLADMIN        "Necesita tener derechos administrativos para instalar SuRun.\r\n\r\nPor favor ingresar las credenciales de un Administrador para este sistema:"
-    IDS_LOGONFAILED         "Inicio de Sesion fallo!\r\n\r\nControlar el nombre de usuario y clave e intentar otra vez!\r\n\r\nNotar que el nombre de usuario y clave respetan mayusculas y minusculas."
-    IDS_NOADMIN             "Error!\r\n\r\nEl usuario %s no es Administrador!"
-    IDS_NOSURUNNER          "Necesita ser miembro del grupo de usuarios ""SuRunners"" para usar SuRun.\r\n\r\nIngresar credenciales administrativas para convertirse en miembro de ""SuRunners"".\r\n\r\nDe otra forma presione 'Cancelar'!"
-    IDS_ASKSURUNNER         "Necesita ser miembro del grupo de usuarios ""SuRunners"" para usar SuRun.\r\n\r\nQuiere convertirse en miembro de ""SuRunners""?\r\n\r\nSi presiona Aceptar, se convertira en SuRunner y PERDERA su ESTADO de ADMINISTRADOR.\r\n\r\nSi no esta seguro de lo que va a hacer, presione ""No""."
-    IDS_MENUSTR             "Iniciar como administrador"
-    IDS_BUILTINADMIN        "Ud. es un Administrador ""genuino"".\r\n\r\nNo puede usar SuRun porque no puede desempeñarse como usuario normal!"
-    IDS_SURUNNER_OK         "Ud. ha sido agregado al grupo de usuarios ""SuRunners"" satisfactoriamente."
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELUSER             "Quiere remover al usuario '%s' del grupo local SuRunners.\r\n\r\nTodas las configuraciones especificas de SuRun seran borradas.\r\n\r\nQuiere agregar al usuario al grupo local de administradores?"
-    IDS_CANCEL              "Cancelar (%d)"
-    IDS_NOADD2USERS         "Error!\r\n\r\nEl intento de colocar su cuenta en el grupo de usuarios comunes fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Error!\r\n\r\nEl intento de remover su cuenta del grupo de administradores fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
-    IDS_ADMINSHELL          "La consola de Windows esta actualmente corriendo con derechos administrativos!\r\n\r\nNecesita cerrar y abrir sesion antes de usar SuRun."
-    IDS_SIMPLESETUP         "Quiere restablecer todos los ajustes a los valores recomendados para usuarios comunes?"
-    IDS_NOADMIN2            "(%s) no tiene permiso para modificar los 'Ajustes de SuRun'.\r\n\r\nIngresar credenciales administrativas para cambiar las opciones de SuRun.\r\n\r\nDe otra forma presione 'Cancelar'!"
-    IDS_RUNRESTRICTED       "Las opciones de SuRun lo restringen a Ud. (%s) para solo correr las aplicaciones especificadas.\r\nU. no esta permitido iniciar '%s' con privilegios elevados."
-    IDS_SETUP1              "Ajustes Comunes"
-    IDS_SETUP2              "Grupo SuRunners"
-    IDS_SETUP3              "Intercepciones de Ejecucion"
-    IDS_SETUP4              "Avanzado"
-    IDS_ASKAUTO             "La aplicacion:\r\n\r\n%s\r\n\r\nparece requerir privilegios elevados para correr apropiadamente.\r\n\r\nSi presiona 'Cancelar' la aplicacion sera iniciada sin privilegios elevados."
-    IDS_ASKSURUNNER2        "Necesita ser miembro del grupo de usuarios ""SuRunners"" para usar SuRun.\r\n\r\nQuiere convertirse en miembro de ""SuRunners""?\r\n\r\nSi no esta seguro de lo que va a hacer, presione ""No""."
-    IDS_ASKSURUNNER3        "Quiere convertir a '%s' en miembro de 'SuRunners'?"
-    IDS_STARTED             "Info:\r\n%s\r\nesta corriendo con privilegios elevados."
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_ASKSURUNNER1        "Quiere convertir a '%s' en miembro de 'SuRunners'?\r\n\r\nSi presiona Aceptar, '%s' se convertira en SuRunner y PERDERA el ESTADO de ADMINISTRADOR."
-    IDS_BUILTINADMIN1       "'%s' es un Administrador ""genuino"".\r\n\r\nEste usuario no puede usar SuRun porque no puede desempeñarse como usuario normal!"
-    IDS_NOADD2USERS1        "Error!\r\n\r\nEl intento de colocar a '%s' en el grupo de usuarios comunes fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
-    IDS_SURUNNER_ERR1       "Error!\r\n\r\nEl intento de colocar a '%s' en el grupo de usuarios ""SuRunners"" fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
-    IDS_ADDUNINST           "Guardando informacion para desinstalacion en el registro"
-    IDS_ADDAUTORUN          "Instalando autoejecucion para ""SuRun /SysmenuHook"""
-    IDS_ADDASSOC            "Instalando asociaciones de SuRun en el Registro"
-    IDS_ADDCPL              "Instalando 'Ajustes de SuRun' en el Panel de Control"
-    IDS_REMUNINST           "Removiendo informacion para desinstalacion del Registro"
-    IDS_REMAUTORUN          "Removiendo autoejecucion para ""SuRun /SysmenuHook"""
-    IDS_REMASSOC            "Removiendo asociaciones de SuRun del Registro"
-    IDS_REMCPL              "Removiendo 'Ajustes de SuRun' del Panel de Control"
-    IDS_DELFILE             "Borrando archivo '%s'"
-    IDS_DELFILEBOOT         "El archivo '%s' sera removido en el siguiente inicio de sistema"
-    IDS_IMPORTFAIL          "Restablecer fallo!\r\nEl archivo %s no se encontro."
-    IDS_COPYFILE            "Copiando el archivo '%s' a '%s'"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_SURUNNER_ERR        "Error!\r\n\r\nEl intento de colocar su cuenta en el grupo de usuarios ""SuRunners"" fallo.\r\nWindows reporta el error como:\r\n\r\n%s"
-    IDS_LOGOFFON            "Ud. ha sido agregado a los ""SuRunners"" y removido del grupo de usuarios Administradores satisfactoriamente.\r\n\r\nPara contirnuar usando su computadora con privilegios de acceso limitados necesita cerrar y abrir la sesion."
-    IDS_SYSMENUEXT          "Extension de Menu de Sistema de SuRun"
-    IDS_SURUNINST           "Instalar como administrador"
-    IDS_SURUNUNINST         "Remover como administrador"
-    IDS_SURUNREPAIR         "Reparar como administrador"
-    IDS_CPLNAME             "Ajustes de SuRun"
-    IDS_RUNFAILED           "Error!\r\n\r\n%s\r\n\r\nno pudo ser iniciado."
-    IDS_EMPTYPASS           "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s\nUsar SuRun es inutil si Ud. no establece una clave para estas cuentas!"
-    IDS_STARTMENUDIR        "SuRun"
-    IDS_SURUNSTUCK          "SuRun no esta respondiendo!\n\nEsto puede ser causado por un sistema de proteccion de intrusos (HIPS)\nel cual esta tratando de comunicarle algo.\n\nPresione aqui para retornar a su escritorio."
-    IDS_SWITCHBACK          "Presione aqui para retornar\nal Escritorio de SuRun."
-    IDS_APPOK               "La linea de comandos parece no trabajar.\n\nEsta seguro que la linea de comandos esta bien?\n(Puso entre comillas los espacios?)"
-    IDS_GRPDESC             "Los miembros de este grupo pueden usar SuRun."
-    IDS_ADDTOBLKLIST        "Agregar programa a no interceptar"
-    IDS_ADDFILETOLIST       "Ingresar nombre de archivo y linea de comando"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELSERVICE          "Borrando servicio de SuRun"
-    IDS_DELREG              "Removiendo configuraciones de registro de SuRun"
-    IDS_SR2ADMIN            "Colocando '%s' al grupo local de administradores"
-    IDS_DELSURUNNERS        "Borrando el grupo local 'SuRunners'"
-    IDS_INSTFAILED          "Instalacion fallo!"
-    IDS_CLOSE               "&Cerrar"
-    IDS_INSTSUCCESS         "SuRun fue instalado satisfactoriamente"
-    IDS_INSTSUCCESS2        "Debe cerrar sesion antes de usar SuRun"
-    IDC_LOGOFF              "&Cerrar sesion"
-    IDC_INSTALL             "SuRun esta siendo instalado"
-    IDS_STARTSVC            "Iniciando el servicio de SuRun"
-    IDS_INSTSVC             "Instalando el servicio de SuRun"
-    IDC_UNINSTALL           "SuRun esta siendo removido"
-    IDS_UNINSTFAILED        "Desinstalacion fallo!"
-    IDS_UNINSTSUCCESS       "SuRun fue desinstalado"
-    IDS_RUNAS               "Ejecutar como..."
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_WARNADMIN           "Todos los usuarios"
-    IDS_WARNADMIN2          "SuRunners y Administradores"
-    IDS_WARNADMIN3          "SuRunners y Administradores no restringidos (*)"
-    IDS_WARNADMIN4          "Administradores"
-    IDS_WARNADMIN5          "No usuarios"
-    IDS_SHNAME1             "Mi PC"
-    IDS_SHNAME2             "Mis sitios de red"
-    IDS_SHNAME3             "Conexiones de red"
-    IDS_SHNAME4             "Panel de Control"
-    IDS_SHNAME5             "Papelera de reciclaje"
-    IDS_SHNAME6             "Fuentes"
-    IDS_SHNAME7             "Herramientas Administrativas"
-    IDS_SHNAME8             "Mis Documentos"
-    IDS_BEAUTIFIED          "%s\r\n[Significando: %s]"
-    IDS_PW4SETUP            "Para cambiar ajustes de SuRun necesita ingresar su clave."
-    IDS_REBOOT              "&Reiniciar"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_INSTSUCCESS3        "El sistema debe ser reiniciado!"
-    IDS_HIDESELF            "Realmente quiere ocultar a SuRun de Ud. mismo?\n\nNo podra cambiar ajustes de SuRun luego de hacer esto."
-    IDS_NOIMPORT            "Debe ser miembro del grupo local de administradores\npara importar las configuraciones de SuRun."
-    IDS_NOEXPORT            "Debe ser miembro del grupo local de administradores\npara exportar las configuraciones de SuRun."
-    IDS_EMPTYPASS3          "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s"
-    IDS_SRACCDESC           "Helper account for SuRun"
-END
-
-#endif    // Spanish (Modern) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // Spanish (Castilian) (unknown sub-lang: 0xB) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESS)
@@ -2793,7 +2781,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Clave requerida"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -2826,7 +2814,7 @@ STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS |
     DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Autorizacion requerida"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
@@ -2905,7 +2893,7 @@ IDD_UPDATE DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Actualizacion"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Actualizar >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
@@ -2928,7 +2916,7 @@ IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "Remover SuRun"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Remover >>",IDIGNORE,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38

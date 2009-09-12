@@ -116,6 +116,8 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain=0);
 
 //GetProcessID
 DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1);
+//GetProcessName
+BOOL GetProcessName(DWORD PID,LPTSTR ProcessName);
 
 //Shell stuff
 HANDLE GetShellProcessToken();
