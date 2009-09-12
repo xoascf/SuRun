@@ -167,7 +167,8 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle,DWORD& Cu
   wnd=Wnd;
   CurPID=g_TSAData.CurPID;
   if (!InternalGetWindowText(wnd,WndTitle,MAX_PATH))
-    _stprintf(WndTitle,L"Process %d",g_TSAData.CurPID);
+    if (!GetProcessName(CurPID,WndTitle))
+      _stprintf(WndTitle,L"Process %d",CurPID);
   return g_TSAData.CurUserIsadmin;
 }
 

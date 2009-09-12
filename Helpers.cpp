@@ -1261,6 +1261,48 @@ DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID/*=-1*/)
   return dwRet;
 }
 
+BOOL GetProcessName(DWORD PID,LPTSTR ProcessName)
+{
+  //Terminal Services:
+  DWORD nProcesses=0;
+  WTS_PROCESS_INFO* pwtspi=0;
+  WTSEnumerateProcesses(WTS_CURRENT_SERVER_HANDLE,0,1,&pwtspi,&nProcesses);
+  for (DWORD Process=0;Process<nProcesses;Process++) 
+  {
+    if(pwtspi[Process].ProcessId==PID)
+    {
+      _tcscpy(ProcessName,pwtspi[Process].pProcessName);
+      //PathStripPath(ProcessName);
+      return WTSFreeMemory(pwtspi), TRUE;
+    }
+  }
+  WTSFreeMemory(pwtspi);
+  //ToolHelp
+  HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
+  if (hSnap==INVALID_HANDLE_VALUE)
+  {
+    DBGTrace1("CreateToolhelp32Snapshot failed: %s",GetLastErrorNameStatic());
+    return FALSE; 
+  }
+  BOOL bRet=FALSE;
+  PROCESSENTRY32 pe={0};
+  pe.dwSize = sizeof(PROCESSENTRY32);
+  bool bFirst=true;
+  while((bFirst?Process32First(hSnap,&pe):Process32Next(hSnap,&pe)))
+  {
+    bFirst=false;
+    if (pe.th32ProcessID==PID)
+    {
+      _tcscpy(ProcessName,pe.szExeFile);
+      //PathStripPath(ProcessName);
+      bRet=TRUE;
+      break;
+    }
+  }
+  CloseHandle(hSnap);
+  return bRet;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // 
 // GetShellProcessToken

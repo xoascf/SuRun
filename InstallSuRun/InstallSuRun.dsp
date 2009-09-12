@@ -117,12 +117,36 @@ SOURCE=.\resource.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
+SOURCE=.\app.manifest
+# End Source File
+# Begin Source File
+
 SOURCE=..\res\SuRun.ico
 # End Source File
 # Begin Source File
 
-SOURCE=.\app.manifest
+SOURCE=..\ReleaseUx64\SuRun32.bin
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\ReleaseU\SuRun.exe
+# End Source File
+# Begin Source File
+
+SOURCE=..\ReleaseUx64\SuRun.exe
+# End Source File
+# Begin Source File
+
+SOURCE=..\ReleaseU\SuRunExt.dll
+# End Source File
+# Begin Source File
+
+SOURCE=..\ReleaseUx64\SuRunExt.dll
+# End Source File
+# Begin Source File
+
+SOURCE=..\ReleaseUx64\SuRunExt32.dll
+# End Source File
 # End Target
 # End Project

@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* TSA: Processes with unknown Windows Text are displayed with their exe name, 
+  not their Process ID
 
 ToDo
 ---------------------

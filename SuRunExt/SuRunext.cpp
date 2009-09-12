@@ -874,12 +874,15 @@ static HANDLE l_InitThread=0;
 DWORD WINAPI InitProc(void* p)
 {
 //  CTimeLog l(L"InitProc");
-  while (!GetModuleHandleA("psapi.dll"))
+  if (p)
   {
-    //Wait until all Loadlibrary Operations are done by setting the threads prio
-    //to lowest. [Windows NT does not run lower prio threads while higher prio 
-    //threads are redy to run]
-    Sleep(1);
+    while (!GetModuleHandleA("psapi.dll"))
+    {
+      //Wait until all Loadlibrary Operations are done by setting the threads prio
+      //to lowest. [Windows NT does not run lower prio threads while higher prio 
+      //threads are redy to run]
+      Sleep(1);
+    }
   }
   //Resources
   l_Groups=UserIsInSuRunnersOrAdmins();
@@ -978,6 +981,6 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if (GetModuleHandleA("psapi.dll"))
     InitProc(0);
   else
-    l_InitThread=CreateThread(0,0,InitProc,0,0,0);
+    l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
   return TRUE;
 }
