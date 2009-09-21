@@ -90,7 +90,7 @@ BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** Re
   return bRet;
 }
 
-BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes)
+BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWORD nBytes,BOOL bFlush/*=FALSE*/)
 {
   HKEY Key;
   DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key);
@@ -99,6 +99,8 @@ BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWOR
   if (dwRes==ERROR_SUCCESS)
   {
     LONG l=RegSetValueEx(Key,ValName,0,Type,Data,nBytes);
+    if (bFlush)
+      RegFlushKey(Key);
     RegCloseKey(Key);
     return l==ERROR_SUCCESS;
   }else
@@ -106,13 +108,15 @@ BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWOR
   return FALSE;
 }
 
-BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName)
+BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,BOOL bFlush/*=FALSE*/)
 {
   HKEY Key;
   DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key);
   if (dwRes==ERROR_SUCCESS)
   {
     BOOL bRet=RegDeleteValue(Key,ValName)==ERROR_SUCCESS;
+    if (bFlush)
+      RegFlushKey(Key);
     RegCloseKey(Key);
     return bRet;
   }

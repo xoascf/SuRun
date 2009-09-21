@@ -679,6 +679,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
     return; 
   }
+  RestoreUserPasswords();
   if (GetUseSVCHook)
     InjectIATHook(L"services.exe");
   //Steal token from LSASS.exe to get SeCreateTokenPrivilege in Vista

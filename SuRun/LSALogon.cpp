@@ -402,6 +402,34 @@ HANDLE GetSavedPasswordUserToken(LPTSTR UserName)
   return hUser;
 }
 
+void RestoreUserPasswords()
+{
+  BYTE* V;
+  DWORD nV;
+  DWORD Vtype;
+  TCHAR UserID[10];
+  zero(UserID);
+  int i=0;
+  while(RegEnumValName(HKLM,CResStr(SVCKEY L"\\Restore"),i,UserID,sizeof(UserID)/sizeof(TCHAR)))
+  {
+    V=0;
+    nV=0;
+    Vtype=0;
+    if(GetRegAnyAlloc(HKLM,CResStr(SVCKEY L"\\Restore"),UserID,&Vtype,&V,&nV))
+    {
+      if (!SetRegAny(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%s",UserID),L"V",Vtype,V,nV,TRUE))
+        DBGTrace1("Fatal Error, could not restore user(%s) credentials!",UserID);
+      free(V);
+    }else
+      DBGTrace1("Fatal Error, could not restore user(%s) credentials!",UserID);
+    free(V);
+    zero(UserID);
+    i++;
+  }
+  DelRegKey(HKLM,CResStr(SVCKEY L"\\Restore"));
+  RegFlushKey(HKLM);
+}
+
 HANDLE GetTempAdminToken(LPTSTR UserName)
 {
   HANDLE hUser=g_Tokens.Find(UserName);
@@ -424,6 +452,11 @@ HANDLE GetTempAdminToken(LPTSTR UserName)
   }
   if(!GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",&Vtype,&V,&nV))
     return 0;
+  if (!SetRegAny(HKLM,CResStr(SVCKEY L"\\Restore"),CResStr(L"%08X",UserID),Vtype,V,nV,TRUE))
+  {
+    DBGTrace1("Fatal Error, could not create backup of user(%s) credentials!",UserName);
+    return 0;
+  }
   RPC_WSTR p=0;
   {
     UUID id;
@@ -444,11 +477,14 @@ HANDLE GetTempAdminToken(LPTSTR UserName)
     hUser=LogonAsAdmin(UserName,(LPWSTR)p);
   }
   RpcStringFree(&p);
-  if (!SetRegAny(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",Vtype,V,nV))
+  if (!SetRegAny(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",Vtype,V,nV,TRUE))
     DBGTrace1("Fatal Error, could not restore user(%s) credentials!",UserName);
   free(V);
+  if (!RegDelVal(HKLM,CResStr(SVCKEY L"\\Restore"),CResStr(L"%08X",UserID),TRUE))
+    DBGTrace1("Fatal Error, could not delete backup of user(%s) credentials!",UserName);
   if (hUser)
     g_Tokens.Add(UserName,hUser);
+  RestoreUserPasswords();
   return hUser;
 }
 

@@ -5,6 +5,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
 
 HANDLE LogonAsAdmin(LPTSTR UserName,LPTSTR p);
 
+void RestoreUserPasswords();
 void DeleteTempAdminTokens();
 HANDLE GetTempAdminToken(LPTSTR UserName);
 
