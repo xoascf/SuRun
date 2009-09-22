@@ -1,7 +1,5 @@
 Done, to be tested:
 ---------------------------
-* TSA: Processes with unknown Windows Text are displayed with their exe name, 
-  not their Process ID
 
 ToDo
 ---------------------
@@ -29,6 +27,12 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.0.8 Beta 1 - 2009-09-22
+---------------------------------
+* SuRun flushes the registry to disk after restoring the user password hash
+  and restores the password hash on power loss
+* TSA: Processes with unknown Windows Text are displayed with their exe name
+
 SuRun 1.2.0.7 - 2009-09-10 (changes to SuRun 1.2.0.6):
 --------------------------------
 * NEW: Added preliminary Spanish resources
