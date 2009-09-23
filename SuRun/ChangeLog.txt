@@ -27,11 +27,20 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.8 - 2009-09-23
+--------------------------
+* renamed SuRun 1.2.0.8 Beta 1 to SuRun 1.2.0.8
+
 SuRun 1.2.0.8 Beta 1 - 2009-09-22
 ---------------------------------
-* SuRun flushes the registry to disk after restoring the user password hash
-  and restores the password hash on power loss
-* TSA: Processes with unknown Windows Text are displayed with their exe name
+* CHG: The tray symbol shows Processes with unknown Windows Text with their 
+    file name
+* FIX: Starting with SuRun 1.2.0.7, after a SuRunner started one application as 
+    Administrator and the system was not shut down properly (E.g. in cause of a
+    power loss), the user's password was messed up. Now SuRun flushes the 
+    registry to disk after restoring the user password hash and restores the 
+    password hash on power loss.
 
 SuRun 1.2.0.7 - 2009-09-10 (changes to SuRun 1.2.0.6):
 --------------------------------

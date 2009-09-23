@@ -195,8 +195,18 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.7 - 2009-09-10 (changes to SuRun 1.2.0.6):
---------------------------------
+SuRun 1.2.0.8 - 2009-09-23
+--------------------------
+* CHG: The tray symbol shows Processes with unknown Windows Text with their 
+    file name
+* FIX: Starting with SuRun 1.2.0.7, after a SuRunner started one application as 
+    Administrator and the system was not shut down properly (E.g. in cause of a
+    power loss), the user's password was messed up. Now SuRun flushes the 
+    registry to disk after restoring the user password hash and restores the 
+    password hash on power loss.
+
+SuRun 1.2.0.7 - 2009-09-10:
+---------------------------
 * NEW: Added preliminary Spanish resources
 * NEW: Added check for "*UPGRADE*" in file names that need admin rights
 * NEW: SuRun supports user bitmaps in Vista and Windows 7 (HKLM\SAM\SAM\
