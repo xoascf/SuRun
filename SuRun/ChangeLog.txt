@@ -28,6 +28,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.9 Beta 1 - 2009-10-09
+---------------------------------
+* FIX: HideAppStartCursor() caused InstallSuRun on Win7 with Aero to terminate
+
 SuRun 1.2.0.8 - 2009-09-23
 --------------------------
 * renamed SuRun 1.2.0.8 Beta 1 to SuRun 1.2.0.8

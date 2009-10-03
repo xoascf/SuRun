@@ -397,11 +397,10 @@ BOOL ProcessTrayShowAdmin(BOOL bShowTray,BOOL bBalloon)
   MSG msg;
   do
   {
-    if(GetMessage(&msg,0,0,0))
-    {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
+    if(!GetMessage(&msg,0,0,0))
+      return FALSE;
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
   }while(PeekMessage(&msg,0,0,0,PM_NOREMOVE));
   return TRUE;
 }

@@ -730,7 +730,7 @@ BOOL TestLogonDlg()
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   
-  return 1;
+//  return 1;
 
   l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
   if (l==-1)
@@ -790,7 +790,7 @@ BOOL TestLogonDlg()
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
 
-  ::ExitProcess(0);
+//  ::ExitProcess(0);
   return TRUE;
 }
 

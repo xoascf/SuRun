@@ -69,7 +69,7 @@ static void HideAppStartCursor()
   HWND w=CreateWindow(_TEXT("Static"),0,0,0,0,0,0,0,0,0,0);
   PostMessage(w,WM_QUIT,0,0);
   MSG msg;
-  GetMessage(&msg,0,0,0);
+  GetMessage(&msg,w,WM_QUIT,WM_QUIT);
   DestroyWindow(w);
 }
 
@@ -111,7 +111,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
 //  ResolveCommandLine(L"control",g_RunData.CurDir,g_RunData.cmdLine);
 //  LSAStartAdminProcess() ;
-  ExitProcess(0);
+//  ExitProcess(0);
 #endif _DEBUG
   HideAppStartCursor();
   if(HandleServiceStuff())
