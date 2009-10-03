@@ -30,6 +30,9 @@ SuRun Changes:
 
 SuRun 1.2.0.9 Beta 1 - 2009-10-09
 ---------------------------------
+* CHG: On Windows 7 SuRun does not support and Display "Start as Administrator"
+    on the control panel and the recycle bin. Also SuRun does not display 
+    "(Re)start as Administrator" in Explorer's system menu
 * FIX: HideAppStartCursor() caused InstallSuRun on Win7 with Aero to terminate
 
 SuRun 1.2.0.8 - 2009-09-23

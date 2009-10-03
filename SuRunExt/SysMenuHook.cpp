@@ -66,6 +66,25 @@ BOOL IsShell()
   return g_IsShell;
 }
 
+BOOL g_IsWin7Explorer=-1;
+
+BOOL IsWin7Explorer()
+{
+  if (g_IsWin7Explorer!=-1)
+    return g_IsWin7Explorer;
+  g_IsWin7Explorer=FALSE;
+  if (!IsWin7)
+    return FALSE;
+  TCHAR app[MAX_PATH]={0};
+  GetSystemWindowsDirectory(app,MAX_PATH);
+  PathAppend(app,_T("explorer.exe"));
+
+  TCHAR cmd[MAX_PATH]={0};
+  GetProcessFileName(cmd,MAX_PATH);
+  g_IsWin7Explorer=_tcsicmp(cmd,app)==0;
+  return g_IsWin7Explorer;
+}
+
 UINT GetMenuItemType(HMENU m,int pos)
 {
   MENUITEMINFO mii={0};
@@ -119,6 +138,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       if ((HIWORD(wps->lParam)==TRUE) 
         && IsMenu(hmenu) 
         && (GetSystemMenu((HWND)wps->hwnd,FALSE)==hmenu)
+        && (!IsWin7Explorer())
         && (!l_IsAdmin)
         && (!GetHideFromUser(l_User)))
       {

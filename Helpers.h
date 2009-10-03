@@ -19,6 +19,7 @@
 #define CHK_BOOL_FN(p) if(!p) DBGTrace2("%s failed: %s",_T(#p),GetLastErrorNameStatic());
 
 #define IsWin2k ((_winmajor==5)&&(_winminor==0))
+#define IsWin7 ((_winmajor==6)&&(_winminor==1))
 
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT
