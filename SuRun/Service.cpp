@@ -1277,13 +1277,13 @@ DWORD LSAStartAdminProcess()
       BOOL bIsExplorer=FALSE;
       {
         TCHAR app[MAX_PATH]={0};
-        GetSystemWindowsDirectory(app,4096);
+        GetSystemWindowsDirectory(app,MAX_PATH);
         PathAppend(app,_T("explorer.exe"));
         TCHAR cmd[MAX_PATH]={0};
         _tcscpy(cmd,g_RunData.cmdLine);
         PathRemoveArgs(cmd);
         PathUnquoteSpaces(cmd);
-        bIsExplorer=_tcscmp(cmd,app)==0;
+        bIsExplorer=_tcsicmp(cmd,app)==0;
       }
       if(bIsExplorer)
       {
@@ -1706,12 +1706,15 @@ void InstallRegistry()
     //MSP Apply
     SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
     SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
-    //Control Panel
-    SetRegStr(HKCR,CPLREG,L"",MenuStr);
-    SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
-    //Trash
-    SetRegStr(HKCR,TRSREG,L"",MenuStr);
-    SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
+    if (!IsWin7)
+    {
+      //Control Panel
+      SetRegStr(HKCR,CPLREG,L"",MenuStr);
+      SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
+      //Trash
+      SetRegStr(HKCR,TRSREG,L"",MenuStr);
+      SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
+    }
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_ADDCPL));
@@ -1721,12 +1724,12 @@ void InstallRegistry()
   //Add SuRun CPL to "Performance and Maintenance"
   SetRegInt(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Extended Properties\\{305CA226-D286-468e-B848-2B2E8E697B74} 2",SuRunExe,5);
   //add to AppInit_Dlls
-  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
-  AddAppInit(AppInit,_T("SuRunExt.dll"));
-#ifdef _WIN64
-  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
-  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
-#endif _WIN64
+//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+//  AddAppInit(AppInit,_T("SuRunExt.dll"));
+//#ifdef _WIN64
+//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+//  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+//#endif _WIN64
 }
 
 //////////////////////////////////////////////////////////////////////////////
