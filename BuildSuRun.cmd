@@ -3,6 +3,7 @@ if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
 rem compile using VC6
 Set MSSDK=E:\MSTOOLS
 SET VC6Dir=%MSDevDir%\..\..
+if "%VC6Dir%"=="\..\.." SET VC6Dir=E:\VStudio
 
 SETLOCAL
 call %VC6Dir%\VC98\Bin\VCVARS32.BAT
