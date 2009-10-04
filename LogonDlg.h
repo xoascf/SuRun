@@ -28,7 +28,7 @@ DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,int IDmsg,...);
 
 BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User);
 
-BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
+BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,LPTSTR LastUser,int IDmsg,...);
 
 BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...);
 BOOL LogonAdmin(DWORD SessionId,int IDmsg,...);

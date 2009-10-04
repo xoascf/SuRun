@@ -1461,8 +1461,12 @@ void SuRun(DWORD ProcessID)
     if (CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,
                           (!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk))
     {
-      if (!RunAsLogon(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
-                      IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
+      TCHAR User[UNLEN+DNLEN+2]={0};
+      _tcscpy(User,g_RunData.UserName);
+      TCHAR RunAsUser[UNLEN+DNLEN+2]={0};
+      if (!GetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",RunAsUser,UNLEN+DNLEN+2))
+        _tcscpy(RunAsUser,g_RunData.UserName);
+      if (!RunAsLogon(g_RunData.SessionID,User,g_RunPwd,RunAsUser,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
       {
         DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
@@ -1470,6 +1474,8 @@ void SuRun(DWORD ProcessID)
       }
       RetVal=RETVAL_OK;
       DeleteSafeDesktop(false);
+      SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",User);
+      _tcscpy(g_RunData.UserName,User);
     }else
     {
       DBGTrace("CreateSafeDesktop failed");
@@ -2124,6 +2130,8 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           ShowWindow(GetDlgItem(hwnd,IDC_OPTNST),SW_HIDE);
           ShowWindow(g_InstLog,SW_SHOW);
           //Disable Buttons
+          SetWindowLong(g_InstLog,GWL_STYLE,GetWindowLong(g_InstLog,GWL_STYLE)|WS_TABSTOP);
+          SetFocus(g_InstLog);
           EnableWindow(GetDlgItem(hwnd,IDOK),0);
           EnableWindow(GetDlgItem(hwnd,IDCANCEL),0);
           //Show some Progress
@@ -2180,7 +2188,8 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CLOSE));
           SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
           SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
-          SetFocus(GetDlgItem(hwnd,IDOK));
+          SetWindowLong(g_InstLog,GWL_STYLE,GetWindowLong(g_InstLog,GWL_STYLE)&(~WS_TABSTOP));
+          SetFocus(GetDlgItem(hwnd,IDCONTINUE));
           return TRUE;
         }
       case MAKELPARAM(IDCANCEL,BN_CLICKED): //Close Dlg

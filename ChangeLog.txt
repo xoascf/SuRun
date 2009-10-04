@@ -28,6 +28,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.9 Beta 2 - 2009-10-09
+---------------------------------
+* NEW: SuRun remembers the last /RunAs user
+* CHG: SuRuns Installer sets the focus to "Logoff"/"Restart" after Installation
+
 SuRun 1.2.0.9 Beta 1 - 2009-10-09
 ---------------------------------
 * CHG: On Windows 7 SuRun does not support and Display "Start as Administrator"
