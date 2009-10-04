@@ -3,6 +3,7 @@ Done, to be tested:
 
 ToDo
 ---------------------
+* Support for "RunAs" in LNK files!
 * GUI for SwitchToUser
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
