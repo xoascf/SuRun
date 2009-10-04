@@ -174,6 +174,7 @@ typedef struct _LOGONDLGPARAMS
   int MaxTimeOut;
   DWORD UsrFlags;
   BOOL bRunAs;
+  LPTSTR RaUser;
   BOOL bFUS;//Fast User switching
   DWORD SessionId;
   _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags,DWORD S)
@@ -187,6 +188,7 @@ typedef struct _LOGONDLGPARAMS
     TimeOut=MaxTimeOut;
     UsrFlags=UFlags;
     bRunAs=FALSE;
+    RaUser=NULL;
     bFUS=FALSE;
     SessionId=S;
   }
@@ -426,7 +428,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
         SendDlgItemMessage(hwnd,IDC_USER,CB_INSERTSTRING,i,
           (LPARAM)p->Users.GetUserName(i));
-        if (_tcsicmp(p->Users.GetUserName(i),p->User)==0)
+        if (_tcsicmp(p->Users.GetUserName(i),p->bRunAs?p->RaUser:p->User)==0)
         {
           SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,i,0);
           bFoundUser=TRUE;
@@ -453,7 +455,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       if (p->bFUS)
           SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
       else if ((!p->ForceAdminLogon)|| bFoundUser)
-        SetDlgItemText(hwnd,IDC_USER,p->User);
+        SetDlgItemText(hwnd,IDC_USER,(bFoundUser && p->bRunAs)?p->RaUser:p->User);
       else
       {
         SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
@@ -654,7 +656,7 @@ BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User)
                   0,DialogProc,(LPARAM)&p);
 }
 
-BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
+BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,LPTSTR LastUser,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
@@ -662,6 +664,7 @@ BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
   LOGONDLGPARAMS p(S,User,Password,false,false,false,SessionId);
   p.Users.SetUsualUsers(SessionId,FALSE);
   p.bRunAs=TRUE;
+  p.RaUser=LastUser;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
                   0,DialogProc,(LPARAM)&p);
 }
