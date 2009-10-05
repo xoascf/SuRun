@@ -366,27 +366,27 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef DoDBGTrace
-//  TCHAR Path[4096]={0};
-//  if (pIDFolder)
-//    SHGetPathFromIDList(pIDFolder,Path);
-//  TCHAR FileClass[4096]={0};
-//  if(hRegKey)
-//    GetRegStr(hRegKey,0,L"",FileClass,4096);
-//  TCHAR File[4096]={0};
-//  if(pDataObj)
-//  {
-//    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-//    STGMEDIUM stm;
-//    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-//    {
-//      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-//        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
-//      ReleaseStgMedium(&stm);
-//    }
-//  }
-//  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-//  if(pDataObj)
-//    PrintDataObj(pDataObj);
+  TCHAR Path[4096]={0};
+  if (pIDFolder)
+    SHGetPathFromIDList(pIDFolder,Path);
+  TCHAR FileClass[4096]={0};
+  if(hRegKey)
+    GetRegStr(hRegKey,0,L"",FileClass,4096);
+  TCHAR File[4096]={0};
+  if(pDataObj)
+  {
+    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    STGMEDIUM stm;
+    if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+    {
+      if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+        DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
+      ReleaseStgMedium(&stm);
+    }
+  }
+  DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+  if(pDataObj)
+    PrintDataObj(pDataObj);
 #endif DoDBGTrace
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
@@ -527,19 +527,13 @@ static CRITICAL_SECTION l_SxHkCs;
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
 #ifdef DoDBGTrace
-//  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-//    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-//    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-//    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
-//    pei->lpClass,
-//    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
+    pei->lpClass,
+    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
 #endif DoDBGTrace
-  //Admins don't need the ShellExec Hook!
-  if (l_IsAdmin)
-    return S_FALSE;
-  //Non SuRunners don't need the ShellExec Hook!
-  if ((!l_IsSuRunner))
-    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
@@ -564,6 +558,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 #endif DoDBGTrace
     return S_FALSE;
   }
+  //Admins don't need the ShellExec Hook!
+  if (l_IsAdmin)
+    return S_FALSE;
+  //Non SuRunners don't need the ShellExec Hook!
+  if ((!l_IsSuRunner))
+    return S_FALSE;
   EnterCriticalSection(&l_SxHkCs);
   static TCHAR tmp[4096];
   zero(tmp);
@@ -574,10 +574,15 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   PathQuoteSpaces(tmp);
   //Verb must be "open" or empty
   BOOL bNoAutoRun=TRUE;
+  BOOL bRunAs=FALSE;
   if (pei->lpVerb && (_tcslen(pei->lpVerb)!=0)
     &&(_tcsicmp(pei->lpVerb,L"open")!=0)
     &&(_tcsicmp(pei->lpVerb,L"cplopen")!=0))
   {
+    if (_tcsicmp(pei->lpVerb,L"runas")==0)
+    {
+      bRunAs=TRUE;
+    }else
     if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
     {
       //AutoRun: get open command
@@ -634,8 +639,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   //ToDo: Directly write to service pipe!
   static PROCESS_INFORMATION rpi;
   zero(rpi);
-  _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
-    GetCurrentProcessId(),&rpi,tmp);
+  if (bRunAs)
+    _stprintf(&cmd[wcslen(cmd)],L" /RUNAS %s",tmp);
+  else
+    _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&rpi,tmp);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
@@ -659,7 +666,8 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       {
         pei->hInstApp=(HINSTANCE)SE_ERR_ACCESSDENIED;
         //Tell IAT-Hook to not check "tmp" again!
-        SetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp);
+        if (!bRunAs)
+          SetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp);
       }
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
@@ -832,8 +840,8 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #ifdef DoDBGTrace
-//  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-//  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #endif DoDBGTrace
   //self Approval
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
