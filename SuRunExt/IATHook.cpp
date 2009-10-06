@@ -599,7 +599,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-//    TRACExA("SuRunExt32.dll: call to CreateProcA(%s,%s)",lpApplicationName,lpCommandLine);
+//  TRACExA("SuRunExt32.dll: call to CreateProcA(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   DWORD tas=RETVAL_SX_NOTINLIST;
   if ((!l_IsAdmin) && l_IsSuRunner)
@@ -621,7 +621,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-//    TRACEx(L"SuRunExt32.dll: call to CreateProcW(%s,%s)",lpApplicationName,lpCommandLine);
+//  TRACEx(L"SuRunExt32.dll: call to CreateProcW(%s,%s)",lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   DWORD tas=RETVAL_SX_NOTINLIST;
   if ((!l_IsAdmin) && l_IsSuRunner)
