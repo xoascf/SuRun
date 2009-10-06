@@ -274,6 +274,12 @@ BOOL RemoveFromBlackList(LPCTSTR CmdLine)
 //////////////////////////////////////////////////////////////////////////////
 void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
 {
+  SetHandleRunAs(TRUE);
+  if (_winmajor<6)
+  {
+    ReplaceSuRunWithRunAs(hKey);
+    return;
+  }
   TCHAR s[512];
   DWORD i,nS;
   for(i=0,nS=512;0==RegEnumKey(hKey,i,s,nS);nS=512,i++)
@@ -319,6 +325,7 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
 
 void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
 {
+  SetHandleRunAs(FALSE);
   TCHAR s[512];
   DWORD i,nS;
   for(i=0,nS=512;0==RegEnumKey(hKey,i,s,nS);nS=512,i++)
@@ -2196,13 +2203,18 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       CheckDlgButton(hwnd,IDC_NOLOGONDESK,GetUseWinLogonDesk==0);
-      HKEY kra=0;
-      if (0==RegOpenKeyEx(HKCR,L"exefile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra))
-        RegCloseKey(kra);
-      if ((!kra)
-        &&(0==RegOpenKeyEx(HKCR,L"cplfile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra)))
-        RegCloseKey(kra);
-      CheckDlgButton(hwnd,IDC_DORUNAS,(kra?BST_UNCHECKED:BST_CHECKED));
+      if (_winmajor<6)
+        CheckDlgButton(hwnd,IDC_DORUNAS,GetHandleRunAs);
+      else
+      {
+        HKEY kra=0;
+        if (0==RegOpenKeyEx(HKCR,L"exefile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra))
+          RegCloseKey(kra);
+        if ((!kra)
+          &&(0==RegOpenKeyEx(HKCR,L"cplfile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra)))
+          RegCloseKey(kra);
+        CheckDlgButton(hwnd,IDC_DORUNAS,(kra?BST_UNCHECKED:BST_CHECKED));
+      }
       if(GetUseSuRunGrp)
       {
         CheckDlgButton(hwnd,IDC_ALLOWTIME,GetSetTime(SURUNNERSGROUP));

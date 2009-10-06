@@ -29,6 +29,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.9 Beta 3 - 2009-10-06
+---------------------------------
+* CHG: SuRun handles RunAs verb for ShellExecute/~Ex when "Replace RunAs with 
+    SuRuns RunAs" is activated (Windows 5 only!)
+
 SuRun 1.2.0.9 Beta 2 - 2009-10-09
 ---------------------------------
 * NEW: SuRun remembers the last /RunAs user
