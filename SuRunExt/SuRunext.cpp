@@ -664,7 +664,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
           pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
       }else 
       {
-        pei->hInstApp=(HINSTANCE)(bRunAs?34:SE_ERR_ACCESSDENIED);
+        pei->hInstApp=bRunAs?(HINSTANCE)34:(HINSTANCE)SE_ERR_ACCESSDENIED;
         //Tell IAT-Hook to not check "tmp" again!
         if (!bRunAs)
           SetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp);
