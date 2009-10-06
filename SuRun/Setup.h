@@ -63,6 +63,7 @@
 
 #define GetUseWinLogonDesk  (GetOption(_T("UseWinLogonDesk"),1)!=0)
 #define SetUseWinLogonDesk(b) SetOption(_T("UseWinLogonDesk"),b,1)
+
 //Save or not Passwords in the registry
 #define GetAskPW         ((GetOption(_T("SavePasswords"),1)==0) || (GetPwTimeOut!=0))
 
@@ -195,6 +196,8 @@
 #define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),TSA_ADMIN|TSA_TIPS)
 #define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,TSA_ADMIN|TSA_TIPS)
 
+#define GetHandleRunAs    (GetShExtSetting(_T("HandleRunAs"),1)!=0)
+#define SetHandleRunAs(b) SetShExtSetting(_T("HandleRunAs"),b,1)
 
 //Show App admin status in system tray per user setting
 #define GetUsrOption(u,s,d)   GetRegInt(HKCR,USROPTKEY(u),s,d)
