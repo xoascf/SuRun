@@ -275,8 +275,9 @@ BOOL RemoveFromBlackList(LPCTSTR CmdLine)
 void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
 {
   SetHandleRunAs(TRUE);
-  if (_winmajor<6)
+  if (GetUseIShExHook && (_winmajor<6))
   {
+    //IShellExecuteHook will handle "runas" verb
     ReplaceSuRunWithRunAs(hKey);
     return;
   }
