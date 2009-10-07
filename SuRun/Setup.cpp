@@ -269,18 +269,82 @@ BOOL RemoveFromBlackList(LPCTSTR CmdLine)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
+//  Setup Dialog Data
+// 
+//////////////////////////////////////////////////////////////////////////////
+#define nTabs 4
+typedef struct _SETUPDATA 
+{
+  USERLIST Users;
+  LPCTSTR OrgUser;
+  DWORD SessID;
+  int CurUser;
+  HICON UserIcon;
+  HWND hTabCtrl[nTabs];
+  HWND HelpWnd;
+  int DlgExitCode;
+  HIMAGELIST ImgList;
+  int ImgIconIdx[9];
+  TCHAR NewUser[2*UNLEN+2];
+  CDlgAnchor MainSetupAnchor;
+  CDlgAnchor Setup2Anchor;
+  int MinW;
+  int MinH;
+  _SETUPDATA(DWORD SessionID,LPCTSTR User)
+  {
+    MinW=600;
+    MinH=400;
+    OrgUser=User;
+    SessID=SessionID;
+    Users.SetSurunnersUsers(User,SessionID,FALSE);
+    CurUser=-1;
+    int i;
+    for (i=0;i<Users.GetCount();i++)
+      if (_tcsicmp(Users.GetUserName(i),OrgUser)==0)
+      {
+        CurUser=i;
+        break;
+      }
+    DlgExitCode=IDCANCEL;
+    HelpWnd=0;
+    zero(hTabCtrl);
+    zero(NewUser);
+    UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
+        IMAGE_ICON,48,48,0);
+    ImgList=ImageList_Create(16,16,ILC_COLOR8,7,1);
+    for (i=0;i<9;i++)
+    {
+      HICON icon=(HICON)LoadImage(GetModuleHandle(0),
+        MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
+      ImgIconIdx[i]=ImageList_AddIcon(ImgList,icon);
+      DestroyIcon(icon);
+    }
+  }
+  ~_SETUPDATA()
+  {
+    DestroyIcon(UserIcon);
+    ImageList_Destroy(ImgList);
+  }
+}SETUPDATA;
+
+//There can be only one Setup per Application. It's data is stored in g_SD
+static SETUPDATA *g_SD=NULL;
+
+//////////////////////////////////////////////////////////////////////////////
+// 
 //  Registry replace stuff
 // 
 //////////////////////////////////////////////////////////////////////////////
 void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
 {
-  SetHandleRunAs(TRUE);
-  if (GetUseIShExHook && (_winmajor<6))
+  if ((IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK)) && (_winmajor<6))
   {
     //IShellExecuteHook will handle "runas" verb
     ReplaceSuRunWithRunAs(hKey);
+    SetHandleRunAs(TRUE);
     return;
   }
+  SetHandleRunAs(TRUE);
   TCHAR s[512];
   DWORD i,nS;
   for(i=0,nS=512;0==RegEnumKey(hKey,i,s,nS);nS=512,i++)
@@ -367,69 +431,6 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
     }
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// 
-//  Setup Dialog Data
-// 
-//////////////////////////////////////////////////////////////////////////////
-#define nTabs 4
-typedef struct _SETUPDATA 
-{
-  USERLIST Users;
-  LPCTSTR OrgUser;
-  DWORD SessID;
-  int CurUser;
-  HICON UserIcon;
-  HWND hTabCtrl[nTabs];
-  HWND HelpWnd;
-  int DlgExitCode;
-  HIMAGELIST ImgList;
-  int ImgIconIdx[9];
-  TCHAR NewUser[2*UNLEN+2];
-  CDlgAnchor MainSetupAnchor;
-  CDlgAnchor Setup2Anchor;
-  int MinW;
-  int MinH;
-  _SETUPDATA(DWORD SessionID,LPCTSTR User)
-  {
-    MinW=600;
-    MinH=400;
-    OrgUser=User;
-    SessID=SessionID;
-    Users.SetSurunnersUsers(User,SessionID,FALSE);
-    CurUser=-1;
-    int i;
-    for (i=0;i<Users.GetCount();i++)
-      if (_tcsicmp(Users.GetUserName(i),OrgUser)==0)
-      {
-        CurUser=i;
-        break;
-      }
-    DlgExitCode=IDCANCEL;
-    HelpWnd=0;
-    zero(hTabCtrl);
-    zero(NewUser);
-    UserIcon=(HICON)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAINICON),
-        IMAGE_ICON,48,48,0);
-    ImgList=ImageList_Create(16,16,ILC_COLOR8,7,1);
-    for (i=0;i<9;i++)
-    {
-      HICON icon=(HICON)LoadImage(GetModuleHandle(0),
-        MAKEINTRESOURCE(IDI_LISTICON+i),IMAGE_ICON,0,0,0);
-      ImgIconIdx[i]=ImageList_AddIcon(ImgList,icon);
-      DestroyIcon(icon);
-    }
-  }
-  ~_SETUPDATA()
-  {
-    DestroyIcon(UserIcon);
-    ImageList_Destroy(ImgList);
-  }
-}SETUPDATA;
-
-//There can be only one Setup per Application. It's data is stored in g_SD
-static SETUPDATA *g_SD=NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 // 
