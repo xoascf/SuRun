@@ -279,7 +279,8 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       DBGTrace("LsaLogonUser failed");
       __leave;
     }
-    GetElevatedToken(hUser);
+    if (!bNoAdmin)
+      GetElevatedToken(hUser);
   } // try
   __finally
   {
