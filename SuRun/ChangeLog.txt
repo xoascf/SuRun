@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* FIX: SuRun /RunAs does not get the elevated token of UAC admins any more
 
 ToDo
 ---------------------
