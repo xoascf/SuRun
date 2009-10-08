@@ -67,10 +67,13 @@ extern void ShowFUSGUI();
 static void HideAppStartCursor()
 {
   HWND w=CreateWindow(_TEXT("Static"),0,0,0,0,0,0,0,0,0,0);
-  PostMessage(w,WM_QUIT,0,0);
-  MSG msg;
-  GetMessage(&msg,w,WM_QUIT,WM_QUIT);
-  DestroyWindow(w);
+  if(w)
+  {
+    PostMessage(w,WM_QUIT,0,0);
+    MSG msg;
+    GetMessage(&msg,w,WM_QUIT,WM_QUIT);
+    DestroyWindow(w);
+  }
 }
 
 extern HANDLE GetAdminToken(DWORD SessionID);

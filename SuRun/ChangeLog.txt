@@ -31,6 +31,9 @@ SuRun Changes:
 SuRun 1.2.0.9 Beta 5 - 2009-10-08
 ---------------------------------
 * FIX: "SuRun /SYSMENUHOOK" caused 100% CPU load on one CPU core
+* FIX: Pressing <ENTER> after Install or Update caused to run install or 
+    update for another time
+* FIX: Tray icon disappeared when "SuRun /SYSMENUHOOK" was started "too early"
 
 SuRun 1.2.0.9 Beta 4 - 2009-10-08
 ---------------------------------
