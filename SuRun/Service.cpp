@@ -2116,6 +2116,17 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       {
       case MAKELPARAM(IDOK,BN_CLICKED): //Install SuRun:
         {
+          //Make IDOK->Close
+          SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
+          //Disable Buttons
+          SetWindowLong(g_InstLog,GWL_STYLE,GetWindowLong(g_InstLog,GWL_STYLE)|WS_TABSTOP);
+          SetFocus(g_InstLog);
+          EnableWindow(GetDlgItem(hwnd,IDCLOSE),0);
+          EnableWindow(GetDlgItem(hwnd,IDCANCEL),0);
+          //remove all pending WM_COMMAND messages
+          MSG msg;
+          while (PeekMessage(&msg,hwnd,WM_COMMAND,WM_COMMAND,PM_REMOVE))
+            ;
           //Settings
           g_bKeepRegistry=IsDlgButtonChecked(hwnd,IDC_KEEPREGISTRY)!=0;
           SetSROption(L"UpdKeepSettings",(DWORD)g_bKeepRegistry,0);
@@ -2129,11 +2140,6 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           ShowWindow(GetDlgItem(hwnd,IDC_OWNGRPST),SW_HIDE);
           ShowWindow(GetDlgItem(hwnd,IDC_OPTNST),SW_HIDE);
           ShowWindow(g_InstLog,SW_SHOW);
-          //Disable Buttons
-          SetWindowLong(g_InstLog,GWL_STYLE,GetWindowLong(g_InstLog,GWL_STYLE)|WS_TABSTOP);
-          SetFocus(g_InstLog);
-          EnableWindow(GetDlgItem(hwnd,IDOK),0);
-          EnableWindow(GetDlgItem(hwnd,IDCANCEL),0);
           //Show some Progress
           SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDC_INSTALL));
           MsgLoop();
@@ -2142,11 +2148,10 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             //Install failed:
             InstLog(CResStr(IDS_INSTFAILED));
             SetDlgItemText(hwnd,IDC_QUESTION,CResStr(IDS_INSTFAILED));
-            //Make IDOK->Close, hide IDCANCEL
-            SetDlgItemText(hwnd,IDOK,CResStr(IDS_CLOSE));
+            //hide IDCANCEL
+            SetDlgItemText(hwnd,IDCLOSE,CResStr(IDS_CLOSE));
             ShowWindow(GetDlgItem(hwnd,IDCANCEL),SW_HIDE);
-            EnableWindow(GetDlgItem(hwnd,IDOK),1);
-            SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
+            EnableWindow(GetDlgItem(hwnd,IDCLOSE),1);
             return TRUE;
           }
           //Run Setup?
@@ -2174,22 +2179,22 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           else
             InstLog(CResStr(IDS_INSTSUCCESS2));
           //Enable OK, CANCEL
-          EnableWindow(GetDlgItem(hwnd,IDOK),1);
+          EnableWindow(GetDlgItem(hwnd,IDCLOSE),1);
           EnableWindow(GetDlgItem(hwnd,IDCANCEL),1);
           //Cancel->Close; OK->Logoff
+          SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
+          SetWindowLongPtr(GetDlgItem(hwnd,IDCLOSE),GWL_ID,IDCONTINUE);
           OSVERSIONINFO oie;
           oie.dwOSVersionInfoSize=sizeof(oie);
           if (_winmajor<6)
             //2k/XP Reboot required for WinLogon Notification
-            SetDlgItemText(hwnd,IDOK,CResStr(IDS_REBOOT));
+            SetDlgItemText(hwnd,IDCONTINUE,CResStr(IDS_REBOOT));
           else 
             //Vista++ display LogOff 
-            SetDlgItemText(hwnd,IDOK,CResStr(IDC_LOGOFF));
-          SetDlgItemText(hwnd,IDCANCEL,CResStr(IDS_CLOSE));
-          SetWindowLongPtr(GetDlgItem(hwnd,IDCANCEL),GWL_ID,IDCLOSE);
-          SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCONTINUE);
-          SetWindowLong(g_InstLog,GWL_STYLE,GetWindowLong(g_InstLog,GWL_STYLE)&(~WS_TABSTOP));
+            SetDlgItemText(hwnd,IDCONTINUE,CResStr(IDC_LOGOFF));
+          SetDlgItemText(hwnd,IDCLOSE,CResStr(IDS_CLOSE));
           SetFocus(GetDlgItem(hwnd,IDCONTINUE));
+          SetWindowLong(g_InstLog,GWL_STYLE,GetWindowLong(g_InstLog,GWL_STYLE)&(~WS_TABSTOP));
           return TRUE;
         }
       case MAKELPARAM(IDCANCEL,BN_CLICKED): //Close Dlg
