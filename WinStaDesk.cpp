@@ -619,6 +619,24 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
   }
+//  if (_winmajor>=6)
+//  {
+//    typedef HRESULT (WINAPI* Win32DwmEnableComposition)(UINT);
+//    static Win32DwmEnableComposition dwmenablecomposition=NULL;
+//    if (!dwmenablecomposition)
+//    {
+//      HINSTANCE dwmapi=LoadLibrary(_T("dwmapi.dll"));
+//      if (dwmapi)
+//        dwmenablecomposition=(Win32DwmEnableComposition)GetProcAddress(dwmapi,"DwmEnableComposition");
+//    }
+//    if(dwmenablecomposition)
+//    {
+//      HRESULT hr=dwmenablecomposition(1);
+//      if (hr!=S_OK)
+//        DBGTrace1("DwmEnableComposition failed: %s",GetErrorNameStatic(hr));
+//    }else
+//      DBGTrace("Could not link to DwmEnableComposition");
+//  }
 //  LockWndSta();
   return true;
 }

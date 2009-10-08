@@ -2115,7 +2115,13 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       switch (wParam)
       {
       case MAKELPARAM(IDOK,BN_CLICKED): //Install SuRun:
+        if(GetDlgItem(hwnd,IDCONTINUE))
+          goto DoContinue;
+        if(GetDlgItem(hwnd,IDCLOSE))
+          goto DoClose;
+        if(GetDlgItem(hwnd,IDOK))
         {
+          
           //Make IDOK->Close
           SetWindowLongPtr(GetDlgItem(hwnd,IDOK),GWL_ID,IDCLOSE);
           //Disable Buttons
@@ -2201,9 +2207,11 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
         EndDialog(hwnd,IDCANCEL);
         return TRUE;
       case MAKELPARAM(IDCLOSE,BN_CLICKED): //Close Dlg
+DoClose:
         EndDialog(hwnd,IDCLOSE);
         return TRUE;
       case MAKELPARAM(IDCONTINUE,BN_CLICKED): //LogOff
+DoContinue:
         //ExitWindowsEx will not work here because we run as Admin
         if (_winmajor<6)
         {
