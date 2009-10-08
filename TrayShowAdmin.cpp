@@ -139,6 +139,19 @@ static void ShutDownSuRunProcesses()
   g_TSAPID=0;
 }
 
+static BOOL MessageLoop()
+{
+  MSG msg;
+  while(PeekMessage(&msg,0,0,0,PM_NOREMOVE))
+  {
+    if(!GetMessage(&msg,0,0,0))
+      return FALSE;
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+  return TRUE;
+}
+
 static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle,DWORD& CurPID)
 {
   if ((g_TSAPID==-2)||(g_TSAPID==-1))
@@ -157,9 +170,14 @@ static BOOL ForegroundWndIsAdmin(LPTSTR User,HWND& wnd,LPTSTR WndTitle,DWORD& Cu
   GetWindowThreadProcessId(Wnd,&g_TSAPID);
   if (g_TSAPID!=g_TSAData.CurPID)
   {
+    CTimeOut t(1000);
     SetEvent(g_TSAEvent);
     for(;g_TSAPID!=g_TSAData.CurPID;)
+    {
+      if ((!MessageLoop())||t.TimedOut())
+        return -1;
       Sleep(10);
+    }
   }
   _tcscpy(User,g_TSAData.CurUserName);
   if (!g_TSAData.CurPID)
@@ -394,15 +412,7 @@ BOOL ProcessTrayShowAdmin(BOOL bShowTray,BOOL bBalloon)
       Shell_NotifyIcon(NIM_DELETE,&g_NotyData);
     g_IconShown=FALSE;
   }
-  MSG msg;
-  do
-  {
-    if(!GetMessage(&msg,0,0,0))
-      return FALSE;
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
-  }while(PeekMessage(&msg,0,0,0,PM_NOREMOVE));
-  return TRUE;
+  return MessageLoop();
 }
 
 void CloseTrayShowAdmin()

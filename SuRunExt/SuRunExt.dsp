@@ -276,5 +276,9 @@ SOURCE=.\SysMenuHook.h
 SOURCE=..\res\SuRun.ico
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\res\app.manifest
+# End Source File
 # End Target
 # End Project

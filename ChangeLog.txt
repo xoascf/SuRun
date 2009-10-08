@@ -1,10 +1,8 @@
 Done, to be tested:
 ---------------------------
-* FIX: SuRun /RunAs does not get the elevated token of UAC admins any more
 
 ToDo
 ---------------------
-* Support for "RunAs" in LNK files!
 * GUI for SwitchToUser
 * Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
@@ -29,6 +27,13 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.9 Beta 4 - 2009-10-08
+---------------------------------
+* FIX: "SuRun /RunAs" now runs processes as limited user for UAC-Admins
+* FIX: Tray icon sometimes did not close on SuRun Uninstall/Update
+* FIX: Fast clicking or pressing <ENTER> on Install or Update caused to run 
+    install or update twice
 
 SuRun 1.2.0.9 Beta 3 - 2009-10-06
 ---------------------------------
