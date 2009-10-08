@@ -28,6 +28,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.9 Beta 5 - 2009-10-08
+---------------------------------
+* FIX: "SuRun /SYSMENUHOOK" caused 100% CPU load on one CPU core
+
 SuRun 1.2.0.9 Beta 4 - 2009-10-08
 ---------------------------------
 * FIX: "SuRun /RunAs" now runs processes as limited user for UAC-Admins
