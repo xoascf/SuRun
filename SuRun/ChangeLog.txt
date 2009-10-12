@@ -28,6 +28,12 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.9 Beta 6 - 2009-10-12
+---------------------------------
+* FIX: IAT-Hooks are always set in a separate thread (again) to avoid GPFs in 
+    "SuRunExt.dll_unloaded".
+* FIX: "'SuRun Explorer' here" is disabled and grayed in Windows 7.
+
 SuRun 1.2.0.9 Beta 5 - 2009-10-08
 ---------------------------------
 * FIX: "SuRun /SYSMENUHOOK" caused 100% CPU load on one CPU core
