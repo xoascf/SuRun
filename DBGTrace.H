@@ -18,7 +18,7 @@
 #pragma comment(lib,"winmm")
 #pragma warning(disable : 4996)
 
-static WCHAR SuRun_Beta[]={0x03B2,'5',0};
+static WCHAR SuRun_Beta[]={0x03B2,'6',0};
 #define BetaVer SuRun_Beta
 
 //#define DoDBGTrace

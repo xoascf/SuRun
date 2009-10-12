@@ -279,12 +279,13 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
 #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
 
+static UINT g_CF_FileNameW=0;
+static UINT g_CF_ShellIdList=0;
+
 static void PrintDataObj(LPDATAOBJECT pDataObj)
 {
-  static UINT g_CF_FileNameW=0;
   if (g_CF_FileNameW==0)
     g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
-  static UINT g_CF_ShellIdList=0;
   if(g_CF_ShellIdList==0)
     g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
   IEnumFORMATETC *pefEtc = 0;
@@ -416,6 +417,8 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   }else
   {
     FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    if(g_CF_ShellIdList==0)
+      g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
     FORMATETC fe1 = {g_CF_ShellIdList, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
     STGMEDIUM m;
     if ((SUCCEEDED(pDataObj->GetData(&fe,&m)))
@@ -885,21 +888,29 @@ static HANDLE l_InitThread=0;
 DWORD WINAPI InitProc(void* p)
 {
 //  CTimeLog l(L"InitProc");
-  if (p)
+  //Try to make shure that the NT Dll Loader is done:
+  HINSTANCE h=0;
+  for(;;)
   {
-    while (!GetModuleHandleA("psapi.dll"))
-    {
-      //Wait until all Loadlibrary Operations are done by setting the threads prio
-      //to lowest. [Windows NT does not run lower prio threads while higher prio 
-      //threads are redy to run]
-      Sleep(1);
-    }
+    h=GetModuleHandleA("psapi.dll");
+    if (h)
+      break;
+    Sleep(1);
   }
+  GetProcAddress(h,"EnumProcessModules");
+  h=0;
+  for(;;)
+  {
+    h=GetModuleHandleA("advapi32.dll");
+    if (h)
+      break;
+    Sleep(1);
+  }
+  GetProcAddress(h,"CreateProcessAsUserW");
   //Resources
   l_Groups=UserIsInSuRunnersOrAdmins();
-  //if (!l_IsAdmin)
   GetProcessUserName(GetCurrentProcessId(),l_User);
-  l_bSetHook=1;//(!l_IsAdmin)||GetUseSVCHook;
+  l_bSetHook=1;
   //IAT Hook:
   if (l_bSetHook)
   {
@@ -925,26 +936,6 @@ DWORD WINAPI InitProc(void* p)
         SR_PathQuoteSpacesW(fNoHook);
         l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)==0);
       }
-//      //Do not set hooks into lsass!
-//      GetSystemWindowsDirectory(fNoHook,4096);
-//      SR_PathAppendW(fNoHook,L"SYSTEM32\\lsass.exe");
-//      SR_PathQuoteSpacesW(fNoHook);
-//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-//      //Do not set hooks into logonui!
-//      GetSystemWindowsDirectory(fNoHook,4096);
-//      SR_PathAppendW(fNoHook,L"SYSTEM32\\logonui.exe");
-//      SR_PathQuoteSpacesW(fNoHook);
-//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-//      //Do not set hooks into userinit!
-//      GetSystemWindowsDirectory(fNoHook,4096);
-//      SR_PathAppendW(fNoHook,L"SYSTEM32\\userinit.exe");
-//      SR_PathQuoteSpacesW(fNoHook);
-//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-//      //Do not set hooks into Winlogon!
-//      GetSystemWindowsDirectory(fNoHook,4096);
-//      SR_PathAppendW(fNoHook,L"SYSTEM32\\winlogon.exe");
-//      SR_PathQuoteSpacesW(fNoHook);
-//      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
       //Do not set hooks into blacklisted files!
       l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
 //      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
@@ -974,9 +965,10 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
       }
       l_InitThread=0;
     }
-    EnterCriticalSection(&l_SxHkCs);
-    LeaveCriticalSection(&l_SxHkCs);
-    DeleteCriticalSection(&l_SxHkCs);
+//  "The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
+//    EnterCriticalSection(&l_SxHkCs);
+//    LeaveCriticalSection(&l_SxHkCs);
+//    DeleteCriticalSection(&l_SxHkCs);
     //IAT-Hook
     UnloadHooks();
     return TRUE;
@@ -989,9 +981,16 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
-  if (GetModuleHandleA("psapi.dll"))
-    InitProc(0);
-  else
-    l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
+//  if (GetModuleHandleA("psapi.dll"))
+//    InitProc(0);
+//  else
+  {
+    l_InitThread=CreateThread(0,0,InitProc,(void*)1,CREATE_SUSPENDED,0);
+    if (l_InitThread)
+    {
+      SetThreadPriority(l_InitThread,GetThreadPriority(GetCurrentThread())-1);
+      ResumeThread(l_InitThread);
+    }
+  }
   return TRUE;
 }
