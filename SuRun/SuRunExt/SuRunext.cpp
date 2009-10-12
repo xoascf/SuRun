@@ -276,14 +276,17 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 //////////////////////////////////////////////////////////////////////////////
 // IShellExtInit
 //////////////////////////////////////////////////////////////////////////////
-UINT g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
-UINT g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
-
 #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
 #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
 
 static void PrintDataObj(LPDATAOBJECT pDataObj)
 {
+  static UINT g_CF_FileNameW=0;
+  if (g_CF_FileNameW==0)
+    g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
+  static UINT g_CF_ShellIdList=0;
+  if(g_CF_ShellIdList==0)
+    g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
   IEnumFORMATETC *pefEtc = 0;
   if(SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc)) && SUCCEEDED(pefEtc->Reset()))
   while(TRUE)
