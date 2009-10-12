@@ -1643,11 +1643,10 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       if (IsWin7)
       {
         SetCtrlAsAdmin(0);
-        SetCtrlAsAdmin(0);
+        SetExpAsAdmin(0);
         EnableWindow(GetDlgItem(hwnd,IDC_CTRLASADMIN),false);
         EnableWindow(GetDlgItem(hwnd,IDC_EXPASADMIN),false);
       }
-
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
       EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k)&&GetBlurDesk);
