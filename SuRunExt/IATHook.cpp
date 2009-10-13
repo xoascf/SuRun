@@ -924,12 +924,9 @@ void UnloadHooks()
 {
   if (!g_IATInit)
     return;
-//  "The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
-//  EnterCriticalSection(&g_HookCs);
-//  if (l_IsAdmin)
-    UnhookModules();
+  //"The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
+  // Leave the critical section g_HookCs untouched to avoid possible dead locks
+  UnhookModules();
   g_IATInit=FALSE;
-//  LeaveCriticalSection(&g_HookCs);
-//  DeleteCriticalSection(&g_HookCs);
 }
 

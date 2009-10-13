@@ -965,10 +965,8 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
       }
       l_InitThread=0;
     }
-//  "The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
-//    EnterCriticalSection(&l_SxHkCs);
-//    LeaveCriticalSection(&l_SxHkCs);
-//    DeleteCriticalSection(&l_SxHkCs);
+    //"The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
+    // Leave the critical section l_SxHkCs untouched to avoid possible dead locks
     //IAT-Hook
     UnloadHooks();
     return TRUE;
@@ -976,21 +974,10 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if(dwReason!=DLL_PROCESS_ATTACH)
     return TRUE;
   //Process Attach:
-  DisableThreadLibraryCalls(hInstDLL);
   if (l_hInst==hInstDLL)
     return TRUE;
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
-//  if (GetModuleHandleA("psapi.dll"))
-//    InitProc(0);
-//  else
-  {
-    l_InitThread=CreateThread(0,0,InitProc,(void*)1,CREATE_SUSPENDED,0);
-    if (l_InitThread)
-    {
-      SetThreadPriority(l_InitThread,GetThreadPriority(GetCurrentThread())-1);
-      ResumeThread(l_InitThread);
-    }
-  }
+  l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
   return TRUE;
 }
