@@ -1593,7 +1593,6 @@ static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
 
 static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
 {
-  return;
   TCHAR s[4096]={0};
   GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
   if (_tcsstr(s,Dll)==0)

@@ -888,60 +888,68 @@ static HANDLE l_InitThread=0;
 DWORD WINAPI InitProc(void* p)
 {
 //  CTimeLog l(L"InitProc");
-  //Try to make shure that the NT Dll Loader is done:
-  HINSTANCE h=0;
-  for(;;)
+  __try
   {
-    h=GetModuleHandleA("psapi.dll");
-    if (h)
-      break;
-    Sleep(1);
-  }
-  GetProcAddress(h,"EnumProcessModules");
-  h=0;
-  for(;;)
-  {
-    h=GetModuleHandleA("advapi32.dll");
-    if (h)
-      break;
-    Sleep(1);
-  }
-  GetProcAddress(h,"CreateProcessAsUserW");
-  //Resources
-  l_Groups=UserIsInSuRunnersOrAdmins();
-  GetProcessUserName(GetCurrentProcessId(),l_User);
-  l_bSetHook=1;
-  //IAT Hook:
-  if (l_bSetHook)
-  {
-    TCHAR fMod[MAX_PATH];
-    TCHAR fNoHook[4096];
-    GetProcessFileName(fMod,MAX_PATH);
-    //Do not set hooks into SuRun!
-    GetSystemWindowsDirectory(fNoHook,4096);
-#ifndef _SR32
-    SR_PathAppendW(fNoHook, _T("SuRun.exe"));
-#else _SR32
-    SR_PathAppendW(fNoHook, _T("SuRun32.bin"));
-#endif _SR32
-    SR_PathQuoteSpacesW(fNoHook);
-    l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
-    if(l_bSetHook)
+    //Try to make shure that the NT Dll Loader is done:
+    HINSTANCE h=0;
+    for(;;)
     {
-      if (l_IsAdmin)
-      {
-        //Admin process: Only set a hook into services.exe!
-        GetSystemWindowsDirectory(fNoHook,4096);
-        SR_PathAppendW(fNoHook,L"SYSTEM32\\services.exe");
-        SR_PathQuoteSpacesW(fNoHook);
-        l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)==0);
-      }
-      //Do not set hooks into blacklisted files!
-      l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
-//      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
-      if(l_bSetHook && GetUseIATHook)
-        LoadHooks();
+      h=GetModuleHandleA("psapi.dll");
+      if (h)
+        break;
+      Sleep(1);
     }
+    GetProcAddress(h,"EnumProcessModules");
+    h=0;
+    for(;;)
+    {
+      h=GetModuleHandleA("advapi32.dll");
+      if (h)
+        break;
+      Sleep(1);
+    }
+    GetProcAddress(h,"CreateProcessAsUserW");
+    //Resources
+    l_Groups=UserIsInSuRunnersOrAdmins();
+    GetProcessUserName(GetCurrentProcessId(),l_User);
+    l_bSetHook=1;
+    //IAT Hook:
+    if (l_bSetHook)
+    {
+      TCHAR fMod[MAX_PATH];
+      TCHAR fNoHook[4096];
+      GetProcessFileName(fMod,MAX_PATH);
+      //Do not set hooks into SuRun!
+      GetSystemWindowsDirectory(fNoHook,4096);
+#ifndef _SR32
+      SR_PathAppendW(fNoHook, _T("SuRun.exe"));
+#else _SR32
+      SR_PathAppendW(fNoHook, _T("SuRun32.bin"));
+#endif _SR32
+      SR_PathQuoteSpacesW(fNoHook);
+      l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
+      if(l_bSetHook)
+      {
+        if (l_IsAdmin)
+        {
+          //Admin process: Only set a hook into services.exe!
+          GetSystemWindowsDirectory(fNoHook,4096);
+          SR_PathAppendW(fNoHook,L"SYSTEM32\\services.exe");
+          SR_PathQuoteSpacesW(fNoHook);
+          l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)==0);
+        }
+        //Do not set hooks into blacklisted files!
+        l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
+        //      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());
+        if(l_bSetHook && GetUseIATHook)
+          LoadHooks();
+      }
+    }
+  }__except(GetExceptionCode()==EXCEPTION_ACCESS_VIOLATION)
+  {
+    extern BOOL g_IATInit;
+    g_IATInit=FALSE;
+    l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
   }
   return 0;
 }
