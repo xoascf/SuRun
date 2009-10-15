@@ -526,7 +526,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
   return hr;
 }
 
-static CRITICAL_SECTION l_SxHkCs;
+static CRITICAL_SECTION l_SxHkCs={0};
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
@@ -887,9 +887,9 @@ __declspec(dllexport) void RemoveShellExt()
 static HANDLE l_InitThread=0;
 DWORD WINAPI InitProc(void* p)
 {
-//  CTimeLog l(L"InitProc");
   __try
   {
+    //  CTimeLog l(L"InitProc");
     //Try to make shure that the NT Dll Loader is done:
     HINSTANCE h=0;
     for(;;)
@@ -950,7 +950,7 @@ DWORD WINAPI InitProc(void* p)
     extern BOOL g_IATInit;
     g_IATInit=FALSE;
     l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
-  }
+  }  
   return 0;
 }
 

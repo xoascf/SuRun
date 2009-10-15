@@ -478,7 +478,7 @@ DWORD HookModules()
   return nHooked;
 }
 
-CRITICAL_SECTION g_HookCs;
+CRITICAL_SECTION g_HookCs={0};
 
 DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
                      DWORD dwCreationFlags,LPPROCESS_INFORMATION lppi,
