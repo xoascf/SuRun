@@ -55,11 +55,11 @@ typedef BOOL (WINAPI* lpCreateProcessW)(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,
                                         LPVOID,LPCWSTR,LPSTARTUPINFOW,
                                         LPPROCESS_INFORMATION);
 
-//typedef BOOL (WINAPI* lpCreateProcessAsUserA)(HANDLE,LPCSTR,LPSTR,
-//                                              LPSECURITY_ATTRIBUTES,
-//                                              LPSECURITY_ATTRIBUTES,BOOL,DWORD,
-//                                              LPVOID,LPCSTR,LPSTARTUPINFOA,
-//                                              LPPROCESS_INFORMATION);
+typedef BOOL (WINAPI* lpCreateProcessAsUserA)(HANDLE,LPCSTR,LPSTR,
+                                              LPSECURITY_ATTRIBUTES,
+                                              LPSECURITY_ATTRIBUTES,BOOL,DWORD,
+                                              LPVOID,LPCSTR,LPSTARTUPINFOA,
+                                              LPPROCESS_INFORMATION);
 typedef BOOL (WINAPI* lpCreateProcessAsUserW)(HANDLE,LPCWSTR,LPWSTR,
                                               LPSECURITY_ATTRIBUTES,
                                               LPSECURITY_ATTRIBUTES,BOOL,DWORD,
@@ -74,8 +74,8 @@ BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
-//BOOL WINAPI CreatePAUA(HANDLE,LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
-//                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
+BOOL WINAPI CreatePAUA(HANDLE,LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
+                        BOOL,DWORD,LPVOID,LPCSTR,LPSTARTUPINFOA,LPPROCESS_INFORMATION);
 BOOL WINAPI CreatePAUW(HANDLE,LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 
@@ -142,7 +142,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","api-ms-win-core-libraryloader-
 static CHookDescriptor hkCrProcA ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessW",(PROC)CreateProcW);
 
-//static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
+static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
 
 //Windows XP: only hook calls from umpnpmgr.dll to advapi32.dlls "CreateProcessAsUserW"
 static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessAsUserW",(PROC)CreatePAUW,"umpnpmgr.dll");
@@ -174,12 +174,14 @@ static CHookDescriptor* hdt[]=
 
 static CHookDescriptor* sys_need_hdt[]=
 {
-  &hkCrPAUW
+  &hkCrPAUA,
+  &hkCrPAUW,
 };
 
 static CHookDescriptor* sys_hdt[]=
 {
-  &hkCrPAUW
+  &hkCrPAUA,
+  &hkCrPAUW,
 };
 
 //relative pointers in PE images
@@ -670,29 +672,29 @@ static BOOL IsShellAndSuRunner(HANDLE hToken)
   return bRet;
 }
 
-//BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLine,
-//    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
-//    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
-//    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
-//    LPPROCESS_INFORMATION lpProcessInformation)
-//{
-//  //ToDo: *original function will call CreateProcess. SuRun must not ask twice!
-//#ifdef DoDBGTrace
-////  TRACExA("SuRunExt32.dll: call to CreatePAUA(%s,%s)",lpApplicationName,lpCommandLine);
-//#endif DoDBGTrace
-//  if(IsShellAndSuRunner(hToken))
-//  {
-//    DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
-//      dwCreationFlags,lpProcessInformation,hToken);
-//    if(tas==RETVAL_OK)
-//      return SetLastError(NOERROR),TRUE;
-//    if(tas==RETVAL_CANCELLED)
-//      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
-//  }
-//  return ((lpCreateProcessAsUserA)hkCrPAUA.OrgFunc())(hToken,lpApplicationName,
-//      lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,
-//      dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
-//}
+BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLine,
+    LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
+    LPCSTR lpCurrentDirectory,LPSTARTUPINFOA lpStartupInfo,
+    LPPROCESS_INFORMATION lpProcessInformation)
+{
+  //ToDo: *original function will call CreateProcess. SuRun must not ask twice!
+#ifdef DoDBGTrace
+//  TRACExA("SuRunExt32.dll: call to CreatePAUA(%s,%s)",lpApplicationName,lpCommandLine);
+#endif DoDBGTrace
+  if(IsShellAndSuRunner(hToken))
+  {
+    DWORD tas=TestAutoSuRunA(lpApplicationName,lpCommandLine,lpCurrentDirectory,
+      dwCreationFlags,lpProcessInformation,hToken);
+    if(tas==RETVAL_OK)
+      return SetLastError(NOERROR),TRUE;
+    if(tas==RETVAL_CANCELLED)
+      return SetLastError(ERROR_ACCESS_DENIED),FALSE;
+  }
+  return ((lpCreateProcessAsUserA)hkCrPAUA.OrgFunc())(hToken,lpApplicationName,
+      lpCommandLine,lpProcessAttributes,lpThreadAttributes,bInheritHandles,
+      dwCreationFlags,lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+}
 
 
 BOOL WINAPI CreatePAUW(HANDLE hToken,LPCWSTR lpApplicationName,LPWSTR lpCommandLine,

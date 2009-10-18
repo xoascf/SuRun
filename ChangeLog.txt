@@ -28,6 +28,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.0.9 Beta 7 - 2009-10-18
+---------------------------------
+* FIX: IAT-Hook initialisation uses an exception filter that restarts 
+    initialisation on access violation
+
 SuRun 1.2.0.9 Beta 6 - 2009-10-12
 ---------------------------------
 * FIX: IAT-Hooks are always set in a separate thread (again) to avoid GPFs in 
