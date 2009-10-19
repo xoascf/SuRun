@@ -21,6 +21,8 @@
 static WCHAR SuRun_Beta[]={0x03B2,'7',0};
 #define BetaVer SuRun_Beta
 
+#define _TEST_STABILITY
+
 //#define DoDBGTrace
 
 #ifdef BetaVer

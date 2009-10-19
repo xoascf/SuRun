@@ -155,6 +155,10 @@ static CHookDescriptor* need_hdt[]=
   &hkCrProcA, 
   &hkCrProcW,
   &hkSwDesk,
+#ifdef _TEST_STABILITY
+  &hkCrPAUA,
+  &hkCrPAUW,
+#endif _TEST_STABILITY
 };
 
 //Functions that will be hooked
@@ -164,24 +168,45 @@ static CHookDescriptor* hdt[]=
   &hkLdLibW, 
   &hkLdLibXA, 
   &hkLdLibXW, 
-//  &hkGetPAdr,
+  &hkGetPAdr,
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
   &hkSwDesk,
+#ifdef _TEST_STABILITY
+  &hkCrPAUA,
+  &hkCrPAUW,
+#endif _TEST_STABILITY
 };
 
 static CHookDescriptor* sys_need_hdt[]=
 {
   &hkCrPAUA,
   &hkCrPAUW,
+#ifdef _TEST_STABILITY
+  &hkCrProcA, 
+  &hkCrProcW,
+  &hkSwDesk,
+#endif _TEST_STABILITY
 };
 
 static CHookDescriptor* sys_hdt[]=
 {
   &hkCrPAUA,
   &hkCrPAUW,
+#ifdef _TEST_STABILITY
+  &hkLdLibA,
+  &hkLdLibW, 
+  &hkLdLibXA, 
+  &hkLdLibXW, 
+  &hkGetPAdr,
+  &hkFreeLib, 
+  &hkFrLibXT, 
+  &hkCrProcA, 
+  &hkCrProcW,
+  &hkSwDesk,
+#endif _TEST_STABILITY
 };
 
 //relative pointers in PE images
