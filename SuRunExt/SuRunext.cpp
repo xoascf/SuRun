@@ -930,6 +930,7 @@ DWORD WINAPI InitProc(void* p)
       l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
       if(l_bSetHook)
       {
+#ifdef _TEST_STABILITY
         if (l_IsAdmin)
         {
           //Admin process: Only set a hook into services.exe!
@@ -938,6 +939,7 @@ DWORD WINAPI InitProc(void* p)
           SR_PathQuoteSpacesW(fNoHook);
           l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)==0);
         }
+#endif _TEST_STABILITY
         //Do not set hooks into blacklisted files!
         l_bSetHook=l_bSetHook && (!IsInBlackList(fMod));
         //      DBGTrace3("SuRunExt: %s Hook=%d [%s]",fMod,l_bSetHook,GetCommandLine());

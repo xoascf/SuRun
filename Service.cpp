@@ -1729,12 +1729,14 @@ void InstallRegistry()
   //Add SuRun CPL to "Performance and Maintenance"
   SetRegInt(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Extended Properties\\{305CA226-D286-468e-B848-2B2E8E697B74} 2",SuRunExe,5);
   //add to AppInit_Dlls
-//  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
-//  AddAppInit(AppInit,_T("SuRunExt.dll"));
-//#ifdef _WIN64
-//  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
-//  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
-//#endif _WIN64
+#ifdef _TEST_STABILITY
+  SetRegInt(HKLM,AppInit,_T("LoadAppInit_DLLs"),1);
+  AddAppInit(AppInit,_T("SuRunExt.dll"));
+#ifdef _WIN64
+  SetRegInt(HKLM,AppInit32,_T("LoadAppInit_DLLs"),1);
+  AddAppInit(AppInit32,_T("SuRunExt32.dll"));
+#endif _WIN64
+#endif _TEST_STABILITY
 }
 
 //////////////////////////////////////////////////////////////////////////////
