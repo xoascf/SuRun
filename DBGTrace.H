@@ -18,7 +18,7 @@
 #pragma comment(lib,"winmm")
 #pragma warning(disable : 4996)
 
-#define _TEST_STABILITY
+//#define _TEST_STABILITY
 
 static WCHAR SuRun_Beta[]={0x03B2,'7',
 #ifdef _TEST_STABILITY
