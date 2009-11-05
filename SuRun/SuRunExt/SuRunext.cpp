@@ -930,7 +930,7 @@ DWORD WINAPI InitProc(void* p)
       l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
       if(l_bSetHook)
       {
-#ifdef _TEST_STABILITY
+#ifndef _TEST_STABILITY
         if (l_IsAdmin)
         {
           //Admin process: Only set a hook into services.exe!
