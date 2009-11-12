@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+*NEW: POLISH resources by junne
 
 ToDo
 ---------------------
