@@ -228,9 +228,9 @@ BEGIN
     IDS_ERR                 "SuRunExt.dll fout"
     IDS_TOOLTIP             "Configuratiescherm starten als Administrator"
     IDS_SURUN               "Configuratiescherm als Administrator"
-    IDS_SURUNCMD            "'SuRun cmd' hier"
-    IDS_SURUNEXP            "'SuRun Explorer' hier"
-    IDS_RESTARTSHELL        "Wilt u de Windows omgeving (%s)\nopnieuw starten met Administrator rechten??"
+    IDS_SURUNCMD            "'SuRun opdrachtprompt' hier"
+    IDS_SURUNEXP            "'SuRun Verkenner' hier"
+    IDS_RESTARTSHELL        "Wilt u de Windows omgeving (%s)\nopnieuw starten met Administrator-rechten??"
     IDS_CPLNAME             "SuRun instellingen"
     IDS_MENURESTART         "Opnieuw starten als Administrator"
 END

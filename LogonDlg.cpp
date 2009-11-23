@@ -635,13 +635,12 @@ BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
                   0,DialogProc,(LPARAM)&p);
 }
 
-DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,int IDmsg,...)
+DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
 {
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  TCHAR P[PWLEN]={0};
-  LOGONDLGPARAMS p(S,User,P,true,false,0,SessionId);
+  LOGONDLGPARAMS p(S,User,Password,true,false,0,SessionId);
   p.Users.Add(User);
   return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
@@ -729,9 +728,15 @@ BOOL TestLogonDlg()
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
   BOOL l;
-  l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  l=ValidateCurrentUser(0,User,Password,IDS_ASKOK,L"C:\\Windows\\Explorer.exe");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+
+
+  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  if (l==-1)
+    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  
   
 //  return 1;
 
@@ -753,7 +758,7 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 
-  l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
@@ -774,7 +779,7 @@ BOOL TestLogonDlg()
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
   
-  l=RunAsLogon(0,User,Password,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");

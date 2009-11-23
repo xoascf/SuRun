@@ -1050,12 +1050,28 @@ DWORD PrepareSuRun()
       if (f&FLAG_DONTASK)
       {
         //Program is known but password expired: Only check password!
-        l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_ASKOK);
-      }else
-      {
-        l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
-          IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+        if(ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
+            IDS_ASKOK,BeautifyCmdLine(g_RunData.cmdLine))&1)
+        {
+          UpdLastRunTime(g_RunData.UserName);
+          DeleteSafeDesktop(FALSE);
+          if(!NoNeedPw)
+          {
+            SavePassword(g_RunData.UserName,g_RunPwd);
+            HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
+            DWORD n=0;
+            if (hUser)
+              CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
+            zero(g_RunPwd);
+            //Do not call CloseHandle(hUser)!
+          }
+          return RETVAL_OK;
+        }
+        DeleteSafeDesktop(bFadeDesk);
+        return RETVAL_CANCELLED;
       }
+      l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
+          IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
       if((!NoNeedPw)&&(l&1))
       {
         PwOk=TRUE;
@@ -1064,6 +1080,7 @@ DWORD PrepareSuRun()
         DWORD n=0;
         if (hUser)
           CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
+        zero(g_RunPwd);
         //Do not call CloseHandle(hUser)!
       }
     }else //if (PwOk):
@@ -1164,8 +1181,9 @@ BOOL Setup()
   //check if user name needs to enter the password:
   if (GetReqPw4Setup(g_RunData.UserName))
   {
-    if(!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP))
+    if(!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_PW4SETUP))
       return FALSE;
+    zero(g_RunPwd);
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
   //only Admins and SuRunners may setup SuRun
@@ -1183,8 +1201,9 @@ BOOL Setup()
     || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0))
   {
     if ( (!GetSavePW || PasswordExpired(g_RunData.UserName))
-      && (!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,IDS_PW4SETUP)))
+      && (!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_PW4SETUP)))
         return FALSE;
+    zero(g_RunPwd);
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
   return false;
