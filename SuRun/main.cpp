@@ -58,7 +58,7 @@ static void Crash()
 #ifdef _DEBUG
 //#include "LSALogon.h"
 //extern BOOL TestSetup();
-//extern BOOL TestLogonDlg();
+extern BOOL TestLogonDlg();
 //extern DWORD LSAStartAdminProcess();
 //extern int TestBS();
 extern void ShowFUSGUI();
@@ -107,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetAdminToken(0);
 //  TestBS();
 //  TestSetup();
-//  TestLogonDlg();
+  TestLogonDlg();
 //  TCHAR Args[4096];
 //  ResolveCommandLine(L"C:\\WINDOWS\\system32\\control.exe appwiz.cpl,,3",L"C:\\Dokumente und Einstellungen\\Kay",Args);
 //  UserIsInSuRunnersOrAdmins();
@@ -117,7 +117,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 //  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
 //  ResolveCommandLine(L"control",g_RunData.CurDir,g_RunData.cmdLine);
 //  LSAStartAdminProcess() ;
-//  ExitProcess(0);
+  ExitProcess(0);
 #endif _DEBUG
   HideAppStartCursor();
   if(HandleServiceStuff())

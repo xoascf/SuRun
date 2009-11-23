@@ -1,6 +1,5 @@
 Done, to be tested:
 ---------------------------
-*NEW: POLISH resources by junne
 
 ToDo
 ---------------------
@@ -28,6 +27,13 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.9 Beta 8 - 2009-11-23
+---------------------------------
+*NEW: POLISH resources by junne
+*CHG: Updated Dutch resources by Stephan Paternotte
+*FIX: Require the user's password after timeout and in domains for approved 
+  programs GFP'ed silently
 
 SuRun 1.2.0.9 Beta 7 - 2009-10-18
 ---------------------------------
