@@ -20,7 +20,7 @@
 
 //#define _TEST_STABILITY
 
-static WCHAR SuRun_Beta[]={0x03B2,'8',
+static WCHAR SuRun_Beta[]={0x03B2,'9',
 #ifdef _TEST_STABILITY
     'a',
 #endif _TEST_STABILITY

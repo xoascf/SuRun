@@ -168,9 +168,9 @@ static CHookDescriptor* hdt[]=
   &hkLdLibW, 
   &hkLdLibXA, 
   &hkLdLibXW, 
-#ifdef _TEST_STABILITY
+//#ifdef _TEST_STABILITY
   &hkGetPAdr,
-#endif _TEST_STABILITY
+//#endif _TEST_STABILITY
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
