@@ -822,10 +822,6 @@ HANDLE GetAdminToken(DWORD SessionID)
     }
     //
     OBJECT_ATTRIBUTES oa = {sizeof(oa), 0, 0, 0, 0, 0};
-    //Get Token statistics for AuthenticationId and ExpirationTime
-//    HANDLE hAdmin=GetTempAdminToken();
-//    if (hAdmin)
-//      CHK_BOOL_FN(GetTokenInformation(hAdmin,TokenStatistics,&tstat,sizeof(tstat),&n));
     //Create the token
     if (!ZwCreateToken)
     	ZwCreateToken=(ZwCrTok)GetProcAddress(GetModuleHandleA("ntdll.dll"),"ZwCreateToken");

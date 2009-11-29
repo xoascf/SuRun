@@ -530,7 +530,8 @@ static CRITICAL_SECTION l_SxHkCs={0};
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
-STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
+//SHELLEXECUTEINFOW l_lastfailedSx={0};
+HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 {
 #ifdef DoDBGTrace
 //  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
@@ -557,16 +558,18 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
       sizeof(SHELLEXECUTEINFO),pei->cbSize);
     return S_FALSE;
   }
+//  if (memcmp(&l_lastfailedSx,pei,sizeof(SHELLEXECUTEINFOW))==0)
+//    return S_FALSE;
   if (!pei->lpFile)
   {
     DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
 #ifdef DoDBGTrace
-    DBGTrace15("  siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-      L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-      pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-      pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
-      pei->lpClass,
-      pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+//    DBGTrace15("  siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
+//      L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
+//      pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
+//      pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
+//      pei->lpClass,
+//      pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
 #endif DoDBGTrace
     return S_FALSE;
   }
@@ -630,6 +633,7 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   SetCurrentDirectory(cmd);
 
   RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
+//  zero(l_lastfailedSx);
 
   GetSystemWindowsDirectory(cmd,countof(cmd));
 #ifndef _SR32
@@ -673,7 +677,10 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
         pei->hInstApp=bRunAs?(HINSTANCE)34:(HINSTANCE)SE_ERR_ACCESSDENIED;
         //Tell IAT-Hook to not check "tmp" again!
         if (!bRunAs)
+        {
           SetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp);
+//          l_lastfailedSx=*pei;
+        }
       }
     }else
       DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
@@ -683,6 +690,12 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
   }else
     DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
+}
+
+
+STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
+{
+  return ShellExtExecute(pei);
 }
 
 //////////////////////////////////////////////////////////////////////////////
