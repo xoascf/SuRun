@@ -115,7 +115,7 @@ void TRACEx(LPCTSTR s,...)
 
 void TRACExA(LPCSTR s,...)
 {
-  char S[1024]={0};
+  char S[4096]={0};
   int len=0;
   va_list va;
   va_start(va,s);

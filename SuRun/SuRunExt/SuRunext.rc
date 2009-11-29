@@ -13,6 +13,42 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// Polish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PLK)
+#ifdef _WIN32
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+#pragma code_page(1250)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILENOTFOUND        "Plik nie znaleziony: SuRun.exe"
+    IDS_ERR                 "B31d SuRunExt.dll"
+    IDS_TOOLTIP             "Uruchom panel sterowania z uprawnieniami administracyjnymi"
+    IDS_SURUN               "Panel sterowania (SuRun)"
+    IDS_SURUNCMD            "Wiersz polecenia (SuRun)"
+    IDS_SURUNEXP            "Eksploruj (SuRun)"
+    IDS_RESTARTSHELL        "Czy napewno chcesz uruchomia ponownie pow3oke Windows\n(%s) z uprawnieniami administracyjnymi?"
+    IDS_CPLNAME             "Ustawienia SuRun"
+    IDS_MENURESTART         "Restartuj (SuRun)"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUSTART           "Uruchom (SuRun)"
+END
+
+#endif    // Polish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)

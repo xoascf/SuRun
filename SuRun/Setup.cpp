@@ -496,7 +496,7 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_NOTIFY:
     {
       switch (wParam)
@@ -608,7 +608,7 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_COMMAND:
     switch (wParam)
     {
@@ -720,7 +720,7 @@ INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_COMMAND:
     switch (wParam)
     {
@@ -1438,7 +1438,7 @@ INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_COMMAND:
     switch (wParam)
     {
@@ -1682,7 +1682,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_COMMAND:
     {
       switch (wParam)
@@ -1818,7 +1818,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_PAINT:
     // The List Control is (to for some to me unknow reason) NOT displayed if
     // a user app switches to the user desktop and WatchDog switches back.
@@ -2149,7 +2149,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_DESTROY:
     if (g_SD->DlgExitCode==IDOK) //User pressed OK, save settings
     {
@@ -2258,7 +2258,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_CTLCOLORSTATIC:
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
-    return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+    return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
   case WM_DESTROY:
     if (g_SD->DlgExitCode==IDOK) //User pressed OK, save settings
     {

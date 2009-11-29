@@ -514,7 +514,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       if ((CtlId==IDC_DLGQUESTION)||(CtlId==IDC_SECICON))
       {
         SetBkMode((HDC)wParam,TRANSPARENT);
-        return (BOOL)PtrToUlong(GetStockObject(WHITE_BRUSH));
+        return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
       }
       if ((CtlId==IDC_HINT)||(CtlId==IDC_SECICON1))
       {
