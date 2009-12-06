@@ -29,12 +29,12 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_FILENOTFOUND        "Plik nie znaleziony: SuRun.exe"
-    IDS_ERR                 "B31d SuRunExt.dll"
+    IDS_ERR                 "B³¹d SuRunExt.dll"
     IDS_TOOLTIP             "Uruchom panel sterowania z uprawnieniami administracyjnymi"
     IDS_SURUN               "Panel sterowania (SuRun)"
     IDS_SURUNCMD            "Wiersz polecenia (SuRun)"
     IDS_SURUNEXP            "Eksploruj (SuRun)"
-    IDS_RESTARTSHELL        "Czy napewno chcesz uruchomia ponownie pow3oke Windows\n(%s) z uprawnieniami administracyjnymi?"
+    IDS_RESTARTSHELL        "Czy napewno chcesz uruchomiæ ponownie pow³okê Windows\n(%s) z uprawnieniami administracyjnymi?"
     IDS_CPLNAME             "Ustawienia SuRun"
     IDS_MENURESTART         "Restartuj (SuRun)"
 END

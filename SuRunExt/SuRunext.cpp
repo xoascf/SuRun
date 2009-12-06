@@ -534,12 +534,13 @@ static CRITICAL_SECTION l_SxHkCs={0};
 HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 {
 #ifdef DoDBGTrace
-//  DBGTrace15("SuRun ShellExtHook: siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-//    L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-//    pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-//    pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
-//    pei->lpClass,
-//    pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+//  if (pei)
+//    DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, "
+//      L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
+//      pei->fMask,pei->lpVerb,pei->lpFile,pei->lpParameters,pei->lpDirectory,
+//      pei->lpIDList,pei->lpClass,pei->hkeyClass,pei->hProcess);
+//  else
+//    DBGTrace("SuRun ShellExtHook::ShellExtExecute");
 #endif DoDBGTrace
   //Admins don't need the ShellExec Hook!
   if (l_IsAdmin)

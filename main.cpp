@@ -39,30 +39,11 @@
 
 extern RUNDATA g_RunData;
 
-
-#ifdef BetaVer
-static void Crash()
-{
-  SafeMsgBox(0,L"Crashing!",CResStr(IDS_APPNAME),MB_ICONINFORMATION);
-  DWORD* p=NULL;
-  *p=GetTickCount();
-}
-#endif BetaVer
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // WinMain
 //
 //////////////////////////////////////////////////////////////////////////////
-
-#ifdef _DEBUG
-//#include "LSALogon.h"
-//extern BOOL TestSetup();
-extern BOOL TestLogonDlg();
-//extern DWORD LSAStartAdminProcess();
-//extern int TestBS();
-extern void ShowFUSGUI();
-#endif _DEBUG
 
 static void HideAppStartCursor()
 {
@@ -79,7 +60,6 @@ static void HideAppStartCursor()
 extern HANDLE GetAdminToken(DWORD SessionID);
 #include <Userenv.h>
 
-//#include "ScreenSnap.h"
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
@@ -100,31 +80,10 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,SUBLANG_DEFAULT),SORT_DEFAULT));
     break;
   }
-#ifdef _DEBUG
-//  ShowFUSGUI();
-//  HKEY hkcu=0;
-//  RegOpenKey(HKCU,0,&hkcu);
-//  GetAdminToken(0);
-//  TestBS();
-//  TestSetup();
-  TestLogonDlg();
-//  TCHAR Args[4096];
-//  ResolveCommandLine(L"C:\\WINDOWS\\system32\\control.exe appwiz.cpl,,3",L"C:\\Dokumente und Einstellungen\\Kay",Args);
-//  UserIsInSuRunnersOrAdmins();
-//  _tcscpy(g_RunData.UserName,_T("BRUNS\\Kay"));
-//  _tcscpy(g_RunData.CurDir,_T("C:\\Windows"));
-//  GetWinStaName(g_RunData.WinSta,countof(g_RunData.WinSta));
-//  GetDesktopName(g_RunData.Desk,countof(g_RunData.Desk));
-//  ResolveCommandLine(L"control",g_RunData.CurDir,g_RunData.cmdLine);
-//  LSAStartAdminProcess() ;
-  ExitProcess(0);
-#endif _DEBUG
   HideAppStartCursor();
   if(HandleServiceStuff())
     return 0;
-#ifdef DoDBGTrace
-  *((DWORD*)&g_RunData.CurDir[4090])=timeGetTime();
-#endif DoDBGTrace
+  
   if (g_RunData.CliThreadId==GetCurrentThreadId())
   {
     //Started from service:
@@ -167,12 +126,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       Args=PathGetArgs(Args);
       if (*(Args-1)==' ')
         *(Args-1)=0;
-#ifdef BetaVer
-      if (!_wcsicmp(c,L"/CRASH"))
-      {
-        Crash();
-      }else 
-#endif BetaVer
       if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;

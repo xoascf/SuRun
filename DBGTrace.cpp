@@ -88,53 +88,126 @@ static void WriteLog(LPTSTR S)
 #endif UNICODE
 }
 
+//#pragma pack(push,1)
+//typedef struct
+//{
+//  DWORD PID;
+//  char s[4096-sizeof(DWORD)];
+//}DBGSTRBUF;
+//#pragma pack(pop)
+////DbgOutA was created after reading:
+////http://unixwiz.net/techtips/outputdebugstring.html
+//void DbgOutA(LPCSTR s)
+//{
+//  static HANDLE DBWMtx=NULL;
+//  if (!DBWMtx)
+//    DBWMtx=OpenMutexA(SYNCHRONIZE,false,"DBWinMutex");
+//  if (!DBWMtx)
+//  {
+//    //Just in case Microsoft changes OutputDebugString in future:
+//    OutputDebugStringA("FATAL: DBWinMutex not available\n");
+//    return;
+//  }
+//  WaitForSingleObject(DBWMtx,INFINITE);
+//  HANDLE DBWBuf=OpenFileMappingA(FILE_MAP_READ|FILE_MAP_WRITE,FALSE,"DBWIN_BUFFER");
+//  if (!DBWBuf) 
+//  {
+//    ReleaseMutex(DBWMtx);
+//    //Just in case Microsoft changes OutputDebugString in future:
+//    OutputDebugStringA("FATAL: DBWIN_BUFFER not available\n");
+//    return;
+//  }
+//  DBGSTRBUF* Buf=(DBGSTRBUF*)MapViewOfFile(DBWBuf,FILE_MAP_WRITE,0,0,0);
+//  HANDLE evRdy=OpenEventA(EVENT_MODIFY_STATE,FALSE,"DBWIN_DATA_READY");
+//  HANDLE evAck=OpenEventA(SYNCHRONIZE,FALSE,"DBWIN_BUFFER_READY");
+//  __try 
+//  {
+//    if (evRdy && WaitForSingleObject(evAck,5000) == WAIT_OBJECT_0) 
+//    {
+//      Buf->PID=GetCurrentProcessId();
+//      memset(&Buf->s,0,sizeof(Buf->s));
+//      memmove(&Buf->s,s,min(strlen(s),sizeof(Buf->s)-1));
+//      SetEvent(evRdy);
+//    }else
+//    {
+//      //Just in case Microsoft changes OutputDebugString in future:
+//      OutputDebugStringA("FATAL: DBWIN_xxx events not available\n");
+//    }
+//  }
+//  __except(1) 
+//  {
+//    //Just in case Microsoft changes OutputDebugString in future:
+//    OutputDebugStringA("FATAL: Exception in DbgOutA\n");
+//  }
+//  if (evAck) 
+//    CloseHandle(evAck);
+//  if (evRdy) 
+//    CloseHandle(evRdy);
+//  if (Buf) 
+//    UnmapViewOfFile(Buf);
+//  CloseHandle(DBWBuf);
+//  ReleaseMutex(DBWMtx);
+//}
+
 void TRACEx(LPCTSTR s,...)
 {
-  TCHAR S[4096]={0};
-  int len=0;
-  va_list va;
-  va_start(va,s);
-  if (_vstprintf(&S[len],s,va)>=4096)
-    DebugBreak();
-  va_end(va);
-  LPTSTR c0=_tcschr(S,':');
-  LPTSTR c1=_tcschr(S,'\\');
-  LPTSTR c2=_tcschr(S,'.');
-  LPTSTR c3=_tcschr(S,'(');
-  LPTSTR c4=_tcschr(S,')');
-  if((c0<c1)&&(c1<c2)&&(c2<c3)&&(c3<c4))
+  __try
   {
-    *c2=0;
-    c0=_tcsrchr(c0,'\\')+1;
-    *c2='.';
-    memmove(S,c0,(_tcslen(c0)+1)*sizeof(TCHAR));
+    TCHAR S[4096]={0};
+    va_list va;
+    va_start(va,s);
+    _vstprintf(S,s,va);
+    va_end(va);
+    LPTSTR c0=_tcschr(S,':');
+    LPTSTR c1=_tcschr(S,'\\');
+    LPTSTR c2=_tcschr(S,'.');
+    LPTSTR c3=_tcschr(S,'(');
+    LPTSTR c4=_tcschr(S,')');
+    if((c0<c1)&&(c1<c2)&&(c2<c3)&&(c3<c4))
+    {
+      *c2=0;
+      c0=_tcsrchr(c0,'\\')+1;
+      *c2='.';
+      memmove(S,c0,(_tcslen(c0)+1)*sizeof(TCHAR));
+    }
+    OutputDebugString(S);
+//    char Sa[4096]={0};
+//	  WideCharToMultiByte(CP_ACP,0,S,_tcslen(S),Sa,4096,NULL,NULL);
+//	  DbgOutA(Sa);
+    //  WriteLog(S);
+  }__except(1)
+  {
+    OutputDebugStringA("FATAL: Exception in TRACEx");
   }
-  OutputDebugString(S);
-//  WriteLog(S);
 }
 
 void TRACExA(LPCSTR s,...)
 {
-  char S[4096]={0};
-  int len=0;
-  va_list va;
-  va_start(va,s);
-  if (vsprintf(&S[len],s,va)>=1024)
-    DebugBreak();
-  va_end(va);
-  LPSTR c0=strchr(S,':');
-  LPSTR c1=strchr(S,'\\');
-  LPSTR c2=strchr(S,'.');
-  LPSTR c3=strchr(S,'(');
-  LPSTR c4=strchr(S,')');
-  if((c0<c1)&&(c1<c2)&&(c2<c3)&&(c3<c4))
+  __try
   {
-    *c2=0;
-    c0=strrchr(c0,'\\')+1;
-    *c2='.';
-    memmove(S,c0,strlen(c0)+1);
+    char S[4096]={0};
+    va_list va;
+    va_start(va,s);
+    vsprintf(S,s,va);
+    va_end(va);
+    LPSTR c0=strchr(S,':');
+    LPSTR c1=strchr(S,'\\');
+    LPSTR c2=strchr(S,'.');
+    LPSTR c3=strchr(S,'(');
+    LPSTR c4=strchr(S,')');
+    if((c0<c1)&&(c1<c2)&&(c2<c3)&&(c3<c4))
+    {
+      *c2=0;
+      c0=strrchr(c0,'\\')+1;
+      *c2='.';
+      memmove(S,c0,strlen(c0)+1);
+    }
+//    DbgOutA(S);
+    OutputDebugStringA(S);
+    //  WriteLogA(S);
+  }__except(1)
+  {
+    OutputDebugStringA("FATAL: Exception in TRACExA");
   }
-  OutputDebugStringA(S);
-//  WriteLogA(S);
 }
 

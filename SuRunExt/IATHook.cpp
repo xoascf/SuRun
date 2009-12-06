@@ -596,7 +596,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     SR_PathQuoteSpacesW(cmd);
     if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
       //Never start SuRun administrative
-      return /*DBGTrace("NoSuRunAutoSuRun"),*/LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
+      return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
     //Exit if ShellExecHook failed on "tmp"
     static WCHAR tmp2[4096];
     GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp2,4096);

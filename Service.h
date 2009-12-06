@@ -43,7 +43,7 @@ typedef struct
   {
     struct
     {
-      DWORD RetPID;     //SuRun->Service: Return PROCESS_INFORMATION to this Porcess
+      DWORD RetPID;     //SuRun->Service: Return PROCESS_INFORMATION to this Process
       DWORD_PTR RetPtr; //SuRun->Service: Return PROCESS_INFORMATION to this Address
     };
     struct
