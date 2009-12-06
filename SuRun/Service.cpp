@@ -339,7 +339,6 @@ DWORD CheckCliProcess(RUNDATA& rd)
   CloseHandle(hProcess);
   if (sizeof(RUNDATA)!=s)
     return 0;
-  ActivateKeyboardLayout(GetKeyboardLayout(g_RunData.CliThreadId),KLF_SETFORPROCESS);
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
     return 1;
   return 2;
@@ -697,7 +696,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     g_ss.dwCheckPoint       = 0;
     g_ss.dwWaitHint         = 0;
     SetServiceStatus(g_hSS,&g_ss);
-    DBGTrace( "SuRun Service running");
+    DBGTrace("SuRun Service running");
     CTimeOut cto;
     while (g_hPipe!=INVALID_HANDLE_VALUE)
     {
@@ -793,9 +792,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             GetSystemWindowsDirectory(cmd,4096);
             PathAppend(cmd,L"SuRun.exe");
             PathQuoteSpaces(cmd);
-            _tcscat(cmd,L" /AskPID ");
-            TCHAR PID[10];
-            _tcscat(cmd,_itot(g_RunData.CliProcessId,PID,10));
+            _tcscat(cmd,L" /AskUSER");
             EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
             EnablePrivilege(SE_INCREASE_QUOTA_NAME);
             BYTE bRunCount=0;
@@ -807,6 +804,8 @@ TryAgain:
                                     0,NULL,&si,&pi))
             {
               bRunCount++;
+              SIZE_T N=0;
+              WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(rd),&N);
               if (!g_RunData.bRunAs)
               {
                 HANDLE hTok=GetTempAdminToken(g_RunData.UserName);
@@ -816,7 +815,6 @@ TryAgain:
                   DWORD n=0;
                   CHK_BOOL_FN(GetTokenInformation(hTok,TokenStatistics,&tstat,sizeof(tstat),&n));
                 }
-                SIZE_T N=0;
                 WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&N);
               }
               ResumeThread(pi.hThread);
@@ -1452,7 +1450,7 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
 //  SuRun
 // 
 //////////////////////////////////////////////////////////////////////////////
-void SuRun(DWORD ProcessID)
+void SuRun()
 {
 //#ifdef DoDBGTrace
 //  g_nTimes++;
@@ -1464,15 +1462,8 @@ void SuRun(DWORD ProcessID)
     DBGTrace("FATAL: SuRun() not running as SYSTEM; EXIT!");
     return;
   }
-  zero(g_RunData);
   zero(g_RunPwd);
-  RUNDATA RD={0};
-  RD.CliProcessId=ProcessID;
-  if(CheckCliProcess(RD)!=1)
-  {
-    DBGTrace("FATAL: SuRun() Client Process check failed; EXIT!");
-    return;
-  }
+  ActivateKeyboardLayout(GetKeyboardLayout(g_RunData.CliThreadId),KLF_SETFORPROCESS);
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //RunAs...
   if (g_RunData.bRunAs)
@@ -2482,9 +2473,9 @@ bool HandleServiceStuff()
   if (cmd.argc()==3)
   {
     //Service GUI run in Users WindowStation
-    if(_tcsicmp(cmd.argv(1),_T("/AskPID"))==0)
+    if(_tcscmp(cmd.argv(1),_T("/AskUSER"))==0)
     {
-      SuRun(wcstol(cmd.argv(2),0,10));
+      SuRun();
       DeleteSafeDesktop(false);
       ExitProcess(~GetCurrentProcessId());
       return true;
