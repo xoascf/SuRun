@@ -606,14 +606,12 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
       bNoAutoRun=FALSE;
     }else
     {
-      DBGTrace1("SuRun ShellExtHook Error: invalid verb (%s)!",pei->lpVerb);
 #ifdef DoDBGTrace
-      DBGTrace15("  siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
-        L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
-        pei->cbSize,pei->fMask,pei->hwnd,pei->lpVerb,pei->lpFile,pei->lpParameters,
-        pei->lpDirectory,pei->nShow,pei->hInstApp,pei->lpIDList,
-        pei->lpClass,
-        pei->hkeyClass,pei->dwHotKey,pei->hIcon,pei->hProcess);
+      DBGTrace1("SuRun ShellExtHook Error: invalid verb (%s)!",pei->lpVerb);
+//    DBGTrace9("  msk=%X verb=%s, file=%s, parms=%s, "
+//      L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
+//      pei->fMask,pei->lpVerb,pei->lpFile,pei->lpParameters,pei->lpDirectory,
+//      pei->lpIDList,pei->lpClass,pei->hkeyClass,pei->hProcess);
 #endif DoDBGTrace
       return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
     }
