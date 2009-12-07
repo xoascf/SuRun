@@ -3,12 +3,16 @@ Done, to be tested:
 
 ToDo
 ---------------------
+* Create Inline Hook instead of IAT-Hook
+* Hooks must directly write to Service pipe
+* Automagic must start App "non elevated" on "cancel" and AutoCancel
+
 * GUI for SwitchToUser
-* Console SuRun support
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * Checksums for "Always Yes" programs
 * Windows 7 compatibility
   Explorer is started via DCOM explorer.exe /FACTORY,{...
+* Console SuRun support
 * LOG-File for SuRun activity
 
 To be done in future:
