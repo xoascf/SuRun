@@ -23,26 +23,22 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// String Table
+// String Table resources
 //
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_FILENOTFOUND        "Plik nie znaleziony: SuRun.exe"
-    IDS_ERR                 "Blad SuRunExt.dll"
-    IDS_TOOLTIP             "Uruchom panel sterowania z uprawnieniami administracyjnymi"
-    IDS_SURUN               "Panel sterowania (SuRun)"
-    IDS_SURUNCMD            "Wiersz polecenia (SuRun)"
-    IDS_SURUNEXP            "Eksploruj (SuRun)"
-    IDS_RESTARTSHELL        "Czy napewno chcesz uruchomic ponownie powloke Windows\n(%s) z uprawnieniami administracyjnymi?"
-    IDS_CPLNAME             "Ustawienia SuRun"
-    IDS_MENURESTART         "Restartuj (SuRun)"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_MENUSTART           "Uruchom (SuRun)"
-END
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+STRINGTABLE
+{
+    IDS_FILENOTFOUND              "Plik nie znaleziony: SuRun.exe"
+    IDS_ERR                       "B³¹d SuRunExt.dll"
+    IDS_TOOLTIP                   "Uruchom panel sterowania z uprawnieniami administracyjnymi"
+    IDS_SURUN                     "Panel sterowania (SuRun)"
+    IDS_SURUNCMD                  "Wiersz polecenia (SuRun)"
+    IDS_SURUNEXP                  "Eksploruj (SuRun)"
+    IDS_RESTARTSHELL              "Czy napewno chcesz uruchomiæ ponownie pow³okê Windows\n(%s) z uprawnieniami administracyjnymi?"
+    IDS_CPLNAME                   "Ustawienia SuRun"
+    IDS_MENURESTART               "Restartuj (SuRun)"
+    IDS_MENUSTART                 "Uruchom (SuRun)"
+}
 
 #endif    // Polish resources
 /////////////////////////////////////////////////////////////////////////////

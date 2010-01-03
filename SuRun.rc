@@ -25,690 +25,543 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Dialog
+// Dialog resources
 //
-
-IDD_ADDTOBLKLST DIALOG DISCARDABLE  0, 0, 361, 65
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_ADDTOBLKLST DIALOG 0, 0, 361, 65
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 CAPTION "Dodawanie programu do czarnej listy"
 FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,38,357,1
-    LTEXT           "Wiersz polecenia",-1,7,7,58,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,68,7,248,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Symbole wieloznaczne '*' i '?' sa dozwolone.",-1,64,25,
-                    252,8
-    DEFPUSHBUTTON   "&OK",IDOK,241,45,50,14,WS_GROUP
-    PUSHBUTTON      "&Anuluj",IDCANCEL,304,45,50,14
-END
+{
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 38, 357, 1
+    LTEXT           "Wiersz polecenia", -1, 7, 7, 58, 14, SS_LEFT | SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME, 68, 7, 248, 14, ES_AUTOHSCROLL
+    PUSHBUTTON      "...", IDC_SELFILE, 321, 7, 33, 14
+    LTEXT           "Symbole wieloznaczne '*' i '?' s¹ dozwolone.", -1, 64, 25, 252, 8, SS_LEFT
+    DEFPUSHBUTTON   "&OK", IDOK, 241, 45, 50, 14, WS_GROUP
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 304, 45, 50, 14
+}
 
-IDD_APPOPTIONS DIALOG DISCARDABLE  0, 0, 379, 196
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_APPOPTIONS DIALOG 0, 0, 379, 196
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 CAPTION "Opcje programu"
 FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,169,373,1
-    LTEXT           "Wiersz polecenia",IDC_STATIC,7,7,60,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,68,7,248,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    LTEXT           "Symbole wieloznaczne '*' i '?' sa dozwolone.\nWAZNE: Jesli polecenie zawiera spacje, musi zostac umieszczone w cudzyslowiu.",
-                    IDC_STATIC,70,23,261,19
-    GROUPBOX        "Co SuRun ma zrobic, jesli program zostanie uruchomiony z menu przez opcje 'SuRun'?",
-                    IDC_STATIC,16,43,352,64,WS_GROUP
-    ICON            IDI_LISTICON2,IDC_STATIC,24,55,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON3,IDC_STATIC,24,68,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON8,IDC_STATIC,24,81,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON6,IDC_STATIC,24,94,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Spytaj, czy program ma zostac uruchomiony z uprawnieniami administracyjnymi. (Domyslnie)",
-                    IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,40,55,301,10
-    CONTROL         "Automagicznie uruchom ten program z uprawnieniami administracyjnymi.",
-                    IDC_NOASK2,"Button",BS_AUTORADIOBUTTON,40,68,321,10
-    CONTROL         "Automagicznie uruchom ten program z uprawnieniami administracyjnymi i nigdy nie pytaj o haslo.",
-                    IDC_NOASK4,"Button",BS_AUTORADIOBUTTON,40,81,321,10
-    CONTROL         "NIGDY nie uruchamiaj tego programu z uprawnieniami administracyjnymi.",
-                    IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,40,94,321,10
-    GROUPBOX        "Co SuRun ma zrobic przy przechwyceniu programu?",
-                    IDC_STATIC,16,110,352,52,WS_GROUP
-    ICON            IDI_LISTICON1,IDC_STATIC,24,122,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON,IDC_STATIC,24,135,21,20,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON7,IDC_STATIC,24,148,21,20,SS_REALSIZEIMAGE
-    CONTROL         "Ocen, czy program wymaga uprawnien administracyjnych. (Domyslnie)",
-                    IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,40,122,300,10
-    CONTROL         "Automagicznie uruchom ten program z uprawnieniami administracyjnymi.",
-                    IDC_AUTO2,"Button",BS_AUTORADIOBUTTON,40,135,300,10
-    CONTROL         "Bez automagii. Ignoruj ten program.",IDC_AUTO3,"Button",
-                    BS_AUTORADIOBUTTON,40,148,300,10
-    DEFPUSHBUTTON   "&OK",IDOK,241,176,50,14,WS_GROUP
-    PUSHBUTTON      "&Anuluj",IDCANCEL,304,176,50,14
-END
+{
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 169, 373, 1
+    LTEXT           "Wiersz polecenia", IDC_STATIC, 7, 7, 60, 14, SS_LEFT | SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME, 68, 7, 248, 14, ES_AUTOHSCROLL
+    PUSHBUTTON      "...", IDC_SELFILE, 321, 7, 33, 14
+    LTEXT           "Symbole wieloznaczne '*' i '?' s¹ dozwolone.\nWA¯NE: Jeœli polecenie zawiera spacje, musi zostaæ umieszczone w cudzys³owiu.", IDC_STATIC, 70, 23, 261, 19, SS_LEFT
+    GROUPBOX        "Co SuRun ma zrobiæ, jeœli program zostanie uruchomiony z menu przez opcjê 'SuRun'?", IDC_STATIC, 16, 43, 352, 64, WS_GROUP
+    ICON            IDI_LISTICON2, IDC_STATIC, 24, 55, 21, 20, SS_ICON | 0x00000800
+    ICON            IDI_LISTICON3, IDC_STATIC, 24, 68, 21, 20, SS_ICON | 0x00000800
+    ICON            IDI_LISTICON8, IDC_STATIC, 24, 81, 21, 20, SS_ICON | 0x00000800
+    ICON            IDI_LISTICON6, IDC_STATIC, 24, 94, 21, 20, SS_ICON | 0x00000800
+    AUTORADIOBUTTON "Spytaj, czy program ma zostaæ uruchomiony z uprawnieniami administracyjnymi. (Domyœlnie)", IDC_NOASK1, 40, 55, 301, 10, WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Automagicznie uruchom ten program z uprawnieniami administracyjnymi.", IDC_NOASK2, 40, 68, 321, 10
+    AUTORADIOBUTTON "Automagicznie uruchom ten program z uprawnieniami administracyjnymi i nigdy nie pytaj o has³o.", IDC_NOASK4, 40, 81, 321, 10
+    AUTORADIOBUTTON "NIGDY nie uruchamiaj tego programu z uprawnieniami administracyjnymi.", IDC_NOASK3, 40, 94, 321, 10
+    GROUPBOX        "Co SuRun ma zrobiæ przy przechwyceniu programu?", IDC_STATIC, 16, 110, 352, 52, WS_GROUP
+    ICON            IDI_LISTICON1, IDC_STATIC, 24, 122, 21, 20, SS_ICON | 0x00000800
+    ICON            IDI_LISTICON, IDC_STATIC, 24, 135, 21, 20, SS_ICON | 0x00000800
+    ICON            IDI_LISTICON7, IDC_STATIC, 24, 148, 21, 20, SS_ICON | 0x00000800
+    AUTORADIOBUTTON "Oceñ, czy program wymaga uprawnieñ administracyjnych. (Domyœlnie)", IDC_AUTO1, 40, 122, 300, 10, WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Automagicznie uruchom ten program z uprawnieniami administracyjnymi.", IDC_AUTO2, 40, 135, 300, 10
+    AUTORADIOBUTTON "Bez automagii. Ignoruj ten program.", IDC_AUTO3, 40, 148, 300, 10
+    DEFPUSHBUTTON   "&OK", IDOK, 241, 176, 50, 14, WS_GROUP
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 304, 176, 50, 14
+}
 
-IDD_BLKLST DIALOG DISCARDABLE  0, 0, 247, 198
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_BLKLST DIALOG 0, 0, 247, 198
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 CAPTION "Czarna lista przechwytywania"
 FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Nie przechwytuj nastepujacych aplikacji:",IDC_STATIC,7,
-                    4,233,8
-    CONTROL         "",IDC_BLACKLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
-                    LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | 
-                    WS_TABSTOP,7,15,233,141
-    CTEXT           "Symbole wieloznaczne '*' i '?' sa dozwolone.",
-                    IDC_STATIC,8,160,233,10
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,241,1
-    PUSHBUTTON      "&Dodaj...",IDC_ADDAPP,10,179,46,14
-    PUSHBUTTON      "&Edytuj",IDC_EDITAPP,60,179,50,14
-    PUSHBUTTON      "&Usun",IDC_DELETE,114,179,50,14
-    DEFPUSHBUTTON   "&OK",IDOK,192,179,50,14
-END
+{
+    LTEXT           "Nie przechwytuj nastêpuj¹cych aplikacji:", IDC_STATIC, 7, 4, 233, 8, SS_LEFT
+    CONTROL         "", IDC_BLACKLIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOLABELWRAP | LVS_NOSORTHEADER | LVS_REPORT | LVS_SORTASCENDING, 7, 15, 233, 141
+    CTEXT           "Symbole wieloznaczne '*' i '?' s¹ dozwolone.", IDC_STATIC, 8, 160, 233, 10, SS_CENTER
+    CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 0, 174, 241, 1
+    PUSHBUTTON      "&Dodaj...", IDC_ADDAPP, 10, 179, 46, 14
+    PUSHBUTTON      "&Edytuj", IDC_EDITAPP, 60, 179, 50, 14
+    PUSHBUTTON      "&Usuñ", IDC_DELETE, 114, 179, 50, 14
+    DEFPUSHBUTTON   "&OK", IDOK, 192, 179, 50, 14
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_CURUSRACK DIALOGEX 0, 0, 290, 227
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_ABSALIGN | DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Wymagana autoryzacja"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
-    LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,281,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,280,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
-    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    LTEXT           "Wcisnij 'OK' jesli aplikacja ma zostac uruchomiona z uprawnieniami administracyjnymi.\r\n\r\nJesli nie, wcisnij 'Anuluj'!",
-                    IDC_HINT,48,73,234,44,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,9,132,47,46
-    RTEXT           "&Uzytkownik:",IDC_USRST,64,134,44,8
-    EDITTEXT        IDC_USER,110,132,172,12,WS_DISABLED
-    RTEXT           "&Haslo:",IDC_PWDST,64,149,44,8
-    EDITTEXT        IDC_PASSWORD,110,147,172,12,ES_PASSWORD | WS_DISABLED
-    CONTROL         "Nie pytaj wiecej o ten program",IDC_ALWAYSOK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,110,165,172,10
-    CONTROL         "Automagicznie uruchom ten program\nz uprawnieniami administracyjnymi.",
-                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,110,178,172,18
-    PUSHBUTTON      "OK",IDOK,179,202,50,14
-    DEFPUSHBUTTON   "Anuluj",IDCANCEL,232,202,50,14
-    CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,218,
-                    290,9
-END
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 290, 65
+    LTEXT           "", IDC_HINTBK, 0, 66, 289, 56, NOT WS_GROUP | SS_LEFT
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 121, 281, 1
+    CONTROL         "", IDC_FRAME2, WC_STATIC, SS_ETCHEDHORZ, 0, 65, 280, 1
+    ICON            IDI_SHIELD, IDC_SECICON1, 6, 73, 21, 20, SS_ICON | 0x00000800
+    LTEXT           "", IDC_DLGQUESTION, 7, 8, 274, 52, SS_LEFT | SS_NOPREFIX
+    LTEXT           "Wciœnij 'OK' jeœli aplikacja ma zostaæ uruchomiona z uprawnieniami administracyjnymi.\r\n\r\nJeœli nie, wciœnij 'Anuluj'!", IDC_HINT, 48, 73, 234, 44, SS_LEFT | SS_NOPREFIX
+    CONTROL         "", IDC_USERBITMAP, WC_STATIC, SS_ETCHEDFRAME | 0x00000800, 9, 132, 47, 46
+    RTEXT           "&U¿ytkownik:", IDC_USRST, 64, 134, 44, 8, SS_RIGHT
+    EDITTEXT        IDC_USER, 110, 132, 172, 12, WS_DISABLED
+    RTEXT           "&Has³o:", IDC_PWDST, 64, 149, 44, 8, SS_RIGHT
+    EDITTEXT        IDC_PASSWORD, 110, 147, 172, 12, WS_DISABLED | ES_PASSWORD
+    AUTOCHECKBOX    "Nie pytaj wiêcej o ten program", IDC_ALWAYSOK, 110, 165, 172, 10
+    AUTOCHECKBOX    "Automagicznie uruchom ten program\nz uprawnieniami administracyjnymi.", IDC_SHELLEXECOK, 110, 178, 172, 18, BS_MULTILINE
+    PUSHBUTTON      "OK", IDOK, 179, 202, 50, 14
+    DEFPUSHBUTTON   "Anuluj", IDCANCEL, 232, 202, 50, 14
+    CONTROL         "", IDC_AUTOCANCEL, PROGRESS_CLASS, PBS_SMOOTH, 0, 218, 290, 9
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_CURUSRLOGON DIALOGEX 0, 0, 290, 227
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_ABSALIGN | DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "Wymagane haslo"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,290,65
-    LTEXT           "",IDC_HINTBK,0,66,290,56,NOT WS_GROUP
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,287,1
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,287,1
-    LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Podaj haslo, jesli aplikacja ma zostac uruchomiona z uprawnieniami administracyjnymi.\r\n\r\nJesli nie, wcisnij 'Anuluj'!",
-                    IDC_HINT,48,73,234,44,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,9,132,47,46
-    RTEXT           "&Uzytkownik:",IDC_USRST,64,134,44,8
-    EDITTEXT        IDC_USER,110,132,172,12,WS_DISABLED
-    RTEXT           "&Haslo:",IDC_PWDST,64,149,44,8
-    EDITTEXT        IDC_PASSWORD,110,147,172,12,ES_AUTOHSCROLL
-    CONTROL         "Nie pytaj wiecej o ten program",IDC_ALWAYSOK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,110,165,172,10
-    CONTROL         "Automagicznie uruchom ten program\nz uprawnieniami administracyjnymi.",
-                    IDC_SHELLEXECOK,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,110,178,172,18
-    DEFPUSHBUTTON   "OK",IDOK,179,202,50,14
-    PUSHBUTTON      "Anuluj",IDCANCEL,232,202,50,14
-    CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,218,
-                    290,9
-END
+CAPTION "Wymagane has³o"
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 290, 65
+    LTEXT           "", IDC_HINTBK, 0, 66, 290, 56, NOT WS_GROUP | SS_LEFT
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 121, 287, 1
+    CONTROL         "", IDC_FRAME2, WC_STATIC, SS_ETCHEDHORZ, 0, 65, 287, 1
+    LTEXT           "", IDC_DLGQUESTION, 7, 8, 274, 52, SS_LEFT | SS_NOPREFIX
+    ICON            IDI_SHIELD1, IDC_SECICON1, 6, 73, 21, 20, SS_ICON | 0x00000800
+    LTEXT           "Podaj has³o, jeœli aplikacja ma zostaæ uruchomiona z uprawnieniami administracyjnymi.\r\n\r\nJeœli nie, wciœnij 'Anuluj'!", IDC_HINT, 48, 73, 234, 44, SS_LEFT | SS_NOPREFIX
+    CONTROL         "", IDC_USERBITMAP, WC_STATIC, SS_ETCHEDFRAME | 0x00000800, 9, 132, 47, 46
+    RTEXT           "&U¿ytkownik:", IDC_USRST, 64, 134, 44, 8, SS_RIGHT
+    EDITTEXT        IDC_USER, 110, 132, 172, 12, WS_DISABLED
+    RTEXT           "&Has³o:", IDC_PWDST, 64, 149, 44, 8, SS_RIGHT
+    EDITTEXT        IDC_PASSWORD, 110, 147, 172, 12, ES_AUTOHSCROLL
+    AUTOCHECKBOX    "Nie pytaj wiêcej o ten program", IDC_ALWAYSOK, 110, 165, 172, 10
+    AUTOCHECKBOX    "Automagicznie uruchom ten program\nz uprawnieniami administracyjnymi.", IDC_SHELLEXECOK, 110, 178, 172, 18, BS_MULTILINE
+    DEFPUSHBUTTON   "OK", IDOK, 179, 202, 50, 14
+    PUSHBUTTON      "Anuluj", IDCANCEL, 232, 202, 50, 14
+    CONTROL         "", IDC_AUTOCANCEL, PROGRESS_CLASS, PBS_SMOOTH, 0, 218, 290, 9
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_FUSDLG DIALOGEX 0, 0, 263, 143
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_ABSALIGN | DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
-CAPTION "Przelaczanie uzytkowników"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,258,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Podaj haslo uzytkownika, do którego sesji chcesz sie przelaczyc.",
-                    IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,73,47,44
-    RTEXT           "&Uzytkownik:",IDC_USRST,62,77,42,8
-    RTEXT           "&Haslo:",IDC_PWDST,62,91,42,8
-    EDITTEXT        IDC_PASSWORD,107,89,149,12,ES_AUTOHSCROLL
-    CONTROL         "pamietaj haslo",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,107,104,149,10
-    DEFPUSHBUTTON   "OK",IDOK,150,117,52,14
-    PUSHBUTTON      "Anuluj",IDCANCEL,204,117,52,14
-    CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,134,
-                    263,9
-    EDITTEXT        IDC_USER,107,74,149,12,ES_AUTOHSCROLL
-END
+CAPTION "Prze³¹czanie u¿ytkowników"
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 263, 65
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 65, 258, 1
+    ICON            IDI_SHIELD, IDC_SECICON, 6, 10, 21, 20, SS_ICON | 0x00000800
+    LTEXT           "Podaj has³o u¿ytkownika, do którego sesji chcesz siê prze³¹czyæ.", IDC_DLGQUESTION, 50, 7, 206, 51, SS_LEFT | SS_NOPREFIX
+    CONTROL         "", IDC_USERBITMAP, WC_STATIC, SS_ETCHEDFRAME | 0x00000800, 7, 73, 47, 44
+    RTEXT           "&U¿ytkownik:", IDC_USRST, 62, 77, 42, 8, SS_RIGHT
+    RTEXT           "&Has³o:", IDC_PWDST, 62, 91, 42, 8, SS_RIGHT
+    EDITTEXT        IDC_PASSWORD, 107, 89, 149, 12, ES_AUTOHSCROLL
+    AUTOCHECKBOX    "pamiêtaj has³o", IDC_STOREPASS, 107, 104, 149, 10
+    DEFPUSHBUTTON   "OK", IDOK, 150, 117, 52, 14
+    PUSHBUTTON      "Anuluj", IDCANCEL, 204, 117, 52, 14
+    CONTROL         "", IDC_AUTOCANCEL, PROGRESS_CLASS, PBS_SMOOTH, 0, 134, 263, 9
+    EDITTEXT        IDC_USER, 107, 74, 149, 12, ES_AUTOHSCROLL
+}
 
-IDD_IMPORTSETTINGS DIALOG DISCARDABLE  0, 0, 361, 103
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Import ustawien SuRun"
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_IMPORTSETTINGS DIALOG 0, 0, 361, 103
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
+CAPTION "Import ustawieñ SuRun"
 FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Nazwa pliku",-1,7,7,52,14,SS_CENTERIMAGE
-    EDITTEXT        IDC_FILENAME,64,7,252,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SELFILE,321,7,33,14
-    CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,27,359,1
-    CONTROL         "Importuj ustawienia SuRun",IDC_IMPSURUNSETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,63,32,100,10
-    CONTROL         "Importuj czarna liste przechwytywania",IDC_IMPBLACKLIST,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,63,45,134,10
-    CONTROL         "Importuj uzytkownika z grupy 'SuRunners' oraz jego ustawienia",
-                    IDC_IMPUSRSETTINGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    63,58,213,10
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,74,359,1
-    DEFPUSHBUTTON   "&OK",IDOK,241,81,50,14,WS_GROUP
-    PUSHBUTTON      "&Anuluj",IDCANCEL,304,81,50,14
-END
+{
+    LTEXT           "Nazwa pliku", -1, 7, 7, 52, 14, SS_LEFT | SS_CENTERIMAGE
+    EDITTEXT        IDC_FILENAME, 64, 7, 252, 14, ES_AUTOHSCROLL
+    PUSHBUTTON      "...", IDC_SELFILE, 321, 7, 33, 14
+    CONTROL         "", IDC_FRAME2, WC_STATIC, SS_ETCHEDHORZ, 0, 27, 359, 1
+    AUTOCHECKBOX    "Importuj ustawienia SuRun", IDC_IMPSURUNSETTINGS, 63, 32, 100, 10
+    AUTOCHECKBOX    "Importuj czarn¹ listê przechwytywania", IDC_IMPBLACKLIST, 63, 45, 134, 10
+    AUTOCHECKBOX    "Importuj u¿ytkownika z grupy 'SuRunners' oraz jego ustawienia", IDC_IMPUSRSETTINGS, 63, 58, 213, 10
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 74, 359, 1
+    DEFPUSHBUTTON   "&OK", IDOK, 241, 81, 50, 14, WS_GROUP
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 304, 81, 50, 14
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_INSTALL DIALOGEX 0, 0, 364, 126
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
-    WS_CAPTION
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SYSMODAL | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP
 CAPTION "SuRun %s - Instalacja"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "&Instaluj >>",IDOK,291,107,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,7,21,20
-    LTEXT           "Czy chcesz zainstalowac SuRun?",IDC_QUESTION,45,7,316,
-                    25,SS_CENTERIMAGE
-    CONTROL         "Pokaz ustawienia SuRun po instalacji",IDC_RUNSETUP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,335,10
-    LTEXT           "Dla bezpieczenstwa nastepujaca zasada zabezpieczen lokalnych powinna zostac wlaczona:",
-                    IDC_OWNGRPST,18,60,335,8
-    CONTROL         "Ustaw 'Administratorów' zamiast 'TWÓRCE-WLASCICIELA' jako domyslnego wlasciciela obiektów nowo utworzonych przez Administratorów.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,18,74,335,27
-    PUSHBUTTON      "&Anuluj",IDCANCEL,217,107,68,14
-    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
-                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
-                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-END
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    DEFPUSHBUTTON   "&Instaluj >>", IDOK, 291, 107, 68, 14
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 364, 38
+    LTEXT           "", IDC_OPTNST, 1, 38, 362, 64, NOT WS_GROUP | SS_LEFT | SS_SUNKEN
+    ICON            IDI_MAINICON, IDC_SECICON, 9, 7, 21, 20, SS_ICON
+    LTEXT           "Czy chcesz zainstalowaæ SuRun?", IDC_QUESTION, 45, 7, 316, 25, SS_LEFT | SS_CENTERIMAGE
+    AUTOCHECKBOX    "Poka¿ ustawienia SuRun po instalacji", IDC_RUNSETUP, 18, 44, 335, 10
+    LTEXT           "Dla bezpieczeñstwa nastêpuj¹ca zasada zabezpieczeñ lokalnych powinna zostaæ w³¹czona:", IDC_OWNGRPST, 18, 60, 335, 8, SS_LEFT
+    AUTOCHECKBOX    "Ustaw 'Administratorów' zamiast 'TWÓRCÊ-W£AŒCICIELA' jako domyœlnego w³aœciciela obiektów nowo utworzonych przez Administratorów.", IDC_OWNERGROUP, 18, 74, 335, 27, BS_VCENTER | BS_MULTILINE
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 217, 107, 68, 14
+    LISTBOX         IDC_INSTLOG, 0, 38, 363, 64, NOT WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | NOT LBS_NOTIFY | NOT WS_BORDER | LBS_NOINTEGRALHEIGHT | LBS_NOSEL, WS_EX_STATICEDGE
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_LOGONDLG DIALOGEX 0, 0, 263, 143
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_ABSALIGN | DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Wymagana autoryzacja"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,258,1
-    ICON            IDI_SHIELD2,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Podaj dane identyfikujace Cie jako osobe autoryzowana.",
-                    IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
-    LTEXT           "Jesli nie wiesz, o co chodzi, wcisnij 'Anuluj'!",
-                    IDC_HINT2,65,70,191,8
-    RTEXT           "&Uzytkownik:",IDC_USRST,62,84,42,8
-    RTEXT           "&Haslo:",IDC_PWDST,62,98,42,8
-    COMBOBOX        IDC_USER,107,82,149,30,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PASSWORD,107,97,149,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,150,117,52,14
-    PUSHBUTTON      "Anuluj",IDCANCEL,204,117,52,14
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,73,47,44
-    CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,134,
-                    263,9
-END
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 263, 65
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 65, 258, 1
+    ICON            IDI_SHIELD2, IDC_SECICON, 6, 10, 21, 20, SS_ICON | 0x00000800
+    LTEXT           "Podaj dane identyfikuj¹ce Ciê jako osobê autoryzowan¹.", IDC_DLGQUESTION, 50, 7, 206, 51, SS_LEFT | SS_NOPREFIX
+    LTEXT           "Jeœli nie wiesz, o co chodzi, wciœnij 'Anuluj'!", IDC_HINT2, 65, 70, 191, 8, SS_LEFT
+    RTEXT           "&U¿ytkownik:", IDC_USRST, 62, 84, 42, 8, SS_RIGHT
+    RTEXT           "&Has³o:", IDC_PWDST, 62, 98, 42, 8, SS_RIGHT
+    COMBOBOX        IDC_USER, 107, 82, 149, 30, WS_TABSTOP | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWN | CBS_SORT
+    EDITTEXT        IDC_PASSWORD, 107, 97, 149, 12, ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK", IDOK, 150, 117, 52, 14
+    PUSHBUTTON      "Anuluj", IDCANCEL, 204, 117, 52, 14
+    CONTROL         "", IDC_USERBITMAP, WC_STATIC, SS_ETCHEDFRAME | 0x00000800, 7, 73, 47, 44
+    CONTROL         "", IDC_AUTOCANCEL, PROGRESS_CLASS, PBS_SMOOTH, 0, 134, 263, 9
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_RUNASDLG DIALOGEX 0, 0, 263, 143
-STYLE DS_ABSALIGN | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | 
-    DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_ABSALIGN | DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Uruchom jako..."
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
-    CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,257,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
-    LTEXT           "Podaj dane identyfikujace Cie jako osobe autoryzowana.",
-                    IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
-    RTEXT           "&Uzytkownik:",IDC_USRST,62,77,42,8
-    COMBOBOX        IDC_USER,107,74,149,30,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    RTEXT           "&Haslo:",IDC_PWDST,62,91,42,8
-    EDITTEXT        IDC_PASSWORD,107,89,149,12,ES_AUTOHSCROLL
-    CONTROL         "pamietaj haslo",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,107,104,149,10
-    DEFPUSHBUTTON   "OK",IDOK,150,117,52,14
-    PUSHBUTTON      "Anuluj",IDCANCEL,204,117,52,14
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,7,73,47,44
-    CONTROL         "",IDC_AUTOCANCEL,"msctls_progress32",PBS_SMOOTH,0,134,
-                    263,9
-END
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 263, 65
+    CONTROL         "", IDC_FRAME1, WC_STATIC, SS_ETCHEDHORZ, 0, 65, 257, 1
+    ICON            IDI_SHIELD, IDC_SECICON, 6, 10, 21, 20, SS_ICON | 0x00000800
+    LTEXT           "Podaj dane identyfikuj¹ce Ciê jako osobê autoryzowan¹.", IDC_DLGQUESTION, 50, 7, 206, 51, SS_LEFT | SS_NOPREFIX
+    RTEXT           "&U¿ytkownik:", IDC_USRST, 62, 77, 42, 8, SS_RIGHT
+    COMBOBOX        IDC_USER, 107, 74, 149, 30, WS_TABSTOP | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWN | CBS_SORT
+    RTEXT           "&Has³o:", IDC_PWDST, 62, 91, 42, 8, SS_RIGHT
+    EDITTEXT        IDC_PASSWORD, 107, 89, 149, 12, ES_AUTOHSCROLL
+    AUTOCHECKBOX    "pamiêtaj has³o", IDC_STOREPASS, 107, 104, 149, 10
+    DEFPUSHBUTTON   "OK", IDOK, 150, 117, 52, 14
+    PUSHBUTTON      "Anuluj", IDCANCEL, 204, 117, 52, 14
+    CONTROL         "", IDC_USERBITMAP, WC_STATIC, SS_ETCHEDFRAME | 0x00000800, 7, 73, 47, 44
+    CONTROL         "", IDC_AUTOCANCEL, PROGRESS_CLASS, PBS_SMOOTH, 0, 134, 263, 9
+}
 
-IDD_SELUSER DIALOG DISCARDABLE  0, 0, 247, 227
-STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Dodawanie uzytkownika do grupy SuRunners"
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_SELUSER DIALOG 0, 0, 247, 227
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_SYSMENU
+CAPTION "Dodawanie u¿ytkownika do grupy SuRunners"
 FONT 8, "MS Shell Dlg"
-BEGIN
-    LTEXT           "Wybierz uzytkownika, którego chcesz dodac do grupy 'SuRunners':",
-                    IDC_STATIC,7,4,233,8
-    CONTROL         "",IDC_USERLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
-                    LVS_NOLABELWRAP | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | 
-                    WS_BORDER | WS_TABSTOP,7,15,233,141
-    CONTROL         "pokaz uzytkowników domeny",IDC_ALLUSERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,7,157,233,10
-    LTEXT           "lub podaj uzytkownika domeny manualnie w formie 'domena\\uzytkownik':",
-                    IDC_STATIC,7,171,233,8
-    EDITTEXT        IDC_USERNAME,7,183,233,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,201,243,1
-    DEFPUSHBUTTON   "&OK",IDOK,130,208,50,14
-    PUSHBUTTON      "&Anuluj",IDCANCEL,188,208,50,14
-END
+{
+    LTEXT           "Wybierz u¿ytkownika, którego chcesz dodaæ do grupy 'SuRunners':", IDC_STATIC, 7, 4, 233, 8, SS_LEFT
+    CONTROL         "", IDC_USERLIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOLABELWRAP | LVS_NOSORTHEADER | LVS_SINGLESEL | LVS_REPORT | LVS_SORTASCENDING, 7, 15, 233, 141
+    AUTOCHECKBOX    "poka¿ u¿ytkowników domeny", IDC_ALLUSERS, 7, 157, 233, 10
+    LTEXT           "lub podaj u¿ytkownika domeny manualnie w formie 'domena\\u¿ytkownik':", IDC_STATIC, 7, 171, 233, 8, SS_LEFT
+    EDITTEXT        IDC_USERNAME, 7, 183, 233, 14, ES_AUTOHSCROLL
+    CONTROL         "", IDC_STATIC, WC_STATIC, SS_ETCHEDHORZ, 0, 201, 243, 1
+    DEFPUSHBUTTON   "&OK", IDOK, 130, 208, 50, 14
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 188, 208, 50, 14
+}
 
-IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 393, 242
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_SETUP1 DIALOG 0, 0, 393, 242
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 FONT 8, "MS Shell Dlg"
-BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
-    GROUPBOX        "Bezpieczny pulpit",IDC_EXTOPT2,67,0,321,52,WS_GROUP
-    CONTROL         "Pokaz zamglony &pulpit uzytkownika w tle",
-                    IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,75,11,162,11
-    CONTROL         "Przyciemnienie pulpitu",IDC_FADEDESKTOP,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,75,24,106,11
-    CONTROL         "Automatycznie wcisnij 'Anuluj' po",IDC_USE_C_TO,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,75,37,126,9
-    EDITTEXT        IDC_CANCEL_TO,196,36,18,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "s",IDC_STATIC,218,38,8,8
-    CONTROL         "Pokaz uplyw czasu jako pasek postepu",IDC_SHOW_C_TO,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,234,38,147,10
-    GROUPBOX        "Bezpieczenstwo",IDC_EXTOPT3,67,56,321,52,WS_GROUP
-    CONTROL         "Uzytkownicy musza podac swoje haslo",IDC_ASKPW,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,75,66,136,18
-    EDITTEXT        IDC_ASKTIMEOUT,233,67,18,12,ES_CENTER | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    LTEXT           "czas miedzy ponownym zapytaniem",IDC_STATIC,254,68,128,
-                    11,NOT WS_GROUP
-    LTEXT           "Ostrzegaj, jesli Administratorzy nie posiadaja hasla:",
-                    IDC_STATIC,76,86,117,18
-    COMBOBOX        IDC_WARNADMIN,202,83,175,30,CBS_DROPDOWNLIST | 
-                    WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Integracja z powloka",IDC_STATIC,67,110,321,79,WS_GROUP
-    CONTROL         "Pokaz 'Panel sterowania (SuRun)' w menu kontekstowym pulpitu",
-                    IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,
-                    120,252,11
-    CONTROL         "Pokaz 'Wiersz polecenia (SuRun)' w menu kontekstowym folderów",
-                    IDC_CMDASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,
-                    133,251,11
-    CONTROL         "Pokaz 'Ekspoloruj (SuRun)' w menu kontekstowym folderów",
-                    IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,
-                    146,234,11
-    CONTROL         "Pokaz 'Restartuj (SuRun)' w menu systemowym aplikacji",
-                    IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    75,159,224,11
-    CONTROL         "Pokaz 'Uruchom (SuRun)' w menu systemowym aplikacji",
-                    IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,75,
-                    172,222,11
-    GROUPBOX        "Wygoda uzytkowania",IDC_STATIC,4,194,227,45
-    CONTROL         "Pokaz zaawansowane ustawienia SuRun",IDC_NOEXPERT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,205,185,10
-    PUSHBUTTON      "Ustaw opcje polecane dla domowych uzytkowników",
-                    IDC_SIMPLESETUP,14,218,207,14
-    GROUPBOX        "Kopia zapasowa ustawien",IDC_STATIC,237,193,151,45
-    CTEXT           "Wszystkie ustawienia SuRun",IDC_STATIC,244,205,139,8
-    PUSHBUTTON      "Kopiuj...",IDC_EXPORT,247,218,63,14
-    PUSHBUTTON      "Przywróc...",IDC_IMPORT,316,218,63,14
-END
+{
+    ICON            IDI_SHIELD, IDC_SECICON, 18, 19, 21, 20, SS_ICON | 0x00000800
+    GROUPBOX        "Bezpieczny pulpit", IDC_EXTOPT2, 67, 0, 321, 52, WS_GROUP
+    AUTOCHECKBOX    "Poka¿ zamglony &pulpit u¿ytkownika w tle", IDC_BLURDESKTOP, 75, 11, 162, 11, BS_MULTILINE
+    AUTOCHECKBOX    "Przyciemnienie pulpitu", IDC_FADEDESKTOP, 75, 24, 106, 11, BS_MULTILINE
+    AUTOCHECKBOX    "Automatycznie wciœnij 'Anuluj' po", IDC_USE_C_TO, 75, 37, 126, 9, BS_MULTILINE
+    EDITTEXT        IDC_CANCEL_TO, 196, 36, 18, 12, ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s", IDC_STATIC, 218, 38, 8, 8, SS_LEFT
+    AUTOCHECKBOX    "Poka¿ up³yw czasu jako pasek postêpu", IDC_SHOW_C_TO, 234, 38, 147, 10
+    GROUPBOX        "Bezpieczeñstwo", IDC_EXTOPT3, 67, 56, 321, 52, WS_GROUP
+    AUTOCHECKBOX    "U¿ytkownicy musz¹ podaæ swoje has³o", IDC_ASKPW, 75, 66, 136, 18, BS_MULTILINE
+    EDITTEXT        IDC_ASKTIMEOUT, 233, 67, 18, 12, ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "czas miêdzy ponownym zapytaniem", IDC_STATIC, 254, 68, 128, 11, NOT WS_GROUP | SS_LEFT
+    LTEXT           "Ostrzegaj, jeœli Administratorzy nie posiadaj¹ has³a:", IDC_STATIC, 76, 86, 117, 18, SS_LEFT
+    COMBOBOX        IDC_WARNADMIN, 202, 83, 175, 30, WS_TABSTOP | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWNLIST
+    GROUPBOX        "Integracja z pow³ok¹", IDC_STATIC, 67, 110, 321, 79, WS_GROUP
+    AUTOCHECKBOX    "Poka¿ 'Panel sterowania (SuRun)' w menu kontekstowym pulpitu", IDC_CTRLASADMIN, 75, 120, 252, 11
+    AUTOCHECKBOX    "Poka¿ 'Wiersz polecenia (SuRun)' w menu kontekstowym folderów", IDC_CMDASADMIN, 75, 133, 251, 11
+    AUTOCHECKBOX    "Poka¿ 'Ekspoloruj (SuRun)' w menu kontekstowym folderów", IDC_EXPASADMIN, 75, 146, 234, 11
+    AUTOCHECKBOX    "Poka¿ 'Restartuj (SuRun)' w menu systemowym aplikacji", IDC_RESTARTADMIN, 75, 159, 224, 11
+    AUTOCHECKBOX    "Poka¿ 'Uruchom (SuRun)' w menu systemowym aplikacji", IDC_STARTADMIN, 75, 172, 222, 11
+    GROUPBOX        "Wygoda u¿ytkowania", IDC_STATIC, 4, 194, 227, 45
+    AUTOCHECKBOX    "Poka¿ zaawansowane ustawienia SuRun", IDC_NOEXPERT, 14, 205, 185, 10
+    PUSHBUTTON      "Ustaw opcje polecane dla domowych u¿ytkowników", IDC_SIMPLESETUP, 14, 218, 207, 14
+    GROUPBOX        "Kopia zapasowa ustawieñ", IDC_STATIC, 237, 193, 151, 45
+    CTEXT           "Wszystkie ustawienia SuRun", IDC_STATIC, 244, 205, 139, 8, SS_CENTER
+    PUSHBUTTON      "Kopiuj...", IDC_EXPORT, 247, 218, 63, 14
+    PUSHBUTTON      "Przywróæ...", IDC_IMPORT, 316, 218, 63, 14
+}
 
-IDD_SETUP2 DIALOG DISCARDABLE  0, 0, 424, 239
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_SETUP2 DIALOG 0, 0, 424, 239
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 FONT 8, "MS Shell Dlg"
-BEGIN
-    COMBOBOX        IDC_USER,96,5,192,217,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Dodaj...",IDC_ADDUSER,291,4,50,14
-    PUSHBUTTON      "Usun",IDC_DELUSER,344,4,50,14
-    CONTROL         "Uzytkownik moze zmieniac ustawienia SuRun",IDC_RUNSETUP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,22,178,10
-    CONTROL         "Wymagaj hasla uzytkownika do zmiany ustawien SuRun",
-                    IDC_REQPW4SETUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,
-                    35,193,10
-    CONTROL         "Instaluj nowy sprzet jako administrator",IDC_HW_ADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,48,144,10
-    CONTROL         "Ukrywaj SuRun przed tym uzytkownikiem",IDC_HIDESURUN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,262,22,153,10
-    CONTROL         "Pokaz status uzytkownika w pasku zadan",
-                    IDC_TRAYSHOWADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    262,35,153,10
-    CONTROL         "Pokaz status uzytkownika jako podpowiedz",
-                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    262,48,156,10
-    CONTROL         "Uzytkownik moze uruchamiac z uprawnieniami administracyjnymi tylko aplikacje okreslone ponizej:",
-                    IDC_RESTRICTED,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,60,61,323,10
-    CONTROL         "",IDC_WHITELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | 
-                    LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | 
-                    WS_TABSTOP,12,86,399,128
-    PUSHBUTTON      "Eksport...",IDC_EXPORT,55,217,50,14
-    PUSHBUTTON      "Import...",IDC_IMPORT,109,217,50,14
-    PUSHBUTTON      "&Dodaj...",IDC_ADDAPP,246,217,50,14
-    PUSHBUTTON      "&Edytuj...",IDC_EDITAPP,300,217,50,14
-    PUSHBUTTON      "&Usun",IDC_DELETE,354,217,50,14
-    CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
-                    SS_REALSIZEIMAGE,9,8,40,37
-    LTEXT           "SuRunner",IDC_USRST,60,8,33,8
-    GROUPBOX        "Lista programów dla wybranego uzytkownika (zmiany maja efekt natychmiastowy, nawet w przypadku wcisniecia 'Anuluj').",
-                    IDS_GRPDESC,9,77,405,158
-    LTEXT           "Lista programów",IDC_IMEXSTATIC,17,219,34,8
-END
+{
+    COMBOBOX        IDC_USER, 96, 5, 192, 217, WS_TABSTOP | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_SORT
+    PUSHBUTTON      "Dodaj...", IDC_ADDUSER, 291, 4, 50, 14
+    PUSHBUTTON      "Usuñ", IDC_DELUSER, 344, 4, 50, 14
+    AUTOCHECKBOX    "U¿ytkownik mo¿e zmieniaæ ustawienia SuRun", IDC_RUNSETUP, 60, 22, 178, 10
+    AUTOCHECKBOX    "Wymagaj has³a u¿ytkownika do zmiany ustawieñ SuRun", IDC_REQPW4SETUP, 60, 35, 193, 10
+    AUTOCHECKBOX    "Instaluj nowy sprzêt jako administrator", IDC_HW_ADMIN, 60, 48, 144, 10
+    AUTOCHECKBOX    "Ukrywaj SuRun przed tym u¿ytkownikiem", IDC_HIDESURUN, 262, 22, 153, 10
+    AUTOCHECKBOX    "Poka¿ status u¿ytkownika w pasku zadañ", IDC_TRAYSHOWADMIN, 262, 35, 153, 10
+    AUTOCHECKBOX    "Poka¿ status u¿ytkownika jako podpowiedŸ", IDC_TRAYBALLOON, 262, 48, 156, 10
+    AUTOCHECKBOX    "U¿ytkownik mo¿e uruchamiaæ z uprawnieniami administracyjnymi tylko aplikacje okreœlone poni¿ej:", IDC_RESTRICTED, 60, 61, 323, 10, BS_MULTILINE
+    CONTROL         "", IDC_WHITELIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOLABELWRAP | LVS_REPORT | LVS_AUTOARRANGE | LVS_SORTASCENDING, 12, 86, 399, 128
+    PUSHBUTTON      "Eksport...", IDC_EXPORT, 55, 217, 50, 14
+    PUSHBUTTON      "Import...", IDC_IMPORT, 109, 217, 50, 14
+    PUSHBUTTON      "&Dodaj...", IDC_ADDAPP, 246, 217, 50, 14
+    PUSHBUTTON      "&Edytuj...", IDC_EDITAPP, 300, 217, 50, 14
+    PUSHBUTTON      "&Usuñ", IDC_DELETE, 354, 217, 50, 14
+    CONTROL         "", IDC_USERBITMAP, WC_STATIC, SS_ETCHEDFRAME | 0x00000800, 9, 8, 40, 37
+    LTEXT           "SuRunner", IDC_USRST, 60, 8, 33, 8, SS_LEFT
+    GROUPBOX        "Lista programów dla wybranego u¿ytkownika (zmiany maj¹ efekt natychmiastowy, nawet w przypadku wciœniêcia 'Anuluj').", IDS_GRPDESC, 9, 77, 405, 158
+    LTEXT           "Lista programów", IDC_IMEXSTATIC, 17, 219, 34, 8, SS_LEFT
+}
 
-IDD_SETUP3 DIALOG DISCARDABLE  0, 0, 424, 300
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_SETUP3 DIALOG 0, 0, 424, 300
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 FONT 8, "MS Shell Dlg"
-BEGIN
-    GROUPBOX        "AUTOMAGICZNE uruchamianie programów z uprawnieniami administracyjnymi",
-                    IDC_STATIC,10,3,403,291
-    LTEXT           "Aby programy mogly byc automagicznie uruchamiane z uprawnieniami administracyjnymi, przynajmniej jedna z funkcji ponizej musi zostac wlaczona:",
-                    IDC_STATIC,20,14,387,20
-    CONTROL         "Zainstaluj filtr przechwytujacy programy uruchamiane poprzez interfejs uzytkownika Windows",
-                    IDC_SHEXHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,37,
-                    319,10
-    LTEXT           "Wlaczenie tej funkcji powoduje zainstalowanie w systemie filtra wywolywanego podczas próby uruchomienia programu przez powloke Windows. SuRun moze wtedy zadecydowac, czy uruchomic aplikacje z uprawnieniami administracyjnymi.",
-                    IDC_STATIC,31,50,376,17
-    LTEXT           "Filtr nie wykrywa, czy program próbuje utworzyc proces bezposrednio, bez odwolywania sie do powloki. Jesli chcesz, by SuRun przechwytywal próby bezposredniej kreacji procesu, zaznacz opcje ponizej.",
-                    IDC_STATIC,31,71,376,16
-    CONTROL         "Przechwytuj wszystkie procesy, które bezposrednio uruchamiaja aplikacje",
-                    IDC_IATHOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,94,
-                    241,10
-    LTEXT           "Jesli ta funkcja bedzie wylaczona, SuRun nie bedzie mógl automatycznie uruchamiac niektórych\n(w Windows Vista wielu) procesów z uprawnieniami administracyjnymi.",
-                    IDC_STATIC,31,107,374,16
-    LTEXT           "Wlaczenie tej funkcji w rzadkich przypadkach moze spowodowac problemy z niektórymi programami.\nW takim wypadku mozesz wylaczyc przechwytywanie dla tego programu w czarnej liscie ponizej.",
-                    IDC_STATIC,31,129,374,17
-    CONTROL         "Przechwytuj równiez uslugi i procesy administracyjne. (Wymagany restart systemu!)",
-                    IDC_SVCHOOK,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,31,149,371,10
-    LTEXT           "Jesli jakis program przestanie poprawnie dzialac po wlaczeniu powyzszych funkcji, mozesz wylaczyc przechwytywanie jego uruchomienia dodajac go do czarnej listy.",
-                    IDC_STATIC,20,168,313,20
-    PUSHBUTTON      "Czarna lista...",IDC_BLACKLIST,341,169,57,14
-    CONTROL         "Spróbuj wykryc, czy nieznana aplikacja moze potrzebowac uprawnien administracyjnych.",
-                    IDC_REQADMIN,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,20,194,379,10
-    LTEXT           "Jesli opcja ta nie bedzie zaznaczona, SuRun bedzie uruchamial automagicznie z uprawnieniami administracyjnymi tylko predefiniowane aplikacje. Wtedy instalatory i podobne programy nie beda wykrywane i uruchamiane z uprawnieniami administracyjnymi.",
-                    IDC_STATIC,31,207,376,32
-    CONTROL         "Pokaz wiadomosc, jesli program zostal uruchomiony automagicznie",
-                    IDC_SHOWTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,
-                    239,241,10
-    LTEXT           "Jesli ta opcja bedze zaznaczona, SuRun wyswietli informacje w prawym, dolnym rogu pulpitu, gdy jakis program zostanie automagicznie uruchomiony z uprawnieniami administracyjnymi. Informacja zniknie po 20 sekundach.",
-                    IDC_STATIC,31,252,376,17
-    CTEXT           "UWAGA: Zmiany w tych ustawieniach beda aktywne po ponownym zalogowaniu.",
-                    IDC_STATIC,52,280,318,8
-END
+{
+    GROUPBOX        "AUTOMAGICZNE uruchamianie programów z uprawnieniami administracyjnymi", IDC_STATIC, 10, 3, 403, 291
+    LTEXT           "Aby programy mog³y byæ automagicznie uruchamiane z uprawnieniami administracyjnymi, przynajmniej jedna z funkcji poni¿ej musi zostaæ w³¹czona:", IDC_STATIC, 20, 14, 387, 20, SS_LEFT
+    AUTOCHECKBOX    "Zainstaluj filtr przechwytuj¹cy programy uruchamiane poprzez interfejs u¿ytkownika Windows", IDC_SHEXHOOK, 20, 37, 319, 10
+    LTEXT           "W³¹czenie tej funkcji powoduje zainstalowanie w systemie filtra wywo³ywanego podczas próby uruchomienia programu przez pow³okê Windows. SuRun mo¿e wtedy zadecydowaæ, czy uruchomiæ aplikacjê z uprawnieniami administracyjnymi.", IDC_STATIC, 31, 50, 376, 17, SS_LEFT
+    LTEXT           "Filtr nie wykrywa, czy program próbuje utworzyæ proces bezpoœrednio, bez odwo³ywania siê do pow³oki. Jeœli chcesz, by SuRun przechwytywa³ próby bezpoœredniej kreacji procesu, zaznacz opcjê poni¿ej.", IDC_STATIC, 31, 71, 376, 16, SS_LEFT
+    AUTOCHECKBOX    "Przechwytuj wszystkie procesy, które bezpoœrednio uruchamiaj¹ aplikacje", IDC_IATHOOK, 20, 94, 241, 10
+    LTEXT           "Jeœli ta funkcja bêdzie wy³¹czona, SuRun nie bêdzie móg³ automatycznie uruchamiaæ niektórych\n(w Windows Vista wielu) procesów z uprawnieniami administracyjnymi.", IDC_STATIC, 31, 107, 374, 16, SS_LEFT
+    LTEXT           "W³¹czenie tej funkcji w rzadkich przypadkach mo¿e spowodowaæ problemy z niektórymi programami.\nW takim wypadku mo¿esz wy³¹czyæ przechwytywanie dla tego programu w czarnej liœcie poni¿ej.", IDC_STATIC, 31, 129, 374, 17, SS_LEFT
+    AUTOCHECKBOX    "Przechwytuj równie¿ us³ugi i procesy administracyjne. (Wymagany restart systemu!)", IDC_SVCHOOK, 31, 149, 371, 10, NOT WS_VISIBLE | BS_VCENTER | BS_MULTILINE
+    LTEXT           "Jeœli jakiœ program przestanie poprawnie dzia³aæ po w³¹czeniu powy¿szych funkcji, mo¿esz wy³¹czyæ przechwytywanie jego uruchomienia dodaj¹c go do czarnej listy.", IDC_STATIC, 20, 168, 313, 20, SS_LEFT
+    PUSHBUTTON      "Czarna lista...", IDC_BLACKLIST, 341, 169, 57, 14
+    AUTOCHECKBOX    "Spróbuj wykryæ, czy nieznana aplikacja mo¿e potrzebowaæ uprawnieñ administracyjnych.", IDC_REQADMIN, 20, 194, 379, 10, BS_VCENTER | BS_MULTILINE
+    LTEXT           "Jeœli opcja ta nie bêdzie zaznaczona, SuRun bêdzie uruchamia³ automagicznie z uprawnieniami administracyjnymi tylko predefiniowane aplikacje. Wtedy instalatory i podobne programy nie bêd¹ wykrywane i uruchamiane z uprawnieniami administracyjnymi.", IDC_STATIC, 31, 207, 376, 32, SS_LEFT
+    AUTOCHECKBOX    "Poka¿ wiadomoœæ, jeœli program zosta³ uruchomiony automagicznie", IDC_SHOWTRAY, 20, 239, 241, 10
+    LTEXT           "Jeœli ta opcja bêdze zaznaczona, SuRun wyœwietli informacjê w prawym, dolnym rogu pulpitu, gdy jakiœ program zostanie automagicznie uruchomiony z uprawnieniami administracyjnymi. Informacja zniknie po 20 sekundach.", IDC_STATIC, 31, 252, 376, 17, SS_LEFT
+    CTEXT           "UWAGA: Zmiany w tych ustawieniach bêd¹ aktywne po ponownym zalogowaniu.", IDC_STATIC, 52, 280, 318, 8, SS_CENTER
+}
 
-IDD_SETUP4 DIALOG DISCARDABLE  0, 0, 378, 284
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_SETUP4 DIALOG 0, 0, 378, 284
+STYLE DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 FONT 8, "MS Shell Dlg"
-BEGIN
-    GROUPBOX        "Pokaz ikone w obszarze powiadomien dla uzytkowników spoza grupy 'SuRunners'",
-                    IDC_STATIC,5,5,370,37
-    LTEXT           "Pokaz status uzytkownika dla aktywnego programu w zasobniku paska zadan",
-                    IDC_STATIC,15,16,185,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,210,14,99,30,CBS_DROPDOWNLIST | 
-                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Pokaz podpowiedzi dla aktywnych programów pracujacych z innymi poswiadczeniami uzytkownika",
-                    IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,
-                    27,349,10
-    CONTROL         "NIE uzywaj pulpitu WinLogon. Twórz wlasny, bezpieczny pulpit.",
-                    IDC_NOLOGONDESK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,
-                    44,346,10
-    GROUPBOX        "Jesli uzytkownik spoza grupy 'SuRunners' uzyje SuRun:",
-                    IDC_STATIC,5,58,370,51
-    CONTROL         "Nigdy nie pytaj Administratorów o przylaczenie sie do grupy 'SuRunners'",
-                    IDC_NOCONVADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,
-                    70,349,8
-    CONTROL         "Nigdy nie pytaj nikogo o przylaczenie do sie grupy 'SuRunners'",
-                    IDC_NOCONVUSER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,
-                    83,349,8
-    CONTROL         "Ukryj SuRun przed uzytkownikami, którzy nie naleza do grupy 'SuRunners'",
-                    IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,
-                    96,349,8
-    GROUPBOX        "Wygoda uzytkowania (ustawienia windows, które mozna zmienic z pomoca SuRun)",
-                    IDC_EXTOPT,5,113,370,90,WS_GROUP
-    CONTROL         "Zastap 'Uruchom jako...' systemu Windows funkcja 'Uruchom jako...' programu SuRun",
-                    IDC_DORUNAS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,15,126,295,10
-    CONTROL         "Pozwól grupie 'SuRunners' zmieniac czas systemowy.",
-                    IDC_ALLOWTIME,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,15,139,349,11
-    CONTROL         "Pozwól grupie 'SuRunners' zmieniac opcje zasilania i wybierac schematy zasilania.",
-                    IDC_SETENERGY,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,15,152,349,11
-    CONTROL         "Pokaz wszystkim uzytkownikom powiadomienia o aktualizacjach dla systemu Windows (jesli aktualizacje automatyczne sa wlaczone).",
-                    IDC_WINUPD4ALL,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,15,167,349,18
-    CONTROL         "Wylacz ponowne uruchamianie komputera po wykonaniu zaplanowanych aktualizacji.",
-                    IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,15,188,349,11
-    GROUPBOX        "Bezpieczenstwo systemu Windows (Regula zabezpieczen która mozna zmienic z pomoca SuRun)",
-                    IDC_STATIC,5,208,369,60
-    CONTROL         "Ustaw Administratorów zamiast TWÓRCE-WLASCICIELA jako domyslnego wlasciciela nowo utworzonych obiektów.",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
-                    BS_MULTILINE | WS_TABSTOP,15,218,356,20
-    CTEXT           "UWAGA: Zmiany w niektórych z tych ustawien beda aktywne po ponownym zalogowaniu.",
-                    IDC_STATIC,5,270,365,8
-    LTEXT           "UWAGA: Jesli ta opcja bedzie wylaczona, zwykli uzytkownicy beda mogli zmieniac pliki i klucze rejestru utworzone przez uzytkowników SuRun.",
-                    IDC_STATIC,15,243,350,18
-END
+{
+    GROUPBOX        "Poka¿ ikonê w obszarze powiadomieñ dla u¿ytkowników spoza grupy 'SuRunners'", IDC_STATIC, 5, 5, 370, 37
+    LTEXT           "Poka¿ status u¿ytkownika dla aktywnego programu w zasobniku paska zadañ", IDC_STATIC, 15, 16, 185, 8, SS_LEFT
+    COMBOBOX        IDC_TRAYSHOWADMIN, 210, 14, 99, 30, WS_TABSTOP | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_SORT
+    AUTOCHECKBOX    "Poka¿ podpowiedzi dla aktywnych programów pracuj¹cych z innymi poœwiadczeniami u¿ytkownika", IDC_TRAYBALLOON, 15, 27, 349, 10
+    AUTOCHECKBOX    "NIE u¿ywaj pulpitu WinLogon. Twórz w³asny, bezpieczny pulpit.", IDC_NOLOGONDESK, 15, 44, 346, 10
+    GROUPBOX        "Jeœli u¿ytkownik spoza grupy 'SuRunners' u¿yje SuRun:", IDC_STATIC, 5, 58, 370, 51
+    AUTOCHECKBOX    "Nigdy nie pytaj Administratorów o przy³¹czenie siê do grupy 'SuRunners'", IDC_NOCONVADMIN, 15, 70, 349, 8
+    AUTOCHECKBOX    "Nigdy nie pytaj nikogo o przy³¹czenie do siê grupy 'SuRunners'", IDC_NOCONVUSER, 15, 83, 349, 8
+    AUTOCHECKBOX    "Ukryj SuRun przed u¿ytkownikami, którzy nie nale¿¹ do grupy 'SuRunners'", IDC_HIDESURUN, 15, 96, 349, 8
+    GROUPBOX        "Wygoda u¿ytkowania (ustawienia windows, które mo¿na zmieniæ z pomoc¹ SuRun)", IDC_EXTOPT, 5, 113, 370, 90, WS_GROUP
+    AUTOCHECKBOX    "Zast¹p 'Uruchom jako...' systemu Windows funkcj¹ 'Uruchom jako...' programu SuRun", IDC_DORUNAS, 15, 126, 295, 10, BS_MULTILINE
+    AUTOCHECKBOX    "Pozwól grupie 'SuRunners' zmieniaæ czas systemowy.", IDC_ALLOWTIME, 15, 139, 349, 11, BS_VCENTER | BS_MULTILINE
+    AUTOCHECKBOX    "Pozwól grupie 'SuRunners' zmieniaæ opcje zasilania i wybieraæ schematy zasilania.", IDC_SETENERGY, 15, 152, 349, 11, BS_VCENTER | BS_MULTILINE
+    AUTOCHECKBOX    "Poka¿ wszystkim u¿ytkownikom powiadomienia o aktualizacjach dla systemu Windows (jeœli aktualizacje automatyczne s¹ w³¹czone).", IDC_WINUPD4ALL, 15, 167, 349, 18, BS_VCENTER | BS_MULTILINE
+    AUTOCHECKBOX    "Wy³¹cz ponowne uruchamianie komputera po wykonaniu zaplanowanych aktualizacji.", IDC_WINUPDBOOT, 15, 188, 349, 11, BS_VCENTER | BS_MULTILINE
+    GROUPBOX        "Bezpieczeñstwo systemu Windows (Regu³a zabezpieczeñ któr¹ mo¿na zmieniæ z pomoc¹ SuRun)", IDC_STATIC, 5, 208, 369, 60
+    AUTOCHECKBOX    "Ustaw Administratorów zamiast TWÓRCÊ-W£AŒCICIELA jako domyœlnego w³aœciciela nowo utworzonych obiektów.", IDC_OWNERGROUP, 15, 218, 356, 20, BS_VCENTER | BS_MULTILINE
+    CTEXT           "UWAGA: Zmiany w niektórych z tych ustawieñ bêd¹ aktywne po ponownym zalogowaniu.", IDC_STATIC, 5, 270, 365, 8, SS_CENTER
+    LTEXT           "UWAGA: Jeœli ta opcja bêdzie wy³¹czona, zwykli u¿ytkownicy bêd¹ mogli zmieniaæ pliki i klucze rejestru utworzone przez u¿ytkowników SuRun.", IDC_STATIC, 15, 243, 350, 18, SS_LEFT
+}
 
-IDD_SETUP_MAIN DIALOG DISCARDABLE  0, 0, 428, 356
-STYLE DS_ABSALIGN | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
-    WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+IDD_SETUP_MAIN DIALOG 0, 0, 428, 356
+STYLE DS_ABSALIGN | DS_CENTER | DS_SETFOREGROUND | DS_SHELLFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP | WS_THICKFRAME | WS_SYSMENU
 CAPTION "Ustawienia SuRun %s"
 FONT 8, "MS Shell Dlg"
-BEGIN
-    CONTROL         "",IDC_SETUP_TAB,"SysTabControl32",WS_GROUP | WS_TABSTOP,
-                    0,0,428,332
-    PUSHBUTTON      "&Zastosuj",ID_APPLY,252,337,50,14
-    DEFPUSHBUTTON   "Zapi&sz",IDOK,311,337,50,14
-    PUSHBUTTON      "&Anuluj",IDCANCEL,370,337,50,14
-END
+{
+    CONTROL         "", IDC_SETUP_TAB, WC_TABCONTROL, WS_GROUP | WS_TABSTOP, 0, 0, 428, 332
+    PUSHBUTTON      "&Zastosuj", ID_APPLY, 252, 337, 50, 14
+    DEFPUSHBUTTON   "Zapi&sz", IDOK, 311, 337, 50, 14
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 370, 337, 50, 14
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_UNINSTALL DIALOGEX 0, 0, 364, 126
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
-    WS_CAPTION
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SYSMODAL | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP
 CAPTION "Usuwanie SuRun"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "&Usun >>",IDIGNORE,291,107,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,7,21,20
-    LTEXT           "Czy chcesz teraz odinstalowac SuRun?",IDC_QUESTION,45,7,
-                    316,25,SS_CENTERIMAGE
-    CONTROL         "Zachowaj ustawienia SuRun",IDC_KEEPREGISTRY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,17,50,317,10
-    CONTROL         "Usun grupe 'SuRunners'",IDC_DELSURUNNERS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,17,64,317,10
-    CONTROL         "Przenies czlonków grupy 'SuRunners' do grupy lokalnych Administratorów",
-                    IDC_SR2ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,78,
-                    317,10
-    PUSHBUTTON      "&Anuluj",IDCANCEL,217,107,68,14
-    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
-                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
-                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-END
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    DEFPUSHBUTTON   "&Usuñ >>", IDIGNORE, 291, 107, 68, 14
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 364, 38
+    LTEXT           "", IDC_OPTNST, 1, 38, 362, 64, NOT WS_GROUP | SS_LEFT | SS_SUNKEN
+    ICON            IDI_MAINICON, IDC_SECICON, 9, 7, 21, 20, SS_ICON
+    LTEXT           "Czy chcesz teraz odinstalowaæ SuRun?", IDC_QUESTION, 45, 7, 316, 25, SS_LEFT | SS_CENTERIMAGE
+    AUTOCHECKBOX    "Zachowaj ustawienia SuRun", IDC_KEEPREGISTRY, 17, 50, 317, 10
+    AUTOCHECKBOX    "Usuñ grupê 'SuRunners'", IDC_DELSURUNNERS, 17, 64, 317, 10
+    AUTOCHECKBOX    "Przenieœ cz³onków grupy 'SuRunners' do grupy lokalnych Administratorów", IDC_SR2ADMIN, 17, 78, 317, 10
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 217, 107, 68, 14
+    LISTBOX         IDC_INSTLOG, 0, 38, 363, 64, NOT WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | NOT LBS_NOTIFY | NOT WS_BORDER | LBS_NOINTEGRALHEIGHT | LBS_NOSEL, WS_EX_STATICEDGE
+}
 
+
+
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 IDD_UPDATE DIALOGEX 0, 0, 364, 126
-STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
-    WS_CAPTION
+STYLE DS_CENTER | DS_MODALFRAME | DS_SETFOREGROUND | DS_SYSMODAL | DS_SETFONT | WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP
 CAPTION "Aktualizacja SuRun %s"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    DEFPUSHBUTTON   "&Aktualizuj >>",IDOK,291,107,68,14
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,7,21,20
-    LTEXT           "Czy chcesz zastapic SuRun?",IDC_QUESTION,45,7,316,25,
-                    SS_CENTERIMAGE
-    LTEXT           "Jesli menu kontekstowe SuRun bylo modyfikowane, zaznacz opcje ponizej:",
-                    IDC_KEEPREGST,14,41,335,8
-    CONTROL         "Pozostaw powiazania SuRun w obecnym stanie",
-                    IDC_KEEPREGISTRY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    14,50,335,10
-    PUSHBUTTON      "&Anuluj",IDCANCEL,217,107,68,14
-    LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | 
-                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT 
-                    WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-END
+FONT 8, "MS Shell Dlg", 0, 0, 1
+{
+    DEFPUSHBUTTON   "&Aktualizuj >>", IDOK, 291, 107, 68, 14
+    CONTROL         "", IDC_WHTBK, WC_STATIC, SS_WHITERECT, 0, 0, 364, 38
+    LTEXT           "", IDC_OPTNST, 1, 38, 362, 64, NOT WS_GROUP | SS_LEFT | SS_SUNKEN
+    ICON            IDI_MAINICON, IDC_SECICON, 9, 7, 21, 20, SS_ICON
+    LTEXT           "Czy chcesz zast¹piæ SuRun?", IDC_QUESTION, 45, 7, 316, 25, SS_LEFT | SS_CENTERIMAGE
+    LTEXT           "Jeœli menu kontekstowe SuRun by³o modyfikowane, zaznacz opcjê poni¿ej:", IDC_KEEPREGST, 14, 41, 335, 8, SS_LEFT
+    AUTOCHECKBOX    "Pozostaw powi¹zania SuRun w obecnym stanie", IDC_KEEPREGISTRY, 14, 50, 335, 10
+    PUSHBUTTON      "&Anuluj", IDCANCEL, 217, 107, 68, 14
+    LISTBOX         IDC_INSTLOG, 0, 38, 363, 64, NOT WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | NOT LBS_NOTIFY | NOT WS_BORDER | LBS_NOINTEGRALHEIGHT | LBS_NOSEL, WS_EX_STATICEDGE
+}
 
 
-/////////////////////////////////////////////////////////////////////////////
+
 //
-// String Table
+// String Table resources
 //
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_USAGE               "Przyklad uzycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
-    IDS_ASKOK               "Polecenie:\r\n\r\n%s\r\n\r\nzostanie wykonane z uprawnieniami administracyjnymi."
-    IDS_APPNAME             "SuRun"
-    IDS_NODESK              "Blad!\r\n\r\nUtworzenie pulpitu sie nie udalo!"
-    IDS_SERVICE_NAME        "Usluga Super User Run (SuRun)"
-    IDS_ASKRUNAS            "Podaj dane uwierzytelniajace do uruchomienia:\r\n\r\n%s"
-    IDS_UNINSTALLADMIN      "Potrzebujesz uprawnien administracyjnych by odinstalowac SuRun.\r\n\r\nPodaj dane uwierzytelniajace Administratora tego komputera:"
-    IDS_INSTALLADMIN        "Potrzebujesz uprawnien administracyjnych by zainstalowac SuRun.\r\n\r\nPodaj dane uwierzytelniajace Administratora tego komputera:"
-    IDS_LOGONFAILED         "Logowanie nie powiodlo sie!\r\n\r\nSprawdz nazwe uzytkownika i haslo, i spróbuj ponownie!\r\n\r\nPamietaj, ze wielkosc liter w nazwie uzytkownika i w hasle ma znaczenie."
-    IDS_NOADMIN             "Blad!\r\n\r\nUzytkownik %s nie jest Administratorem!"
-    IDS_NOSURUNNER          "Musisz byc czlonkiem grupy 'SuRunners' by móc uzywac SuRun.\r\n\r\nPodaj dane uwierzytelniajace Administratora tego komputera by dolaczyc do grupy 'SuRunners',\r\n\r\nlub wcisnij 'Anuluj'!"
-    IDS_ASKSURUNNER         "Musisz byc czlonkiem grupy 'SuRunners' by móc uzywac SuRun.\r\n\r\nCzy chcesz dolaczyc do grupy 'SuRunners'?\r\n\r\nDolaczajac do grupy 'SuRunners', STRACISZ STATUS ADMINISTRATORA.\r\n\r\nJesli nie masz pewnosci, co robisz, wcisnij 'Nie'."
-    IDS_MENUSTR             "SuRun"
-    IDS_BUILTINADMIN        "To konto administracyjne jest wbudowane.\r\n\r\nNie mozesz uzywac SuRun, bo to konto nie moze dzialac z ograniczonymi uprawnieniami!"
-    IDS_SURUNNER_OK         "Twoje konto zostalo dodane do grupy 'SuRunners'."
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELUSER             "Zamierzasz usunac uzytkownika '%s' z lokalnej grupy SuRunners.\r\n\r\nWszystkie ustawienia SuRun dla tego uzytkownika zostana usuniete.\r\n\r\nCzy chcesz dodac tego uzytkownika do lokalnej grupy Administratorów?"
-    IDS_CANCEL              "Anuluj (%d)"
-    IDS_NOADD2USERS         "Blad!\r\n\r\nDodanie Twego konta do grupy zwyklych uzytkowników nie powiodlo sie.\r\nSystem Windows zwrócil blad:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Blad!\r\n\r\nUsuniecie Twego konta z grupy Administratorów nie powiodlo sie.\r\nSystem Windows zwrócil blad:\r\n\r\n%s"
-    IDS_ADMINSHELL          "Powloka systemu pracuje obecnie z uprawnieniami administracyjnymi!\r\n\r\nPrzed uzyciem SuRun musisz sie wylogowac."
-    IDS_SIMPLESETUP         "Czy chcesz przywrócic wszystkie ustawienia do wartosci domyslnych, polecanych dla domowych uzytkowników?"
-    IDS_NOADMIN2            "Nie masz pozwolenia na zmiane ustawien SuRun.\r\n\r\nPodaj dane uwierzytelniajace Administratora tego komputera, by móc zmienic opcje SuRun,\r\n\r\nlub wcisnij 'Anuluj'!"
-    IDS_RUNRESTRICTED       "Nie masz pozwolenia na uruchomienie tej aplikacji z uprawnieniami administracyjnymi.\r\nMozesz uruchomic z uprawnieniami administracyjnymi tylko programy skonfigurowane w opcjach SuRun."
-    IDS_SETUP1              "Ustawienia glówne"
-    IDS_SETUP2              "grupa SuRunners"
-    IDS_SETUP3              "Przechwytywanie"
-    IDS_SETUP4              "Zaawansowane"
-    IDS_ASKAUTO             "Aplikacja:\r\n\r\n%s\r\n\r\nmoze potrzebowac uprawnien administracyjnych do poprawnego dzialania.\r\n\r\nJesli wcisniesz 'Anuluj', aplikacja zostanie uruchomiona ze zwyklymi uprawnieniami."
-    IDS_ASKSURUNNER2        "Musisz byc czlonkiem grupy 'SuRunners' by móc uzywac SuRun.\r\n\r\nCzy chcesz dolaczyc do grupy 'SuRunners'?\r\n\r\nJesli nie masz pewnosci, co robisz, wcisnij 'Nie'."
-    IDS_ASKSURUNNER3        "Czy dolaczyc konto '%s' do grupy 'SuRunners'?"
-    IDS_STARTED             "Info:\r\n%s\r\npracuje z uprawnieniami administracyjnymi."
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_ASKSURUNNER1        "Czy chcesz dolaczyc konto '%s' do grupy 'SuRunners'?\r\n\r\nJesli wcisniejsz 'Tak', konto '%s' zostanie dolaczone do grupy 'SuRunners' i STRACI STATUS ADMINISTRATORA."
-    IDS_BUILTINADMIN1       "Konto '%s' jest wbudowanym kontem administracyjnym.\r\n\r\nTo konto nie moze dzialac z ograniczonymi uprawnieniami, przez co nie moze zostac zarejestrowane jako uzytkownik SuRun!"
-    IDS_NOADD2USERS1        "Blad!\r\n\r\nDodanie '%s' do grupy zwyklych uzytkowników nie powiodlo sie.\r\nSystem Windows zwrócil blad:\r\n\r\n%s"
-    IDS_SURUNNER_ERR1       "Blad!\r\n\r\nDodanie '%s' do grupy 'SuRunners' nie powiodlo sie.\r\nSystem Windows zwrócil blad:\r\n\r\n%s"
-    IDS_ADDUNINST           "Zapisywanie w rejestrze informacji deinstalacji"
-    IDS_ADDAUTORUN          "Instalowanie automatycznego uruchomienia 'SuRun /SysmenuHook'"
-    IDS_ADDASSOC            "Instalowanie powiazan SuRun w rejestrze"
-    IDS_ADDCPL              "Instalowanie SuRun w panelu sterowania"
-    IDS_REMUNINST           "Usuwanie informacji deinstalacji z rejestru"
-    IDS_REMAUTORUN          "Usuwanie automatycznego uruchomienia 'SuRun /SysmenuHook'"
-    IDS_REMASSOC            "Usuwanie powiazan SuRun z rejestru"
-    IDS_REMCPL              "Usuwanie SuRun z panelu sterowania"
-    IDS_DELFILE             "Usuwanie pliku '%s'"
-    IDS_DELFILEBOOT         "Plik '%s' zostanie usuniety przy nastepnym uruchomieniu systemu"
-    IDS_IMPORTFAIL          "Przywracanie nie powiodlo sie!\r\nPlik %s nie odnaleziony."
-    IDS_COPYFILE            "Kopiowanie pliku '%s' do '%s'"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_SURUNNER_ERR        "Blad!\r\n\r\nDodanie Twego konta do grupy 'SuRunners' nie powiodlo sie.\r\nSystem Windows zwrócil blad::\r\n\r\n%s"
-    IDS_LOGOFFON            "Twoje konto zostalo dodane do grupy 'SuRunners' i usuniete z lokalnej grupy Administratorów.\r\n\r\nAby móc pracowac z ograniczonymi uprawnieniami musisz sie ponownie zalogowac."
-    IDS_SYSMENUEXT          "Rozszerzenie SuRun menu systemowego"
-    IDS_SURUNINST           "Instaluj (SuRun)"
-    IDS_SURUNUNINST         "Usun (SuRun)"
-    IDS_SURUNREPAIR         "Napraw (SuRun)"
-    IDS_CPLNAME             "Ustawienia SuRun"
-    IDS_RUNFAILED           "Blad!\r\n\r\n%s\r\n\r\nnie mógl zostac uruchomiony."
-    IDS_EMPTYPASS           "UWAGA: Nastepujace konta Administratorów nie posiadaja hasla:\n\n%s\nUzywanie SuRun mija sie z celem, jesli te konta nie beda zabezpieczone haslem!"
-    IDS_STARTMENUDIR        "SuRun"
-    IDS_SURUNSTUCK          "SuRun nie odpowiada!\n\nTo moze byc spowodowane przez system prewencji wlaman(HIPS),\nktóry wymaga interakcji uzytkownika.\n\nKliknij tu, by przelaczyc sie do swojego pulpitu."
-    IDS_SWITCHBACK          "Kliknij tu, by przelaczyc sie\ndo bezpiecznego pulpitu SuRun."
-    IDS_APPOK               "Wiersz polecenia zdaje sie nie dzialac.\n\nCzy napewno wiersz polecenia jest poprawny?\n(Jesli zawiera spacje, to czy zostal umieszczony w cudzyslowiu?)"
-    IDS_GRPDESC             "Czlonkowie tej grupy moga uzywac SuRun."
-    IDS_ADDTOBLKLIST        "Dodaj program do przechwytywania"
-    IDS_ADDFILETOLIST       "Podaj plik i wiersz polecenia"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_DELSERVICE          "Usuwanie uslugi SuRun"
-    IDS_DELREG              "Usuwanie wpisów SuRun z rejestru"
-    IDS_SR2ADMIN            "Dodawanie '%s' do grupy lokalnych administratorów"
-    IDS_DELSURUNNERS        "Usuwanie lokalnej grupy 'SuRunners'"
-    IDS_INSTFAILED          "Instalacja sie nie powiodla!"
-    IDS_CLOSE               "&Zamknij"
-    IDS_INSTSUCCESS         "SuRun zostal pomyslnie zainstalowany"
-    IDS_INSTSUCCESS2        "Przed uzyciem SuRun musisz sie wylogowac"
-    IDC_LOGOFF              "&Wyloguj"
-    IDC_INSTALL             "SuRun jest instalowany"
-    IDS_STARTSVC            "Uruchamianie uslugi SuRun"
-    IDS_INSTSVC             "Instalowanie uslugi SuRun"
-    IDC_UNINSTALL           "SuRun jest usuwany"
-    IDS_UNINSTFAILED        "Deinstalacja sie nie powiodla!"
-    IDS_UNINSTSUCCESS       "SuRun zostal odinstalowany"
-    IDS_RUNAS               "Uruchom jako..."
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_WARNADMIN           "Wszyscy uzytkownicy"
-    IDS_WARNADMIN2          "SuRunners i Administratorzy"
-    IDS_WARNADMIN3          "nieograniczeni SuRunners i Administratorzy (*)"
-    IDS_WARNADMIN4          "Administratorzy"
-    IDS_WARNADMIN5          "Nikt"
-    IDS_SHNAME1             "Mój komputer"
-    IDS_SHNAME2             "Moje miejsca sieciowe"
-    IDS_SHNAME3             "Polaczenia sieciowe"
-    IDS_SHNAME4             "Panel sterowania"
-    IDS_SHNAME5             "Kosz"
-    IDS_SHNAME6             "Czcionki"
-    IDS_SHNAME7             "Narzedzia administracyjne"
-    IDS_SHNAME8             "Moje dokumenty"
-    IDS_BEAUTIFIED          "%s\r\n[Czyli: %s]"
-    IDS_PW4SETUP            "By zmienic ustawienia SuRun musisz podac swoje haslo."
-    IDS_REBOOT              "&Uruchom ponownie"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_INSTSUCCESS3        "System musi zostac zrestartowany!"
-    IDS_HIDESELF            "Napewno chcesz ukryc SuRun przed samym soba?\n\nJesli tak zrobisz, nie bedziesz mógl zmieniac ustawien suRun."
-    IDS_NOIMPORT            "Musisz byc czlonkiem lokalnej grupy Administratorów\nby móc importowac ustawienia SuRun."
-    IDS_NOEXPORT            "Musisz byc czlonkiem lokalnej grupy Administratorów\nby móc eksportowac ustawienia SuRun."
-    IDS_NOTLOGGEDON         "Szybkie przelaczenie uzytkownika niemozliwe:\n%s nie jest zalogowany."
-    IDS_NOTLOGGEDON2        "Szybkie przelaczenie uzytkownika niemozliwe:\nSesja %d nie jest zalogowana."
-    IDS_EMPTYPASS2          "UWAGA: Nastepujace konta Administratorów nie posiadaja hasla:\n\n%s"
-    IDS_SRACCDESC           "Konto pomocnicze dla SuRun"
-END
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+STRINGTABLE
+{
+    IDS_USAGE                     "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_ASKOK                     "Polecenie:\r\n\r\n%s\r\n\r\nzostanie wykonane z uprawnieniami administracyjnymi."
+    IDS_APPNAME                   "SuRun"
+    IDS_NODESK                    "B³¹d!\r\n\r\nUtworzenie pulpitu siê nie uda³o!"
+    IDS_SERVICE_NAME              "Us³uga Super User Run (SuRun)"
+    IDS_ASKRUNAS                  "Podaj dane uwierzytelniaj¹ce do uruchomienia:\r\n\r\n%s"
+    IDS_UNINSTALLADMIN            "Potrzebujesz uprawnieñ administracyjnych by odinstalowaæ SuRun.\r\n\r\nPodaj dane uwierzytelniaj¹ce Administratora tego komputera:"
+    IDS_INSTALLADMIN              "Potrzebujesz uprawnieñ administracyjnych by zainstalowaæ SuRun.\r\n\r\nPodaj dane uwierzytelniaj¹ce Administratora tego komputera:"
+    IDS_LOGONFAILED               "Logowanie nie powiod³o siê!\r\n\r\nSprawdŸ nazwê u¿ytkownika i has³o, i spróbuj ponownie!\r\n\r\nPamiêtaj, ¿e wielkoœæ liter w nazwie u¿ytkownika i w haœle ma znaczenie."
+    IDS_NOADMIN                   "B³¹d!\r\n\r\nU¿ytkownik %s nie jest Administratorem!"
+    IDS_NOSURUNNER                "Musisz byæ cz³onkiem grupy 'SuRunners' by móc u¿ywaæ SuRun.\r\n\r\nPodaj dane uwierzytelniaj¹ce Administratora tego komputera by do³¹czyæ do grupy 'SuRunners',\r\n\r\nlub wciœnij 'Anuluj'!"
+    IDS_ASKSURUNNER               "Musisz byæ cz³onkiem grupy 'SuRunners' by móc u¿ywaæ SuRun.\r\n\r\nCzy chcesz do³¹czyæ do grupy 'SuRunners'?\r\n\r\nDo³¹czaj¹c do grupy 'SuRunners', STRACISZ STATUS ADMINISTRATORA.\r\n\r\nJeœli nie masz pewnoœci, co robisz, wciœnij 'Nie'."
+    IDS_MENUSTR                   "SuRun"
+    IDS_BUILTINADMIN              "To konto administracyjne jest wbudowane.\r\n\r\nNie mo¿esz u¿ywaæ SuRun, bo to konto nie mo¿e dzia³aæ z ograniczonymi uprawnieniami!"
+    IDS_SURUNNER_OK               "Twoje konto zosta³o dodane do grupy 'SuRunners'."
+    IDS_DELUSER                   "Zamierzasz usun¹æ u¿ytkownika '%s' z lokalnej grupy SuRunners.\r\n\r\nWszystkie ustawienia SuRun dla tego u¿ytkownika zostan¹ usuniête.\r\n\r\nCzy chcesz dodaæ tego u¿ytkownika do lokalnej grupy Administratorów?"
+    IDS_CANCEL                    "Anuluj (%d)"
+    IDS_NOADD2USERS               "B³¹d!\r\n\r\nDodanie Twego konta do grupy zwyk³ych u¿ytkowników nie powiod³o siê.\r\nSystem Windows zwróci³ b³¹d:\r\n\r\n%s"
+    IDS_NOREMADMINS               "B³¹d!\r\n\r\nUsuniêcie Twego konta z grupy Administratorów nie powiod³o siê.\r\nSystem Windows zwróci³ b³¹d:\r\n\r\n%s"
+    IDS_ADMINSHELL                "Pow³oka systemu pracuje obecnie z uprawnieniami administracyjnymi!\r\n\r\nPrzed u¿yciem SuRun musisz siê wylogowaæ."
+    IDS_SIMPLESETUP               "Czy chcesz przywróciæ wszystkie ustawienia do wartoœci domyœlnych, polecanych dla domowych u¿ytkowników?"
+    IDS_NOADMIN2                  "Nie masz pozwolenia na zmianê ustawieñ SuRun.\r\n\r\nPodaj dane uwierzytelniaj¹ce Administratora tego komputera, by móc zmieniæ opcje SuRun,\r\n\r\nlub wciœnij 'Anuluj'!"
+    IDS_RUNRESTRICTED             "Nie masz pozwolenia na uruchomienie tej aplikacji z uprawnieniami administracyjnymi.\r\nMo¿esz uruchomiæ z uprawnieniami administracyjnymi tylko programy skonfigurowane w opcjach SuRun."
+    IDS_SETUP1                    "Ustawienia g³ówne"
+    IDS_SETUP2                    "grupa SuRunners"
+    IDS_SETUP3                    "Przechwytywanie"
+    IDS_SETUP4                    "Zaawansowane"
+    IDS_ASKAUTO                   "Aplikacja:\r\n\r\n%s\r\n\r\nmo¿e potrzebowaæ uprawnieñ administracyjnych do poprawnego dzia³ania.\r\n\r\nJeœli wciœniesz 'Anuluj', aplikacja zostanie uruchomiona ze zwyk³ymi uprawnieniami."
+    IDS_ASKSURUNNER2              "Musisz byæ cz³onkiem grupy 'SuRunners' by móc u¿ywaæ SuRun.\r\n\r\nCzy chcesz do³¹czyæ do grupy 'SuRunners'?\r\n\r\nJeœli nie masz pewnoœci, co robisz, wciœnij 'Nie'."
+    IDS_ASKSURUNNER3              "Czy do³¹czyæ konto '%s' do grupy 'SuRunners'?"
+    IDS_STARTED                   "Info:\r\n%s\r\npracuje z uprawnieniami administracyjnymi."
+    IDS_ASKSURUNNER1              "Czy chcesz do³¹czyæ konto '%s' do grupy 'SuRunners'?\r\n\r\nJeœli wciœniejsz 'Tak', konto '%s' zostanie do³¹czone do grupy 'SuRunners' i STRACI STATUS ADMINISTRATORA."
+    IDS_BUILTINADMIN1             "Konto '%s' jest wbudowanym kontem administracyjnym.\r\n\r\nTo konto nie mo¿e dzia³aæ z ograniczonymi uprawnieniami, przez co nie mo¿e zostaæ zarejestrowane jako u¿ytkownik SuRun!"
+    IDS_NOADD2USERS1              "B³¹d!\r\n\r\nDodanie '%s' do grupy zwyk³ych u¿ytkowników nie powiod³o siê.\r\nSystem Windows zwróci³ b³¹d:\r\n\r\n%s"
+    IDS_SURUNNER_ERR1             "B³¹d!\r\n\r\nDodanie '%s' do grupy 'SuRunners' nie powiod³o siê.\r\nSystem Windows zwróci³ b³¹d:\r\n\r\n%s"
+    IDS_ADDUNINST                 "Zapisywanie w rejestrze informacji deinstalacji"
+    IDS_ADDAUTORUN                "Instalowanie automatycznego uruchomienia 'SuRun /SysmenuHook'"
+    IDS_ADDASSOC                  "Instalowanie powi¹zañ SuRun w rejestrze"
+    IDS_ADDCPL                    "Instalowanie SuRun w panelu sterowania"
+    IDS_REMUNINST                 "Usuwanie informacji deinstalacji z rejestru"
+    IDS_REMAUTORUN                "Usuwanie automatycznego uruchomienia 'SuRun /SysmenuHook'"
+    IDS_REMASSOC                  "Usuwanie powi¹zañ SuRun z rejestru"
+    IDS_REMCPL                    "Usuwanie SuRun z panelu sterowania"
+    IDS_DELFILE                   "Usuwanie pliku '%s'"
+    IDS_DELFILEBOOT               "Plik '%s' zostanie usuniêty przy nastêpnym uruchomieniu systemu"
+    IDS_IMPORTFAIL                "Przywracanie nie powiod³o siê!\r\nPlik %s nie odnaleziony."
+    IDS_COPYFILE                  "Kopiowanie pliku '%s' do '%s'"
+    IDS_SURUNNER_ERR              "B³¹d!\r\n\r\nDodanie Twego konta do grupy 'SuRunners' nie powiod³o siê.\r\nSystem Windows zwróci³ b³¹d::\r\n\r\n%s"
+    IDS_LOGOFFON                  "Twoje konto zosta³o dodane do grupy 'SuRunners' i usuniête z lokalnej grupy Administratorów.\r\n\r\nAby móc pracowaæ z ograniczonymi uprawnieniami musisz siê ponownie zalogowaæ."
+    IDS_SYSMENUEXT                "Rozszerzenie SuRun menu systemowego"
+    IDS_SURUNINST                 "Instaluj (SuRun)"
+    IDS_SURUNUNINST               "Usuñ (SuRun)"
+    IDS_SURUNREPAIR               "Napraw (SuRun)"
+    IDS_CPLNAME                   "Ustawienia SuRun"
+    IDS_RUNFAILED                 "B³¹d!\r\n\r\n%s\r\n\r\nnie móg³ zostaæ uruchomiony."
+    IDS_EMPTYPASS                 "UWAGA: Nastêpuj¹ce konta Administratorów nie posiadaj¹ has³a:\n\n%s\nU¿ywanie SuRun mija siê z celem, jeœli te konta nie bêd¹ zabezpieczone has³em!"
+    IDS_STARTMENUDIR              "SuRun"
+    IDS_SURUNSTUCK                "SuRun nie odpowiada!\n\nTo mo¿e byæ spowodowane przez system prewencji w³amañ(HIPS),\nktóry wymaga interakcji u¿ytkownika.\n\nKliknij tu, by prze³¹czyæ siê do swojego pulpitu."
+    IDS_SWITCHBACK                "Kliknij tu, by prze³¹czyæ siê\ndo bezpiecznego pulpitu SuRun."
+    IDS_APPOK                     "Wiersz polecenia zdaje siê nie dzia³aæ.\n\nCzy napewno wiersz polecenia jest poprawny?\n(Jeœli zawiera spacje, to czy zosta³ umieszczony w cudzys³owiu?)"
+    IDS_GRPDESC                   "Cz³onkowie tej grupy mog¹ u¿ywaæ SuRun."
+    IDS_ADDTOBLKLIST              "Dodaj program do przechwytywania"
+    IDS_ADDFILETOLIST             "Podaj plik i wiersz polecenia"
+    IDS_DELSERVICE                "Usuwanie us³ugi SuRun"
+    IDS_DELREG                    "Usuwanie wpisów SuRun z rejestru"
+    IDS_SR2ADMIN                  "Dodawanie '%s' do grupy lokalnych administratorów"
+    IDS_DELSURUNNERS              "Usuwanie lokalnej grupy 'SuRunners'"
+    IDS_INSTFAILED                "Instalacja siê nie powiod³a!"
+    IDS_CLOSE                     "&Zamknij"
+    IDS_INSTSUCCESS               "SuRun zosta³ pomyœlnie zainstalowany"
+    IDS_INSTSUCCESS2              "Przed u¿yciem SuRun musisz siê wylogowaæ"
+    IDC_LOGOFF                    "&Wyloguj"
+    IDC_INSTALL                   "SuRun jest instalowany"
+    IDS_STARTSVC                  "Uruchamianie us³ugi SuRun"
+    IDS_INSTSVC                   "Instalowanie us³ugi SuRun"
+    IDC_UNINSTALL                 "SuRun jest usuwany"
+    IDS_UNINSTFAILED              "Deinstalacja siê nie powiod³a!"
+    IDS_UNINSTSUCCESS             "SuRun zosta³ odinstalowany"
+    IDS_RUNAS                     "Uruchom jako..."
+    IDS_WARNADMIN                 "Wszyscy u¿ytkownicy"
+    IDS_WARNADMIN2                "SuRunners i Administratorzy"
+    IDS_WARNADMIN3                "nieograniczeni SuRunners i Administratorzy (*)"
+    IDS_WARNADMIN4                "Administratorzy"
+    IDS_WARNADMIN5                "Nikt"
+    IDS_SHNAME1                   "Mój komputer"
+    IDS_SHNAME2                   "Moje miejsca sieciowe"
+    IDS_SHNAME3                   "Po³¹czenia sieciowe"
+    IDS_SHNAME4                   "Panel sterowania"
+    IDS_SHNAME5                   "Kosz"
+    IDS_SHNAME6                   "Czcionki"
+    IDS_SHNAME7                   "Narzêdzia administracyjne"
+    IDS_SHNAME8                   "Moje dokumenty"
+    IDS_BEAUTIFIED                "%s\r\n[Czyli: %s]"
+    IDS_PW4SETUP                  "By zmieniæ ustawienia SuRun musisz podaæ swoje has³o."
+    IDS_REBOOT                    "&Uruchom ponownie"
+    IDS_INSTSUCCESS3              "System musi zostaæ zrestartowany!"
+    IDS_HIDESELF                  "Napewno chcesz ukryæ SuRun przed samym sob¹?\n\nJeœli tak zrobisz, nie bêdziesz móg³ zmieniaæ ustawieñ suRun."
+    IDS_NOIMPORT                  "Musisz byæ cz³onkiem lokalnej grupy Administratorów\nby móc importowaæ ustawienia SuRun."
+    IDS_NOEXPORT                  "Musisz byæ cz³onkiem lokalnej grupy Administratorów\nby móc eksportowaæ ustawienia SuRun."
+    IDS_NOTLOGGEDON               "Szybkie prze³¹czenie u¿ytkownika niemo¿liwe:\n%s nie jest zalogowany."
+    IDS_NOTLOGGEDON2              "Szybkie prze³¹czenie u¿ytkownika niemo¿liwe:\nSesja %d nie jest zalogowana."
+    IDS_EMPTYPASS2                "UWAGA: Nastêpuj¹ce konta Administratorów nie posiadaj¹ has³a:\n\n%s"
+    IDS_SRACCDESC                 "Konto pomocnicze dla SuRun"
+}
 
 #endif    // Polish resources
 /////////////////////////////////////////////////////////////////////////////
@@ -2535,10 +2388,10 @@ BEGIN
                     IDC_STATIC,65,23,251,19
     GROUPBOX        "Wat moet SuRun doen als dit programma ""Als Administrator"" wordt gestart?",
                     IDC_STATIC,16,43,330,64,WS_GROUP
-    ICON            IDI_LISTICON2,IDC_STATIC,24,55,11,10,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON3,IDC_STATIC,24,68,11,10,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON8,IDC_STATIC,24,81,11,10,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON6,IDC_STATIC,24,94,11,10,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON2,IDC_STATIC,24,55,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON3,IDC_STATIC,24,68,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON8,IDC_STATIC,24,81,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON6,IDC_STATIC,24,94,21,20,SS_REALSIZEIMAGE
     CONTROL         "Vragen om dit programma met verhoogde rechten te starten.",
                     IDC_NOASK1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,40,55,205,10
@@ -2550,9 +2403,9 @@ BEGIN
                     IDC_NOASK3,"Button",BS_AUTORADIOBUTTON,40,94,187,10
     GROUPBOX        "Hoe moet SuRun's execution hooks dit programma behandelen?",
                     IDC_STATIC,16,110,330,52,WS_GROUP
-    ICON            IDI_LISTICON1,IDC_STATIC,24,122,11,10,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON,IDC_STATIC,24,135,11,10,SS_REALSIZEIMAGE
-    ICON            IDI_LISTICON7,IDC_STATIC,24,148,11,10,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON1,IDC_STATIC,24,122,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON,IDC_STATIC,24,135,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_LISTICON7,IDC_STATIC,24,148,21,20,SS_REALSIZEIMAGE
     CONTROL         "Inschatten of het programma verhoogde rechten nodig heeft.",
                     IDC_AUTO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,40,122,207,10
@@ -2595,7 +2448,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,288,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,287,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",
                     IDC_HINT,48,73,234,44,SS_NOPREFIX
@@ -2629,7 +2482,7 @@ BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,288,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,288,1
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",
                     IDC_HINT,48,74,234,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -2659,7 +2512,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,261,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Voer gebruikersnaam en wachtwoord in om van gebruiker te wisselen.",
                     IDC_DLGQUESTION,50,7,205,22,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | 
@@ -2706,7 +2559,7 @@ BEGIN
     DEFPUSHBUTTON   "&Installeren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,7,32,30
+    ICON            IDI_MAINICON,IDC_SECICON,9,7,21,20
     LTEXT           "Wilt u SuRun installeren?",IDC_QUESTION,45,7,311,25,
                     SS_CENTERIMAGE
     CONTROL         "Na installatie 'SuRun instellingen' openen",
@@ -2732,7 +2585,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,261,1
-    ICON            IDI_SHIELD2,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD2,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Meld u aan als computerbeheerder.",IDC_DLGQUESTION,51,7,
                     205,51,SS_NOPREFIX
     LTEXT           "Kies 'Annuleren' indien u niet zeker weet wat dit inhoudt!",
@@ -2759,7 +2612,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,261,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Voer de gebruikersnaam van een computerbeheerder in.",
                     IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     RTEXT           "&Gebruikersnaam:",IDC_USRST,58,77,57,8
@@ -2802,7 +2655,7 @@ IDD_SETUP1 DIALOG DISCARDABLE  0, 0, 378, 235
 STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
     GROUPBOX        "Beveiligd Bureaublad",IDC_EXTOPT2,75,2,297,49,WS_GROUP
     CONTROL         "Scherm vervagen en Bureaublad in de achtergrond 'dimmen'",
                     IDC_BLURDESKTOP,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
@@ -2986,7 +2839,7 @@ BEGIN
     GROUPBOX        "Windows beveiliging. (Windows-functies die SuRun kan aanpassen.)",
                     IDC_STATIC,4,182,369,39
     CONTROL         "Markeer 'Administrators' i.p.v. 'Maker' als eigenaar van Administrators-bestanden.\nWAARSCHUWING: Indien niet geactiveerd, dan kunnen standaard-gebruikers bestanden en registersleutels van SuRun Administrators wijzigen!!",
-                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_TOP | 
+                    IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,11,193,360,24
     CTEXT           "LET OP: Deze instellingen zijn pas na de volgende Windows-aanmelding volledig van kracht",
                     IDC_STATIC,6,223,365,8
@@ -3014,7 +2867,7 @@ BEGIN
     DEFPUSHBUTTON   "&Deïnstalleren >>",IDIGNORE,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,7,32,30
+    ICON            IDI_MAINICON,IDC_SECICON,9,7,21,20
     LTEXT           "Wilt u SuRun deïnstalleren?",IDC_QUESTION,44,7,312,25,
                     SS_CENTERIMAGE
     CONTROL         "SuRun instellingen behouden",IDC_KEEPREGISTRY,"Button",
@@ -3039,7 +2892,7 @@ BEGIN
     DEFPUSHBUTTON   "&Vernieuwen >>",IDOK,291,107,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,7,32,30
+    ICON            IDI_MAINICON,IDC_SECICON,9,7,21,20
     LTEXT           "Wilt u SuRun vernieuwen?",IDC_QUESTION,44,7,312,25,
                     SS_CENTERIMAGE
     LTEXT           "SuRun context-menu instellingen:",IDC_KEEPREGST,14,41,
@@ -3076,11 +2929,11 @@ BEGIN
     IDS_MENUSTR             "Start als Administrator"
     IDS_BUILTINADMIN        "U bent aangemeld als de ""ingebouwde"" Windows Administrator.\r\n\r\nU kunt SuRun zo niet gebruiken!"
     IDS_SURUNNER_OK         "U bent toegevoegd aan de gebruikersgroep ""SuRunners""."
+    IDS_DELUSER             "U wilt gebruiker '%s' verwijderen uit de groep SuRunners.\r\n\r\nAlle gebruikersinstellingen zullen worden gewist.\r\n\r\nWilt u dat de gebruiker wordt toegevoegd aan de groep Administrators?"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DELUSER             "U wilt gebruiker '%s' verwijderen uit de groep SuRunners.\r\n\r\nAlle gebruikersinstellingen zullen worden gewist.\r\n\r\nWilt u dat de gebruiker wordt toegevoegd aan de groep Administrators?"
     IDS_CANCEL              "Annuleren (%d)"
     IDS_NOADD2USERS         "Fout!\r\n\r\nKan uw gebruikersnaam niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_NOREMADMINS         "Fout!\r\n\r\nKan uw gebruikersnaam niet van de groep Administrators verwijderen.\r\nWindows foutmelding:\r\n\r\n%s"
@@ -3096,11 +2949,11 @@ BEGIN
     IDS_ASKSURUNNER2        "Om SuRun te gebruiken moet u lid zijn van de groep ""SuRunners"".\r\n\r\nWilt u aan deze groep worden toegevoegd?\r\n\r\nIndien u niet zeker bent, druk dan ""Nee""."
     IDS_ASKSURUNNER3        "Wilt u dat '%s' aan de groep ""SuRunners"" wordt toegevoegd?"
     IDS_STARTED             "Info:\r\n%s\r\nwordt met verhoogde rechten uitgevoerd."
+    IDS_ASKSURUNNER1        "Wilt u dat '%s' aan de groep ""SuRunners"" wordt toegevoegd?\r\n\r\nAls u JA drukt, zal '%s' zijn ADMINISTRATOR STATUS VERLIEZEN."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_ASKSURUNNER1        "Wilt u dat '%s' aan de groep ""SuRunners"" wordt toegevoegd?\r\n\r\nAls u JA drukt, zal '%s' zijn ADMINISTRATOR STATUS VERLIEZEN."
     IDS_BUILTINADMIN1       "'%s' is de ""ingebouwde"" Administrator.\r\n\r\nTDeze gebruiker kan SuRun niet gebruiken!"
     IDS_NOADD2USERS1        "Fout!\r\n\r\nKan '%s' niet aan de normale gebruikersgroep toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Fout!\r\n\r\nKan '%s' niet aan de groep ""SuRunners"" toevoegen.\r\nWindows foutmelding:\r\n\r\n%s"
@@ -3116,11 +2969,11 @@ BEGIN
     IDS_DELFILEBOOT         "Bestand '%s' wordt tijdens de volgende computerstart verwijderd"
     IDS_IMPORTFAIL          "Herstel mislukt!\r\nBestand %s niet gevonden."
     IDS_COPYFILE            "Kopiëer bestand '%s' naar '%s'"
+    IDS_SURUNNER_ERR        "Fout!\r\n\r\nUw gebruikersnaam kan niet aan de groep ""SuRunners"" worden toegevoegd.\r\nWindows foutmelding:\r\n\r\n%s"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_SURUNNER_ERR        "Fout!\r\n\r\nUw gebruikersnaam kan niet aan de groep ""SuRunners"" worden toegevoegd.\r\nWindows foutmelding:\r\n\r\n%s"
     IDS_LOGOFFON            "U bent aan de groep ""SuRunners"" toegevoegd en verwijderd uit de groep Administrators.\r\n\r\nMeld u opnieuw aan om de computer verder met beperkte rechten te gebruiken."
     IDS_SYSMENUEXT          "SuRun Systeem-menu uitbreiding"
     IDS_SURUNINST           "Als Administrator installeren"
@@ -3133,15 +2986,19 @@ BEGIN
     IDS_SURUNSTUCK          "SuRun reageert niet!\n\nMogelijk wil een ""host intrusion protection system"" (HIPS) \nu hiervan melding maken.\n\nKlik hier om terug te schakelen naar het bureaublad."
     IDS_SWITCHBACK          "Klik hier om terug te schakelen\nnaar SuRuns bureaublad."
     IDS_APPOK               "De opdrachtregel lijkt niet te werken.\n\nWeet u zeker dat hij goed is?\n(Aanhalingstekens toegepast bij spaties?)"
-    IDS_GRPDESC             "Leden van deze groep kunnen SuRun gebruiken."
     IDS_ADDTOBLKLIST        "Program aan uitsluitingenlijst toevoegen"
     IDS_ADDFILETOLIST       "Voer bestandsnaam en opdracht in"
+    IDS_DELSERVICE          "Stoppen SuRun service"
+    IDS_DELREG              "Verwijderen SuRuns registerinstellingen"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DELSERVICE          "Stoppen SuRun service"
-    IDS_DELREG              "Verwijderen SuRuns registerinstellingen"
+    IDS_GRPDESC             "Leden van deze groep kunnen SuRun gebruiken."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
     IDS_SR2ADMIN            "Toevoegen '%s' aan de Administrators groep"
     IDS_DELSURUNNERS        "Verwijderen gebruikersgroep 'SuRunners'"
     IDS_INSTFAILED          "Installatie mislukt!"
@@ -3156,12 +3013,12 @@ BEGIN
     IDS_UNINSTFAILED        "Deïnstallatie mislukt!"
     IDS_UNINSTSUCCESS       "Deïnstallatie voltooid"
     IDS_RUNAS               "Uitvoeren als..."
+    IDS_WARNADMIN           "Alle gebruikers"
+    IDS_WARNADMIN2          "SuRunners en Administrators"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_WARNADMIN           "Alle gebruikers"
-    IDS_WARNADMIN2          "SuRunners en Administrators"
     IDS_WARNADMIN3          "Onbeperkte SuRunners en Administrators (*)"
     IDS_WARNADMIN4          "Administrators"
     IDS_WARNADMIN5          "Geen gebruikers"
@@ -3176,12 +3033,12 @@ BEGIN
     IDS_BEAUTIFIED          "%s\r\n[Betekenis: %s]"
     IDS_PW4SETUP            "Om SuRun instellingen te wijzigen moet u uw wachtwoord invoeren."
     IDS_REBOOT              "&Opnieuw starten"
+    IDS_INSTSUCCESS3        "De computer moet opnieuw starten!"
+    IDS_HIDESELF            "Wilt u SuRun voor UZELF verbergen?\n\nSuRun instellingen kunnen hierna niet meer worden gewijzigd."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_INSTSUCCESS3        "De computer moet opnieuw starten!"
-    IDS_HIDESELF            "Wilt u SuRun voor UZELF verbergen?\n\nSuRun instellingen kunnen hierna niet meer worden gewijzigd."
     IDS_NOIMPORT            "U moet lid zijn van de Admonistrators gebruikersgroep\nom SuRun instellingen te kunnen importeren."
     IDS_NOEXPORT            "U moet lid zijn van de Admonistrators gebruikersgroep\nom SuRun instellingen te kunnen exporteren."
     IDS_NOTLOGGEDON         "Snelle gebruikerswissel niet mogelijk:\nGebruiker %d is niet aangemeld."
