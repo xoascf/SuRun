@@ -562,6 +562,17 @@ void USERLIST::Add(LPCWSTR UserName)
   return;
 }
 
+static void MsgLoop()
+{
+  MSG msg;
+  int count=0;
+  while (PeekMessage(&msg,0,0,0,PM_REMOVE) && (count++<100))
+  {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+}
+
 void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
 //  DBGTrace1("AddGroupUsers for Group %s",GroupName);
@@ -578,6 +589,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0)
       && (NetGetAnyDCName(0,dn,(BYTE**)&dc)==NERR_Success)) 
     {
+
       TCHAR gn[2*UNLEN+2]={0};
       _tcscpy(gn,GroupName);
       PathStripPath(gn);
@@ -588,6 +600,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
         LPBYTE pBuff=0;
         DWORD dwRec=0;
         DWORD dwTot=0;
+        MsgLoop();
         res = NetGroupGetUsers(dc,gn,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
         if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
         {
@@ -597,6 +610,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
         for(GROUP_USERS_INFO_0* p=(GROUP_USERS_INFO_0*)pBuff;dwRec>0;dwRec--,p++)
         {
           USER_INFO_2* b=0;
+          MsgLoop();
           NetUserGetInfo(dc,p->grui0_name,2,(LPBYTE*)&b);
           if (b)
           {
@@ -620,6 +634,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
     LPBYTE pBuff=0;
     DWORD dwRec=0;
     DWORD dwTot=0;
+    MsgLoop();
     res = NetLocalGroupGetMembers(0,GroupName,2,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
@@ -647,6 +662,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
           PathRemoveFileSpec(dn);
           USER_INFO_2* b=0;
           LPTSTR dc=0;
+          MsgLoop();
           if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0))
             NetGetAnyDCName(0,dn,(BYTE**)&dc);
           NET_API_STATUS st=NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
@@ -692,6 +708,7 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
     LPBYTE pBuff=0;
     DWORD dwRec=0;
     DWORD dwTot=0;
+    MsgLoop();
     res = NetLocalGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
     if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
     {
@@ -711,6 +728,7 @@ void USERLIST::AddAllUsers(BOOL bScanDomain)
       LPBYTE pBuff=0;
       DWORD dwRec=0;
       DWORD dwTot=0;
+      MsgLoop();
       res = NetGroupEnum(NULL,0,&pBuff,MAX_PREFERRED_LENGTH,&dwRec,&dwTot,&i);
       if((res!=ERROR_SUCCESS) && (res!=ERROR_MORE_DATA))
       {
