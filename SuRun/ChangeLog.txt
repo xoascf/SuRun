@@ -3,6 +3,7 @@ Done, to be tested:
 
 ToDo
 ---------------------
+* make /RESTORE /BACKUP work from local System
 * Create Inline Hook instead of IAT-Hook
 * Hooks must directly write to Service pipe
 * Automagic must start App "non elevated" on "cancel" and AutoCancel
