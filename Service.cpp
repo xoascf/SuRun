@@ -628,7 +628,7 @@ static BOOL TestDirectServiceCommands()
   {
     GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
     //Double check if User is Admin!
-    if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
+    if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID)||IsLocalSystem(g_RunData.CliProcessId))
     {
       if (!ImportSettings(&g_RunData.cmdLine[9]))
         SafeMsgBox(0,CBigResStr(IDS_IMPORTFAIL,&g_RunData.cmdLine[9]),
@@ -645,7 +645,7 @@ static BOOL TestDirectServiceCommands()
   {
     GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
     //Double check if User is Admin!
-    if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID))
+    if (IsInAdmins(g_RunData.UserName,g_RunData.SessionID)||IsLocalSystem(g_RunData.CliProcessId))
     {
       ExportSettings(&g_RunData.cmdLine[8],g_RunData.SessionID,g_RunData.UserName);
       ResumeClient(RETVAL_OK);
@@ -661,6 +661,8 @@ static BOOL TestDirectServiceCommands()
 }
 
 extern TOKEN_STATISTICS g_AdminTStat;
+
+DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd);//forward decl
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
@@ -738,10 +740,16 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             continue;
           }
           //check if the requested App is Flagged with AutoCancel
-          if (wlf&FLAG_AUTOCANCEL)
+          if ((wlf&(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))==FLAG_AUTOCANCEL)
           {
             ResumeClient((g_RunData.bShlExHook)?RETVAL_SX_NOTINLIST:RETVAL_CANCELLED);
             DBGTrace2("ShellExecute AutoCancel WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
+            continue;
+          }
+          if ((wlf&(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))==(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))
+          {
+            ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine),true);
+            DBGTrace2("ShellExecute AutoRunLOW WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
             continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist

@@ -73,10 +73,10 @@ typedef BOOL (WINAPI* lpCreateProcessAsUserW)(HANDLE,LPCWSTR,LPWSTR,
                                               LPPROCESS_INFORMATION);
 
 //TEMP!!!
-typedef BOOL (WINAPI* lpShellExecuteExW)(LPSHELLEXECUTEINFOW);
-typedef BOOL (WINAPI* lpShellExecuteExA)(LPSHELLEXECUTEINFOA);
-typedef HINSTANCE (WINAPI* lpShellExecuteA)(HWND,LPCSTR,LPCSTR,LPCSTR,LPCSTR,INT);
-typedef HINSTANCE (WINAPI* lpShellExecuteW)(HWND,LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR,INT);
+//typedef BOOL (WINAPI* lpShellExecuteExW)(LPSHELLEXECUTEINFOW);
+//typedef BOOL (WINAPI* lpShellExecuteExA)(LPSHELLEXECUTEINFOA);
+//typedef HINSTANCE (WINAPI* lpShellExecuteA)(HWND,LPCSTR,LPCSTR,LPCSTR,LPCSTR,INT);
+//typedef HINSTANCE (WINAPI* lpShellExecuteW)(HWND,LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR,INT);
 //END TEMP!!!
 
 typedef BOOL (WINAPI* lpSwitchDesk)(HDESK);
@@ -87,10 +87,10 @@ BOOL WINAPI CreateProcA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES
 BOOL WINAPI CreateProcW(LPCWSTR,LPWSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
                         BOOL,DWORD,LPVOID,LPCWSTR,LPSTARTUPINFOW,LPPROCESS_INFORMATION);
 //TEMP!!!
-BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei);
-BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA);
-HINSTANCE WINAPI ShellExA(HWND,LPCSTR,LPCSTR,LPCSTR,LPCSTR,INT);
-HINSTANCE WINAPI ShellExW(HWND,LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR,INT);
+//BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei);
+//BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA);
+//HINSTANCE WINAPI ShellExA(HWND,LPCSTR,LPCSTR,LPCSTR,LPCSTR,INT);
+//HINSTANCE WINAPI ShellExW(HWND,LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR,INT);
 //END TEMP!!!
 
 BOOL WINAPI CreatePAUA(HANDLE,LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECURITY_ATTRIBUTES,
@@ -169,10 +169,10 @@ static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads
 static CHookDescriptor hkSwDesk  ("user32.dll",NULL,"SwitchDesktop",(PROC)SwitchDesk);
 
 //TEMP!!!
-static CHookDescriptor hkShExExW("shell32.dll",NULL,"ShellExecuteExW",(PROC)ShellExExW);
-static CHookDescriptor hkShExExA("shell32.dll",NULL,"ShellExecuteExA",(PROC)ShellExExA);
-static CHookDescriptor hkShExW("shell32.dll",NULL,"ShellExecuteW",(PROC)ShellExW);
-static CHookDescriptor hkShExA("shell32.dll",NULL,"ShellExecuteA",(PROC)ShellExA);
+//static CHookDescriptor hkShExExW("shell32.dll",NULL,"ShellExecuteExW",(PROC)ShellExExW);
+//static CHookDescriptor hkShExExA("shell32.dll",NULL,"ShellExecuteExA",(PROC)ShellExExA);
+//static CHookDescriptor hkShExW("shell32.dll",NULL,"ShellExecuteW",(PROC)ShellExW);
+//static CHookDescriptor hkShExA("shell32.dll",NULL,"ShellExecuteA",(PROC)ShellExA);
 //END TEMP!!!
 
 //Functions that, if present in the IAT, cause the module to be hooked
@@ -182,10 +182,10 @@ static CHookDescriptor* need_hdt[]=
   &hkCrProcW,
   &hkSwDesk,
 //TEMP!!!
-  &hkShExExA,
-  &hkShExExW,
-  &hkShExA,
-  &hkShExW,
+//  &hkShExExA,
+//  &hkShExExW,
+//  &hkShExA,
+//  &hkShExW,
 //END TEMP!!!
 #ifdef _TEST_STABILITY
   &hkCrPAUA,
@@ -200,21 +200,19 @@ static CHookDescriptor* hdt[]=
   &hkLdLibW, 
   &hkLdLibXA, 
   &hkLdLibXW, 
-//TEMP!!!
-//#ifdef _TEST_STABILITY
+#ifdef _TEST_STABILITY
   &hkGetPAdr,
-//#endif _TEST_STABILITY
-//END TEMP!!!
+#endif _TEST_STABILITY
   &hkFreeLib, 
   &hkFrLibXT, 
   &hkCrProcA, 
   &hkCrProcW,
   &hkSwDesk,
 //TEMP!!!
-  &hkShExExA,
-  &hkShExExW,
-  &hkShExA,
-  &hkShExW,
+//  &hkShExExA,
+//  &hkShExExW,
+//  &hkShExA,
+//  &hkShExW,
 //END TEMP!!!
 #ifdef _TEST_STABILITY
   &hkCrPAUA,
@@ -710,22 +708,22 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 }
 
 //TEMP!!!
-extern HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei); //SuRunExt.cpp
-BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExExW()",DLLNAME);
-#endif DoDBGTrace
-//  if (S_OK==ShellExtExecute(pei))
-//    return TRUE;
-  return ((lpShellExecuteExW)hkShExExW.OrgFunc())(pei);
-}
-
-BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExExA()",DLLNAME);
-#endif DoDBGTrace
+//extern HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei); //SuRunExt.cpp
+//BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
+//{
+//#ifdef DoDBGTrace
+//  TRACExA("%s: call to ShellExExW()",DLLNAME);
+//#endif DoDBGTrace
+////  if (S_OK==ShellExtExecute(pei))
+////    return TRUE;
+//  return ((lpShellExecuteExW)hkShExExW.OrgFunc())(pei);
+//}
+//
+//BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA)
+//{
+//#ifdef DoDBGTrace
+//  TRACExA("%s: call to ShellExExA()",DLLNAME);
+//#endif DoDBGTrace
 //  if (peiA)
 //  {
 //    SHELLEXECUTEINFOW pei;
@@ -756,28 +754,28 @@ BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA)
 //      return TRUE;
 //    }
 //  }
-  return ((lpShellExecuteExA)hkShExExA.OrgFunc())(peiA);
-}
-
-HINSTANCE WINAPI ShellExA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, 
-                          LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExA()",DLLNAME);
-#endif DoDBGTrace
-  return ((lpShellExecuteA)hkShExA.OrgFunc())(hwnd,lpOperation,lpFile,
-                                              lpParameters,lpDirectory,nShowCmd);
-}
-
-HINSTANCE WINAPI ShellExW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, 
-                          LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExW()",DLLNAME);
-#endif DoDBGTrace
-  return ((lpShellExecuteW)hkShExW.OrgFunc())(hwnd,lpOperation,lpFile,
-                                              lpParameters,lpDirectory,nShowCmd);
-}
+//  return ((lpShellExecuteExA)hkShExExA.OrgFunc())(peiA);
+//}
+//
+//HINSTANCE WINAPI ShellExA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, 
+//                          LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
+//{
+//#ifdef DoDBGTrace
+//  TRACExA("%s: call to ShellExA()",DLLNAME);
+//#endif DoDBGTrace
+//  return ((lpShellExecuteA)hkShExA.OrgFunc())(hwnd,lpOperation,lpFile,
+//                                              lpParameters,lpDirectory,nShowCmd);
+//}
+//
+//HINSTANCE WINAPI ShellExW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, 
+//                          LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd)
+//{
+//#ifdef DoDBGTrace
+//  TRACExA("%s: call to ShellExW()",DLLNAME);
+//#endif DoDBGTrace
+//  return ((lpShellExecuteW)hkShExW.OrgFunc())(hwnd,lpOperation,lpFile,
+//                                              lpParameters,lpDirectory,nShowCmd);
+//}
 //END TEMP!!!
 
 static BOOL IsShellAndSuRunner(HANDLE hToken)
