@@ -1,12 +1,10 @@
 Done, to be tested:
 ---------------------------
-
 ToDo
 ---------------------
-* make /RESTORE /BACKUP work from local System
+* On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.
 * Create Inline Hook instead of IAT-Hook
 * Hooks must directly write to Service pipe
-* Automagic must start App "non elevated" on "cancel" and AutoCancel
 * GUI for SwitchToUser
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * Checksums for "Always Yes" programs
@@ -32,6 +30,17 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.9 Beta 9 - 2010-01-08
+---------------------------------
+* NEW: Local System is accepted as user for Backup/Restore
+* NEW: If "Start the program automagically with elevated rights." and "NEVER 
+  start this program with elevated rights." are both checked, SuRuns Hooks 
+  directly start the program with the rights of the hooked user process.
+  (Automagic starts App "non elevated" on "AutoExec" and "AutoCancel")
+* CHG: Updated polish language (special characters)
+* FIX: SuRun keeps WatchDog happy when scanning for domain users
+* FIX: Fixed white backgroud color in SuRun's dialogs
 
 SuRun 1.2.0.9 Beta 8 - 2009-11-23
 ---------------------------------

@@ -187,10 +187,31 @@ bool IsLocalSystem()
 {
 	HANDLE htok = 0;
 	if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&htok ))
-    return false;
+    return DBGTrace1("OpenProcessToken() failed: %s",GetLastErrorNameStatic()),false;
   bool bIsLocalSystem=IsLocalSystem(htok);
   CloseHandle(htok);
 	return bIsLocalSystem;
+}
+
+bool IsLocalSystem(DWORD ProcessID)
+{
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcessID?ProcessID:GetCurrentProcessId());
+  if (!hProc)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ProcessID,GetLastErrorNameStatic());
+    return false;
+  }
+  HANDLE hToken;
+  bool bRet=false;
+  // Open impersonation token for process
+  if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
+  {
+    bRet=IsLocalSystem(hToken);
+    CloseHandle(hToken);
+  }else
+    DBGTrace2("OpenProcessToken(ID==%d) failed: %s",ProcessID,GetLastErrorNameStatic());
+  CloseHandle(hProc);
+	return bRet;
 }
 
 //////////////////////////////////////////////////////////////////////////////

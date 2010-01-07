@@ -22,6 +22,7 @@ BOOL IsSplitAdmin(HANDLE hToken=NULL);
 // return true if you are running as local system
 bool IsLocalSystem(HANDLE htok);
 bool IsLocalSystem();
+bool IsLocalSystem(DWORD ProcessID);
 
 //Start a process with Admin cedentials and wait until it closed
 BOOL RunAsAdmin(LPCTSTR lpCmdLine,int IDmsg);
