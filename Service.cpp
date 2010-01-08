@@ -2480,14 +2480,6 @@ bool HandleServiceStuff()
   CCmdLine cmd(0);
   if (cmd.argc()==3)
   {
-    //Service GUI run in Users WindowStation
-    if(_tcscmp(cmd.argv(1),_T("/AskUSER"))==0)
-    {
-      SuRun();
-      DeleteSafeDesktop(false);
-      ExitProcess(~GetCurrentProcessId());
-      return true;
-    }
     //Install
     if (_tcsicmp(cmd.argv(1),_T("/INSTALL"))==0)
     {
@@ -2513,6 +2505,14 @@ bool HandleServiceStuff()
   }
   if (cmd.argc()==2)
   {
+    //Service GUI run in Users WindowStation
+    if(_tcscmp(cmd.argv(1),_T("/AskUSER"))==0)
+    {
+      SuRun();
+      DeleteSafeDesktop(false);
+      ExitProcess(~GetCurrentProcessId());
+      return true;
+    }
     //Service
     if (_tcsicmp(cmd.argv(1),_T("/SERVICERUN"))==0)
     {
