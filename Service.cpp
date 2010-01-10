@@ -442,6 +442,7 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 //  MyCPAU
 // 
 //////////////////////////////////////////////////////////////////////////////
+
 BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
   LPSECURITY_ATTRIBUTES lpProcessAttributes,LPSECURITY_ATTRIBUTES lpThreadAttributes,
   BOOL bInheritHandles,DWORD dwCreationFlags,LPVOID lpEnvironment,
@@ -471,7 +472,8 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
       DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
         lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
     SetLastError(le);
-  }else if (!bOK)
+  }
+  if (!bOK)
     DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
       lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
   return bOK;
@@ -748,8 +750,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
           if ((wlf&(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))==(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))
           {
-            ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine),true);
             DBGTrace2("ShellExecute AutoRunLOW WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
+            ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine),true);
             continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist
@@ -1407,6 +1409,47 @@ DWORD LSAStartAdminProcess()
   return RetVal;
 }
 
+//NtSetInformationProcess
+typedef enum _PROCESSINFOCLASS 
+{ 
+  ProcessBasicInformation, 
+  ProcessQuotaLimits, 
+  ProcessIoCounters, 
+  ProcessVmCounters, 
+  ProcessTimes, 
+  ProcessBasePriority, 
+  ProcessRaisePriority, 
+  ProcessDebugPort, 
+  ProcessExceptionPort, 
+  ProcessAccessToken, 
+  ProcessLdtInformation, 
+  ProcessLdtSize, 
+  ProcessDefaultHardErrorMode, 
+  ProcessIoPortHandlers, 
+  ProcessPooledUsageAndLimits, 
+  ProcessWorkingSetWatch, 
+  ProcessUserModeIOPL, 
+  ProcessEnableAlignmentFaultFixup, 
+  ProcessPriorityClass, 
+  ProcessWx86Information, 
+  ProcessHandleCount, 
+  ProcessAffinityMask, 
+  ProcessPriorityBoost, 
+  ProcessDeviceMap, 
+  ProcessSessionInformation, 
+  ProcessForegroundInformation, 
+  ProcessWow64Information, 
+  MaxProcessInfoClass 
+} PROCESSINFOCLASS; 
+
+typedef struct _PROCESS_ACCESS_TOKEN 
+{ 
+  HANDLE Token; 
+  HANDLE Thread; 
+} PROCESS_ACCESS_TOKEN; 
+
+typedef DWORD(CALLBACK * NTSIP)(HANDLE,PROCESSINFOCLASS,PVOID,ULONG);
+
 DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd) 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
@@ -1446,7 +1489,31 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
           cmd,GetLastErrorNameStatic());
       }
     }else
-      DBGTrace1("CreateProcess failed: %s",GetLastErrorNameStatic());
+    {
+      if (GetLastError()==740/*ERROR_ELEVATION_REQUIRED*/)
+      {
+        ToDo: 
+        HANDLE hAdmin=GetAdminToken(g_RunData.SessionID);
+        if (MyCPAU(hAdmin,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
+                    CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
+        {
+          static NTSIP NtSetInformationProcess = NULL;
+          if (!NtSetInformationProcess)
+            NtSetInformationProcess=(NTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
+          if(NtSetInformationProcess)
+          {
+            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+            PROCESS_ACCESS_TOKEN pat={0};
+            pat.Token=hUser;
+            pat.Thread=pi.hThread;
+            DWORD Status=NtSetInformationProcess(pi.hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
+            if (!NT_SUCCESS(Status))
+              ...
+          }
+        }
+      }else
+        DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+    }
     DestroyEnvironmentBlock(Env);
   }
   CloseHandle(hUser);
