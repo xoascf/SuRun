@@ -209,6 +209,7 @@ static void DisplayIcon()
     LastPID=0;
   if ((BalloonTimeOut.TimedOut()||(CurPID!=LastPID))&&(g_NotyData.szInfo[0]))
   {
+    memset(&g_NotyData.szInfoTitle,0,sizeof(g_NotyData.szInfoTitle));
     memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
     bNoUpd=FALSE;
   }
@@ -232,6 +233,7 @@ static void DisplayIcon()
     {
       LastPID=CurPID;
       BalloonTimeOut.Set(20000);
+      _stprintf(g_NotyData.szInfoTitle,_T("SuRun %s"),GetVersionString());
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
     }
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
@@ -243,6 +245,7 @@ static void DisplayIcon()
     {
       LastPID=CurPID;
       BalloonTimeOut.Set(20000);
+      _stprintf(g_NotyData.szInfoTitle,_T("SuRun %s"),GetVersionString());
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
     }
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
@@ -277,6 +280,7 @@ void DisplayMenu(HWND hWnd)
   if (bBTip)
   {
     //Close Balloon
+    memset(&g_NotyData.szInfoTitle,0,sizeof(g_NotyData.szInfoTitle));
     memset(&g_NotyData.szInfo,0,sizeof(g_NotyData.szInfo));
     _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
     if(g_IconShown)
@@ -378,7 +382,6 @@ void InitTrayShowAdmin()
                                         IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
   
   _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
-  _stprintf(g_NotyData.szInfoTitle,_T("SuRun %s"),GetVersionString());
   g_NotyData.dwInfoFlags=NIIF_INFO|NIIF_NOSOUND;
   g_NotyData.uID   = 1;
   g_NotyData.uFlags= NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE;
