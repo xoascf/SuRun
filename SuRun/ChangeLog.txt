@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* bBBlean taskbar compatible
+
 ToDo
 ---------------------
 * On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.

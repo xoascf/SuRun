@@ -1490,28 +1490,28 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
       }
     }else
     {
-      if (GetLastError()==740/*ERROR_ELEVATION_REQUIRED*/)
-      {
-        ToDo: 
-        HANDLE hAdmin=GetAdminToken(g_RunData.SessionID);
-        if (MyCPAU(hAdmin,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
-                    CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
-        {
-          static NTSIP NtSetInformationProcess = NULL;
-          if (!NtSetInformationProcess)
-            NtSetInformationProcess=(NTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
-          if(NtSetInformationProcess)
-          {
-            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-            PROCESS_ACCESS_TOKEN pat={0};
-            pat.Token=hUser;
-            pat.Thread=pi.hThread;
-            DWORD Status=NtSetInformationProcess(pi.hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
-            if (!NT_SUCCESS(Status))
-              ...
-          }
-        }
-      }else
+//      if (GetLastError()==740/*ERROR_ELEVATION_REQUIRED*/)
+//      {
+//        ToDo: 
+//        HANDLE hAdmin=GetAdminToken(g_RunData.SessionID);
+//        if (MyCPAU(hAdmin,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
+//                    CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
+//        {
+//          static NTSIP NtSetInformationProcess = NULL;
+//          if (!NtSetInformationProcess)
+//            NtSetInformationProcess=(NTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
+//          if(NtSetInformationProcess)
+//          {
+//            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+//            PROCESS_ACCESS_TOKEN pat={0};
+//            pat.Token=hUser;
+//            pat.Thread=pi.hThread;
+//            DWORD Status=NtSetInformationProcess(pi.hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
+//            if (!NT_SUCCESS(Status))
+//              ...
+//          }
+//        }
+//      }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
     }
     DestroyEnvironmentBlock(Env);
