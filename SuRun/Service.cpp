@@ -816,6 +816,7 @@ TryAgain:
               bRunCount++;
               SIZE_T N=0;
               WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(rd),&N);
+              WriteProcessMemory(pi.hProcess,&g_CliIsAdmin,&g_CliIsAdmin,sizeof(g_CliIsAdmin),&N);
               if (!g_RunData.bRunAs)
               {
                 HANDLE hTok=GetTempAdminToken(g_RunData.UserName);
