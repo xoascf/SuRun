@@ -1448,6 +1448,8 @@ typedef struct _PROCESS_ACCESS_TOKEN
   HANDLE Thread; 
 } PROCESS_ACCESS_TOKEN; 
 
+#define NT_SUCCESS(Status) ((NTSTATUS)(Status) >= 0)
+
 typedef DWORD(CALLBACK * NTSIP)(HANDLE,PROCESSINFOCLASS,PVOID,ULONG);
 
 DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd) 
@@ -1464,13 +1466,15 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
     TCHAR WinstaDesk[MAX_PATH];
     _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
     si.lpDesktop = WinstaDesk;
-    if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT,Env,
-               g_RunData.CurDir,&si,&pi))
+    if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
+                CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
     {
-      CloseHandle(pi.hThread);
-      CloseHandle(pi.hProcess);
+UsualWay:
       RetVal=RETVAL_OK;
       g_RunData.NewPID=pi.dwProcessId;
+      CloseHandle(pi.hProcess);
+      ResumeThread(pi.hThread);
+      CloseHandle(pi.hThread);
       //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
       if((g_RunData.RetPID)&&(g_RunData.RetPtr))
       {
@@ -1490,28 +1494,44 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
       }
     }else
     {
-//      if (GetLastError()==740/*ERROR_ELEVATION_REQUIRED*/)
-//      {
-//        ToDo: 
-//        HANDLE hAdmin=GetAdminToken(g_RunData.SessionID);
-//        if (MyCPAU(hAdmin,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
-//                    CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
-//        {
-//          static NTSIP NtSetInformationProcess = NULL;
-//          if (!NtSetInformationProcess)
-//            NtSetInformationProcess=(NTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
-//          if(NtSetInformationProcess)
-//          {
-//            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-//            PROCESS_ACCESS_TOKEN pat={0};
-//            pat.Token=hUser;
-//            pat.Thread=pi.hThread;
-//            DWORD Status=NtSetInformationProcess(pi.hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
-//            if (!NT_SUCCESS(Status))
-//              ...
-//          }
-//        }
-//      }else
+      if (GetLastError()==740/*ERROR_ELEVATION_REQUIRED*/)
+      {
+        //We need to start the process elevated and then drop it's rights
+        HANDLE hAdmin=GetAdminToken(g_RunData.SessionID);
+        BOOL bCloseAdmin=TRUE;
+        if (!hAdmin)
+        {
+          bCloseAdmin=FALSE;
+          hAdmin=GetTempAdminToken(g_RunData.UserName);
+          SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
+        }
+        if (MyCPAU(hAdmin,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
+                    CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
+        {
+          //This is highly undocumented but ReactOS/Wine/MS use it, so I do too
+          static NTSIP NtSetInformationProcess = NULL;
+          if (!NtSetInformationProcess)
+            NtSetInformationProcess=(NTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
+          if(NtSetInformationProcess)
+          {
+            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+            PROCESS_ACCESS_TOKEN pat={hUser,pi.hThread};
+            DWORD Status=NtSetInformationProcess(pi.hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
+            if (NT_SUCCESS(Status))
+            {
+              if(bCloseAdmin)
+                CloseHandle(hAdmin);
+              goto UsualWay;
+            }
+            DBGTrace1("NtSetInformationProcess failed: %s",GetErrorNameStatic(Status));
+            TerminateProcess(pi.hProcess,-1);
+          }else
+            DBGTrace1("GetProcAddress(\"NtSetInformationProcess\") failed: %s",GetLastErrorNameStatic());
+        }else
+          DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
+        if(bCloseAdmin)
+          CloseHandle(hAdmin);
+      }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
     }
     DestroyEnvironmentBlock(Env);
