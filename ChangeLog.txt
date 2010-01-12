@@ -1,7 +1,7 @@
 Done, to be tested:
 ---------------------------
 
-ToDo
+ToDo:
 ---------------------
 * On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.
 * Create Inline Hook instead of IAT-Hook
@@ -31,6 +31,11 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.9 Beta10 - 2010-01-12
+---------------------------------
+* FIX: SuRuns second service instance did not realize if the client process 
+    has admin rights and thus it asked the user to become a SuRunners member.
 
 SuRun 1.2.0.9 Beta 9 - 2010-01-11
 ---------------------------------
