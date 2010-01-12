@@ -1,6 +1,5 @@
 Done, to be tested:
 ---------------------------
-* bBBlean taskbar compatible
 
 ToDo
 ---------------------
@@ -33,7 +32,7 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.0.9 Beta 9 - 2010-01-08
+SuRun 1.2.0.9 Beta 9 - 2010-01-11
 ---------------------------------
 * NEW: Local System is accepted as user for Backup/Restore
 * NEW: If "Start the program automagically with elevated rights." and "NEVER 
@@ -41,6 +40,7 @@ SuRun 1.2.0.9 Beta 9 - 2010-01-08
   directly start the program with the rights of the hooked user process.
   (Automagic starts App "non elevated" on "AutoExec" and "AutoCancel")
 * CHG: Updated polish language (special characters)
+* FIX: Made SuRuns Tray symbol better BlackBox (bBBlean) taskbar compatible
 * FIX: SuRun keeps WatchDog happy when scanning for domain users
 * FIX: Fixed white backgroud color in SuRun's dialogs
 
