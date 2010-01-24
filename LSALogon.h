@@ -7,6 +7,8 @@ HANDLE LogonAsAdmin(LPTSTR UserName,LPTSTR p);
 
 void RestoreUserPasswords();
 void DeleteTempAdminTokens();
+void DeleteTempAdminToken(HANDLE hToken);
+void DeleteTempAdminToken(LPTSTR UserName);
 HANDLE GetTempAdminToken(LPTSTR UserName);
 
 HANDLE GetAdminToken(DWORD SessionID);
