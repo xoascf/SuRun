@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "helpers.h"
 #include "IsAdmin.h"
+#include "LSALogon.h"
 #include "service.h"
 #include "setup.h"
 #include "resstr.h"
@@ -77,6 +78,7 @@ DWORD WINAPI TSAThreadProc(void* p)
       if ((_winmajor<6)&& OpenProcessToken(hProc,TOKEN_ALL_ACCESS,&hToken))
       {
         SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
+        DeleteTempAdminToken(hToken);
         TerminateAllSuRunnedProcesses(hToken);
         SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
         CloseHandle(hToken);

@@ -336,6 +336,26 @@ public:
     m_Tokens[m_nTokens]=Token;
     m_nTokens++;
   }
+  void Remove(LPTSTR UserName)
+  {
+    LPTSTR n=m_UserNames;
+    for (DWORD i=0;i<m_nTokens;i++,n+=_tcslen(n)+1)
+    {
+      if (_tcsicmp(n,UserName)==0)
+      {
+        HANDLE hToken=m_Tokens[i];
+        if ((i+1)<m_nTokens)
+        {
+          LPTSTR m=n+_tcslen(n)+1;
+          memmove(n,m,_msize(m_UserNames)+n-m);
+          memmove(&m_Tokens[i],&m_Tokens[i+1],sizeof(HANDLE)*(m_nTokens-i));
+        }else
+          *n=NULL;
+        m_nTokens--;
+        CloseHandle(hToken);
+      }
+    }
+  }
   void RemoveAll()
   {
     free(m_UserNames);
@@ -353,6 +373,18 @@ protected:
 };
 
 static CTokenList g_Tokens;
+
+void DeleteTempAdminToken(LPTSTR UserName)
+{
+  g_Tokens.Remove(UserName);
+}
+
+void DeleteTempAdminToken(HANDLE hToken)
+{
+  TCHAR un[UNLEN+DNLEN+2];
+  GetTokenUserName(hToken,un);
+  DeleteTempAdminToken(un);
+}
 
 void DeleteTempAdminTokens()
 {
