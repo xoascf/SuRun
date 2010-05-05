@@ -67,12 +67,10 @@ HINSTANCE   l_hInst     = NULL;
 TCHAR       l_User[514] = {0};
 BOOL        l_bSetHook  = TRUE;
 DWORD       l_Groups    = 0;
+HANDLE      l_InitThread= 0;
 
 #define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
 #define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
-
-UINT        WM_SYSMH0   = -2;
-UINT        WM_SYSMH1   = -2;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -152,6 +150,8 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 	*ppvOut = NULL;
   if (IsEqualIID(rclsid, CLSID_ShellExtension)) 
   {
+    if (l_InitThread)
+        WaitForSingleObject(l_InitThread,5000);
     CShellExtClassFactory *pcf = new CShellExtClassFactory;
     return pcf->QueryInterface(riid, ppvOut);
   }
@@ -706,7 +706,9 @@ STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 
 LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
 { 
-  BOOL noCPL=HideSuRun(l_User,l_Groups);
+  if (l_InitThread)
+      WaitForSingleObject(l_InitThread,5000);
+  static BOOL noCPL=HideSuRun(l_User,l_Groups);
   switch (uMsg) 
   { 
   case CPL_INIT:
@@ -736,7 +738,7 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
       GetSystemWindowsDirectory(fSuRunExe,4096);
       PathAppend(fSuRunExe,L"SuRun.exe");
       PathQuoteSpaces(fSuRunExe);
-      ShellExecute(hwnd,L"open",fSuRunExe,L"/Setup",0,SW_SHOW);
+      HINSTANCE h=ShellExecute(hwnd,L"open",fSuRunExe,L"/Setup",0,SW_SHOWNORMAL);
       return 0;
     }
   } 
@@ -837,6 +839,8 @@ VOID APIENTRY SuRunLogoffUser(PWLX_NOTIFICATION_INFO Info)
 //////////////////////////////////////////////////////////////////////////////
 __declspec(dllexport) void InstallShellExt()
 {
+  if (l_InitThread)
+      WaitForSingleObject(l_InitThread,5000);
   if(GetUseIShExHook)
   {
     //Vista: Enable IShellExecHook
@@ -873,6 +877,8 @@ __declspec(dllexport) void InstallShellExt()
 
 __declspec(dllexport) void RemoveShellExt()
 {
+  if (l_InitThread)
+      WaitForSingleObject(l_InitThread,5000);
   //Clean up:
   //Vista: Disable ShellExecHook?
   if (GetOption(L"DelIShellExecHookEnable",0)!=0)
@@ -896,7 +902,6 @@ __declspec(dllexport) void RemoveShellExt()
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
-static HANDLE l_InitThread=0;
 DWORD WINAPI InitProc(void* p)
 {
   __try
@@ -959,6 +964,7 @@ DWORD WINAPI InitProc(void* p)
           LoadHooks();
       }
     }
+    l_InitThread=0;
   }__except(GetExceptionCode()==EXCEPTION_ACCESS_VIOLATION)
   {
     extern BOOL g_IATInit;

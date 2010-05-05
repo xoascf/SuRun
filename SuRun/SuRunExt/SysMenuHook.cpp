@@ -48,12 +48,14 @@ HHOOK       g_hookMenu  = NULL;
 extern HINSTANCE l_hInst; //the local Dll instance
 extern TCHAR     l_User[514];  //the Process user Name
 extern DWORD     l_Groups;
+extern HANDLE    l_InitThread;
 #define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
 #define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
 
 
-extern UINT      WM_SYSMH0;
-extern UINT      WM_SYSMH1;
+UINT        WM_SYSMH0   = -2;
+UINT        WM_SYSMH1   = -2;
+
 
 BOOL g_IsShell=-1;
 BOOL IsShell()
@@ -109,6 +111,8 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if(nCode>=0)
   {
+    if (l_InitThread)
+        WaitForSingleObject(l_InitThread,5000);
     if (WM_SYSMH0==-2)
       WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     if (WM_SYSMH1==-2)
@@ -206,6 +210,8 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
 __declspec(dllexport) BOOL InstallSysMenuHook()
 {
   DBGTrace2("InstallSysMenuHook init (%x,%x)",g_hookShell,g_hookMenu);
+  if (l_InitThread)
+      WaitForSingleObject(l_InitThread,5000);
   if((g_hookShell!=NULL)||(g_hookMenu!=NULL))
     UninstallSysMenuHook();
   if((g_hookShell!=NULL)||(g_hookMenu!=NULL))
@@ -226,6 +232,8 @@ __declspec(dllexport) BOOL InstallSysMenuHook()
 __declspec(dllexport) BOOL UninstallSysMenuHook()
 {
   DBGTrace2("UninstallSysMenuHook init (%x,%x)",g_hookShell,g_hookMenu);
+  if (l_InitThread)
+      WaitForSingleObject(l_InitThread,5000);
   BOOL bRet=TRUE;
   if (g_hookShell)
     bRet&=(UnhookWindowsHookEx(g_hookShell)!=0);
