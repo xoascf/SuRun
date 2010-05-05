@@ -1,5 +1,6 @@
 Done, to be tested:
 ---------------------------
+* SuRunExtDll export functions wait for Initproc to be done
 
 ToDo:
 ---------------------

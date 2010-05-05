@@ -819,12 +819,18 @@ TryAgain:
               WriteProcessMemory(pi.hProcess,&g_CliIsAdmin,&g_CliIsAdmin,sizeof(g_CliIsAdmin),&N);
               if (!g_RunData.bRunAs)
               {
-                HANDLE hTok=GetTempAdminToken(g_RunData.UserName);
+                HANDLE hTok=0;
+                if (g_RunData.Groups&IS_IN_ADMINS)
+                  hTok=GetProcessUserToken(g_RunData.CliProcessId);
+                else
+                  hTok=GetTempAdminToken(g_RunData.UserName);
                 TOKEN_STATISTICS tstat={0};
                 if (hTok)
                 {
                   DWORD n=0;
                   CHK_BOOL_FN(GetTokenInformation(hTok,TokenStatistics,&tstat,sizeof(tstat),&n));
+                  if (g_RunData.Groups&IS_IN_ADMINS)
+                    CloseHandle(hTok);
                 }
                 WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&N);
               }
