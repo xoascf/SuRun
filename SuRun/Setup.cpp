@@ -1543,9 +1543,9 @@ void SetRecommendedSettings()
   CheckDlgButton(h,IDC_ASKPW,0);
   SetDlgItemInt(h,IDC_ASKTIMEOUT,0,0);
   ComboBox_SetCurSel(GetDlgItem(h,IDC_WARNADMIN),APW_NR_SR_ADMIN);
-  CheckDlgButton(h,IDC_CTRLASADMIN,IsWin7==0);
+  CheckDlgButton(h,IDC_CTRLASADMIN,1/*IsWin7==0*/);
   CheckDlgButton(h,IDC_CMDASADMIN,0);
-  CheckDlgButton(h,IDC_EXPASADMIN,IsWin7==0);
+  CheckDlgButton(h,IDC_EXPASADMIN,1/*IsWin7==0*/);
   CheckDlgButton(h,IDC_RESTARTADMIN,1);
   CheckDlgButton(h,IDC_STARTADMIN,0);
   EnableWindow(GetDlgItem(h,IDC_FADEDESKTOP),!IsWin2k);
@@ -1640,13 +1640,13 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-      if (IsWin7)
-      {
-        SetCtrlAsAdmin(0);
-        SetExpAsAdmin(0);
-        EnableWindow(GetDlgItem(hwnd,IDC_CTRLASADMIN),false);
-        EnableWindow(GetDlgItem(hwnd,IDC_EXPASADMIN),false);
-      }
+//      if (IsWin7)
+//      {
+//        SetCtrlAsAdmin(0);
+//        SetExpAsAdmin(0);
+//        EnableWindow(GetDlgItem(hwnd,IDC_CTRLASADMIN),false);
+//        EnableWindow(GetDlgItem(hwnd,IDC_EXPASADMIN),false);
+//      }
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
       EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k)&&GetBlurDesk);

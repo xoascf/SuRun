@@ -123,6 +123,22 @@ BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,BOOL bFlush/*=FALSE*/)
   return FALSE;
 }
 
+BOOL RegRenameVal(HKEY HK,LPCTSTR SubKey,LPCTSTR OldName,LPCTSTR NewName)
+{
+  BYTE* v=0;
+  DWORD n=0;
+  DWORD t=0;
+  BOOL bOk=GetRegAnyAlloc(HK,SubKey,OldName,&t,&v,&n);
+  if (bOk)
+  {
+    bOk=SetRegAny(HK,SubKey,NewName,t,v,n);
+    if (bOk)
+      bOk=RegDelVal(HK,SubKey,OldName);
+    free(v);
+  }
+  return bOk;
+}
+
 DWORD GetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Default)
 {
   DWORD RetVal=Default;

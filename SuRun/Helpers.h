@@ -46,6 +46,8 @@ BOOL DelRegKey(HKEY hKey,LPTSTR pszSubKey);
 BOOL DelRegKeyChildren(HKEY hKey,LPTSTR pszSubKey);
 BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,BOOL bFlush=FALSE);
 
+BOOL RegRenameVal(HKEY HK,LPCTSTR SubKey,LPCTSTR OldName,LPCTSTR NewName);
+
 BOOL SetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Value);
 DWORD GetRegInt(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Default);
 
