@@ -536,7 +536,7 @@ PACL SetAdminDenyUserAccess(PACL pOldDACL,PSID UserSID,DWORD Permissions/*=SYNCH
   if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
     DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
   {
-    DBGTrace1( "GetEffectiveRightsFromAcl failed %s", GetLastErrorNameStatic());
+    DBGTrace1( "AllocateAndInitializeSid failed %s", GetLastErrorNameStatic());
     return 0; 
   }
   // Initialize EXPLICIT_ACCESS structures
