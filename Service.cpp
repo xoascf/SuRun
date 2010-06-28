@@ -1306,45 +1306,6 @@ DWORD LSAStartAdminProcess()
       TCHAR WinstaDesk[MAX_PATH];
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
-      //Special handling for Explorer:
-      BOOL orgSP=1;
-      BOOL bIsExplorer=FALSE;
-      {
-        TCHAR app[MAX_PATH]={0};
-        GetSystemWindowsDirectory(app,MAX_PATH);
-        PathAppend(app,_T("explorer.exe"));
-        TCHAR cmd[MAX_PATH]={0};
-        _tcscpy(cmd,g_RunData.cmdLine);
-        PathRemoveArgs(cmd);
-        PathUnquoteSpaces(cmd);
-        bIsExplorer=_tcsicmp(cmd,app)==0;
-      }
-      if(bIsExplorer)
-      {
-        //Before Vista: kill Desktop Proxy
-        if (_winmajor<6)
-        {
-          //To start control Panel and other Explorer children we need to tell 
-          //Explorer to open folders in a new proecess
-          orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
-          if(!orgSP)
-            SetSeparateProcess((HKEY)ProfInf.hProfile,1);
-          //Messages work on the same WinSta/Desk only
-          SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
-          //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
-          //Explorer.exe, this will cause a new Explorer.exe to stay running
-          EnumWindows(KillProxyDesktopEnum,0);
-        }
-        else //Vista and newer, use "/separate" command line option
-        {
-          TCHAR cmd[MAX_PATH]={0};
-          _tcscpy(cmd,g_RunData.cmdLine);
-          PathRemoveArgs(cmd);
-          _tcscat(cmd,_T(" /SEPARATE, "));
-          _tcscat(cmd,PathGetArgs(g_RunData.cmdLine));
-          _tcscpy(g_RunData.cmdLine,cmd);
-        }
-      }
       if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
           CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
       {
@@ -1358,6 +1319,48 @@ DWORD LSAStartAdminProcess()
           SetAdminDenyUserAccess(pi.hThread,ShellSID);
           free(ShellSID);
           CloseHandle(hShell);
+        }
+        //Special handling for Explorer:
+        BOOL orgSP=1;
+        BOOL bIsExplorer=FALSE;
+        {
+          TCHAR app[MAX_PATH]={0};
+          GetSystemWindowsDirectory(app,MAX_PATH);
+          PathAppend(app,_T("explorer.exe"));
+          TCHAR cmd[MAX_PATH]={0};
+          _tcscpy(cmd,g_RunData.cmdLine);
+          PathRemoveArgs(cmd);
+          PathUnquoteSpaces(cmd);
+          bIsExplorer=_tcsicmp(cmd,app)==0;
+        }
+        if(bIsExplorer)
+        {
+          //Before Vista: kill Desktop Proxy
+          if (_winmajor<6)
+          {
+            //To start control Panel and other Explorer children we need to tell 
+            //Explorer to open folders in a new proecess
+            orgSP=GetSeparateProcess((HKEY)ProfInf.hProfile);
+            if(!orgSP)
+              SetSeparateProcess((HKEY)ProfInf.hProfile,1);
+            //Messages work on the same WinSta/Desk only
+            SetProcWinStaDesk(g_RunData.WinSta,g_RunData.Desk);
+            //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
+            //Explorer.exe, this will cause a new Explorer.exe to stay running
+            EnumWindows(KillProxyDesktopEnum,0);
+          }
+          else //Vista and newer, use "/separate" command line option
+          {
+            TCHAR cmd[MAX_PATH]={0};
+            _tcscpy(cmd,g_RunData.cmdLine);
+            PathRemoveArgs(cmd);
+            _tcscat(cmd,_T(" /SEPARATE, "));
+            _tcscat(cmd,PathGetArgs(g_RunData.cmdLine));
+            _tcscpy(g_RunData.cmdLine,cmd);
+            //Win7: Set HKCR\AppID\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}\RunAs:
+            if (IsWin7)
+              RegRenameVal(HKCR,L"AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}",L"RunAs",L"_RunAs");
+          }
         }
         ResumeThread(pi.hThread);
         if(bIsExplorer)
@@ -1375,7 +1378,10 @@ DWORD LSAStartAdminProcess()
               && pid && EnumWindows(KillProxyDesktopEnum,(LPARAM)&pid)
               && (WaitForSingleObject(pi.hProcess,100)==WAIT_TIMEOUT))
               ;
-          }
+            if(!orgSP)
+              SetSeparateProcess((HKEY)ProfInf.hProfile,0);
+          }else if (IsWin7) //Restore original RunAs:
+            RegRenameVal(HKCR,L"AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}",L"_RunAs",L"RunAs");
         }
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
@@ -1403,8 +1409,6 @@ DWORD LSAStartAdminProcess()
           ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
-      if(bIsExplorer && (!orgSP))
-        SetSeparateProcess((HKEY)ProfInf.hProfile,0);
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
@@ -1823,7 +1827,7 @@ void InstallRegistry()
     //MSP Apply
     SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
     SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
-    if (!IsWin7)
+    //if (!IsWin7)
     {
       //Control Panel
       SetRegStr(HKCR,CPLREG,L"",MenuStr);

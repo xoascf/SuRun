@@ -454,7 +454,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   {
     if(m_pDeskClicked)
     {
-      if ((!IsWin7)&&(GetCtrlAsAdmin))
+      if (/*(!IsWin7)&&*/(GetCtrlAsAdmin))
       {
         //right click target is folder background
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
@@ -465,7 +465,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
     if(m_ClickFolderName[0])
     {
       BOOL bCmd=GetCmdAsAdmin;
-      BOOL bExp=(!IsWin7)&& GetExpAsAdmin;
+      BOOL bExp=/*(!IsWin7)&&*/ GetExpAsAdmin;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       //right click target is folder background
