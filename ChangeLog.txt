@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* Windows 7 Explorer can be launched with admin rights by cheating the registry
+  (AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}","RunAs") THANKS to Junne!!!
 * SuRunExtDll export functions wait for Initproc to be done
 
 ToDo:
