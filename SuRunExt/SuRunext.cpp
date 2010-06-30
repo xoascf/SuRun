@@ -444,6 +444,20 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   return NOERROR;
 }
 
+UINT CompareMenuItemText(HMENU m,int pos,LPCTSTR Text)
+{
+  TCHAR s[MAX_PATH];
+  return GetMenuString(m,pos,s,MAX_PATH-1,MF_BYPOSITION)?_tcsicmp(s,Text):-1;
+}
+
+int FindMenuItem(HMENU m,LPCTSTR Text)
+{
+  for (int i=0;i<GetMenuItemCount(m);i++)
+    if (CompareMenuItemText(m,i,Text)==0)
+      return i;
+  return -1;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // IContextMenu
 //////////////////////////////////////////////////////////////////////////////
@@ -456,24 +470,30 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
     {
       if (/*(!IsWin7)&&*/(GetCtrlAsAdmin))
       {
-        //right click target is folder background
-        InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, CResStr(l_hInst,IDS_SURUN));
-        InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+        CResStr s(l_hInst,IDS_SURUN);
+        if (FindMenuItem(hMenu,s)<0)
+        {
+          //right click target is folder background
+          InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+          InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
+          InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
+        }
       }
     }else
     if(m_ClickFolderName[0])
     {
-      BOOL bCmd=GetCmdAsAdmin;
-      BOOL bExp=/*(!IsWin7)&&*/ GetExpAsAdmin;
+      CResStr sCmd(l_hInst,IDS_SURUNCMD);
+      CResStr sExp(l_hInst,IDS_SURUNEXP);
+      BOOL bCmd=GetCmdAsAdmin && (FindMenuItem(hMenu,sCmd)<0);
+      BOOL bExp=/*(!IsWin7)&&*/ GetExpAsAdmin && (FindMenuItem(hMenu,sExp)<0);
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       //right click target is folder background
       if (bCmd)
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNCMD));
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, sCmd);
       id++;
       if (bExp)
-        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, CResStr(l_hInst,IDS_SURUNEXP));
+        InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id, sExp);
       id++;
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
