@@ -984,7 +984,7 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
   //The DLL must not be unloaded while the process is running!
   if (hLibModule==l_hInst)
   {
-    if (g_IATInit)
+    //if (g_IATInit)
     {
       SetLastError(NOERROR);
       return true;
@@ -998,7 +998,7 @@ BOOL WINAPI FreeLib(HMODULE hLibModule)
 VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 {
   //The DLL must not be unloaded while the process is running!
-  if ((!g_IATInit) || (hLibModule!=l_hInst))
+  if (/*(!g_IATInit) || */(hLibModule!=l_hInst))
   {
     if (((lpFreeLibraryAndExitThread)hkFrLibXT.OrgFunc()))
       ((lpFreeLibraryAndExitThread)hkFrLibXT.OrgFunc())(hLibModule,dwExitCode);
@@ -1044,6 +1044,12 @@ void LoadHooks()
   if (g_IATInit)
     return;
   orgGPA=GetProcAddress;
+  {
+    //Increase Dll load count
+    char fmod[MAX_PATH]={0};
+    GetModuleFileNameA(0,fmod,MAX_PATH);
+    ((lpLoadLibraryA)hkLdLibA.OrgFunc())(fmod);
+  }
   InitializeCriticalSectionAndSpinCount(&g_HookCs,0x80000000);
   g_IATInit=TRUE;
   if (!GetUseIATHook)

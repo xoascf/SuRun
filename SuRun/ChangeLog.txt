@@ -32,6 +32,14 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.0.9 Beta12 - 2010-06-30
+---------------------------------
+* SuRuns Context Menu Extension add it's items only once. When righ clicking 
+  the folder tree in Win7 Explorer calls the extension twice, one time for the 
+  folder and one time for the folder background.
+* IAT-Hook explicitly loads SuRunExt.dll to avoid unloading the Dll too early.
+  In Win7 x64 a call to LoadLibW() in Unloaded_SuRunExt.dll GPFed.
+
 SuRun 1.2.0.9 Beta11 - 2010-06-28
 ---------------------------------
 * Windows 7 Explorer can be launched with admin rights by cheating the registry
