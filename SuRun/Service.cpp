@@ -459,7 +459,7 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
     lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
     lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
   DWORD le=GetLastError();
-  if ((!bOK)&&((le==ERROR_ACCESS_DENIED)||(le==ERROR_DIRECTORY)))
+  if ((!bOK)&&((le==ERROR_ACCESS_DENIED)||(le==ERROR_DIRECTORY)||(le==ERROR_INVALID_PASSWORD)))
   {
     DBGTrace4("WARNING: CreateProcessAsUser(%s,%s,%s) failed: %s; SECOND TRY with Impersonation",
       lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
