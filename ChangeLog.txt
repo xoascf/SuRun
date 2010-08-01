@@ -4,6 +4,7 @@ Done, to be tested:
 ToDo:
 ---------------------
 * Hooks must directly write to Service pipe
+* on Win x64 detect x32 Executables on x64 hook (ShellExecute32->WoW->CreateProcess64)
 * On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.
 * Create Inline Hook instead of IAT-Hook
 * GUI for SwitchToUser
@@ -32,6 +33,10 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.0.9 Beta13 - 2010-07-21
+---------------------------------
+* SuRun's service tries to impersonate the user on ERROR_INVALID_PASSWORD
+
 SuRun 1.2.0.9 Beta12 - 2010-06-30
 ---------------------------------
 * SuRuns Context Menu Extension add it's items only once. When righ clicking 
