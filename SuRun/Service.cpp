@@ -459,9 +459,10 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
     lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
     lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
   DWORD le=GetLastError();
-  if ((!bOK)&&((le==ERROR_ACCESS_DENIED)||(le==ERROR_DIRECTORY)||(le==ERROR_INVALID_PASSWORD)))
+  //Second try: Admin user
+  if ((!bOK)&&((le==ERROR_ACCESS_DENIED)||(le==ERROR_DIRECTORY)))
   {
-    DBGTrace4("WARNING: CreateProcessAsUser(%s,%s,%s) failed: %s; SECOND TRY with Impersonation",
+    DBGTrace4("WARNING: CreateProcessAsUser(%s,%s,%s) failed: %s; Impersonating as Admin",
       lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
     //Impersonation required for EFS and CreateProcessAsUser
     ImpersonateLoggedOnUser(hToken);
@@ -470,14 +471,26 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     le=GetLastError();
     RevertToSelf();
-    if (!bOK)
-      DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
-        lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
-    SetLastError(le);
+  }
+  //Third try: Session User
+  if ((!bOK)&&((le==ERROR_ACCESS_DENIED)||(le==ERROR_DIRECTORY)||(le==ERROR_INVALID_PASSWORD)))
+  {
+    DBGTrace4("WARNING: CreateProcessAsUser(%s,%s,%s) failed: %s; Impersonating as User",
+      lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
+    //Impersonation required for EFS and CreateProcessAsUser
+    HANDLE hUser=GetSessionUserToken(g_RunData.SessionID);
+    ImpersonateLoggedOnUser(hUser);
+    bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
+      lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
+      lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
+    le=GetLastError();
+    RevertToSelf();
+    CloseHandle(hUser);
   }
   if (!bOK)
     DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
       lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
+  SetLastError(le);
   return bOK;
 }
 
