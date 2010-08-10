@@ -269,6 +269,7 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|x64"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -424,6 +425,7 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Debug|x64"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -483,6 +485,7 @@
 		</Configuration>
 		<Configuration
 			Name="x64 Unicode Release|Win32"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool

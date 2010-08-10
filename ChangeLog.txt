@@ -33,6 +33,11 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.0.9 Beta14 - 2010-08-04
+---------------------------------
+* If CreateProcessAsUser fails, SuRun's service impersonates first as Admin 
+  and if that fails too, it impersonates as logged on user
+
 SuRun 1.2.0.9 Beta13 - 2010-07-21
 ---------------------------------
 * SuRun's service tries to impersonate the user on ERROR_INVALID_PASSWORD
