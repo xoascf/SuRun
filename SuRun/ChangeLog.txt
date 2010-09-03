@@ -3,6 +3,7 @@ Done, to be tested:
 
 ToDo:
 ---------------------
+* on Windows Vista/7 use the elevated token istead of changing the password
 * Hooks must directly write to Service pipe
 * on Win x64 detect x32 Executables on x64 hook (ShellExecute32->WoW->CreateProcess64)
 * On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.
@@ -11,8 +12,6 @@ ToDo:
 * Create a "Default" SuRunner for users that are not in "SuRunners"
 * MAP network drives
 * Checksums for "Always Yes" programs
-* Windows 7 compatibility
-  Explorer is started via DCOM explorer.exe /FACTORY,{...
 * use IContextMenu2/IContextMenu to implement an Icon/Popup menu
 * Console SuRun support
 * LOG-File for SuRun activity
