@@ -1,7 +1,7 @@
 @echo off
 if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
 rem compile using VC6
-Set MSSDK=E:\MSTOOLS
+if "%MSSDK%"=="" SET MSSDK=E:\MSTOOLS
 SET VC6Dir=%MSDevDir%\..\..
 if "%VC6Dir%"=="\..\.." SET VC6Dir=E:\VStudio
 
