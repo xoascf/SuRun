@@ -4,6 +4,7 @@ Done, to be tested:
 ToDo:
 ---------------------
 * on Windows Vista/7 use the elevated token istead of changing the password
+* make Tray Windows for automagically started apps configurable
 * Hooks must directly write to Service pipe
 * on Win x64 detect x32 Executables on x64 hook (ShellExecute32->WoW->CreateProcess64)
 * On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.
