@@ -200,8 +200,9 @@ void DelTmpFiles()
   PathRemoveBackslash(tmp);
   PathAppend(tmp,"SuRunInst");
   PathUnquoteSpaces(tmp);
-  sprintf(s,"cmd.exe /c rd /s /q %s",tmp);
-  SetRegStr(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce","Delete SuRunInst",s);
+  //sprintf(s,"cmd.exe /c rd /s /q %s",tmp);
+  sprintf(s,"%%SystemRoot%%\\System32\\RunDll32.Exe %%SystemRoot%%\\System32\\AdvPack.Dll,DelNodeRunDLL32 \"%s\"",tmp);
+  SetRegStr(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce","Clean_SuRunInst_tmp",s);
 }
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
