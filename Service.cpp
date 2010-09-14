@@ -1021,7 +1021,7 @@ DWORD PrepareSuRun()
   BOOL PwExpired=PasswordExpired(g_RunData.UserName);
   BOOL NoNeedPw=g_AdminTStat.AuthenticationId.HighPart||g_AdminTStat.AuthenticationId.LowPart;
   //Ask For Password?
-  BOOL PwOk=GetSavePW &&(!PwExpired) && NoNeedPw;
+  BOOL PwOk=GetSavePW && (!PwExpired) && NoNeedPw;
   DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
   bool bNotInList=f==-1;
   if(bNotInList)
@@ -1068,10 +1068,10 @@ DWORD PrepareSuRun()
       return RETVAL_CANCELLED;
     if (!g_CliIsInSuRunners)
     {
-      PwOk=GetSavePW &&(!PasswordExpired(g_RunData.UserName));
+      PwOk=GetSavePW && (!PasswordExpired(g_RunData.UserName));
       g_RunData.Groups|=IS_IN_SURUNNERS;
     }
-    //Testing if User is restricted is already done in Service Main
+    //Testing if User is restricted has already been done in Service Main
     DWORD l=0;
     //if Shell executes unknown app ask for AutoMagic, else ask for permission
     int IDSMsg=(g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK;
@@ -1085,8 +1085,9 @@ DWORD PrepareSuRun()
         {
           UpdLastRunTime(g_RunData.UserName);
           DeleteSafeDesktop(FALSE);
-          if(!NoNeedPw)
+          if(!NoNeedPw)//Only if we don't have the admin Token:
           {
+            //Save the password for unse in ServiceMain:
             SavePassword(g_RunData.UserName,g_RunPwd);
             HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
             DWORD n=0;
@@ -1102,9 +1103,10 @@ DWORD PrepareSuRun()
       }
       l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
           IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
-      if((!NoNeedPw)&&(l&1))
+      if((!NoNeedPw)&&(l&1))//Only if we don't have the admin Token:
       {
         PwOk=TRUE;
+        //Save the password for unse in ServiceMain:
         SavePassword(g_RunData.UserName,g_RunPwd);
         HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
         DWORD n=0;
@@ -2298,6 +2300,7 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       int CtlId=GetDlgCtrlID((HWND)lParam);
       if ((CtlId==IDC_QUESTION)||(CtlId==IDC_SECICON))
       {
+        SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
         SetBkMode((HDC)wParam,TRANSPARENT);
         return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
       }

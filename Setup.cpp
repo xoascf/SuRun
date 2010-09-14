@@ -27,6 +27,7 @@
 #include "Setup.h"
 #include "Helpers.h"
 #include "BlowFish.h"
+//ToDo: #include <wincrypt.h>
 #include "ResStr.h"
 #include "UserGroups.h"
 #include "lsa_laar.h"
@@ -49,6 +50,7 @@ static BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,
 
 void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
+  //ToDo: use Impersonation and CryptUnprotectData()
   CBlowFish bf;
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
   if (GetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
@@ -63,6 +65,7 @@ void DeletePassword(LPTSTR UserName)
 
 void SavePassword(LPTSTR UserName,LPTSTR Password)
 {
+  //ToDo: use Impersonation and CryptProtectData()
   CBlowFish bf;
   TCHAR pw[PWLEN];
   bf.Initialize(KEYPASS,sizeof(KEYPASS));
@@ -494,6 +497,7 @@ INT_PTR CALLBACK SelUserDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }
     return FALSE;
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -606,6 +610,7 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }
     return TRUE;
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -718,6 +723,7 @@ INT_PTR CALLBACK BlkLstDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }
     return TRUE;
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -1436,6 +1442,7 @@ INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     }
     return TRUE;
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -1680,6 +1687,7 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -1816,6 +1824,7 @@ INT_PTR CALLBACK SetupDlg2Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     }
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -2147,6 +2156,7 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
@@ -2256,6 +2266,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));

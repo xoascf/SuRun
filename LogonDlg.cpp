@@ -513,16 +513,21 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       int CtlId=GetDlgCtrlID((HWND)lParam);
       if ((CtlId==IDC_DLGQUESTION)||(CtlId==IDC_SECICON))
       {
+        SetTextColor((HDC)wParam,GetSysColor(COLOR_BTNTEXT));
         SetBkMode((HDC)wParam,TRANSPARENT);
         return (BOOL)PtrToUlong(GetSysColorBrush(COLOR_3DHILIGHT));
       }
       if ((CtlId==IDC_HINT)||(CtlId==IDC_SECICON1))
       {
+        SetTextColor((HDC)wParam,RGB(0,0,0));
         SetBkMode((HDC)wParam,TRANSPARENT);
         return (BOOL)PtrToUlong(g_HintBrush);
       }
       if (CtlId==IDC_HINTBK)
+      {
+        SetTextColor((HDC)wParam,RGB(0,0,0));
         return (BOOL)PtrToUlong(g_HintBrush);
+      }
       break;
     }
   case WM_TIMER:
