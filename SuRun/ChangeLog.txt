@@ -1,5 +1,7 @@
 Done, to be tested:
 ---------------------------
+* FIX: When using the black high contrast theme, in some of SuRun's windows no 
+  text was visible.
 
 ToDo:
 ---------------------

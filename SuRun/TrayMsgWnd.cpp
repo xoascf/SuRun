@@ -216,6 +216,7 @@ LRESULT CALLBACK CTrayMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
     }
     return 0;
   case WM_CTLCOLORSTATIC:
+    SetTextColor((HDC)wParam,GetSysColor(COLOR_WINDOWTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
   case WM_CTLCOLORDLG:
     return (DWORD_PTR)m_bkBrush;
