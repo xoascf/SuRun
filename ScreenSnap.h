@@ -86,36 +86,13 @@ inline void BlurBright(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
     }
 }
 
-//Globals: (for better speed!)
-static BITMAPINFO g_bmi32={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
-
-inline HBITMAP Blur(HBITMAP hbm,DWORD w,DWORD h)
+inline HBITMAP CreateDIB(HDC dc,int w,int h,void** Bits)
 {
-  HBITMAP hbbm=0;
-  g_bmi32.bmiHeader.biHeight=h;
-  g_bmi32.bmiHeader.biWidth=w;
-  g_bmi32.bmiHeader.biSizeImage=((((w+3)/4)*4)*((h+3)/4)*4)*4;
-  COLORREF* pSrc=(COLORREF*)malloc(g_bmi32.bmiHeader.biSizeImage); 
-  if (pSrc==NULL)
-    return 0;
-  HDC DC=GetDC(0);
-  if(!GetDIBits(DC,hbm,0,h,pSrc,&g_bmi32,DIB_RGB_COLORS))
-  {
-    ReleaseDC(0,DC);
-    free(pSrc);
-    return hbbm;
-  }
-  COLORREF* pDst=(COLORREF*)calloc(g_bmi32.bmiHeader.biSizeImage,1);
-  if (pDst!=NULL)
-  {
-    Blur(pDst,pSrc,w,h);
-    hbbm=CreateCompatibleBitmap(DC,w,h);
-    SetDIBits(DC,hbbm,0,w,pDst,&g_bmi32,DIB_RGB_COLORS);
-    free(pDst);
-  }
-  ReleaseDC(0,DC);
-  free(pSrc);
-  return hbbm;
+  BITMAPINFO bmi={{sizeof(BITMAPINFOHEADER),0,0,1,32,0,0,0,0},0};
+  bmi.bmiHeader.biHeight=h;
+  bmi.bmiHeader.biWidth=w;
+  bmi.bmiHeader.biSizeImage=w*h*4;
+  return CreateDIBSection(dc,&bmi,DIB_RGB_COLORS,Bits,NULL,0);
 }
 
 class CBlurredScreen
@@ -129,7 +106,9 @@ public:
     m_y=0;
     m_dx=0;
     m_dy=0;
+    m_pbmBits=0;
     m_bm=0;
+    m_pblurbmBits=0;
     m_blurbm=0;
     m_Thread=NULL;
     timeBeginPeriod(1);
@@ -148,11 +127,12 @@ public:
     m_dy=GetSystemMetrics(SM_CYVIRTUALSCREEN);
     HDC dc=GetDC(0);
     HDC MemDC=CreateCompatibleDC(dc);
-    m_bm=CreateCompatibleBitmap(dc,m_dx,m_dy);
+    m_bm=CreateDIB(dc,m_dx,m_dy,&m_pbmBits);
     (HBITMAP)SelectObject(MemDC,m_bm);
     BitBlt(MemDC,0,0,m_dx,m_dy,dc,m_x,m_y,SRCCOPY|CAPTUREBLT);
     DeleteDC(MemDC);
     ReleaseDC(0,dc);
+    GdiFlush();
   }
   void Done()
   {
@@ -214,10 +194,15 @@ public:
       m_hWnd=0;
       if (m_bm)
       {
-        m_blurbm=Blur(m_bm,m_dx,m_dy);
+        HDC dc=GetDC(0);
+        m_blurbm=CreateDIB(dc,m_dx,m_dy,&m_pblurbmBits);
+        ReleaseDC(0,dc);
+        GdiFlush();
+        Blur((COLORREF*)m_pblurbmBits,(COLORREF*)m_pbmBits,m_dx,m_dy);
         DeleteObject(m_bm);
         InvalidateRect(m_hWndTrans,0,true);
       }
+      m_pbmBits=0;
       m_bm=0;
     }
     MsgLoop();
@@ -261,7 +246,11 @@ private:
     Sleep(200);
     CBlurredScreen* bs=(CBlurredScreen*)p;  
     SetThreadDesktop(bs->m_hDesk);
-    bs->m_blurbm=Blur(bs->m_bm,bs->m_dx,bs->m_dy);
+    HDC dc=GetDC(0);
+    bs->m_blurbm=CreateDIB(dc,bs->m_dx,bs->m_dy,&bs->m_pblurbmBits);
+    ReleaseDC(0,dc);
+    GdiFlush();
+    Blur((COLORREF*)bs->m_pblurbmBits,(COLORREF*)bs->m_pbmBits,bs->m_dx,bs->m_dy);
     SetLayeredWindowAttributes(bs->m_hWndTrans,0,0,LWA_ALPHA);
     RedrawWindow(bs->m_hWndTrans,0,0,RDW_INTERNALPAINT|RDW_UPDATENOW);
     DWORD StartTime=timeGetTime();
@@ -326,7 +315,9 @@ private:
   int m_y;
   int m_dx;
   int m_dy;
+  void* m_pbmBits;
   HBITMAP m_bm;
+  void* m_pblurbmBits;
   HBITMAP m_blurbm;
   HANDLE m_Thread;
   HDESK m_hDesk;
