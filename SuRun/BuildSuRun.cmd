@@ -1,6 +1,8 @@
 @echo off
-if NOT "%MSDevDir%"=="" goto VC6compile
+if NOT "%VS100COMNTOOLS%"=="" goto VC10compile
+if NOT "%VS90COMNTOOLS%"=="" goto VC9compile
 if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
+if NOT "%MSDevDir%"=="" goto VC6compile
 
 rem compile using VC6
 :VC6compile
@@ -30,13 +32,17 @@ type %TMP%\SuRun32.log
 del %TMP%\SuRun32.log 1>NUL 2>NUL
 goto Done
 
-rem compile using VC8 (2005)
+rem compile using VC8 (2005), VC9 (2008) or VC10 (2010)
 :VC8compile
+:VC9compile
+:VC10compile
 SETLOCAL
-call "%VS80COMNTOOLS%vsvars32.bat"
-"%DevEnvDir%\devenv" /rebuild "x64 Unicode Release|x64" "SuRun.sln"
-"%DevEnvDir%\devenv" /rebuild "SuRun32 Unicode Release|Win32" "SuRun.sln"
-"%DevEnvDir%\devenv" /rebuild "Unicode Release|Win32" "SuRun.sln"
+if NOT "%VS100COMNTOOLS%"=="" call "%VS100COMNTOOLS%vsvars32.bat"
+if NOT "%VS90COMNTOOLS%"=="" call "%VS90COMNTOOLS%vsvars32.bat"
+if NOT "%VS80COMNTOOLS%"=="" call "%VS80COMNTOOLS%vsvars32.bat"
+msbuild SuRun.sln /t:Rebuild /p:Configuration="x64 Unicode Release" /p:Platform=x64
+msbuild SuRun.sln /t:Rebuild /p:Configuration="SuRun32 Unicode Release" /p:Platform=Win32
+msbuild SuRun.sln /t:Rebuild /p:Configuration="Unicode Release" /p:Platform=Win32
 ENDLOCAL
 
 :Done
