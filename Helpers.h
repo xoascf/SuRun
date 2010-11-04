@@ -122,6 +122,8 @@ DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID=-1);
 //GetProcessName
 BOOL GetProcessName(DWORD PID,LPTSTR ProcessName);
 
+//GetProcessUserToken
+HANDLE GetProcessUserToken(DWORD ProcId);
 //Shell stuff
 HANDLE GetShellProcessToken();
 
@@ -186,6 +188,36 @@ public:
     }
   }
   ~CImpersonateSessionUser()
+  {
+    if (m_Token)
+    {
+      RevertToSelf();
+      CloseHandle(m_Token);
+    }
+  }
+protected:
+  HANDLE m_Token;
+};
+
+// CImpersonateProcessUser
+class CImpersonateProcessUser
+{
+public:
+  CImpersonateProcessUser(DWORD ProcessID)
+  {
+    m_Token=0;
+    if(ProcessID)
+      m_Token=GetProcessUserToken(ProcessID);
+    if(m_Token)
+    {
+      if (!ImpersonateLoggedOnUser(m_Token))
+      {
+        CloseHandle(m_Token);
+        m_Token=0;
+      }
+    }
+  }
+  ~CImpersonateProcessUser()
   {
     if (m_Token)
     {

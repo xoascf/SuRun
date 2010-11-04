@@ -79,7 +79,7 @@ BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** Re
   DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_READ),&Key);
   if (dwRes==ERROR_SUCCESS)
   {
-    if ((RegQueryValueEx(Key,ValName,NULL,Type,0,nBytes)==ERROR_SUCCESS)&& nBytes)
+    if ((RegQueryValueEx(Key,ValName,NULL,Type,0,nBytes)==ERROR_SUCCESS)&& (*nBytes))
     {
       *RetVal=(BYTE*)malloc(*nBytes);
       if(*RetVal)
@@ -1478,6 +1478,33 @@ DWORD UserIsInSuRunnersOrAdmins()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// 
+//  GetProcessUserToken
+// 
+//////////////////////////////////////////////////////////////////////////////
+HANDLE GetProcessUserToken(DWORD ProcId)
+{
+  EnablePrivilege(SE_DEBUG_NAME);
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
+  if (!hProc)
+  {
+    DBGTrace2("OpenProcess(%d) failed: %s",ProcId,GetLastErrorNameStatic());
+    return 0;
+  }
+  // Open impersonation token for process
+  HANDLE hToken=NULL;
+  CHK_BOOL_FN(OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
+                                     |TOKEN_ASSIGN_PRIMARY,&hToken));
+  CloseHandle(hProc);
+  if(!hToken)
+    return 0;
+  HANDLE hUser=0;
+  CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
+                                TokenPrimary,&hUser)); 
+  return CloseHandle(hToken),hUser;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 //
 //  GetSessionUserToken
 //
@@ -1518,19 +1545,7 @@ HANDLE GetSessionUserToken(DWORD SessID)
     if (!ShellID)
       return 0;
     //We got the Shells Process ID, now get the user token
-    EnablePrivilege(SE_DEBUG_NAME);
-    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ShellID);
-    if (!hProc)
-    {
-      DBGTrace2("OpenProcess(%d) failed: %s",ShellID,GetLastErrorNameStatic());
-      return 0;
-    }
-    // Open impersonation token for Shell process
-    CHK_BOOL_FN(OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-                          |TOKEN_ASSIGN_PRIMARY,&hToken));
-    CloseHandle(hProc);
-    if(!hToken)
-      return 0;
+    return GetProcessUserToken(ShellID);
   }
   HANDLE hTokenDup=NULL;
   CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
