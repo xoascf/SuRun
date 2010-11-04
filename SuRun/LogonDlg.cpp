@@ -18,8 +18,8 @@
 #include <shlwapi.h>
 #include <lm.h>
 #include <commctrl.h>
+#include <WinCrypt.h>
 #include "Isadmin.h"
-#include "BlowFish.h"
 #include "ResStr.h"
 #include "DBGTrace.h"
 #include "UserGroups.h"
@@ -33,6 +33,7 @@
 #pragma comment(lib,"Netapi32.lib")
 #pragma comment(lib,"Gdi32.lib")
 #pragma comment(lib,"comctl32.lib")
+#pragma comment(lib,"Crypt32.lib")
 
 #ifndef SuRunEXT_EXPORTS
 #ifdef DoDBGTrace
@@ -116,17 +117,27 @@ BOOL PasswordOK(DWORD SessionId,LPCTSTR User,LPCTSTR Password,bool AllowEmptyPas
 
 static BYTE KEYPASS[16]={0x4f,0xc9,0x4d,0x14,0x63,0xa9,0x4d,0xe2,0x96,0x47,0x2b,0x6a,0xd6,0x80,0xd3,0xc2};
 
-bool LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
+bool LoadRunAsPassword(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
   if (!GetSavePW)
     return false;
-  CBlowFish bf;
-  bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  if (GetRegAny(HKLM,RAPASSKEY(RunAsUser),UserName,REG_BINARY,(BYTE*)Password,&nBytes))
+  DWORD Type=REG_BINARY;
+  BYTE* ePassword;
+  DWORD nB=0;
+  if (!GetRegAnyAlloc(HKLM,RAPASSKEY(RunAsUser),UserName,&Type,&ePassword,&nB))
+    return false;
+  if (!ePassword)
+    return false;
+  DATA_BLOB PW={0};
+  DATA_BLOB entropy={sizeof(KEYPASS),KEYPASS};
+  DATA_BLOB pw={nB,(BYTE*)ePassword};
+  if(!CryptUnprotectData(&pw,0,&entropy,0,0,CRYPTPROTECT_UI_FORBIDDEN,&PW))
+    DBGTrace1("CryptUnprotectData failed: %s",GetLastErrorNameStatic());
+  free(ePassword);
+  if (PW.pbData)
   {
-    if (nBytes==0)
-      return false;
-    bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
+    memcpy(Password,PW.pbData,min(nBytes,PW.cbData));
+    LocalFree(PW.pbData);
     return true;
   }
   return false;
@@ -137,21 +148,26 @@ void DeleteRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName)
   RegDelVal(HKLM,RAPASSKEY(RunAsUser),UserName);
 }
 
-void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
+void SaveRunAsPassword(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
 {
   if (!GetSavePW)
     return;
-  CBlowFish bf;
-  TCHAR pw[PWLEN];
-  bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,RAPASSKEY(RunAsUser),UserName,REG_BINARY,(BYTE*)pw,
-    bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
+  DATA_BLOB pw={0};
+  DATA_BLOB entropy={sizeof(KEYPASS),KEYPASS};
+  DATA_BLOB PW={(_tcslen(Password)+1)*sizeof(TCHAR),(BYTE*)Password};
+  if (!CryptProtectData(&PW,0,&entropy,0,0,CRYPTPROTECT_UI_FORBIDDEN,&pw))
+    DBGTrace1("CryptProtectData failed: %s",GetLastErrorNameStatic());
+  if (pw.cbData)
+  {
+    SetRegAny(HKLM,RAPASSKEY(RunAsUser),UserName,REG_BINARY,pw.pbData,pw.cbData);
+    LocalFree(pw.pbData);
+  }
 }
 
 bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
 {
   TCHAR Pass[PWLEN+1]={0};
-  LoadRunAsPassword(RunAsUser,UserName,Pass,PWLEN);
+  LoadRunAsPassword(SessionId,RunAsUser,UserName,Pass,PWLEN);
     if (PasswordOK(SessionId,UserName,Pass,true))
     return zero(Pass),true;
   return zero(Pass),false;
@@ -231,7 +247,7 @@ static void SetUserBitmap(HWND hwnd)
   if ((p->bRunAs)||(p->bFUS))
   {
     TCHAR Pass[PWLEN+1]={0};
-    if (LoadRunAsPassword(p->User,User,Pass,PWLEN) 
+    if (LoadRunAsPassword(p->SessionId,p->User,User,Pass,PWLEN) 
       && PasswordOK(p->SessionId,User,Pass,false))
     {
       SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
@@ -594,7 +610,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                 if ((p->bRunAs)||(p->bFUS))
                 {
                   if(IsDlgButtonChecked(hwnd,IDC_STOREPASS))
-                    SaveRunAsPassword(p->User,User,Pass);
+                    SaveRunAsPassword(p->SessionId,p->User,User,Pass);
                   else
                     DeleteRunAsPassword(p->User,User);
                 }

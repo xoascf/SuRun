@@ -24,10 +24,9 @@
 #include <lm.h>
 #include <commctrl.h>
 #include <shlwapi.h>
+#include <WinCrypt.h>
 #include "Setup.h"
 #include "Helpers.h"
-#include "BlowFish.h"
-//ToDo: #include <wincrypt.h>
 #include "ResStr.h"
 #include "UserGroups.h"
 #include "lsa_laar.h"
@@ -39,6 +38,7 @@
 #pragma comment(lib,"comctl32.lib")
 #pragma comment(lib,"Comdlg32.lib")
 #pragma comment(lib,"shlwapi.lib")
+#pragma comment(lib,"Crypt32.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -50,11 +50,24 @@ static BYTE KEYPASS[16]={0x5B,0xC3,0x25,0xE9,0x8F,0x2A,0x41,0x10,0xA3,0xF4,0x26,
 
 void LoadPassword(LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
-  //ToDo: use Impersonation and CryptUnprotectData()
-  CBlowFish bf;
-  bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  if (GetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)Password,&nBytes))
-    bf.Decode((BYTE*)Password,(BYTE*)Password,nBytes);
+  DWORD Type=REG_BINARY;
+  BYTE* ePassword;
+  DWORD nB=0;
+  if (!GetRegAnyAlloc(HKLM,PASSWKEY,UserName,&Type,&ePassword,&nB))
+    return;
+  if (!ePassword)
+    return;
+  DATA_BLOB PW={0};
+  DATA_BLOB entropy={sizeof(KEYPASS),KEYPASS};
+  DATA_BLOB pw={nB,(BYTE*)ePassword};
+  if(!CryptUnprotectData(&pw,0,&entropy,0,0,CRYPTPROTECT_UI_FORBIDDEN,&PW))
+    DBGTrace1("CryptUnprotectData failed: %s",GetLastErrorNameStatic());
+  free(ePassword);
+  if (PW.pbData)
+  {
+    memcpy(Password,PW.pbData,min(nBytes,PW.cbData));
+    LocalFree(PW.pbData);
+  }
 }
 
 void DeletePassword(LPTSTR UserName)
@@ -65,12 +78,16 @@ void DeletePassword(LPTSTR UserName)
 
 void SavePassword(LPTSTR UserName,LPTSTR Password)
 {
-  //ToDo: use Impersonation and CryptProtectData()
-  CBlowFish bf;
-  TCHAR pw[PWLEN];
-  bf.Initialize(KEYPASS,sizeof(KEYPASS));
-  SetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,(BYTE*)pw,
-    bf.Encode((BYTE*)Password,(BYTE*)pw,(int)_tcslen(Password)*sizeof(TCHAR)));
+  DATA_BLOB pw={0};
+  DATA_BLOB entropy={sizeof(KEYPASS),KEYPASS};
+  DATA_BLOB PW={(_tcslen(Password)+1)*sizeof(TCHAR),(BYTE*)Password};
+  if (!CryptProtectData(&PW,0,&entropy,0,0,CRYPTPROTECT_UI_FORBIDDEN,&pw))
+    DBGTrace1("CryptProtectData failed: %s",GetLastErrorNameStatic());
+  if (pw.cbData)
+  {
+    SetRegAny(HKLM,PASSWKEY,UserName,REG_BINARY,pw.pbData,pw.cbData);
+    LocalFree(pw.pbData);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////

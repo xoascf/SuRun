@@ -414,33 +414,6 @@ VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
 
 //////////////////////////////////////////////////////////////////////////////
 // 
-//  GetProcessUserToken
-// 
-//////////////////////////////////////////////////////////////////////////////
-HANDLE GetProcessUserToken(DWORD ProcId)
-{
-  HANDLE hToken=NULL;
-  EnablePrivilege(SE_DEBUG_NAME);
-  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS,TRUE,ProcId);
-  if (!hProc)
-  {
-    DBGTrace2("OpenProcess(%d) failed: %s",ProcId,GetLastErrorNameStatic());
-    return 0;
-  }
-  // Open impersonation token for process
-  CHK_BOOL_FN(OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
-                                     |TOKEN_ASSIGN_PRIMARY,&hToken));
-  CloseHandle(hProc);
-  if(!hToken)
-    return 0;
-  HANDLE hUser=0;
-  CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
-                                TokenPrimary,&hUser)); 
-  return CloseHandle(hToken),hUser;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// 
 //  MyCPAU
 // 
 //////////////////////////////////////////////////////////////////////////////
@@ -478,14 +451,11 @@ BOOL MyCPAU(HANDLE hToken,LPCTSTR lpApplicationName,LPTSTR lpCommandLine,
     DBGTrace4("WARNING: CreateProcessAsUser(%s,%s,%s) failed: %s; Impersonating as User",
       lpCommandLine,lpEnvironment,lpCurrentDirectory,GetErrorNameStatic(le));
     //Impersonation required for EFS and CreateProcessAsUser
-    HANDLE hUser=GetSessionUserToken(g_RunData.SessionID);
-    ImpersonateLoggedOnUser(hUser);
+    CImpersonateSessionUser ISU(g_RunData.SessionID);
     bOK=CreateProcessAsUser(hToken,lpApplicationName,lpCommandLine,
       lpProcessAttributes,lpThreadAttributes,bInheritHandles,dwCreationFlags,
       lpEnvironment,lpCurrentDirectory,lpStartupInfo,lpProcessInformation);
     le=GetLastError();
-    RevertToSelf();
-    CloseHandle(hUser);
   }
   if (!bOK)
     DBGTrace4("CreateProcessAsUser(%s,%s,%s) failed: %s",
