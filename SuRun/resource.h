@@ -248,6 +248,7 @@
 #define IDC_REQPW4SETUP                 1079
 #define IDC_SIMPLESETUP                 1080
 #define IDC_ASKPW                       1081
+#define IDC_STORE_PW                    1082
 #define IDC_REQADMIN                    1084
 #define IDC_BLACKLIST                   1085
 #define IDC_NOEXPERT                    1087
