@@ -126,8 +126,17 @@
 #define GetRestrictApps(u)    (GetUsrSetting(u,_T("RestrictApps"),0)!=0)
 #define SetRestrictApps(u,b)  SetUsrSetting(u,_T("RestrictApps"),b,0)
 //SuRunner may install Devices
-#define GetInstallDevs(u)      (GetUsrSetting(u,_T("InstallDevs"),GetRestrictApps(u)==0)!=0)
-#define SetInstallDevs(u,b)    SetUsrSetting(u,_T("InstallDevs"),b,0)
+#define GetInstallDevs(u)     (GetUsrSetting(u,_T("InstallDevs"),GetRestrictApps(u)==0)!=0)
+#define SetInstallDevs(u,b)   SetUsrSetting(u,_T("InstallDevs"),b,0)
+
+#define GetStoreUsrPW(u)      GetUsrSetting(u,_T("StoreUsrPW"),0)
+#define SetStoreUsrPW(u,b)    if(GetUsrSetting(u,_T("StoreUsrPW"),0)!=b) \
+                              { \
+                                SetRegInt(HKLM,USERKEY(u),_T("StoreUsrPW"),b); \
+                                DeleteTempAdminToken(u); \
+                                if (!b) \
+                                  DeletePassword(u);  \
+                              }
 
 //////////////////////////////////////////////////////////////////////////////
 //Shell Extension Settings; stored in: HKCR\\CLSID\\sGUID

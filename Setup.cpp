@@ -26,6 +26,7 @@
 #include <shlwapi.h>
 #include <WinCrypt.h>
 #include "Setup.h"
+#include "LSALogon.h"
 #include "Helpers.h"
 #include "ResStr.h"
 #include "UserGroups.h"
@@ -880,6 +881,7 @@ static void SaveUserFlags()
       SetInstallDevs(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HW_ADMIN)!=0);
     SetHideFromUser(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_HIDESURUN)!=0);
     SetReqPw4Setup(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_REQPW4SETUP)!=0);
+    SetStoreUsrPW(u,IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_STORE_PW)!=0);
     if(!IsDlgButtonChecked(g_SD->hTabCtrl[1],IDC_TRAYSHOWADMIN))
     {
       SetUserTSA(u,0);
@@ -975,6 +977,8 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),0);
     CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
     CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
+    EnableWindow(GetDlgItem(hwnd,IDC_STORE_PW),1);
+    CheckDlgButton(hwnd,IDC_STORE_PW,GetStoreUsrPW(u));
     switch(GetUserTSA(u))
     {
     case 2:
@@ -993,6 +997,7 @@ static void UpdateUser(HWND hwnd)
       EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),0);
       EnableWindow(GetDlgItem(hwnd,IDC_HW_ADMIN),GetUseSVCHook);
       EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),0);
+      EnableWindow(GetDlgItem(hwnd,IDC_STORE_PW),0);
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
       CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
@@ -1000,6 +1005,7 @@ static void UpdateUser(HWND hwnd)
       CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
       CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseSVCHook && GetInstallDevs(u));
       CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
+      CheckDlgButton(hwnd,IDC_STORE_PW,BST_UNCHECKED);
     }
     EnableWindow(hWL,true);
     HKEY Key;
@@ -1036,6 +1042,7 @@ static void UpdateUser(HWND hwnd)
     EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),false);
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),false);
     EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),false);
+    EnableWindow(GetDlgItem(hwnd,IDC_STORE_PW),false);
     EnableWindow(hWL,false);
     EnableWindow(GetDlgItem(hwnd,IDC_ADDAPP),false);
     EnableWindow(GetDlgItem(hwnd,IDC_DELETE),false);
@@ -1175,6 +1182,7 @@ void ExportUser(LPCTSTR ini,LPCTSTR User,int nUser)
   EXPORTINTu(USRKEY,UserTSA,User,ini);
   EXPORTINTu(USRKEY,HideFromUser,User,ini);
   EXPORTINTu(USRKEY,ReqPw4Setup,User,ini);
+  EXPORTINTu(USRKEY,StoreUsrPW,User,ini);
   ExportUserWhiteList(ini,User,WLKEY,WLFKEY);
 }
 
@@ -1234,6 +1242,7 @@ BOOL ImportUser(LPCTSTR ini,LPCTSTR USRKEY,LPCTSTR WLKEY,LPCTSTR WLFKEY)
   IMPORTINTu(USRKEY,UserTSA,User,ini);
   IMPORTINTu(USRKEY,HideFromUser,User,ini);
   IMPORTINTu(USRKEY,ReqPw4Setup,User,ini);
+  IMPORTINTu(USRKEY,StoreUsrPW,User,ini);
   return ImportUserWhiteList(ini,User,WLKEY,WLFKEY);
 }
 
@@ -1585,6 +1594,8 @@ void SetRecommendedSettings()
     EnableWindow(GetDlgItem(h,IDC_HIDESURUN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYSHOWADMIN),1);
     EnableWindow(GetDlgItem(h,IDC_TRAYBALLOON),!IsWin2k);
+    EnableWindow(GetDlgItem(h,IDC_STORE_PW),1);
+    CheckDlgButton(h,IDC_STORE_PW,0);
     CheckDlgButton(h,IDC_RUNSETUP,1);
     CheckDlgButton(h,IDC_REQPW4SETUP,0);
     CheckDlgButton(h,IDC_RESTRICTED,0);
@@ -1592,6 +1603,7 @@ void SetRecommendedSettings()
     CheckDlgButton(h,IDC_HIDESURUN,0);
     CheckDlgButton(h,IDC_TRAYSHOWADMIN,1);
     CheckDlgButton(h,IDC_TRAYBALLOON,!IsWin2k);
+    CheckDlgButton(h,IDC_STORE_PW,0);
     //CheckDlgButton(h,IDC_NOUSESURUNNERS,0);
     //SetUseSuRuners(TRUE);
     int User=g_SD->CurUser;
@@ -1664,13 +1676,6 @@ INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
   case WM_INITDIALOG:
     {
-//      if (IsWin7)
-//      {
-//        SetCtrlAsAdmin(0);
-//        SetExpAsAdmin(0);
-//        EnableWindow(GetDlgItem(hwnd,IDC_CTRLASADMIN),false);
-//        EnableWindow(GetDlgItem(hwnd,IDC_EXPASADMIN),false);
-//      }
       CheckDlgButton(hwnd,IDC_BLURDESKTOP,GetBlurDesk);
       CheckDlgButton(hwnd,IDC_FADEDESKTOP,GetFadeDesk);
       EnableWindow(GetDlgItem(hwnd,IDC_FADEDESKTOP),(!IsWin2k)&&GetBlurDesk);
@@ -2036,6 +2041,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           EnableWindow(GetDlgItem(hwnd,IDC_REQPW4SETUP),0);
           EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),0);
           EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),0);
+          EnableWindow(GetDlgItem(hwnd,IDC_STORE_PW),0);
           CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);
           CheckDlgButton(hwnd,IDC_TRAYSHOWADMIN,BST_UNCHECKED);
           CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
@@ -2043,6 +2049,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           CheckDlgButton(hwnd,IDC_RESTRICTED,BST_CHECKED);
           CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseSVCHook && GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
           CheckDlgButton(hwnd,IDC_RUNSETUP,BST_UNCHECKED);
+          CheckDlgButton(hwnd,IDC_STORE_PW,BST_UNCHECKED);
         }else
         {
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN),1);
@@ -2050,6 +2057,7 @@ DelApp:   HWND hWL=GetDlgItem(hwnd,IDC_WHITELIST);
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bBal);
           EnableWindow(GetDlgItem(hwnd,IDC_RUNSETUP),1);
           EnableWindow(GetDlgItem(hwnd,IDC_RESTRICTED),1);
+          EnableWindow(GetDlgItem(hwnd,IDC_STORE_PW),1);
           CheckDlgButton(hwnd,IDC_HW_ADMIN,GetUseSVCHook && GetInstallDevs(g_SD->Users.GetUserName(g_SD->CurUser)));
         }
         UpdateWhiteListFlags(GetDlgItem(hwnd,IDC_WHITELIST));

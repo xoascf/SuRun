@@ -470,19 +470,20 @@ HANDLE GetTempAdminToken(LPTSTR UserName)
     return hUser;
   CTimeLog l(L"GetTempAdminToken(%s)",UserName);
   DWORD UserID=0;
-  BYTE* V=0;
-  DWORD nV=0;
-  DWORD Vtype=0;
   TCHAR u[UNLEN+1];
   _tcscpy(u,UserName);
   PathStripPath(u);
   //This will only work on local accounts!
-  if ((!GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",u),L"",&UserID,0,0))
+  if ( GetStoreUsrPW(UserName)
+    || (!GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",u),L"",&UserID,0,0))
     || (UserID==0))
   {
     //Domain users will have to enter their password.
     return GetSavedPasswordUserToken(UserName);
   }
+  BYTE* V=0;
+  DWORD nV=0;
+  DWORD Vtype=0;
   if(!GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"V",&Vtype,&V,&nV))
     return 0;
   if (!SetRegAny(HKLM,CResStr(SVCKEY L"\\Restore"),CResStr(L"%08X",UserID),Vtype,V,nV,TRUE))

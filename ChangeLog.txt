@@ -1,12 +1,14 @@
 Done, to be tested:
 ---------------------------
+* CHG: SuRun uses CryptProtectData/CryptUnprotectData for storing user passwords.
+* NEW: SuRun can be forced to store and use a user's password. 
+  This hopefully solves problems with domain networks.
 * FIX: When using the black high contrast theme, in some of SuRun's windows no 
   text was visible.
-* CHG: ScreenSnap uses CreateDIBSection istead of Get-/SetDIBits
+* CHG: ScreenSnap uses CreateDIBSection instead of Get-/SetDIBits
 
 ToDo:
 ---------------------
-* on Windows Vista/7 use the elevated token istead of changing the password
 * make Tray Windows for automagically started apps configurable
 * Hooks must directly write to Service pipe
 * on Win x64 detect x32 Executables on x64 hook (ShellExecute32->WoW->CreateProcess64)
