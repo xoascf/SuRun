@@ -2155,7 +2155,10 @@ BOOL InstallService()
   if (CheckServiceStatus())
   {
     if (!DeleteService(true))
+    {
+      DBGTrace1("DeleteService failed: %s",GetLastErrorNameStatic());
       return FALSE;
+    }
     //Wait until "SuRun /SYSMENUHOOK" has exited:
     CTimeOut t(11000);
     for(;;)
@@ -2191,13 +2194,20 @@ BOOL InstallService()
                           SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,
                           SERVICE_ERROR_NORMAL,SvcFile,L"PlugPlay",0,0,0,0);
   if (!hdlServ) 
-    return CloseServiceHandle(hdlSCM),FALSE;
+  {
+    DBGTrace1("CreateService failed: %s",GetLastErrorNameStatic());
+    CloseServiceHandle(hdlSCM);
+    return FALSE;
+  }
   CloseServiceHandle(hdlServ);
   InstLog(CResStr(IDS_STARTSVC));
   hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START);
+  if (!hdlServ)
+    DBGTrace1("OpenService failed: %s",GetLastErrorNameStatic());
   BOOL bRet=StartService(hdlServ,0,0);
   if (!bRet)
   {
+    DBGTrace1("StartService failed: %s",GetLastErrorNameStatic());
     CloseServiceHandle(hdlServ);
     hdlServ=OpenService(hdlSCM,SvcName,SERVICE_STOP|DELETE);
     if (hdlServ)

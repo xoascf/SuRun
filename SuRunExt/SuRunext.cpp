@@ -565,9 +565,6 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   //Admins don't need the ShellExec Hook!
   if (l_IsAdmin)
     return S_FALSE;
-  //Non SuRunners don't need the ShellExec Hook!
-  if ((!l_IsSuRunner))
-    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
@@ -636,6 +633,9 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
       return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
     }
   }
+  if ((!bRunAs) && (!l_IsSuRunner))
+    //Non SuRunners may only use /RunAs
+    return S_FALSE;
   if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
   {
     _tcscat(tmp,L" ");

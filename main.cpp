@@ -62,6 +62,7 @@ extern HANDLE GetAdminToken(DWORD SessionID);
 
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+//  DBGTrace1("SuRun started with (%s)",GetCommandLine());
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
   case 1:
