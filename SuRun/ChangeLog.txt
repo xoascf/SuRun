@@ -39,6 +39,18 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.9 Beta15 - 2010-11-08
+---------------------------------
+* CHG: SuRun uses CryptProtectData() for storing user passwords. 
+  This encryption uses a master key derived from the user's Windows password.
+* NEW: SuRun can be forced to store and use a user's password. 
+  This hopefully solves problems with domain networks.
+* NEW: SuRun's ShellExecute Hook let's non-SuRunners use SuRun's "Run as..."
+* FIX: When using the black high contrast theme, in some of SuRun's windows no 
+  text was visible.
+* CHG: ScreenSnap uses CreateDIBSection instead of Get-/SetDIBits
+
 SuRun 1.2.0.9 Beta14 - 2010-08-04
 ---------------------------------
 * If CreateProcessAsUser fails, SuRun's service impersonates first as Admin 

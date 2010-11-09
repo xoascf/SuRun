@@ -370,44 +370,44 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
 #ifdef DoDBGTrace
-  {
-    TCHAR Path[4096]={0};
-    if (pIDFolder)
-      SHGetPathFromIDList(pIDFolder,Path);
-    TCHAR FileClass[4096]={0};
-    if(hRegKey)
-      GetRegStr(hRegKey,0,L"",FileClass,4096);
-    TCHAR File[4096]={0};
-    if(pDataObj)
-    {
-      FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-      STGMEDIUM stm;
-      if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-      {
-        if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-          DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
-        ReleaseStgMedium(&stm);
-      }
-    }
-    DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
-    if(pDataObj)
-      PrintDataObj(pDataObj);
-    //Link?
-    {
-      IShellLink *psl = NULL;
-      IPersistFile *pPf = NULL;
-      if ( SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl))
-        && SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf))
-        && SUCCEEDED(pPf->Load(File,STGM_READ|STGM_SHARE_DENY_NONE))
-        && SUCCEEDED(psl->Resolve(0,SLR_NO_UI|SLR_NOSEARCH|SLR_NOTRACK|SLR_NOLINKINFO)))
-      {
-        psl->GetPath(File,4096,0,SLGP_UNCPRIORITY);
-        psl->GetArguments(FileClass,4096);
-        psl->GetWorkingDirectory(Path,4096);
-        DBGTrace3("----LNK-Info(%s,%s,%s)",Path,File,FileClass);
-      }
-    }
-  }
+//  {
+//    TCHAR Path[4096]={0};
+//    if (pIDFolder)
+//      SHGetPathFromIDList(pIDFolder,Path);
+//    TCHAR FileClass[4096]={0};
+//    if(hRegKey)
+//      GetRegStr(hRegKey,0,L"",FileClass,4096);
+//    TCHAR File[4096]={0};
+//    if(pDataObj)
+//    {
+//      FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+//      STGMEDIUM stm;
+//      if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+//      {
+//        if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+//          DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
+//        ReleaseStgMedium(&stm);
+//      }
+//    }
+//    DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+//    if(pDataObj)
+//      PrintDataObj(pDataObj);
+//    //Link?
+//    {
+//      IShellLink *psl = NULL;
+//      IPersistFile *pPf = NULL;
+//      if ( SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl))
+//        && SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf))
+//        && SUCCEEDED(pPf->Load(File,STGM_READ|STGM_SHARE_DENY_NONE))
+//        && SUCCEEDED(psl->Resolve(0,SLR_NO_UI|SLR_NOSEARCH|SLR_NOTRACK|SLR_NOLINKINFO)))
+//      {
+//        psl->GetPath(File,4096,0,SLGP_UNCPRIORITY);
+//        psl->GetArguments(FileClass,4096);
+//        psl->GetWorkingDirectory(Path,4096);
+//        DBGTrace3("----LNK-Info(%s,%s,%s)",Path,File,FileClass);
+//      }
+//    }
+//  }
 #endif DoDBGTrace
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
