@@ -1,8 +1,8 @@
 @echo off
-if NOT "%VS100COMNTOOLS%"=="" goto VC10compile
-if NOT "%VS90COMNTOOLS%"=="" goto VC9compile
-if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
 if NOT "%MSDevDir%"=="" goto VC6compile
+if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
+if NOT "%VS90COMNTOOLS%"=="" goto VC9compile
+if NOT "%VS100COMNTOOLS%"=="" goto VC10compile
 
 rem compile using VC6
 :VC6compile

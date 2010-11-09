@@ -328,6 +328,7 @@
 		</Configuration>
 		<Configuration
 			Name="x64 Unicode Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			>

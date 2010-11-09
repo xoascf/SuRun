@@ -3,6 +3,7 @@ Done, to be tested:
 * CHG: SuRun uses CryptProtectData/CryptUnprotectData for storing user passwords.
 * NEW: SuRun can be forced to store and use a user's password. 
   This hopefully solves problems with domain networks.
+* NEW: SuRun's ShellExecute Hook let's non-SuRunners use SuRun's "Run as..."
 * FIX: When using the black high contrast theme, in some of SuRun's windows no 
   text was visible.
 * CHG: ScreenSnap uses CreateDIBSection instead of Get-/SetDIBits
