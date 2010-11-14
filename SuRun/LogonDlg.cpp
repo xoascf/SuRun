@@ -168,7 +168,7 @@ bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
 {
   TCHAR Pass[PWLEN+1]={0};
   LoadRunAsPassword(SessionId,RunAsUser,UserName,Pass,PWLEN);
-    if (PasswordOK(SessionId,UserName,Pass,true))
+  if (PasswordOK(SessionId,UserName,Pass,true))
     return zero(Pass),true;
   return zero(Pass),false;
 }
