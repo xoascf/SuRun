@@ -46,13 +46,13 @@ SuRun 1.2.0.9 rc1 - 2010-12-03
   text was visible.
 * If CreateProcessAsUser fails, SuRun's service impersonates first as Admin 
   and if that fails too, it impersonates as logged on user
-* SuRuns Context Menu Extension add it's items only once. When righ clicking 
-  the folder tree in Win7 Explorer calls the extension twice, one time for the 
-  folder and one time for the folder background.
-* IAT-Hook explicitly loads SuRunExt.dll to avoid unloading the Dll too early.
-  In Win7 x64 a call to LoadLibW() in Unloaded_SuRunExt.dll GPFed.
-* Windows 7 Explorer can be launched with admin rights
-* NEW: Local System is accepted as user for Backup/Restore
+* SuRuns Context Menu Extension adds it's items only once. 
+  When right clicking the folder tree in Win7 Explorer calls the extension 
+  twice, one time for the folder and one time for the folder background.
+* FIX: IAT-Hook explicitly loads SuRunExt.dll to avoid unloading the Dll too 
+  early. In Win7 x64 a call to LoadLibW() in Unloaded_SuRunExt.dll GPFed.
+* NEW: Windows 7 Explorer can be launched with admin rights
+* NEW: Local System is valid as user for Backup/Restore.
 * NEW: If "Start the program automagically with elevated rights." and "NEVER 
   start this program with elevated rights." are both checked, SuRuns Hooks 
   directly start the program with the rights of the hooked user process.
@@ -66,7 +66,7 @@ SuRun 1.2.0.9 rc1 - 2010-12-03
     "SuRunExt.dll_unloaded".
 * FIX: IAT-Hook initialisation uses an exception filter that restarts 
     initialisation on access violation
-* CHG: SuRun handles RunAs verb for ShellExecute/~Ex when "Replace RunAs with 
+* NEW: SuRun handles RunAs verb for ShellExecute/~Ex when "Replace RunAs with 
     SuRuns RunAs" is activated
 * NEW: SuRun remembers the last /RunAs user
 * CHG: SuRuns Installer sets the focus to "Logoff"/"Restart" after Installation
