@@ -415,6 +415,10 @@ SOURCE=.\res\SuRun.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\SuRunBW.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\Windows.ico
 # End Source File
 # End Group

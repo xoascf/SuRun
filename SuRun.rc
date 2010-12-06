@@ -1398,6 +1398,7 @@ IDI_SHIELD              ICON    DISCARDABLE     "res\\ico10605.ico"
 IDI_SHIELD1             ICON    DISCARDABLE     "res\\ico10607.ico"
 IDI_SHIELD2             ICON    DISCARDABLE     "res\\ico10606.ico"
 IDI_SRADMIN             ICON    DISCARDABLE     "res\\SrAdmin.ico"
+IDI_MAIN_BW             ICON    DISCARDABLE     "res\\SuRunBW.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
