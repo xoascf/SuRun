@@ -34,8 +34,44 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
-SuRun 1.2.0.9 rc1 - 2010-12-04
+SuRun 1.2.0.9 rc1 - 2010-12-03
 ---------------------------------
+* CHG: In Vista/Win7 Control Panel as Administrator" starts "Control Panel Main page"
+* CHG: SuRun uses CryptProtectData() for storing user passwords. 
+  This encryption uses a master key derived from the user's Windows password.
+* NEW: SuRun can be forced to store and use a user's password. 
+  This hopefully solves problems with domain networks.
+* NEW: SuRun's ShellExecute Hook let's non-SuRunners use SuRun's "Run as..."
+* FIX: When using the black high contrast theme, in some of SuRun's windows no 
+  text was visible.
+* If CreateProcessAsUser fails, SuRun's service impersonates first as Admin 
+  and if that fails too, it impersonates as logged on user
+* SuRuns Context Menu Extension add it's items only once. When righ clicking 
+  the folder tree in Win7 Explorer calls the extension twice, one time for the 
+  folder and one time for the folder background.
+* IAT-Hook explicitly loads SuRunExt.dll to avoid unloading the Dll too early.
+  In Win7 x64 a call to LoadLibW() in Unloaded_SuRunExt.dll GPFed.
+* Windows 7 Explorer can be launched with admin rights
+* NEW: Local System is accepted as user for Backup/Restore
+* NEW: If "Start the program automagically with elevated rights." and "NEVER 
+  start this program with elevated rights." are both checked, SuRuns Hooks 
+  directly start the program with the rights of the hooked user process.
+  (Automagic starts App "non elevated" on "AutoExec" and "AutoCancel")
+* FIX: Made SuRuns Tray symbol better BlackBox (bBBlean) taskbar compatible
+* FIX: SuRun keeps safe Desktop WatchDog happy when scanning for domain users
+* NEW: POLISH resources by junne
+* FIX: Require the user's password after timeout and in domains for approved 
+  programs GFP'ed silently
+* FIX: IAT-Hooks are always set in a separate thread (again) to avoid GPFs in 
+    "SuRunExt.dll_unloaded".
+* FIX: IAT-Hook initialisation uses an exception filter that restarts 
+    initialisation on access violation
+* CHG: SuRun handles RunAs verb for ShellExecute/~Ex when "Replace RunAs with 
+    SuRuns RunAs" is activated
+* NEW: SuRun remembers the last /RunAs user
+* CHG: SuRuns Installer sets the focus to "Logoff"/"Restart" after Installation
+* FIX: HideAppStartCursor() caused InstallSuRun on Win7 with Aero to terminate
+
 
 SuRun 1.2.0.9 Beta15 - 2010-11-08
 ---------------------------------
