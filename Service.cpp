@@ -561,15 +561,19 @@ BOOL InjectIATHook(HANDLE hProc)
     size_t nDll=strlen(DllName)+1;
 	  void* RmteName=VirtualAllocEx(hProc,NULL,nDll,MEM_COMMIT,PAGE_READWRITE);
 	  if(RmteName==NULL)
-		  return DBGTrace1("InjectIATHook VirtualAllocEx failed: %s",GetLastErrorNameStatic()),false;
+    {
+      DBGTrace1("InjectIATHook VirtualAllocEx failed: %s",GetLastErrorNameStatic());
+      return false;
+    }
 	  WriteProcessMemory(hProc,RmteName,(void*)DllName,nDll,NULL);
     __try
     {
       hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
       if (hThread==0)
         DBGTrace1("InjectIATHook CreateRemoteThread failed: %s",GetLastErrorNameStatic());
-    }__except(DBGTrace("SuRun: CreateRemoteThread Exeption!\n"),1)
+    }__except(1)
     {
+      DBGTrace("SuRun: CreateRemoteThread Exeption!");
     }
 	  if (hThread!=NULL)
     {
@@ -577,8 +581,9 @@ BOOL InjectIATHook(HANDLE hProc)
       CloseHandle(hThread);
     }
 	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
-  }__except(DBGTrace("SuRun: InjectIATHook() Exeption!\n"),1)
+  }__except(1)
   {
+    DBGTrace("SuRun: InjectIATHook() Exeption!");
   }
   return hThread!=0;
 }
@@ -588,7 +593,10 @@ BOOL InjectIATHook(DWORD ProcId)
   HANDLE hProc=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_READ|PROCESS_VM_WRITE
     |PROCESS_CREATE_THREAD|PROCESS_QUERY_INFORMATION,false,ProcId);
   if (!hProc)
-    return DBGTrace2("InjectIATHook OpenProcess(%d) failed: %s",ProcId,GetLastErrorNameStatic()),false;
+  {
+    DBGTrace2("InjectIATHook OpenProcess(%d) failed: %s",ProcId,GetLastErrorNameStatic());
+    return false;
+  }
   BOOL bRet=InjectIATHook(hProc);
   CloseHandle(hProc);
   return bRet;
@@ -597,7 +605,10 @@ BOOL InjectIATHook(DWORD ProcId)
 BOOL InjectIATHook(LPTSTR ProcName)
 {
   DWORD PID=GetProcessID(ProcName);
-  return PID?InjectIATHook(PID):(DBGTrace1("InjectIATHook GetProcessID(%s) failed",ProcName),FALSE);
+  if (PID)
+    return InjectIATHook(PID);
+  DBGTrace1("InjectIATHook GetProcessID(%s) failed",ProcName);
+  return FALSE;
 }
 
 static BOOL TestDirectServiceCommands()
