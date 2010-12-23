@@ -80,7 +80,6 @@ SuRun 1.2.0.9 rc1 - 2010-12-03
 * CHG: SuRuns Installer sets the focus to "Logoff"/"Restart" after Installation
 * FIX: HideAppStartCursor() caused InstallSuRun on Win7 with Aero to terminate
 
-
 SuRun 1.2.0.9 Beta15 - 2010-11-08
 ---------------------------------
 * CHG: SuRun uses CryptProtectData() for storing user passwords. 

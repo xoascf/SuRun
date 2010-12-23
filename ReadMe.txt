@@ -28,7 +28,7 @@ asked to join "SuRunners". The user must either be an administrator or enter
 administrator credentials to join the SuRunners group.
 (SuRun does not store any administrator credentials!)
 
-Members of "SuRunners" can be restricted so that they must not change SuRuns 
+Members of "SuRunners" can be restricted so that they must not change SuRun's 
 settings and to be able to only start predefined applications with elevated 
 rights. So parents can allow their children to play games that require 
 administrative rights without loosing control of the system. Also employees 
@@ -111,7 +111,7 @@ Why use SuRun?
 ------------------------------------------------------------------------------
 Command line switches
 ------------------------------------------------------------------------------
-SuRuns supports the following command line:
+SuRun supports the following command line:
 
 "SuRun [options] [<program> [parameters]]" to start <program> as Administrator.
 
@@ -194,6 +194,43 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.0.9 - 2010-12-23
+--------------------------
+* NEW: In Windows 7 Explorer can be launched with elevated rights.
+* NEW: The local System is allowed as user for Backup/Restore.
+* NEW: If "Start the program automagically with elevated rights." and "NEVER 
+  start this program with elevated rights." are both checked, SuRun directly 
+  starts the program with the rights of the current user.
+  (Automagic starts Application "non elevated" on "AutoExec" and "AutoCancel")
+* NEW: SuRun's ShellExecute Hook let's non-"SuRunners" use SuRun's "Run as..."
+* NEW: SuRun can be forced to store and use a user's real password. 
+  This hopefully solves problems in domain networks.
+* NEW: Polish resources by Junne. Thanks!
+* NEW: SuRun handles ShellExecute's "runas" verb "Replace RunAs with SuRuns 
+  RunAs" is activated
+* NEW: SuRun remembers the last /RunAs user
+* CHG: In Vista and Windows 7 "Control Panel as Administrator" starts the 
+  "Control Panel Main page"
+* CHG: SuRun uses CryptProtectData() for encrypting user passwords. 
+  This encryption uses a master key derived from the user's Windows password.
+* CHG: If the SuRun service fails to start a Program, it tries to start the 
+  Program with impersonation. First as local Administrator and then, as the 
+  current user.
+* FIX: When using the black high contrast theme, in some of SuRun's windows no 
+  text was visible.
+* FIX: SuRun's Context Menu Extension adds it's items only once. 
+  When right clicking the folder tree in Windows 7 Explorer calls the extension 
+  twice, one time for the folder and one time for the folder background.
+* FIX: SuRun's Tray symbol is better BlackBox (bBBlean) taskbar compatible
+* FIX: SuRun keeps safe Desktop WatchDog happy when scanning for domain users
+* FIX: With "Require the user's password" active and timed out in domains for 
+  approved programs SuRun GPF'ed silently
+* FIX: Hooks are set in a separate thread to avoid GPFs in 
+  "SuRunExt.dll_unloaded".
+* FIX: Hook initialisation uses an exception filter that restarts Hook
+  initialisation on access violation
+* FIX: InstallSuRun terminated silently on Windows 7 with Aero.
 
 SuRun 1.2.0.8 - 2009-09-23
 --------------------------
