@@ -60,8 +60,16 @@ static void HideAppStartCursor()
 extern HANDLE GetAdminToken(DWORD SessionID);
 #include <Userenv.h>
 
+//#include "ScreenSnap.h"
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+//  {
+//    CBlurredScreen cbs;
+//    cbs.Init();
+//    cbs.Show(false);
+//    cbs.Done();
+//    ExitProcess(0);
+//  }
 //  DBGTrace1("SuRun started with (%s)",GetCommandLine());
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
