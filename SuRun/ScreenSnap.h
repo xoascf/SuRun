@@ -29,60 +29,54 @@
 //Simplified 3x3 Gausian blur
 inline void Blur(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
 {
-//  CTimeLog l(_T("Blur %dx%d"),w,h);
-  DWORD x,y,c1,c2;
-  for (y=1;y<h-1;y++)
+  CTimeLog l(_T("Blur %dx%d"),w,h);
+  DWORD x,y;
+  DWORD c,c1,c2;
+  COLORREF* p;
+  COLORREF* d=pDst+w+1;
+  for (y=1;y<h-1;y++,d+=2)
     for (x=1;x<w-1;x++)
     {
-      c1 =(pSrc[x-1+(y-1)*w]&0x00FF00FF);
-      c2 =(pSrc[x-1+(y-1)*w]&0x0000FF00);
-      c1+=(pSrc[x+(y-1)*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x+(y-1)*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x+1+(y-1)*w]&0x00FF00FF);
-      c2+=(pSrc[x+1+(y-1)*w]&0x0000FF00);
-      c1+=(pSrc[x-1+y*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x-1+y*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x+y*w]&0x00FF00FF)<<2;
-      c2+=(pSrc[x+y*w]&0x0000FF00)<<2;
-      c1+=(pSrc[x+1+y*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x+1+y*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x-1+(y+1)*w]&0x00FF00FF);
-      c2+=(pSrc[x-1+(y+1)*w]&0x0000FF00);
-      c1+=(pSrc[x+(y+1)*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x+(y+1)*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x+1+(y+1)*w]&0x00FF00FF);
-      c2+=(pSrc[x+1+(y+1)*w]&0x0000FF00);
-      pDst[x+y*w]=((c1>>5)&0x00FF00FF)+((c2>>5)&0x0000FF00);
+      p=pSrc+x-1+(y-1)*w;
+      c=*p++;       c2 =c&0x0000FF00; c1 =c&0x00FF00FF;
+      c=(*p++)<<1;  c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      c=*p;         c2+=c&0x0000FF00; c1+=c&0x00FF00FF;
+      p+=w-2;
+      c=(*p++)<<1;  c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      c=(*p++)<<2;  c2+=c&0x0003FC00; c1+=c&0x03FC03FC;
+      c=(*p)<<1;    c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      p+=w-2;
+      c=*p++;       c2+=c&0x0000FF00; c1+=c&0x00FF00FF;
+      c=(*p++)<<1;  c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      c=*p;         c2+=c&0x0000FF00; c1+=c&0x00FF00FF;
+      *d++=((c2>>5)&0x0000FF00)+((c1>>5)&0x00FF00FF);
     }
 }
 
 //Simplified 3x3 Gausian blur
 inline void BlurBright(COLORREF* pDst,COLORREF* pSrc,DWORD w,DWORD h)
 {
-//  CTimeLog l(_T("Blur %dx%d"),w,h);
-  DWORD x,y,c1,c2;
-  for (y=1;y<h-1;y++)
+  //CTimeLog l(_T("Blur %dx%d"),w,h);
+  DWORD x,y;
+  DWORD c,c1,c2;
+  COLORREF* p;
+  COLORREF* d=pDst+w+1;
+  for (y=1;y<h-1;y++,d+=2)
     for (x=1;x<w-1;x++)
     {
-      c1 =(pSrc[x-1+(y-1)*w]&0x00FF00FF);
-      c2 =(pSrc[x-1+(y-1)*w]&0x0000FF00);
-      c1+=(pSrc[x+(y-1)*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x+(y-1)*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x+1+(y-1)*w]&0x00FF00FF);
-      c2+=(pSrc[x+1+(y-1)*w]&0x0000FF00);
-      c1+=(pSrc[x-1+y*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x-1+y*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x+y*w]&0x00FF00FF)<<2;
-      c2+=(pSrc[x+y*w]&0x0000FF00)<<2;
-      c1+=(pSrc[x+1+y*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x+1+y*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x-1+(y+1)*w]&0x00FF00FF);
-      c2+=(pSrc[x-1+(y+1)*w]&0x0000FF00);
-      c1+=(pSrc[x+(y+1)*w]&0x00FF00FF)<<1;
-      c2+=(pSrc[x+(y+1)*w]&0x0000FF00)<<1;
-      c1+=(pSrc[x+1+(y+1)*w]&0x00FF00FF);
-      c2+=(pSrc[x+1+(y+1)*w]&0x0000FF00);
-      pDst[x+y*w]=((c1>>6)&0x00FF00FF)+((c2>>6)&0x0000FF00)+0x40404040;
+      p=pSrc+x-1+(y-1)*w;
+      c=*p++;       c2 =c&0x0000FF00; c1 =c&0x00FF00FF;
+      c=(*p++)<<1;  c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      c=*p;         c2+=c&0x0000FF00; c1+=c&0x00FF00FF;
+      p+=w-2;
+      c=(*p++)<<1;  c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      c=(*p++)<<2;  c2+=c&0x0003FC00; c1+=c&0x03FC03FC;
+      c=(*p)<<1;    c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      p+=w-2;
+      c=*p++;       c2+=c&0x0000FF00; c1+=c&0x00FF00FF;
+      c=(*p++)<<1;  c2+=c&0x0001FE00; c1+=c&0x01FE01FE;
+      c=*p;         c2+=c&0x0000FF00; c1+=c&0x00FF00FF;
+      *d++=0xC0C0C0C0+((c2>>6)&0x0000FF00)+((c1>>6)&0x00FF00FF);
     }
 }
 
