@@ -1476,13 +1476,13 @@ BEGIN
     IDS_SETUP4              "Erweitert"
     IDS_ASKAUTO             "Das Programm:\r\n\r\n%s\r\n\r\nscheint mit erhöhten Rechten ausgeführt werden zu müssen.\r\n\r\nWenn Sie  'Abbrechen' wählen, wird das Programm ohne erhöhte Rechte gestartet."
     IDS_ASKSURUNNER2        "Um SuRun zu benutzen, müssen Sie Mitglied der Benutzergruppe ""SuRunners"" sein.\r\n\r\nWollen Sie Mitglied der ""SuRunners"" Gruppe werden?\r\n\r\nWenn Sie unsicher sind, was das hier ist, klicken Sie auf ""NEIN""!"
-    IDS_ASKSURUNNER3        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe wird?"
+    IDS_ASKSURUNNER3        "Wollen Sie, dass '%s' Mitglied der 'SuRunners' Gruppe wird?"
     IDS_STARTED             "Info:\r\n%s\r\nwird mit erhöhten Rechten ausgeführt."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_ASKSURUNNER1        "Wollen Sie, das '%s' Mitglied der 'SuRunners' Gruppe und aus der Administratoren Gruppe ausgetragen wird?\r\n\r\nWenn Sie Ja wählen, ist %s KEIN ADMINISTRATOR mehr, sondern SuRunner."
+    IDS_ASKSURUNNER1        "Wollen Sie, dass '%s' Mitglied der 'SuRunners' Gruppe und aus der Administratoren Gruppe ausgetragen wird?\r\n\r\nWenn Sie Ja wählen, ist %s KEIN ADMINISTRATOR mehr, sondern SuRunner."
     IDS_BUILTINADMIN1       "'%s' ist ein vordefinierter Administrator!\r\n\r\nEr kann SuRun nicht benutzen, weil er nicht zum normalen Benutzer degradiert werden kann."
     IDS_NOADD2USERS1        "Fehler!\r\n\r\n'%s' konnte nicht in die Gruppe der normalen Benutzer aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
     IDS_SURUNNER_ERR1       "Fehler!\r\n\r\n'%s' konnte nicht in die ""SuRunners"" Gruppe aufgenommen werden!\r\nWindows meldet den Fehler:\r\n\r\n%s"
