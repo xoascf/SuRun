@@ -939,6 +939,7 @@ __declspec(dllexport) void RemoveShellExt()
   RegDelVal(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",sGUID);
 }
 
+bool g_bDoExit=FALSE;
 DWORD WINAPI InitProc(void* p)
 {
   __try
@@ -1006,7 +1007,8 @@ DWORD WINAPI InitProc(void* p)
   {
     extern BOOL g_IATInit;
     g_IATInit=FALSE;
-    l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
+    if (!g_bDoExit)
+      l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
   }  
   return 0;
 }
@@ -1021,19 +1023,21 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   //Process Detach:
   if(dwReason==DLL_PROCESS_DETACH)
   {
-    if(l_InitThread)
+    g_bDoExit=TRUE;
+    if (l_InitThread && (GetCurrentThreadId()!=GetThreadId(l_InitThread)))
     {
-      if(WaitForSingleObject(l_InitThread,1000)==WAIT_TIMEOUT)
+      if((lpReserved!=0)||(WaitForSingleObject(l_InitThread,1000)==WAIT_TIMEOUT))
       {
         DBGTrace("WARNING: SuRunExt Terminating InitThread");
         TerminateThread(l_InitThread,0);
       }
-      l_InitThread=0;
     }
+    l_InitThread=0;
     //"The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
     // Leave the critical section l_SxHkCs untouched to avoid possible dead locks
     //IAT-Hook
-    UnloadHooks();
+    if(lpReserved==0)
+      UnloadHooks();
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)
@@ -1043,6 +1047,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
     return TRUE;
   l_hInst=hInstDLL;
   InitializeCriticalSectionAndSpinCount(&l_SxHkCs,0x80000000);
-  l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
+  InitProc((void*)1);
+  //l_InitThread=CreateThread(0,0,InitProc,(void*)1,0,0);
   return TRUE;
 }

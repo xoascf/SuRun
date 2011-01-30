@@ -76,6 +76,8 @@
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/InstallSuRun.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -168,6 +170,8 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile=".\Release/InstallSuRun.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -263,14 +267,38 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath=".\app.manifest"
+				>
+			</File>
+			<File
 				RelativePath="..\res\SuRun.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\app.manifest"
+				RelativePath="..\ReleaseUx64\SuRun32.bin"
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\ReleaseU\SuRun.exe"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseUx64\SuRun.exe"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseU\SuRunExt.dll"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseUx64\SuRunExt.dll"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseUx64\SuRunExt32.dll"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

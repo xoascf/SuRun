@@ -80,6 +80,8 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile=".\ReleaseUsr32/SuRun32.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -235,6 +237,8 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile=".\ReleaseU/SuRun.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -267,6 +271,7 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
@@ -390,6 +395,8 @@
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\DebugU/SuRun.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -514,6 +521,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateMapFile="true"
+				MapExports="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -1426,6 +1435,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\neverquestion.ico"
+				>
+			</File>
+			<File
 				RelativePath="res\NoAdmin.ico"
 				>
 			</File>
@@ -1463,6 +1476,10 @@
 			</File>
 			<File
 				RelativePath="res\SuRun.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\SuRunBW.ico"
 				>
 			</File>
 			<File

@@ -78,9 +78,12 @@
 				OutputFile="../DebugU/SuRunExt.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ModuleDefinitionFile=".\SuRunExt.Def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\DebugU/SuRunExt.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				ImportLibrary=".\DebugU/SuRunExt.lib"
 				TargetMachine="1"
 			/>
@@ -234,8 +237,11 @@
 				OutputFile="../ReleaseU/SuRunExt.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ModuleDefinitionFile=".\SuRunExt.Def"
 				ProgramDatabaseFile=".\ReleaseU/SuRunExt.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				ImportLibrary=".\ReleaseU/SuRunExt.lib"
 				TargetMachine="1"
 			/>
@@ -268,6 +274,7 @@
 		</Configuration>
 		<Configuration
 			Name="Unicode Release|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
@@ -361,6 +368,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateManifest="false"
+				GenerateMapFile="true"
+				MapExports="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -548,8 +558,11 @@
 				OutputFile="../ReleaseUx64/SuRunExt32.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ModuleDefinitionFile=".\SuRunExt32.Def"
 				ProgramDatabaseFile=".\ReleaseUsr32/SuRunExt32.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
 				ImportLibrary=".\ReleaseUsr32/SuRunExt32.lib"
 				TargetMachine="1"
 			/>
@@ -1775,6 +1788,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\res\app.manifest"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
