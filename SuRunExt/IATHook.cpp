@@ -150,8 +150,8 @@ public:
 }; 
 
 //Standard Hooks: These must be implemented!
-static CHookDescriptor hkLdLibA  ("kernel32.dll",NULL,"LoadLibraryA",(PROC)LoadLibA);
-static CHookDescriptor hkLdLibW  ("kernel32.dll",NULL,"LoadLibraryW",(PROC)LoadLibW);
+static CHookDescriptor hkLdLibA  ("kernel32.dll","///noload!","LoadLibraryA",(PROC)LoadLibA);
+static CHookDescriptor hkLdLibW  ("kernel32.dll","///noload!","LoadLibraryW",(PROC)LoadLibW);
 static CHookDescriptor hkLdLibXA ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","LoadLibraryExA",(PROC)LoadLibExA);
 static CHookDescriptor hkLdLibXW ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","LoadLibraryExW",(PROC)LoadLibExW);
 static CHookDescriptor hkGetPAdr ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","GetProcAddress",(PROC)GetProcAddr);
@@ -161,7 +161,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","api-ms-win-core-libraryloader-
 static CHookDescriptor hkCrProcA ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessW",(PROC)CreateProcW);
 
-static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
+static CHookDescriptor hkCrPAUA  ("advapi32.dll","///noload!","CreateProcessAsUserA",(PROC)CreatePAUA);
 
 //Windows XP: only hook calls from umpnpmgr.dll to advapi32.dlls "CreateProcessAsUserW"
 static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessAsUserW",(PROC)CreatePAUW,"umpnpmgr.dll");
@@ -259,8 +259,9 @@ BOOL DoHookDll(char* DllName,char* HostDll)
     return FALSE;
   if (l_IsAdmin)
   {
+    
     for(int i=0;i<countof(sys_hdt);i++)
-      if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
+      if ((((!IsWin7)||(sys_hdt[i]->Win7DllName==0))&&(stricmp(sys_hdt[i]->DllName,DllName)==0))
         ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
       {
         return (sys_hdt[i]->HostDll==0) || (stricmp(sys_hdt[i]->HostDll,HostDll)==0);
@@ -268,7 +269,7 @@ BOOL DoHookDll(char* DllName,char* HostDll)
   }else
   {
     for(int i=0;i<countof(hdt);i++)
-      if ((stricmp(hdt[i]->DllName,DllName)==0)
+      if ((((!IsWin7)||(hdt[i]->Win7DllName==0))&&(stricmp(hdt[i]->DllName,DllName)==0))
         ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
       {
         return (hdt[i]->HostDll==0) || (stricmp(hdt[i]->HostDll,HostDll)==0);
@@ -287,7 +288,7 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
     if (l_IsAdmin)
     {
       for(int i=0;i<countof(sys_hdt);i++)
-        if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
+        if ((((!IsWin7)||(hdt[i]->Win7DllName==0))&& (stricmp(hdt[i]->DllName,DllName)==0))
           ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
           if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
           {
@@ -298,7 +299,7 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
     }else
     {
       for(int i=0;i<countof(hdt);i++)
-        if ((stricmp(hdt[i]->DllName,DllName)==0)
+        if ((((!IsWin7)||(hdt[i]->Win7DllName==0))&&(stricmp(hdt[i]->DllName,DllName)==0))
           ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
           if (stricmp(hdt[i]->FuncName,ImpName)==0)
           {
