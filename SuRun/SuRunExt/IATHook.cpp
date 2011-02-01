@@ -13,7 +13,6 @@
 
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
-#define WINBASE_DECLARE_GET_MODULE_HANDLE_EX
 #include <windows.h>
 #include <Psapi.h>
 
@@ -1053,8 +1052,12 @@ void LoadHooks()
     if (!IsWin2k)
     {
       HMODULE hMod=0;
-      if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_PIN,fmod,&hMod))
-        TRACExA("SuRun IAT-Hook: Locking %s failed: %s",fmod,GetLastErrorNameStatic());
+      #define GET_MODULE_HANDLE_EX_FLAG_PIN (0x00000001)
+      typedef BOOL (WINAPI* GMHExA)(DWORD,LPCSTR,HMODULE*);
+      GMHExA GetModuleHandleExA=(GMHExA)GetProcAddress(GetModuleHandleA("kernel32.dll"),"GetModuleHandleExA");
+      if(GetModuleHandleExA)
+        if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_PIN,fmod,&hMod))
+          TRACExA("SuRun IAT-Hook: Locking %s failed: %s",fmod,GetLastErrorNameStatic());
     }
   }
   InitializeCriticalSectionAndSpinCount(&g_HookCs,0x80000000);
