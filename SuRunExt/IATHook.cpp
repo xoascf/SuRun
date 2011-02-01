@@ -13,7 +13,7 @@
 
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
-
+#define WINBASE_DECLARE_GET_MODULE_HANDLE_EX
 #include <windows.h>
 #include <Psapi.h>
 
@@ -150,8 +150,8 @@ public:
 }; 
 
 //Standard Hooks: These must be implemented!
-static CHookDescriptor hkLdLibA  ("kernel32.dll","///noload!","LoadLibraryA",(PROC)LoadLibA);
-static CHookDescriptor hkLdLibW  ("kernel32.dll","///noload!","LoadLibraryW",(PROC)LoadLibW);
+static CHookDescriptor hkLdLibA  ("kernel32.dll",NULL,"LoadLibraryA",(PROC)LoadLibA);
+static CHookDescriptor hkLdLibW  ("kernel32.dll",NULL,"LoadLibraryW",(PROC)LoadLibW);
 static CHookDescriptor hkLdLibXA ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","LoadLibraryExA",(PROC)LoadLibExA);
 static CHookDescriptor hkLdLibXW ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","LoadLibraryExW",(PROC)LoadLibExW);
 static CHookDescriptor hkGetPAdr ("kernel32.dll","api-ms-win-core-libraryloader-l1-1-0.dll","GetProcAddress",(PROC)GetProcAddr);
@@ -161,7 +161,7 @@ static CHookDescriptor hkFrLibXT ("kernel32.dll","api-ms-win-core-libraryloader-
 static CHookDescriptor hkCrProcA ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessW",(PROC)CreateProcW);
 
-static CHookDescriptor hkCrPAUA  ("advapi32.dll","///noload!","CreateProcessAsUserA",(PROC)CreatePAUA);
+static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
 
 //Windows XP: only hook calls from umpnpmgr.dll to advapi32.dlls "CreateProcessAsUserW"
 static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads-l1-1-0.dll","CreateProcessAsUserW",(PROC)CreatePAUW,"umpnpmgr.dll");
@@ -1048,8 +1048,14 @@ void LoadHooks()
   {
     //Increase Dll load count
     char fmod[MAX_PATH]={0};
-    GetModuleFileNameA(0,fmod,MAX_PATH);
+    GetModuleFileNameA(l_hInst,fmod,MAX_PATH);
     ((lpLoadLibraryA)hkLdLibA.OrgFunc())(fmod);
+    if (!IsWin2k)
+    {
+      HMODULE hMod=0;
+      if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_PIN,fmod,&hMod))
+        TRACExA("SuRun IAT-Hook: Locking %s failed: %s",fmod,GetLastErrorNameStatic());
+    }
   }
   InitializeCriticalSectionAndSpinCount(&g_HookCs,0x80000000);
   g_IATInit=TRUE;
