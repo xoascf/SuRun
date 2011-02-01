@@ -1,3 +1,9 @@
+* IAT-Hooks are directly loaded without a separate thread.
+  When that GPF's, a thread is created to load the hooks.
+* SuRunExt.Dll uses GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN,...) 
+  to prevent unloading the Dll. This effectively eliminated GPFs in 
+  SuRunExt.Dll_unloaded on my Win7pro system.
+
 ToDo:
 ---------------------
 * Add Option to store a user's password
