@@ -952,6 +952,8 @@ DWORD WINAPI InitProc(void* p)
       h=GetModuleHandleA("psapi.dll");
       if (h)
         break;
+      if (l_InitThread)
+        LoadLibraryA("psapi.dll");
       Sleep(1);
     }
     GetProcAddress(h,"EnumProcessModules");
@@ -961,6 +963,8 @@ DWORD WINAPI InitProc(void* p)
       h=GetModuleHandleA("advapi32.dll");
       if (h)
         break;
+      if (l_InitThread)
+        LoadLibraryA("advapi32.dll");
       Sleep(1);
     }
     GetProcAddress(h,"CreateProcessAsUserW");
@@ -1024,7 +1028,7 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   if(dwReason==DLL_PROCESS_DETACH)
   {
     g_bDoExit=TRUE;
-    if (l_InitThread && (GetCurrentThreadId()!=GetThreadId(l_InitThread)))
+    if (l_InitThread)
     {
       if((lpReserved!=0)||(WaitForSingleObject(l_InitThread,1000)==WAIT_TIMEOUT))
       {
