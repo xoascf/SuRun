@@ -62,6 +62,8 @@ BOOL RegEnumValName(HKEY HK,LPTSTR SubKey,int Index,LPTSTR Str,DWORD ccMax);
 
 BOOL RenameRegKey(HKEY hKeyRoot,LPTSTR sSrc,LPTSTR sDst);
 
+DWORD hKeyToKeyName(HKEY key,LPTSTR KeyName,DWORD nBytes);
+
 #define EmptyPWAllowed (GetRegInt(HKLM,\
                           _T("SYSTEM\\CurrentControlSet\\Control\\Lsa"),\
                           _T("limitblankpassworduse"),1)==0)

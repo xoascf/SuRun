@@ -280,6 +280,28 @@ BOOL RenameRegKey(HKEY hKeyRoot,LPTSTR sSrc,LPTSTR sDst)
   return TRUE;
 }
 
+DWORD hKeyToKeyName(HKEY key,LPTSTR KeyName,DWORD nBytes)
+{
+  if (key && (nBytes>4))
+  {
+    typedef DWORD (__stdcall *zwQK)(HANDLE,int,PVOID,ULONG,PULONG);
+    static zwQK g_zwqk=0;
+    if(!g_zwqk)
+      g_zwqk = reinterpret_cast<zwQK>(GetProcAddress(GetModuleHandle(L"ntdll.dll"),"ZwQueryKey"));
+    if (g_zwqk) 
+    {
+      DWORD n;
+      if(g_zwqk(key,3,KeyName,nBytes-4,&n)==ERROR_SUCCESS)
+      {
+        memmove(KeyName,&((BYTE*)KeyName)[4],n-4);
+        ((BYTE*)KeyName)[n-4]=0;
+        return n-4;
+      }
+    }
+  }
+  return 0;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // 
 // Privilege stuff

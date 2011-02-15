@@ -123,10 +123,10 @@ static BOOL SwitchToSession(DWORD SessionId)
 static DWORD DoFUS() //Do Fast User Switching
 {
   TCHAR UserName[UNLEN+UNLEN+2];
-  DWORD SessID=wcstol(PathGetArgs(g_RunData.cmdLine),0,10)-1;
+  DWORD SessID=wcstol(SR_PathGetArgsW(g_RunData.cmdLine),0,10)-1;
   if (SessID==-1)
   {
-    _tcsncpy(UserName,PathGetArgs(g_RunData.cmdLine),UNLEN+UNLEN);
+    _tcsncpy(UserName,SR_PathGetArgsW(g_RunData.cmdLine),UNLEN+UNLEN);
     DWORD n=0;
     WTS_SESSION_INFO* si=0;
     WTSEnumerateSessions(0,0,1,&si,&n);
@@ -475,13 +475,13 @@ void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut)
     return;
   TCHAR cmd[4096]={0};
   GetSystemWindowsDirectory(cmd,4096);
-  PathAppend(cmd,L"SuRun.exe");
+  SR_PathAppendW(cmd,L"SuRun.exe");
   HANDLE hUser=GetSessionUserToken(g_RunData.SessionID);
   PROCESS_INFORMATION pi={0};
   STARTUPINFO si={0};
   si.cb	= sizeof(si);
   //Do not inherit Desktop from calling process, use Tokens Desktop
-  TCHAR WinstaDesk[MAX_PATH];
+  TCHAR WinstaDesk[2*MAX_PATH+2];
   _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
   si.lpDesktop = WinstaDesk;
   //Show ToolTip "<Program> is running elevated"...
@@ -790,14 +790,14 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           {
             STARTUPINFO si={0};
             si.cb=sizeof(si);
-            TCHAR WinstaDesk[MAX_PATH];
+            TCHAR WinstaDesk[2*MAX_PATH+2];
             _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
             si.lpDesktop = WinstaDesk;
             si.dwFlags=STARTF_FORCEOFFFEEDBACK;
             TCHAR cmd[4096]={0};
             GetSystemWindowsDirectory(cmd,4096);
-            PathAppend(cmd,L"SuRun.exe");
-            PathQuoteSpaces(cmd);
+            SR_PathAppendW(cmd,L"SuRun.exe");
+            SR_PathQuoteSpacesW(cmd);
             _tcscat(cmd,L" /AskUSER");
             EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
             EnablePrivilege(SE_INCREASE_QUOTA_NAME);
@@ -1303,29 +1303,42 @@ DWORD LSAStartAdminProcess()
       STARTUPINFO si={0};
       si.cb	= sizeof(si);
       //Do not inherit Desktop from calling process, use Tokens Desktop
-      TCHAR WinstaDesk[MAX_PATH];
+      TCHAR WinstaDesk[2*MAX_PATH+2];
       _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
       si.lpDesktop = WinstaDesk;
       //Special handling for Explorer:
       BOOL bIsExplorer=FALSE;
       {
         TCHAR app[MAX_PATH]={0};
-        GetSystemWindowsDirectory(app,MAX_PATH);
-        PathAppend(app,_T("explorer.exe"));
-        TCHAR cmd[MAX_PATH]={0};
+        TCHAR cmd[4096]={0};
         _tcscpy(cmd,g_RunData.cmdLine);
         PathRemoveArgs(cmd);
         PathUnquoteSpaces(cmd);
+        //Explorer?
+        GetSystemWindowsDirectory(app,MAX_PATH);
+        PathAppend(app,_T("explorer.exe"));
         bIsExplorer=_tcsicmp(cmd,app)==0;
-      }
-      if(bIsExplorer && (_winmajor>=6))//Vista and newer, use "/separate" command line option
-      {
-        TCHAR cmd[MAX_PATH]={0};
-        _tcscpy(cmd,g_RunData.cmdLine);
-        PathRemoveArgs(cmd);
-        _tcscat(cmd,_T(" /SEPARATE, "));
-        _tcscat(cmd,PathGetArgs(g_RunData.cmdLine));
-        _tcscpy(g_RunData.cmdLine,cmd);
+        if(bIsExplorer && (_winmajor>=6))//Vista and newer, use "/separate" command line option
+        {
+          PathQuoteSpaces(cmd);
+          _tcscat(cmd,_T(" /SEPARATE, "));
+          _tcscat(cmd,PathGetArgs(g_RunData.cmdLine));
+          _tcscpy(g_RunData.cmdLine,cmd);
+        }
+        if(!bIsExplorer)
+        {
+          //Cmd?
+          GetSystemWindowsDirectory(app,MAX_PATH);
+          PathAppend(app,_T("system32\\cmd.exe"));
+          if(_tcsicmp(cmd,app)==0)
+          {
+            //cmd.exe: Disable AutoRuns
+            PathQuoteSpaces(cmd);
+            _tcscat(cmd,_T(" /D "));
+            _tcscat(cmd,PathGetArgs(g_RunData.cmdLine));
+            _tcscpy(g_RunData.cmdLine,cmd);
+          }
+        }
       }
       if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,
           CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,Env,g_RunData.CurDir,&si,&pi))
@@ -1540,7 +1553,7 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
     PROCESS_INFORMATION pi={0};
     si.cb	= sizeof(si);
     //Do not inherit Desktop from calling process, use Tokens Desktop
-    TCHAR WinstaDesk[MAX_PATH];
+    TCHAR WinstaDesk[2*MAX_PATH+2];
     _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
     si.lpDesktop = WinstaDesk;
     if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
@@ -1830,8 +1843,8 @@ static void MsgLoop()
 
 void InstallRegistry()
 {
-  TCHAR SuRunExe[4096];
-  GetSystemWindowsDirectory(SuRunExe,4096);
+  TCHAR SuRunExe[MAX_PATH];
+  GetSystemWindowsDirectory(SuRunExe,MAX_PATH);
   InstLog(CResStr(IDS_ADDUNINST));
   PathAppend(SuRunExe,L"SuRun.exe");
   PathQuoteSpaces(SuRunExe);
@@ -1877,8 +1890,8 @@ void InstallRegistry()
     //regfile
     SetRegStr(HKCR,REGRUN,L"",MenuStr);
     SetRegStr(HKCR,REGRUN L"\\command",L"",DefCmd);
-    TCHAR MSIExe[4096];
-    GetSystemDirectory(MSIExe,4096);
+    TCHAR MSIExe[MAX_PATH];
+    GetSystemDirectory(MSIExe,MAX_PATH);
     PathAppend(MSIExe,L"msiexec.exe");
     PathQuoteSpaces(MSIExe);
     //MSI Install
@@ -1905,7 +1918,7 @@ void InstallRegistry()
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_ADDCPL));
-  GetSystemWindowsDirectory(SuRunExe,4096);
+  GetSystemWindowsDirectory(SuRunExe,MAX_PATH);
   PathAppend(SuRunExe,L"SuRunExt.dll");
   SetRegStr(HKLM,L"Software\\Microsoft\\Windows\\CurrentVersion\\Control Panel\\Cpls",L"SuRunCpl",SuRunExe);
   //Add SuRun CPL to "Performance and Maintenance"
