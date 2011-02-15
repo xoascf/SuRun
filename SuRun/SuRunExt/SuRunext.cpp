@@ -29,6 +29,7 @@
 #include <tlhelp32.h>
 #include <USERENV.H>
 #include <wtsapi32.h>
+#include <msi.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -38,6 +39,7 @@
 #pragma comment(lib,"PSAPI.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"WTSApi32.lib")
+#pragma comment(lib,"msi.lib")
 
 #include "../Setup.h"
 #include "../Service.h"
@@ -105,6 +107,7 @@ protected:
   ULONG m_cRef;
   bool m_pDeskClicked;
   TCHAR m_ClickFolderName[4096];
+  TCHAR m_ClickCmdLine[4096];
 public:
   CShellExt();
   ~CShellExt();
@@ -369,48 +372,64 @@ static void PrintDataObj(LPDATAOBJECT pDataObj)
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
+  zero(m_ClickFolderName);
+  zero(m_ClickCmdLine);
+  m_pDeskClicked=FALSE;
 #ifdef DoDBGTrace
-//  {
-//    TCHAR Path[4096]={0};
-//    if (pIDFolder)
-//      SHGetPathFromIDList(pIDFolder,Path);
-//    TCHAR FileClass[4096]={0};
-//    if(hRegKey)
-//      GetRegStr(hRegKey,0,L"",FileClass,4096);
-//    TCHAR File[4096]={0};
-//    if(pDataObj)
-//    {
-//      FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-//      STGMEDIUM stm;
-//      if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-//      {
-//        if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-//          DragQueryFile((HDROP)stm.hGlobal,0,File,4096-1);
-//        ReleaseStgMedium(&stm);
-//      }
-//    }
-//    DBGTrace3("CShellExt::Initialize(%s,%s,%s)",Path,File,FileClass);
+  {
+    if (pIDFolder)
+      SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
+    if(pDataObj)
+    {
+      FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+      STGMEDIUM stm;
+      if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+      {
+        if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+          DragQueryFile((HDROP)stm.hGlobal,0,m_ClickCmdLine,4096-1);
+        ReleaseStgMedium(&stm);
+      }
+    }
+    //Link?
+    if(m_ClickCmdLine[0])
+    {
+      TCHAR cc[40];
+      TCHAR pc[40];
+      if (ERROR_SUCCESS==MsiGetShortcutTarget(m_ClickCmdLine,pc,0,cc))
+      {
+        DWORD len=4095;
+        MsiGetComponentPath(pc,cc,m_ClickCmdLine,&len);
+      }else
+      {
+        IShellLink *psl = NULL;
+        IPersistFile *pPf = NULL;
+        if ( SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl))
+          && SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf))
+          && SUCCEEDED(pPf->Load(m_ClickCmdLine,STGM_READ|STGM_SHARE_DENY_NONE))
+          && SUCCEEDED(psl->Resolve(0,SLR_NO_UI|SLR_NOSEARCH|SLR_NOTRACK|SLR_NOLINKINFO)))
+        {
+          psl->GetPath(m_ClickCmdLine,4096,0,SLGP_UNCPRIORITY);
+          psl->GetArguments(m_ClickFolderName,4096);
+          _tcscat(m_ClickCmdLine,_T(" "));
+          _tcscat(m_ClickCmdLine,m_ClickFolderName);
+          psl->GetWorkingDirectory(m_ClickFolderName,4096);
+        }
+        if (pPf)
+          pPf->Release();
+        if(psl)
+          psl->Release();
+      }
+    }
+    TCHAR FileClass[4096]={0};
+    if(hRegKey)
+      hKeyToKeyName(hRegKey,FileClass,4096);
+    DBGTrace3("CShellExt::Initialize(%s , %s , %s)",m_ClickFolderName,m_ClickCmdLine,FileClass);
 //    if(pDataObj)
 //      PrintDataObj(pDataObj);
-//    //Link?
-//    {
-//      IShellLink *psl = NULL;
-//      IPersistFile *pPf = NULL;
-//      if ( SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl))
-//        && SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf))
-//        && SUCCEEDED(pPf->Load(File,STGM_READ|STGM_SHARE_DENY_NONE))
-//        && SUCCEEDED(psl->Resolve(0,SLR_NO_UI|SLR_NOSEARCH|SLR_NOTRACK|SLR_NOLINKINFO)))
-//      {
-//        psl->GetPath(File,4096,0,SLGP_UNCPRIORITY);
-//        psl->GetArguments(FileClass,4096);
-//        psl->GetWorkingDirectory(Path,4096);
-//        DBGTrace3("----LNK-Info(%s,%s,%s)",Path,File,FileClass);
-//      }
-//    }
-//  }
-#endif DoDBGTrace
+  }
   zero(m_ClickFolderName);
-  m_pDeskClicked=FALSE;
+  zero(m_ClickCmdLine);
+#endif DoDBGTrace
   //Non SuRunners don't need the Shell Extension!
   if ((!l_IsSuRunner)||GetHideFromUser(l_User))
     return NOERROR;
@@ -433,10 +452,10 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
     }
   }else
   {
-    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
     if(g_CF_ShellIdList==0)
       g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
-    FORMATETC fe1 = {g_CF_ShellIdList, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+    FORMATETC fe1= {g_CF_ShellIdList, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
     STGMEDIUM m;
     if ((SUCCEEDED(pDataObj->GetData(&fe,&m)))
       &&(DragQueryFile((HDROP)m.hGlobal,(UINT)-1,NULL,0)==1)) 
@@ -463,8 +482,8 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 
 UINT CompareMenuItemText(HMENU m,int pos,LPCTSTR Text)
 {
-  TCHAR s[MAX_PATH];
-  return GetMenuString(m,pos,s,MAX_PATH-1,MF_BYPOSITION)?_tcsicmp(s,Text):-1;
+  TCHAR s[4096];
+  return GetMenuString(m,pos,s,4095,MF_BYPOSITION)?_tcsicmp(s,Text):-1;
 }
 
 int FindMenuItem(HMENU m,LPCTSTR Text)
@@ -485,7 +504,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
   {
     if(m_pDeskClicked)
     {
-      if (/*(!IsWin7)&&*/(GetCtrlAsAdmin))
+      if (GetCtrlAsAdmin)
       {
         CResStr s(l_hInst,IDS_SURUN);
         if (FindMenuItem(hMenu,s)<0)
@@ -502,7 +521,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
       CResStr sCmd(l_hInst,IDS_SURUNCMD);
       CResStr sExp(l_hInst,IDS_SURUNEXP);
       BOOL bCmd=GetCmdAsAdmin && (FindMenuItem(hMenu,sCmd)<0);
-      BOOL bExp=/*(!IsWin7)&&*/ GetExpAsAdmin && (FindMenuItem(hMenu,sExp)<0);
+      BOOL bExp=GetExpAsAdmin && (FindMenuItem(hMenu,sExp)<0);
       if (bExp || bCmd)
         InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
       //right click target is folder background
@@ -538,8 +557,8 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     GetSystemWindowsDirectory(cmd,4096);
-    PathAppend(cmd, _T("SuRun.exe"));
-    PathQuoteSpaces(cmd);
+    SR_PathAppendW(cmd, _T("SuRun.exe"));
+    SR_PathQuoteSpacesW(cmd);
     if (m_pDeskClicked)
       _tcscat(cmd,L" control");
     else
@@ -548,7 +567,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
         _tcscat(cmd,L" cmd /D /T:4E /K cd /D ");
       else
         _tcscat(cmd,L" explorer /e, ");
-      PathQuoteSpaces(m_ClickFolderName);
+      SR_PathQuoteSpacesW(m_ClickFolderName);
       _tcscat(cmd,m_ClickFolderName);
     }
     // Start the child process.
@@ -615,7 +634,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   zero(cmd);
   //check if this Programm has an Auto-SuRun-Entry in the List
   _tcscpy(tmp,pei->lpFile);
-  PathQuoteSpaces(tmp);
+  SR_PathQuoteSpacesW(tmp);
   //Verb must be "open" or empty
   BOOL bNoAutoRun=TRUE;
   BOOL bRunAs=FALSE;
@@ -630,7 +649,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     if (_tcsicmp(pei->lpVerb,L"AutoRun")==0)
     {
       //AutoRun: get open command
-      PathAppend(tmp,L"AutoRun.inf");
+      SR_PathAppendW(tmp,L"AutoRun.inf");
       if (GetPrivateProfileInt(L"AutoRun",L"UseAutoPlay",0,tmp)!=0)
         return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
       GetPrivateProfileString(L"AutoRun",L"open",L"",cmd,countof(cmd)-1,tmp);
@@ -673,11 +692,11 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 
   GetSystemWindowsDirectory(cmd,countof(cmd));
 #ifndef _SR32
-  PathAppend(cmd, _T("SuRun.exe"));
+  SR_PathAppendW(cmd, _T("SuRun.exe"));
 #else _SR32
-  PathAppend(cmd, _T("SuRun32.bin"));
+  SR_PathAppendW(cmd, _T("SuRun32.bin"));
 #endif _SR32
-  PathQuoteSpaces(cmd);
+  SR_PathQuoteSpacesW(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
     return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
@@ -773,8 +792,8 @@ LONG CALLBACK CPlApplet(HWND hwnd,UINT uMsg,LPARAM lParam1,LPARAM lParam2)
         return 1;
       TCHAR fSuRunExe[4096];
       GetSystemWindowsDirectory(fSuRunExe,4096);
-      PathAppend(fSuRunExe,L"SuRun.exe");
-      PathQuoteSpaces(fSuRunExe);
+      SR_PathAppendW(fSuRunExe,L"SuRun.exe");
+      SR_PathQuoteSpacesW(fSuRunExe);
       HINSTANCE h=ShellExecute(hwnd,L"open",fSuRunExe,L"/Setup",0,SW_SHOWNORMAL);
       return 0;
     }
@@ -899,7 +918,7 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Directory\\Background\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #ifdef DoDBGTrace
-  //SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
   SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #endif DoDBGTrace
   //self Approval
@@ -975,9 +994,9 @@ DWORD WINAPI InitProc(void* p)
     //IAT Hook:
     if (l_bSetHook)
     {
-      TCHAR fMod[MAX_PATH];
+      TCHAR fMod[4096];
       TCHAR fNoHook[4096];
-      GetProcessFileName(fMod,MAX_PATH);
+      GetProcessFileName(fMod,4096);
       //Do not set hooks into SuRun!
       GetSystemWindowsDirectory(fNoHook,4096);
 #ifndef _SR32
@@ -1029,19 +1048,10 @@ BOOL APIENTRY DllMain( HINSTANCE hInstDLL,DWORD dwReason,LPVOID lpReserved)
   {
     g_bDoExit=TRUE;
     if (l_InitThread)
-    {
-      if((lpReserved!=0)||(WaitForSingleObject(l_InitThread,1000)==WAIT_TIMEOUT))
-      {
-        DBGTrace("WARNING: SuRunExt Terminating InitThread");
-        TerminateThread(l_InitThread,0);
-      }
-    }
+      TerminateThread(l_InitThread,0);
     l_InitThread=0;
     //"The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
     // Leave the critical section l_SxHkCs untouched to avoid possible dead locks
-    //IAT-Hook
-    if(lpReserved==0)
-      UnloadHooks();
     return TRUE;
   }
   if(dwReason!=DLL_PROCESS_ATTACH)

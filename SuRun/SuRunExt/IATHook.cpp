@@ -278,7 +278,7 @@ BOOL DoHookDll(char* DllName,char* HostDll)
 }
 
 //returns newFunc if DllName->ImpName is one to be hooked up
-PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
+PROC DoHookFn(char* DllName,char* ImpName)
 {
   if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
     return 0;
@@ -290,72 +290,14 @@ PROC DoHookFn(char* DllName,char* ImpName,PROC* orgFunc)
         if ((((!IsWin7)||(hdt[i]->Win7DllName==0))&& (stricmp(hdt[i]->DllName,DllName)==0))
           ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
           if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
-          {
-            if(orgFunc)
-              *orgFunc=sys_hdt[i]->OrgFunc();
             return sys_hdt[i]->newFunc;
-          }
     }else
     {
       for(int i=0;i<countof(hdt);i++)
         if ((((!IsWin7)||(hdt[i]->Win7DllName==0))&&(stricmp(hdt[i]->DllName,DllName)==0))
           ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
           if (stricmp(hdt[i]->FuncName,ImpName)==0)
-          {
-            if(orgFunc)
-              *orgFunc=hdt[i]->OrgFunc();
             return hdt[i]->newFunc;
-          }
-    }
-  }
-  return false;
-}
-
-PROC DoHookFn(char* DllName,PROC orgFunc)
-{
-  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(orgFunc,1))
-    return 0;
-  if(*DllName)
-  {
-    if (l_IsAdmin)
-    {
-      for(int i=0;i<countof(sys_hdt);i++)
-        if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
-          ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
-          if (sys_hdt[i]->OrgFunc()==orgFunc)
-            return sys_hdt[i]->newFunc;
-    }
-    {
-      for(int i=0;i<countof(hdt);i++)
-        if ((stricmp(hdt[i]->DllName,DllName)==0)
-          ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-          if (hdt[i]->OrgFunc()==orgFunc)
-            return hdt[i]->newFunc;
-    }
-  }
-  return false;
-}
-
-PROC GetOrgFn(char* DllName,char* ImpName)
-{
-  if(IsBadReadPtr(DllName,1)||IsBadReadPtr(ImpName,1))
-    return 0;
-  if(*DllName && *ImpName)
-  {
-    if (l_IsAdmin)
-    {
-      for(int i=0;i<countof(sys_hdt);i++)
-        if ((stricmp(sys_hdt[i]->DllName,DllName)==0)
-          ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
-          if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
-            return sys_hdt[i]->OrgFunc();
-    }else
-    {
-      for(int i=0;i<countof(hdt);i++)
-        if ((stricmp(hdt[i]->DllName,DllName)==0)
-          ||(hdt[i]->Win7DllName && (stricmp(hdt[i]->Win7DllName,DllName)==0)))
-          if (stricmp(hdt[i]->FuncName,ImpName)==0)
-            return hdt[i]->OrgFunc();
     }
   }
   return false;
@@ -387,7 +329,7 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
   return false;
 }
 
-DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
+DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
 {
   DWORD nHooked=0;
 #ifdef DoDBGTrace
@@ -413,12 +355,9 @@ DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
         if ((pOrgThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )==0)
         {
           PIMAGE_IMPORT_BY_NAME pBN=RelPtr(PIMAGE_IMPORT_BY_NAME,hMod,pOrgThunk->u1.AddressOfData);
-          PROC orgFunc = 0;
-          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name,&orgFunc);
+          PROC newFunc = DoHookFn(DllName,(char*)pBN->Name);
           //PROC newFunc = DoHookFn(DllName,(PROC)pThunk->u1.Function);
-          if (newFunc && orgFunc 
-            && (((!bUnHook) && (pThunk->u1.Function!=(DWORD_PTR)newFunc))
-               ||(bUnHook && (pThunk->u1.Function==(DWORD_PTR)newFunc))))
+          if (newFunc && (pThunk->u1.Function!=(DWORD_PTR)newFunc))
           {
             __try
             {
@@ -434,7 +373,7 @@ DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
 //                  TRACExA("%s: %sHookFunc(%s):%s,%s (%x->%x) newProt:%x; oldProt:%x\n",DLLNAME,
 //                    (bUnHook?"Un":""),fmod,DllName,pBN->Name,pThunk->u1.Function,newFunc,PAGE_EXECUTE_WRITECOPY,oldProt);
 #endif DoDBGTrace
-                InterlockedExchangePointer((VOID**)&pThunk->u1.Function,(bUnHook?orgFunc:newFunc));
+                InterlockedExchangePointer((VOID**)&pThunk->u1.Function,newFunc);
                 VirtualProtect(&pThunk->u1.Function,sizeof(pThunk->u1.Function), oldProt, &oldProt);
                 nHooked++;
               }
@@ -450,7 +389,7 @@ DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID,bool bUnHook)
   return nHooked;
 }
 
-DWORD Hook(HMODULE hMod,bool bUnHook)
+DWORD Hook(HMODULE hMod)
 {
   //Detect if a module is using CreateProcess, if yes, it needs to be hooked
   if(hMod==l_hInst)
@@ -501,22 +440,13 @@ DWORD Hook(HMODULE hMod,bool bUnHook)
           if(NeedHookFn(DllName,(char*)pBN->Name,(void*)pThunk->u1.Function))
           {
             //Hook IAT
-            DWORD dwRet=HookIAT(fMod,hMod,pID,bUnHook);
+            DWORD dwRet=HookIAT(fMod,hMod,pID);
             return dwRet;
           }
         }
     }//if(DoHookDll(DllName))
   }//for(;pID->Name;pID++) 
   return false;
-}
-
-DWORD UnhookModules()
-{
-  DWORD nHooked=0;
-  //Unhook hModules
-  for(ModList::iterator it=g_ModList.begin();it!=g_ModList.end();++it)
-    nHooked+=Hook(*it,TRUE);
-  return nHooked;
 }
 
 DWORD HookModules()
@@ -540,7 +470,7 @@ DWORD HookModules()
     std::set_difference(hMod,hMod+n,g_ModList.begin(),g_ModList.end(),std::back_inserter(newMods));
     //Hook new hModules
     for(ModList::iterator it=newMods.begin();it!=newMods.end();++it)
-      nHooked+=Hook(*it,FALSE);
+      nHooked+=Hook(*it);
     //merge new hModules to list
     g_ModList.merge(newMods);
     free(hMod);
@@ -870,7 +800,7 @@ FARPROC WINAPI GetProcAddr(HMODULE hModule,LPCSTR lpProcName)
     if(GetModuleFileNameA(hModule,f,MAX_PATH))
     {
       SR_PathStripPathA(f);
-      p=DoHookFn(f,(char*)lpProcName,NULL);
+      p=DoHookFn(f,(char*)lpProcName);
 #ifdef DoDBGTrace
 //      if (p)
 //        TRACExA("%s: intercepting call to GetProcAddr(%s,%s)",DLLNAME,f,lpProcName);
@@ -1077,14 +1007,3 @@ void LoadHooks()
   HookModules();
   LeaveCriticalSection(&g_HookCs);
 }
-
-void UnloadHooks()
-{
-  if (!g_IATInit)
-    return;
-  //"The Old New Thing:" Don't try to be smart on DLL_PROCESS_DETACH
-  // Leave the critical section g_HookCs untouched to avoid possible dead locks
-  UnhookModules();
-  g_IATInit=FALSE;
-}
-
