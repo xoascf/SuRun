@@ -586,37 +586,34 @@ static CRITICAL_SECTION l_SxHkCs={0};
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
-//SHELLEXECUTEINFOW l_lastfailedSx={0};
 HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 {
 #ifdef DoDBGTrace
-//  if (pei)
-//    DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, "
-//      L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
-//      pei->fMask,pei->lpVerb,pei->lpFile,pei->lpParameters,pei->lpDirectory,
-//      pei->lpIDList,pei->lpClass,pei->hkeyClass,pei->hProcess);
-//  else
-//    DBGTrace("SuRun ShellExtHook::ShellExtExecute");
+  if (pei)
+    DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, "
+      L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
+      pei->fMask,pei->lpVerb,pei->lpFile,pei->lpParameters,pei->lpDirectory,
+      pei->lpIDList,pei->lpClass,pei->hkeyClass,pei->hProcess);
+  else
+    DBGTrace("SuRun ShellExtHook::ShellExtExecute");
 #endif DoDBGTrace
   //Admins don't need the ShellExec Hook!
   if (l_IsAdmin)
     return S_FALSE;
   if (!pei)
   {
-    DBGTrace("SuRun ShellExtHook Error: LPSHELLEXECUTEINFO==NULL");
+    DBGTrace("SuRun ShellExtExecute Error: LPSHELLEXECUTEINFO==NULL");
     return S_FALSE;
   }
   if(pei->cbSize<sizeof(SHELLEXECUTEINFO))
   {
-    DBGTrace2("SuRun ShellExtHook Error: invalid Size (expected=%d;real=%d)",
+    DBGTrace2("SuRun ShellExtExecute Error: invalid Size (expected=%d;real=%d)",
       sizeof(SHELLEXECUTEINFO),pei->cbSize);
     return S_FALSE;
   }
-//  if (memcmp(&l_lastfailedSx,pei,sizeof(SHELLEXECUTEINFOW))==0)
-//    return S_FALSE;
   if (!pei->lpFile)
   {
-    DBGTrace("SuRun ShellExtHook Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
+    DBGTrace("SuRun ShellExtExecute Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
 #ifdef DoDBGTrace
 //    DBGTrace15("  siz=%d, msk=%X wnd=%X, verb=%s, file=%s, parms=%s, "
 //      L"dir=%s, nShow=%X, inst=%X, idlist=%X, class=%s, hkc=%X, hotkey=%X, hicon=%X, hProc=%X",
@@ -660,7 +657,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     }else
     {
 #ifdef DoDBGTrace
-      DBGTrace1("SuRun ShellExtHook Error: invalid verb (%s)!",pei->lpVerb);
+      DBGTrace1("SuRun ShellExtExecute Error: invalid verb (%s)!",pei->lpVerb);
 //    DBGTrace9("  msk=%X verb=%s, file=%s, parms=%s, "
 //      L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
 //      pei->fMask,pei->lpVerb,pei->lpFile,pei->lpParameters,pei->lpDirectory,
@@ -685,10 +682,11 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     GetCurrentDirectory(countof(CurDir),CurDir);
   
   ResolveCommandLine(tmp,CurDir,tmp);
-  SetCurrentDirectory(cmd);
 
+//  GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",cmd,4096);
+//  if(_tcsicmp(tmp,cmd)==0)
+//    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;  
   RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
-//  zero(l_lastfailedSx);
 
   GetSystemWindowsDirectory(cmd,countof(cmd));
 #ifndef _SR32
@@ -734,16 +732,15 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
         if (!bRunAs)
         {
           SetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp);
-//          l_lastfailedSx=*pei;
         }
       }
     }else
-      DBGTrace1("SuRun ShellExtHook: WHOOPS! %s",cmd);
+      DBGTrace1("SuRun ShellExtExecute: WHOOPS! %s",cmd);
     CloseHandle(pi.hProcess);
     LeaveCriticalSection(&l_SxHkCs);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
-    DBGTrace2("SuRun ShellExtHook: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
+    DBGTrace2("SuRun ShellExtExecute: CreateProcess(%s) failed: %s",cmd,GetLastErrorNameStatic());
   return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
 }
 
@@ -1015,7 +1012,7 @@ DWORD WINAPI InitProc(void* p)
           GetSystemWindowsDirectory(fNoHook,4096);
           SR_PathAppendW(fNoHook,L"SYSTEM32\\services.exe");
           SR_PathQuoteSpacesW(fNoHook);
-          l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)==0);
+          l_bSetHook=_tcsicmp(fMod,fNoHook)==0;
         }
 #endif _TEST_STABILITY
         //Do not set hooks into blacklisted files!
