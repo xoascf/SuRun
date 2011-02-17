@@ -813,7 +813,7 @@ TryAgain:
               SIZE_T N=0;
               WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(rd),&N);
               WriteProcessMemory(pi.hProcess,&g_CliIsAdmin,&g_CliIsAdmin,sizeof(g_CliIsAdmin),&N);
-              if (!g_RunData.bRunAs)
+              //if (!g_RunData.bRunAs)
               {
                 HANDLE hTok=0;
                 if (g_RunData.Groups&IS_IN_ADMINS)
@@ -1229,6 +1229,7 @@ BOOL Setup()
 // 
 //////////////////////////////////////////////////////////////////////////////
 static bool g_RunAsAsAdmin=false;//ToDo: Don't use globals here!
+static bool g_RunAsAsUser=false;//ToDo: Don't use globals here!
 HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs)
 {
   //Admin Token for SessionId
@@ -1243,6 +1244,8 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs
   BOOL bEmptyPWAllowed=FALSE;
   if(bRunAs)
     hUser=LSALogon(SessionID,un,dn,Password,!g_RunAsAsAdmin);
+  else if (g_RunAsAsUser)
+    hUser=GetProcessUserToken(g_RunData.CliProcessId);
   else
     hUser=GetAdminToken(SessionID);
   return hUser;
@@ -1674,7 +1677,12 @@ void SuRun()
       SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",User);
       _tcscpy(g_RunData.UserName,User);
       //AsAdmin!
-      g_RunAsAsAdmin=(r&8)!=0;//ToDo: Don't use globals here!
+      g_RunAsAsAdmin=(r&0x08)!=0;//ToDo: Don't use globals here!
+      if(r&0x10)
+      {
+        g_RunData.bRunAs=FALSE;
+        g_RunAsAsUser=(r&0x08)==0;//ToDo: Don't use globals here!
+      }
     }else
     {
       DBGTrace("CreateSafeDesktop failed");
