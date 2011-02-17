@@ -43,6 +43,8 @@ extern DWORD g_nTimes;
 #define AddTime(s) { g_RunTimes[g_nTimes]=timeGetTime(); g_RunTimeNames[g_nTimes++]=_TEXT(s); }
 #endif DoDBGTrace
 #endif SuRunEXT_EXPORTS
+extern TOKEN_STATISTICS g_AdminTStat;
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Logon Helper
@@ -255,13 +257,30 @@ static void SetUserBitmap(HWND hwnd)
       if(bAdmin)
       {
         if (UACEnabled)
-        {
-          CheckDlgButton(hwnd,IDC_RUNASADMIN,1);
           ShowWindow(GetDlgItem(hwnd,IDC_RUNASADMIN),SW_SHOW);
-        }
+        CheckDlgButton(hwnd,IDC_RUNASADMIN,1);
       }else if (IsInSuRunners(User,p->SessionId) && (!GetRestrictApps(User)))
+      {
+        bAdmin=TRUE;
         ShowWindow(GetDlgItem(hwnd,IDC_RUNASADMIN),SW_SHOW);
+      }
+      if (bAdmin && (_tcsicmp(User,p->User)==0))
+      {
+        CheckDlgButton(hwnd,IDC_RUNASADMIN,1);
+        BOOL PwExpired=PasswordExpired(User);
+        BOOL NoNeedPw=g_AdminTStat.AuthenticationId.HighPart||g_AdminTStat.AuthenticationId.LowPart;
+        BOOL PwOk=GetSavePW && (!PwExpired) && NoNeedPw;
+        if (PwOk)
+        {
+          SetDlgItemText(hwnd,IDC_PASSWORD,_T("****"));
+          EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),0);
+          CheckDlgButton(hwnd,IDC_STOREPASS,0);
+          EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),0);
+          return;
+        }
+      }
     }
+    EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),1);
     TCHAR Pass[PWLEN+1]={0};
     if (LoadRunAsPassword(p->SessionId,p->User,User,Pass,PWLEN) 
       && PasswordOK(p->SessionId,User,Pass,false))
@@ -297,8 +316,8 @@ SIZE CliSize(HWND w)
 int NX_Ctrls[]={IDC_SECICON,IDC_SECICON1,IDC_USERBITMAP,IDC_USRST,IDC_PWDST};
 //These controls are stretched on X-Resize
 int SX_Ctrls[]={IDC_WHTBK,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,IDC_DLGQUESTION,
-                IDC_USER,IDC_PASSWORD,IDC_STOREPASS,IDC_HINT,IDC_HINT2,IDC_ALWAYSOK,
-                IDC_SHELLEXECOK,IDC_AUTOCANCEL};
+                IDC_USER,IDC_PASSWORD,IDC_STOREPASS,IDC_RUNASADMIN,IDC_HINT,
+                IDC_HINT2,IDC_ALWAYSOK,IDC_SHELLEXECOK,IDC_AUTOCANCEL};
 //These controls are moved on X-Resize
 int MX_Ctrls[]={IDCANCEL,IDOK};
 //These controls are not changed on Y-Resize
@@ -307,8 +326,9 @@ int NY_Ctrls[]={IDC_SECICON};
 int SY_Ctrls[]={IDC_WHTBK,IDC_DLGQUESTION};
 //These controls are moved on Y-Resize
 int MY_Ctrls[]={IDC_SECICON1,IDC_USERBITMAP,IDC_HINTBK,IDC_FRAME1,IDC_FRAME2,
-                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2,IDCANCEL,IDC_STOREPASS,IDOK,
-                IDC_USRST,IDC_PWDST,IDC_ALWAYSOK,IDC_SHELLEXECOK,IDC_AUTOCANCEL};
+                IDC_USER,IDC_PASSWORD,IDC_HINT,IDC_HINT2,IDCANCEL,IDC_STOREPASS,
+                IDC_RUNASADMIN,IDOK,IDC_USRST,IDC_PWDST,IDC_ALWAYSOK,
+                IDC_SHELLEXECOK,IDC_AUTOCANCEL};
 
 void MoveDlgCtrl(HWND hDlg,int nId,int x,int y,int dx,int dy)
 {
@@ -606,6 +626,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                             +(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2)
                             +(IsDlgButtonChecked(hwnd,IDC_RUNASADMIN)<<3);
           LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+          if (p->bRunAs && (!IsWindowEnabled(GetDlgItem(hwnd,IDC_STOREPASS))))
+          {
+            p->bRunAs=FALSE;
+            ExitCode|=1<<4;
+          }
           if (p->bRunAs || IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
             TCHAR User[UNLEN+GNLEN+2]={0};
