@@ -1228,6 +1228,7 @@ BOOL Setup()
 //  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
+static g_RunAsAsAdmin=false;//ToDo: Don't use globals here!
 HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs)
 {
   //Admin Token for SessionId
@@ -1241,7 +1242,7 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
   if(bRunAs)
-    hUser=LSALogon(SessionID,un,dn,Password,true);
+    hUser=LSALogon(SessionID,un,dn,Password,!g_RunAsAsAdmin);
   else
     hUser=GetAdminToken(SessionID);
   return hUser;
@@ -1661,7 +1662,8 @@ void SuRun()
       TCHAR RunAsUser[UNLEN+DNLEN+2]={0};
       if (!GetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",RunAsUser,UNLEN+DNLEN+2))
         _tcscpy(RunAsUser,g_RunData.UserName);
-      if (!RunAsLogon(g_RunData.SessionID,User,g_RunPwd,RunAsUser,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine)))
+      DWORD r=RunAsLogon(g_RunData.SessionID,User,g_RunPwd,RunAsUser,IDS_ASKRUNAS,BeautifyCmdLine(g_RunData.cmdLine));
+      if (r==0)
       {
         DeleteSafeDesktop((!(g_RunData.Groups&IS_TERMINAL_USER))&GetFadeDesk);
         ResumeClient(RETVAL_CANCELLED);
@@ -1671,6 +1673,8 @@ void SuRun()
       DeleteSafeDesktop(false);
       SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",User);
       _tcscpy(g_RunData.UserName,User);
+      //AsAdmin!
+      g_RunAsAsAdmin=(r&8)!=0;//ToDo: Don't use globals here!
     }else
     {
       DBGTrace("CreateSafeDesktop failed");

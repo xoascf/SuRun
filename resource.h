@@ -244,6 +244,7 @@
 #define IDC_STOREPASS                   1074
 #define IDC_NOLOGONDESK                 1074
 #define IDC_WARNADMIN                   1075
+#define IDC_RUNASADMIN                  1075
 #define IDC_AUTOCANCEL                  1077
 #define IDC_HIDESURUN                   1078
 #define IDC_REQPW4SETUP                 1079

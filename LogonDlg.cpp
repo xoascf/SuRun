@@ -246,6 +246,22 @@ static void SetUserBitmap(HWND hwnd)
   //Password:
   if ((p->bRunAs)||(p->bFUS))
   {
+    CheckDlgButton(hwnd,IDC_RUNASADMIN,0);
+    ShowWindow(GetDlgItem(hwnd,IDC_RUNASADMIN),SW_HIDE);
+    BOOL bAdmin=FALSE;
+    if (p->bRunAs)
+    {
+      BOOL bAdmin=IsInAdmins(User,p->SessionId);
+      if(bAdmin)
+      {
+        if (UACEnabled)
+        {
+          CheckDlgButton(hwnd,IDC_RUNASADMIN,1);
+          ShowWindow(GetDlgItem(hwnd,IDC_RUNASADMIN),SW_SHOW);
+        }
+      }else if (IsInSuRunners(User,p->SessionId) && (!GetRestrictApps(User)))
+        ShowWindow(GetDlgItem(hwnd,IDC_RUNASADMIN),SW_SHOW);
+    }
     TCHAR Pass[PWLEN+1]={0};
     if (LoadRunAsPassword(p->SessionId,p->User,User,Pass,PWLEN) 
       && PasswordOK(p->SessionId,User,Pass,false))
@@ -587,7 +603,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       case MAKEWPARAM(IDOK,BN_CLICKED):
         {
           INT_PTR ExitCode=1+(IsDlgButtonChecked(hwnd,IDC_ALWAYSOK)<<1)
-                            +(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2);
+                            +(IsDlgButtonChecked(hwnd,IDC_SHELLEXECOK)<<2)
+                            +(IsDlgButtonChecked(hwnd,IDC_RUNASADMIN)<<3);
           LOGONDLGPARAMS* p=(LOGONDLGPARAMS*)GetWindowLongPtr(hwnd,GWLP_USERDATA);
           if (p->bRunAs || IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
