@@ -1228,7 +1228,7 @@ BOOL Setup()
 //  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-static g_RunAsAsAdmin=false;//ToDo: Don't use globals here!
+static bool g_RunAsAsAdmin=false;//ToDo: Don't use globals here!
 HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs)
 {
   //Admin Token for SessionId
