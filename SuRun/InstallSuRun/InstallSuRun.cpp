@@ -15,6 +15,7 @@
 #include <windows.h>
 #include <shlwapi.h>
 #include <stdio.h>
+#include <tchar.h>
 #include <Aclapi.h>
 #pragma comment(lib,"shlwapi.lib")
 
@@ -207,6 +208,18 @@ void DelTmpFiles()
 
 int APIENTRY WinMain(HINSTANCE,HINSTANCE,LPSTR,int)
 {
+  {
+    //Enable DEP
+    HMODULE hMod=GetModuleHandle(_T("Kernel32.dll"));
+    if (hMod) 
+    {
+      typedef BOOL (WINAPI *PSETDEP)(DWORD);
+      #define PROCESS_DEP_ENABLE 0x00000001
+      PSETDEP SetProcessDEPPolicy=(PSETDEP)GetProcAddress(hMod,"SetProcessDEPPolicy");
+      if (SetProcessDEPPolicy) 
+        SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
+    }
+  }
   if(IsWow64()) //Win64
   {
     if ((!ResToTmp("EXE64_FILE","SuRun.exe"))

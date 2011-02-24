@@ -166,9 +166,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=" /NXCOMPAT /FIXED:No /DynamicBase"
 				OutputFile="../InstallSuRun.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ProgramDatabaseFile=".\Release/InstallSuRun.pdb"
 				GenerateMapFile="true"
 				MapExports="true"

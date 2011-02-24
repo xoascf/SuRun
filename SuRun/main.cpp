@@ -57,12 +57,20 @@ static void HideAppStartCursor()
   }
 }
 
-extern HANDLE GetAdminToken(DWORD SessionID);
-#include <Userenv.h>
-
-
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  {
+    //Enable DEP
+    HMODULE hMod=GetModuleHandle(_T("Kernel32.dll"));
+    if (hMod) 
+    {
+      typedef BOOL (WINAPI *PSETDEP)(DWORD);
+      #define PROCESS_DEP_ENABLE 0x00000001
+      PSETDEP SetProcessDEPPolicy=(PSETDEP)GetProcAddress(hMod,"SetProcessDEPPolicy");
+      if (SetProcessDEPPolicy) 
+        SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
+    }
+  }
 //  DBGTrace1("SuRun started with (%s)",GetCommandLine());
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {

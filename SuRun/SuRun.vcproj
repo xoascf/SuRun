@@ -75,7 +75,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089"
+				AdditionalOptions="/IGNORE:4089 /NXCOMPAT /FIXED:No /DynamicBase"
 				OutputFile="ReleaseUx64/SuRun32.bin"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -232,15 +232,18 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089"
+				AdditionalOptions="/IGNORE:4089  /NXCOMPAT /FIXED:No /DynamicBase"
 				OutputFile=".\ReleaseU/SuRun.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ProgramDatabaseFile=".\ReleaseU/SuRun.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
 				SubSystem="2"
+				OptimizeForWindows98="0"
 				TargetMachine="1"
+				FixedBaseAddress="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -611,7 +614,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089 /machine:AMD64 "
+				AdditionalOptions="/IGNORE:4089 /machine:AMD64   /NXCOMPAT /FIXED:No /DynamicBase"
 				AdditionalDependencies="LIBCMT.LIB KERNEL32.LIB"
 				ShowProgress="0"
 				OutputFile=".\ReleaseUx64/SuRun.exe"
@@ -623,7 +626,12 @@
 				SubSystem="2"
 				TerminalServerAware="2"
 				SwapRunFromNet="false"
+				ResourceOnlyDLL="false"
+				SetChecksum="true"
+				SupportUnloadOfDelayLoadedDLL="false"
 				TargetMachine="17"
+				FixedBaseAddress="1"
+				CLRUnmanagedCodeCheck="false"
 			/>
 			<Tool
 				Name="VCALinkTool"

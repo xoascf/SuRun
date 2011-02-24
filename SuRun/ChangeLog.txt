@@ -31,7 +31,12 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
-SuRun 1.2.1.0 Beta 2 - 2011-02-15
+SuRun 1.2.1.0 Beta 4 - 2011-02-24
+---------------------------------
+* NEW: InstallSurun and SuRun set DEP permanently ON
+* NEW: All files are compiled DEP compatible and with ASLR ON
+
+SuRun 1.2.1.0 Beta 3 - 2011-02-15
 ---------------------------------
 * NEW: SuRun's RunAs has a new "Run elevated" Option for non restricted 
     SuRunners and Administrators
