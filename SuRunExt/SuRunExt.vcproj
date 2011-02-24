@@ -232,7 +232,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089"
+				AdditionalOptions="/IGNORE:4089 /NXCOMPAT /FIXED:No /DynamicBase"
 				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile="../ReleaseU/SuRunExt.dll"
 				LinkIncremental="1"
@@ -456,7 +456,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089 /machine:AMD64 "
+				AdditionalOptions="/IGNORE:4089 /machine:AMD64 /NXCOMPAT /FIXED:No /DynamicBase"
 				AdditionalDependencies="LIBCMT.LIB KERNEL32.LIB"
 				OutputFile="../ReleaseUx64/SuRunExt.dll"
 				LinkIncremental="1"
@@ -553,7 +553,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089"
+				AdditionalOptions="/IGNORE:4089 /NXCOMPAT /FIXED:No /DynamicBase"
 				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile="../ReleaseUx64/SuRunExt32.dll"
 				LinkIncremental="1"

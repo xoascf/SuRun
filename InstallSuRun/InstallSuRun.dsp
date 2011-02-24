@@ -23,6 +23,8 @@ CFG=InstallSuRun - Win32 Debug
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
+# PROP Scc_ProjName ""
+# PROP Scc_LocalPath ""
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
@@ -53,10 +55,11 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"../InstallSuRun.exe"
 # Begin Special Build Tool
+WkspDir=.
 TargetPath=\surun\SuRun\InstallSuRun.exe
 SOURCE="$(InputPath)"
 PostBuild_Desc=UPXing
-PostBuild_Cmds=upx --lzma $(TargetPath)
+PostBuild_Cmds=$(WkspDir)\bin\setdllcharacteristics.exe +d +n $(TargetPath)	upx --lzma $(TargetPath)
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "InstallSuRun - Win32 Debug"
