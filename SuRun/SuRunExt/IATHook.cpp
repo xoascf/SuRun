@@ -297,7 +297,7 @@ PROC DoHookFn(char* DllName,char* ImpName)
     if (l_IsAdmin)
     {
       for(int i=0;i<countof(sys_hdt);i++)
-        if ((((!IsWin7)||(hdt[i]->Win7DllName==0))&& (stricmp(hdt[i]->DllName,DllName)==0))
+        if ((((!IsWin7)||(sys_hdt[i]->Win7DllName==0))&& (stricmp(sys_hdt[i]->DllName,DllName)==0))
           ||(sys_hdt[i]->Win7DllName && (stricmp(sys_hdt[i]->Win7DllName,DllName)==0)))
           if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
             return sys_hdt[i]->newFunc;
