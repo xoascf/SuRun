@@ -31,6 +31,9 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+* FIX: Install Hardware automatically as administrator did not work in all 
+    1.2.1.0 Betas.
+
 SuRun 1.2.1.0 Beta 4 - 2011-02-24
 ---------------------------------
 * NEW: InstallSurun and SuRun set DEP permanently ON
