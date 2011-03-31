@@ -31,6 +31,12 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+
+---------------------------------
+* FIX: "(Re-)Start as Administrator" did not work with captionless Windows
+
+SuRun 1.2.1.0 Beta 5 - 2011-03-18
+---------------------------------
 * FIX: Install Hardware automatically as administrator did not work in all 
     1.2.1.0 Betas.
 

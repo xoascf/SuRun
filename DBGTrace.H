@@ -41,6 +41,8 @@ static WCHAR SuRun_Beta[]={0x03B2,'5',
 void TRACExA(LPCSTR s,...);
 void TRACEx(LPCTSTR s,...);
 
+LPCTSTR MsgName(UINT msg);
+
 #ifdef DoDBGTrace
 
 #define DBGTrace(msg)                             TRACEx(_T("%s(%i): ")_T(msg)_T("\n"),_T(__FILE__),__LINE__)
