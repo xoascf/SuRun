@@ -35,6 +35,8 @@ SuRun Changes:
 
 SuRun 1.1.0.3 - 2008-04-09:
 ----------------------------
+* NEW: "SuRuns Settings" appears in the control panels category view in
+       "Performance and Maintenance"
 * NEW: SuRun can replace Windows "Run as..." in context menu
 * NEW: User file list rules: "never start automatically"/"never start elevated"
 * NEW: Option to show a user status icon and balloon tips in the notification 
@@ -47,6 +49,11 @@ SuRun 1.1.0.3 - 2008-04-09:
 * NEW: Initialise desktop background before and close it after SwitchDesktop
 * NEW: "Apply" Button in SuRun Settings
 * CHG: SuRuns IAT-Hook is turned ON by default
+* CHG: If Admin credentials are required, SuRun does not include Domain Admin 
+       accounts in the drop down list
+* FIX: Scenario: Restircted SuRunner, changed password, SuRun asks to autorun 
+       a predefined app with elevated rights, User presses 'Cancel'. Then the
+       app was flagged "never start automagically".
 * FIX: SuRuns "Run as..." and Administrator authentication respect the 
        "Accounts: Limit local account use of blank passwords to console logon 
        only" group policy.
