@@ -182,6 +182,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -282,19 +283,19 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\ReleaseU\SuRun.exe"
-			>
-		</File>
-		<File
 			RelativePath="..\ReleaseUx64\SuRun.exe"
 			>
 		</File>
 		<File
-			RelativePath="..\ReleaseU\SuRunExt.dll"
+			RelativePath="..\ReleaseU\SuRun.exe"
 			>
 		</File>
 		<File
 			RelativePath="..\ReleaseUx64\SuRunExt.dll"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseU\SuRunExt.dll"
 			>
 		</File>
 		<File
