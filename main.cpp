@@ -89,6 +89,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   case 5:
     SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,SUBLANG_DEFAULT),SORT_DEFAULT));
     break;
+  case 6:
+    SetThreadLocale(MAKELCID(MAKELANGID(LANG_FRENCH,SUBLANG_FRENCH),SORT_DEFAULT));
+    break;
   }
   HideAppStartCursor();
   if(HandleServiceStuff())
