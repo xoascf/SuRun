@@ -32,10 +32,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.1.0 Beta 6 - 2011-04-14
+SuRun 1.2.1.0 Beta 6 - 2011-05-03
 ---------------------------------
-* NEW: French resources by Laurent Hilsz. Thanks!
+* NEW: partly French resources by Laurent Hilsz. Thanks!
 * FIX: "(Re-)Start as Administrator" did not work with captionless Windows
+* FIX: IAT-Hook prevented SwitchDesktop in AVAST and caused a system deadlock
 
 SuRun 1.2.1.0 Beta 5 - 2011-03-18
 ---------------------------------

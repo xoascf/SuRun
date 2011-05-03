@@ -610,7 +610,7 @@ BOOL WINAPI CreateProcA(LPCSTR lpApplicationName,LPSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-  TRACExA("%s: call to CreateProcA(%s,%s)",DLLNAME,lpApplicationName,lpCommandLine);
+//  TRACExA("%s: call to CreateProcA(%s,%s)",DLLNAME,lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   DWORD tas=RETVAL_SX_NOTINLIST;
   if ((!l_IsAdmin) && l_IsSuRunner)
@@ -632,7 +632,7 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-  TRACEx(L"%s: call to CreateProcW(%s,%s)",_T(DLLNAME),lpApplicationName,lpCommandLine);
+//  TRACEx(L"%s: call to CreateProcW(%s,%s)",_T(DLLNAME),lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   DWORD tas=RETVAL_SX_NOTINLIST;
   if ((!l_IsAdmin) && l_IsSuRunner)
@@ -652,7 +652,7 @@ extern HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei); //SuRunExt.cpp
 BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
 {
 #ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExExW()",DLLNAME);
+//  TRACExA("%s: call to ShellExExW()",DLLNAME);
 #endif DoDBGTrace
 //  if (S_OK==ShellExtExecute(pei))
 //    return TRUE;
@@ -662,7 +662,7 @@ BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
 BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA)
 {
 #ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExExA()",DLLNAME);
+//  TRACExA("%s: call to ShellExExA()",DLLNAME);
 #endif DoDBGTrace
   if (peiA)
   {
@@ -701,7 +701,7 @@ HINSTANCE WINAPI ShellExA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile,
                           LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
 {
 #ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExA()",DLLNAME);
+//  TRACExA("%s: call to ShellExA()",DLLNAME);
 #endif DoDBGTrace
   return ((lpShellExecuteA)hkShExA.OrgFunc())(hwnd,lpOperation,lpFile,
                                               lpParameters,lpDirectory,nShowCmd);
@@ -711,7 +711,7 @@ HINSTANCE WINAPI ShellExW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile,
                           LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd)
 {
 #ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExW()",DLLNAME);
+//  TRACExA("%s: call to ShellExW()",DLLNAME);
 #endif DoDBGTrace
   return ((lpShellExecuteW)hkShExW.OrgFunc())(hwnd,lpOperation,lpFile,
                                               lpParameters,lpDirectory,nShowCmd);
@@ -760,7 +760,7 @@ BOOL WINAPI CreatePAUA(HANDLE hToken,LPCSTR lpApplicationName,LPSTR lpCommandLin
 {
   //ToDo: *original function will call CreateProcess. SuRun must not ask twice!
 #ifdef DoDBGTrace
-  TRACExA("%s: call to CreatePAUA(%s,%s)",DLLNAME,lpApplicationName,lpCommandLine);
+//  TRACExA("%s: call to CreatePAUA(%s,%s)",DLLNAME,lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   if(IsShellAndSuRunner(hToken))
   {
@@ -784,7 +784,7 @@ BOOL WINAPI CreatePAUW(HANDLE hToken,LPCWSTR lpApplicationName,LPWSTR lpCommandL
     LPPROCESS_INFORMATION lpProcessInformation)
 {
 #ifdef DoDBGTrace
-  TRACEx(L"%s: call to CreatePAUW(%s,%s)",_T(DLLNAME),lpApplicationName,lpCommandLine);
+//  TRACEx(L"%s: call to CreatePAUW(%s,%s)",_T(DLLNAME),lpApplicationName,lpCommandLine);
 #endif DoDBGTrace
   //ToDo: *original function may call CreateProcess. SuRun must not ask twice!
   if(IsShellAndSuRunner(hToken))
@@ -953,29 +953,39 @@ VOID WINAPI FreeLibAndExitThread(HMODULE hLibModule,DWORD dwExitCode)
 BOOL WINAPI SwitchDesk(HDESK Desk)
 {
 #ifdef DoDBGTrace
-  DBGTrace1("%s: call to SwitchDesk()",_T(DLLNAME));
+//  DBGTrace1("%s: call to SwitchDesk()",_T(DLLNAME));
 #endif DoDBGTrace
   if ((!l_IsAdmin)&&(!IsLocalSystem()))
   {
-    HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
+    HDESK d=OpenInputDesktop(0,0,0);
     if (!d)
-      return DBGTrace1("%s: SwitchDeskop interrupted",_T(DLLNAME)),FALSE;
+    {
+      DBGTrace2("%s: OpenInputDesktop failed: %s; SwitchDeskop interrupted",_T(DLLNAME),GetLastErrorNameStatic());
+      return FALSE;
+    }
     TCHAR dn[4096]={0};
     DWORD dnl=4096;
     if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
-      return CloseDesktop(d),DBGTrace1("%s: SwitchDeskop interrupted2",_T(DLLNAME)),FALSE;
+    {
+      CloseDesktop(d);
+      DBGTrace2("%s: GetUserObjectInformation failed: %s; SwitchDeskop interrupted2",_T(DLLNAME),GetLastErrorNameStatic());
+      return FALSE;
+    }
     CloseDesktop(d);
     if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
     {
       SetLastError(ERROR_ACCESS_DENIED);
-      return CloseDesktop(d),DBGTrace1("%s: SwitchDeskop interrupted3",_T(DLLNAME)),FALSE;
+      CloseDesktop(d);
+      DBGTrace2("%s: SwitchDeskop(%s) interrupted3",_T(DLLNAME),dn);
+      return FALSE;
     }
-    DBGTrace2("%s: SwitchDeskop(%s) granted",_T(DLLNAME),dn);
+//    DBGTrace2("%s: SwitchDeskop(%s) granted",_T(DLLNAME),dn);
   }
   BOOL bRet=FALSE;
   if (hkSwDesk.OrgFunc())
     bRet=((lpSwitchDesk)hkSwDesk.OrgFunc())(Desk);
-  bRet=SwitchDesktop(Desk);
+  else
+    bRet=SwitchDesktop(Desk);
   return bRet;
 }
 
