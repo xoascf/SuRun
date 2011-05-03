@@ -959,16 +959,16 @@ BOOL WINAPI SwitchDesk(HDESK Desk)
   {
     HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
     if (!d)
-      return /*DBGTrace("%s: SwitchDeskop interrupted",_T(DLLNAME)),*/FALSE;
+      return DBGTrace("%s: SwitchDeskop interrupted",_T(DLLNAME)),FALSE;
     TCHAR dn[4096]={0};
     DWORD dnl=4096;
     if (!GetUserObjectInformation(d,UOI_NAME,dn,dnl,&dnl))
-      return CloseDesktop(d),/*DBGTrace("%s: SwitchDeskop interrupted2",_T(DLLNAME)),*/FALSE;
+      return CloseDesktop(d),DBGTrace("%s: SwitchDeskop interrupted2",_T(DLLNAME)),FALSE;
     CloseDesktop(d);
     if ((_tcsicmp(dn,_T("Winlogon"))==0) || (_tcsnicmp(dn,_T("SRD_"),4)==0))
     {
       SetLastError(ERROR_ACCESS_DENIED);
-      return CloseDesktop(d),/*DBGTrace("%s: SwitchDeskop interrupted3",_T(DLLNAME)),*/FALSE;
+      return CloseDesktop(d),DBGTrace("%s: SwitchDeskop interrupted3",_T(DLLNAME)),FALSE;
     }
     DBGTrace2("%s: SwitchDeskop(%s) granted",_T(DLLNAME),dn);
   }
