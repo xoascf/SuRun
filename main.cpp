@@ -165,7 +165,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         g_RunData.RetPtr=wcstoul(Args,0,16);
         Args=PathGetArgs(Args);
         //If we run on a desktop we cannot switch from, bail out!
-        HDESK d=OpenInputDesktop(0,0,DESKTOP_SWITCHDESKTOP);
+        HDESK d=OpenInputDesktop(0,0,0);
         if (!d)
           g_RunData.bShExNoSafeDesk=TRUE;
         else
