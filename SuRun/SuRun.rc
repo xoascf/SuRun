@@ -1020,12 +1020,13 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installieren >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
-    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,9,21,20
+    LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_VISIBLE | 
+                    NOT WS_GROUP
+    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Wollen Sie SuRun jetzt installieren?",IDC_QUESTION,39,7,
                     317,25,SS_CENTERIMAGE
     CONTROL         "Starte 'SuRun Einstellungen' nach der Installation",
@@ -3244,12 +3245,12 @@ IDD_INSTALL DIALOGEX 0, 0, 364, 126
 STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | 
     WS_CAPTION
 CAPTION "SuRun %s - Installation"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&Installer >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,9,11,10
+    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Voulez-vous vraiment installer SuRun ?",IDC_QUESTION,39,
                     7,317,25,SS_CENTERIMAGE
     CONTROL         "Start 'SuRun Settings' after installation",IDC_RUNSETUP,
