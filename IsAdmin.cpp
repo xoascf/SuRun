@@ -114,7 +114,7 @@ BOOL IsAdmin(HANDLE hToken/*=NULL*/)
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-#if !defined (TokenElevationType)
+#ifndef SYSTEM_MANDATORY_LABEL_NO_WRITE_UP
 typedef enum _TOKEN_INFORMATION_CLASS_1 
 {
     TokenElevationType = TokenOrigin+1,
@@ -136,7 +136,7 @@ typedef enum _TOKEN_ELEVATION_TYPE
     TokenElevationTypeFull,
     TokenElevationTypeLimited,
 } TOKEN_ELEVATION_TYPE, *PTOKEN_ELEVATION_TYPE;
-#endif TokenElevationType
+#endif SYSTEM_MANDATORY_LABEL_NO_WRITE_UP
 
 BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
 {

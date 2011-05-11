@@ -18,6 +18,14 @@
 
 #define CHK_BOOL_FN(p) if(!p) DBGTrace2("%s failed: %s",_T(#p),GetLastErrorNameStatic());
 
+#if _MSC_VER >= 1500
+extern unsigned int _osplatform;
+extern unsigned int _osver;
+extern unsigned int _winver;
+extern unsigned int _winmajor;
+extern unsigned int _winminor;
+#endif //_MSC_VER >= 1500
+
 #define IsWin2k ((_winmajor==5)&&(_winminor==0))
 #define IsWin7 ((_winmajor==6)&&(_winminor==1))
 

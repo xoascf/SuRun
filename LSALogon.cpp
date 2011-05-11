@@ -37,7 +37,9 @@
 #define STATUS_UNSUCCESSFUL             ((NTSTATUS)0xC0000001L)
 #endif
 
-#if !defined (TokenElevationType)
+
+#ifndef SYSTEM_MANDATORY_LABEL_NO_WRITE_UP
+
 typedef enum _TOKEN_INFORMATION_CLASS_1 
 {
     TokenElevationType = TokenOrigin+1,
@@ -65,7 +67,7 @@ typedef struct _TOKEN_LINKED_TOKEN
   HANDLE LinkedToken;
 } TOKEN_LINKED_TOKEN,*PTOKEN_LINKED_TOKEN;
 
-#endif TokenElevationType
+#endif SYSTEM_MANDATORY_LABEL_NO_WRITE_UP
 
 BOOL GetElevatedToken(HANDLE& hToken)
 {

@@ -39,6 +39,28 @@
 #pragma comment(lib,"WINMM.LIB")
 #pragma comment(lib,"Wtsapi32")
 
+#if _MSC_VER >= 1500
+unsigned int _osplatform = 0;
+unsigned int _osver = 0;
+unsigned int _winmajor = 0;
+unsigned int _winminor = 0;
+
+static unsigned int _GetWinVer()
+{
+  OSVERSIONINFO vi;
+  vi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx(&vi);
+  _osplatform = vi.dwPlatformId;
+  _winmajor = vi.dwMajorVersion;
+  _winminor = vi.dwMinorVersion;
+  _osver = (vi.dwBuildNumber) & 0x07fff;
+  if ( _osplatform != VER_PLATFORM_WIN32_NT )
+      _osver |= 0x08000;
+  return (_winmajor << 8) + _winminor;
+}
+unsigned int _winver = _GetWinVer();
+#endif  //_MSC_VER
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Registry Helper

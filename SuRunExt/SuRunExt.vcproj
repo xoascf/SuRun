@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="SuRunExt"
 	ProjectGUID="{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -84,6 +85,9 @@
 				ProgramDatabaseFile=".\DebugU/SuRunExt.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				ImportLibrary=".\DebugU/SuRunExt.lib"
 				TargetMachine="1"
 			/>
@@ -92,6 +96,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -106,9 +111,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -149,12 +151,16 @@
 			<Tool
 				Name="VCLinkerTool"
 				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -167,9 +173,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -243,6 +246,9 @@
 				ProgramDatabaseFile=".\ReleaseU/SuRunExt.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				ImportLibrary=".\ReleaseU/SuRunExt.lib"
 				TargetMachine="1"
 			/>
@@ -266,9 +272,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -310,6 +313,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -329,9 +335,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -375,12 +378,16 @@
 				GenerateManifest="false"
 				GenerateMapFile="true"
 				MapExports="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -393,9 +400,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -433,7 +437,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHsc /Wp64 "
+				AdditionalOptions=""
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;UNICODE;_USRDLL;SuRunEXT_EXPORTS"
@@ -460,14 +464,18 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089 /machine:AMD64 /NXCOMPAT /FIXED:No /DynamicBase"
+				AdditionalOptions="/IGNORE:4089"
 				AdditionalDependencies="LIBCMT.LIB KERNEL32.LIB"
 				OutputFile="../ReleaseUx64/SuRunExt.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				IgnoreDefaultLibraryNames="LIBCMT.LIB"
 				ModuleDefinitionFile=".\SuRunExt.Def"
 				ProgramDatabaseFile=".\ReleaseUx64/SuRunExt.pdb"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				ImportLibrary=".\ReleaseUx64/SuRunExt.lib"
 				TargetMachine="17"
 			/>
@@ -476,6 +484,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -490,9 +499,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -567,6 +573,9 @@
 				ProgramDatabaseFile=".\ReleaseUsr32/SuRunExt32.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				ImportLibrary=".\ReleaseUsr32/SuRunExt32.lib"
 				TargetMachine="1"
 			/>
@@ -590,9 +599,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -632,12 +638,17 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -650,9 +661,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

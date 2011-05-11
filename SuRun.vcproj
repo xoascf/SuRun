@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="SuRun"
 	ProjectGUID="{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -84,6 +85,9 @@
 				GenerateMapFile="true"
 				MapExports="true"
 				SubSystem="2"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -106,9 +110,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -149,12 +150,17 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -167,9 +173,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -244,8 +247,10 @@
 				MapExports="true"
 				SubSystem="2"
 				OptimizeForWindows98="0"
-				TargetMachine="1"
+				RandomizedBaseAddress="2"
 				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -267,9 +272,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -311,6 +313,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -330,9 +335,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -401,11 +403,15 @@
 				OutputFile=".\DebugU/SuRun.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\DebugU/SuRun.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
 				SubSystem="2"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -413,6 +419,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -427,9 +434,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -470,12 +474,16 @@
 			<Tool
 				Name="VCLinkerTool"
 				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -488,9 +496,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -530,14 +535,19 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateManifest="false"
 				GenerateMapFile="true"
 				MapExports="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -550,9 +560,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -590,7 +597,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/EHsc /Wp64 "
+				AdditionalOptions=""
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;UNICODE"
@@ -604,7 +611,7 @@
 				ProgramDataBaseFileName=".\ReleaseUx64/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -620,7 +627,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/IGNORE:4089 /machine:AMD64   /NXCOMPAT /FIXED:No /DynamicBase"
+				AdditionalOptions="/IGNORE:4089"
 				AdditionalDependencies="LIBCMT.LIB KERNEL32.LIB"
 				ShowProgress="0"
 				OutputFile=".\ReleaseUx64/SuRun.exe"
@@ -634,9 +641,11 @@
 				SwapRunFromNet="false"
 				ResourceOnlyDLL="false"
 				SetChecksum="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
 				SupportUnloadOfDelayLoadedDLL="false"
 				TargetMachine="17"
-				FixedBaseAddress="1"
 				CLRUnmanagedCodeCheck="false"
 			/>
 			<Tool
@@ -644,6 +653,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -658,9 +668,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
