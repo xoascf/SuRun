@@ -718,6 +718,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     if((WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
+      pei->hProcess=rpi.hProcess;
       //ExitCode==-2 means that the program is not in the WhiteList
       if (ExitCode==RETVAL_OK)
       {
