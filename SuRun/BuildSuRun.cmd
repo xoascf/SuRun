@@ -6,6 +6,7 @@ if NOT "%VS100COMNTOOLS%"=="" goto VC10compile
 
 rem compile using VC6
 :VC6compile
+echo VC6
 if "%MSSDK%"=="" SET MSSDK=E:\MSTOOLS
 SET VC6Dir=%MSDevDir%\..\..
 if "%VC6Dir%"=="\..\.." SET VC6Dir=E:\VStudio
@@ -34,8 +35,16 @@ goto Done
 
 rem compile using VC8 (2005), VC9 (2008) or VC10 (2010)
 :VC8compile
+echo VC8
+goto VCxcompile
 :VC9compile
+echo VC9
+goto VCxcompile
 :VC10compile
+echo VC10
+goto VCxcompile
+
+:VCxcompile
 SETLOCAL
 if NOT "%VS100COMNTOOLS%"=="" call "%VS100COMNTOOLS%vsvars32.bat"
 if NOT "%VS90COMNTOOLS%"=="" call "%VS90COMNTOOLS%vsvars32.bat"
