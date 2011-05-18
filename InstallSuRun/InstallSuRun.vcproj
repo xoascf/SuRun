@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8,00"
 	Name="InstallSuRun"
 	ProjectGUID="{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}"
-	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -75,14 +74,11 @@
 				OutputFile=".\Debug/InstallSuRun.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/InstallSuRun.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -90,7 +86,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -105,6 +100,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -177,8 +175,6 @@
 				GenerateMapFile="true"
 				MapExports="true"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -201,6 +197,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -284,19 +283,19 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\ReleaseU\SuRun.exe"
-			>
-		</File>
-		<File
 			RelativePath="..\ReleaseUx64\SuRun.exe"
 			>
 		</File>
 		<File
-			RelativePath="..\ReleaseU\SuRunExt.dll"
+			RelativePath="..\ReleaseU\SuRun.exe"
 			>
 		</File>
 		<File
 			RelativePath="..\ReleaseUx64\SuRunExt.dll"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseU\SuRunExt.dll"
 			>
 		</File>
 		<File
