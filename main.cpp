@@ -57,6 +57,7 @@ static void HideAppStartCursor()
   }
 }
 
+//extern LPTSTR GetSvcName();
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
   {
@@ -71,6 +72,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
     }
   }
+//  LPTSTR sn=GetSvcName();
 //  DBGTrace1("SuRun started with (%s)",GetCommandLine());
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
