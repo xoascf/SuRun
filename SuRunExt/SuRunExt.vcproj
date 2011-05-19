@@ -465,6 +465,7 @@
 				OutputFile="../ReleaseUx64/SuRunExt.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				IgnoreDefaultLibraryNames="LIBCMT.LIB"
 				ModuleDefinitionFile=".\SuRunExt.Def"
 				ProgramDatabaseFile=".\ReleaseUx64/SuRunExt.pdb"
@@ -476,6 +477,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
