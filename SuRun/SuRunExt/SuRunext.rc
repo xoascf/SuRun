@@ -238,6 +238,40 @@ END
 #endif    // Spanish (Castilian) resources
 /////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////
+// French (France) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+#ifdef _WIN32
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_FILENOTFOUND        "Fichier introuvable : SuRun.exe"
+    IDS_ERR                 "Erreur dans SuRunExt.dll"
+    IDS_TOOLTIP             "Ouvrir le panneau de configurations avec des droits administrateur"
+    IDS_SURUN               "Panneau de configuration en tant qu'administrateur"
+    IDS_SURUNCMD            "Ouvrir une fenêtre de commande avec SuRun ici"
+    IDS_SURUNEXP            "Ouvrir l'Explorateur Windows avec SuRun ici"
+    IDS_RESTARTSHELL        "Voulez-vous réellement redémarrer le shell Windows avec des droits administrateur ?"
+    IDS_CPLNAME             "Réglage de SuRun"
+    IDS_MENURESTART         "Relancer en tant qu'administrateur"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MENUSTART           "Démarrer en tant qu'administrateur"
+END
+
+#endif    // French (France) resources
+/////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
 // Dutch (Netherlands) resources

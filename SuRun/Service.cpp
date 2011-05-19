@@ -94,7 +94,8 @@
 static SERVICE_STATUS_HANDLE g_hSS=0;
 static SERVICE_STATUS g_ss= {0};
 static HANDLE g_hPipe=INVALID_HANDLE_VALUE;
-CResStr SvcName(IDS_SERVICE_NAME);
+CResStr SvcNameID(IDS_SERVICE_ID);
+CResStr SvcDisplayText(IDS_SERVICE_NAME);
 
 RUNDATA g_RunData={0};
 TCHAR g_RunPwd[PWLEN]={0};//here, for historical reasons; olny used for RunAs
@@ -672,10 +673,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   g_ss.dwServiceType      = SERVICE_WIN32_OWN_PROCESS; 
   g_ss.dwControlsAccepted = SERVICE_ACCEPT_STOP; 
   g_ss.dwCurrentState     = SERVICE_START_PENDING; 
-  g_hSS                   = RegisterServiceCtrlHandler(SvcName,SvcCtrlHndlr); 
+  g_hSS                   = RegisterServiceCtrlHandler(SvcNameID,SvcCtrlHndlr); 
   if (g_hSS==(SERVICE_STATUS_HANDLE)0) 
   {
-    DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcName,GetLastErrorNameStatic());
+    DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",SvcNameID,GetLastErrorNameStatic());
     return; 
   }
   RestoreUserPasswords();
@@ -1151,7 +1152,7 @@ DWORD PrepareSuRun()
 // 
 //////////////////////////////////////////////////////////////////////////////
 
-DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcName)
+DWORD CheckServiceStatus(LPCTSTR ServiceName=SvcNameID)
 {
   SC_HANDLE hdlSCM=OpenSCManager(0,0,SC_MANAGER_CONNECT|SC_MANAGER_ENUMERATE_SERVICE);
   if (hdlSCM==0) 
@@ -2103,7 +2104,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
   SC_HANDLE hdlSCM = OpenSCManager(0,0,SC_MANAGER_CONNECT);
   if (hdlSCM) 
   {
-    SC_HANDLE hdlServ=OpenService(hdlSCM,SvcName,SERVICE_STOP|DELETE);
+    SC_HANDLE hdlServ=OpenService(hdlSCM,SvcNameID,SERVICE_STOP|DELETE);
     if (hdlServ)
     {
       SERVICE_STATUS ss;
@@ -2227,7 +2228,7 @@ BOOL InstallService()
   PathAppend(SvcFile,_T("SuRun.exe"));
   PathQuoteSpaces(SvcFile);
   _tcscat(SvcFile,_T(" /ServiceRun"));
-  SC_HANDLE hdlServ = CreateService(hdlSCM,SvcName,SvcName,STANDARD_RIGHTS_REQUIRED,
+  SC_HANDLE hdlServ = CreateService(hdlSCM,SvcNameID,SvcDisplayText,STANDARD_RIGHTS_REQUIRED,
                           SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,
                           SERVICE_ERROR_NORMAL,SvcFile,L"PlugPlay",0,0,0,0);
   if (!hdlServ) 
@@ -2238,7 +2239,7 @@ BOOL InstallService()
   }
   CloseServiceHandle(hdlServ);
   InstLog(CResStr(IDS_STARTSVC));
-  hdlServ = OpenService(hdlSCM,SvcName,SERVICE_START);
+  hdlServ = OpenService(hdlSCM,SvcNameID,SERVICE_START);
   if (!hdlServ)
     DBGTrace1("OpenService failed: %s",GetLastErrorNameStatic());
   BOOL bRet=StartService(hdlServ,0,0);
@@ -2246,7 +2247,7 @@ BOOL InstallService()
   {
     DBGTrace1("StartService failed: %s",GetLastErrorNameStatic());
     CloseServiceHandle(hdlServ);
-    hdlServ=OpenService(hdlSCM,SvcName,SERVICE_STOP|DELETE);
+    hdlServ=OpenService(hdlSCM,SvcNameID,SERVICE_STOP|DELETE);
     if (hdlServ)
       DeleteService(hdlServ);
   }
@@ -2720,7 +2721,7 @@ bool HandleServiceStuff()
         return false;
       //Shell Extension
       InstallShellExt();
-      SERVICE_TABLE_ENTRY DispatchTable[]={{SvcName,ServiceMain},{0,0}};
+      SERVICE_TABLE_ENTRY DispatchTable[]={{SvcNameID,ServiceMain},{0,0}};
       //StartServiceCtrlDispatcher is a blocking call
       StartServiceCtrlDispatcher(DispatchTable);
       //Shell Extension
