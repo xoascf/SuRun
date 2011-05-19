@@ -3601,7 +3601,7 @@ BEGIN
                     IDC_WINUPDBOOT,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,11,161,349,11
     GROUPBOX        "Sécurité Windows (Ceci est une stratégie Windows pouvant être ajustée avec SuRun)",
-                    IDC_STATIC,4,177,386,50
+                    IDC_STATIC,4,177,386,46
     CONTROL         "Utiliser ""Administrateurs"" au lieu du ""Créateur de l'objet"" comme propriétaire par défaut des objets créés par les administrateurs.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,11,186,347,18
