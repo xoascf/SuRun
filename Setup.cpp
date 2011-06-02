@@ -39,7 +39,6 @@
 #pragma comment(lib,"comctl32.lib")
 #pragma comment(lib,"Comdlg32.lib")
 #pragma comment(lib,"shlwapi.lib")
-#pragma comment(lib,"Crypt32.lib")
 
 //////////////////////////////////////////////////////////////////////////////
 // 

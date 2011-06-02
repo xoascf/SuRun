@@ -74,6 +74,7 @@
 				OutputFile=".\Debug/InstallSuRun.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/InstallSuRun.pdb"
 				GenerateMapFile="true"
@@ -86,6 +87,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"

@@ -15,7 +15,6 @@
 #include "DBGTrace.h"
 
 #pragma comment(lib,"advapi32.lib")
-#pragma comment(lib,"Wtsapi32.lib")
 
 #define CLASSNAME     _T("SuRunTrayShowAdminClass")
 #define MENU_SURUNSETUP WM_USER+903

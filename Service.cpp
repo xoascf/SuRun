@@ -30,7 +30,7 @@
 #include <USERENV.H>
 #include <Psapi.h>
 #include <Tlhelp32.h>
-#include <Wtsapi32.h>
+#include "DynWTSAPI.h"
 #include <Aclapi.h>
 #include <Sddl.h>
 #include "Setup.h"
@@ -52,7 +52,6 @@
 #include "SuRunExt/SuRunExt.h"
 #include "SuRunExt/SysMenuHook.h"
 
-#pragma comment(lib,"Wtsapi32.lib")
 #pragma comment(lib,"Userenv.lib")
 #pragma comment(lib,"AdvApi32.lib")
 #pragma comment(lib,"PSAPI.lib")

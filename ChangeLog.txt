@@ -32,6 +32,16 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.0 Beta 7 - 2011-06-02
+---------------------------------
+* NEW: French resources by Laurent Hilsz. Thanks!
+* FIX: Updating SuRun with a different locale failed.
+       An English SuRun could not be updated by a French SuRun because the 
+       SuRun service name was localized.
+* NEW: Removed dependencies on wtsapi32.h and wtsapi32.lib
+* NEW: added bin\Crypt32x64.Lib and bin\Crypt32x86.Lib because Crypt32.Lib is 
+       missing in VS2005.
+
 SuRun 1.2.1.0 Beta 6 - 2011-05-03
 ---------------------------------
 * NEW: partly French resources by Laurent Hilsz. Thanks!

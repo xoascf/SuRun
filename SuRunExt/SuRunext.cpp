@@ -28,7 +28,7 @@
 #include <psapi.h>
 #include <tlhelp32.h>
 #include <USERENV.H>
-#include <wtsapi32.h>
+#include "../DynWTSAPI.h"
 //#include <msi.h>
 
 #pragma comment(lib,"User32.lib")
@@ -38,7 +38,6 @@
 #pragma comment(lib,"Shlwapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 #pragma comment(lib,"Userenv.lib")
-#pragma comment(lib,"WTSApi32.lib")
 //#pragma comment(lib,"msi.lib")
 
 #include "../Setup.h"
@@ -52,6 +51,12 @@
 #include "Resource.h"
 
 #include "../DBGTrace.h"
+
+#ifdef _WIN64
+#pragma comment(lib,"../bin/Crypt32x64.lib")
+#else _WIN64
+#pragma comment(lib,"../bin/Crypt32x86.lib")
+#endif _WIN64
 
 //////////////////////////////////////////////////////////////////////////////
 //

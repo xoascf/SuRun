@@ -94,6 +94,7 @@ LINK32_OBJS= \
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
 
+WkspDir=.
 TargetPath=\surun\SuRun\InstallSuRun.exe
 SOURCE="$(InputPath)"
 PostBuild_Desc=UPXing
@@ -102,7 +103,8 @@ DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
 ALL : $(DS_POSTBUILD_DEP)
 
 $(DS_POSTBUILD_DEP) : "..\InstallSuRun.exe"
-   upx --lzma \surun\SuRun\InstallSuRun.exe
+   f:\surun\SuRun\bin\setdllcharacteristics.exe +d +n \surun\SuRun\InstallSuRun.exe
+	upx --lzma \surun\SuRun\InstallSuRun.exe
 	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "InstallSuRun - Win32 Debug"
