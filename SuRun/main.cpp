@@ -37,6 +37,12 @@
 #pragma comment(lib,"netapi32.lib")
 #pragma comment(lib,"shlwapi")
 
+#ifdef _WIN64
+#pragma comment(lib,"bin/Crypt32x64.lib")
+#else _WIN64
+#pragma comment(lib,"bin/Crypt32x86.lib")
+#endif _WIN64
+
 extern RUNDATA g_RunData;
 
 //////////////////////////////////////////////////////////////////////////////

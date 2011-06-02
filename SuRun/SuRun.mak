@@ -50,8 +50,8 @@ CLEAN :"SuRunExt - Win32 Unicode DebugCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
-	-@erase "$(INTDIR)\blowfish.obj"
 	-@erase "$(INTDIR)\DBGTrace.obj"
+	-@erase "$(INTDIR)\DynWTSAPI.obj"
 	-@erase "$(INTDIR)\Helpers.obj"
 	-@erase "$(INTDIR)\IsAdmin.obj"
 	-@erase "$(INTDIR)\LogonDlg.obj"
@@ -121,8 +121,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /incremental:yes /pdb:"$(OUTDIR)\SuRun.pdb" /debug /machine:I386 /out:"$(OUTDIR)\SuRun.exe" /pdbtype:sept 
 LINK32_OBJS= \
-	"$(INTDIR)\blowfish.obj" \
 	"$(INTDIR)\DBGTrace.obj" \
+	"$(INTDIR)\DynWTSAPI.obj" \
 	"$(INTDIR)\Helpers.obj" \
 	"$(INTDIR)\IsAdmin.obj" \
 	"$(INTDIR)\LogonDlg.obj" \
@@ -173,8 +173,8 @@ CLEAN :"SuRunExt - Win32 Unicode ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
-	-@erase "$(INTDIR)\blowfish.obj"
 	-@erase "$(INTDIR)\DBGTrace.obj"
+	-@erase "$(INTDIR)\DynWTSAPI.obj"
 	-@erase "$(INTDIR)\Helpers.obj"
 	-@erase "$(INTDIR)\IsAdmin.obj"
 	-@erase "$(INTDIR)\LogonDlg.obj"
@@ -244,8 +244,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\SuRun.pdb" /map:"$(INTDIR)\SuRun.map" /debug /machine:I386 /out:"$(OUTDIR)\SuRun.exe" /IGNORE:4089 /OPT:REF 
 LINK32_OBJS= \
-	"$(INTDIR)\blowfish.obj" \
 	"$(INTDIR)\DBGTrace.obj" \
+	"$(INTDIR)\DynWTSAPI.obj" \
 	"$(INTDIR)\Helpers.obj" \
 	"$(INTDIR)\IsAdmin.obj" \
 	"$(INTDIR)\LogonDlg.obj" \
@@ -272,7 +272,20 @@ LINK32_OBJS= \
 <<
 
 OutDir=.\ReleaseU
+WkspDir=.
+TargetPath=.\ReleaseU\SuRun.exe
 SOURCE="$(InputPath)"
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+# Begin Custom Macros
+OutDir=.\ReleaseU
+# End Custom Macros
+
+$(DS_POSTBUILD_DEP) : "SuRunExt - Win32 Unicode Release" "$(OUTDIR)\SuRun.exe"
+   f:\surun\SuRun\bin\setdllcharacteristics.exe +d +n .\ReleaseU\SuRun.exe
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "SuRun - Win32 x64 Unicode Release"
 
@@ -297,8 +310,8 @@ CLEAN :"SuRunExt - Win32 x64 Unicode ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
-	-@erase "$(INTDIR)\blowfish.obj"
 	-@erase "$(INTDIR)\DBGTrace.obj"
+	-@erase "$(INTDIR)\DynWTSAPI.obj"
 	-@erase "$(INTDIR)\Helpers.obj"
 	-@erase "$(INTDIR)\IsAdmin.obj"
 	-@erase "$(INTDIR)\LogonDlg.obj"
@@ -368,8 +381,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib bufferoverflowu.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\SuRun.pdb" /map:"$(INTDIR)\SuRun.map" /debug /machine:IX86 /out:"$(OUTDIR)\SuRun.exe" /IGNORE:4089 /machine:AMD64 /OPT:REF 
 LINK32_OBJS= \
-	"$(INTDIR)\blowfish.obj" \
 	"$(INTDIR)\DBGTrace.obj" \
+	"$(INTDIR)\DynWTSAPI.obj" \
 	"$(INTDIR)\Helpers.obj" \
 	"$(INTDIR)\IsAdmin.obj" \
 	"$(INTDIR)\LogonDlg.obj" \
@@ -396,7 +409,20 @@ LINK32_OBJS= \
 <<
 
 OutDir=.\ReleaseUx64
+WkspDir=.
+TargetPath=.\ReleaseUx64\SuRun.exe
 SOURCE="$(InputPath)"
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+# Begin Custom Macros
+OutDir=.\ReleaseUx64
+# End Custom Macros
+
+$(DS_POSTBUILD_DEP) : "SuRunExt - Win32 x64 Unicode Release" "$(OUTDIR)\SuRun.exe"
+   f:\surun\SuRun\bin\setdllcharacteristics.exe +d +n .\ReleaseUx64\SuRun.exe
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
 
 !ELSEIF  "$(CFG)" == "SuRun - Win32 SuRun32 Unicode Release"
 
@@ -418,8 +444,8 @@ CLEAN :"SuRunExt - Win32 SuRun32 Unicode ReleaseCLEAN"
 !ELSE 
 CLEAN :
 !ENDIF 
-	-@erase "$(INTDIR)\blowfish.obj"
 	-@erase "$(INTDIR)\DBGTrace.obj"
+	-@erase "$(INTDIR)\DynWTSAPI.obj"
 	-@erase "$(INTDIR)\Helpers.obj"
 	-@erase "$(INTDIR)\IsAdmin.obj"
 	-@erase "$(INTDIR)\LogonDlg.obj"
@@ -489,8 +515,8 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=gdi32.lib user32.lib advapi32.lib kernel32.lib shell32.lib /nologo /subsystem:windows /incremental:no /pdb:"$(OUTDIR)\SuRun32.pdb" /map:"$(INTDIR)\SuRun32.map" /debug /machine:I386 /out:"ReleaseUx64/SuRun32.bin" /IGNORE:4089 /OPT:REF 
 LINK32_OBJS= \
-	"$(INTDIR)\blowfish.obj" \
 	"$(INTDIR)\DBGTrace.obj" \
+	"$(INTDIR)\DynWTSAPI.obj" \
 	"$(INTDIR)\Helpers.obj" \
 	"$(INTDIR)\IsAdmin.obj" \
 	"$(INTDIR)\LogonDlg.obj" \
@@ -514,6 +540,17 @@ LINK32_OBJS= \
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
 
+WkspDir=.
+TargetPath=.\ReleaseUx64\SuRun32.bin
+SOURCE="$(InputPath)"
+DS_POSTBUILD_DEP=$(INTDIR)\postbld.dep
+
+ALL : $(DS_POSTBUILD_DEP)
+
+$(DS_POSTBUILD_DEP) : "SuRunExt - Win32 SuRun32 Unicode Release" ".\ReleaseUx64\SuRun32.bin"
+   f:\surun\SuRun\bin\setdllcharacteristics.exe +d +n .\ReleaseUx64\SuRun32.bin
+	echo Helper for Post-build step > "$(DS_POSTBUILD_DEP)"
+
 !ENDIF 
 
 
@@ -527,14 +564,14 @@ LINK32_OBJS= \
 
 
 !IF "$(CFG)" == "SuRun - Win32 Unicode Debug" || "$(CFG)" == "SuRun - Win32 Unicode Release" || "$(CFG)" == "SuRun - Win32 x64 Unicode Release" || "$(CFG)" == "SuRun - Win32 SuRun32 Unicode Release"
-SOURCE=.\blowfish.cpp
-
-"$(INTDIR)\blowfish.obj" : $(SOURCE) "$(INTDIR)"
-
-
 SOURCE=.\DBGTrace.cpp
 
 "$(INTDIR)\DBGTrace.obj" : $(SOURCE) "$(INTDIR)"
+
+
+SOURCE=.\DynWTSAPI.cpp
+
+"$(INTDIR)\DynWTSAPI.obj" : $(SOURCE) "$(INTDIR)"
 
 
 SOURCE=.\Helpers.cpp

@@ -20,7 +20,7 @@
 #include <ShlGuid.h>
 #include <lm.h>
 #include <MMSYSTEM.H>
-#include <WtsApi32.h>
+#include "DynWTSAPI.h"
 #include <Tlhelp32.h>
 
 #include "Helpers.h"
@@ -37,7 +37,6 @@
 #pragma comment(lib,"ole32.lib")
 #pragma comment(lib,"Version.lib")
 #pragma comment(lib,"WINMM.LIB")
-#pragma comment(lib,"Wtsapi32")
 
 #if _MSC_VER >= 1500
 unsigned int _osplatform = 0;
@@ -1559,21 +1558,11 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 
 HANDLE GetSessionUserToken(DWORD SessID)
 {
-  //WTSQueryUserToken is present in WinXP++, load it dynamically
-  typedef BOOL (WINAPI* wtsqut)(ULONG,PHANDLE);
-  static wtsqut wtsqueryusertoken=NULL;
-  if (!wtsqueryusertoken)
-  {
-    HINSTANCE wtsapi32=LoadLibrary(_T("wtsapi32.dll"));
-    if (wtsapi32)
-      wtsqueryusertoken=(wtsqut)GetProcAddress(wtsapi32,"WTSQueryUserToken");
-  }
   HANDLE hToken = NULL;
   //SE_TCB_NAME is only present in a local System User Token
   //WTSQueryUserToken requires SE_TCB_NAME!
-  if ((!wtsqueryusertoken)
-    ||(!EnablePrivilege(SE_TCB_NAME))
-    ||(!wtsqueryusertoken(SessID,&hToken))
+  if ((!EnablePrivilege(SE_TCB_NAME))
+    ||(!WTSQueryUserToken(SessID,&hToken))
     ||(hToken==NULL))
   {
     //No WTSQueryUserToken: we're in Win2k

@@ -191,6 +191,10 @@ SOURCE=.\DBGTrace.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DynWTSAPI.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Helpers.cpp
 # End Source File
 # Begin Source File
@@ -268,6 +272,10 @@ SOURCE=.\CmdLine.h
 # Begin Source File
 
 SOURCE=.\DBGTrace.H
+# End Source File
+# Begin Source File
+
+SOURCE=.\DynWTSAPI.h
 # End Source File
 # Begin Source File
 

@@ -92,6 +92,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -640,6 +641,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -735,6 +737,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\DynWTSAPI.cpp"
+				>
 			</File>
 			<File
 				RelativePath="..\Helpers.cpp"
@@ -1697,6 +1703,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath="..\DynWTSAPI.h"
+				>
+			</File>
 			<File
 				RelativePath="..\Helpers.h"
 				>

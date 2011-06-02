@@ -33,7 +33,6 @@
 #pragma comment(lib,"Netapi32.lib")
 #pragma comment(lib,"Gdi32.lib")
 #pragma comment(lib,"comctl32.lib")
-#pragma comment(lib,"Crypt32.lib")
 
 #ifndef SuRunEXT_EXPORTS
 #ifdef DoDBGTrace
