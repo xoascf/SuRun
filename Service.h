@@ -54,7 +54,7 @@ typedef struct
   };
   bool  bShlExHook;     //we're run from a hook
   bool  beQuiet;        //No message boxes
-  bool  bRunAs;         //do a RunAs Logon
+  BYTE  bRunAs;         //do a RunAs Logon
   DWORD Groups;         //IS_IN_ADMINS,IS_IN_SURUNNERS
   bool  bShExNoSafeDesk;//if a safe desktop is required, cancel the request
 }RUNDATA;

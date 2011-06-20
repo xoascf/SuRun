@@ -190,7 +190,7 @@ typedef struct _LOGONDLGPARAMS
   int TimeOut;
   int MaxTimeOut;
   DWORD UsrFlags;
-  BOOL bRunAs;
+  BYTE bRunAs;
   LPTSTR RaUser;
   BOOL bFUS;//Fast User switching
   DWORD SessionId;

@@ -158,7 +158,17 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         bWaitPID=TRUE;
       }else if (!_wcsicmp(c,L"/RUNAS"))
       {
-        g_RunData.bRunAs=TRUE;
+        g_RunData.bRunAs|=1;
+      }else if ((!_wcsicmp(c,L"/HIGH"))&& (g_RunData.bRunAs&1))
+      {
+        g_RunData.bRunAs|=2;
+      }else if ((!_wcsicmp(c,L"/USER"))&& (g_RunData.bRunAs&1))
+      {
+        c=Args;
+        Args=PathGetArgs(Args);
+        if (*(Args-1)==' ')
+          *(Args-1)=0;
+        wcsncpy(g_RunData.UserName,c,UNLEN+UNLEN);
       }else if (!_wcsicmp(c,L"/SETUP"))
       {
         bRunSetup=TRUE;

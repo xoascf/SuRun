@@ -96,7 +96,7 @@ static HANDLE g_hPipe=INVALID_HANDLE_VALUE;
 CResStr SvcDisplayText(IDS_SERVICE_NAME);
 
 RUNDATA g_RunData={0};
-TCHAR g_RunPwd[PWLEN]={0};//here, for historical reasons; olny used for RunAs
+TCHAR g_RunPwd[PWLEN]={0};
 
 int g_RetVal=0;
 bool g_CliIsAdmin=FALSE;
@@ -764,7 +764,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       {
         if (TestDirectServiceCommands())
           continue;
-        if (!g_RunData.bRunAs)
+        if ((g_RunData.bRunAs&1)==0)
         {
           DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
           bool bNotInList=wlf==-1;
@@ -821,7 +821,15 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             }
             //DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
-        }//if (!g_RunData.bRunAs)
+        }else //if ((g_RunData.bRunAs&1)==0)
+        {
+          TCHAR UserName[UNLEN+UNLEN+2];
+          memmove(UserName,g_RunData.UserName,min(sizeof(UserName),sizeof(g_RunData.UserName)));
+          GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
+          ToDo... SuRun must ask, if program is not whitelisted
+          if (_tcsicmp(UserName,g_RunData.UserName)!=0) //RunAs with different user
+            SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",UserName);
+        }
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
         if (hRunLSASS)
@@ -1270,9 +1278,7 @@ BOOL Setup()
 //  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-static bool g_RunAsAsAdmin=false;//ToDo: Don't use globals here!
-static bool g_RunAsAsUser=false;//ToDo: Don't use globals here!
-HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs)
+HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password, BYTE bRunAs)
 {
   //Admin Token for SessionId
   HANDLE hUser=0;
@@ -1284,11 +1290,11 @@ HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password,bool bRunAs
   PathRemoveFileSpec(dn);
   //Enable use of empty passwords for network logon
   BOOL bEmptyPWAllowed=FALSE;
-  if(bRunAs)
-    hUser=LSALogon(SessionID,un,dn,Password,!g_RunAsAsAdmin);
-  else if (g_RunAsAsUser)
+  if(bRunAs&1) //different user, password
+    hUser=LSALogon(SessionID,un,dn,Password,(bRunAs&2)==0);
+  else if ((bRunAs&2)==0) //same user, no admin
     hUser=GetProcessUserToken(g_RunData.CliProcessId);
-  else
+  else //same user admin
     hUser=GetAdminToken(SessionID);
   return hUser;
 }
@@ -1537,7 +1543,7 @@ DWORD LSAStartAdminProcess()
       DestroyEnvironmentBlock(Env);
     }else
       DBGTrace1("CreateEnvironmentBlock failed: %s",GetLastErrorNameStatic());
-    if ((!g_RunData.bRunAs)||(RetVal!=RETVAL_OK))
+    if (((g_RunData.bRunAs&1)==0)||(RetVal!=RETVAL_OK))
       UnloadUserProfile(hAdmin,ProfInf.hProfile);
   }else
     DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
@@ -1719,12 +1725,12 @@ void SuRun()
       SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",User);
       _tcscpy(g_RunData.UserName,User);
       //AsAdmin!
-      g_RunAsAsAdmin=(r&0x08)!=0;//ToDo: Don't use globals here!
-      if(r&0x10)
-      {
-        g_RunData.bRunAs=FALSE;
-        g_RunAsAsUser=(r&0x08)==0;//ToDo: Don't use globals here!
-      }
+      if ((r&0x08)!=0)
+        g_RunData.bRunAs|=2;
+      else
+        g_RunData.bRunAs&=~2;
+      if(r&0x10)//Same user as Client Process
+        g_RunData.bRunAs&=~0x01;
     }else
     {
       DBGTrace("CreateSafeDesktop failed");
