@@ -147,6 +147,9 @@ PSID GetLogonSid(HANDLE hToken);
 DWORD UserIsInSuRunnersOrAdmins(HANDLE hToken);
 DWORD UserIsInSuRunnersOrAdmins();
 
+//  GetShellPID
+DWORD GetShellPID(DWORD SessID);
+
 //  GetSessionUserToken
 HANDLE GetSessionUserToken(DWORD SessID);
 

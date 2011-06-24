@@ -32,6 +32,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+* NEW: /USER <name> command line parameter for specifying the RunAs user
+* NEW: /LOW command line parameter for launching non elevated processes
+* FIX: "runas" was not handled by ShellExecuteHook of last beta
+
 SuRun 1.2.1.0 Beta 7 - 2011-06-02
 ---------------------------------
 * NEW: French resources by Laurent Hilsz. Thanks!

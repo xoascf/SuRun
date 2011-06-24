@@ -764,7 +764,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
       {
         if (TestDirectServiceCommands())
           continue;
-        if ((g_RunData.bRunAs&1)==0)
+        if (!g_RunData.bRunAs)
         {
           DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
           bool bNotInList=wlf==-1;
@@ -789,7 +789,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           if ((wlf&(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))==(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))
           {
             DBGTrace2("ShellExecute AutoRunLOW WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
-            ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine),true);
+            ResumeClient(DirectStartUserProcess(0,g_RunData.cmdLine),true);
             continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist
@@ -821,14 +821,18 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             }
             //DBGTrace2("ShellExecute WhiteList Match: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
           }
-        }else //if ((g_RunData.bRunAs&1)==0)
+        }else //if (!g_RunData.bRunAs)
         {
           TCHAR UserName[UNLEN+UNLEN+2];
           memmove(UserName,g_RunData.UserName,min(sizeof(UserName),sizeof(g_RunData.UserName)));
           GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-          ToDo... SuRun must ask, if program is not whitelisted
           if (_tcsicmp(UserName,g_RunData.UserName)!=0) //RunAs with different user
             SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",UserName);
+          else if (g_RunData.bRunAs&2)///LOW option:
+          {
+            ResumeClient(DirectStartUserProcess(0,g_RunData.cmdLine),true);
+            continue;
+          }
         }
         //Process Check succeded, now start this exe in the calling processes
         //Terminal server session to get SwitchDesktop working:
@@ -1278,25 +1282,23 @@ BOOL Setup()
 //  LSAStartAdminProcess
 // 
 //////////////////////////////////////////////////////////////////////////////
-HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password, BYTE bRunAs)
+HANDLE GetUserToken(DWORD SessionID,LPCTSTR UserName,LPTSTR Password, bool bRunAs, bool bNoAdmin)
 {
   //Admin Token for SessionId
-  HANDLE hUser=0;
-  TCHAR un[2*UNLEN+2]={0};
-  TCHAR dn[2*UNLEN+2]={0};
-  _tcscpy(un,UserName);
-  PathStripPath(un);
-  _tcscpy(dn,UserName);
-  PathRemoveFileSpec(dn);
-  //Enable use of empty passwords for network logon
-  BOOL bEmptyPWAllowed=FALSE;
-  if(bRunAs&1) //different user, password
-    hUser=LSALogon(SessionID,un,dn,Password,(bRunAs&2)==0);
-  else if ((bRunAs&2)==0) //same user, no admin
-    hUser=GetProcessUserToken(g_RunData.CliProcessId);
-  else //same user admin
-    hUser=GetAdminToken(SessionID);
-  return hUser;
+  if(bRunAs) //different user, password
+  {
+    TCHAR un[2*UNLEN+2]={0};
+    TCHAR dn[2*UNLEN+2]={0};
+    _tcscpy(un,UserName);
+    PathStripPath(un);
+    _tcscpy(dn,UserName);
+    PathRemoveFileSpec(dn);
+    return LSALogon(SessionID,un,dn,Password,bNoAdmin);
+  }
+  if (bNoAdmin) //same user, no admin
+    return GetSessionUserToken(SessionID);
+  //same user admin
+  return GetAdminToken(SessionID);
 }
 
 #define GetSeparateProcess(k) GetRegInt(k,\
@@ -1336,7 +1338,8 @@ DWORD LSAStartAdminProcess()
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //Get Admin User Token and Job object token
-  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,g_RunData.bRunAs);
+  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
+    (g_RunData.bRunAs&1)!=0,(g_RunData.bRunAs&2)!=0);
   //Clear Password
   zero(g_RunPwd);
   if (!hAdmin)
@@ -1597,7 +1600,8 @@ typedef DWORD(CALLBACK * NTSIP)(HANDLE,PROCESSINFOCLASS,PVOID,ULONG);
 DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd) 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
-  HANDLE hUser=GetProcessUserToken(ProcId);
+  //ProcId==0; Start process with shell token
+  HANDLE hUser=ProcId?GetProcessUserToken(ProcId):GetSessionUserToken(g_RunData.SessionID);
   void* Env=0;
   if (CreateEnvironmentBlock(&Env,hUser,FALSE))
   {

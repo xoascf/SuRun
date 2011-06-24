@@ -1549,6 +1549,24 @@ HANDLE GetProcessUserToken(DWORD ProcId)
 
 //////////////////////////////////////////////////////////////////////////////
 //
+//  GetShellPID return the process id of the shell
+//
+//////////////////////////////////////////////////////////////////////////////
+DWORD GetShellPID(DWORD SessID)
+{
+  //Get the Shells Name
+  TCHAR Shell[MAX_PATH];
+  if (!GetRegStr(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Microsoft\\Windows NT\\")
+                 _T("CurrentVersion\\Winlogon"),_T("Shell"),Shell,MAX_PATH))
+    return 0;
+  PathRemoveArgs(Shell);
+  PathStripPath(Shell);
+  //Now return the Shells Process ID
+  return GetProcessID(Shell,SessID);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
 //  GetSessionUserToken
 //
 //  This function tries to use WTSQueryUserToken to get the token of the 
@@ -1566,15 +1584,7 @@ HANDLE GetSessionUserToken(DWORD SessID)
     ||(hToken==NULL))
   {
     //No WTSQueryUserToken: we're in Win2k
-    //Get the Shells Name
-    TCHAR Shell[MAX_PATH];
-    if (!GetRegStr(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Microsoft\\Windows NT\\")
-                   _T("CurrentVersion\\Winlogon"),_T("Shell"),Shell,MAX_PATH))
-      return 0;
-    PathRemoveArgs(Shell);
-    PathStripPath(Shell);
-    //Now get the Shells Process ID
-    DWORD ShellID=GetProcessID(Shell,SessID);
+    DWORD ShellID=GetShellPID(SessID);
     if (!ShellID)
       return 0;
     //We got the Shells Process ID, now get the user token
