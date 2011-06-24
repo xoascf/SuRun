@@ -159,7 +159,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       }else if (!_wcsicmp(c,L"/RUNAS"))
       {
         g_RunData.bRunAs|=1;
-      }else if ((!_wcsicmp(c,L"/HIGH"))&& (g_RunData.bRunAs&1))
+      }else if (!_wcsicmp(c,L"/LOW"))
       {
         g_RunData.bRunAs|=2;
       }else if ((!_wcsicmp(c,L"/USER"))&& (g_RunData.bRunAs&1))

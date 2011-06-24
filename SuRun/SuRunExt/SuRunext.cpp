@@ -645,8 +645,8 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     &&(_tcsicmp(pei->lpVerb,L"cplopen")!=0))
   {
     if (GetHandleRunAs 
-      && (_tcsicmp(pei->lpVerb,L"runas")==0)
-      && (_tcsicmp(pei->lpVerb,L"runasuser")==0))
+      && ((_tcsicmp(pei->lpVerb,L"runas")==0)
+      || (_tcsicmp(pei->lpVerb,L"runasuser")==0)))
     {
       bRunAs=TRUE;
     }else
