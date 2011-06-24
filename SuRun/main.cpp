@@ -169,6 +169,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         if (*(Args-1)==' ')
           *(Args-1)=0;
         wcsncpy(g_RunData.UserName,c,UNLEN+UNLEN);
+        g_RunData.bRunAs|=4;
       }else if (!_wcsicmp(c,L"/SETUP"))
       {
         bRunSetup=TRUE;

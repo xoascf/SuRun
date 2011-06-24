@@ -505,7 +505,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       //Fast User swithing always set IDC_USER Text to Users(0):
       if (p->bFUS)
           SetDlgItemText(hwnd,IDC_USER,p->Users.GetUserName(0));
-      else if ((!p->ForceAdminLogon)|| bFoundUser)
+      else if ((!p->ForceAdminLogon) || p->bRunAs || bFoundUser)
         SetDlgItemText(hwnd,IDC_USER,(bFoundUser && p->bRunAs)?p->RaUser:p->User);
       else
       {
