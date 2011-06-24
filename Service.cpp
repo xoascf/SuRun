@@ -823,12 +823,19 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
         }else //if (!g_RunData.bRunAs)
         {
-          TCHAR UserName[UNLEN+UNLEN+2];
-          memmove(UserName,g_RunData.UserName,min(sizeof(UserName),sizeof(g_RunData.UserName)));
-          GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
-          if (_tcsicmp(UserName,g_RunData.UserName)!=0) //RunAs with different user
-            SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",UserName);
-          else if (g_RunData.bRunAs&2)///LOW option:
+          if (rd.bRunAs&4)
+          {
+            if (_tcschr(rd.UserName,L'\\')==NULL)
+            {
+              DWORD n=sizeof(g_RunData.UserName);
+              GetComputerName(g_RunData.UserName,&n);
+              PathAppend(g_RunData.UserName,rd.UserName);
+            }
+            GetProcessUserName(g_RunData.CliProcessId,rd.UserName);
+            SetRegStr(HKLM,USERKEY(rd.UserName),L"LastRunAsUser",g_RunData.UserName);
+            g_RunData=rd;
+          }
+          if ((rd.bRunAs&3)==2)///LOW option:
           {
             ResumeClient(DirectStartUserProcess(0,g_RunData.cmdLine),true);
             continue;
@@ -1729,7 +1736,7 @@ void SuRun()
       SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",User);
       _tcscpy(g_RunData.UserName,User);
       //AsAdmin!
-      if ((r&0x08)!=0)
+      if ((r&0x08)==0)
         g_RunData.bRunAs|=2;
       else
         g_RunData.bRunAs&=~2;
