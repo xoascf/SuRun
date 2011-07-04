@@ -76,6 +76,7 @@ public:
   void SetGroupUsers(LPWSTR GroupName,DWORD SessionId,BOOL bScanDomain);
   void SetGroupUsers(DWORD WellKnownGroup,DWORD SessionId,BOOL bScanDomain);
   void SetSurunnersUsers(LPCTSTR CurUser,DWORD SessionId,BOOL bScanDomain);
+  int FindUser(LPTSTR UserName);
   LPTSTR  GetUserName(int nUser);
   HBITMAP GetUserBitmap(int nUser);
   HBITMAP GetUserBitmap(LPTSTR UserName);
