@@ -702,7 +702,7 @@ static BOOL TestDirectServiceCommands()
 
 extern TOKEN_STATISTICS g_AdminTStat;
 
-DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd);//forward decl
+DWORD DirectStartUserProcess(DWORD ProcId);//forward decl
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
@@ -789,7 +789,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           if ((wlf&(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))==(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))
           {
             DBGTrace2("ShellExecute AutoRunLOW WhiteList MATCH: %s: %s",g_RunData.UserName,g_RunData.cmdLine);
-            ResumeClient(DirectStartUserProcess(0,g_RunData.cmdLine),true);
+            ResumeClient(DirectStartUserProcess(0),true);
             continue;
           }
           //check if the requested App is in the ShellExecHook-Runlist
@@ -823,10 +823,28 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
         }else //if (!g_RunData.bRunAs)
         {
+          if ((rd.bRunAs&3)==2)///LOW option:
+          {
+            ResumeClient(DirectStartUserProcess(0),true);
+            continue;
+          }
           if (rd.bRunAs&4)
           {
-            if (_tcschr(rd.UserName,L'\\')==NULL)
+            if (_tcsicmp(rd.UserName,_T("SYSTEM"))==0)
             {
+              GetProcessUserName(g_RunData.CliProcessId,rd.UserName);
+              HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
+              DWORD IsIn=UserIsInSuRunnersOrAdmins(hUser);
+              CloseHandle(hUser);
+              if ((IsIn&IS_IN_ADMINS==0)
+               &&((IsIn&IS_IN_SURUNNERS==0)||(GetRestrictApps(g_RunData.UserName))))
+              {
+                ResumeClient(RETVAL_ACCESSDENIED);
+                continue;
+              }
+            }else if (_tcschr(rd.UserName,L'\\')==NULL)
+            {
+              
               DWORD n=sizeof(g_RunData.UserName);
               GetComputerName(g_RunData.UserName,&n);
               PathAppend(g_RunData.UserName,rd.UserName);
@@ -834,11 +852,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
             GetProcessUserName(g_RunData.CliProcessId,rd.UserName);
             SetRegStr(HKLM,USERKEY(rd.UserName),L"LastRunAsUser",g_RunData.UserName);
             g_RunData=rd;
-          }
-          if ((rd.bRunAs&3)==2)///LOW option:
-          {
-            ResumeClient(DirectStartUserProcess(0,g_RunData.cmdLine),true);
-            continue;
           }
         }
         //Process Check succeded, now start this exe in the calling processes
@@ -1604,11 +1617,16 @@ typedef struct _PROCESS_ACCESS_TOKEN
 
 typedef DWORD(CALLBACK * NTSIP)(HANDLE,PROCESSINFOCLASS,PVOID,ULONG);
 
-DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd) 
+DWORD DirectStartUserProcess(DWORD ProcId) 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //ProcId==0; Start process with shell token
   HANDLE hUser=ProcId?GetProcessUserToken(ProcId):GetSessionUserToken(g_RunData.SessionID);
+  { //Start in same session as Client:
+    DWORD SessionID=0;
+    ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
+    SetTokenInformation(hUser,TokenSessionId,&SessionID,sizeof(DWORD));
+  }
   void* Env=0;
   if (CreateEnvironmentBlock(&Env,hUser,FALSE))
   {
@@ -1619,7 +1637,7 @@ DWORD DirectStartUserProcess(DWORD ProcId,LPTSTR cmd)
     TCHAR WinstaDesk[2*MAX_PATH+2];
     _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
     si.lpDesktop = WinstaDesk;
-    if (MyCPAU(hUser,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
+    if (MyCPAU(hUser,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
                 CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
     {
 UsualWay:
@@ -1639,11 +1657,11 @@ UsualWay:
           SIZE_T n;
           if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
             DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-            cmd,GetLastErrorNameStatic());
+            g_RunData.cmdLine,GetLastErrorNameStatic());
           CloseHandle(hProcess);
         }else
           DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-          cmd,GetLastErrorNameStatic());
+          g_RunData.cmdLine,GetLastErrorNameStatic());
       }
     }else
     {
@@ -1658,7 +1676,7 @@ UsualWay:
           hAdmin=GetTempAdminToken(g_RunData.UserName);
           SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
         }
-        if (MyCPAU(hAdmin,NULL,cmd,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
+        if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
                     CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
         {
           //This is highly undocumented but ReactOS/Wine/MS use it, so I do too
@@ -1735,6 +1753,11 @@ void SuRun()
       DeleteSafeDesktop(false);
       SetRegStr(HKLM,USERKEY(g_RunData.UserName),L"LastRunAsUser",User);
       _tcscpy(g_RunData.UserName,User);
+      if (r&(1<<5))// /USER SYSTEM
+      {
+        ResumeClient(DirectStartUserProcess(GetProcessID(L"Services.exe")),true);
+        return;
+      }
       //AsAdmin!
       if ((r&0x08)==0)
         g_RunData.bRunAs|=2;
@@ -1795,7 +1818,7 @@ void SuRun()
     {
       //Just start the client process!
       KillProcess(g_RunData.KillPID);
-      ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId,g_RunData.cmdLine),true);
+      ResumeClient(DirectStartUserProcess(g_RunData.CliProcessId),true);
       return;
     }
     //Start execution

@@ -466,6 +466,14 @@ void USERLIST::LoadUserBitmaps()
   }
 }
 
+int USERLIST::FindUser(LPTSTR UserName)
+{
+  for (int i=0;i<nUsers;i++)
+    if(_tcsicmp(User[i].UserName,UserName)==0)
+      return i;
+  return -1;
+}
+
 void USERLIST::SetUsualUsers(DWORD SessionId,BOOL bScanDomain)
 {
   DeleteUserBitmaps();

@@ -290,8 +290,16 @@ static void SetUserBitmap(HWND hwnd)
     }else
     {
       SetDlgItemText(hwnd,IDC_PASSWORD,_T(""));
-      EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),1);
       CheckDlgButton(hwnd,IDC_STOREPASS,0);
+      if ((_tcsicmp(User,_T("SYSTEM"))==0)
+        &&(IsInAdmins(p->User,p->SessionId)
+        ||(IsInSuRunners(p->User,p->SessionId) && (!GetRestrictApps(p->User)))))
+      {
+        EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),false);
+        EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),false);
+      }
+      else
+        EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),1);
     }
     zero(Pass);
   }
@@ -629,6 +637,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           {
             p->bRunAs=FALSE;
             ExitCode|=1<<4;
+            //RunAs /USER SYSTEM
+            TCHAR User[UNLEN+GNLEN+2]={0};
+            GetDlgItemText(hwnd,IDC_USER,User,UNLEN+GNLEN+1);
+            if (_tcsicmp(User,_T("SYSTEM"))==0)
+              ExitCode|=1<<5;
           }
           if (p->bRunAs || IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
           {
@@ -639,7 +652,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             HANDLE hUser=GetUserToken(p->SessionId,User,Pass,p->bFUS||((!p->ForceAdminLogon)&&(!p->bRunAs)));
             if (hUser)
             {
-              if ((p->ForceAdminLogon)&&(!IsAdmin(hUser)))
+              if((p->ForceAdminLogon) && (!IsAdmin(hUser)))
               {
                 zero(Pass);
                 CloseHandle(hUser);
@@ -724,6 +737,7 @@ BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,LPTSTR LastUser,int 
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,false,false,false,SessionId);
   p.Users.SetUsualUsers(SessionId,FALSE);
+  p.Users.Add(LastUser);
   p.bRunAs=TRUE;
   p.RaUser=LastUser;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
