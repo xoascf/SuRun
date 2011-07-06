@@ -836,8 +836,8 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
               DWORD IsIn=UserIsInSuRunnersOrAdmins(hUser);
               CloseHandle(hUser);
-              if ((IsIn&IS_IN_ADMINS==0)
-               &&((IsIn&IS_IN_SURUNNERS==0)||(GetRestrictApps(g_RunData.UserName))))
+              if (((IsIn&IS_IN_ADMINS)==0)
+               &&(((IsIn&IS_IN_SURUNNERS)==0)||(GetRestrictApps(g_RunData.UserName))))
               {
                 ResumeClient(RETVAL_ACCESSDENIED);
                 continue;
