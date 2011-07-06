@@ -1,7 +1,7 @@
 @echo off
-if NOT "%VS90COMNTOOLS%"=="" goto VC9compile
-if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
 if NOT "%MSDevDir%"=="" goto VC6compile
+if NOT "%VS80COMNTOOLS%"=="" goto VC8compile
+if NOT "%VS90COMNTOOLS%"=="" goto VC9compile
 
 rem compile using VC6
 :VC6compile
@@ -36,7 +36,7 @@ rem compile using VC8 (2005), VC9 (2008) or VC10 (2010)
 :VC8compile
 SETLOCAL
 echo VC8
-if NOT "%VS80COMNTOOLS%"=="" call "%VS80COMNTOOLS%vsvars32.bat"
+call "%VS80COMNTOOLS%vsvars32.bat"
 msbuild SuRun.sln /t:Rebuild /p:Configuration="x64 Unicode Release" /p:Platform=x64
 msbuild SuRun.sln /t:Rebuild /p:Configuration="SuRun32 Unicode Release" /p:Platform=Win32
 msbuild SuRun.sln /t:Rebuild /p:Configuration="Unicode Release" /p:Platform=Win32
@@ -46,7 +46,7 @@ goto Done
 :VC9compile
 echo VC9
 SETLOCAL
-if NOT "%VS90COMNTOOLS%"=="" call "%VS90COMNTOOLS%vsvars32.bat"
+call "%VS90COMNTOOLS%vsvars32.bat"
 msbuild SuRunVC9.sln /t:Rebuild /p:Configuration="x64 Unicode Release" /p:Platform=x64
 msbuild SuRunVC9.sln /t:Rebuild /p:Configuration="SuRun32 Unicode Release" /p:Platform=Win32
 msbuild SuRunVC9.sln /t:Rebuild /p:Configuration="Unicode Release" /p:Platform=Win32
