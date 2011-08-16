@@ -89,12 +89,12 @@ BOOL GetElevatedToken(HANDLE& hToken)
       if(DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
                           SecurityImpersonation,TokenPrimary,&hAdmin)) 
       {
-        CloseHandle(lt.LinkedToken);
-        CloseHandle(hToken);
+        CloseHandleEx(lt.LinkedToken);
+        CloseHandleEx(hToken);
         hToken=hAdmin;
         return TRUE;
       }
-      CloseHandle(lt.LinkedToken);
+      CloseHandleEx(lt.LinkedToken);
     }
   }
   return FALSE;
@@ -222,7 +222,7 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       strcpy(tsrc.SourceName,"SuRun");
       //Copy Logon SID from the Shell Process of SessionID:
       LogonSID=GetLogonSid(hShell);
-      CloseHandle(hShell);
+      CloseHandleEx(hShell);
       hShell=0;
     }else
       __leave;
@@ -354,7 +354,7 @@ public:
         }else
           *n=NULL;
         m_nTokens--;
-        CloseHandle(hToken);
+        CloseHandleEx(hToken);
       }
     }
   }
@@ -363,7 +363,7 @@ public:
     free(m_UserNames);
     m_UserNames=NULL;
     for (DWORD i=0;i<m_nTokens;i++)
-      CloseHandle(m_Tokens[i]);
+      CloseHandleEx(m_Tokens[i]);
     free(m_Tokens);
     m_Tokens=NULL;
     m_nTokens=NULL;
@@ -876,7 +876,7 @@ HANDLE GetAdminToken(DWORD SessionID)
   __finally
   {
     if(hShell)
-      CloseHandle(hShell);
+      CloseHandleEx(hShell);
     if(LogonSID)
       free(LogonSID);
     if (UserSID)

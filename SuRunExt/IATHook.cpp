@@ -485,7 +485,7 @@ DWORD HookModules()
     g_ModList.merge(newMods);
     free(hMod);
   }
-  CloseHandle(hProc);
+  CloseHandleEx(hProc);
   return nHooked;
 }
 
@@ -510,7 +510,7 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   static WCHAR cmd[4096];
   zero(cmd);
-  if(lpApp)
+  if(lpApp && (*lpApp))
   {
     wcscat(cmd,lpApp);
     SR_PathQuoteSpacesW(cmd);
@@ -525,26 +525,26 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     wcscat(cmd,parms);
   PROCESS_INFORMATION rpi={0};
   //ToDo: Directly write to service pipe!
+  static WCHAR tmp[4096];
+  zero(tmp);
+  ResolveCommandLine(cmd,CurDir,tmp);
+  GetSystemWindowsDirectoryW(cmd,countof(cmd));
+  SR_PathAppendW(cmd,L"SuRun.exe");
+  SR_PathQuoteSpacesW(cmd);
+  if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
+    //Never start SuRun administrative
+    return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
+  //Exit if ShellExecHook failed on "tmp"
+  static WCHAR tmp2[4096];
+  if (GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp2,4096))
   {
-    static WCHAR tmp[4096];
-    zero(tmp);
-    ResolveCommandLine(cmd,CurDir,tmp);
-    GetSystemWindowsDirectoryW(cmd,countof(cmd));
-    SR_PathAppendW(cmd,L"SuRun.exe");
-    SR_PathQuoteSpacesW(cmd);
-    if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
-      //Never start SuRun administrative
-      return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;
-    //Exit if ShellExecHook failed on "tmp"
-    static WCHAR tmp2[4096];
-    GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",tmp2,4096);
     RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
     if(_tcsicmp(tmp,tmp2)==0)
       return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
-    wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
-      GetCurrentProcessId(),&rpi,tmp);
   }
-//  CTimeLog l(L"IATHook TestAutoSuRun(%s)",lpCmd);
+  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
+    GetCurrentProcessId(),&rpi,tmp);
+//  CTimeLog l(L"IATHook TestAutoSuRun(%s)",tmp);
   static STARTUPINFOW si;
   zero(si);
   static PROCESS_INFORMATION pi;
@@ -562,10 +562,10 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   }
   if (bStarted)
   {
-    CloseHandle(pi.hThread);
+    CloseHandleEx(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
     GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
-    CloseHandle(pi.hProcess);
+    CloseHandleEx(pi.hProcess);
     if (ExitCode==RETVAL_OK)
     {
       //return a valid PROCESS_INFORMATION!
@@ -591,14 +591,17 @@ DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
   EnterCriticalSection(&g_HookCs);
   static WCHAR wApp[4096];
   zero(wApp);
-  MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
+  if(lpApp)
+    MultiByteToWideChar(CP_ACP,0,lpApp,-1,wApp,(int)4096);
   static WCHAR wCmd[4096];
   zero(wCmd);
-  MultiByteToWideChar(CP_ACP,0,lpCmd,-1,wCmd,(int)4096);
+  if(lpCmd)
+    MultiByteToWideChar(CP_ACP,0,lpCmd,-1,wCmd,(int)4096);
   static WCHAR wCurDir[4096];
   zero(wCurDir);
-  MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
-  DWORD dwRet=TestAutoSuRunW(wApp,wCmd,wCurDir,dwCreationFlags,lppi,hUser);
+  if(lpCurDir)
+    MultiByteToWideChar(CP_ACP,0,lpCurDir,-1,wCurDir,(int)4096);
+  DWORD dwRet=TestAutoSuRunW((lpApp?wApp:0),(lpCmd?wCmd:0),(lpCurDir?wCurDir:0),dwCreationFlags,lppi,hUser);
   LeaveCriticalSection(&g_HookCs);
   return dwRet;
 }
@@ -745,7 +748,7 @@ static BOOL IsShellAndSuRunner(HANDLE hToken)
           }
           free(ShellSID);
         }
-        CloseHandle(hShell);
+        CloseHandleEx(hShell);
       }
     }
   }

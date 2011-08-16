@@ -578,8 +578,8 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     // Start the child process.
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      CloseHandle( pi.hProcess );
-      CloseHandle( pi.hThread );
+      CloseHandleEx( pi.hProcess );
+      CloseHandleEx( pi.hThread );
       hr = NOERROR;
     }else
       MessageBoxW(lpcmi->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),CResStr(l_hInst,IDS_ERR),MB_ICONSTOP|MB_SYSTEMMODAL);
@@ -690,8 +690,8 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   
   ResolveCommandLine(tmp,CurDir,tmp);
 
-//  GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",cmd,4096);
-//  if(_tcsicmp(tmp,cmd)==0)
+//  if(GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",cmd,4096)
+//    &&(_tcsicmp(tmp,cmd)==0))
 //    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;  
   RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
 
@@ -720,7 +720,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   // Start the child process.
   if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,CurDir,&si,&pi))
   {
-    CloseHandle(pi.hThread);
+    CloseHandleEx(pi.hThread);
     DWORD ExitCode=ERROR_ACCESS_DENIED;
     if((WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
@@ -744,7 +744,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
       }
     }else
       DBGTrace1("SuRun ShellExtExecute: WHOOPS! %s",cmd);
-    CloseHandle(pi.hProcess);
+    CloseHandleEx(pi.hProcess);
     LeaveCriticalSection(&l_SxHkCs);
     return ((ExitCode==RETVAL_OK)||(ExitCode==RETVAL_CANCELLED))?S_OK:S_FALSE;
   }else
@@ -843,10 +843,10 @@ int KillIfSuRunProcess(PSID LogonSID,LUID SrcId,DWORD PID)
       }else
         DBGTrace2("GetTokenInformation(%d) failed: %s",PID,GetLastErrorNameStatic());
     }
-    CloseHandle(ht);
+    CloseHandleEx(ht);
   }else
     DBGTrace2("OpenProcessToken(%d) failed: %s",PID,GetLastErrorNameStatic());
-  CloseHandle(hp);
+  CloseHandleEx(hp);
   return RetVal;
 }
 
@@ -881,7 +881,7 @@ __declspec(dllexport) void TerminateAllSuRunnedProcesses(HANDLE hToken)
           KillIfSuRunProcess(LogonSID,Logonsrc.SourceIdentifier,pe32.th32ProcessID);
         }while (Process32Next(h, &pe32)); 
       } 
-      CloseHandle(h);
+      CloseHandleEx(h);
     }
   }
   free(LogonSID);

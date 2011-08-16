@@ -52,12 +52,10 @@ extern HANDLE    l_InitThread;
 #define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
 #define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
 
-
 UINT        WM_SYSMH0   = -2;
 UINT        WM_SYSMH1   = -2;
 UINT        WM_SYSMH2   = -2;
 UINT        WM_SYSMH3   = -2;
-
 
 BOOL g_IsShell=-1;
 BOOL IsShell()
@@ -168,8 +166,8 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         _tcscat(cmd,GetCommandLine());
         if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
         {
-          CloseHandle(pi.hProcess);
-          CloseHandle(pi.hThread);
+          CloseHandleEx(pi.hProcess);
+          CloseHandleEx(pi.hThread);
         }else
           SafeMsgBox(wps->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
         //We processed the Message: Stop calling other hooks!
@@ -239,8 +237,8 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     _tcscat(cmd,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      CloseHandle(pi.hProcess);
-      CloseHandle(pi.hThread);
+      CloseHandleEx(pi.hProcess);
+      CloseHandleEx(pi.hThread);
     }else
       SafeMsgBox(msg->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
     //We processed the Message: Stop calling other hooks!

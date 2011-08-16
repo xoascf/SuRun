@@ -212,7 +212,7 @@ static DWORD DoFUS() //Do Fast User Switching
       return RETVAL_CANCELLED;
     }
     GetTokenUserName(tSess,UserName);
-    CloseHandle(tSess);
+    CloseHandleEx(tSess);
     if (!UserName[0])
     {
       SafeMsgBox(0,CBigResStr(IDS_NOTLOGGEDON2,SessID),CResStr(IDS_APPNAME),
@@ -336,15 +336,15 @@ DWORD CheckCliProcess(RUNDATA& rd)
       if ((!OpenThreadToken(hThread,TOKEN_DUPLICATE,FALSE,&hTok))
         && (GetLastError()!=ERROR_NO_TOKEN))
         DBGTrace2("OpenThreadToken(%d) failed: %s",rd.CliThreadId,GetLastErrorNameStatic());
-      CloseHandle(hThread);
+      CloseHandleEx(hThread);
     }
     if ((!hTok)&&(!OpenProcessToken(hProcess,TOKEN_DUPLICATE,&hTok)))
     {
       DBGTrace2("OpenProcessToken(%d) failed: %s",rd.CliProcessId,GetLastErrorNameStatic());
-      return CloseHandle(hProcess),0;
+      return CloseHandleEx(hProcess),0;
     }
     g_CliIsAdmin=IsAdmin(hTok)!=0;
-    CloseHandle(hTok);
+    CloseHandleEx(hTok);
   }
   SIZE_T s;
   //Check if the calling process is this Executable:
@@ -356,31 +356,31 @@ DWORD CheckCliProcess(RUNDATA& rd)
     if (!GetProcessFileName(f1,MAX_PATH))
     {
       DBGTrace1("GetProcessFileName failed",GetLastErrorNameStatic());
-      return CloseHandle(hProcess),0;
+      return CloseHandleEx(hProcess),0;
     }
     if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
     {
       DBGTrace1("EnumProcessModules failed",GetLastErrorNameStatic());
-      return CloseHandle(hProcess),0;
+      return CloseHandleEx(hProcess),0;
     }
     if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
     {
       DBGTrace1("GetModuleFileNameEx failed",GetLastErrorNameStatic());
-      return CloseHandle(hProcess),0;
+      return CloseHandleEx(hProcess),0;
     }
     if(_tcsicmp(f1,f2)!=0)
     {
       DBGTrace2("Invalid Process! %s != %s !",f1,f2);
-      return CloseHandle(hProcess),0;
+      return CloseHandleEx(hProcess),0;
     }
   }
   //Since it's the same process, g_RunData has the same address!
   if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&s))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),0;
+    return CloseHandleEx(hProcess),0;
   }
-  CloseHandle(hProcess);
+  CloseHandleEx(hProcess);
   if (sizeof(RUNDATA)!=s)
     return 0;
   if (memcmp(&rd,&g_RunData,sizeof(RUNDATA))!=0)
@@ -406,7 +406,7 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
   if (!WriteProcessMemory(hProcess,&g_RetVal,&RetVal,sizeof(int),&n))
   {
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
-    return CloseHandle(hProcess),FALSE;
+    return CloseHandleEx(hProcess),FALSE;
   }
   if (sizeof(int)!=n)
     DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(int),n);
@@ -416,7 +416,7 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
     if (sizeof(RUNDATA)!=n)
       DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
   }
-  CloseHandle(hProcess);
+  CloseHandleEx(hProcess);
   return TRUE;
 }
 
@@ -447,7 +447,7 @@ VOID WINAPI SvcCtrlHndlr(DWORD dwControl)
       sw=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
     }
     //As g_hPipe is now INVALID_HANDLE_VALUE, the Service will exit
-    CloseHandle(hPipe);
+    CloseHandleEx(hPipe);
     return;
   } 
   if (g_hSS!=(SERVICE_STATUS_HANDLE)0) 
@@ -543,10 +543,10 @@ void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut)
     if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
       TerminateProcess(pi.hProcess,0);
     ResumeThread(pi.hThread);
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
+    CloseHandleEx(pi.hThread);
+    CloseHandleEx(pi.hProcess);
   }
-  CloseHandle(hUser);
+  CloseHandleEx(hUser);
 }
 
 void TestEmptyAdminPasswords()
@@ -620,7 +620,7 @@ BOOL InjectIATHook(HANDLE hProc)
 	  if (hThread!=NULL)
     {
       WaitForSingleObject(hThread,INFINITE);
-      CloseHandle(hThread);
+      CloseHandleEx(hThread);
     }
 	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
   }__except(1)
@@ -640,7 +640,7 @@ BOOL InjectIATHook(DWORD ProcId)
     return false;
   }
   BOOL bRet=InjectIATHook(hProc);
-  CloseHandle(hProc);
+  CloseHandleEx(hProc);
   return bRet;
 }
 
@@ -661,7 +661,7 @@ static BOOL TestDirectServiceCommands()
   if (_tcsicmp(g_RunData.cmdLine,_T("/TSATHREAD"))==0)
   {
     TestEmptyAdminPasswords();
-    CloseHandle(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
+    CloseHandleEx(CreateThread(0,0,TSAThreadProc,(VOID*)(DWORD_PTR)g_RunData.CliProcessId,0,0));
     return true;
   }
   if (_tcsnicmp(g_RunData.cmdLine,_T("/RESTORE "),9)==0)
@@ -835,7 +835,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               GetProcessUserName(g_RunData.CliProcessId,rd.UserName);
               HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
               DWORD IsIn=UserIsInSuRunnersOrAdmins(hUser);
-              CloseHandle(hUser);
+              CloseHandleEx(hUser);
               if (((IsIn&IS_IN_ADMINS)==0)
                &&(((IsIn&IS_IN_SURUNNERS)==0)||(GetRestrictApps(g_RunData.UserName))))
               {
@@ -900,16 +900,16 @@ TryAgain:
                   DWORD n=0;
                   CHK_BOOL_FN(GetTokenInformation(hTok,TokenStatistics,&tstat,sizeof(tstat),&n));
                   if (g_RunData.Groups&IS_IN_ADMINS)
-                    CloseHandle(hTok);
+                    CloseHandleEx(hTok);
                 }
                 WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&N);
               }
               ResumeThread(pi.hThread);
-              CloseHandle(pi.hThread);
+              CloseHandleEx(pi.hThread);
               WaitForSingleObject(pi.hProcess,INFINITE);
               DWORD ex=0;
               GetExitCodeProcess(pi.hProcess,&ex);
-              CloseHandle(pi.hProcess);
+              CloseHandleEx(pi.hProcess);
               if (ex!=(~pi.dwProcessId))
               {
                 DBGTrace4("SuRun: Starting child process try %d failed after %d ms. "
@@ -930,7 +930,7 @@ TryAgain:
     }
   }else
     DBGTrace1( "CreateNamedPipe failed %s",GetLastErrorNameStatic());
-  CloseHandle(hRunLSASS);
+  CloseHandleEx(hRunLSASS);
   DeleteTempAdminTokens();
   //Stop Service
   g_ss.dwCurrentState     = SERVICE_STOPPED; 
@@ -982,7 +982,7 @@ void KillProcess(DWORD PID,DWORD TimeOut=5000)
   //Give the Process time to close
   if ((!g_bKilledOne) || (WaitForSingleObject(hProcess,TimeOut)!=WAIT_OBJECT_0))
     TerminateProcess(hProcess,0);
-  CloseHandle(hProcess);
+  CloseHandleEx(hProcess);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1150,7 +1150,7 @@ DWORD PrepareSuRun()
             if (hUser)
               CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
             zero(g_RunPwd);
-            //Do not call CloseHandle(hUser)!
+            //Do not call CloseHandleEx(hUser)!
           }
           return RETVAL_OK;
         }
@@ -1169,7 +1169,7 @@ DWORD PrepareSuRun()
         if (hUser)
           CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
         zero(g_RunPwd);
-        //Do not call CloseHandle(hUser)!
+        //Do not call CloseHandleEx(hUser)!
       }
     }else //if (PwOk):
     {
@@ -1427,7 +1427,7 @@ DWORD LSAStartAdminProcess()
           SetAdminDenyUserAccess(pi.hProcess,ShellSID);
           SetAdminDenyUserAccess(pi.hThread,ShellSID);
           free(ShellSID);
-          CloseHandle(hShell);
+          CloseHandleEx(hShell);
         }
         //Special handling for Explorer:
         BOOL orgSP=1;
@@ -1537,8 +1537,8 @@ DWORD LSAStartAdminProcess()
           LocalFree((HLOCAL)pNewDACL); 
         if(pNewOwner)
           FreeSid(pNewOwner);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
+        CloseHandleEx(pi.hThread);
+        CloseHandleEx(pi.hProcess);
         g_RunData.NewPID=pi.dwProcessId;
         RetVal=RETVAL_OK;
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
@@ -1553,7 +1553,7 @@ DWORD LSAStartAdminProcess()
             if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
               DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
               g_RunData.cmdLine,GetLastErrorNameStatic());
-            CloseHandle(hProcess);
+            CloseHandleEx(hProcess);
           }else
             DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
             g_RunData.cmdLine,GetLastErrorNameStatic());
@@ -1570,7 +1570,7 @@ DWORD LSAStartAdminProcess()
       UnloadUserProfile(hAdmin,ProfInf.hProfile);
   }else
     DBGTrace1("LoadUserProfile failed: %s",GetLastErrorNameStatic());
-  CloseHandle(hAdmin);
+  CloseHandleEx(hAdmin);
   return RetVal;
 }
 
@@ -1643,9 +1643,9 @@ DWORD DirectStartUserProcess(DWORD ProcId)
 UsualWay:
       RetVal=RETVAL_OK;
       g_RunData.NewPID=pi.dwProcessId;
-      CloseHandle(pi.hProcess);
+      CloseHandleEx(pi.hProcess);
       ResumeThread(pi.hThread);
-      CloseHandle(pi.hThread);
+      CloseHandleEx(pi.hThread);
       //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
       if((g_RunData.RetPID)&&(g_RunData.RetPtr))
       {
@@ -1658,7 +1658,7 @@ UsualWay:
           if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
             DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
             g_RunData.cmdLine,GetLastErrorNameStatic());
-          CloseHandle(hProcess);
+          CloseHandleEx(hProcess);
         }else
           DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
           g_RunData.cmdLine,GetLastErrorNameStatic());
@@ -1691,7 +1691,7 @@ UsualWay:
             if (NT_SUCCESS(Status))
             {
               if(bCloseAdmin)
-                CloseHandle(hAdmin);
+                CloseHandleEx(hAdmin);
               goto UsualWay;
             }
             DBGTrace1("NtSetInformationProcess failed: %s",GetErrorNameStatic(Status));
@@ -1701,13 +1701,13 @@ UsualWay:
         }else
           DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
         if(bCloseAdmin)
-          CloseHandle(hAdmin);
+          CloseHandleEx(hAdmin);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
     }
     DestroyEnvironmentBlock(Env);
   }
-  CloseHandle(hUser);
+  CloseHandleEx(hUser);
   return RetVal;
 }
 
@@ -2128,11 +2128,11 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
     si.cb = sizeof(si);
     if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      CloseHandle(pi.hThread);
+      CloseHandleEx(pi.hThread);
       DWORD ExitCode=-1;
       if (WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
         GetExitCodeProcess(pi.hProcess,&ExitCode);
-      CloseHandle(pi.hProcess);
+      CloseHandleEx(pi.hProcess);
       if (ExitCode!=RETVAL_OK)
         return FALSE;
       WaitFor(CheckServiceStatus()==WaitStat);
@@ -2287,10 +2287,10 @@ BOOL InstallService()
       HANDLE m=CreateMutex(NULL,true,_T("SuRun_SysMenuHookIsRunning"));
       if (GetLastError()!=ERROR_ALREADY_EXISTS)
       {
-        CloseHandle(m);
+        CloseHandleEx(m);
         break;
       }
-      CloseHandle(m);
+      CloseHandleEx(m);
       Sleep(200);
     }
   }
@@ -2472,9 +2472,9 @@ INT_PTR CALLBACK InstallDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
             si.cb	= sizeof(si);
             if (CreateProcess(NULL,(LPTSTR)SuRunExe,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
             {
-              CloseHandle(pi.hThread);
+              CloseHandleEx(pi.hThread);
               WaitForSingleObject(pi.hProcess,INFINITE);
-              CloseHandle(pi.hProcess);
+              CloseHandleEx(pi.hProcess);
             }
           }
           //Show success
@@ -2630,7 +2630,7 @@ DWORD WINAPI HKThreadProc(void* p)
       {
         DWORD n=0;
         WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
-        CloseHandle(hPipe);
+        CloseHandleEx(hPipe);
       }
     }
     UnregisterHotKey(0,HotKeyID);
@@ -2680,8 +2680,8 @@ static void HandleHooks()
     si.cb = sizeof(si);
     if (CreateProcess(NULL,SuRun32Exe,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      CloseHandle(pi.hProcess);
-      CloseHandle(pi.hThread);
+      CloseHandleEx(pi.hProcess);
+      CloseHandleEx(pi.hThread);
     }
   }
 #endif _WIN64
@@ -2745,7 +2745,7 @@ static void HandleHooks()
 //    PostThreadMessage(HkTID,WM_QUIT,0,0);
 //  if(WaitForSingleObject(hHkThread,1000)==WAIT_TIMEOUT)
 //    TerminateThread(hHkThread,-1);
-//  CloseHandle(hHkThread);
+//  CloseHandleEx(hHkThread);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2775,9 +2775,9 @@ bool HandleServiceStuff()
       si.cb = sizeof(si);
       if (CreateProcess(NULL,CMD,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
       {
-        CloseHandle(pi.hThread);
+        CloseHandleEx(pi.hThread);
         WaitForSingleObject(pi.hProcess,INFINITE);
-        CloseHandle(pi.hProcess);
+        CloseHandleEx(pi.hProcess);
       }
       ExitProcess(0);
       return true;
