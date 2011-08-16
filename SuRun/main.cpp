@@ -249,7 +249,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if(hTok)
     {
       bShellIsadmin=IsAdmin(hTok)!=0;
-      CloseHandle(hTok);
+      CloseHandleEx(hTok);
     }
     //Convert Command Line
     if (!bRunSetup)
@@ -292,7 +292,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
   DWORD nWritten=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&nWritten,0);
-  CloseHandle(hPipe);
+  CloseHandleEx(hPipe);
   //Wait for max 60s for the Password...
   to.Set(60000);
   while ((g_RetVal==RETVAL_WAIT)&&(!to.TimedOut()))
@@ -329,7 +329,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         if(hProcess)
         {
           WaitForSingleObject(hProcess,INFINITE);
-          CloseHandle(hProcess);
+          CloseHandleEx(hProcess);
         }else
           DBGTrace2("OpenProcess(%d) failed: %s",g_RunData.NewPID,GetLastErrorNameStatic());
       }

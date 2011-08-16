@@ -215,7 +215,7 @@ static bool ProcessRunning(DWORD PID)
     return false;
   }
   DWORD WaitRes=WaitForSingleObject(hProc,0);
-  CloseHandle(hProc);
+  CloseHandleEx(hProc);
 #ifdef DoDBGTrace
   if(WaitRes!=WAIT_TIMEOUT)
     DBGTrace1("ProcessRunning failed: Wait result==%08X",WaitRes);
@@ -297,7 +297,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
       //Revoke access from user desktop
       SetProcWinStaDesk(0,SafeDesk);
       SetAccessToWinDesk(hTok,0,UserDesk,false);
-      CloseHandle(hTok);
+      CloseHandleEx(hTok);
       hTok=0;
     }
   }

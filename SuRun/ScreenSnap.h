@@ -134,7 +134,7 @@ public:
     {
       if(WaitForSingleObject(m_Thread,2000)!=WAIT_OBJECT_0)
         TerminateThread(m_Thread,0);
-      CloseHandle(m_Thread);
+      CloseHandleEx(m_Thread);
     }
     m_Thread=NULL;
     if(m_hWnd)

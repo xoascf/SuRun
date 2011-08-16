@@ -64,7 +64,7 @@ DWORD WINAPI TSAThreadProc(void* p)
      ||(WaitForSingleObject(hEvent,INFINITE)!=WAIT_OBJECT_0)
      ||(!ReadProcessMemory(hProc,&g_TSAPID,&TSAData.CurPID,sizeof(DWORD),&s))
      ||(sizeof(DWORD)!=s))
-      return CloseHandle(hProc),0;
+      return CloseHandleEx(hProc),0;
     //Special case: WM_QUERYENDSESSION
     if(TSAData.CurPID==-1)
     {
@@ -80,7 +80,7 @@ DWORD WINAPI TSAThreadProc(void* p)
         DeleteTempAdminToken(hToken);
         TerminateAllSuRunnedProcesses(hToken);
         SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-        CloseHandle(hToken);
+        CloseHandleEx(hToken);
       }
     }else
     {
@@ -95,10 +95,10 @@ DWORD WINAPI TSAThreadProc(void* p)
           
           GetTokenUserName(hTok,TSAData.CurUserName);
           TSAData.CurUserIsadmin=IsAdmin(hTok);
-          CloseHandle(hTok);
+          CloseHandleEx(hTok);
         }else
           DBGTrace1("OpenProcessToken failed: %s",GetLastErrorNameStatic());
-        CloseHandle(h);
+        CloseHandleEx(h);
       }//else
       //DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurPID,GetLastErrorNameStatic());
     }
@@ -122,7 +122,7 @@ BOOL StartTSAThread()
   g_TSAEvent=CreateEvent(0,1,0,0);
   DWORD n=0;
   WriteFile(hPipe,&g_RunData,sizeof(RUNDATA),&n,0);
-  CloseHandle(hPipe);
+  CloseHandleEx(hPipe);
   Sleep(10);
   for(n=0;(!g_TSAThreadRunning)&&(n<100);n++)
     Sleep(100);
@@ -366,7 +366,7 @@ void InitTrayShowAdmin()
   if(hTok)
   {
     g_CliIsAdmin=IsAdmin(hTok)!=0;
-    CloseHandle(hTok);
+    CloseHandleEx(hTok);
   }
   WNDCLASS WCLASS={0};
   WCLASS.hCursor      =LoadCursor(0,IDC_ARROW);

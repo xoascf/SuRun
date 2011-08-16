@@ -656,8 +656,8 @@ INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           CREATE_SUSPENDED|CREATE_UNICODE_ENVIRONMENT,0,NULL,&si,&pi))
         {
           TerminateProcess(pi.hProcess,0);
-          CloseHandle(pi.hThread);
-          CloseHandle(pi.hProcess);
+          CloseHandleEx(pi.hThread);
+          CloseHandleEx(pi.hProcess);
         }else
           if (SafeMsgBox(hwnd,CBigResStr(IDS_APPOK),CResStr(IDS_APPNAME),
             MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2)==IDNO)
