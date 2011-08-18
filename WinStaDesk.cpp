@@ -540,12 +540,12 @@ BOOL WeMustClose()
   TCHAR f1[MAX_PATH];
   TCHAR f2[MAX_PATH];
   if (!GetProcessFileName(f1,MAX_PATH))
-    return CloseHandleEx(hProcess),TRUE;
+    return CloseHandle(hProcess),TRUE;
   if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
-    return CloseHandleEx(hProcess),TRUE;
+    return CloseHandle(hProcess),TRUE;
   if(GetModuleFileNameEx(hProcess,hMod,f2,MAX_PATH)==0)
-    return CloseHandleEx(hProcess),TRUE;
-  CloseHandleEx(hProcess);
+    return CloseHandle(hProcess),TRUE;
+  CloseHandle(hProcess);
   if(_tcsicmp(f1,f2)!=0)
   {
     DBGTrace2("SuRun GUI must be closed (\"%s\"!=\"%s\")",f1,f2);
@@ -617,7 +617,7 @@ bool CreateSafeDesktop(LPTSTR WinSta,LPCTSTR UserDesk,bool BlurDesk,bool bFade)
   {
     SetThreadPriority(pi.hThread,THREAD_PRIORITY_IDLE);
     ResumeThread(pi.hThread);
-    CloseHandleEx(pi.hThread);
+    CloseHandle(pi.hThread);
   }
 //  if (_winmajor>=6)
 //  {
@@ -647,7 +647,7 @@ void DeleteSafeDesktop(bool bFade)
   if(g_WatchDogProcess)
   {
     TerminateProcess(g_WatchDogProcess,0);
-    CloseHandleEx(g_WatchDogProcess);
+    CloseHandle(g_WatchDogProcess);
   }
   g_WatchDogProcess=0;
   if (g_RunOnNewDesk && bFade)
@@ -656,7 +656,7 @@ void DeleteSafeDesktop(bool bFade)
     delete g_RunOnNewDesk;
   g_RunOnNewDesk=NULL;
   if(g_WatchDogEvent)
-    CloseHandleEx(g_WatchDogEvent);
+    CloseHandle(g_WatchDogEvent);
   g_WatchDogEvent=NULL;
   if (g_WatchDogTimer)
     KillTimer(0,g_WatchDogTimer);

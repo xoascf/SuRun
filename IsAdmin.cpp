@@ -49,7 +49,7 @@ BOOL IsAdmin(HANDLE hToken/*=NULL*/)
   if (!DuplicateToken(hToken,SecurityImpersonation,&hToken))
     return FALSE;
   if (hTok)
-    CloseHandleEx(hTok);
+    CloseHandle(hTok);
   __try 
   {
     // Initialize Admin SID and SD
@@ -103,7 +103,7 @@ BOOL IsAdmin(HANDLE hToken/*=NULL*/)
       LocalFree(psdAdmin);  
     if (psidAdmin) 
       FreeSid(psidAdmin);
-    CloseHandleEx(hToken);
+    CloseHandle(hToken);
   }
   return bReturn;
 }
@@ -152,7 +152,7 @@ BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
                             &elevationType,sizeof(elevationType),&dwSize))
       bRet=elevationType==TokenElevationTypeLimited;
     if (hT==NULL)
-      CloseHandleEx(hToken);
+      CloseHandle(hToken);
   }
   return bRet;
 };
@@ -189,7 +189,7 @@ bool IsLocalSystem()
 	if (!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&htok ))
     return DBGTrace1("OpenProcessToken() failed: %s",GetLastErrorNameStatic()),false;
   bool bIsLocalSystem=IsLocalSystem(htok);
-  CloseHandleEx(htok);
+  CloseHandle(htok);
 	return bIsLocalSystem;
 }
 
@@ -207,10 +207,10 @@ bool IsLocalSystem(DWORD ProcessID)
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
     bRet=IsLocalSystem(hToken);
-    CloseHandleEx(hToken);
+    CloseHandle(hToken);
   }else
     DBGTrace2("OpenProcessToken(ID==%d) failed: %s",ProcessID,GetLastErrorNameStatic());
-  CloseHandleEx(hProc);
+  CloseHandle(hProc);
 	return bRet;
 }
 
@@ -239,8 +239,8 @@ BOOL RunAs(LPCWSTR lpCmdLine,LPCWSTR szUser,LPCWSTR szPassword)
     //MessageBox(0,GetLastErrorNameStatic(),0,0);
     return false;
   }
-  CloseHandleEx(pi.hProcess);
-  CloseHandleEx(pi.hThread);
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
   return TRUE;
 }
 
@@ -255,8 +255,8 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
     si.cb	= sizeof(si);
     if (!CreateProcess(NULL,(LPTSTR)cmdline,NULL,NULL,FALSE,NORMAL_PRIORITY_CLASS,NULL,NULL,&si,&pi))
       return FALSE;
-    CloseHandleEx(pi.hProcess);
-    CloseHandleEx(pi.hThread);
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
     return TRUE;
   }
   //Vista!

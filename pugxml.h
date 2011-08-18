@@ -1407,7 +1407,7 @@ inline static bool load_file(const TCHAR* path,TCHAR** buffer,unsigned long* siz
 		*size += read_bytes;
 		ZeroMemory(temp,sizeof(TCHAR)*tempsize);
 	}
-	CloseHandleEx(file_handle);
+	CloseHandle(file_handle);
 	free(temp);
 	return (*size) ? true : false;
 }
@@ -3627,7 +3627,7 @@ protected:
 		}
 		if(_mmfmap != 0)
 		{
-			CloseHandleEx(_mmfmap);
+			CloseHandle(_mmfmap);
 			_mmfmap = 0;
 		}
 		if(_mmfile != 0)
@@ -3638,7 +3638,7 @@ protected:
 				SetEndOfFile(_mmfile);
 				_addeos = false;
 			}
-			CloseHandleEx(_mmfile);
+			CloseHandle(_mmfile);
 			_mmfile = 0;
 		}
 		_mfsize = 0;
@@ -3841,14 +3841,14 @@ protected:
 				}
 				else
 				{
-					CloseHandleEx(_mmfmap);
-					CloseHandleEx(_mmfile);
+					CloseHandle(_mmfmap);
+					CloseHandle(_mmfile);
 					_mmfile = _mmfmap = 0;
 				}
 			}
 			else
 			{
-				CloseHandleEx(_mmfile);
+				CloseHandle(_mmfile);
 				_mmfile = 0;
 			}
 		}

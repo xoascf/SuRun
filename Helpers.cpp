@@ -61,21 +61,6 @@ unsigned int _winver = _GetWinVer();
 #endif  //_MSC_VER
 
 //////////////////////////////////////////////////////////////////////////////
-//  CloseHandleEx
-//////////////////////////////////////////////////////////////////////////////
-BOOL CloseHandleEx(HANDLE hObject)
-{
-  BOOL bRet=FALSE;
-  __try
-  {
-    bRet=CloseHandle(hObject);
-  }__except(1)
-  {
-  }
-  return bRet;
-}
-
-//////////////////////////////////////////////////////////////////////////////
 //
 //  Registry Helper
 //
@@ -366,12 +351,12 @@ BOOL EnablePrivilege(LPCTSTR name)
   else
   {
     bRet&=EnablePrivilege(hToken,name);
-    CloseHandleEx(hToken);
+    CloseHandle(hToken);
   }
   if(!OpenProcessToken(GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES,&hToken))
     return FALSE;
   bRet&=EnablePrivilege(hToken,name);
-  CloseHandleEx(hToken);
+  CloseHandle(hToken);
   return bRet;
 }
 
@@ -1241,10 +1226,10 @@ PSID GetProcessUserSID(DWORD ProcessID)
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
     sid=GetTokenUserSID(hToken);
-    CloseHandleEx(hToken);
+    CloseHandle(hToken);
   }else
     DBGTrace2("OpenProcessToken(ID==%d) failed: %s",ProcessID,GetLastErrorNameStatic());
-  CloseHandleEx(hProc);
+  CloseHandle(hProc);
   return sid;
 }
 
@@ -1269,10 +1254,10 @@ bool GetProcessUserName(DWORD ProcessID,LPTSTR User,LPTSTR Domain/*=0*/)
   if (OpenProcessToken(hProc,TOKEN_QUERY,&hToken))
   {
     bRet=GetTokenUserName(hToken,User,Domain);
-    CloseHandleEx(hToken);
+    CloseHandle(hToken);
   }else
     DBGTrace2("OpenProcessToken(ID==%d) failed: %s",ProcessID,GetLastErrorNameStatic());
-  CloseHandleEx(hProc);
+  CloseHandle(hProc);
   return bRet;
 }
 
@@ -1335,7 +1320,7 @@ DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID/*=-1*/)
     dwRet=pe.th32ProcessID;
     break;
   }
-  CloseHandleEx(hSnap);
+  CloseHandle(hSnap);
   return dwRet;
 }
 
@@ -1377,7 +1362,7 @@ BOOL GetProcessName(DWORD PID,LPTSTR ProcessName)
       break;
     }
   }
-  CloseHandleEx(hSnap);
+  CloseHandle(hSnap);
   return bRet;
 }
 
@@ -1407,7 +1392,7 @@ HANDLE GetShellProcessToken()
   {
     DBGTrace2("OpenProcessToken(%d) failed: %s",ShellID,GetLastErrorNameStatic());
   }
-  CloseHandleEx(hShell);
+  CloseHandle(hShell);
   return hTok;
 }
 
@@ -1531,7 +1516,7 @@ DWORD UserIsInSuRunnersOrAdmins()
     return 0;
   }
   DWORD dwRet=UserIsInSuRunnersOrAdmins(hToken);
-  CloseHandleEx(hToken);
+  CloseHandle(hToken);
 	return dwRet;
 }
 
@@ -1553,13 +1538,13 @@ HANDLE GetProcessUserToken(DWORD ProcId)
   HANDLE hToken=NULL;
   CHK_BOOL_FN(OpenProcessToken(hProc,TOKEN_IMPERSONATE|TOKEN_QUERY|TOKEN_DUPLICATE
                                      |TOKEN_ASSIGN_PRIMARY,&hToken));
-  CloseHandleEx(hProc);
+  CloseHandle(hProc);
   if(!hToken)
     return 0;
   HANDLE hUser=0;
   CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
                                 TokenPrimary,&hUser)); 
-  return CloseHandleEx(hToken),hUser;
+  return CloseHandle(hToken),hUser;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1608,7 +1593,7 @@ HANDLE GetSessionUserToken(DWORD SessID)
   HANDLE hTokenDup=NULL;
   CHK_BOOL_FN(DuplicateTokenEx(hToken,MAXIMUM_ALLOWED,NULL,SecurityIdentification,
                           TokenPrimary,&hTokenDup)); 
-  CloseHandleEx(hToken);
+  CloseHandle(hToken);
   return hTokenDup;
 }
 
@@ -1624,7 +1609,7 @@ PSID GetSessionLogonSID(DWORD SessionID)
   if (!hToken)
     return 0;
   PSID p=GetLogonSid(hToken);
-  CloseHandleEx(hToken);
+  CloseHandle(hToken);
   return p;
 }
 

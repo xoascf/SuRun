@@ -106,7 +106,7 @@ BOOL PasswordOK(DWORD SessionId,LPCTSTR User,LPCTSTR Password,bool AllowEmptyPas
 {
   HANDLE hToken=GetUserToken(SessionId,User,Password,AllowEmptyPassword);
   BOOL bRet=hToken!=0;
-  CloseHandleEx(hToken);
+  CloseHandle(hToken);
   return bRet;
 }
 
@@ -655,7 +655,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
               if((p->ForceAdminLogon) && (!IsAdmin(hUser)))
               {
                 zero(Pass);
-                CloseHandleEx(hUser);
+                CloseHandle(hUser);
                 SafeMsgBox(hwnd,CResStr(IDS_NOADMIN,User),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
                 SendDlgItemMessage(hwnd,IDC_PASSWORD,EM_SETSEL,0,-1);
                 SetFocus(GetDlgItem(hwnd,IDC_PASSWORD));
@@ -672,7 +672,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                   _tcscpy(p->User,User);
                 if(p->Password)
                   _tcscpy(p->Password,Pass);
-                CloseHandleEx(hUser);
+                CloseHandle(hUser);
                 zero(Pass);
                 EndDialog(hwnd,ExitCode);
               }
