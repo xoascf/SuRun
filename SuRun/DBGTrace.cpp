@@ -355,12 +355,12 @@ static void WriteLog(LPTSTR S)
 //    OutputDebugStringA("FATAL: Exception in DbgOutA\n");
 //  }
 //  if (evAck)
-//    CloseHandleEx(evAck);
+//    CloseHandle(evAck);
 //  if (evRdy)
-//    CloseHandleEx(evRdy);
+//    CloseHandle(evRdy);
 //  if (Buf)
 //    UnmapViewOfFile(Buf);
-//  CloseHandleEx(DBWBuf);
+//  CloseHandle(DBWBuf);
 //  ReleaseMutex(DBWMtx);
 //}
 

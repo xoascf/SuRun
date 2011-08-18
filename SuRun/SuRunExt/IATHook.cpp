@@ -485,7 +485,7 @@ DWORD HookModules()
     g_ModList.merge(newMods);
     free(hMod);
   }
-  CloseHandleEx(hProc);
+  CloseHandle(hProc);
   return nHooked;
 }
 
@@ -562,10 +562,10 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   }
   if (bStarted)
   {
-    CloseHandleEx(pi.hThread);
+    CloseHandle(pi.hThread);
     WaitForSingleObject(pi.hProcess,INFINITE);
     GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode);
-    CloseHandleEx(pi.hProcess);
+    CloseHandle(pi.hProcess);
     if (ExitCode==RETVAL_OK)
     {
       //return a valid PROCESS_INFORMATION!
@@ -748,7 +748,7 @@ static BOOL IsShellAndSuRunner(HANDLE hToken)
           }
           free(ShellSID);
         }
-        CloseHandleEx(hShell);
+        CloseHandle(hShell);
       }
     }
   }

@@ -29,9 +29,6 @@ extern unsigned int _winminor;
 #define IsWin2k ((_winmajor==5)&&(_winminor==0))
 #define IsWin7 ((_winmajor==6)&&(_winminor==1))
 
-//CloseHandle in __try{}except{}
-BOOL CloseHandleEx(HANDLE hObject);
-
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT
 #define HKCU HKEY_CURRENT_USER
@@ -197,7 +194,7 @@ public:
       {
         if (!ImpersonateLoggedOnUser(m_Token))
         {
-          CloseHandleEx(m_Token);
+          CloseHandle(m_Token);
           m_Token=0;
         }
       }
@@ -208,7 +205,7 @@ public:
     if (m_Token)
     {
       RevertToSelf();
-      CloseHandleEx(m_Token);
+      CloseHandle(m_Token);
     }
   }
 protected:
@@ -228,7 +225,7 @@ public:
     {
       if (!ImpersonateLoggedOnUser(m_Token))
       {
-        CloseHandleEx(m_Token);
+        CloseHandle(m_Token);
         m_Token=0;
       }
     }
@@ -238,7 +235,7 @@ public:
     if (m_Token)
     {
       RevertToSelf();
-      CloseHandleEx(m_Token);
+      CloseHandle(m_Token);
     }
   }
 protected:

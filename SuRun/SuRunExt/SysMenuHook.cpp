@@ -166,8 +166,8 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         _tcscat(cmd,GetCommandLine());
         if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
         {
-          CloseHandleEx(pi.hProcess);
-          CloseHandleEx(pi.hThread);
+          CloseHandle(pi.hProcess);
+          CloseHandle(pi.hThread);
         }else
           SafeMsgBox(wps->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
         //We processed the Message: Stop calling other hooks!
@@ -237,8 +237,8 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
     _tcscat(cmd,GetCommandLine());
     if (CreateProcess(NULL,cmd,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
-      CloseHandleEx(pi.hProcess);
-      CloseHandleEx(pi.hThread);
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
     }else
       SafeMsgBox(msg->hwnd,CResStr(l_hInst,IDS_FILENOTFOUND),0,MB_ICONSTOP);
     //We processed the Message: Stop calling other hooks!
