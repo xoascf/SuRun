@@ -1089,10 +1089,17 @@ DWORD PrepareSuRun()
     //if "Never ask for a password", just run the program 
     if (NoNeedPw && ((f&(FLAG_DONTASK|FLAG_NEVERASK))==(FLAG_DONTASK|FLAG_NEVERASK)))
       return RETVAL_OK;
-  }else  if (f&FLAG_DONTASK)
-    return UpdLastRunTime(g_RunData.UserName),RETVAL_OK;
+  }else  if (f&(FLAG_DONTASK|FLAG_NEVERASK))
+  {
+    UpdLastRunTime(g_RunData.UserName);
+    return RETVAL_OK;
+  }
   if(g_RunData.bShExNoSafeDesk)
+  {
+    DBGTrace1("PrepareSuRun(%s) EXIT: bShExNoSafeDesk",g_RunData.cmdLine);
+    WriteLog(g_RunData.cmdLine);
     return RETVAL_SX_NOTINLIST;
+  }
   //Get real groups for the user: (Not just the groups from the Client Token)
 //#ifdef DoDBGTrace
 //  AddTime("IsInSuRunnersOrAdmins start")
