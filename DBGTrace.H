@@ -38,7 +38,8 @@ static WCHAR SuRun_Beta[]={0x03B2,'9',
 #define DoDBGTrace
 #endif
 
-void WriteLog(LPTSTR S);
+void WriteLogA(LPSTR S,...);
+void WriteLog(LPTSTR S,...);
 
 void TRACExA(LPCSTR s,...);
 void TRACEx(LPCTSTR s,...);

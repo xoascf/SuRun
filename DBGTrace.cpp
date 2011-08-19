@@ -267,7 +267,7 @@ LPCTSTR GetLastErrorNameStatic()
   return GetErrorNameStatic(GetLastError());
 }
 
-static void WriteLogA(LPSTR S)
+void WriteLogA(LPSTR S,...)
 {
   char tmp[MAX_PATH];
   GetTempPathA(MAX_PATH,tmp);
@@ -278,12 +278,16 @@ static void WriteLogA(LPSTR S)
     SYSTEMTIME st;
     GetLocalTime(&st);
     fprintf(f,"%02d:%02d:%02d.%03d [%d]: %s",st.wHour,st.wMinute,st.wSecond,
-      st.wMilliseconds,GetCurrentProcessId(),S);
+      st.wMilliseconds,GetCurrentProcessId());
+    va_list va;
+    va_start(va,S);
+    vfprintf(f,S,va);
+    va_end(va);
     fclose(f);
   }
 }
 
-void WriteLog(LPTSTR S)
+void WriteLog(LPTSTR S,...)
 {
 #ifdef UNICODE
   WCHAR tmp[MAX_PATH];
@@ -294,8 +298,12 @@ void WriteLog(LPTSTR S)
   {
     SYSTEMTIME st;
     GetLocalTime(&st);
-    fwprintf(f,L"%02d:%02d:%02d.%03d [%d]: %s",st.wHour,st.wMinute,st.wSecond,
-      st.wMilliseconds,GetCurrentProcessId(),S);
+    fwprintf(f,L"%02d:%02d:%02d.%03d [%d]: ",st.wHour,st.wMinute,st.wSecond,
+      st.wMilliseconds,GetCurrentProcessId());
+    va_list va;
+    va_start(va,S);
+    vfwprintf(f,S,va);
+    va_end(va);
     fclose(f);
   }
 #else UNICODE
@@ -389,7 +397,7 @@ void TRACEx(LPCTSTR s,...)
 //    char Sa[4096]={0};
 //	  WideCharToMultiByte(CP_ACP,0,S,_tcslen(S),Sa,4096,NULL,NULL);
 //	  DbgOutA(Sa);
-    //  WriteLog(S);
+      //WriteLog(S);
   }__except(1)
   {
     OutputDebugStringA("FATAL: Exception in TRACEx");

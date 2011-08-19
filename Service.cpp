@@ -1097,7 +1097,6 @@ DWORD PrepareSuRun()
   if(g_RunData.bShExNoSafeDesk)
   {
     DBGTrace1("PrepareSuRun(%s) EXIT: bShExNoSafeDesk",g_RunData.cmdLine);
-    WriteLog(g_RunData.cmdLine);
     return RETVAL_SX_NOTINLIST;
   }
   //Get real groups for the user: (Not just the groups from the Client Token)
