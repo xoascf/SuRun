@@ -79,7 +79,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     }
   }
 //  LPTSTR sn=GetSvcName();
-//  DBGTrace1("SuRun started with (%s)",GetCommandLine());
+  DBGTrace1("SuRun started with (%s)",GetCommandLine());
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
   case 1:
