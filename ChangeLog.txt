@@ -32,6 +32,9 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+* FIX: The CreateProcessAsuserA hook failed...
+* LANG_PORTUGUESE
+
 SuRun 1.2.1.0 Beta 9 - 2011-07-06
 ---------------------------------
 * NEW: User SYSTEM is supported for /RUNAS, but only when used by a non

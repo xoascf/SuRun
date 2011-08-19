@@ -283,7 +283,7 @@ static void WriteLogA(LPSTR S)
   }
 }
 
-static void WriteLog(LPTSTR S)
+void WriteLog(LPTSTR S)
 {
 #ifdef UNICODE
   WCHAR tmp[MAX_PATH];
