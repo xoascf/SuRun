@@ -281,10 +281,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   while (!to.TimedOut())
   {
     hPipe=CreateFile(ServicePipeName,GENERIC_WRITE,0,0,OPEN_EXISTING,0,0);
+    DWORD err=GetLastError();
     if(hPipe!=INVALID_HANDLE_VALUE)
       break;
-    if ((GetLastError()==ERROR_FILE_NOT_FOUND)||(GetLastError()==ERROR_ACCESS_DENIED))
+    if ((err==ERROR_FILE_NOT_FOUND)||(err==ERROR_ACCESS_DENIED))
       return RETVAL_ACCESSDENIED;
+    DBGTrace2("CreateFile(%s) failed: %s",ServicePipeName,GetErrorNameStatic(err));
     Sleep(250);
   }
   //No Pipe handle: fail!
