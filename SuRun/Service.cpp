@@ -347,10 +347,10 @@ DWORD CheckCliProcess(RUNDATA& rd)
     CloseHandle(hTok);
   }
   SIZE_T s;
+  HMODULE hMod;
   //Check if the calling process is this Executable:
   {
     DWORD d;
-    HMODULE hMod;
     TCHAR f1[MAX_PATH];
     TCHAR f2[MAX_PATH];
     if (!GetProcessFileName(f1,MAX_PATH))
@@ -375,7 +375,7 @@ DWORD CheckCliProcess(RUNDATA& rd)
     }
   }
   //Since it's the same process, g_RunData has the same address!
-  if (!ReadProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&s))
+  if (!ReadProcessMemory(hProcess,BASE_ADDR(&g_RunData,hProcess),&g_RunData,sizeof(RUNDATA),&s))
   {
     DBGTrace1("ReadProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),0;
@@ -403,7 +403,7 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
   }
   SIZE_T n;
   //Since it's the same process, g_RetVal has the same address!
-  if (!WriteProcessMemory(hProcess,&g_RetVal,&RetVal,sizeof(int),&n))
+  if (!WriteProcessMemory(hProcess,BASE_ADDR(&g_RetVal,hProcess),&RetVal,sizeof(int),&n))
   {
     DBGTrace1("WriteProcessMemory failed: %s",GetLastErrorNameStatic());
     return CloseHandle(hProcess),FALSE;
@@ -412,7 +412,7 @@ BOOL ResumeClient(int RetVal,bool bWriteRunData=false)
     DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(int),n);
   if(bWriteRunData)
   {
-    WriteProcessMemory(hProcess,&g_RunData,&g_RunData,sizeof(RUNDATA),&n);
+    WriteProcessMemory(hProcess,BASE_ADDR(&g_RunData,hProcess),&g_RunData,sizeof(RUNDATA),&n);
     if (sizeof(RUNDATA)!=n)
       DBGTrace2("WriteProcessMemory invalid size %d != %d ",sizeof(RUNDATA),n);
   }
@@ -540,7 +540,7 @@ void ShowTrayWarning(LPCTSTR Text,int IconId,int TimeOut)
     rd.TimeOut=TimeOut;
     _tcscpy(rd.cmdLine,Text);
     DWORD_PTR n=0;
-    if (!WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(RUNDATA),&n))
+    if (!WriteProcessMemory(pi.hProcess,BASE_ADDR(&g_RunData,pi.hProcess),&rd,sizeof(RUNDATA),&n))
       TerminateProcess(pi.hProcess,0);
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
@@ -885,8 +885,8 @@ TryAgain:
             {
               bRunCount++;
               SIZE_T N=0;
-              WriteProcessMemory(pi.hProcess,&g_RunData,&rd,sizeof(rd),&N);
-              WriteProcessMemory(pi.hProcess,&g_CliIsAdmin,&g_CliIsAdmin,sizeof(g_CliIsAdmin),&N);
+              WriteProcessMemory(pi.hProcess,BASE_ADDR(&g_RunData,pi.hProcess),&rd,sizeof(rd),&N);
+              WriteProcessMemory(pi.hProcess,BASE_ADDR(&g_CliIsAdmin,pi.hProcess),&g_CliIsAdmin,sizeof(g_CliIsAdmin),&N);
               //if (!g_RunData.bRunAs)
               {
                 HANDLE hTok=0;
@@ -902,7 +902,7 @@ TryAgain:
                   if (g_RunData.Groups&IS_IN_ADMINS)
                     CloseHandle(hTok);
                 }
-                WriteProcessMemory(pi.hProcess,&g_AdminTStat,&tstat,sizeof(TOKEN_STATISTICS),&N);
+                WriteProcessMemory(pi.hProcess,BASE_ADDR(&g_AdminTStat,pi.hProcess),&tstat,sizeof(TOKEN_STATISTICS),&N);
               }
               ResumeThread(pi.hThread);
               CloseHandle(pi.hThread);

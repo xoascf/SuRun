@@ -52,17 +52,17 @@ DWORD WINAPI TSAThreadProc(void* p)
     BOOL CurUserIsadmin;
   }TSAData={0};
   BOOL TSAThreadRunning=TRUE;
-  WriteProcessMemory(hProc,&g_TSAThreadRunning,&TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
+  WriteProcessMemory(hProc,BASE_ADDR(&g_TSAThreadRunning,hProc),&TSAThreadRunning,sizeof(g_TSAThreadRunning),0);
   HANDLE hEvent=0;
   SIZE_T s;
-  ReadProcessMemory(hProc,&g_TSAEvent,&hEvent,sizeof(HANDLE),&s);
+  ReadProcessMemory(hProc,BASE_ADDR(&g_TSAEvent,hProc),&hEvent,sizeof(HANDLE),&s);
   DuplicateHandle(hProc,hEvent,GetCurrentProcess(),&hEvent,0,FALSE,DUPLICATE_SAME_ACCESS);
   EnablePrivilege(SE_DEBUG_NAME);
   for(;;)
   {
     if ((WaitForSingleObject(hProc,0)==WAIT_OBJECT_0)
      ||(WaitForSingleObject(hEvent,INFINITE)!=WAIT_OBJECT_0)
-     ||(!ReadProcessMemory(hProc,&g_TSAPID,&TSAData.CurPID,sizeof(DWORD),&s))
+     ||(!ReadProcessMemory(hProc,BASE_ADDR(&g_TSAPID,hProc),&TSAData.CurPID,sizeof(DWORD),&s))
      ||(sizeof(DWORD)!=s))
       return CloseHandle(hProc),0;
     //Special case: WM_QUERYENDSESSION
@@ -102,7 +102,7 @@ DWORD WINAPI TSAThreadProc(void* p)
       }//else
       //DBGTrace2("OpenProcess(%d) failed: %s",TSAData.CurPID,GetLastErrorNameStatic());
     }
-    WriteProcessMemory(hProc,&g_TSAData,&TSAData,sizeof(g_TSAData),&s);
+    WriteProcessMemory(hProc,BASE_ADDR(&g_TSAData,hProc),&TSAData,sizeof(g_TSAData),&s);
     ResetEvent(hEvent);
   }
 }
