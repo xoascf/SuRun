@@ -13,6 +13,9 @@
 
 #pragma once
 
+#include <Psapi.h>
+#include "DBGTrace.H"
+
 #define countof(b) sizeof(b)/sizeof(b[0])
 #define zero(x) memset(&x,0,sizeof(x))
 
@@ -160,6 +163,25 @@ PSID GetSessionLogonSID(DWORD SessionID);
 DWORD GetModuleFileNameAEx(HMODULE hMod,LPSTR lpFilename,DWORD nSize);
 DWORD GetModuleFileNameWEx(HMODULE hMod,LPWSTR lpFilename,DWORD nSize);
 DWORD GetProcessFileName(LPWSTR lpFilename,DWORD nSize);
+
+//ASLR
+inline LPVOID BASE_ADDR(LPVOID LocAddr,HANDLE hProcess)
+{
+  DWORD d;
+  HMODULE hMod=0;
+  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
+  {
+    DBGTrace1("EnumProcessModules failed",GetLastErrorNameStatic());
+    return LocAddr;
+  }
+  LPVOID p=(LPVOID)((BYTE*)LocAddr-(BYTE*)GetModuleHandle(0)+(BYTE*)hMod);
+#ifdef _WIN64
+  DBGTrace2("BASE_ADDR(%I64x)==%I64x",LocAddr,p);
+#else
+  DBGTrace2("BASE_ADDR(%x)==%x",LocAddr,p);
+#endif
+  return p;
+}
 
 // GetVersionString
 LPCTSTR GetVersionString();
