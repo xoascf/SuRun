@@ -36,7 +36,7 @@ void GetErrorName(int ErrorCode,LPTSTR s)
   FormatMessage(dwFormatFlags,hModule,ErrorCode,MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &MessageBuffer,0,NULL);
   if(hModule != NULL)
     FreeLibrary(hModule);
-  _stprintf(s,_T("%d(0x%08X): %s"),ErrorCode,ErrorCode,MessageBuffer);
+  _sntprintf(s,1024,_T("%d(0x%08X): %s"),ErrorCode,ErrorCode,MessageBuffer);
   LocalFree(MessageBuffer);
 }
 
@@ -379,7 +379,7 @@ void TRACEx(LPCTSTR s,...)
     TCHAR S[4096]={0};
     va_list va;
     va_start(va,s);
-    _vstprintf(S,s,va);
+    _vsntprintf(S,4095,s,va);
     va_end(va);
     LPTSTR c0=_tcschr(S,':');
     LPTSTR c1=_tcschr(S,'\\');
@@ -411,7 +411,7 @@ void TRACExA(LPCSTR s,...)
     char S[4096]={0};
     va_list va;
     va_start(va,s);
-    vsprintf(S,s,va);
+    _vsnprintf(S,4095,s,va);
     va_end(va);
     LPSTR c0=strchr(S,':');
     LPSTR c1=strchr(S,'\\');
