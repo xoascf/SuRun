@@ -41,7 +41,7 @@ void TRACEx(LPCTSTR s,...)
   int len=0;
   va_list va;
   va_start(va,s);
-  if (_vstprintf(&S[len],s,va)>=4096)
+  if (_vsntprintf(&S[len],4095-len,s,va)>=4096)
     DebugBreak();
   va_end(va);
   OutputDebugString(S);

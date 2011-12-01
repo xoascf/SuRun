@@ -20,7 +20,7 @@
 
 //#define _TEST_STABILITY
 
-static WCHAR SuRun_Beta[]={0x03B2,'1','0',
+static WCHAR SuRun_Beta[]={0x03B2,'1','1',
 //static WCHAR SuRun_Beta[]={'r','c','3',
 #ifdef _TEST_STABILITY
     'a',
@@ -90,7 +90,7 @@ public:
 #ifdef DoDBGTrace
     va_list args;
     va_start(args, logTitle);
-    _vstprintf(m_logTitle,logTitle,args);
+    _vsntprintf(m_logTitle,4095,logTitle,args);
     va_end(args);
     TRACEx(_T("%s init.\n"),(LPCTSTR)m_logTitle);
     m_StartTime=timeGetTime();

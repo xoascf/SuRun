@@ -593,21 +593,14 @@ static CRITICAL_SECTION l_SxHkCs={0};
 //////////////////////////////////////////////////////////////////////////////
 HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 {
-#ifdef DoDBGTrace
-  if (pei)
-    DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, "
-      L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
-      pei->fMask,pei->lpVerb,pei->lpFile,pei->lpParameters,pei->lpDirectory,
-      pei->lpIDList,pei->lpClass,pei->hkeyClass,pei->hProcess);
-  else
-    DBGTrace("SuRun ShellExtHook::ShellExtExecute");
-#endif DoDBGTrace
-  //Admins don't need the ShellExec Hook!
-  if (l_IsAdmin)
-    return S_FALSE;
   if (!pei)
   {
     DBGTrace("SuRun ShellExtExecute Error: LPSHELLEXECUTEINFO==NULL");
+    return S_FALSE;
+  }
+  if(IsBadReadPtr(pei,sizeof(SHELLEXECUTEINFO)))
+  {
+    DBGTrace("SuRun ShellExtExecute Error: LPSHELLEXECUTEINFO Bad Ptr");
     return S_FALSE;
   }
   if(pei->cbSize<sizeof(SHELLEXECUTEINFO))
@@ -616,6 +609,23 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
       sizeof(SHELLEXECUTEINFO),pei->cbSize);
     return S_FALSE;
   }
+#ifdef DoDBGTrace
+//   DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, "
+//     L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
+//     pei->fMask,
+//     pei->lpVerb?pei->lpVerb:L"(null)",
+//     pei->lpFile?pei->lpFile:L"(null)",
+//     pei->lpParameters?pei->lpParameters:L"(null)",
+//     pei->lpDirectory?pei->lpDirectory:L"(null)",
+//     pei->lpIDList,
+//     (((pei->fMask&SEE_MASK_CLASSNAME)==SEE_MASK_CLASSNAME)&& (pei->lpClass))?pei->lpClass:L"(null)",
+//     pei->hkeyClass,pei->hProcess);
+#endif DoDBGTrace
+  if(!GetUseIShExHook)
+    return S_FALSE;
+  //Admins don't need the ShellExec Hook!
+  if (l_IsAdmin)
+    return S_FALSE;
   if (!pei->lpFile)
   {
     DBGTrace("SuRun ShellExtExecute Error: invalid LPSHELLEXECUTEINFO->lpFile==NULL!");
