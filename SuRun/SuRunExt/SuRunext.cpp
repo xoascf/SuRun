@@ -610,8 +610,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     return S_FALSE;
   }
 #ifdef DoDBGTrace
-//   DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, "
-//     L"dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
+//   DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
 //     pei->fMask,
 //     pei->lpVerb?pei->lpVerb:L"(null)",
 //     pei->lpFile?pei->lpFile:L"(null)",

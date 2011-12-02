@@ -376,7 +376,7 @@ void TRACEx(LPCTSTR s,...)
 {
   __try
   {
-    TCHAR S[4096]={0};
+    static TCHAR S[4096]={0};
     va_list va;
     va_start(va,s);
     _vsntprintf(S,4095,s,va);
@@ -400,7 +400,7 @@ void TRACEx(LPCTSTR s,...)
       //WriteLog(S);
   }__except(1)
   {
-    OutputDebugStringA("FATAL: Exception in TRACEx");
+    //OutputDebugStringA("FATAL: Exception in TRACEx");
   }
 }
 
@@ -408,7 +408,7 @@ void TRACExA(LPCSTR s,...)
 {
   __try
   {
-    char S[4096]={0};
+    static char S[4096]={0};
     va_list va;
     va_start(va,s);
     _vsnprintf(S,4095,s,va);
@@ -430,7 +430,7 @@ void TRACExA(LPCSTR s,...)
     //  WriteLogA(S);
   }__except(1)
   {
-    OutputDebugStringA("FATAL: Exception in TRACExA");
+    //OutputDebugStringA("FATAL: Exception in TRACExA");
   }
 }
 
