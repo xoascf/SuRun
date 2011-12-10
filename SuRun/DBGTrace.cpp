@@ -357,7 +357,7 @@ void WriteLog(LPTSTR S,...)
 //      OutputDebugStringA("FATAL: DBWIN_xxx events not available\n");
 //    }
 //  }
-//  __except(1)
+// }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
 //  {
 //    //Just in case Microsoft changes OutputDebugString in future:
 //    OutputDebugStringA("FATAL: Exception in DbgOutA\n");
@@ -398,9 +398,9 @@ void TRACEx(LPCTSTR s,...)
 //	  WideCharToMultiByte(CP_ACP,0,S,_tcslen(S),Sa,4096,NULL,NULL);
 //	  DbgOutA(Sa);
       //WriteLog(S);
-  }__except(1)
+  }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
-    //OutputDebugStringA("FATAL: Exception in TRACEx");
+    OutputDebugStringA("FATAL: Exception in TRACEx");
   }
 }
 
@@ -428,9 +428,9 @@ void TRACExA(LPCSTR s,...)
 //    DbgOutA(S);
     OutputDebugStringA(S);
     //  WriteLogA(S);
-  }__except(1)
+  }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
-    //OutputDebugStringA("FATAL: Exception in TRACExA");
+    OutputDebugStringA("FATAL: Exception in TRACExA");
   }
 }
 

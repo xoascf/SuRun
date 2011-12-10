@@ -613,7 +613,7 @@ BOOL InjectIATHook(HANDLE hProc)
       hThread=CreateRemoteThread(hProc,NULL,0,(LPTHREAD_START_ROUTINE)pLoadLib,RmteName,0,NULL);
       if (hThread==0)
         DBGTrace1("InjectIATHook CreateRemoteThread failed: %s",GetLastErrorNameStatic());
-    }__except(1)
+    }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
     {
       DBGTrace("SuRun: CreateRemoteThread Exeption!");
     }
@@ -623,7 +623,7 @@ BOOL InjectIATHook(HANDLE hProc)
       CloseHandle(hThread);
     }
 	  VirtualFreeEx(hProc,RmteName,sizeof(DllName),MEM_RELEASE);
-  }__except(1)
+  }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
     DBGTrace("SuRun: InjectIATHook() Exeption!");
   }
@@ -1217,7 +1217,7 @@ DWORD PrepareSuRun()
     }
     UpdLastRunTime(g_RunData.UserName);
     return RETVAL_OK;
-  }__except(1)
+  }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
     DBGTrace("FATAL: Exception in PrepareSuRun()");
     DeleteSafeDesktop(false);
@@ -1809,7 +1809,7 @@ void SuRun()
         __try
         {
           Setup();
-        }__except(1)
+        }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
         {
         }
         DeleteSafeDesktop(bFadeDesk);
@@ -1851,7 +1851,7 @@ void SuRun()
   {
     KillProcess(g_RunData.KillPID);
     RetVal=LSAStartAdminProcess();
-  }__except(1)
+  }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
     DBGTrace("FATAL: Exception in StartAdminProcessTrampoline()");
   }

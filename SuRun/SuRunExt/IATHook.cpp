@@ -388,7 +388,7 @@ DWORD HookIAT(char* fMod,HMODULE hMod,PIMAGE_IMPORT_DESCRIPTOR pID)
                 nHooked++;
               }
             }
-            __except(1)
+            __except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
             {
               DBGTrace("FATAL: Exception in HookIAT");
             }
