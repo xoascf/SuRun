@@ -18,6 +18,10 @@
 #pragma comment(lib,"winmm")
 #pragma warning(disable : 4996)
 
+#ifndef DBG_PRINTEXCEPTION_C
+#define DBG_PRINTEXCEPTION_C             (0x40010006L)
+#endif  DBG_PRINTEXCEPTION_C
+
 //#define _TEST_STABILITY
 
 static WCHAR SuRun_Beta[]={0x03B2,'1','1',

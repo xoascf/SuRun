@@ -449,12 +449,12 @@ bool CRunOnNewDeskTop::IsValid()
 };
 
 
-LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
-{
-  DBGTrace("FATAL: Exception in SuRun!");
-  DeleteSafeDesktop(0);
-  return EXCEPTION_EXECUTE_HANDLER;
-}
+// LONG WINAPI ExceptionFilter(struct _EXCEPTION_POINTERS *ExceptionInfo )
+// {
+//   DBGTrace("FATAL: Exception in SuRun!");
+//   DeleteSafeDesktop(0);
+//   return EXCEPTION_EXECUTE_HANDLER;
+// }
 
 HANDLE g_WatchDogEvent=NULL;
 HANDLE g_WatchDogProcess=NULL;
@@ -661,8 +661,8 @@ void DeleteSafeDesktop(bool bFade)
   if (g_WatchDogTimer)
     KillTimer(0,g_WatchDogTimer);
   g_WatchDogTimer=0;
-  if (IsLocalSystem())
-    SetUnhandledExceptionFilter(NULL);
+//   if (IsLocalSystem())
+//     SetUnhandledExceptionFilter(NULL);
 }
 
 #ifdef _DEBUG

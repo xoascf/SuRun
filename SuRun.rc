@@ -1832,7 +1832,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,335,10
     LTEXT           "For security the following group policy must be activated:",
                     IDC_OWNGRPST,18,60,335,8
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by Administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun Administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,18,74,335,27
     PUSHBUTTON      "&Cancel",IDCANCEL,215,105,68,14
@@ -1949,7 +1949,7 @@ BEGIN
     COMBOBOX        IDC_WARNADMIN,201,83,166,30,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Shell Integration",IDC_STATIC,75,110,297,75,WS_GROUP
-    CONTROL         "Show ""Control panel as administrator"" in the context menu of the desktop",
+    CONTROL         "Show ""Control panel as Administrator"" in the context menu of the desktop",
                     IDC_CTRLASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     120,283,11
     CONTROL         "Show ""'SuRun cmd' here"" in the context menu of folders",
@@ -1958,10 +1958,10 @@ BEGIN
     CONTROL         "Show ""'SuRun Explorer' here"" in the context menu of folders",
                     IDC_EXPASADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     145,283,11
-    CONTROL         "Show ""Restart as administrator"" in the System menu of applications",
+    CONTROL         "Show ""Restart as Administrator"" in the System menu of applications",
                     IDC_RESTARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     83,157,283,11
-    CONTROL         "Show ""Start as administrator"" in the System menu of applications",
+    CONTROL         "Show ""Start as Administrator"" in the System menu of applications",
                     IDC_STARTADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,
                     170,283,11
     GROUPBOX        "Convenience",IDC_STATIC,4,187,206,45
@@ -2000,7 +2000,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,29,137,10
     CONTROL         "Display user status as 'Balloon-Tips'",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,39,137,10
-    CONTROL         "Install new Hardware automagically as administrator",
+    CONTROL         "Install new Hardware automagically as Administrator",
                     IDC_HW_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,49,
                     201,10
     CONTROL         "Store and use real user password",IDC_STORE_PW,"Button",
@@ -2107,7 +2107,7 @@ BEGIN
                     BS_MULTILINE | WS_TABSTOP,11,170,349,11
     GROUPBOX        "Windows Security (This is a Windows policy that you can adjust with SuRun)",
                     IDC_STATIC,4,186,369,39
-    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun administrators.",
+    CONTROL         "Set 'Administrators' instead of 'Object creator' as default owner for objects created by Administrators.\nWARNING: If this option is not active, limited users can modify files and registry keys created by SuRun Administrators.",
                     IDC_OWNERGROUP,"Button",BS_AUTOCHECKBOX | BS_VCENTER | 
                     BS_MULTILINE | WS_TABSTOP,11,196,349,26
     CTEXT           "NOTE: Changes in some of these settings become effective after the next logon.",
@@ -2215,7 +2215,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "SuRun, start programs as administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
+            VALUE "Comments", "SuRun, start programs as Administrator, based on the idea of SuDown http://sudown.sourceforge.net\0"
             VALUE "CompanyName", "http://kay-bruns.de\0"
             VALUE "FileDescription", "SuperUserRun\0"
             VALUE "FileVersion", "1, 2, 1, 0\0"
@@ -2255,17 +2255,17 @@ BEGIN
     IDS_NOADMIN             "Error!\r\n\r\nUser %s is no Administrator!"
     IDS_NOSURUNNER          "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nEnter administrative credentials to become a ""SuRunners"" member.\r\n\r\nOtherwise click 'Cancel'!"
     IDS_ASKSURUNNER         "You need to be member of the ""SuRunners"" user group to use SuRun.\r\n\r\nDo you want to become a ""SuRunners"" member?\r\n\r\nIf you press Yes, you will become SuRunner and will LOSE your ADMINISTRATOR STATUS.\r\n\r\nIf you're not sure what you're doing, click ""No""."
-    IDS_MENUSTR             "Start as administrator"
+    IDS_MENUSTR             "Start as Administrator"
     IDS_BUILTINADMIN        "You are a ""built in"" Administrator.\r\n\r\nYou cannot use SuRun because you cannot act as normal user!"
     IDS_SURUNNER_OK         "You have successfully been added to the ""SuRunners"" user group."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_DELUSER             "You want to remove the user '%s' from the local SuRunners group.\r\n\r\nAll user specific SuRun settings will be deleted.\r\n\r\nDo you want to join the user to the local administrators group?"
+    IDS_DELUSER             "You want to remove the user '%s' from the local SuRunners group.\r\n\r\nAll user specific SuRun settings will be deleted.\r\n\r\nDo you want to join the user to the local Administrators group?"
     IDS_CANCEL              "Cancel (%d)"
     IDS_NOADD2USERS         "Error!\r\n\r\nPutting your account into the standard users group failed.\r\nWindows reports the error as:\r\n\r\n%s"
-    IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
+    IDS_NOREMADMINS         "Error!\r\n\r\nRemoving your account from the Administrators group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_ADMINSHELL          "The Windows Shell is currently running with administrative rights!\r\n\r\nYou need to log off and on before using SuRun."
     IDS_SIMPLESETUP         "Do yo want to reset all settings to recommended values for home users?"
     IDS_NOADMIN2            "You (%s) have no permission to modify 'SuRun Settings'.\r\n\r\nEnter administrative credentials to change SuRun's options.\r\n\r\nOtherwise click 'Cancel'!"
@@ -2305,9 +2305,9 @@ BEGIN
     IDS_SURUNNER_ERR        "Error!\r\n\r\nPutting your account into the ""SuRunners"" user group failed.\r\nWindows reports the error as:\r\n\r\n%s"
     IDS_LOGOFFON            "You have successfully been added to the ""SuRunners"" and removed from the Administrators user groups.\r\n\r\nTo continue using you computer with limited access rights you need to log off and log on."
     IDS_SYSMENUEXT          "SuRun System Menu Extension"
-    IDS_SURUNINST           "Install as administrator"
-    IDS_SURUNUNINST         "Remove as administrator"
-    IDS_SURUNREPAIR         "Repair as administrator"
+    IDS_SURUNINST           "Install as Administrator"
+    IDS_SURUNUNINST         "Remove as Administrator"
+    IDS_SURUNREPAIR         "Repair as Administrator"
     IDS_CPLNAME             "SuRun Settings"
     IDS_RUNFAILED           "Error!\r\n\r\n%s\r\n\r\ncould not be started."
     IDS_EMPTYPASS           "WARNING: The following Administrator accounts have no password:\n\n%s\nUsing SuRun is useless if you do not set a password for these accounts!"
@@ -2324,7 +2324,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_DELSERVICE          "Deleting SuRun service"
     IDS_DELREG              "Removing SuRun's registry settings"
-    IDS_SR2ADMIN            "Putting '%s' to the local administrators group"
+    IDS_SR2ADMIN            "Putting '%s' to the local Administrators group"
     IDS_DELSURUNNERS        "Deleting local group 'SuRunners'"
     IDS_INSTFAILED          "Installation failed!"
     IDS_CLOSE               "&Close"
@@ -2364,8 +2364,8 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_INSTSUCCESS3        "The system must be restarted!"
     IDS_HIDESELF            "Do you really want do hide SuRun from yourself?\n\nYou cannot changes SuRun settings after doing so."
-    IDS_NOIMPORT            "You must be member of the local administrators group\nto import SuRun Settings."
-    IDS_NOEXPORT            "You must be member of the local administrators group\nto export SuRun Settings."
+    IDS_NOIMPORT            "You must be member of the local Administrators group\nto import SuRun Settings."
+    IDS_NOEXPORT            "You must be member of the local Administrators group\nto export SuRun Settings."
     IDS_NOTLOGGEDON         "Fast user switch not possible:\n%s is not logged on."
     IDS_NOTLOGGEDON2        "Fast user switch not possible:\nSession %d is not logged on."
     IDS_EMPTYPASS2          "WARNING: The following Administrator accounts have no password:\n\n%s"
@@ -2769,7 +2769,7 @@ BEGIN
     CONTROL         "Estado de Usuario como 'Ayuda-Emergente'",
                     IDC_TRAYBALLOON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     252,39,166,10
-    CONTROL         "Install new Hardware automagically as administrator",
+    CONTROL         "Install new Hardware automagically as Administrator",
                     IDC_HW_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,49,
                     201,10
     CONTROL         "Almacenar y utilizar la contraseña de usuario real",
