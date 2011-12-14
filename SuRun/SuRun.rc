@@ -729,7 +729,7 @@ BEGIN
     IDS_NOTLOGGEDON2        "Szybkie prze³¹czenie u¿ytkownika niemo¿liwe:\nSesja %d nie jest zalogowana."
     IDS_EMPTYPASS2          "UWAGA: Nastêpuj¹ce konta Administratorów nie posiadaj¹ has³a:\n\n%s"
     IDS_SRACCDESC           "Konto pomocnicze dla SuRun"
-    IDS_EMPTYRECYCLEBIN     "SuRun: Opróz.nij kosz"
+    IDS_EMPTYRECYCLEBIN     "SuRun: Opróznij kosz"
 END
 
 #endif    // Polish resources
@@ -2372,7 +2372,7 @@ BEGIN
     IDS_NOTLOGGEDON2        "Fast user switch not possible:\nSession %d is not logged on."
     IDS_EMPTYPASS2          "WARNING: The following Administrator accounts have no password:\n\n%s"
     IDS_SRACCDESC           "Helper account for SuRun"
-    IDS_EMPTYRECYCLEBIN     "SuRun: Empty recycle bin"
+    IDS_EMPTYRECYCLEBIN     "SuRun: Empty Recycle Bin"
 END
 
 #endif    // English (U.S.) resources
@@ -3094,7 +3094,7 @@ BEGIN
     IDS_NOEXPORT            "Debe ser miembro del grupo local de administradores\npara exportar las configuraciones de SuRun."
     IDS_EMPTYPASS3          "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s"
     IDS_SRACCDESC           "Helper account for SuRun"
-    IDS_EMPTYRECYCLEBIN     "SuRun: Vaciar papelera de reciclaje"
+    IDS_EMPTYRECYCLEBIN     "SuRun: Vaciar Papelera de reciclaje"
 END
 
 #endif    // Spanish (Castilian) resources
@@ -3812,7 +3812,7 @@ BEGIN
     IDS_NOTLOGGEDON2        "La bascule rapide d'utilisateur n'est pas possible :\nLa session %s n'est pas ouverte."
     IDS_EMPTYPASS2          "ATTENTION : Le compte administrateur suivant n'a pas de mot de passe :\n\n%s"
     IDS_SRACCDESC           "Compte d'assistance SuRun"
-    IDS_EMPTYRECYCLEBIN     "SuRun: Papierkorb leeren\nVider la corbeille"
+    IDS_EMPTYRECYCLEBIN     "SuRun: Vider la Corbeille"
 END
 
 #endif    // French (France) resources
@@ -5248,7 +5248,7 @@ BEGIN
     IDS_NOTLOGGEDON2        "A mudança de utilizador não é possível:\nA sessão %d não está aberta."
     IDS_EMPTYPASS2          "AVISO: As seguintes contas de Administrador não têm palavra-passe:\n\n%s"
     IDS_SRACCDESC           "Conta de ajudante para o SuRun"
-    IDS_EMPTYRECYCLEBIN     "SuRun: Vazio recycle bin"
+    IDS_EMPTYRECYCLEBIN     "SuRun: Esvaziar Reciclagem"
 END
 
 #endif    // Portuguese (Portugal) resources
