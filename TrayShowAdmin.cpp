@@ -133,7 +133,7 @@ static void ShutDownSuRunProcesses()
 {
   if (!StartTSAThread())
     return;
-  g_TSAPID=-2;
+  g_TSAPID=(DWORD)-2;
   SetEvent(g_TSAEvent);
   for(;g_TSAPID!=g_TSAData.CurPID;)
     Sleep(10);

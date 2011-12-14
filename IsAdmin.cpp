@@ -269,7 +269,6 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
     PathRemoveArgs(cmd);
     PathUnquoteSpaces(cmd);
     NetworkPathToUNCPath(cmd);
-    DWORD dwRet=0;
     SHELLEXECUTEINFO sei={0};
     sei.cbSize=sizeof(sei);
     sei.fMask=SEE_MASK_NOCLOSEPROCESS;
@@ -285,7 +284,7 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
   TCHAR User[UNLEN+GNLEN+2]={0};
   TCHAR Password[PWLEN+1]={0};
   GetProcessUserName(GetCurrentProcessId(),User);
-  BOOL bRet=LogonAdmin(-1,User,Password,IDmsg) 
+  BOOL bRet=LogonAdmin((DWORD)-1,User,Password,IDmsg) 
     && RunAs(cmdline,User,Password);
   zero(User);      //Clean sensitive Data
   zero(Password);  //Clean sensitive Data

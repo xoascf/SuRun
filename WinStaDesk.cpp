@@ -556,6 +556,10 @@ BOOL WeMustClose()
 
 static VOID CALLBACK WDTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
+  UNREFERENCED_PARAMETER(hwnd);
+  UNREFERENCED_PARAMETER(uMsg);
+  UNREFERENCED_PARAMETER(idEvent);
+  UNREFERENCED_PARAMETER(dwTime);
   if(g_WatchDogEvent)
   {
     SetEvent(g_WatchDogEvent);
@@ -674,7 +678,7 @@ int TestBS()
     g_RunOnNewDesk->m_Screen.MsgLoop();
   DeleteSafeDesktop(true);
   ExitProcess(0);
-  return 1;
+  //return 1;
 }
 #endif _DEBUG
 

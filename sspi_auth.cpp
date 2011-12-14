@@ -213,7 +213,7 @@ BOOL GenServerContext(PAUTH_SEQ pAS,PVOID pIn,DWORD cbIn,PVOID pOut,PDWORD pcbOu
   *pcbOut = sbOut.cbBuffer;
   if (!pAS->fInitialized)
     pAS->fInitialized = TRUE;
-  *pfDone = !(ss = SEC_I_CONTINUE_NEEDED  || ss == SEC_I_COMPLETE_AND_CONTINUE);
+  *pfDone = !((ss == SEC_I_CONTINUE_NEEDED ) || (ss == SEC_I_COMPLETE_AND_CONTINUE));
   return TRUE;
 }
 

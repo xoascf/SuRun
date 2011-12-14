@@ -66,6 +66,10 @@ static void HideAppStartCursor()
 //extern LPTSTR GetSvcName();
 int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdShow)
 {
+  UNREFERENCED_PARAMETER(hInst);
+  UNREFERENCED_PARAMETER(hPrevInst);
+  UNREFERENCED_PARAMETER(lpCmdLine);
+  UNREFERENCED_PARAMETER(nCmdShow);
   {
     //Enable DEP
     HMODULE hMod=GetModuleHandle(_T("Kernel32.dll"));
@@ -148,8 +152,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     {
       LPTSTR c=Args;
       Args=PathGetArgs(Args);
-      if (*(Args-1)==' ')
-        *(Args-1)=0;
+      for(LPTSTR C=Args-1;*C==' ';C--)
+        *C=0;
       if (!_wcsicmp(c,L"/QUIET"))
       {
         g_RunData.beQuiet=TRUE;
@@ -214,7 +218,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
           SafeMsgBox(0,CBigResStr(IDS_NOIMPORT),CResStr(IDS_APPNAME),MB_ICONSTOP);
           return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
         }
-        g_RunData.KillPID=-1;
+        g_RunData.KillPID=(DWORD)-1;
         if (Args && (*(Args-1)==0))
           *(Args-1)=' ';
         Args=c;
@@ -226,14 +230,14 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
           SafeMsgBox(0,CBigResStr(IDS_NOEXPORT),CResStr(IDS_APPNAME),MB_ICONSTOP);
           return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
         }
-        g_RunData.KillPID=-1;
+        g_RunData.KillPID=(DWORD)-1;
         if (Args && (*(Args-1)==0))
           *(Args-1)=' ';
         Args=c;
         break;
       }else if (!_wcsicmp(c,L"/SWITCHTO"))
       {
-        g_RunData.KillPID=-1;
+        g_RunData.KillPID=(DWORD)-1;
         if (Args && (*(Args-1)==0))
           *(Args-1)=' ';
         Args=c;

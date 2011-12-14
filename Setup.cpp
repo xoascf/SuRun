@@ -199,7 +199,7 @@ BOOL IsInWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flag)
 BOOL AddToWhiteList(LPCTSTR User,LPCTSTR CmdLine,DWORD Flags/*=0*/)
 {
   CBigResStr key(_T("%s\\%s"),SVCKEY,User);
-  DWORD d=GetRegInt(HKLM,key,CmdLine,-1);
+  DWORD d=GetRegInt(HKLM,key,CmdLine,(DWORD)-1);
   return (d==Flags)||SetRegInt(HKLM,key,CmdLine,Flags);
 }
 
@@ -257,20 +257,20 @@ DWORD GetBlackListFlags(LPCTSTR CmdLine,DWORD Default)
 
 BOOL IsInBlackList(LPCTSTR CmdLine)
 {
-  BOOL blf=GetBlackListFlags(CmdLine,-1);
+  BOOL blf=GetBlackListFlags(CmdLine,(DWORD)-1);
   if (blf!=-1)
     return TRUE;
   TCHAR s[4096]={0};
   if(GetShortPathName(CmdLine,s,4096) && (_tcscmp(s,CmdLine)))
   {
-    blf=GetBlackListFlags(s,-1);
+    blf=GetBlackListFlags(s,(DWORD)-1);
     if (blf!=-1)
       return TRUE;
   }
   zero(s);
   if (GetLongPathName(CmdLine,s,4096) && (_tcscmp(s,CmdLine)))
   {
-    blf=GetBlackListFlags(s,-1);
+    blf=GetBlackListFlags(s,(DWORD)-1);
     if (blf!=-1)
       return TRUE;
   }
@@ -601,6 +601,7 @@ static BOOL ChooseFile(HWND hwnd,LPTSTR FileName)
 
 INT_PTR CALLBACK AppOptDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+  UNREFERENCED_PARAMETER(lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -775,7 +776,7 @@ EditApp:
           if ( GetFileName(hwnd,f,CMD,IDD_ADDTOBLKLST,IDS_ADDTOBLKLIST)
             && (CMD[0]) &&(_tcsicmp(CMD,cmd)!=0))
           {
-            if((GetRegInt(HKLM,HKLSTKEY,CMD,-1)==-1) //No duplicates!
+            if((GetRegInt(HKLM,HKLSTKEY,CMD,(DWORD)-1)==(DWORD)-1) //No duplicates!
               && RemoveFromBlackList(cmd))
             {
               AddToBlackList(CMD);
@@ -1075,7 +1076,7 @@ static void UpdateUser(HWND hwnd)
 static void UpdateUserList(HWND hwnd,LPCTSTR UserName)
 {
   SendDlgItemMessage(hwnd,IDC_USER,CB_RESETCONTENT,0,0);
-  SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,-1,0);
+  SendDlgItemMessage(hwnd,IDC_USER,CB_SETCURSEL,(DWORD)-1,0);
   g_SD->CurUser=0;
   for (int i=0;i<g_SD->Users.GetCount();i++)
   {
@@ -1198,7 +1199,7 @@ BOOL ImportUserWhiteList(LPCTSTR ini,LPCTSTR User,LPCTSTR WLKEY,LPCTSTR WLFKEY)
       DWORD d=0;
       IMPORTVAL(WLFKEY,i,d,ini);
       DBGTrace3("%s: %s=%x",WLKEY,cmd,d);
-      if (GetRegInt(HKLM,key,cmd,-1)==-1)
+      if (GetRegInt(HKLM,key,cmd,(DWORD)-1)==(DWORD)-1)
       {
         SetRegInt(HKLM,key,cmd,d);
         DBGTrace3("%s: %s=%x ok",WLKEY,cmd,d);
@@ -1455,6 +1456,7 @@ static BOOL OpenINIFile(HWND hwnd,LPTSTR FileName)
 
 INT_PTR CALLBACK ImportDlgProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+  UNREFERENCED_PARAMETER(lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -1536,31 +1538,30 @@ static BOOL ImportSettings(HWND hwnd)
 // SetRecommendedSettings()
 // 
 //////////////////////////////////////////////////////////////////////////////
-void SetUseSuRuners(BOOL bUse)
-{
-  return;
-  if (GetUseSuRunGrp==bUse)
-    return;
-  TCHAR u[MAX_PATH];
-  _tcscpy(u,(g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
-  //SetUseSuRunGrp((DWORD)bUse);
-  if (bUse)
-    CreateSuRunnersGroup(); 
-  else
-    DeleteSuRunnersGroup();
-  DelAllUsrSettings;
-  g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,g_SD->SessID,false);
-  UpdateUserList(g_SD->hTabCtrl[1],u);
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_ADDUSER),bUse);
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_DELUSER),bUse);
-  
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVADMIN),bUse);
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVUSER),bUse);
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_HIDESURUN),bUse);
-
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_ALLOWTIME),bUse);
-  EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_SETENERGY),bUse);
-}
+// void SetUseSuRuners(BOOL bUse)
+// {
+//   if (GetUseSuRunGrp==bUse)
+//     return;
+//   TCHAR u[MAX_PATH];
+//   _tcscpy(u,(g_SD->CurUser>=0)?g_SD->Users.GetUserName(g_SD->CurUser):g_SD->OrgUser);
+//   //SetUseSuRunGrp((DWORD)bUse);
+//   if (bUse)
+//     CreateSuRunnersGroup(); 
+//   else
+//     DeleteSuRunnersGroup();
+//   DelAllUsrSettings;
+//   g_SD->Users.SetSurunnersUsers(g_SD->OrgUser,g_SD->SessID,false);
+//   UpdateUserList(g_SD->hTabCtrl[1],u);
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_ADDUSER),bUse);
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_DELUSER),bUse);
+//   
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVADMIN),bUse);
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_NOCONVUSER),bUse);
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_HIDESURUN),bUse);
+// 
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_ALLOWTIME),bUse);
+//   EnableWindow(GetDlgItem(g_SD->hTabCtrl[3],IDC_SETENERGY),bUse);
+// }
 
 void SetRecommendedSettings()
 {
@@ -1671,6 +1672,7 @@ void ShowExpertSettings(HWND hwnd,bool bShow)
 //////////////////////////////////////////////////////////////////////////////
 INT_PTR CALLBACK SetupDlg1Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+  UNREFERENCED_PARAMETER(lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -2162,6 +2164,7 @@ ApplyChanges:
 //////////////////////////////////////////////////////////////////////////////
 INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+  UNREFERENCED_PARAMETER(lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -2233,6 +2236,7 @@ ApplyChanges:
 //////////////////////////////////////////////////////////////////////////////
 INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+  UNREFERENCED_PARAMETER(lParam);
   switch(msg)
   {
   case WM_INITDIALOG:
@@ -2544,7 +2548,7 @@ BOOL TestSetup()
   if (!RunSetup(0,un))
     DBGTrace1("DialogBox failed: %s",GetLastErrorNameStatic());
   ::ExitProcess(0);
-  return TRUE;
+  //return TRUE;
 }
 
 #endif _DEBUGSETUP

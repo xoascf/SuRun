@@ -158,7 +158,7 @@ static BOOL SwitchToSession(DWORD SessionId)
   WSCW WinStationConnectW=(WSCW)GetProcAddress(hWinSta,"WinStationConnectW");
   if (!WinStationConnectW) 
     return FALSE;
-  BOOL bRet=WinStationConnectW(0,SessionId,-1,L"",TRUE);
+  BOOL bRet=WinStationConnectW(0,SessionId,(DWORD)-1,L"",TRUE);
   return bRet;
 }
 
@@ -300,9 +300,8 @@ void ShowFUSGUI()
     else if (dx>4)
       dy=2;
     dx=ul.GetCount()/dy;
-    int DX=(10+48+10)*dx;
-    int DY=(10+48+10)*dy;
-
+//     int DX=(10+48+10)*dx;
+//     int DY=(10+48+10)*dy;
   }    
 #ifndef _DEBUG
   DeleteSafeDesktop(false);
@@ -766,7 +765,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           continue;
         if (!g_RunData.bRunAs)
         {
-          DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
+          DWORD wlf=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,(DWORD)-1);
           bool bNotInList=wlf==-1;
           if(bNotInList)
             wlf=0;
@@ -1078,7 +1077,7 @@ DWORD PrepareSuRun()
   BOOL NoNeedPw=g_AdminTStat.AuthenticationId.HighPart||g_AdminTStat.AuthenticationId.LowPart;
   //Ask For Password?
   BOOL PwOk=GetSavePW && (!PwExpired) && NoNeedPw;
-  DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,-1);
+  DWORD f=GetWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,(DWORD)-1);
   bool bNotInList=f==-1;
   if(bNotInList)
     f=0;
@@ -1117,7 +1116,7 @@ DWORD PrepareSuRun()
   if (!CreateSafeDesktop(g_RunData.WinSta,g_RunData.Desk,GetBlurDesk,bFadeDesk))
   {
     DBGTrace("PrepareSuRun EXIT: CreateSafeDesktop failed");
-    return RETVAL_NODESKTOP;
+    return (DWORD)RETVAL_NODESKTOP;
   }
 //#ifdef DoDBGTrace
 //  AddTime("CreateSafeDesktop done")
@@ -1701,7 +1700,7 @@ UsualWay:
               goto UsualWay;
             }
             DBGTrace1("NtSetInformationProcess failed: %s",GetErrorNameStatic(Status));
-            TerminateProcess(pi.hProcess,-1);
+            TerminateProcess(pi.hProcess,(DWORD)-1);
           }else
             DBGTrace1("GetProcAddress(\"NtSetInformationProcess\") failed: %s",GetLastErrorNameStatic());
         }else
@@ -1886,18 +1885,18 @@ static void RemoveAppInit(LPCTSTR Key,LPCTSTR Dll)
   }
 }
 
-static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
-{
-  TCHAR s[4096]={0};
-  GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
-  if (_tcsstr(s,Dll)==0)
-  {
-    if (s[0])
-      _tcscat(s,_T(","));
-    _tcscat(s,Dll);
-    SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
-  }
-}
+// static void AddAppInit(LPCTSTR Key,LPCTSTR Dll)
+// {
+//   TCHAR s[4096]={0};
+//   GetRegStr(HKLM,Key,_T("AppInit_DLLs"),s,4096);
+//   if (_tcsstr(s,Dll)==0)
+//   {
+//     if (s[0])
+//       _tcscat(s,_T(","));
+//     _tcscat(s,Dll);
+//     SetRegStr(HKLM,Key,_T("AppInit_DLLs"),s);
+//   }
+// }
 
 //////////////////////////////////////////////////////////////////////////////
 // 
@@ -2135,7 +2134,7 @@ BOOL RunThisAsAdmin(LPCTSTR cmd,DWORD WaitStat,int nResId)
     if (CreateProcess(NULL,cmdLine,NULL,NULL,FALSE,0,NULL,NULL,&si,&pi))
     {
       CloseHandle(pi.hThread);
-      DWORD ExitCode=-1;
+      DWORD ExitCode=(DWORD)-1;
       if (WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
         GetExitCodeProcess(pi.hProcess,&ExitCode);
       CloseHandle(pi.hProcess);
@@ -2260,7 +2259,7 @@ BOOL DeleteService(BOOL bJustStop=FALSE)
     if (g_bSR2Admins)
     {
       USERLIST SuRunners;
-      SuRunners.SetSurunnersUsers(0,-1,FALSE);
+      SuRunners.SetSurunnersUsers(0,(DWORD)-1,FALSE);
       for (int i=0;i<SuRunners.GetCount();i++)
       {
         InstLog(CResStr(IDS_SR2ADMIN,SuRunners.GetUserName(i)));
@@ -2621,6 +2620,7 @@ BOOL UserUninstall()
 //////////////////////////////////////////////////////////////////////////////
 DWORD WINAPI HKThreadProc(void* p)
 {
+  UNREFERENCED_PARAMETER(p);
   MSG msg={0};
   //Create Message queue
   ATOM HotKeyID=GlobalAddAtom(L"SuRunFUSHotKey");
@@ -2691,7 +2691,7 @@ static void HandleHooks()
     }
   }
 #endif _WIN64
-  DWORD HkTID=0;
+  //DWORD HkTID=0;
   //HANDLE hHkThread=CreateThread(0,0,HKThreadProc,0,0,&HkTID);
   CTimeOut t;
   HKEY RegKey=0;
@@ -2786,7 +2786,7 @@ bool HandleServiceStuff()
         CloseHandle(pi.hProcess);
       }
       ExitProcess(0);
-      return true;
+      //return true;
     }
   }
   if (cmd.argc()==2)
@@ -2797,7 +2797,7 @@ bool HandleServiceStuff()
       SuRun();
       DeleteSafeDesktop(false);
       ExitProcess(~GetCurrentProcessId());
-      return true;
+      //return true;
     }
     //Service
     if (_tcsicmp(cmd.argv(1),_T("/SERVICERUN"))==0)
@@ -2812,35 +2812,35 @@ bool HandleServiceStuff()
       //Shell Extension
       RemoveShellExt();
       ExitProcess(0);
-      return true;
+      //return true;
     }
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
       HandleHooks();
       ExitProcess(0);
-      return true;
+      //return true;
     }
     //Install
     if (_tcsicmp(cmd.argv(1),_T("/INSTALL"))==0)
     {
       InstallService();
       ExitProcess(0);
-      return true;
+      //return true;
     }
     //UnInstall
     if (_tcsicmp(cmd.argv(1),_T("/UNINSTALL"))==0)
     {
       UserUninstall();
       ExitProcess(0);
-      return true;
+      //return true;
     }
     //UserInst:
     if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
     {
       UserInstall();
       ExitProcess(0);
-      return true;
+      //return true;
     }
   }
   if (cmd.argc()==5)
@@ -2850,10 +2850,11 @@ bool HandleServiceStuff()
     {
       DoWatchDog(cmd.argv(2),cmd.argv(3),_tcstoul(cmd.argv(4),0,10));
       ExitProcess(0);
-      return true;
+      //return true;
     }
   }
   //Are we run from the Windows directory?, if Not, ask for Install/update
+#ifndef _DEBUG
   {
     TCHAR fn[4096];
     TCHAR wd[4096];
@@ -2874,9 +2875,10 @@ bool HandleServiceStuff()
         UserInstall();
         ExitProcess(0);
       }
-      return true;
+      //return true;
     }
   }
+#endif _DEBUG
   //In the first three Minutes after Sytstem start:
   //Wait for the service to start
   DWORD ss=CheckServiceStatus();
@@ -2887,8 +2889,8 @@ bool HandleServiceStuff()
   ss=CheckServiceStatus();
   if (ss!=SERVICE_RUNNING)
   {
-    ExitProcess(-2);//Let ShellExec Hook return
-    return true;
+    ExitProcess((DWORD)-2);//Let ShellExec Hook return
+    //return true;
   }
   return false;
 }

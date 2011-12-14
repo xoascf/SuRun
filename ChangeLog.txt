@@ -32,8 +32,16 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-* FIX: The CreateProcessAsuserA hook failed...
-* LANG_PORTUGUESE
+SuRun 1.2.1.0 rc1 - 2011-12-14
+-------------------------------
+* FIX: Two or more spaces after an SuRun Option in the command line caused 
+  SuRun to just exit. (E.g.: "SuRun /wait  cmd"
+
+SuRun 1.2.1.0 Beta 10 - 2011-10-17
+----------------------------------
+* FIX: Fixed implementation of CreateProcessAsuserA IAT-Hook
+* FIX: IAT-Hook sometimes failed with ASLR enabled
+* NEW: PORTUGUESE language resources by "the.magic.silver.bullet"
 
 SuRun 1.2.1.0 Beta 9 - 2011-07-06
 ---------------------------------

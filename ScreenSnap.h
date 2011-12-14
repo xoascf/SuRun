@@ -256,7 +256,7 @@ private:
       if (a==255)
         return 0;
     }
-    return 0;
+    //return 0;
   }
   static LRESULT CALLBACK WindowProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
   {
