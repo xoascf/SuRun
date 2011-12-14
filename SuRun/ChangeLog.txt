@@ -34,6 +34,7 @@ SuRun Changes:
 
 SuRun 1.2.1.0 rc1 - 2011-12-14
 -------------------------------
+* NEW: Command "SuRun: Emty recycle bin" in Recycle Bin context menu
 * FIX: Two or more spaces after an SuRun Option in the command line caused 
   SuRun to just exit. (E.g.: "SuRun /wait  cmd"
 

@@ -34,9 +34,9 @@ static WCHAR SuRun_Beta[]={'r','c','1',
 
 //#define DoDBGTrace
 
-#ifdef BetaVer
+// #ifdef BetaVer
 // #define DoDBGTrace
-#endif
+// #endif
 
 #ifdef _DEBUG 
 #define DoDBGTrace

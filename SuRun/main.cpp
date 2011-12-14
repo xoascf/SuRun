@@ -111,7 +111,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
   HideAppStartCursor();
   if(HandleServiceStuff())
     return 0;
-  
   if (g_RunData.CliThreadId==GetCurrentThreadId())
   {
     //Started from service:
@@ -119,6 +118,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     TrayMsgWnd(CResStr(IDS_APPNAME),g_RunData.cmdLine,g_RunData.IconId,g_RunData.TimeOut);
     return RETVAL_OK;
   }
+  zero(g_RunData.cmdLine);
   //ProcessId
   g_RunData.CliProcessId=GetCurrentProcessId();
   //ThreadId
@@ -152,7 +152,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     {
       LPTSTR c=Args;
       Args=PathGetArgs(Args);
-      for(LPTSTR C=Args-1;*C==' ';C--)
+      if (Args) for(LPTSTR C=Args-1;C && (*C==' ');C--)
         *C=0;
       if (!_wcsicmp(c,L"/QUIET"))
       {
@@ -173,14 +173,21 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       {
         c=Args;
         Args=PathGetArgs(Args);
-        if (*(Args-1)==' ')
-          *(Args-1)=0;
+        if (Args) for(LPTSTR C=Args-1;C && (*C==' ');C--)
+          *C=0;
         wcsncpy(g_RunData.UserName,c,UNLEN+UNLEN);
         g_RunData.bRunAs|=4;
       }else if (!_wcsicmp(c,L"/SETUP"))
       {
         bRunSetup=TRUE;
         wcscpy(g_RunData.cmdLine,L"/SETUP");
+        break;
+      }if (!_wcsicmp(c,L"/EmptyRecycleBin"))
+      {
+        if (g_RunData.Groups&IS_IN_ADMINS)
+          return SHEmptyRecycleBin(0,0,0)==S_OK?RETVAL_OK:RETVAL_ACCESSDENIED;
+        wcscpy(g_RunData.cmdLine,L"/EmptyRecycleBin");
+        g_RunData.KillPID=0xFFFFFFFF;
         break;
       }else if (!_wcsicmp(c,L"/TESTAA"))
       {
@@ -219,8 +226,8 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
           return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
         }
         g_RunData.KillPID=(DWORD)-1;
-        if (Args && (*(Args-1)==0))
-          *(Args-1)=' ';
+        if (Args) for(LPTSTR C=Args-1;C && (*C==0);C--)
+          *C=' ';
         Args=c;
         break;
       }else if (!_wcsicmp(c,L"/BACKUP"))
@@ -231,15 +238,15 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
           return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
         }
         g_RunData.KillPID=(DWORD)-1;
-        if (Args && (*(Args-1)==0))
-          *(Args-1)=' ';
+        if (Args) for(LPTSTR C=Args-1;C && (*C==0);C--)
+          *C=' ';
         Args=c;
         break;
       }else if (!_wcsicmp(c,L"/SWITCHTO"))
       {
         g_RunData.KillPID=(DWORD)-1;
-        if (Args && (*(Args-1)==0))
-          *(Args-1)=' ';
+        if (Args) for(LPTSTR C=Args-1;C && (*C==0);C--)
+          *C=' ';
         Args=c;
         break;
       }else
@@ -256,7 +263,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       CloseHandle(hTok);
     }
     //Convert Command Line
-    if (!bRunSetup)
+    if (!g_RunData.cmdLine[0])
     {
       //If shell is Admin but User is SuRunner, the Shell must be restarted
       if (g_CliIsInSuRunners && bShellIsadmin)
