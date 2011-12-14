@@ -113,6 +113,7 @@
 #define IDS_SRACCDESC                   103
 #define IDD_DIALOG1                     104
 #define IDI_SHIELD                      104
+#define IDS_EMPTYRECYCLEBIN             104
 #define IDI_SHIELD2                     105
 #define IDI_SHIELD1                     106
 #define IDD_SETUP                       107

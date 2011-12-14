@@ -330,20 +330,20 @@ LANGUAGE LANG_PORTUGUESE, SUBLANG_PORTUGUESE
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_FILENOTFOUND        "File not found: SuRun.exe"
-    IDS_ERR                 "SuRunExt.dll error"
-    IDS_TOOLTIP             "Launch control panel with administrative rights"
-    IDS_SURUN               "Control panel as Administrator"
-    IDS_SURUNCMD            "'SuRun cmd' here"
-    IDS_SURUNEXP            "'SuRun Explorer' here"
-    IDS_RESTARTSHELL        "Do you really want to restart the Windows Shell\n(%s) with elevated rights?"
-    IDS_CPLNAME             "SuRun Settings"
-    IDS_MENURESTART         "Restart as Administrator"
+    IDS_FILENOTFOUND        "Ficheiro não encontrado: SuRun.exe"
+    IDS_ERR                 "Erro SuRunExt.dll"
+    IDS_TOOLTIP             "Abrir Painel de Controlo com direitos administrativos"
+    IDS_SURUN               "Painel de Controlo como administrador"
+    IDS_SURUNCMD            "'SuRun Linha de comandos' aqui"
+    IDS_SURUNEXP            "'SuRun Explorador do Windows' here"
+    IDS_RESTARTSHELL        "Tem a certeza que pretende reiniciar a shell do Windows\n(%s) com direitos elevados?"
+    IDS_CPLNAME             "Configurações do SuRun"
+    IDS_MENURESTART         "Reiniciar como administrador"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_MENUSTART           "Start as Administrator"
+    IDS_MENUSTART           "Iniciar como administrador"
 END
 
 #endif    // Portuguese (Portugal) resources

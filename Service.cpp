@@ -652,6 +652,10 @@ BOOL InjectIATHook(LPTSTR ProcName)
   return FALSE;
 }
 
+extern TOKEN_STATISTICS g_AdminTStat;
+DWORD DirectStartUserProcess(DWORD ProcId);//forward decl
+DWORD LSAStartAdminProcess(); //forward decl
+
 static BOOL TestDirectServiceCommands()
 {
   //
@@ -698,10 +702,6 @@ static BOOL TestDirectServiceCommands()
   }
   return false;
 }
-
-extern TOKEN_STATISTICS g_AdminTStat;
-
-DWORD DirectStartUserProcess(DWORD ProcId);//forward decl
 
 VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
 {
@@ -1022,15 +1022,15 @@ LPCTSTR BeautifyCmdLine(LPTSTR cmd)
   }ShName;
   ShName shn[]=
   {
-    {IDS_SHNAME1,_T("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}")},
-    {IDS_SHNAME2,_T("::{208D2C60-3AEA-1069-A2D7-08002B30309D}")},
-    {IDS_SHNAME3,_T("::{7007ACC7-3202-11D1-AAD2-00805FC1270E}")},
-    {IDS_SHNAME4,_T("::{21EC2020-3AEA-1069-A2DD-08002B30309D}")},
-    {IDS_SHNAME4,_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")},
-    {IDS_SHNAME5,_T("::{645FF040-5081-101B-9F08-00AA002F954E}")},
-    {IDS_SHNAME6,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524152}")},
-    {IDS_SHNAME7,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524153}")},
-    {IDS_SHNAME8,_T("::{450D8FBA-AD25-11D0-98A8-0800361B1103}")}
+    {IDS_SHNAME1,_T("::{20D04FE0-3AEA-1069-A2D8-08002B30309D}")},//"My Computer"
+    {IDS_SHNAME2,_T("::{208D2C60-3AEA-1069-A2D7-08002B30309D}")},//"My Network Places"
+    {IDS_SHNAME3,_T("::{7007ACC7-3202-11D1-AAD2-00805FC1270E}")},//"Network connections"
+    {IDS_SHNAME4,_T("::{21EC2020-3AEA-1069-A2DD-08002B30309D}")},//"Control Panel"
+    {IDS_SHNAME4,_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")},//"Control Panel"
+    {IDS_SHNAME5,_T("::{645FF040-5081-101B-9F08-00AA002F954E}")},//"Recycle Bin"
+    {IDS_SHNAME6,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524152}")},//"Fonts"
+    {IDS_SHNAME7,_T("::{D20EA4E1-3957-11d2-A40B-0C5020524153}")},//"Administrative Tools"
+    {IDS_SHNAME8,_T("::{450D8FBA-AD25-11D0-98A8-0800361B1103}")} //"My Documents"
   };
   static TCHAR c1[4096];
   zero(c1);
@@ -1363,8 +1363,7 @@ DWORD LSAStartAdminProcess()
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
   //Get Admin User Token and Job object token
-  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
-    (g_RunData.bRunAs&1)!=0,(g_RunData.bRunAs&2)!=0);
+  HANDLE hAdmin=GetUserToken(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,(g_RunData.bRunAs&1)!=0,(g_RunData.bRunAs&2)!=0);
   //Clear Password
   zero(g_RunPwd);
   if (!hAdmin)
@@ -1793,6 +1792,22 @@ void SuRun()
         ShowFUSGUI();
         return;
       }
+      //Empty Trash?
+      if ((_tcsicmp(g_RunData.cmdLine,_T("/EmptyRecycleBin"))==0))
+      {
+        if (((g_RunData.Groups&IS_IN_ADMINS)==0)
+          &&(((g_RunData.Groups&IS_IN_SURUNNERS)==0)||(GetRestrictApps(g_RunData.UserName))))
+        {
+          ResumeClient(RETVAL_ACCESSDENIED);
+          ExitProcess(~GetCurrentProcessId());
+        }
+        GetSystemWindowsDirectory(g_RunData.cmdLine,4096);
+        PathAppend(g_RunData.cmdLine,L"SuRun.exe");
+        PathQuoteSpaces(g_RunData.cmdLine);
+        _tcscat(g_RunData.cmdLine,L" /EmptyRecycleBin");
+        ResumeClient(LSAStartAdminProcess(),true);
+        return;
+      }
     }
     //Setup?
     if (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))==0)
@@ -1928,6 +1943,7 @@ HWND g_InstLog=0;
 #define REGRUN  L"regfile" SHLRUN
 #define CPLREG  L"CLSID\\{21EC2020-3AEA-1069-A2DD-08002B30309D}"  SHLRUN
 #define TRSREG  L"CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}"  SHLRUN
+#define TRSREG1 L"CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\Shell\\SuRunEmpty"
 
 static void MsgLoop()
 {
@@ -2013,6 +2029,8 @@ void InstallRegistry()
       //Trash
       SetRegStr(HKCR,TRSREG,L"",MenuStr);
       SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
+      SetRegStr(HKCR,TRSREG1,L"",CResStr(IDS_EMPTYRECYCLEBIN));
+      SetRegStr(HKCR,TRSREG1 L"\\command",L"",CBigResStr(L"%s /EmptyRecycleBin",SuRunExe));
     }
   }
   //Control Panel Applet
