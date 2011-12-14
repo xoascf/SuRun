@@ -383,7 +383,7 @@
 				AssemblerListingLocation=".\DebugU/"
 				ObjectFile=".\DebugU/"
 				ProgramDataBaseFileName=".\DebugU/"
-				WarningLevel="3"
+				WarningLevel="4"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
@@ -805,7 +805,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UNICODE"
 				RuntimeLibrary="1"
 				BrowseInformation="1"
-				WarningLevel="3"
+				WarningLevel="4"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>

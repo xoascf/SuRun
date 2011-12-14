@@ -61,6 +61,7 @@ BOOL RequiresAdmin(xml_node& document)
 
 BOOL CALLBACK EnumResProc(HMODULE hExe,LPCTSTR rType,LPTSTR rName,LONG_PTR lParam)
 {
+  UNREFERENCED_PARAMETER(rType);
   BOOL bAbort=FALSE;
   *((BOOL*)lParam)=FALSE;
   HRSRC hr=FindResource(hExe,rName,RT_MANIFEST);

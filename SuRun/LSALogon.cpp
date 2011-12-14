@@ -598,7 +598,7 @@ PTOKEN_GROUPS AddTokenGroups(PTOKEN_GROUPS pSrcTG,PSID_AND_ATTRIBUTES pAdd)
     return 0;
   }
   pDstTG->GroupCount=pSrcTG->GroupCount+1;
-  SID_AND_ATTRIBUTES* pSA=(SID_AND_ATTRIBUTES*)pDstTG->Groups;
+  //SID_AND_ATTRIBUTES* pSA=(SID_AND_ATTRIBUTES*)pDstTG->Groups;
   LPBYTE pBase=(LPBYTE)pDstTG+sizeof(DWORD)+sizeof(SID_AND_ATTRIBUTES)*pDstTG->GroupCount;
   for(i=0;i<pSrcTG->GroupCount;i++)
   {

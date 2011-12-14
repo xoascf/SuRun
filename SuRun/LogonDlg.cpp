@@ -118,7 +118,7 @@ BOOL PasswordOK(DWORD SessionId,LPCTSTR User,LPCTSTR Password,bool AllowEmptyPas
 
 static BYTE KEYPASS[16]={0x4f,0xc9,0x4d,0x14,0x63,0xa9,0x4d,0xe2,0x96,0x47,0x2b,0x6a,0xd6,0x80,0xd3,0xc2};
 
-bool LoadRunAsPassword(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
+bool LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
   if (!GetSavePW)
     return false;
@@ -149,7 +149,7 @@ void DeleteRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName)
   RegDelVal(HKLM,RAPASSKEY(RunAsUser),UserName);
 }
 
-void SaveRunAsPassword(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
+void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
 {
   if (!GetSavePW)
     return;
@@ -168,7 +168,7 @@ void SaveRunAsPassword(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName,LPTSTR P
 bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
 {
   TCHAR Pass[PWLEN+1]={0};
-  LoadRunAsPassword(SessionId,RunAsUser,UserName,Pass,PWLEN);
+  LoadRunAsPassword(RunAsUser,UserName,Pass,PWLEN);
   if (PasswordOK(SessionId,UserName,Pass,true))
     return zero(Pass),true;
   return zero(Pass),false;
@@ -249,7 +249,6 @@ static void SetUserBitmap(HWND hwnd)
   {
     CheckDlgButton(hwnd,IDC_RUNASADMIN,0);
     ShowWindow(GetDlgItem(hwnd,IDC_RUNASADMIN),SW_HIDE);
-    BOOL bAdmin=FALSE;
     if (p->bRunAs)
     {
       BOOL bAdmin=IsInAdmins(User,p->SessionId);
@@ -281,7 +280,7 @@ static void SetUserBitmap(HWND hwnd)
     }
     EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),1);
     TCHAR Pass[PWLEN+1]={0};
-    if (LoadRunAsPassword(p->SessionId,p->User,User,Pass,PWLEN) 
+    if (LoadRunAsPassword(p->User,User,Pass,PWLEN) 
       && PasswordOK(p->SessionId,User,Pass,false))
     {
       SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
@@ -664,7 +663,7 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
                 if ((p->bRunAs)||(p->bFUS))
                 {
                   if(IsDlgButtonChecked(hwnd,IDC_STOREPASS))
-                    SaveRunAsPassword(p->SessionId,p->User,User,Pass);
+                    SaveRunAsPassword(p->User,User,Pass);
                   else
                     DeleteRunAsPassword(p->User,User);
                 }

@@ -1313,7 +1313,7 @@ DWORD GetProcessID(LPCTSTR ProcName,DWORD SessID/*=-1*/)
       continue;
     if ((SessID!=(DWORD)-1))
     {
-      ULONG s=-2;
+      ULONG s=(DWORD)-2;
       if ((!ProcessIdToSessionId(pe.th32ProcessID,&s))||(s!=SessID))
         continue;
     }

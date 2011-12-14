@@ -177,7 +177,6 @@ BOOL IsInGroup(LPCWSTR Group,LPCWSTR DomainAndName,DWORD SessionId)
   LPLOCALGROUP_USERS_INFO_0 Users = 0;
   DWORD num = 0;
   DWORD total = 0;
-  DWORD_PTR resume = 0;
   CImpersonateSessionUser ilu(SessionId);
   status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
     (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
@@ -244,7 +243,6 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
     LPLOCALGROUP_USERS_INFO_0 Users = 0;
     DWORD num = 0;
     DWORD total = 0;
-    DWORD_PTR resume = 0;
     status = NetUserGetLocalGroups(NULL,DomainAndName,0,LG_INCLUDE_INDIRECT,
       (LPBYTE*)&Users,MAX_PREFERRED_LENGTH,&num,&total);
     if ((((status==NERR_Success)||(status==ERROR_MORE_DATA)))&& Users)
@@ -542,7 +540,7 @@ static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
 
 void USERLIST::Add(LPCWSTR UserName)
 {
-  if (m_bSkipAdmins && IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName,-1))
+  if (m_bSkipAdmins && IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName,(DWORD)-1))
     return;
   int j=0;
   for(;j<nUsers;j++)
@@ -673,7 +671,7 @@ void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
           MsgLoop();
           if (dn[0]/*only domain groups!*/ && (_tcsicmp(dn,cn)!=0))
             NetGetAnyDCName(0,dn,(BYTE**)&dc);
-          NET_API_STATUS st=NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
+          NetUserGetInfo(dc,un,2,(LPBYTE*)&b);
           if (b)
           {
             if ((b->usri2_flags & UF_ACCOUNTDISABLE)==0)

@@ -55,7 +55,7 @@ public:
 	  if ( Buffer )
 		  free( Buffer );
 	  Length = 0;
-	  MaximumLength = maxSize;
+	  MaximumLength = (USHORT)maxSize;
 	  Buffer = ( maxSize == 0 )? NULL: (wchar_t *) calloc( maxSize, 1 );
   }
   void Set( char *s )
@@ -64,7 +64,7 @@ public:
     if ( l >= MaximumLength )
       init( l );
     MultiByteToWideChar( CP_ACP, 0, s, l/sizeof(wchar_t), Buffer, l );
-    Length = l;
+    Length = (USHORT)l;
   }
   void Set( wchar_t *s )
   {
@@ -72,7 +72,7 @@ public:
 	  if ( l >= MaximumLength )
 		  init( l );
 	  memmove(Buffer,s,l);
-	  Length = l;
+	  Length = (USHORT)l;
   }
 	operator LSA_UNICODE_STRING *()
   {
