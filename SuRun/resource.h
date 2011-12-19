@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by SuRun.rc
 //
 #define IDS_USAGE                       1
@@ -156,6 +156,7 @@
 #define IDI_LISTICON6                   206
 #define IDI_LISTICON7                   207
 #define IDI_LISTICON8                   208
+#define IDI_SR_SHIELD                   209
 #define IDC_USER                        1000
 #define IDC_DLGQUESTION                 1001
 #define IDC_PASSWORD                    1002

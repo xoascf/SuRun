@@ -29,6 +29,7 @@
 #include "lsa_laar.h"
 #include "UserGroups.h"
 #include "DBGTRace.h"
+#include "resource.h"
 
 #pragma comment(lib,"ShlWapi.lib")
 #pragma comment(lib,"advapi32.lib")
@@ -1741,6 +1742,46 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
   PathAddExtension(PicDir,_T(".bmp"));
   //DBGTrace1("LoadUserBitmap: %s",Pic);
   return (HBITMAP)LoadImage(0,PicDir,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// GetMenuShieldIcon
+// 
+/////////////////////////////////////////////////////////////////////////////
+HBITMAP GetMenuShieldIcon()
+{
+  //Win2k does not support images AND text in ome menu item. Text is more important!
+  //In XP the Bitmap alpha is not supported
+ if (_winmajor<6) 
+    return NULL;
+  //Getting the LUA Shield icon is a real pain when the exe is not compiled for Win6++
+  //Loadimage looks dull, ather APIs GPF sometimes
+  int cx=GetSystemMetrics(SM_CXSMICON);
+  int cy=GetSystemMetrics(SM_CYSMICON);
+  HICON ico=NULL;
+#ifndef _SR32
+  HMODULE hMod=GetModuleHandle(L"SuRunExt.dll");
+#else _SR32
+  HMODULE hMod=GetModuleHandle(L"SuRunExt32.dll");
+#endif _SR32
+  if(!ico)
+    ico=(HICON)LoadImage(hMod,MAKEINTRESOURCE(IDI_SR_SHIELD),IMAGE_ICON,cx,cy,LR_SHARED|LR_CREATEDIBSECTION);
+  if(!ico)
+    return NULL;
+  //Copy the icon to a Bitmap
+  BITMAPINFO bmi={{sizeof(BITMAPINFOHEADER),cx,cy,1,32,0,cx*cy*4,0,0,0,0},{{0,0,0,0}}};
+  void* Bits=0;
+  HDC dc=CreateCompatibleDC(NULL);
+  HBITMAP hbm=CreateDIBSection(dc,&bmi,DIB_RGB_COLORS,&Bits,NULL,0);
+  if (hbm)
+  {
+    SelectObject(dc,hbm);
+    DrawIconEx(dc,0,0,ico,cx,cy,0,NULL,DI_NORMAL);
+  }
+  DeleteDC(dc);
+  DestroyIcon(ico);
+  return hbm;
 }
 
 /////////////////////////////////////////////////////////////////////////////

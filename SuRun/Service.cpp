@@ -1986,24 +1986,32 @@ void InstallRegistry()
     CResStr(IDS_SYSMENUEXT),CBigResStr(L"%s /SYSMENUHOOK",SuRunExe));
   if (!g_bKeepRegistry)
   {
+    LPCTSTR iconstr=L"SuRunExt.dll,1";
     InstLog(CResStr(IDS_ADDASSOC));
+
     //exefile
     SetRegStr(HKCR,EXERUN,L"",MenuStr);
+    SetRegStr(HKCR,EXERUN,L"Icon",iconstr);
     SetRegStr(HKCR,EXERUN L"\\command",L"",DefCmd);
     //cmdfile
     SetRegStr(HKCR,CMDRUN,L"",MenuStr);
+    SetRegStr(HKCR,CMDRUN,L"Icon",iconstr);
     SetRegStr(HKCR,CMDRUN L"\\command",L"",DefCmd);
     //cplfile
     SetRegStr(HKCR,CPLRUN,L"",MenuStr);
+    SetRegStr(HKCR,CPLRUN,L"Icon",iconstr);
     SetRegStr(HKCR,CPLRUN L"\\command",L"",DefCmd);
     //MSCFile
     SetRegStr(HKCR,MSCRUN,L"",MenuStr);
+    SetRegStr(HKCR,MSCRUN,L"Icon",iconstr);
     SetRegStr(HKCR,MSCRUN L"\\command",L"",DefCmd);
     //batfile
     SetRegStr(HKCR,BATRUN,L"",MenuStr);
+    SetRegStr(HKCR,BATRUN,L"Icon",iconstr);
     SetRegStr(HKCR,BATRUN L"\\command",L"",DefCmd);
     //regfile
     SetRegStr(HKCR,REGRUN,L"",MenuStr);
+    SetRegStr(HKCR,REGRUN,L"Icon",iconstr);
     SetRegStr(HKCR,REGRUN L"\\command",L"",DefCmd);
     TCHAR MSIExe[MAX_PATH];
     GetSystemDirectory(MSIExe,MAX_PATH);
@@ -2011,27 +2019,31 @@ void InstallRegistry()
     PathQuoteSpaces(MSIExe);
     //MSI Install
     SetRegStr(HKCR,MSIPKG L" open",L"",CResStr(IDS_SURUNINST));
+    SetRegStr(HKCR,MSIPKG L" open",L"Icon",iconstr);
     SetRegStr(HKCR,MSIPKG L" open\\command",L"",CBigResStr(L"%s %s /i \"%%1\" %%*",SuRunExe,MSIExe));
     //MSI Repair
     SetRegStr(HKCR,MSIPKG L" repair",L"",CResStr(IDS_SURUNREPAIR));
+    SetRegStr(HKCR,MSIPKG L" repair",L"Icon",iconstr);
     SetRegStr(HKCR,MSIPKG L" repair\\command",L"",CBigResStr(L"%s %s /f \"%%1\" %%*",SuRunExe,MSIExe));
     //MSI Uninstall
     SetRegStr(HKCR,MSIPKG L" Uninstall",L"",CResStr(IDS_SURUNUNINST));
+    SetRegStr(HKCR,MSIPKG L" Uninstall",L"Icon",iconstr);
     SetRegStr(HKCR,MSIPKG L" Uninstall\\command",L"",CBigResStr(L"%s %s /x \"%%1\" %%*",SuRunExe,MSIExe));
     //MSP Apply
     SetRegStr(HKCR,MSIPTCH L" open",L"",MenuStr);
+    SetRegStr(HKCR,MSIPTCH L" open",L"Icon",iconstr);
     SetRegStr(HKCR,MSIPTCH L" open\\command",L"",CBigResStr(L"%s %s /p \"%%1\" %%*",SuRunExe,MSIExe));
-    //if (!IsWin7)
-    {
-      //Control Panel
-      SetRegStr(HKCR,CPLREG,L"",MenuStr);
-      SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
-      //Trash
-      SetRegStr(HKCR,TRSREG,L"",MenuStr);
-      SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
-      SetRegStr(HKCR,TRSREG1,L"",CResStr(IDS_EMPTYRECYCLEBIN));
-      SetRegStr(HKCR,TRSREG1 L"\\command",L"",CBigResStr(L"%s /EmptyRecycleBin",SuRunExe));
-    }
+    //Control Panel
+    SetRegStr(HKCR,CPLREG,L"",MenuStr);
+    SetRegStr(HKCR,CPLREG,L"Icon",iconstr);
+    SetRegStr(HKCR,CPLREG L"\\command",L"",CBigResStr(L"%s control",SuRunExe));
+    //Trash
+    SetRegStr(HKCR,TRSREG,L"",MenuStr);
+    SetRegStr(HKCR,TRSREG,L"Icon",iconstr);
+    SetRegStr(HKCR,TRSREG L"\\command",L"",CBigResStr(L"%s Explorer /N, ::{645FF040-5081-101B-9F08-00AA002F954E}",SuRunExe));
+    SetRegStr(HKCR,TRSREG1,L"",CResStr(IDS_EMPTYRECYCLEBIN));
+    SetRegStr(HKCR,TRSREG1,L"Icon",iconstr);
+    SetRegStr(HKCR,TRSREG1 L"\\command",L"",CBigResStr(L"%s /EmptyRecycleBin",SuRunExe));
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_ADDCPL));

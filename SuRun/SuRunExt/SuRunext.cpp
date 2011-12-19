@@ -75,6 +75,7 @@ TCHAR       l_User[514] = {0};
 BOOL        l_bSetHook  = TRUE;
 DWORD       l_Groups    = 0;
 HANDLE      l_InitThread= 0;
+HBITMAP     l_Shield    =(HBITMAP)-1;
 
 #define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
 #define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
@@ -241,6 +242,9 @@ CShellExt::CShellExt()
 	m_cRef = 0L;
   m_pDeskClicked=false;
   inc_cRefThisDLL();
+  //Shield:
+  if (l_Shield==(HBITMAP)-1)
+    l_Shield=GetMenuShieldIcon();
 }
 
 CShellExt::~CShellExt()
@@ -516,7 +520,8 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu, UINT indexMenu, UINT idCmd
         {
           //right click target is folder background
           InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
-          InsertMenu(hMenu, indexMenu++, MF_STRING|MF_BYPOSITION, id++, s);
+          MENUITEMINFO mi={(UINT)sizeof(MENUITEMINFO),(l_Shield?MIIM_BITMAP:0)|MIIM_ID|MIIM_STRING,0,MFS_ENABLED,id++,0,0,0,0,s,(UINT)_tcslen(s),l_Shield};
+          InsertMenuItem(hMenu,indexMenu++,TRUE,&mi);
           InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, NULL, NULL);
         }
       }
