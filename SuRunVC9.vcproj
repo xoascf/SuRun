@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="SuRun"
 	ProjectGUID="{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}"
+	RootNamespace="SuRun"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -1774,6 +1775,10 @@
 			</File>
 			<File
 				RelativePath="res\SHADMIN.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Shield.ico"
 				>
 			</File>
 			<File

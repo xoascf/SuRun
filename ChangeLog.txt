@@ -32,6 +32,18 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+
+SuRun 1.2.1.0 rc3 - 2011-12-18
+-------------------------------
+* CHG: SuRun uses a custom Menu icon.
+
+SuRun 1.2.1.0 rc2 - 2011-12-16
+-------------------------------
+* FIX: Command "SuRun: Emty recycle bin" caused SuRun to sometimes not work
+  (Automagic etc.)
+* NEW: In Vista and Win7 SuRun's system menu and context entries show the 
+  LUA Shield
+
 SuRun 1.2.1.0 rc1 - 2011-12-14
 -------------------------------
 * NEW: Command "SuRun: Emty recycle bin" in Recycle Bin context menu

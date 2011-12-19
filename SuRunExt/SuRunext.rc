@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -26,7 +26,7 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "Plik nie znaleziony: SuRun.exe"
     IDS_ERR                 "B³¹d SuRunExt.dll"
@@ -39,7 +39,7 @@ BEGIN
     IDS_MENURESTART         "Restartuj (SuRun)"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Uruchom (SuRun)"
 END
@@ -64,21 +64,22 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_MAINICON            ICON    DISCARDABLE     "..\\res\\SuRun.ico"
+IDI_MAINICON            ICON                    "..\\res\\SuRun.ico"
+IDI_SR_SHIELD           ICON                    "..\\res\\Shield.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 24
+// RT_MANIFEST
 //
 
-1                       24      MOVEABLE PURE   "..\\res\\app.manifest"
+1                       RT_MANIFEST             "..\\res\\app.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "Datei nicht gefunden: SuRun.exe"
     IDS_ERR                 "SuRunExt.dll Fehler"
@@ -91,7 +92,7 @@ BEGIN
     IDS_MENURESTART         "Neustart als Administrator"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Start als Administrator"
 END
@@ -115,18 +116,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE MOVEABLE PURE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE MOVEABLE PURE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""winresrc.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE MOVEABLE PURE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -135,7 +136,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -158,16 +158,16 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Based on SuDown http://sudown.sourceforge.net and Tianmiao Hu's gvim extension\0"
-            VALUE "CompanyName", "http://kay-bruns.de\0"
-            VALUE "FileDescription", "Shell extension for SuRun\0"
-            VALUE "FileVersion", "1, 2, 1, 0\0"
-            VALUE "InternalName", "SuRun right-click menu extension\0"
-            VALUE "LegalCopyright", "Copyright © 2007-2011 Kay Bruns\0"
-            VALUE "LegalTrademarks", "SuRun Context Menu Extension\0"
-            VALUE "OriginalFilename", "SuRunExt.dll\0"
-            VALUE "ProductName", "SuRun Context Menu Extension\0"
-            VALUE "ProductVersion", "1, 2, 1, 0\0"
+            VALUE "Comments", "Based on SuDown http://sudown.sourceforge.net and Tianmiao Hu's gvim extension"
+            VALUE "CompanyName", "http://kay-bruns.de"
+            VALUE "FileDescription", "Shell extension for SuRun"
+            VALUE "FileVersion", "1, 2, 1, 0"
+            VALUE "InternalName", "SuRun right-click menu extension"
+            VALUE "LegalCopyright", "Copyright © 2007-2011 Kay Bruns"
+            VALUE "LegalTrademarks", "SuRun Context Menu Extension"
+            VALUE "OriginalFilename", "SuRunExt.dll"
+            VALUE "ProductName", "SuRun Context Menu Extension"
+            VALUE "ProductVersion", "1, 2, 1, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -176,15 +176,13 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "File not found: SuRun.exe"
     IDS_ERR                 "SuRunExt.dll error"
@@ -197,7 +195,7 @@ BEGIN
     IDS_MENURESTART         "Restart as Administrator"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Start as Administrator"
 END
@@ -220,7 +218,7 @@ LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "File not found: SuRun.exe"
     IDS_ERR                 "SuRunExt.dll error"
@@ -233,7 +231,7 @@ BEGIN
     IDS_MENURESTART         "Restart as Administrator"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Start as Administrator"
 END
@@ -256,7 +254,7 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "Fichier introuvable : SuRun.exe"
     IDS_ERR                 "Erreur dans SuRunExt.dll"
@@ -269,7 +267,7 @@ BEGIN
     IDS_MENURESTART         "Relancer en tant qu'administrateur"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Démarrer en tant qu'administrateur"
 END
@@ -292,7 +290,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "Bestand niet gevonden: SuRun.exe"
     IDS_ERR                 "SuRunExt.dll fout"
@@ -305,7 +303,7 @@ BEGIN
     IDS_MENURESTART         "Opnieuw starten als Administrator"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Start als Administrator"
 END
@@ -328,7 +326,7 @@ LANGUAGE LANG_PORTUGUESE, SUBLANG_PORTUGUESE
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_FILENOTFOUND        "Ficheiro não encontrado: SuRun.exe"
     IDS_ERR                 "Erro SuRunExt.dll"
@@ -341,7 +339,7 @@ BEGIN
     IDS_MENURESTART         "Reiniciar como administrador"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE 
 BEGIN
     IDS_MENUSTART           "Iniciar como administrador"
 END

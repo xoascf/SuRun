@@ -168,10 +168,10 @@ static CHookDescriptor hkCrPAUW  ("advapi32.dll","api-ms-win-core-processthreads
 static CHookDescriptor hkSwDesk  ("user32.dll",NULL,"SwitchDesktop",(PROC)SwitchDesk);
 
 //TEMP!!!
-static CHookDescriptor hkShExExW("shell32.dll",NULL,"ShellExecuteExW",(PROC)ShellExExW);
-static CHookDescriptor hkShExExA("shell32.dll",NULL,"ShellExecuteExA",(PROC)ShellExExA);
-static CHookDescriptor hkShExW("shell32.dll",NULL,"ShellExecuteW",(PROC)ShellExW);
-static CHookDescriptor hkShExA("shell32.dll",NULL,"ShellExecuteA",(PROC)ShellExA);
+// static CHookDescriptor hkShExExW("shell32.dll",NULL,"ShellExecuteExW",(PROC)ShellExExW);
+// static CHookDescriptor hkShExExA("shell32.dll",NULL,"ShellExecuteExA",(PROC)ShellExExA);
+// static CHookDescriptor hkShExW("shell32.dll",NULL,"ShellExecuteW",(PROC)ShellExW);
+// static CHookDescriptor hkShExA("shell32.dll",NULL,"ShellExecuteA",(PROC)ShellExA);
 //END TEMP!!!
 
 //Functions that, if present in the IAT, cause the module to be hooked
@@ -226,10 +226,10 @@ static CHookDescriptor* sys_need_hdt[]=
   &hkCrProcW,
   &hkSwDesk,
 //TEMP!!!
-  &hkShExExA,
-  &hkShExExW,
-  &hkShExA,
-  &hkShExW,
+//   &hkShExExA,
+//   &hkShExExW,
+//   &hkShExA,
+//   &hkShExW,
 //END TEMP!!!
 #endif _TEST_STABILITY
 };
@@ -250,10 +250,10 @@ static CHookDescriptor* sys_hdt[]=
   &hkCrProcW,
   &hkSwDesk,
 //TEMP!!!
-  &hkShExExA,
-  &hkShExExW,
-  &hkShExA,
-  &hkShExW,
+//   &hkShExExA,
+//   &hkShExExW,
+//   &hkShExA,
+//   &hkShExW,
 //END TEMP!!!
 #endif _TEST_STABILITY
 };
@@ -651,135 +651,135 @@ BOOL WINAPI CreateProcW(LPCWSTR lpApplicationName,LPWSTR lpCommandLine,
 }
 
 //TEMP!!!
-extern HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei); //SuRunExt.cpp
-BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExExW()",DLLNAME);
-#endif DoDBGTrace
- if (S_OK==ShellExtExecute(pei))
-   return TRUE;
-  return ((lpShellExecuteExW)hkShExExW.OrgFunc())(pei);
-}
-
-BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExExA()",DLLNAME);
-#endif DoDBGTrace
-  if (peiA)
-  {
-    SHELLEXECUTEINFOW pei;
-    pei.cbSize=sizeof(SHELLEXECUTEINFOW);
-    pei.fMask=peiA->fMask;
-    pei.hwnd=peiA->hwnd;
-    static WCHAR wVerb[4096];
-    zero(wVerb);
-    MultiByteToWideChar(CP_ACP,0,peiA->lpVerb,-1,wVerb,(int)4096);
-    static WCHAR wFile[4096];
-    pei.lpVerb=wVerb;
-    zero(wFile);
-    MultiByteToWideChar(CP_ACP,0,peiA->lpFile,-1,wFile,(int)4096);
-    static WCHAR wParameters[4096];
-    pei.lpFile=wFile;
-    zero(wParameters);
-    MultiByteToWideChar(CP_ACP,0,peiA->lpParameters,-1,wParameters,(int)4096);
-    pei.lpParameters=wParameters;
-    static WCHAR wDirectory[4096];
-    zero(wDirectory);
-    MultiByteToWideChar(CP_ACP,0,peiA->lpDirectory,-1,wDirectory,(int)4096);
-    pei.lpDirectory=wDirectory;
-    pei.nShow=peiA->nShow;
-    pei.hInstApp=peiA->hInstApp;
-    pei.lpIDList=peiA->lpIDList;
-    static WCHAR wClass[4096];
-    zero(wClass);
-    MultiByteToWideChar(CP_ACP,0,peiA->lpClass,-1,wClass,(int)4096);
-    pei.lpClass=wClass;
-    pei.hkeyClass=peiA->hkeyClass;
-    pei.dwHotKey=peiA->dwHotKey;
-    pei.hIcon=peiA->hIcon;
-    pei.hProcess=peiA->hProcess;
-    if (S_OK==ShellExtExecute(&pei))
-    {
-      peiA->hProcess=pei.hProcess;
-      return TRUE;
-    }
-  }
-  return ((lpShellExecuteExA)hkShExExA.OrgFunc())(peiA);
-}
-
-HINSTANCE WINAPI ShellExA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, 
-                          LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExA()",DLLNAME);
-#endif DoDBGTrace
-  {
-    SHELLEXECUTEINFOW pei;
-    pei.cbSize=sizeof(SHELLEXECUTEINFOW);
-    pei.fMask=0;
-    pei.hwnd=hwnd;
-    static WCHAR wVerb[4096];
-    zero(wVerb);
-    MultiByteToWideChar(CP_ACP,0,lpOperation,-1,wVerb,(int)4096);
-    static WCHAR wFile[4096];
-    pei.lpVerb=wVerb;
-    zero(wFile);
-    MultiByteToWideChar(CP_ACP,0,lpFile,-1,wFile,(int)4096);
-    static WCHAR wParameters[4096];
-    pei.lpFile=wFile;
-    zero(wParameters);
-    MultiByteToWideChar(CP_ACP,0,lpParameters,-1,wParameters,(int)4096);
-    pei.lpParameters=wParameters;
-    static WCHAR wDirectory[4096];
-    zero(wDirectory);
-    MultiByteToWideChar(CP_ACP,0,lpDirectory,-1,wDirectory,(int)4096);
-    pei.lpDirectory=wDirectory;
-    pei.nShow=nShowCmd;
-    pei.hInstApp=0;
-    pei.lpIDList=0;
-    pei.lpClass=0;
-    pei.hkeyClass=0;
-    pei.dwHotKey=0;
-    pei.hIcon=0;
-    pei.hProcess=0;
-    if (S_OK==ShellExtExecute(&pei))
-      return (HINSTANCE)33;
-  }
-  return ((lpShellExecuteA)hkShExA.OrgFunc())(hwnd,lpOperation,lpFile,
-                                              lpParameters,lpDirectory,nShowCmd);
-}
-
-HINSTANCE WINAPI ShellExW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, 
-                          LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd)
-{
-#ifdef DoDBGTrace
-  TRACExA("%s: call to ShellExW()",DLLNAME);
-#endif DoDBGTrace
-  {
-    SHELLEXECUTEINFOW pei;
-    pei.cbSize=sizeof(SHELLEXECUTEINFOW);
-    pei.fMask=0;
-    pei.hwnd=hwnd;
-    pei.lpVerb=lpOperation;
-    pei.lpFile=lpFile;
-    pei.lpParameters=lpParameters;
-    pei.lpDirectory=lpDirectory;
-    pei.nShow=nShowCmd;
-    pei.hInstApp=0;
-    pei.lpIDList=0;
-    pei.lpClass=0;
-    pei.hkeyClass=0;
-    pei.dwHotKey=0;
-    pei.hIcon=0;
-    pei.hProcess=0;
-    if (S_OK==ShellExtExecute(&pei))
-      return (HINSTANCE)33;
-  }
-  return ((lpShellExecuteW)hkShExW.OrgFunc())(hwnd,lpOperation,lpFile,
-                                              lpParameters,lpDirectory,nShowCmd);
-}
+// extern HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei); //SuRunExt.cpp
+// BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
+// {
+// #ifdef DoDBGTrace
+// //   TRACExA("%s: call to ShellExExW()",DLLNAME);
+// #endif DoDBGTrace
+//  if (S_OK==ShellExtExecute(pei))
+//    return TRUE;
+//   return ((lpShellExecuteExW)hkShExExW.OrgFunc())(pei);
+// }
+// 
+// BOOL WINAPI ShellExExA(LPSHELLEXECUTEINFOA peiA)
+// {
+// #ifdef DoDBGTrace
+// //   TRACExA("%s: call to ShellExExA()",DLLNAME);
+// #endif DoDBGTrace
+//   if (peiA)
+//   {
+//     SHELLEXECUTEINFOW pei;
+//     pei.cbSize=sizeof(SHELLEXECUTEINFOW);
+//     pei.fMask=peiA->fMask;
+//     pei.hwnd=peiA->hwnd;
+//     static WCHAR wVerb[4096];
+//     zero(wVerb);
+//     MultiByteToWideChar(CP_ACP,0,peiA->lpVerb,-1,wVerb,(int)4096);
+//     static WCHAR wFile[4096];
+//     pei.lpVerb=wVerb;
+//     zero(wFile);
+//     MultiByteToWideChar(CP_ACP,0,peiA->lpFile,-1,wFile,(int)4096);
+//     static WCHAR wParameters[4096];
+//     pei.lpFile=wFile;
+//     zero(wParameters);
+//     MultiByteToWideChar(CP_ACP,0,peiA->lpParameters,-1,wParameters,(int)4096);
+//     pei.lpParameters=wParameters;
+//     static WCHAR wDirectory[4096];
+//     zero(wDirectory);
+//     MultiByteToWideChar(CP_ACP,0,peiA->lpDirectory,-1,wDirectory,(int)4096);
+//     pei.lpDirectory=wDirectory;
+//     pei.nShow=peiA->nShow;
+//     pei.hInstApp=peiA->hInstApp;
+//     pei.lpIDList=peiA->lpIDList;
+//     static WCHAR wClass[4096];
+//     zero(wClass);
+//     MultiByteToWideChar(CP_ACP,0,peiA->lpClass,-1,wClass,(int)4096);
+//     pei.lpClass=wClass;
+//     pei.hkeyClass=peiA->hkeyClass;
+//     pei.dwHotKey=peiA->dwHotKey;
+//     pei.hIcon=peiA->hIcon;
+//     pei.hProcess=peiA->hProcess;
+//     if (S_OK==ShellExtExecute(&pei))
+//     {
+//       peiA->hProcess=pei.hProcess;
+//       return TRUE;
+//     }
+//   }
+//   return ((lpShellExecuteExA)hkShExExA.OrgFunc())(peiA);
+// }
+// 
+// HINSTANCE WINAPI ShellExA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, 
+//                           LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
+// {
+// #ifdef DoDBGTrace
+// //   TRACExA("%s: call to ShellExA()",DLLNAME);
+// #endif DoDBGTrace
+//   {
+//     SHELLEXECUTEINFOW pei;
+//     pei.cbSize=sizeof(SHELLEXECUTEINFOW);
+//     pei.fMask=0;
+//     pei.hwnd=hwnd;
+//     static WCHAR wVerb[4096];
+//     zero(wVerb);
+//     MultiByteToWideChar(CP_ACP,0,lpOperation,-1,wVerb,(int)4096);
+//     static WCHAR wFile[4096];
+//     pei.lpVerb=wVerb;
+//     zero(wFile);
+//     MultiByteToWideChar(CP_ACP,0,lpFile,-1,wFile,(int)4096);
+//     static WCHAR wParameters[4096];
+//     pei.lpFile=wFile;
+//     zero(wParameters);
+//     MultiByteToWideChar(CP_ACP,0,lpParameters,-1,wParameters,(int)4096);
+//     pei.lpParameters=wParameters;
+//     static WCHAR wDirectory[4096];
+//     zero(wDirectory);
+//     MultiByteToWideChar(CP_ACP,0,lpDirectory,-1,wDirectory,(int)4096);
+//     pei.lpDirectory=wDirectory;
+//     pei.nShow=nShowCmd;
+//     pei.hInstApp=0;
+//     pei.lpIDList=0;
+//     pei.lpClass=0;
+//     pei.hkeyClass=0;
+//     pei.dwHotKey=0;
+//     pei.hIcon=0;
+//     pei.hProcess=0;
+//     if (S_OK==ShellExtExecute(&pei))
+//       return (HINSTANCE)33;
+//   }
+//   return ((lpShellExecuteA)hkShExA.OrgFunc())(hwnd,lpOperation,lpFile,
+//                                               lpParameters,lpDirectory,nShowCmd);
+// }
+// 
+// HINSTANCE WINAPI ShellExW(HWND hwnd, LPCWSTR lpOperation, LPCWSTR lpFile, 
+//                           LPCWSTR lpParameters, LPCWSTR lpDirectory, INT nShowCmd)
+// {
+// #ifdef DoDBGTrace
+// //   TRACExA("%s: call to ShellExW()",DLLNAME);
+// #endif DoDBGTrace
+//   {
+//     SHELLEXECUTEINFOW pei;
+//     pei.cbSize=sizeof(SHELLEXECUTEINFOW);
+//     pei.fMask=0;
+//     pei.hwnd=hwnd;
+//     pei.lpVerb=lpOperation;
+//     pei.lpFile=lpFile;
+//     pei.lpParameters=lpParameters;
+//     pei.lpDirectory=lpDirectory;
+//     pei.nShow=nShowCmd;
+//     pei.hInstApp=0;
+//     pei.lpIDList=0;
+//     pei.lpClass=0;
+//     pei.hkeyClass=0;
+//     pei.dwHotKey=0;
+//     pei.hIcon=0;
+//     pei.hProcess=0;
+//     if (S_OK==ShellExtExecute(&pei))
+//       return (HINSTANCE)33;
+//   }
+//   return ((lpShellExecuteW)hkShExW.OrgFunc())(hwnd,lpOperation,lpFile,
+//                                               lpParameters,lpDirectory,nShowCmd);
+// }
 //END TEMP!!!
 
 static BOOL IsShellAndSuRunner(HANDLE hToken)

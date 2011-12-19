@@ -30,7 +30,7 @@ extern unsigned int _winminor;
 #endif //_MSC_VER >= 1500
 
 #define IsWin2k ((_winmajor==5)&&(_winminor==0))
-#define IsWin7 ((_winmajor==6)&&(_winminor==1))
+#define IsWin7 (((_winmajor<<8)|_winminor)>=0x601)
 
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT
@@ -189,6 +189,9 @@ LPCTSTR GetVersionString();
 // LoadUserBitmap
 HBITMAP LoadUserBitmap(LPCTSTR UserName);
 
+//GetMenuShieldIcon
+HBITMAP GetMenuShieldIcon();
+
 // CTimeOut
 class CTimeOut
 {
@@ -283,6 +286,3 @@ void SR_PathStripPathW(LPWSTR p);
 void SR_PathQuoteSpacesW(LPWSTR p);
 LPTSTR SR_PathGetArgsW(LPCWSTR p);
 BOOL SR_PathAppendW(LPWSTR p,LPCWSTR a);
-
-
-

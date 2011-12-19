@@ -182,7 +182,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         bRunSetup=TRUE;
         wcscpy(g_RunData.cmdLine,L"/SETUP");
         break;
-      }if (!_wcsicmp(c,L"/EmptyRecycleBin"))
+      }else if (!_wcsicmp(c,L"/EmptyRecycleBin"))
       {
         if (g_RunData.Groups&IS_IN_ADMINS)
           return SHEmptyRecycleBin(0,0,0)==S_OK?RETVAL_OK:RETVAL_ACCESSDENIED;

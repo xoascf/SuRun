@@ -49,6 +49,8 @@ extern HINSTANCE l_hInst; //the local Dll instance
 extern TCHAR     l_User[514];  //the Process user Name
 extern DWORD     l_Groups;
 extern HANDLE    l_InitThread;
+extern HBITMAP   l_Shield;
+
 #define     l_IsAdmin     ((l_Groups&IS_IN_ADMINS)!=0)
 #define     l_IsSuRunner  ((l_Groups&IS_IN_SURUNNERS)!=0)
 
@@ -111,22 +113,12 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if(nCode>=0)
   {
-    if (l_InitThread)
-        WaitForSingleObject(l_InitThread,5000);
-    if (WM_SYSMH0==-2)
-      WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-    if (WM_SYSMH1==-2)
-      WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-    if (WM_SYSMH2==-2)
-      WM_SYSMH2=RegisterWindowMessage(_T("SYSMH3_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
-    if (WM_SYSMH3==-2)
-      WM_SYSMH3=RegisterWindowMessage(_T("SYSMH3_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
     #define wps ((CWPRETSTRUCT*)lParam)
     switch(wps->message)
     {
     case WM_UNINITMENUPOPUP:
       #define hmenu (HMENU)wps->wParam
-      if(IsMenu(hmenu))
+      if(IsMenu(hmenu)&&(WM_SYSMH0!=-2))
       {
         //Two menu items and two separators can be in Sysmenu, remove them:
         RemoveMenu(hmenu,WM_SYSMH2,MF_BYCOMMAND);
@@ -145,7 +137,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
       GetSystemMenu((HWND)wps->hwnd,FALSE);
       break;
     case WM_SYSCOMMAND:
-      if((wps->wParam==WM_SYSMH0)||(wps->wParam==WM_SYSMH1))
+      if((WM_SYSMH0!=-2)&&((wps->wParam==WM_SYSMH0)||(wps->wParam==WM_SYSMH1)))
       {
         //DBGOutMsg(_T("ShellProc"),wps->message,wps->wParam,wps->lParam,wps->lResult);
         STARTUPINFO si={0};
@@ -173,6 +165,7 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         //We processed the Message: Stop calling other hooks!
         return 0;
       }
+      break;
     case WM_INITMENUPOPUP:
       #define hmenu (HMENU)wps->wParam
       if (/*(HIWORD(wps->lParam)==TRUE)*/
@@ -181,6 +174,18 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         && (!l_IsAdmin)
         && (!GetHideFromUser(l_User)))
       {
+        if (l_InitThread)
+          WaitForSingleObject(l_InitThread,5000);
+        if (WM_SYSMH0==-2)
+          WM_SYSMH0=RegisterWindowMessage(_T("SYSMH1_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+        if (WM_SYSMH1==-2)
+          WM_SYSMH1=RegisterWindowMessage(_T("SYSMH2_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+        if (WM_SYSMH2==-2)
+          WM_SYSMH2=RegisterWindowMessage(_T("SYSMH3_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+        if (WM_SYSMH3==-2)
+          WM_SYSMH3=RegisterWindowMessage(_T("SYSMH3_2C7B6088-5A77-4d48-BE43-30337DCA9A86"));
+        if (l_Shield==(HBITMAP)-1)
+          l_Shield=GetMenuShieldIcon();
         int i=-1;
         if( GetRestartAsAdmin 
         && (!IsShell())
@@ -188,8 +193,12 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
           i=FindSCClose(hmenu);
           if (i>=0)
-            if (InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH0,CResStr(l_hInst,IDS_MENURESTART)))
+          {
+            CResStr s(l_hInst,IDS_MENURESTART);
+            MENUITEMINFO mi={(UINT)sizeof(MENUITEMINFO),(l_Shield?MIIM_BITMAP:0)|MIIM_ID|MIIM_STRING,0,MFS_ENABLED,WM_SYSMH0,0,0,0,0,s,(UINT)_tcslen(s),l_Shield};
+            if (InsertMenuItem(hmenu,i,TRUE,&mi))
               i++;
+          }
         }
         if( GetStartAsAdmin
         && (GetMenuState(hmenu,WM_SYSMH1,MF_BYCOMMAND)==(UINT)-1))
@@ -197,8 +206,12 @@ LRESULT CALLBACK ShellProc(int nCode, WPARAM wParam, LPARAM lParam)
           if (i<0)
             i=FindSCClose(hmenu);
           if (i>=0)
-            if (InsertMenu(hmenu,i,MF_BYPOSITION,WM_SYSMH1,CResStr(l_hInst,IDS_MENUSTART)))
+          {
+            CResStr s(l_hInst,IDS_MENUSTART);
+            MENUITEMINFO mi={(UINT)sizeof(MENUITEMINFO),(l_Shield?MIIM_BITMAP:0)|MIIM_ID|MIIM_STRING,0,MFS_ENABLED,WM_SYSMH1,0,0,0,0,s,(UINT)_tcslen(s),l_Shield};
+            if (InsertMenuItem(hmenu,i,TRUE,&mi))
               i++;
+          }
         }
         if (i>=0)
           if(InsertMenu(hmenu,i,MF_SEPARATOR|MF_BYPOSITION,WM_SYSMH2,0))
@@ -216,6 +229,7 @@ LRESULT CALLBACK MenuProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   #define msg ((MSG*)lParam)
   if ((nCode>=0)&&(msg->message==WM_SYSCOMMAND)&&(wParam==PM_REMOVE)
+    &&(WM_SYSMH0!=-2)
     &&((msg->wParam==WM_SYSMH0)||(msg->wParam==WM_SYSMH1)))
   {
     //DBGOutMsg(_T("MenuProc"),msg->message,msg->wParam,msg->lParam,0);
