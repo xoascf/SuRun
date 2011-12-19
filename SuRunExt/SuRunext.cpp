@@ -29,7 +29,7 @@
 #include <tlhelp32.h>
 #include <USERENV.H>
 #include "../DynWTSAPI.h"
-#include <msi.h>
+//#include <msi.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -38,7 +38,7 @@
 #pragma comment(lib,"Shlwapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 #pragma comment(lib,"Userenv.lib")
-#pragma comment(lib,"msi.lib")
+//#pragma comment(lib,"msi.lib")
 
 #include "../Setup.h"
 #include "../Service.h"
