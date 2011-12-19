@@ -1752,8 +1752,8 @@ HBITMAP LoadUserBitmap(LPCTSTR UserName)
 HBITMAP GetMenuShieldIcon()
 {
   //Win2k does not support images AND text in ome menu item. Text is more important!
-  //In XP the Bitmap alpha is not supported
- if (_winmajor<6) 
+  //In XP the Bitmap alpha is not apparently supported
+  if (_winmajor<6) 
     return NULL;
   //Getting the LUA Shield icon is a real pain when the exe is not compiled for Win6++
   //Loadimage looks dull, ather APIs GPF sometimes
