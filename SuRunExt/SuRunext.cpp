@@ -29,7 +29,7 @@
 #include <tlhelp32.h>
 #include <USERENV.H>
 #include "../DynWTSAPI.h"
-//#include <msi.h>
+#include <msi.h>
 
 #pragma comment(lib,"User32.lib")
 #pragma comment(lib,"ole32.lib")
@@ -38,7 +38,7 @@
 #pragma comment(lib,"Shlwapi.lib")
 #pragma comment(lib,"PSAPI.lib")
 #pragma comment(lib,"Userenv.lib")
-//#pragma comment(lib,"msi.lib")
+#pragma comment(lib,"msi.lib")
 
 #include "../Setup.h"
 #include "../Service.h"
@@ -113,7 +113,7 @@ protected:
   ULONG m_cRef;
   bool m_pDeskClicked;
   TCHAR m_ClickFolderName[4096];
-//  TCHAR m_ClickCmdLine[4096];
+//   TCHAR m_ClickCmdLine[4096];
 public:
   CShellExt();
   ~CShellExt();
@@ -288,14 +288,14 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 //////////////////////////////////////////////////////////////////////////////
 // IShellExtInit
 //////////////////////////////////////////////////////////////////////////////
-//#define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
-//#define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
-//
-//static UINT g_CF_FileNameW=0;
 static UINT g_CF_ShellIdList=0;
-//
-//static void PrintDataObj(LPDATAOBJECT pDataObj)
-//{
+// #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
+// #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
+// 
+// static UINT g_CF_FileNameW=0;
+// 
+// static void PrintDataObj(LPDATAOBJECT pDataObj)
+// {
 //  if (g_CF_FileNameW==0)
 //    g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
 //  if(g_CF_ShellIdList==0)
@@ -377,14 +377,14 @@ static UINT g_CF_ShellIdList=0;
 //  }
 //  if(pefEtc)
 //    pefEtc->Release();
-//}
+// }
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
 {
   zero(m_ClickFolderName);
-//  zero(m_ClickCmdLine);
+//   zero(m_ClickCmdLine);
   m_pDeskClicked=FALSE;
-#ifdef DoDBGTrace
+// #ifdef DoDBGTrace
 //  {
 //    if (pIDFolder)
 //      SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
@@ -433,12 +433,12 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
 //    if(hRegKey)
 //      hKeyToKeyName(hRegKey,FileClass,4096);
 //    DBGTrace3("CShellExt::Initialize(%s , %s , %s)",m_ClickFolderName,m_ClickCmdLine,FileClass);
-////    if(pDataObj)
-////      PrintDataObj(pDataObj);
+// //    if(pDataObj)
+// //      PrintDataObj(pDataObj);
 //  }
 //  zero(m_ClickFolderName);
 //  zero(m_ClickCmdLine);
-#endif DoDBGTrace
+// #endif DoDBGTrace
   //Non SuRunners don't need the Shell Extension!
   if ((!l_IsSuRunner)||GetHideFromUser(l_User))
     return NOERROR;
@@ -938,7 +938,7 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #ifdef DoDBGTrace
 //  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-//  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #endif DoDBGTrace
   //self Approval
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
