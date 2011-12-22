@@ -552,7 +552,7 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR idCmd,UINT uFlags,UINT FAR *re
 {
   CResStr s(l_hInst,IDS_TOOLTIP);
   if (m_pDeskClicked && (uFlags == GCS_HELPTEXT) && (cchMax > wcslen(s)))
-    wcscpy((LPWSTR)pszName,s);
+    _tcscpy((LPWSTR)pszName,s);
   return NOERROR;
 }
 
@@ -649,6 +649,9 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   static TCHAR cmd[4096];
   zero(cmd);
   //check if this Programm has an Auto-SuRun-Entry in the List
+  //ToDo: use dynamic allocated strings
+  if (StrLenW(pei->lpFile)>4093)
+    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
   _tcscpy(tmp,pei->lpFile);
   SR_PathQuoteSpacesW(tmp);
   //Verb must be "open" or empty
@@ -692,6 +695,9 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
   if ( bNoAutoRun && pei->lpParameters && _tcslen(pei->lpParameters))
   {
+    //ToDo: use dynamic allocated strings
+    if (StrLenW(tmp)+StrLenW(pei->lpParameters)>4093)
+      return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
     _tcscat(tmp,L" ");
     _tcscat(tmp,pei->lpParameters);
   }
@@ -701,6 +707,9 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     _tcscpy(CurDir,pei->lpDirectory);
   else
     GetCurrentDirectory(countof(CurDir),CurDir);
+  //ToDo: use dynamic allocated strings
+  if (StrLenW(tmp)+StrLenW(CurDir)>4096-64)
+    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
   
   ResolveCommandLine(tmp,CurDir,tmp);
 

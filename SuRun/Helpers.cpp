@@ -889,6 +889,9 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
 
 BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
 {
+  //ToDo: use dynamic allocated strings
+  if (StrLenW(CmdLine)+StrLenW(CurDir)>4096-64)
+    return false;
   //Application
   static TCHAR app[4096];
   zero(app);
@@ -918,7 +921,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   if ((!fExist)&&(!_wcsicmp(app,L"explorer"))||(!_wcsicmp(app,L"explorer.exe")))
   {
     if (args[0]==0) 
-      wcscpy(args,L"/e, C:");
+      _tcscpy(args,L"/e, C:");
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"explorer.exe");
   }else 
@@ -928,7 +931,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"pchealth\\helpctr\\binaries\\msconfig.exe");
     if (!PathFileExists(app))
-      wcscpy(app,L"msconfig");
+      _tcscpy(app,L"msconfig");
   }else
   //Control Panel special folder files:
   if ((args[0]==0)
@@ -939,10 +942,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathAppend(app,L"explorer.exe");
     if (_winmajor<6)
       //2k/XP: Control Panel is beneath "my computer"!
-      wcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
+      _tcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
     else
       //Vista: Control Panel is beneath desktop!
-      wcscpy(args,L"/n, ::{26EE0668-A00A-44D7-9371-BEB064C98683}");
+      _tcscpy(args,L"/n, ::{26EE0668-A00A-44D7-9371-BEB064C98683}");
   }else if (((!_wcsicmp(app,L"ncpa.cpl")) && (args[0]==0))
     ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"ncpa")) && (!_wcsicmp(ext,L".cpl"))))
   {
@@ -950,16 +953,16 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     PathAppend(app,L"explorer.exe");
     if (_winmajor<6)
       //2k/XP: Control Panel is beneath "my computer"!
-      wcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+      _tcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
     else
       //Vista: Control Panel is beneath desktop!
-      wcscpy(args,L"/n, ::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
+      _tcscpy(args,L"/n, ::{21EC2020-3AEA-1069-A2DD-08002B30309D}\\::{7007ACC7-3202-11D1-AAD2-00805FC1270E}");
   }else 
   //*.reg files
   if (!_wcsicmp(ext, L".reg")) 
   {
     PathQuoteSpaces(app);
-    wcscpy(args,app);
+    _tcscpy(args,app);
     GetSystemWindowsDirectory(app,4096);
     PathAppend(app, L"regedit.exe");
   }else
@@ -970,7 +973,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     if (args[0] && app[0])
       wcscat(app,L",");
     wcscat(app,args);
-    wcscpy(args,L"shell32.dll,Control_RunDLLAsUser ");
+    _tcscpy(args,L"shell32.dll,Control_RunDLLAsUser ");
     wcscat(args,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"rundll32.exe");
@@ -983,10 +986,10 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     {
       wcscat(app,L" ");
       wcscat(app,args);
-      wcscpy(args,app);
+      _tcscpy(args,app);
     }else
     {
-      wcscpy(args,L"/i ");
+      _tcscpy(args,L"/i ");
       wcscat(args,app);
     }
     GetSystemDirectory(app,4096);
@@ -999,14 +1002,14 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     {
       GetSystemDirectory(path,4096);
       PathAppend(path,app);
-      wcscpy(app,path);
+      _tcscpy(app,path);
       zero(path);
     }
     PathQuoteSpaces(app);
     if (args[0] && app[0])
       wcscat(app,L" ");
     wcscat(app,args);
-    wcscpy(args,app);
+    _tcscpy(args,app);
     GetSystemDirectory(app,4096);
     PathAppend(app,L"mmc.exe");
   }else
@@ -1019,7 +1022,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
     NetworkPathToUNCPath(app);
     Split(app,path,file,ext);
   }
-  wcscpy(cmd,app);
+  _tcscpy(cmd,app);
   fExist=PathFileExists(app);
   PathQuoteSpaces(cmd);
   if (args[0] && app[0])

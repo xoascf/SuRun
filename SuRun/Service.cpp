@@ -1428,8 +1428,8 @@ DWORD LSAStartAdminProcess()
           //Vista: Set SYNCHRONIZE only access for Logon SID
           HANDLE hShell=GetSessionUserToken(g_RunData.SessionID);
           PSID ShellSID=GetLogonSid(hShell);
-          SetAdminDenyUserAccess(pi.hProcess,ShellSID);
-          SetAdminDenyUserAccess(pi.hThread,ShellSID);
+          SetAdminDenyUserAccess(pi.hProcess,ShellSID/*,SYNCHRONIZE|READ_CONTROL|GENERIC_READ|PROCESS_QUERY_INFORMATION|PROCESS_SUSPEND_RESUME|PROCESS_VM_READ*/);
+          SetAdminDenyUserAccess(pi.hThread,ShellSID/*,SYNCHRONIZE|READ_CONTROL|GENERIC_READ|THREAD_QUERY_INFORMATION|THREAD_SUSPEND_RESUME*/);
           free(ShellSID);
           CloseHandle(hShell);
         }

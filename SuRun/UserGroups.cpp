@@ -563,7 +563,7 @@ void USERLIST::Add(LPCWSTR UserName)
   if (j>=nUsers)
     User=UsrRealloc(User,nUsers+1);
 //  DBGTrace1("-->AddUser: %s",UserName);
-  wcscpy(User[j].UserName,UserName);
+  _tcscpy(User[j].UserName,UserName);
   nUsers++;
   return;
 }

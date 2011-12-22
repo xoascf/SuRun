@@ -504,9 +504,12 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   static TCHAR CurDir[4096];
   zero(CurDir);
   if (lpCurDir && *lpCurDir)
-    _tcscpy(CurDir,lpCurDir);
+    _tcsncpy(CurDir,lpCurDir,4095);
   else
     GetCurrentDirectory(countof(CurDir),CurDir);
+  //ToDo: use dynamic allocated strings
+  if (StrLenW(lpApp)+StrLenW(CurDir)+StrLenW(lpCmd)>4095-64)
+    return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
   WCHAR* parms=(lpCmd && wcslen(lpCmd))?lpCmd:0;
   static WCHAR cmd[4096];
   zero(cmd);
@@ -588,6 +591,9 @@ DWORD TestAutoSuRunA(LPCSTR lpApp,LPSTR lpCmd,LPCSTR lpCurDir,
 {
   if (!g_IATInit)
     return RETVAL_SX_NOTINLIST;
+  //ToDo: use dynamic allocated strings
+  if (StrLenA(lpApp)+StrLenA(lpCurDir)+StrLenA(lpCmd)>4095-64)
+    return RETVAL_SX_NOTINLIST;  
   EnterCriticalSection(&g_HookCs);
   static WCHAR wApp[4096];
   zero(wApp);

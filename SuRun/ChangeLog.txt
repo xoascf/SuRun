@@ -32,6 +32,49 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.0 - 2011-12-2x
+--------------------------
+* NEW: French resources by Laurent Hilsz. Thanks!
+* NEW: Portuguese language resources by "the.magic.silver.bullet" Thanks!
+* NEW: Command "SuRun: Emty recycle bin" in Recycle Bin context menu
+* NEW: In Vista and Win7 SuRun's system menu and context menu entries show 
+  a SuRun Shield icon
+* NEW: /USER <name> command line parameter for specifying the RunAs user
+* NEW: /LOW command line parameter for launching non elevated processes
+* NEW: User SYSTEM is supported for /RUNAS, but only when used by a non
+       restricted SuRunner or by a real Administrator
+* NEW: InstallSurun and SuRun set DEP permanently ON
+* NEW: SuRun's binaries are flagged to use ASLR
+* NEW: SuRun's /RunAs has a new "Run elevated" Checkbox for non restricted 
+    SuRunners and Administrators
+* CHG: Removed dependencies on wtsapi32.h and wtsapi32.lib
+* CHG: added bin\Crypt32x64.Lib and bin\Crypt32x86.Lib because Crypt32.Lib is 
+       missing in VS2005.
+* FIX: Two or more spaces after a direct SuRun command line option caused 
+  SuRun to just exit. (E.g.: "SuRun /wait  cmd"
+* FIX: Fixed implementation of CreateProcessAsuserA IAT-Hook
+* FIX: Updating SuRun with a different locale failed.
+       An English SuRun could not be updated by a French SuRun because the 
+       SuRun service name was localized.
+* FIX: "(Re-)Start as Administrator" did not work with captionless Windows
+* FIX: IAT-Hook prevented SwitchDesktop in AVAST and caused a system deadlock
+* FIX: If SuRun starts %windir%\system32\cmd.exe it inserts a /D option into 
+  the command line to avoid cmd from running AutoRuns
+* FIX: IAT-Hooks are directly loaded without a separate thread.
+  If that GPF's, a thread is created to load the hooks.
+* FIX: SuRunExt.Dll prevents unloading SuRunExt.Dll dynamically. This effectively 
+  eliminated GPFs in SuRunExt.Dll_unloaded on my Win7pro system.
+
+SuRun 1.2.1.0 rc5 - 2011-12-22
+-------------------------------
+* FIX: Command lines with >4096 characters caused a GPF in the SuRun 
+  client and the Hooks
+
+SuRun 1.2.1.0 rc4 - 2011-12-21
+-------------------------------
+* CHG: "Replace RunAs with SuRuns RunAs" now also handles "runasuser" in 
+  Vista++, preserves the Menu visibility ("Extended" Value) and replaces 
+  Windows UAC entries by SuRun's "Start as Administrator"
 
 SuRun 1.2.1.0 rc3 - 2011-12-18
 -------------------------------

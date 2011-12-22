@@ -19,6 +19,9 @@
 #define countof(b) sizeof(b)/sizeof(b[0])
 #define zero(x) memset(&x,0,sizeof(x))
 
+#define StrLenW(s) (s?wcslen(s):0)
+#define StrLenA(s) (s?strlen(s):0)
+
 #define CHK_BOOL_FN(p) if(!p) DBGTrace2("%s failed: %s",_T(#p),GetLastErrorNameStatic());
 
 #if _MSC_VER >= 1500
