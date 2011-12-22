@@ -473,7 +473,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Polecenie:\r\n\r\n%s\r\n\r\nzostanie wykonane z uprawnieniami administracyjnymi."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "B³¹d!\r\n\r\nUtworzenie pulpitu siê nie uda³o!"
@@ -1032,9 +1032,9 @@ BEGIN
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",IDC_STATIC,14,220,356,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 378, 235
+IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",IDC_STATIC,4,0,369,37
     LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",IDC_STATIC,14,12,191,8
@@ -1202,7 +1202,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Gebrauch:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Gebrauch:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Der Befehl:\r\n\r\n%s\r\n\r\nsoll mit erhöhten Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
@@ -1831,7 +1831,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Usage:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Usage:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "The command:\r\n\r\n%s\r\n\r\nis about to be executed with administrative privileges."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
@@ -2147,7 +2147,7 @@ BEGIN
     DEFPUSHBUTTON   "&Instalar >>",IDOK,289,105,68,14
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,364,38
     LTEXT           "",IDC_OPTNST,1,38,362,64,SS_SUNKEN | NOT WS_GROUP
-    ICON            IDI_MAINICON,IDC_SECICON,9,9,21,20
+    ICON            IDI_MAINICON,IDC_SECICON,9,9,20,20
     LTEXT           "Quiere instalar SuRun?",IDC_QUESTION,39,7,317,25,SS_CENTERIMAGE
     CONTROL         "Iniciar 'Configuraciones de SuRun' luego de la instalacion",IDC_RUNSETUP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,44,335,10
@@ -2257,9 +2257,9 @@ BEGIN
     PUSHBUTTON      "Restablecer...",IDC_IMPORT,301,211,63,14
 END
 
-IDD_SETUP2 DIALOG  0, 0, 420, 234
+IDD_SETUP2 DIALOGEX 0, 0, 420, 234
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,4,2,40,37
     LTEXT           "SuRunner",IDC_USRST,50,8,33,8
@@ -2271,18 +2271,18 @@ BEGIN
     CONTROL         "Solicitar clave de usuario para las opciones de SuRun",IDC_REQPW4SETUP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,29,202,10
     CONTROL         "El Usuario puede iniciar programas solo si estan predefinidas",IDC_RESTRICTED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,39,202,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,50,38,202,18
     CONTROL         "Ocultar SuRun para este Usuario",IDC_HIDESURUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,19,166,10
     CONTROL         "Estado de usuario en la barra de tareas",IDC_TRAYSHOWADMIN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,29,166,10
     CONTROL         "Estado de Usuario como 'Ayuda-Emergente'",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,39,166,10
     CONTROL         "Install new Hardware automagically as Administrator",IDC_HW_ADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,49,201,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,55,201,10
     CONTROL         "Almacenar y utilizar la contraseña de usuario real",IDC_STORE_PW,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,49,166,10
-    GROUPBOX        "Lista de programas para el Usuario seleccionado (Los cambios son instantaneos, aun presionando el boton 'Cancelar').",IDS_GRPDESC,6,59,411,174
-    CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,8,70,407,142
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,252,47,166,19
+    GROUPBOX        "Lista de programas para el Usuario seleccionado (Los cambios son instantaneos, aun presionando el boton 'Cancelar').",IDS_GRPDESC,6,71,411,162
+    CONTROL         "List1",IDC_WHITELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,8,83,407,129
     PUSHBUTTON      "Exportar...",IDC_EXPORT,55,216,50,14
     PUSHBUTTON      "Importar...",IDC_IMPORT,109,216,50,14
     PUSHBUTTON      "&Agregar...",IDC_ADDAPP,254,216,50,14
@@ -2318,37 +2318,39 @@ BEGIN
     CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",IDC_STATIC,14,217,356,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 378, 235
+IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Mostrar un icono en el area de notificacion de la barra de tareas para no miembros del grupo 'SuRunners'",IDC_STATIC,3,4,370,37
     LTEXT           "Estado de usuario para el programa activo en la 'bandeja' de la barra de tareas",IDC_STATIC,11,16,253,8
     COMBOBOX        IDC_TRAYSHOWADMIN,269,14,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Mostrar notificaciones para programas activos corriendo con diferentes credenciales de usuario",IDC_TRAYBALLOON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,27,349,10
-    GROUPBOX        "Si un no usuario de 'SuRunners' usa SuRun:",IDC_STATIC,3,46,370,48
+    GROUPBOX        "Si un no usuario de 'SuRunners' usa SuRun:",IDC_STATIC,3,59,370,48
     CONTROL         "Nunca preguntar a Administradores reales si quiere ser miembro de 'SuRunners'",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,57,349,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,70,349,8
     CONTROL         "Never ask anyone to become member of 'SuRunners'",IDC_NOCONVUSER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,69,349,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,82,349,8
     CONTROL         "Ocultar SuRun a los usuarios que no son miembros del Grupo 'SuRunners'",IDC_HIDESURUN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,81,349,8
-    GROUPBOX        "Ajustes convenientes (Estas son configuraciones de Windows que Ud. puede ajustar con SuRun)",IDC_EXTOPT,3,99,370,79,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,94,349,8
+    GROUPBOX        "Ajustes convenientes (Estas son configuraciones de Windows que Ud. puede ajustar con SuRun)",IDC_EXTOPT,3,108,370,79,WS_GROUP
     CONTROL         "Reemplazar Windows' 'Ejecutar como...' con 'Ejecutar como...' de SuRun",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,110,349,9
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,119,349,9
     CONTROL         "Permitir a los 'SuRunners' modificar (y mostrar) la hora del sistema.",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,123,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,132,349,11
     CONTROL         "Permitir a los 'SuRunners' cambiar 'Opciones de Energia' y seleccionar esquemas de energia.",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,137,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,146,349,11
     CONTROL         "Mostrar notificaciones de actualizacion de Windows (si actualizaciones automaticas estan activadas).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,151,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,160,349,11
     CONTROL         "No auto-reiniciar para instalaciones programadas de Actualizaciones Automaticas de Windows",IDC_WINUPDBOOT,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,165,349,11
-    GROUPBOX        "Seguridad de Windows (Esta es una directiva de Windows que Ud. puede ajustar con SuRun)",IDC_STATIC,4,183,369,39
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,174,349,11
+    GROUPBOX        "Seguridad de Windows (Esta es una directiva de Windows que Ud. puede ajustar con SuRun)",IDC_STATIC,4,188,369,33
     CONTROL         "Especificar 'Administradores' en vez de 'Object creator' como propietario por defecto para objetos credos por administradores.",IDC_OWNERGROUP,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,193,349,26
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,197,349,22
     CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",IDC_STATIC,6,224,365,8
+    CONTROL         "DON'T use WinLogon's desktop. Create an own safe desktop instead.",IDC_NOLOGONDESK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,46,346,10
 END
 
 IDD_SETUP_MAIN DIALOG  0, 0, 396, 274
@@ -2422,7 +2424,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] programa [parametros]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] programa [parametros]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "El comando:\r\n\r\n%s\r\n\r\nesta por ser ejecutado con privilegios elevados."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nLa creacion de Escritorio fallo!"
@@ -3002,7 +3004,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Usage :\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] programme [parametres]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Usage :\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] programme [parametres]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "La commande :\r\n\r\n%s\r\n\r\nis est sur le point d'être exécutée en tant qu'administrateur."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Erreur !\r\n\r\nLa création du Bureau a échoué !"
@@ -3594,7 +3596,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Gebruik:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] programma [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Gebruik:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] programma [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "De opdracht:\r\n\r\n%s\r\n\r\nwordt met verhoogde rechten uitgevoerd."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Fout!\r\n\r\nBeveiligd Bureaublad kon niet worden aangemaakt!"
@@ -4055,9 +4057,9 @@ BEGIN
     LTEXT           "Lista de programas",IDC_IMEXSTATIC,9,252,61,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 432, 259
+IDD_SETUP3 DIALOGEX 0, 0, 432, 259
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Tente iniciar certos programas AUTOMATICAMENTE com direitos elevados",IDC_STATIC,10,3,413,249
     LTEXT           "Para iniciar automaticamente programas com direitos elevados, deve ser definida pelo menos uma das duas opções seguintes:",IDC_STATIC,17,16,398,8
@@ -4070,7 +4072,7 @@ BEGIN
     LTEXT           "Se esta opção estiver desativada, o SuRun não será capaz de iniciar automaticamente alguns (no Windows Vista muitos) processos com direitos elevados.",IDC_STATIC,30,99,383,17
     LTEXT           "Ativar esta opção, em alguns casos raros, pode causar incompatibilidades com alguns programas. No caso de  incompatibilidade poderá desativar a interceção do programa na 'Lista Negra' abaixo.",IDC_STATIC,30,120,391,17
     CONTROL         "Também intercetar serviços e processos administrativos. (Necessário reiniciar o sistema!)",IDC_SVCHOOK,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,30,142,293,8
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,30,142,387,8
     LTEXT           "Se alguma aplicação deixar de funcionar corretamente, após ter ativado as opções acima, pode desativar as interceções do SuRun para esse programa, colocando-o na lista negra.",IDC_STATIC,18,156,338,17
     PUSHBUTTON      "Lista Negra...",IDC_BLACKLIST,359,158,57,14
     CONTROL         "Detetar se aplicações desconhecidas precisam de ser iniciadas com direitos elevados:",IDC_REQADMIN,
@@ -4172,7 +4174,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "O comando:\r\n\r\n%s\r\n\r\nestá prestes a ser executado com privilégios administrativos."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Erro!\r\n\r\nNão foi possível criar o Ambiente de Trabalho!"

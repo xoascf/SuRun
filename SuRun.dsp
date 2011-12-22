@@ -419,6 +419,10 @@ SOURCE=.\res\SHADMIN.ico
 # End Source File
 # Begin Source File
 
+SOURCE=.\res\Shield.ico
+# End Source File
+# Begin Source File
+
 SOURCE=.\res\SrAdmin.ico
 # End Source File
 # Begin Source File

@@ -357,13 +357,6 @@ static SETUPDATA *g_SD=NULL;
 //////////////////////////////////////////////////////////////////////////////
 void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
 {
-  if ((IsDlgButtonChecked(g_SD->hTabCtrl[2],IDC_SHEXHOOK)) && (_winmajor<6))
-  {
-    //IShellExecuteHook will handle "runas" verb
-    ReplaceSuRunWithRunAs(hKey);
-    SetHandleRunAs(TRUE);
-    return;
-  }
   SetHandleRunAs(TRUE);
   TCHAR s[512];
   DWORD i,nS;
@@ -374,35 +367,61 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
       HKEY h;
       if(ERROR_SUCCESS==RegOpenKeyEx(hKey,s,0,KSAM(KEY_ALL_ACCESS),&h))
         ReplaceRunAsWithSuRun(h);
-    }
-    else
+    }else
     {
-      TCHAR v[4096];
+      TCHAR v[4096]={0};
       DWORD n=4096;
       DWORD t=0;
-      BOOL bOk=GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",&t,(BYTE*)&v,&n);
-      if (bOk 
-        && ((t==REG_SZ)||(t==REG_EXPAND_SZ))
-        && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun")))
+      BOOL bRunAsOk=GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",&t,(BYTE*)&v,&n);
+      if (bRunAsOk && ((t==REG_SZ)||(t==REG_EXPAND_SZ)))
       {
-        //Preserve original command:
-        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",t,(BYTE*)&v,n);
-        //Set command
-        TCHAR cmd[4096];
-        GetSystemWindowsDirectory(cmd,4096);
-        PathAppend(cmd,L"SuRun.exe");
-        PathQuoteSpaces(cmd);
-        _tcscat(cmd,L" /RUNAS ");
-        _tcscat(cmd,v);
-        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun\\command"),L"",t,
-          (BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
-        //Preserve original command name:
-        n=4096;
-        zero(v);
-        GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"",&t,(BYTE*)&v,&n);
-        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"orgname",t,(BYTE*)&v,n);
-        //Set SuRun command name
-        SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"",CResStr(IDS_RUNAS));
+        BOOL bRunAsUserOk=GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"",&t,0,0);
+        if (bRunAsUserOk || (_winmajor<=5))
+        {
+          //Set SuRun command name
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"",CResStr(IDS_RUNAS));
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"Icon",L"SuRunExt.dll,1");
+          //Set command
+          TCHAR cmd[4096];
+          GetSystemWindowsDirectory(cmd,4096);
+          PathAppend(cmd,L"SuRun.exe");
+          PathQuoteSpaces(cmd);
+          _tcscat(cmd,L" /RUNAS ");
+          _tcscat(cmd,v);
+          SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun\\command"),L"",t,(BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
+          if (GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,(_winmajor<=5)?L"shell\\runas":L"shell\\runasuser"),L"Extended",&t,0,0))
+            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"Extended",L"");
+        }
+        //Disable Context menu entries
+        if (bRunAsUserOk && (!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"LegacyDisable",&t,0,0)))
+        {
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"LegacyDisable",L"");
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"SR_LegacyDisableWasOff",L"1");
+        }
+        if (bRunAsOk)
+        {
+          if(!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable",&t,0,0))
+          {
+            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable",L"");
+            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_LegacyDisableWasOff",L"1");
+          }
+          //Enable SuRun on Entry?
+          if (!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun\\command"),L"",&t,NULL,0))
+          {
+            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_SuRunWasOff",L"1");
+            //Set SuRun command name
+            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"),L"",CResStr(IDS_MENUSTR));
+            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"),L"Icon",L"SuRunExt.dll,1");
+            //Set command
+            TCHAR cmd[4096];
+            GetSystemWindowsDirectory(cmd,4096);
+            PathAppend(cmd,L"SuRun.exe");
+            PathQuoteSpaces(cmd);
+            _tcscat(cmd,L" ");
+            _tcscat(cmd,v);
+            SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun\\command"),L"",t,(BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
+          }
+        }
       }
     }
   }
@@ -420,22 +439,18 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
       HKEY h;
       if(ERROR_SUCCESS==RegOpenKeyEx(hKey,s,0,KSAM(KEY_ALL_ACCESS),&h))
         ReplaceSuRunWithRunAs(h);
-    }
-    else
-    {
+    }else
+    { 
       TCHAR v[4096];
       DWORD n=4096;
       DWORD t=0;
-      BOOL bOk=GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),
-                         L"SuRunWasHere",&t,(BYTE*)&v,&n);
-      if ( bOk
-        && ((t==REG_SZ)||(t==REG_EXPAND_SZ))
-        && RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere")
-        && RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),CResStr(L"%s\\%s",s,L"shell\\runas")))
+      if ( GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere",&t,(BYTE*)&v,&n) && ((t==REG_SZ)||(t==REG_EXPAND_SZ)))
       {
+        //Old RunAs method, RegRename...
+        RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),L"SuRunWasHere");
+        RenameRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"),CResStr(L"%s\\%s",s,L"shell\\runas"));
         //Restore original command
-        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,
-          (BYTE*)&v,(DWORD)_tcslen(v)*sizeof(TCHAR));
+        SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\runas\\command"),L"",t,(BYTE*)&v,(DWORD)_tcslen(v)*sizeof(TCHAR));
         //Restore  original command name:
         n=4096;
         zero(v);
@@ -447,6 +462,24 @@ void ReplaceSuRunWithRunAs(HKEY hKey/*=HKCR*/)
             RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),0);
           RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"orgname");
         }
+      }else //new: use LegacyDisable
+      { 
+        if (GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_SuRunWasOff",&t,0,0))
+        {
+          DelRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"));
+          RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_SuRunWasOff");
+        }
+        if (GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_LegacyDisableWasOff",&t,0,0))
+        {
+          RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable");
+          RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_LegacyDisableWasOff");
+        }
+        if (GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"SR_LegacyDisableWasOff",&t,0,0))
+        {
+          RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"LegacyDisable");
+          RegDelVal(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"SR_LegacyDisableWasOff");
+        }
+        DelRegKey(hKey,CResStr(L"%s\\%s",s,L"shell\\RunAsSuRun"));
       }
     }
   }
@@ -2242,18 +2275,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       CheckDlgButton(hwnd,IDC_NOLOGONDESK,GetUseWinLogonDesk==0);
-      if (_winmajor<6)
-        CheckDlgButton(hwnd,IDC_DORUNAS,GetHandleRunAs);
-      else
-      {
-        HKEY kra=0;
-        if (0==RegOpenKeyEx(HKCR,L"exefile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra))
-          RegCloseKey(kra);
-        if ((!kra)
-          &&(0==RegOpenKeyEx(HKCR,L"cplfile\\shell\\runas\\command",0,KSAM(KEY_READ),&kra)))
-          RegCloseKey(kra);
-        CheckDlgButton(hwnd,IDC_DORUNAS,(kra?BST_UNCHECKED:BST_CHECKED));
-      }
+      CheckDlgButton(hwnd,IDC_DORUNAS,GetHandleRunAs);
       if(GetUseSuRunGrp)
       {
         CheckDlgButton(hwnd,IDC_ALLOWTIME,GetSetTime(SURUNNERSGROUP));

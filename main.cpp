@@ -272,6 +272,9 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
         return RETVAL_ACCESSDENIED;
       }  
+      //ToDo: use dynamic allocated strings
+      if (StrLenW(Args)+StrLenW(g_RunData.CurDir)>4096-64)
+        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
       ResolveCommandLine(Args,g_RunData.CurDir,g_RunData.cmdLine);
       //DBGTrace3("ResolveCommandLine(%s,%s)= %s",Args,g_RunData.CurDir,g_RunData.cmdLine);
     }
