@@ -112,7 +112,7 @@
 #define IDS_EMPTYPASS2                  102
 #define IDS_SRACCDESC                   103
 #define IDD_DIALOG1                     104
-#define IDI_SHIELD                      104
+#define IDI_SHIELD0                     104
 #define IDS_EMPTYRECYCLEBIN             104
 #define IDI_SHIELD2                     105
 #define IDI_SHIELD1                     106
@@ -267,6 +267,7 @@
 #define IDC_SHOW_C_TO                   1102
 #define IDC_CHECK1                      1103
 #define IDC_CHECK2                      1104
+#define IDC_TRAY_TO                     1107
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -275,7 +276,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1105
+#define _APS_NEXT_CONTROL_VALUE         1108
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
