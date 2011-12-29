@@ -1564,7 +1564,7 @@ DWORD LSAStartAdminProcess()
         }
         if (g_RunData.bShlExHook
         && ((GetCommonWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0)&FLAG_SHELLEXEC)==0))
-          ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD,20000);
+          ShowTrayWarning(CBigResStr(IDS_STARTED,BeautifyCmdLine(g_RunData.cmdLine)),IDI_SHIELD0,GetTrayTimeOut*1000);
       }else
         DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
       DestroyEnvironmentBlock(Env);

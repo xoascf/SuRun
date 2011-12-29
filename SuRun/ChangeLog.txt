@@ -1,8 +1,6 @@
 ToDo:
 ---------------------
-* Handle \??\C:\Windows\System32\conhost.exe
-* Add Option to store a user's password
-* make Tray Windows for automagically started apps configurable
+* Handle \??\C:\Windows\System32\conhost.exe* make Tray Windows for automagically started apps configurable
 * Hooks must directly write to Service pipe
 * on Win x64 detect x32 Executables on x64 hook (ShellExecute32->WoW->CreateProcess64)
 * On ShellExec/IAT-Hook: Create Process suspended! Hooks must resume process.
@@ -38,7 +36,7 @@ SuRun 1.2.1.0 - 2011-12-2x
 * NEW: Portuguese language resources by "the.magic.silver.bullet" Thanks!
 * NEW: Command "SuRun: Emty recycle bin" in Recycle Bin context menu
 * NEW: In Vista and Win7 SuRun's system menu and context menu entries show 
-  a SuRun Shield icon
+       a SuRun Shield icon
 * NEW: /USER <name> command line parameter for specifying the RunAs user
 * NEW: /LOW command line parameter for launching non elevated processes
 * NEW: User SYSTEM is supported for /RUNAS, but only when used by a non
@@ -46,7 +44,9 @@ SuRun 1.2.1.0 - 2011-12-2x
 * NEW: InstallSurun and SuRun set DEP permanently ON
 * NEW: SuRun's binaries are flagged to use ASLR
 * NEW: SuRun's /RunAs has a new "Run elevated" Checkbox for non restricted 
-    SuRunners and Administrators
+       SuRunners and Administrators
+* NEW: The display time for the "program was started automagically message" 
+       can be set
 * CHG: Removed dependencies on wtsapi32.h and wtsapi32.lib
 * CHG: added bin\Crypt32x64.Lib and bin\Crypt32x86.Lib because Crypt32.Lib is 
        missing in VS2005.
@@ -62,8 +62,15 @@ SuRun 1.2.1.0 - 2011-12-2x
   the command line to avoid cmd from running AutoRuns
 * FIX: IAT-Hooks are directly loaded without a separate thread.
   If that GPF's, a thread is created to load the hooks.
+* FIX: Command lines with >4096 characters caused a GPF in the SuRun 
+  client and the Hooks
 * FIX: SuRunExt.Dll prevents unloading SuRunExt.Dll dynamically. This effectively 
   eliminated GPFs in SuRunExt.Dll_unloaded on my Win7pro system.
+
+SuRun 1.2.1.0 rc6 - 2011-12-29
+-------------------------------
+* NEW: The display time for the "program was started automagically message" 
+       can be set
 
 SuRun 1.2.1.0 rc5 - 2011-12-22
 -------------------------------

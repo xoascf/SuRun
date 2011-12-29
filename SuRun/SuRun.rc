@@ -105,7 +105,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,281,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,280,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Wciœnij 'OK' jeœli aplikacja ma zostaæ uruchomiona z uprawnieniami administracyjnymi.\r\n\r\nJeœli nie, wciœnij 'Anuluj'!",IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,9,132,47,46
@@ -155,7 +155,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,258,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Podaj has³o u¿ytkownika, do którego sesji chcesz siê prze³¹czyæ.",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     RTEXT           "&U¿ytkownik:",IDC_USRST,62,77,42,8
@@ -235,14 +235,15 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,257,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
     LTEXT           "Podaj dane identyfikuj¹ce Ciê jako osobê autoryzowan¹.",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     RTEXT           "&U¿ytkownik:",IDC_USRST,62,77,42,8
     COMBOBOX        IDC_USER,107,74,149,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     RTEXT           "&Has³o:",IDC_PWDST,62,91,42,8
     EDITTEXT        IDC_PASSWORD,107,89,149,12,ES_AUTOHSCROLL
-    CONTROL         "pamiêtaj has³o",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,107,104,149,10
-    CONTROL         "Run elevated",IDC_RUNASADMIN,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,107,114,149,10
+    CONTROL         "Pamiêtaj has³o",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,107,104,149,10
+    CONTROL         "Uruchom z uprawnieniami administracyjnymi",IDC_RUNASADMIN,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,107,114,156,10
     DEFPUSHBUTTON   "OK",IDOK,150,126,52,14
     PUSHBUTTON      "Anuluj",IDCANCEL,204,126,52,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
@@ -268,7 +269,7 @@ IDD_SETUP1 DIALOG  0, 0, 393, 242
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
     GROUPBOX        "Bezpieczny pulpit",IDC_EXTOPT2,67,0,321,52,WS_GROUP
     CONTROL         "Poka¿ zamglony &pulpit u¿ytkownika w tle",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,75,11,162,11
@@ -340,9 +341,9 @@ BEGIN
     LTEXT           "Lista programów",IDC_IMEXSTATIC,17,219,34,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 424, 300
+IDD_SETUP3 DIALOGEX 0, 0, 424, 300
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "AUTOMAGICZNE uruchamianie programów z uprawnieniami administracyjnymi",IDC_STATIC,10,3,403,291
     LTEXT           "Aby programy mog³y byæ automagicznie uruchamiane z uprawnieniami administracyjnymi, przynajmniej jedna z funkcji poni¿ej musi zostaæ w³¹czona:",IDC_STATIC,20,14,387,20
@@ -363,8 +364,11 @@ BEGIN
     LTEXT           "Jeœli opcja ta nie bêdzie zaznaczona, SuRun bêdzie uruchamia³ automagicznie z uprawnieniami administracyjnymi tylko predefiniowane aplikacje. Wtedy instalatory i podobne programy nie bêd¹ wykrywane i uruchamiane z uprawnieniami administracyjnymi.",IDC_STATIC,31,207,376,32
     CONTROL         "Poka¿ wiadomoœæ, jeœli program zosta³ uruchomiony automagicznie",IDC_SHOWTRAY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,239,241,10
-    LTEXT           "Jeœli ta opcja bêdze zaznaczona, SuRun wyœwietli informacjê w prawym, dolnym rogu pulpitu, gdy jakiœ program zostanie automagicznie uruchomiony z uprawnieniami administracyjnymi. Informacja zniknie po 20 sekundach.",IDC_STATIC,31,252,376,17
+    LTEXT           "Jeœli ta opcja bêdze zaznaczona, SuRun wyœwietli informacjê w prawym, dolnym rogu pulpitu, gdy jakiœ program zostanie automagicznie uruchomiony z uprawnieniami administracyjnymi. Informacja zniknie po <T> sekundach.",IDC_STATIC,31,252,376,17
     CTEXT           "UWAGA: Zmiany w tych ustawieniach bêd¹ aktywne po ponownym zalogowaniu.",IDC_STATIC,52,280,318,8
+    LTEXT           "T=",IDC_STATIC,356,239,10,8
+    EDITTEXT        IDC_TRAY_TO,370,238,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,392,239,8,8
 END
 
 IDD_SETUP4 DIALOG  0, 0, 378, 284
@@ -473,7 +477,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <u¿ytkownik> [/LOW]]][/WAIT] program [parametry]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Polecenie:\r\n\r\n%s\r\n\r\nzostanie wykonane z uprawnieniami administracyjnymi."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "B³¹d!\r\n\r\nUtworzenie pulpitu siê nie uda³o!"
@@ -600,7 +604,7 @@ BEGIN
     IDS_NOTLOGGEDON2        "Szybkie prze³¹czenie u¿ytkownika niemo¿liwe:\nSesja %d nie jest zalogowana."
     IDS_EMPTYPASS2          "UWAGA: Nastêpuj¹ce konta Administratorów nie posiadaj¹ has³a:\n\n%s"
     IDS_SRACCDESC           "Konto pomocnicze dla SuRun"
-    IDS_EMPTYRECYCLEBIN     "SuRun: Opróznij kosz"
+    IDS_EMPTYRECYCLEBIN     "SuRun: Opró¿nij kosz"
 END
 
 #endif    // Polish resources
@@ -740,7 +744,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Wählen Sie OK, wenn die Anwendung mit erhöhten Rechten gestartet werden soll.\r\n\r\nAnsonsten drücken Sie Abbrechen!",IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
@@ -823,7 +827,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Geben Sie das Kennwort des Benutzers ein, um auf dessen Bildschirm umzuschalten.",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     LTEXT           "&Benutzer:",IDC_USRST,62,77,33,8
@@ -903,7 +907,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,20,20,SS_REALSIZEIMAGE
     LTEXT           "Bitte identifizieren Sie sich als berechtigte Person:",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     LTEXT           "&Benutzer:",IDC_USRST,62,77,33,8
@@ -936,7 +940,7 @@ IDD_SETUP1 DIALOG  0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
     GROUPBOX        "Sicherer Desktop",IDC_EXTOPT2,75,2,297,50,WS_GROUP
     CONTROL         "Zeige unscharfen, abgedunkelten Benutzer-&Desktop als Hintergrund",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,13,283,9
@@ -1005,9 +1009,9 @@ BEGIN
     LTEXT           "Programmliste",IDC_IMEXSTATIC,9,219,52,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 378, 235
+IDD_SETUP3 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Versuche bestimmte Programme AUTOMAGISCH mit gehobenen Rechten zu starten",IDC_STATIC,10,3,361,229
     LTEXT           "Um Programme automatisch administrativ zu starten, muss mindestens eins der beiden folgenden aktiv sein:",IDC_STATIC,13,13,354,8
@@ -1027,14 +1031,17 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,158,344,10
     LTEXT           "Ein Deaktivieren dieser Option bewirkt, dass von SuRun nur noch vordefinierte Programme automagisch mit erhöhten Rechten gestartet werden. Setup(etc.)-Programme werden dann nicht mehr erkannt.",IDC_STATIC,31,168,335,17
     CONTROL         "Zeige ein Informationsfenster, wenn Programme automagisch gestartet wurden",IDC_SHOWTRAY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,191,346,10
-    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für 20s rechts unten auf dem Desktop ein Fenster ein, das darüber informiert.",IDC_STATIC,31,201,335,17
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,191,296,10
+    LTEXT           "Ist diese Option aktiv und ein Programm wurde automatisch mit erhöhten Rechten gestartet, blendet SuRun für <T> Sekunden rechts unten auf dem Desktop ein Fenster ein, das darüber informiert.",IDC_STATIC,31,201,335,17
     CTEXT           "Hinweis: Diese Einstellungen werden erst bei der nächsten Anmeldung voll wirksam!",IDC_STATIC,14,220,356,8
+    LTEXT           "T=",IDC_STATIC,322,190,10,8
+    EDITTEXT        IDC_TRAY_TO,336,189,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,358,190,8,8
 END
 
 IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x0
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",IDC_STATIC,4,0,369,37
     LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",IDC_STATIC,14,12,191,8
@@ -1151,7 +1158,7 @@ IDI_LISTICON8           ICON                    "res\\neverquestion.ico"
 IDI_NOADMIN             ICON                    "res\\NoAdmin.ico"
 IDI_NOWINDOW            ICON                    "res\\NoWindow.ico"
 IDI_SHADMIN             ICON                    "res\\SHADMIN.ico"
-IDI_SHIELD              ICON                    "res\\ico10605.ico"
+IDI_SHIELD0             ICON                    "res\\ico10605.ico"
 IDI_SHIELD1             ICON                    "res\\ico10607.ico"
 IDI_SHIELD2             ICON                    "res\\ico10606.ico"
 IDI_SRADMIN             ICON                    "res\\SrAdmin.ico"
@@ -1425,7 +1432,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "If the application should be started with administrative rights, press 'OK'.\r\n\r\nIf not, press 'Cancel'!",IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
@@ -1477,7 +1484,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "You need to enter the passwort for the user to switch to his/her logon session.",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     RTEXT           "&User name:",IDC_USRST,62,77,42,8
@@ -1556,7 +1563,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Identify yourself as authorized person.",IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     RTEXT           "&User name:",IDC_USRST,58,77,37,8
     COMBOBOX        IDC_USER,98,75,158,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
@@ -1589,7 +1596,7 @@ IDD_SETUP1 DIALOG  0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
     GROUPBOX        "Safe Desktop",IDC_EXTOPT2,77,0,297,52,WS_GROUP
     CONTROL         "Show blurred user &desktop as background",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,11,283,11
@@ -1658,9 +1665,9 @@ BEGIN
     LTEXT           "Program list",IDC_IMEXSTATIC,9,219,43,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 378, 235
+IDD_SETUP3 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Try starting certain programs AUTOMAGICALLY with elevated rights",IDC_STATIC,10,3,361,227
     LTEXT           "To automatically start programs with elevated rights, at least one of the two following options must be set:",IDC_STATIC,13,13,354,8
@@ -1677,12 +1684,15 @@ BEGIN
     LTEXT           "If an application does not work as usual after you activate options above, you can disable SuRun's hooks into this program by putting it into the blacklist.",IDC_STATIC,20,130,256,25
     PUSHBUTTON      "Blacklist...",IDC_BLACKLIST,293,134,57,14
     CONTROL         "Try to detect if unknown applications need to start with elevated rights.",IDC_REQADMIN,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,158,238,10
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,158,347,10
     LTEXT           "If you disable this Option, SuRun will only start predefined programs automagically with elevated rights. Then no Setup (etc.) programs are detected and run with administrative rights.",IDC_STATIC,31,170,335,17
     CONTROL         "Show a message when a program has been started automagically",IDC_SHOWTRAY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,190,241,10
-    LTEXT           "With this option active, SuRun will show a message window on the bottom right of the desktop when a program was automatically started with elevated rights. This message is dismissed after 20 seconds.",IDC_STATIC,31,201,335,17
+    LTEXT           "With this option active, SuRun will show a message window on the bottom right of the desktop when a program was automatically started with elevated rights. This message is dismissed after <T> seconds.",IDC_STATIC,31,201,335,17
     CTEXT           "NOTE: Changes in these settings become effective after the next logon.",IDC_STATIC,14,220,356,8
+    LTEXT           "T=",IDC_STATIC,322,190,10,8
+    EDITTEXT        IDC_TRAY_TO,336,189,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,358,190,8,8
 END
 
 IDD_SETUP4 DIALOG  0, 0, 378, 235
@@ -1987,7 +1997,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "You need to enter the passwort for the user to switch to his/her logon session.",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     RTEXT           "&Nombre de usuario:",IDC_USRST,62,77,42,8
@@ -2075,7 +2085,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,290,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,289,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Si la aplicacion deberia ser iniciada con privilegios administrativos, Presionar 'Aceptar'.\r\n\r\nSi no, presionar 'Cancelar'!",IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
@@ -2187,7 +2197,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,263,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Identificar a Ud. mismo como persona autorizada.",IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     RTEXT           "&Nombre de usuario:",IDC_USRST,58,77,37,8
     COMBOBOX        IDC_USER,98,75,158,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
@@ -2220,7 +2230,7 @@ IDD_SETUP1 DIALOG  0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
     GROUPBOX        "Escritorio Seguro",IDC_EXTOPT2,77,0,297,52,WS_GROUP
     CONTROL         "Mostrar escritorio &difuso como fondo",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,11,283,11
@@ -2259,7 +2269,7 @@ END
 
 IDD_SETUP2 DIALOGEX 0, 0, 420, 234
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x0
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,4,2,40,37
     LTEXT           "SuRunner",IDC_USRST,50,8,33,8
@@ -2291,9 +2301,9 @@ BEGIN
     LTEXT           "Lista de Programas",IDC_IMEXSTATIC,9,219,43,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 378, 235
+IDD_SETUP3 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Intentar iniciar ciertos programas AUTOMATICAMENTE con privilegios elevados",IDC_STATIC,10,3,361,227
     LTEXT           "Para iniciar automaticamente programas con privilegios elevados, al menos una de las siguientes dos opciones debe ser indicada:",IDC_STATIC,13,13,354,8
@@ -2313,14 +2323,17 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,155,335,10
     LTEXT           "Si Ud. deshabilita esta Opcion, SuRun solo iniciara los programas predefinidos automaticamente con privilegios elevados. De esta manera ningun programa de Instalacion (etc.) es detectado.",IDC_STATIC,31,167,335,17
     CONTROL         "Mostrar un mensaje cuando un programa ha sido iniciado automaticamente",IDC_SHOWTRAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,187,347,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,187,276,10
     LTEXT           "Con esta opcion activa, SuRun mostrara una ventana con un mensaje, abajo a la derecha del escritorio, cuando un programa fue iniciado automaticamente con privilegios elevados.",IDC_STATIC,31,198,335,17
     CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",IDC_STATIC,14,217,356,8
+    LTEXT           "T=",IDC_STATIC,322,187,10,8
+    EDITTEXT        IDC_TRAY_TO,336,186,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,358,187,8,8
 END
 
 IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x0
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Mostrar un icono en el area de notificacion de la barra de tareas para no miembros del grupo 'SuRunners'",IDC_STATIC,3,4,370,37
     LTEXT           "Estado de usuario para el programa activo en la 'bandeja' de la barra de tareas",IDC_STATIC,11,16,253,8
@@ -2645,7 +2658,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,283,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,282,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Si l'application doit démarrer avec des droits Administrateur, presser 'OK'.\r\n\r\nSinon, presser 'Annuler' !",IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
@@ -2697,7 +2710,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,257,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
     LTEXT           "Vous devez entrer le mot de passe du nouvel utilisateur pour basculer sur sa session.",IDC_DLGQUESTION,50,7,206,51,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     RTEXT           "Nom d'&utilisateur :",IDC_USRST,57,77,60,8
@@ -2778,7 +2791,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,256,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
     LTEXT           "Veuillez vous identifier en tant qu'utilisateur autorisé.",IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     RTEXT           "Nom d'&utilisateur :",IDC_USRST,54,77,60,8
     COMBOBOX        IDC_USER,115,75,141,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
@@ -2813,7 +2826,7 @@ IDD_SETUP1 DIALOG  0, 0, 385, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,11,19,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,11,19,32,30,SS_REALSIZEIMAGE
     GROUPBOX        "Bureau sécurisé",IDC_EXTOPT2,50,0,329,52,WS_GROUP
     CONTROL         "Flouter le &bureau de l'utilisateur et le mettre en image de fond",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,56,11,283,11
@@ -2885,9 +2898,9 @@ BEGIN
     LTEXT           "Liste de programmes",IDC_IMEXSTATIC,47,219,68,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 465, 235
+IDD_SETUP3 DIALOGEX 0, 0, 465, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Paramètres de démarrage automatique de programmes en tant qu'administrateur",IDC_STATIC,10,3,449,227
     LTEXT           "Pour démarrer automatiquement les programmes avec des droits administrateurs, au moins l'une des options suivantes doit être sélectionnée",IDC_STATIC,13,13,438,8
@@ -2908,8 +2921,11 @@ BEGIN
     LTEXT           "Si cette option est désactivée, SuRun ne peux démarrer avec des droits administrateurs que des programmes prédéfinies. Par exemple, aucun programme d'installation ne sera détecté et exécuté avec des droits administrateurs.",IDC_STATIC,31,170,380,17
     CONTROL         "Afficher un message losqu'un programme est lancé automatiquement avec des droits administrateurs",IDC_SHOWTRAY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,190,371,10
-    LTEXT           "Cette option demande à SuRun d'afficher une fenêtre d'information en bas à droite du Bureau lorsqu'une application est démarrée automatiquement avec des droits administrateurs. Le message disparait au bout de 20 secondes.",IDC_STATIC,31,201,395,17
+    LTEXT           "Cette option demande à SuRun d'afficher une fenêtre d'information en bas à droite du Bureau lorsqu'une application est démarrée automatiquement avec des droits administrateurs. Le message disparait au bout de <T> secondes.",IDC_STATIC,31,201,423,17
     CTEXT           "NOTE : tout changement dans ces options devient effectif à la prochaine ouverture de session.   ",IDC_STATIC,32,220,356,8
+    LTEXT           "T=",IDC_STATIC,396,190,10,8
+    EDITTEXT        IDC_TRAY_TO,410,189,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,432,190,8,8
 END
 
 IDD_SETUP4 DIALOG  0, 0, 394, 235
@@ -3228,7 +3244,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,286,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,285,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,21,20,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Moet dit programma met verhoogde rechten worden uitgevoerd?\r\n\r\nZo niet, druk dan 'Annuleren'!",IDC_HINT,48,73,234,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
@@ -3280,7 +3296,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,259,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Voer gebruikersnaam en wachtwoord in om van gebruiker te wisselen.",IDC_DLGQUESTION,50,7,205,22,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     LTEXT           "&Gebruikersnaam:",IDC_USRST,62,77,57,8
@@ -3360,14 +3376,14 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,259,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,21,20,SS_REALSIZEIMAGE
     LTEXT           "Voer de gebruikersnaam van een computerbeheerder in.",IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     RTEXT           "&Gebruikersnaam:",IDC_USRST,58,77,57,8
     COMBOBOX        IDC_USER,117,75,139,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     RTEXT           "&Wachtwoord:",IDC_PWDST,58,91,57,8
     EDITTEXT        IDC_PASSWORD,117,90,139,12,ES_AUTOHSCROLL
     CONTROL         "wachtwoord onthouden",IDC_STOREPASS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,104,138,10
-    CONTROL         "Mit gehobenen Rechten starten",IDC_RUNASADMIN,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,117,114,138,10
+    CONTROL         "Met verhoogde rechten uitvoeren",IDC_RUNASADMIN,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,117,114,138,10
     DEFPUSHBUTTON   "OK",IDOK,153,126,50,14
     PUSHBUTTON      "Annuleren",IDCANCEL,206,126,50,14
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
@@ -3394,7 +3410,7 @@ IDD_SETUP1 DIALOG  0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,18,19,21,20,SS_REALSIZEIMAGE
     GROUPBOX        "Beveiligd Bureaublad",IDC_EXTOPT2,75,2,297,49,WS_GROUP
     CONTROL         "Scherm vervagen en Bureaublad in de achtergrond 'dimmen'",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,83,13,283,9
@@ -3463,9 +3479,9 @@ BEGIN
     LTEXT           "Programmalijst",IDC_IMEXSTATIC,9,219,52,8
 END
 
-IDD_SETUP3 DIALOG  0, 0, 378, 235
+IDD_SETUP3 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "Probeer programma's automatisch met verhoogde rechten te starten",IDC_STATIC,10,3,361,229
     LTEXT           "Opties voor het automatisch met verhoogde rechten starten van programma's:",IDC_STATIC,20,13,354,8
@@ -3485,9 +3501,12 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,152,344,10
     LTEXT           "Zonder deze optie kan SuRun alleen nog vooraf gespecificeerde programma's automatisch met verhoogde rechten starten. Setup programma's enz. worden dan niet meer herkend.",IDC_STATIC,31,162,335,17
     CONTROL         "Informatievenster tonen wanneer SuRun een programma met verhoogde rechten start",IDC_SHOWTRAY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,188,346,10
-    LTEXT           "Met deze optie toont SuRun gedurende 20 seconden een informatievenster over het gestarte programma rechtsonder op het Bureaublad.",IDC_STATIC,31,198,335,17
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,20,188,292,10
+    LTEXT           "Met deze optie toont SuRun gedurende <T> seconden een informatievenster over het gestarte programma rechtsonder op het Bureaublad.",IDC_STATIC,31,198,324,17
     CTEXT           "LET OP: Deze instellingen zijn pas na de volgende Windows-aanmelding volledig van kracht",IDC_STATIC,14,220,356,8
+    LTEXT           "T=",IDC_STATIC,322,188,10,8
+    EDITTEXT        IDC_TRAY_TO,336,187,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,358,188,8,8
 END
 
 IDD_SETUP4 DIALOG  0, 0, 378, 235
@@ -3820,7 +3839,7 @@ BEGIN
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,286,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,285,1
-    ICON            IDI_SHIELD,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
     LTEXT           "Se a aplicação deve ser iniciada com direitos administrativos, clique 'OK'.\r\n\r\nCaso contrário, clique 'Cancelar'!",IDC_HINT,48,73,230,24,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
@@ -3872,7 +3891,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,259,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
     LTEXT           "Precisa de introduzir a palavra-passe do utilizador para mudar para a sessão deste utilizador.",IDC_DLGQUESTION,50,7,209,43,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,7,73,47,44
     RTEXT           "&Nome de utilizador:",IDC_USRST,61,77,62,8
@@ -3953,7 +3972,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,263,65
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,65,259,1
-    ICON            IDI_SHIELD,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,6,10,32,30,SS_REALSIZEIMAGE
     LTEXT           "Identifique-se como pessoa autorizada.",IDC_DLGQUESTION,51,7,205,51,SS_NOPREFIX
     RTEXT           "&Nome de utilizador:",IDC_USRST,61,77,62,8
     COMBOBOX        IDC_USER,126,75,130,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
@@ -3981,11 +4000,11 @@ BEGIN
     PUSHBUTTON      "&Cancelar",IDCANCEL,221,208,50,14
 END
 
-IDD_SETUP1 DIALOG  0, 0, 395, 250
+IDD_SETUP1 DIALOGEX 0, 0, 395, 250
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDI_SHIELD,IDC_SECICON,18,19,32,30,SS_REALSIZEIMAGE
+    ICON            IDI_SHIELD0,IDC_SECICON,18,19,20,20,SS_REALSIZEIMAGE
     GROUPBOX        "Ambiente de Trabalho Seguro",IDC_EXTOPT2,79,0,309,52,WS_GROUP
     CONTROL         "Mostrar Ambiente de Trabalho do utilizador turvado como pano de fundo.",IDC_BLURDESKTOP,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,85,11,245,8
@@ -3997,10 +4016,10 @@ BEGIN
     CONTROL         "Mostrar barra de progresso.",IDC_SHOW_C_TO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,252,38,100,8
     GROUPBOX        "Segurança",IDC_EXTOPT3,79,56,310,49,WS_GROUP
     CONTROL         "O utilizador deve introduzir palavra-passe.",IDC_ASKPW,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,85,67,142,8
-    EDITTEXT        IDC_ASKTIMEOUT,231,66,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Minutos antes de perguntar novamente?",IDC_STATIC,254,67,127,9,NOT WS_GROUP
-    LTEXT           "Avisar caso Administradores não\ntenham palavra-passe.",IDC_STATIC,85,83,103,16
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,85,67,161,8
+    EDITTEXT        IDC_ASKTIMEOUT,247,66,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Minutos antes de perguntar novamente?",IDC_STATIC,269,67,112,9,NOT WS_GROUP
+    LTEXT           "Avisar caso Administradores não\ntenham palavra-passe.",IDC_STATIC,85,83,116,16
     COMBOBOX        IDC_WARNADMIN,203,83,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Integração na Shell",IDC_STATIC,65,111,324,83,WS_GROUP
     CONTROL         "Mostrar ""Painel de Controlo como Administrador"" no menu de contexto do Ambiente de Trabalho.",IDC_CTRLASADMIN,
@@ -4079,9 +4098,12 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,17,178,287,8
     LTEXT           "Se desativar esta opção, o SuRun apenas iniciará programas predefinidos automaticamente com direitos elevados. Nenhum programa de instalação (etc.) será detetado e executado com direitos administrativos.",IDC_STATIC,30,191,387,8
     CONTROL         "Mostrar uma mensagem quando um programa for automaticamente iniciado",IDC_SHOWTRAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,204,251,8
-    LTEXT           "Com esta opção ativa, o SuRun irá mostrar uma janela de mensagem na parte inferior direita do Ambiente de Trabalho quando um programa foi iniciado automaticamente com direitos elevados. Esta mensagem é descartada após 20 segundos.",IDC_STATIC,30,217,390,18
-    CTEXT           "NOTA: As alterações a estas configurações entram em vigor após o próximo início de sessão.",IDC_STATIC,79,238,296,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,204,349,8
+    LTEXT           "Com esta opção ativa, o SuRun irá mostrar uma janela de mensagem na parte inferior direita do Ambiente de Trabalho quando um programa foi iniciado automaticamente com direitos elevados. Esta mensagem é descartada após <T> segundos.",IDC_STATIC,29,216,392,23
+    CTEXT           "NOTA: As alterações a estas configurações entram em vigor após o próximo início de sessão.",IDC_STATIC,79,240,296,8
+    LTEXT           "T=",IDC_STATIC,374,204,10,8
+    EDITTEXT        IDC_TRAY_TO,388,203,18,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "s",IDC_STATIC,410,204,8,8
 END
 
 IDD_SETUP4 DIALOG  0, 0, 379, 302

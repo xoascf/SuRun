@@ -275,7 +275,7 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
       //Switch to the user desktop
       SwitchToDesk(UserDesk);
       //Show Window
-      CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD);
+      CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD0);
       //Turn off Hooks when displaying the user desktop!
       DWORD bIATHk=GetUseIATHook;
       DWORD bIShHk=GetUseIShExHook;

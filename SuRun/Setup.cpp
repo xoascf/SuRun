@@ -1304,7 +1304,7 @@ void ExportSettings(LPTSTR ini)
   EXPORTINT(SuRunKey,UseCancelTimeOut,ini);
   EXPORTINT(SuRunKey,CancelTimeOut,ini);
   EXPORTINT(SuRunKey,ShowCancelTimeOut,ini);
-
+  
   EXPORTINT(SuRunKey,PwTimeOut,ini);
   EXPORTINT(SuRunKey,AdminNoPassWarn,ini);
   
@@ -1321,7 +1321,8 @@ void ExportSettings(LPTSTR ini)
 //  EXPORTINT(SuRunKey,UseSVCHook,ini);
   EXPORTINT(SuRunKey,TestReqAdmin,ini);
   EXPORTINT(SuRunKey,ShowAutoRuns,ini);
-  
+  EXPORTINT(SuRunKey,TrayTimeOut,ini);
+ 
 //  WritePrivateProfileInt(SuRunKey,_T("ReplaceRunAs"),
 //    IsDlgButtonChecked(g_SD->hTabCtrl[3],IDC_DORUNAS),ini);
 //  if(GetUseSuRunGrp)
@@ -1418,6 +1419,8 @@ void ImportSettings(LPCTSTR ini,bool bSuRunSettings,bool bBlackList,bool bUser)
 //    IMPORTINT(SuRunKey,UseSVCHook,ini);
     IMPORTINT(SuRunKey,TestReqAdmin,ini);
     IMPORTINT(SuRunKey,ShowAutoRuns,ini);
+    IMPORTINT(SuRunKey,TrayTimeOut,ini);
+
 
 //    switch(GetPrivateProfileInt(SuRunKey,_T("ReplaceRunAs"),-1,ini))
 //    {
@@ -1653,6 +1656,7 @@ void SetRecommendedSettings()
   CheckDlgButton(h,IDC_IATHOOK,1);
   CheckDlgButton(h,IDC_REQADMIN,1);
   CheckDlgButton(h,IDC_SHOWTRAY,1);
+  SetDlgItemInt(h,IDC_TRAY_TO,20,0);
   EnableWindow(GetDlgItem(h,IDC_REQADMIN),1);
   EnableWindow(GetDlgItem(h,IDC_BLACKLIST),1);
   EnableWindow(GetDlgItem(h,IDC_SHOWTRAY),1);
@@ -2213,6 +2217,8 @@ INT_PTR CALLBACK SetupDlg3Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       EnableWindow(GetDlgItem(hwnd,IDC_REQADMIN),bHook);
       EnableWindow(GetDlgItem(hwnd,IDC_BLACKLIST),bHook);
       EnableWindow(GetDlgItem(hwnd,IDC_SHOWTRAY),bHook);
+      SendDlgItemMessage(hwnd,IDC_TRAY_TO,EM_LIMITTEXT,3,0);
+      SetDlgItemInt(hwnd,IDC_TRAY_TO,GetTrayTimeOut,0);
       return TRUE;
     }//WM_INITDIALOG
   case WM_CTLCOLORSTATIC:
@@ -2232,6 +2238,7 @@ ApplyChanges:
       EnableWindow(GetDlgItem(g_SD->hTabCtrl[1],IDC_HW_ADMIN),GetUseSVCHook);
       LPTSTR u=g_SD->Users.GetUserName(g_SD->CurUser);
       CheckDlgButton(g_SD->hTabCtrl[1],IDC_HW_ADMIN,GetUseSVCHook && GetInstallDevs(u));
+      SetTrayTimeOut(GetDlgItemInt(hwnd,IDC_TRAY_TO,0,0));
       return TRUE;
     }//WM_DESTROY
   case WM_COMMAND:
