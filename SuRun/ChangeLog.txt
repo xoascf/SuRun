@@ -30,15 +30,17 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.1.0 - 2011-12-2x
+SuRun 1.2.1.0 - 2011-12-30
 --------------------------
 * NEW: French resources by Laurent Hilsz. Thanks!
 * NEW: Portuguese language resources by "the.magic.silver.bullet" Thanks!
-* NEW: Command "SuRun: Emty recycle bin" in Recycle Bin context menu
+* NEW: Command "SuRun: Empty recycle bin" in Recycle Bin context menu
 * NEW: In Vista and Win7 SuRun's system menu and context menu entries show 
        a SuRun Shield icon
 * NEW: /USER <name> command line parameter for specifying the RunAs user
-* NEW: /LOW command line parameter for launching non elevated processes
+* NEW: /LOW command line parameter to force launching processes non elevated
+       /LOW you can even start programs that UAC would not allow to be 
+       run low (E.g. Regedit.exe)
 * NEW: User SYSTEM is supported for /RUNAS, but only when used by a non
        restricted SuRunner or by a real Administrator
 * NEW: InstallSurun and SuRun set DEP permanently ON
@@ -51,7 +53,7 @@ SuRun 1.2.1.0 - 2011-12-2x
 * CHG: added bin\Crypt32x64.Lib and bin\Crypt32x86.Lib because Crypt32.Lib is 
        missing in VS2005.
 * FIX: Two or more spaces after a direct SuRun command line option caused 
-  SuRun to just exit. (E.g.: "SuRun /wait  cmd"
+  SuRun to just exit. (E.g.: "SuRun /wait  cmd")
 * FIX: Fixed implementation of CreateProcessAsuserA IAT-Hook
 * FIX: Updating SuRun with a different locale failed.
        An English SuRun could not be updated by a French SuRun because the 
@@ -89,14 +91,14 @@ SuRun 1.2.1.0 rc3 - 2011-12-18
 
 SuRun 1.2.1.0 rc2 - 2011-12-16
 -------------------------------
-* FIX: Command "SuRun: Emty recycle bin" caused SuRun to sometimes not work
+* FIX: Command "SuRun: Empty recycle bin" caused SuRun to sometimes not work
   (Automagic etc.)
 * NEW: In Vista and Win7 SuRun's system menu and context entries show the 
   LUA Shield
 
 SuRun 1.2.1.0 rc1 - 2011-12-14
 -------------------------------
-* NEW: Command "SuRun: Emty recycle bin" in Recycle Bin context menu
+* NEW: Command "SuRun: Empty recycle bin" in Recycle Bin context menu
 * FIX: Two or more spaces after an SuRun Option in the command line caused 
   SuRun to just exit. (E.g.: "SuRun /wait  cmd"
 
@@ -145,7 +147,7 @@ SuRun 1.2.1.0 Beta 4 - 2011-02-24
 
 SuRun 1.2.1.0 Beta 3 - 2011-02-15
 ---------------------------------
-* NEW: SuRun's RunAs has a new "Run elevated" Option for non restricted 
+* NEW: SuRun's RunAs has a new "Run elevated" Option for non-restricted 
     SuRunners and Administrators
 
 SuRun 1.2.1.0 Beta 2 - 2011-02-15

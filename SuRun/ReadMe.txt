@@ -122,7 +122,10 @@ options:
   /QUIET              do not display an messages
   /RESTORE <file>     restore "SuRun Settings" from <file>
   /RETPID             return the process ID of the elevated process
-  /RUNAS <program>    start <program> as different user
+  /RUNAS [/USER <user>] 
+                      start <program> as different user ("SYSTEM" is supported)
+  /LOW                /LOW forces the program to be started with low privileges
+                      (even if UAC would only allow it to be run elevated)
   /SETUP              start "SuRun Settings"
   /SWITCHTO <User>    Switch Desktop to the session of "User"
   /SWITCHTO <Session> Switch Desktop to logon session [0,1,2...]
@@ -150,22 +153,30 @@ Administrator account using "SuRun /RUNAS":
 How to build the sources?
 ------------------------------------------------------------------------------
 
-To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
+To compile SuRun you need Visual C++ 6.0 and Microsoft's Platform SDK for 
+Windows Server 2003 R3 or Visual Studio 2005 or 2008 with x86 and x64 tools.
 
-* To build the 32Bit version of SuRun you can use the last official Platform 
-  SDK for VC6, version 02/2003.
-  Use SuRun.dsw to build "Win32 Unicode Release". 
+* To compile SuRun with Visual Studio 6, 2005 or 2008 just run BuildSuRun.cmd.
+
+* To manually compile SuRun with VS2005 or 2008, open SuRun(VC9).sln and build
+  "SuRun32 Unicode Release|Win32", then "x64 Unicode Release|x64" and at last 
+  "Unicode Release|Win32"
+
+* To manually compile SuRun with VC6 you need the last official Platform SDK 
+  for VC6, Version 04/2005 ("Windows Server 2003 SP1").
+  
+  To build the 32Bit version of SuRun, use SuRun.dsw to build "Win32 Unicode 
+  Release". 
   SuRun.exe and SuRunExt.dll will be compiled to the directory ReleaseU.
 
-* Compiling the 64 Bit version is a bit more tricky.
-  In Win64, Windows has two subsystems in parallel, Win64 and Win32. To get the 
+  Compiling the 64 Bit version is a bit more tricky.
+  
+  In x64, Windows runs two subsystems in parallel, Win64 and Win32. To get the 
   System Menu hook for 32Bit and 64Bit Applications, you must install one Hook 
   for each subsystem. So SuRun64 consists of four files. "SuRun.exe", the Win64
   executable; "SuRunExt.dll" for the Win64 Hooks; "SuRun32.bin", the 32Bit
   executable and "SuRunExt32.dll" for the 32Bit system menu hook.
-  -First you need to install Microsoft's Platform SDK 04/2005 ("Windows Server 
-   2003 SP1")
-  -Then "Open Build Environment Window"->"Windows XP 64-bit Build Environment"
+  -"Open Build Environment Window"->"Windows XP 64-bit Build Environment"
    ->"Set Windows XP x64 Build Environment (Retail)"
   -In the command prompt type "MSDEV.EXE /useenv"
   I use the following batch file for that:
@@ -176,24 +187,59 @@ To compile SuRun you probably need Visual C++ 6.0 and Microsoft's Platform SDK.
     call %MSSDK%\SetEnv.Cmd /X64
     start %VC6Dir%\Common\MSDev98\Bin\MSDEV.EXE /useenv
     --------------------------------------------------------------------------
+  
   In MSDEV with the AMD64 build environment compile the "Win32 x64 Unicode 
   Release" to get SuRun.exe and SuRunExt.dll.
   Then start MSDEV just as usual with the 32Bit build environment and make 
   "Win32 SuRun32 Unicode Release" to get SuRun32.bin and SuRunExt32.dll.
 
-* After compiling "SuRun - Win32 Unicode Release", "SuRun - Win32 SuRun32 
+  After compiling "SuRun - Win32 Unicode Release", "SuRun - Win32 SuRun32 
   Unicode Release" and "SuRun - Win32 x64 Unicode Release" you can compile
   "InstallSuRun - Win32 Release" to build the Install container.
   (You'll need UPX 3.02 or newer in the %path%)
   
-* To compile SuRun with Visual Studio 2005, you need to have the Plattform SDK
-  installed. Just run BuildSuRun.cmd, or open SuRun.sln and build "SuRun32 
-  Unicode Release|Win32", then "x64 Unicode Release|x64" and at last "Unicode 
-  Release|Win32"
-
 ------------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------------
+
+SuRun 1.2.1.0 - 2011-12-30
+--------------------------
+* NEW: French resources by Laurent Hilsz. Thanks!
+* NEW: Portuguese language resources by "the.magic.silver.bullet" Thanks!
+* NEW: Command "SuRun: Empty recycle bin" in Recycle Bin context menu
+* NEW: In Vista and Win7 SuRun's system menu and context menu entries show 
+       a SuRun Shield icon
+* NEW: /USER <name> command line parameter for specifying the RunAs user
+* NEW: /LOW command line parameter to force launching processes non elevated
+       /LOW you can even start programs that UAC would not allow to be 
+       run low (E.g. Regedit.exe)
+* NEW: User SYSTEM is supported for /RUNAS, but only when used by a non
+       restricted SuRunner or by a real Administrator
+* NEW: InstallSurun and SuRun set DEP permanently ON
+* NEW: SuRun's binaries are flagged to use ASLR
+* NEW: SuRun's /RunAs has a new "Run elevated" Checkbox for non restricted 
+       SuRunners and Administrators
+* NEW: The display time for the "program was started automagically message" 
+       can be set
+* CHG: Removed dependencies on wtsapi32.h and wtsapi32.lib
+* CHG: added bin\Crypt32x64.Lib and bin\Crypt32x86.Lib because Crypt32.Lib is 
+       missing in VS2005.
+* FIX: Two or more spaces after a direct SuRun command line option caused 
+  SuRun to just exit. (E.g.: "SuRun /wait  cmd")
+* FIX: Fixed implementation of CreateProcessAsuserA IAT-Hook
+* FIX: Updating SuRun with a different locale failed.
+       An English SuRun could not be updated by a French SuRun because the 
+       SuRun service name was localized.
+* FIX: "(Re-)Start as Administrator" did not work with captionless Windows
+* FIX: IAT-Hook prevented SwitchDesktop in AVAST and caused a system deadlock
+* FIX: If SuRun starts %windir%\system32\cmd.exe it inserts a /D option into 
+  the command line to avoid cmd from running AutoRuns
+* FIX: IAT-Hooks are directly loaded without a separate thread.
+  If that GPF's, a thread is created to load the hooks.
+* FIX: Command lines with >4096 characters caused a GPF in the SuRun 
+  client and the Hooks
+* FIX: SuRunExt.Dll prevents unloading SuRunExt.Dll dynamically. This effectively 
+  eliminated GPFs in SuRunExt.Dll_unloaded on my Win7pro system.
 
 SuRun 1.2.0.9 - 2010-12-23
 --------------------------

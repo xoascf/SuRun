@@ -477,7 +477,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <u¿ytkownik> [/LOW]]][/WAIT] program [parametry]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Przyk³ad u¿ycia:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <u¿ytkownik>][/LOW][/WAIT] program [parametry]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Polecenie:\r\n\r\n%s\r\n\r\nzostanie wykonane z uprawnieniami administracyjnymi."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "B³¹d!\r\n\r\nUtworzenie pulpitu siê nie uda³o!"
@@ -1209,7 +1209,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Gebrauch:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Gebrauch:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user>][/LOW][/WAIT] Programm [Parameter]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "Der Befehl:\r\n\r\n%s\r\n\r\nsoll mit erhöhten Rechten ausgeführt werden."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Abbruch!\r\n\r\nSicherer Desktop konnte nicht erstellt werden!"
@@ -1841,7 +1841,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Usage:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Usage:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user>][/LOW][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "The command:\r\n\r\n%s\r\n\r\nis about to be executed with administrative privileges."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nDesktop creation failed!"
@@ -2437,7 +2437,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] programa [parametros]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user>][/LOW][/WAIT] programa [parametros]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "El comando:\r\n\r\n%s\r\n\r\nesta por ser ejecutado con privilegios elevados."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Error!\r\n\r\nLa creacion de Escritorio fallo!"
@@ -3020,7 +3020,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Usage :\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] programme [parametres]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Usage :\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user>][/LOW][/WAIT] programme [parametres]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "La commande :\r\n\r\n%s\r\n\r\nis est sur le point d'être exécutée en tant qu'administrateur."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Erreur !\r\n\r\nLa création du Bureau a échoué !"
@@ -3615,7 +3615,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Gebruik:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] programma [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Gebruik:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user>][/LOW][/WAIT] programma [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "De opdracht:\r\n\r\n%s\r\n\r\nwordt met verhoogde rechten uitgevoerd."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Fout!\r\n\r\nBeveiligd Bureaublad kon niet worden aangemaakt!"
@@ -4196,7 +4196,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user> [/LOW]]][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
+    IDS_USAGE               "Uso:\r\nSuRun [/QUIET][/RETPID][/RUNAS [/USER <user>][/LOW][/WAIT] program [parameters]\r\nSuRun /SETUP\r\nSuRun /BACKUP\r\nSuRun /RESTORE\r\nSuRun /INSTALL\r\nSuRun /UNINSTALL"
     IDS_ASKOK               "O comando:\r\n\r\n%s\r\n\r\nestá prestes a ser executado com privilégios administrativos."
     IDS_APPNAME             "SuRun"
     IDS_NODESK              "Erro!\r\n\r\nNão foi possível criar o Ambiente de Trabalho!"
