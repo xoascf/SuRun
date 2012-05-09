@@ -716,6 +716,7 @@ DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,true,false,0,SessionId);
   p.Users.Add(User);
+  p.Users.LoadUserBitmaps();
   return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -724,6 +725,7 @@ BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User)
 {
   LOGONDLGPARAMS p(0,RunAsUser,0,true,false,0,SessionId);
   p.Users.Add(User);
+  p.Users.LoadUserBitmaps();
   p.bFUS=TRUE;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_FUSDLG),
                   0,DialogProc,(LPARAM)&p);
@@ -737,6 +739,7 @@ BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,LPTSTR LastUser,int 
   LOGONDLGPARAMS p(S,User,Password,false,false,false,SessionId);
   p.Users.SetUsualUsers(SessionId,FALSE);
   p.Users.Add(LastUser);
+  p.Users.LoadUserBitmaps();
   p.bRunAs=TRUE;
   p.RaUser=LastUser;
   return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
@@ -777,6 +780,7 @@ DWORD LogonCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,DWORD UsrFlag
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,Password,true,false,UsrFlags,SessionId);
   p.Users.Add(User);
+  p.Users.LoadUserBitmaps();
   return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -788,6 +792,7 @@ DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...)
   CBigResStr S(IDmsg,va);
   LOGONDLGPARAMS p(S,User,_T("******"),true,false,UsrFlags,SessionId);
   p.Users.Add(User);
+  p.Users.LoadUserBitmaps();
   return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
                   0,DialogProc,(LPARAM)&p);
 }
@@ -797,39 +802,40 @@ BOOL TestLogonDlg()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
-  TCHAR User[4096]=L"Bruns\\KAY";
+  TCHAR User[4096]=L"KAY_ARBEIT\\Kay";
   TCHAR Password[4096]={0};
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
 
   BOOL l;
-  l=ValidateCurrentUser(0,User,Password,IDS_ASKOK,L"C:\\Windows\\Explorer.exe");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-
-
-  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  
-  
-//  return 1;
-
-  l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//   l=ValidateCurrentUser(0,User,Password,IDS_ASKOK,L"C:\\Windows\\Explorer.exe");
+//   if (l==-1)
+//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+// 
+// 
+//   l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
+//   if (l==-1)
+//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//   
+//   
+// //  return 1;
+// 
+//   l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
+//   if (l==-1)
+//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//   l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
+//   if (l==-1)
+//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//   l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
+//   if (l==-1)
+//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+//   l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"cmd");
+//   if (l==-1)
+//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
+  return 1;
 
   SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
 

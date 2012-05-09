@@ -84,7 +84,9 @@ public:
   SIZE GetUserBitmapSize(LPTSTR UserName);
   int     GetCount(){return nUsers;};
   void Add(LPCWSTR UserName);
+  void DeleteUserBitmap(int i);
   void DeleteUserBitmaps();
+  void LoadUserBitmap(int i);
   void LoadUserBitmaps();
 private:
   int nUsers;

@@ -437,31 +437,41 @@ SIZE USERLIST::GetUserBitmapSize(LPTSTR UserName)
   return s;
 }
 
+void USERLIST::DeleteUserBitmap(int i)
+{
+  if(User[i].UserBitmap)
+  {
+    DeleteObject(User[i].UserBitmap);
+    User[i].UserBitmap=0;
+    User[i].UserBitmapSize.cx=0;
+    User[i].UserBitmapSize.cy=0;
+  }
+}
+
 void USERLIST::DeleteUserBitmaps()
 {
   for (int i=0;i<nUsers;i++)
-    if(User[i].UserBitmap)
-    {
-      DeleteObject(User[i].UserBitmap);
-      User[i].UserBitmap=0;
-      User[i].UserBitmapSize.cx=0;
-      User[i].UserBitmapSize.cy=0;
-    }
+    DeleteUserBitmap(i);
+}
+
+void USERLIST::LoadUserBitmap(int i)
+{
+  if(User[i].UserBitmap)
+    return;
+  User[i].UserBitmap=::LoadUserBitmap(User[i].UserName);
+  if(User[i].UserBitmap)
+  {
+    BITMAP b;
+    GetObject(User[i].UserBitmap,sizeof(BITMAP),&b);
+    User[i].UserBitmapSize.cx=b.bmWidth;
+    User[i].UserBitmapSize.cy=b.bmHeight;
+  }
 }
 
 void USERLIST::LoadUserBitmaps()
 {
   for (int i=0;i<nUsers;i++)
-  {
-    User[i].UserBitmap=LoadUserBitmap(User[i].UserName);
-    if(User[i].UserBitmap)
-    {
-      BITMAP b;
-      GetObject(User[i].UserBitmap,sizeof(BITMAP),&b);
-      User[i].UserBitmapSize.cx=b.bmWidth;
-      User[i].UserBitmapSize.cy=b.bmHeight;
-    }
-  }
+    LoadUserBitmap(i);
 }
 
 int USERLIST::FindUser(LPTSTR UserName)
@@ -563,6 +573,7 @@ void USERLIST::Add(LPCWSTR UserName)
   if (j>=nUsers)
     User=UsrRealloc(User,nUsers+1);
 //  DBGTrace1("-->AddUser: %s",UserName);
+  zero(User[j]);
   _tcscpy(User[j].UserName,UserName);
   nUsers++;
   return;
