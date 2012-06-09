@@ -266,7 +266,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     if (!g_RunData.cmdLine[0])
     {
       //If shell is Admin but User is SuRunner, the Shell must be restarted
-      if (g_CliIsInSuRunners && bShellIsadmin)
+      if ((!g_RunData.bRunAs) && g_CliIsInSuRunners && bShellIsadmin)
       {
         //Complain if shell user is an admin!
         SafeMsgBox(0,CResStr(IDS_ADMINSHELL),CResStr(IDS_APPNAME),MB_ICONEXCLAMATION|MB_SETFOREGROUND);
