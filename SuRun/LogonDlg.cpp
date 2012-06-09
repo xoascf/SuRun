@@ -374,18 +374,9 @@ SIZE GetDrawSize(HWND w)
   int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
   if (S.cx>maxDX)
   {
-    TEXTMETRIC tm;
-    GetTextMetrics(MemDC,&tm);
-    S.cy+=tm.tmHeight*(S.cx/maxDX);
+    SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_HSCROLL);
+    SetScrollRange(w,SB_HORZ,0,S.cx-maxDX+20,0);
     S.cx=maxDX;
-    //Limit the height to 60% of the screen height
-    int maxDY=GetSystemMetrics(SM_CXFULLSCREEN)*6/10;
-    if (S.cy>maxDY)
-    {
-      S.cy=maxDY;
-      SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_VSCROLL|WS_HSCROLL);
-    }else
-      SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_HSCROLL);
   }
   DeleteDC(MemDC);
   return S;
