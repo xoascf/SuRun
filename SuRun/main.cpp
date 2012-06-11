@@ -108,9 +108,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     SetThreadLocale(MAKELCID(MAKELANGID(LANG_PORTUGUESE,SUBLANG_PORTUGUESE),SORT_DEFAULT));
     break;
   }
-  BOOL TestLogonDlg();
-  TestLogonDlg();
-  ExitProcess(0);
   HideAppStartCursor();
   if(HandleServiceStuff())
     return 0;

@@ -318,6 +318,13 @@ SIZE CliSize(HWND w)
   return RectSize(r);
 }
 
+SIZE WindowSize(HWND w)
+{
+  RECT r={0};
+  GetWindowRect(w,&r);
+  return RectSize(r);
+}
+
 //These controls are not changed on X-Resize
 int NX_Ctrls[]={IDC_SECICON,IDC_SECICON1,IDC_USERBITMAP,IDC_USRST,IDC_PWDST};
 //These controls are stretched on X-Resize
@@ -360,26 +367,46 @@ SIZE GetDrawSize(HWND w)
 {
   TCHAR s[4096];
   GetWindowText(w,s,4096);
-  HDC dc=GetDC(0);
-  HDC MemDC=CreateCompatibleDC(dc);
-  ReleaseDC(0,dc);
-  SelectObject(MemDC,(HGDIOBJ)SendMessage(w,WM_GETFONT,0,0));
   RECT r={0};
-  DrawText(MemDC,s,-1,&r,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
-  //the size needed is sometimes too small
-  //Tests have shown that 8 pixels added to cx would be enough
-  //I'll add 20 pixels to cx and pixels 10 to cy until I know a better way:
-  SIZE S={r.right-r.left+20,r.bottom-r.top+10};
-  //Limit the width to 90% of the screen width
-  int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
-  if (S.cx>maxDX)
+  HGDIOBJ font=(HGDIOBJ)SendMessage(w,WM_GETFONT,0,0);
   {
-    SetWindowLong(w,GWL_STYLE,GetWindowLong(w,GWL_STYLE)|WS_HSCROLL|WS_TABSTOP);
-    SetScrollRange(w,SB_HORZ,0,S.cx,true);
-    SetWindowPos(w,HWND_TOP,0,0,0,0,SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOSIZE|SWP_NOCOPYBITS);
-    S.cx=maxDX;
+    HDC dc=GetDC(0);
+    HDC MemDC=CreateCompatibleDC(dc);
+    ReleaseDC(0,dc);
+    SelectObject(MemDC,font);
+    DrawText(MemDC,s,-1,&r,DT_CALCRECT|DT_NOCLIP|DT_NOPREFIX|DT_EXPANDTABS);
+    DeleteDC(MemDC);
   }
-  DeleteDC(MemDC);
+  SIZE S={r.right-r.left,r.bottom-r.top};
+  //Limit dialog size to 90% of the screen width
+  int maxDX=GetSystemMetrics(SM_CXFULLSCREEN)*9/10;
+  int maxDY=GetSystemMetrics(SM_CYFULLSCREEN)*9/10;
+  HWND Parent=GetParent(w);
+  {
+    SIZE PS=WindowSize(Parent);
+    SIZE SS=WindowSize(w);
+    maxDX-=PS.cx-SS.cx;
+    maxDY-=PS.cy-SS.cy;
+  }
+  bool bHScroll=S.cx>maxDX;
+  bool bVScroll=S.cy>maxDY;
+  if(bHScroll || bVScroll)
+  {
+    if (bHScroll)
+      S.cx=maxDX;
+    if (bVScroll)
+      S.cy=maxDY;
+    //Static controls cannot scroll
+    //replace Static with EDIT control to enable Scrolling
+    GetWindowRect(w,&r);
+    ScreenToClient(Parent,(POINT*)&r.left);
+    ScreenToClient(Parent,(POINT*)&r.right);
+    DestroyWindow(w);
+    w=CreateWindow(L"Edit",s,WS_CHILD|WS_VISIBLE|ES_LEFT|ES_AUTOHSCROLL|ES_MULTILINE|ES_READONLY|
+      (bHScroll?WS_HSCROLL:0)|(bVScroll?WS_VSCROLL:0),
+      r.left,r.top,r.right-r.left,r.bottom-r.top,Parent,(HMENU)IDC_DLGQUESTION,0,0);
+    SendMessage(w,WM_SETFONT,(WPARAM)font,1);
+  }
   return S;
 }
 
@@ -387,9 +414,8 @@ void SetWindowSizes(HWND hDlg)
 {
   RECT dlgr={0};
   GetWindowRect(hDlg,&dlgr);
-  HWND ew=GetDlgItem(hDlg,IDC_DLGQUESTION);
-  SIZE ds=GetDrawSize(ew);
-  SIZE es=CliSize(ew);
+  SIZE ds=GetDrawSize(GetDlgItem(hDlg,IDC_DLGQUESTION));
+  SIZE es=CliSize(GetDlgItem(hDlg,IDC_DLGQUESTION));
   //Resize X
   int dx=ds.cx-es.cx;
   if (dx>0) 
@@ -824,7 +850,7 @@ BOOL TestLogonDlg()
 //   l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"cmd");
 //   if (l==-1)
 //     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"cmd {WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}{WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW}");
+  l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"cmd");
   if (l==-1)
     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
   return 1;
