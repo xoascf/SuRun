@@ -31,7 +31,7 @@ SuRun Changes:
 ------------------------------------------------------------------------------
 SuRun 1.2.1.1b1 - 2012-07-03
 ----------------------------
-* FIX: ShellExecuteHook asked to start file.exe when file.exe.txt was run
+* FIX: ShellExecuteHook asked to start file.exe when file.exe.ext was run
 * FIX: User Bitmap Display on confirmation and runas dialogs did not show
 * FIX: Long command lines were not displayed ok on confirmation dialogs
 

@@ -758,7 +758,7 @@ void Combine(LPTSTR Dst,LPTSTR path,LPTSTR file,LPTSTR ext)
 {
   _tcscpy(Dst,path);
   CHK_BOOL_FN(PathAppend(Dst,file));
-  CHK_BOOL_FN(PathAddExtension(Dst,ext));
+  _tcscat(Dst,ext);
 }
 
 //Split path parts
