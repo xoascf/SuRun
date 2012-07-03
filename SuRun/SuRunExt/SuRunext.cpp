@@ -290,96 +290,96 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 // IShellExtInit
 //////////////////////////////////////////////////////////////////////////////
 #ifdef DoDBGTrace
-static UINT g_CF_ShellIdList=0;
-#define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
-#define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
-
-static UINT g_CF_FileNameW=0;
-
-static void PrintDataObj(LPDATAOBJECT pDataObj)
-{
- if (g_CF_FileNameW==0)
-   g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
- if(g_CF_ShellIdList==0)
-   g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
- IEnumFORMATETC *pefEtc = 0;
- if(SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc)) && SUCCEEDED(pefEtc->Reset()))
- while(TRUE)
- {
-   FORMATETC fEtc;
-   ULONG ulFetched = 0L;
-   if(FAILED(pefEtc->Next(1,&fEtc,&ulFetched)) || (ulFetched <= 0))
-     break;
-   STGMEDIUM stgM;
-   if(SUCCEEDED(pDataObj->GetData(&fEtc, &stgM)))
-   {
-     switch (stgM.tymed)
-     {
-     case TYMED_HGLOBAL:
-       if (fEtc.cfFormat==CF_HDROP)
-       {
-         UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
-         if(n>=1) for(UINT x = 0; x < n; x++)
-         {
-           TCHAR f[4096]={0};
-           DragQueryFile((HDROP)stgM.hGlobal,x,f,4096-1);
-           DBGTrace1("--------- TYMED_HGLOBAL, CF_HDROP, File=%s",f);
-         }
-       }else if (fEtc.cfFormat==g_CF_FileNameW)
-       {
-         DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_FILENAMEW:%s",(LPCSTR)stgM.hGlobal); 
-       }else if (fEtc.cfFormat==g_CF_ShellIdList)
-       {
-         TCHAR s[4096]={0};
-         DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST, %d Items",((LPIDA)stgM.hGlobal)->cidl); 
-         LPCITEMIDLIST pIDFolder = HIDA_GetPIDLFolder((LPIDA)stgM.hGlobal);
-         if (pIDFolder)
-         {
-           SHGetPathFromIDList(pIDFolder,s);
-           DBGTrace1("------------------ Folder=%s",s);
-         }
-         for (UINT n=0;n<((LPIDA)stgM.hGlobal)->cidl;n++)
-         {
-           LPCITEMIDLIST pidlItem0=HIDA_GetPIDLItem((LPIDA)stgM.hGlobal,0);
-           SHGetPathFromIDList(pidlItem0,s);
-           DBGTrace2("------------------ Item[%d]=%s",n,s);
-         }
-       }else
-       {
-         TCHAR cfn[4096]={0};
-         GetClipboardFormatName(fEtc.cfFormat,cfn,4096);
-         DBGTrace2("--------- TYMED_HGLOBAL, CF_: %d (%s)",fEtc.cfFormat,cfn);
-       }
-       break;
-     case TYMED_FILE:
-       DBGTrace("--------- TYMED_FILE");
-       break;
-     case TYMED_ISTREAM:
-       DBGTrace("--------- TYMED_ISTREAM");
-       break;
-     case TYMED_ISTORAGE:
-       DBGTrace("--------- TYMED_ISTORAGE");
-       break;
-     case TYMED_GDI:
-       DBGTrace("--------- TYMED_GDI");
-       break;
-     case TYMED_MFPICT:
-       DBGTrace("--------- TYMED_MFPICT");
-       break;
-     case TYMED_ENHMF:
-       DBGTrace("--------- TYMED_ENHMF");
-       break;
-     case TYMED_NULL:
-       DBGTrace("--------- TYMED_NULL");
-       break;
-     default:
-       DBGTrace1("--------- unknown tymed: %d",stgM.tymed);
-     }
-   }
- }
- if(pefEtc)
-   pefEtc->Release();
-}
+// static UINT g_CF_ShellIdList=0;
+// #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
+// #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
+// 
+// static UINT g_CF_FileNameW=0;
+// 
+// static void PrintDataObj(LPDATAOBJECT pDataObj)
+// {
+//  if (g_CF_FileNameW==0)
+//    g_CF_FileNameW=RegisterClipboardFormat(CFSTR_FILENAMEW);
+//  if(g_CF_ShellIdList==0)
+//    g_CF_ShellIdList=RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+//  IEnumFORMATETC *pefEtc = 0;
+//  if(SUCCEEDED(pDataObj->EnumFormatEtc(DATADIR_GET, &pefEtc)) && SUCCEEDED(pefEtc->Reset()))
+//  while(TRUE)
+//  {
+//    FORMATETC fEtc;
+//    ULONG ulFetched = 0L;
+//    if(FAILED(pefEtc->Next(1,&fEtc,&ulFetched)) || (ulFetched <= 0))
+//      break;
+//    STGMEDIUM stgM;
+//    if(SUCCEEDED(pDataObj->GetData(&fEtc, &stgM)))
+//    {
+//      switch (stgM.tymed)
+//      {
+//      case TYMED_HGLOBAL:
+//        if (fEtc.cfFormat==CF_HDROP)
+//        {
+//          UINT n = DragQueryFile((HDROP)stgM.hGlobal,0xFFFFFFFF,NULL,0);
+//          if(n>=1) for(UINT x = 0; x < n; x++)
+//          {
+//            TCHAR f[4096]={0};
+//            DragQueryFile((HDROP)stgM.hGlobal,x,f,4096-1);
+//            DBGTrace1("--------- TYMED_HGLOBAL, CF_HDROP, File=%s",f);
+//          }
+//        }else if (fEtc.cfFormat==g_CF_FileNameW)
+//        {
+//          DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_FILENAMEW:%s",(LPCSTR)stgM.hGlobal); 
+//        }else if (fEtc.cfFormat==g_CF_ShellIdList)
+//        {
+//          TCHAR s[4096]={0};
+//          DBGTrace1("--------- TYMED_HGLOBAL, CFSTR_SHELLIDLIST, %d Items",((LPIDA)stgM.hGlobal)->cidl); 
+//          LPCITEMIDLIST pIDFolder = HIDA_GetPIDLFolder((LPIDA)stgM.hGlobal);
+//          if (pIDFolder)
+//          {
+//            SHGetPathFromIDList(pIDFolder,s);
+//            DBGTrace1("------------------ Folder=%s",s);
+//          }
+//          for (UINT n=0;n<((LPIDA)stgM.hGlobal)->cidl;n++)
+//          {
+//            LPCITEMIDLIST pidlItem0=HIDA_GetPIDLItem((LPIDA)stgM.hGlobal,0);
+//            SHGetPathFromIDList(pidlItem0,s);
+//            DBGTrace2("------------------ Item[%d]=%s",n,s);
+//          }
+//        }else
+//        {
+//          TCHAR cfn[4096]={0};
+//          GetClipboardFormatName(fEtc.cfFormat,cfn,4096);
+//          DBGTrace2("--------- TYMED_HGLOBAL, CF_: %d (%s)",fEtc.cfFormat,cfn);
+//        }
+//        break;
+//      case TYMED_FILE:
+//        DBGTrace("--------- TYMED_FILE");
+//        break;
+//      case TYMED_ISTREAM:
+//        DBGTrace("--------- TYMED_ISTREAM");
+//        break;
+//      case TYMED_ISTORAGE:
+//        DBGTrace("--------- TYMED_ISTORAGE");
+//        break;
+//      case TYMED_GDI:
+//        DBGTrace("--------- TYMED_GDI");
+//        break;
+//      case TYMED_MFPICT:
+//        DBGTrace("--------- TYMED_MFPICT");
+//        break;
+//      case TYMED_ENHMF:
+//        DBGTrace("--------- TYMED_ENHMF");
+//        break;
+//      case TYMED_NULL:
+//        DBGTrace("--------- TYMED_NULL");
+//        break;
+//      default:
+//        DBGTrace1("--------- unknown tymed: %d",stgM.tymed);
+//      }
+//    }
+//  }
+//  if(pefEtc)
+//    pefEtc->Release();
+// }
 #endif DoDBGTrace
 
 STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataObj, HKEY hRegKey)
@@ -387,61 +387,61 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST pIDFolder, LPDATAOBJECT pDataOb
   zero(m_ClickFolderName);
   m_pDeskClicked=FALSE;
 #ifdef DoDBGTrace
-  static TCHAR ClickCmdLine[4096];
-  zero(ClickCmdLine);
-  {
-    if (pIDFolder)
-      SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
-    if(pDataObj)
-    {
-      FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-      STGMEDIUM stm;
-      if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
-      {
-        if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
-          DragQueryFile((HDROP)stm.hGlobal,0,ClickCmdLine,4096-1);
-        ReleaseStgMedium(&stm);
-      }
-    }
-    //Link?
-    if(ClickCmdLine[0])
-    {
-      TCHAR cc[40];
-      TCHAR pc[40];
-      if (ERROR_SUCCESS==MsiGetShortcutTarget(ClickCmdLine,pc,0,cc))
-      {
-        DWORD len=4095;
-        MsiGetComponentPath(pc,cc,ClickCmdLine,&len);
-      }else
-      {
-        IShellLink *psl = NULL;
-        IPersistFile *pPf = NULL;
-        if ( SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl))
-          && SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf))
-          && SUCCEEDED(pPf->Load(ClickCmdLine,STGM_READ|STGM_SHARE_DENY_NONE))
-          && SUCCEEDED(psl->Resolve(0,SLR_NO_UI|SLR_NOSEARCH|SLR_NOTRACK|SLR_NOLINKINFO)))
-        {
-          psl->GetPath(ClickCmdLine,4096,0,SLGP_UNCPRIORITY);
-          psl->GetArguments(m_ClickFolderName,4096);
-          _tcscat(ClickCmdLine,_T(" "));
-          _tcscat(ClickCmdLine,m_ClickFolderName);
-          psl->GetWorkingDirectory(m_ClickFolderName,4096);
-        }
-        if (pPf)
-          pPf->Release();
-        if(psl)
-          psl->Release();
-      }
-    }
-    TCHAR FileClass[4096]={0};
-    if(hRegKey)
-      hKeyToKeyName(hRegKey,FileClass,4096);
-    DBGTrace3("CShellExt::Initialize(%s , %s , %s)",m_ClickFolderName,ClickCmdLine,FileClass);
-   if(pDataObj)
-     PrintDataObj(pDataObj);
-  }
-  zero(m_ClickFolderName);
-  zero(ClickCmdLine);
+//   static TCHAR ClickCmdLine[4096];
+//   zero(ClickCmdLine);
+//   {
+//     if (pIDFolder)
+//       SHGetPathFromIDList(pIDFolder,m_ClickFolderName);
+//     if(pDataObj)
+//     {
+//       FORMATETC fe = {CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+//       STGMEDIUM stm;
+//       if (SUCCEEDED(pDataObj->GetData(&fe,&stm)))
+//       {
+//         if(DragQueryFile((HDROP)stm.hGlobal,(UINT)-1,NULL,0)==1)
+//           DragQueryFile((HDROP)stm.hGlobal,0,ClickCmdLine,4096-1);
+//         ReleaseStgMedium(&stm);
+//       }
+//     }
+//     //Link?
+//     if(ClickCmdLine[0])
+//     {
+//       TCHAR cc[40];
+//       TCHAR pc[40];
+//       if (ERROR_SUCCESS==MsiGetShortcutTarget(ClickCmdLine,pc,0,cc))
+//       {
+//         DWORD len=4095;
+//         MsiGetComponentPath(pc,cc,ClickCmdLine,&len);
+//       }else
+//       {
+//         IShellLink *psl = NULL;
+//         IPersistFile *pPf = NULL;
+//         if ( SUCCEEDED(CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,IID_IShellLink,(LPVOID*)&psl))
+//           && SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (LPVOID*)&pPf))
+//           && SUCCEEDED(pPf->Load(ClickCmdLine,STGM_READ|STGM_SHARE_DENY_NONE))
+//           && SUCCEEDED(psl->Resolve(0,SLR_NO_UI|SLR_NOSEARCH|SLR_NOTRACK|SLR_NOLINKINFO)))
+//         {
+//           psl->GetPath(ClickCmdLine,4096,0,SLGP_UNCPRIORITY);
+//           psl->GetArguments(m_ClickFolderName,4096);
+//           _tcscat(ClickCmdLine,_T(" "));
+//           _tcscat(ClickCmdLine,m_ClickFolderName);
+//           psl->GetWorkingDirectory(m_ClickFolderName,4096);
+//         }
+//         if (pPf)
+//           pPf->Release();
+//         if(psl)
+//           psl->Release();
+//       }
+//     }
+//     TCHAR FileClass[4096]={0};
+//     if(hRegKey)
+//       hKeyToKeyName(hRegKey,FileClass,4096);
+//     DBGTrace3("CShellExt::Initialize(%s , %s , %s)",m_ClickFolderName,ClickCmdLine,FileClass);
+//    if(pDataObj)
+//      PrintDataObj(pDataObj);
+//   }
+//   zero(m_ClickFolderName);
+//   zero(ClickCmdLine);
 #endif DoDBGTrace
   //Non SuRunners don't need the Shell Extension!
   if ((!l_IsSuRunner)||GetHideFromUser(l_User))
