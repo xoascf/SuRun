@@ -289,8 +289,8 @@ STDMETHODIMP_(ULONG) CShellExt::Release()
 //////////////////////////////////////////////////////////////////////////////
 // IShellExtInit
 //////////////////////////////////////////////////////////////////////////////
+static UINT g_CF_ShellIdList=0;
 #ifdef DoDBGTrace
-// static UINT g_CF_ShellIdList=0;
 // #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
 // #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
 // 
