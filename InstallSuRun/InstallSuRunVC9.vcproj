@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="InstallSuRun"
 	ProjectGUID="{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}"
+	RootNamespace="InstallSuRun"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -78,7 +79,7 @@
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/InstallSuRun.pdb"
-				GenerateMapFile="true"
+				GenerateMapFile="false"
 				MapExports="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -90,6 +91,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				OutputManifestFile="$(OutDir)\$(TargetName).manifest"
 				EmbedManifest="false"
 			/>
 			<Tool
@@ -174,8 +176,8 @@
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
 				ProgramDatabaseFile=".\Release/InstallSuRun.pdb"
-				GenerateMapFile="true"
-				MapExports="true"
+				GenerateMapFile="false"
+				MapExports="false"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -186,6 +188,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				OutputManifestFile="$(OutDir)\$(TargetName).manifest"
 				EmbedManifest="false"
 			/>
 			<Tool
@@ -284,6 +287,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				OutputManifestFile="$(OutDir)\$(TargetName).manifest"
 				EmbedManifest="false"
 			/>
 			<Tool
@@ -396,19 +400,19 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\ReleaseUx64\SuRun.exe"
-			>
-		</File>
-		<File
 			RelativePath="..\ReleaseU\SuRun.exe"
 			>
 		</File>
 		<File
-			RelativePath="..\ReleaseUx64\SuRunExt.dll"
+			RelativePath="..\ReleaseUx64\SuRun.exe"
 			>
 		</File>
 		<File
 			RelativePath="..\ReleaseU\SuRunExt.dll"
+			>
+		</File>
+		<File
+			RelativePath="..\ReleaseUx64\SuRunExt.dll"
 			>
 		</File>
 		<File
