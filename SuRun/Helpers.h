@@ -33,7 +33,13 @@ extern unsigned int _winminor;
 #endif //_MSC_VER >= 1500
 
 #define IsWin2k ((_winmajor==5)&&(_winminor==0))
-#define IsWin7 (((_winmajor<<8)|_winminor)>=0x601)
+#define IsWin7pp (((_winmajor<<8)|_winminor)>=0x601)
+#define IsWin7 (((_winmajor<<8)|_winminor)==0x601)
+#define IsWin8 (((_winmajor<<8)|_winminor)==0x602)
+
+#ifndef PROCESS_QUERY_LIMITED_INFORMATION 
+#define PROCESS_QUERY_LIMITED_INFORMATION (0x1000)  
+#endif  PROCESS_QUERY_LIMITED_INFORMATION 
 
 //  Registry Helper
 #define HKCR HKEY_CLASSES_ROOT

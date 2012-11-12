@@ -1428,8 +1428,8 @@ DWORD LSAStartAdminProcess()
           //Vista: Set SYNCHRONIZE only access for Logon SID
           HANDLE hShell=GetSessionUserToken(g_RunData.SessionID);
           PSID ShellSID=GetLogonSid(hShell);
-          SetAdminDenyUserAccess(pi.hProcess,ShellSID,SYNCHRONIZE|READ_CONTROL/*|PROCESS_TERMINATE|PROCESS_VM_READ*/|PROCESS_QUERY_INFORMATION|PROCESS_QUERY_LIMITED_INFORMATION/*|GENERIC_READ|PROCESS_SUSPEND_RESUME*/);
-          SetAdminDenyUserAccess(pi.hThread,ShellSID,SYNCHRONIZE/*|READ_CONTROL|THREAD_GET_CONTEXT|THREAD_QUERY_INFORMATION|THREAD_QUERY_LIMITED_INFORMATION*//*|GENERIC_READ|THREAD_SUSPEND_RESUME*/);
+          SetAdminDenyUserAccess(pi.hProcess,ShellSID,SYNCHRONIZE|READ_CONTROL|PROCESS_QUERY_INFORMATION|PROCESS_QUERY_LIMITED_INFORMATION);
+          SetAdminDenyUserAccess(pi.hThread,ShellSID,SYNCHRONIZE);
           free(ShellSID);
           CloseHandle(hShell);
         }
@@ -1454,7 +1454,7 @@ DWORD LSAStartAdminProcess()
             //call DestroyWindow() for each "Desktop Proxy" Windows Class in an 
             //Explorer.exe, this will cause a new Explorer.exe to stay running
             EnumWindows(KillProxyDesktopEnum,0);
-          }else if (IsWin7) //Win7: Set HKCR\AppID\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}\RunAs:
+          }else if (IsWin7pp) //Win7: Set HKCR\AppID\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}\RunAs:
           {
             PSID pOldOwner = NULL;
             DWORD e=GetNamedSecurityInfo(W7ExplCOMkey,SE_REGISTRY_KEY, 
@@ -1524,7 +1524,7 @@ DWORD LSAStartAdminProcess()
               ;
             if(!orgSP)
               SetSeparateProcess((HKEY)ProfInf.hProfile,0);
-          }else if (IsWin7) //Restore original RunAs:
+          }else if (IsWin7pp) //Restore original RunAs:
           {
             WaitForSingleObject(pi.hProcess,10000);
             if(!RegRenameVal(HKCR,L"AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}",L"_RunAs",L"RunAs"))

@@ -29,8 +29,9 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
-SuRun 1.2.1.1b1 - 2012-07-03
+SuRun 1.2.1.1b2 - 2012-11-12
 ----------------------------
+* FIX: Implemented Q&D fix to hook Windows 8 "api-ms-win-*-l1-1-1" DLLs
 * FIX: Changed permissions of started Apps (SetAdminDenyUserAccess) for 
        Windows 7 Jumplist compatibility
 * FIX: ShellExecuteHook asked to start file.exe when file.exe.ext was run
