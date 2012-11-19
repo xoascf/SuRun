@@ -861,10 +861,10 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           ProcessIdToSessionId(g_RunData.CliProcessId,&SessionID);
           if(SetTokenInformation(hRunLSASS,TokenSessionId,&SessionID,sizeof(DWORD)))
           {
-            STARTUPINFO si={0};
-            si.cb=sizeof(si);
             TCHAR WinstaDesk[2*MAX_PATH+2];
             _stprintf(WinstaDesk,_T("%s\\%s"),g_RunData.WinSta,g_RunData.Desk);
+            STARTUPINFO si={0};
+            si.cb=sizeof(si);
             si.lpDesktop = WinstaDesk;
             si.dwFlags=STARTF_FORCEOFFFEEDBACK;
             TCHAR cmd[4096]={0};
@@ -1428,8 +1428,8 @@ DWORD LSAStartAdminProcess()
           //Vista: Set SYNCHRONIZE only access for Logon SID
           HANDLE hShell=GetSessionUserToken(g_RunData.SessionID);
           PSID ShellSID=GetLogonSid(hShell);
-          SetAdminDenyUserAccess(pi.hProcess,ShellSID,SYNCHRONIZE|READ_CONTROL|PROCESS_QUERY_INFORMATION|PROCESS_QUERY_LIMITED_INFORMATION);
-          SetAdminDenyUserAccess(pi.hThread,ShellSID,SYNCHRONIZE);
+          SetAdminDenyUserAccess(pi.hProcess,ShellSID,SURUN_PROCESS_ACCESS_FLAGS);
+          SetAdminDenyUserAccess(pi.hThread,ShellSID,SURUN_THREAD_ACCESS_FLAGS);
           free(ShellSID);
           CloseHandle(hShell);
         }
@@ -1800,6 +1800,8 @@ void SuRun()
         {
           ResumeClient(RETVAL_ACCESSDENIED);
           ExitProcess(~GetCurrentProcessId());
+          for(;;)
+            ;
         }
         GetSystemWindowsDirectory(g_RunData.cmdLine,4096);
         PathAppend(g_RunData.cmdLine,L"SuRun.exe");
@@ -2816,7 +2818,8 @@ bool HandleServiceStuff()
         CloseHandle(pi.hProcess);
       }
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
   }
   if (cmd.argc()==2)
@@ -2827,7 +2830,8 @@ bool HandleServiceStuff()
       SuRun();
       DeleteSafeDesktop(false);
       ExitProcess(~GetCurrentProcessId());
-      //return true;
+      for(;;)
+        ;
     }
     //Service
     if (_tcsicmp(cmd.argv(1),_T("/SERVICERUN"))==0)
@@ -2842,35 +2846,40 @@ bool HandleServiceStuff()
       //Shell Extension
       RemoveShellExt();
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
     //System Menu Hook: This is AutoRun for every user
     if (_tcsicmp(cmd.argv(1),_T("/SYSMENUHOOK"))==0)
     {
       HandleHooks();
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
     //Install
     if (_tcsicmp(cmd.argv(1),_T("/INSTALL"))==0)
     {
       InstallService();
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
     //UnInstall
     if (_tcsicmp(cmd.argv(1),_T("/UNINSTALL"))==0)
     {
       UserUninstall();
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
     //UserInst:
     if (_tcsicmp(cmd.argv(1),_T("/USERINST"))==0)
     {
       UserInstall();
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
   }
   if (cmd.argc()==5)
@@ -2880,7 +2889,8 @@ bool HandleServiceStuff()
     {
       DoWatchDog(cmd.argv(2),cmd.argv(3),_tcstoul(cmd.argv(4),0,10));
       ExitProcess(0);
-      //return true;
+      for(;;)
+        ;
     }
   }
   //Are we run from the Windows directory?, if Not, ask for Install/update
@@ -2905,7 +2915,8 @@ bool HandleServiceStuff()
         UserInstall();
         ExitProcess(0);
       }
-      //return true;
+      for(;;)
+        ;
     }
   }
 #endif _DEBUG
@@ -2920,7 +2931,8 @@ bool HandleServiceStuff()
   if (ss!=SERVICE_RUNNING)
   {
     ExitProcess((DWORD)-2);//Let ShellExec Hook return
-    //return true;
+    for(;;)
+      ;
   }
   return false;
 }

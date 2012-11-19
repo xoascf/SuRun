@@ -759,7 +759,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
         pei->hInstApp=(HINSTANCE)33;
         //return valid PROCESS_INFORMATION!
         if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
-          pei->hProcess=OpenProcess(SYNCHRONIZE,false,rpi.dwProcessId);
+          pei->hProcess=OpenProcess(SURUN_PROCESS_ACCESS_FLAGS,false,rpi.dwProcessId);
       }else 
       {
         pei->hInstApp=bRunAs?(HINSTANCE)34:(HINSTANCE)SE_ERR_ACCESSDENIED;
