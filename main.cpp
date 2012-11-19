@@ -195,7 +195,11 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         g_RunData.RetPID=wcstol(Args,0,10);
         Args=PathGetArgs(Args);
+#ifndef _WIN64
         g_RunData.RetPtr=wcstoul(Args,0,16);
+#else _WIN64
+        g_RunData.RetPtr=_wcstoui64(Args,0,16);
+#endif _WIN64
         Args=PathGetArgs(Args);
         //If we run on a desktop we cannot switch from, bail out!
         HDESK d=OpenInputDesktop(0,0,0);

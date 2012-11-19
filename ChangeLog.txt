@@ -29,6 +29,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.1.1b2 - 2012-11-19
+----------------------------
+* FIX: On all Windows x64 Systems SuRun's hooks did not return a valid 
+       process handle until now.
+* FIX: SuRun's hooks were not x86 and x64 "cross compatible".
+       If an x64 hook catched an x86 call, the hooks could cause a GPF, 
+       because SuRun wrote a PROCESS_INFOROMATION structure to the client 
+       process and that structure has different sizes on x86 and x64.
+
 SuRun 1.2.1.1b2 - 2012-11-12
 ----------------------------
 * FIX: Implemented Q&D fix to hook Windows 8 "api-ms-win-*-l1-1-1" DLLs

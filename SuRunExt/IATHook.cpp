@@ -567,7 +567,6 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
   }
   if (parms)
     wcscat(cmd,parms);
-  PROCESS_INFORMATION rpi={0};
   //ToDo: Directly write to service pipe!
   static WCHAR tmp[4096];
   zero(tmp);
@@ -586,8 +585,9 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     if(_tcsicmp(tmp,tmp2)==0)
       return LeaveCriticalSection(&g_HookCs),RETVAL_SX_NOTINLIST;  
   }
-  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",
-    GetCurrentProcessId(),&rpi,tmp);
+  static RET_PROCESS_INFORMATION rpi;
+  zero(rpi);
+  wsprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %p %s",GetCurrentProcessId(),&rpi,tmp);
 //  CTimeLog l(L"IATHook TestAutoSuRun(%s)",tmp);
   static STARTUPINFOW si;
   zero(si);
@@ -613,10 +613,25 @@ DWORD TestAutoSuRunW(LPCWSTR lpApp,LPWSTR lpCmd,LPCWSTR lpCurDir,
     if (ExitCode==RETVAL_OK)
     {
       //return a valid PROCESS_INFORMATION!
-      rpi.hProcess=OpenProcess(SURUN_PROCESS_ACCESS_FLAGS,false,rpi.dwProcessId);
-      rpi.hThread=OpenThread(SURUN_THREAD_ACCESS_FLAGS,false,rpi.dwThreadId);
-      if(lppi)
-        memmove(lppi,&rpi,sizeof(PROCESS_INFORMATION));
+      if (lppi)
+      {
+        lppi->dwProcessId=rpi.dwProcessId;
+        lppi->dwThreadId=rpi.dwThreadId;
+        if (rpi.dwProcessId)
+        {
+          lppi->hProcess=OpenProcess(SURUN_PROCESS_ACCESS_FLAGS1,false,rpi.dwProcessId);
+          if (!lppi->hProcess)
+            DBGTrace3("SuRun TestAutoSuRunW(%s): OpenProcess(%d) failed: %s",cmd,rpi.dwProcessId,GetLastErrorNameStatic());
+        }else
+          DBGTrace2("SuRun TestAutoSuRunW(%s): Error, returned ProcessID at %p is NULL!",cmd,&rpi);
+        if(rpi.dwThreadId)
+        {
+          lppi->hThread=OpenThread(SURUN_THREAD_ACCESS_FLAGS1,false,rpi.dwThreadId);
+          if (!lppi->hThread)
+            DBGTrace3("SuRun TestAutoSuRunW(%s): OpenThread(%d) failed: %s",cmd,rpi.dwThreadId,GetLastErrorNameStatic());
+        }else
+          DBGTrace2("SuRun TestAutoSuRunW(%s): Error, returned ThreadID at %p is NULL!",cmd,&rpi);
+      }
 //      DBGTrace5("IATHook AutoSuRun(%s) success! PID=%d (h=%x); TID=%d (h=%x)",
 //        cmd,rpi.dwProcessId,rpi.hProcess,
 //        rpi.dwThreadId,rpi.hThread);
