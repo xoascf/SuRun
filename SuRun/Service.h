@@ -17,6 +17,13 @@
 #pragma once
 #include <LMCons.h>
 
+//PROCESS_INFORMATION data size is different on x64 and x86
+typedef struct 
+{
+  DWORD dwProcessId;
+  DWORD dwThreadId;
+} RET_PROCESS_INFORMATION;
+
 //This is the pipe named used to get the SuRun command to the service
 #define ServicePipeName _T("\\\\.\\Pipe\\SuperUserRun")
 
@@ -79,7 +86,11 @@ extern int g_RetVal;
 
 bool HandleServiceStuff();
 
-#define SURUN_PROCESS_ACCESS_FLAGS (SYNCHRONIZE|READ_CONTROL|PROCESS_QUERY_INFORMATION|PROCESS_QUERY_LIMITED_INFORMATION)
-#define SURUN_THREAD_ACCESS_FLAGS  (SYNCHRONIZE)
+//Create...
+#define SURUN_PROCESS_ACCESS_FLAGS  (SYNCHRONIZE|READ_CONTROL|PROCESS_QUERY_INFORMATION|PROCESS_QUERY_LIMITED_INFORMATION)
+#define SURUN_THREAD_ACCESS_FLAGS   (SYNCHRONIZE)
+//Open...
+#define SURUN_PROCESS_ACCESS_FLAGS1 (SYNCHRONIZE|PROCESS_QUERY_LIMITED_INFORMATION)
+#define SURUN_THREAD_ACCESS_FLAGS1  (SYNCHRONIZE)
 
 #pragma pack(pop)

@@ -1506,6 +1506,7 @@ DWORD LSAStartAdminProcess()
               DBGTrace("RegRenameVal error!");
           }
         }
+        //ToDo: Hooks must call ResumeThread, not Service!
         ResumeThread(pi.hThread);
         if(bIsExplorer)
         {
@@ -1548,19 +1549,18 @@ DWORD LSAStartAdminProcess()
         //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
         if((g_RunData.RetPID)&&(g_RunData.RetPtr))
         {
-          pi.hThread=0;
-          pi.hProcess=0;
           HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
           if (hProcess)
           {
+            RET_PROCESS_INFORMATION rpi;
+            rpi.dwProcessId=pi.dwProcessId;
+            rpi.dwThreadId=pi.dwThreadId;
             SIZE_T n;
-            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-              DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-              g_RunData.cmdLine,GetLastErrorNameStatic());
+            if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&rpi,sizeof(rpi),&n))
+              DBGTrace4("SuRun(%s) WriteProcessMemory to PID %d at %p failed: %s",g_RunData.cmdLine,g_RunData.RetPID,g_RunData.RetPtr,GetLastErrorNameStatic());
             CloseHandle(hProcess);
           }else
-            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-            g_RunData.cmdLine,GetLastErrorNameStatic());
+            DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",g_RunData.cmdLine,GetLastErrorNameStatic());
         }
         if (g_RunData.bShlExHook
         && ((GetCommonWhiteListFlags(g_RunData.UserName,g_RunData.cmdLine,0)&FLAG_SHELLEXEC)==0))
@@ -1653,19 +1653,18 @@ UsualWay:
       //ShellExec-Hook: We must return the PID and TID to fake CreateProcess:
       if((g_RunData.RetPID)&&(g_RunData.RetPtr))
       {
-        pi.hThread=0;
-        pi.hProcess=0;
         HANDLE hProcess=OpenProcess(PROCESS_VM_OPERATION|PROCESS_VM_WRITE,FALSE,g_RunData.RetPID);
         if (hProcess)
         {
           SIZE_T n;
-          if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&pi,sizeof(PROCESS_INFORMATION),&n))
-            DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",
-            g_RunData.cmdLine,GetLastErrorNameStatic());
+          RET_PROCESS_INFORMATION rpi;
+          rpi.dwProcessId=pi.dwProcessId;
+          rpi.dwThreadId=pi.dwThreadId;
+          if (!WriteProcessMemory(hProcess,(LPVOID)g_RunData.RetPtr,&rpi,sizeof(rpi),&n))
+            DBGTrace2("AutoSuRun(%s) WriteProcessMemory failed: %s",g_RunData.cmdLine,GetLastErrorNameStatic());
           CloseHandle(hProcess);
         }else
-          DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",
-          g_RunData.cmdLine,GetLastErrorNameStatic());
+          DBGTrace2("AutoSuRun(%s) OpenProcess failed: %s",g_RunData.cmdLine,GetLastErrorNameStatic());
       }
     }else
     {

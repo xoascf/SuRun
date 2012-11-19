@@ -734,12 +734,12 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
   //CTimeLog l(L"ShellExecHook TestAutoSuRun(%s)",tmp);
   //ToDo: Directly write to service pipe!
-  static PROCESS_INFORMATION rpi;
+  static RET_PROCESS_INFORMATION rpi;
   zero(rpi);
   if (bRunAs)
     _stprintf(&cmd[wcslen(cmd)],L" /RUNAS %s",tmp);
   else
-    _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %x %s",GetCurrentProcessId(),&rpi,tmp);
+    _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %p %s",GetCurrentProcessId(),&rpi,tmp);
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
@@ -752,14 +752,19 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     if((WaitForSingleObject(pi.hProcess,INFINITE)==WAIT_OBJECT_0)
       && GetExitCodeProcess(pi.hProcess,(DWORD*)&ExitCode))
     {
-      pei->hProcess=rpi.hProcess;
+      pei->hProcess=0;
       //ExitCode==-2 means that the program is not in the WhiteList
       if (ExitCode==RETVAL_OK)
       {
+        DBGTrace2("SuRun ShellExtExecute(%s), PID=%d intercepted",cmd,rpi.dwProcessId);
         pei->hInstApp=(HINSTANCE)33;
         //return valid PROCESS_INFORMATION!
         if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
-          pei->hProcess=OpenProcess(SURUN_PROCESS_ACCESS_FLAGS,false,rpi.dwProcessId);
+        {
+          pei->hProcess=OpenProcess(SURUN_PROCESS_ACCESS_FLAGS1,false,rpi.dwProcessId);
+          if (!pei->hProcess)
+            DBGTrace3("SuRun ShellExtExecute(%s): OpenProcess(%d) failed: %s",cmd,rpi.dwProcessId,GetLastErrorNameStatic());
+        }
       }else 
       {
         pei->hInstApp=bRunAs?(HINSTANCE)34:(HINSTANCE)SE_ERR_ACCESSDENIED;
