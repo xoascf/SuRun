@@ -52,6 +52,8 @@ extern TOKEN_STATISTICS g_AdminTStat;
 
 HANDLE GetUserToken(DWORD SessionId,LPCTSTR User,LPCTSTR Password,bool AllowEmptyPassword)
 {
+  if((User==0)||(*User==0))
+    return false;
   TCHAR un[2*UNLEN+2]={0};
   TCHAR dn[2*UNLEN+2]={0};
   _tcscpy(un,User);
@@ -120,6 +122,8 @@ static BYTE KEYPASS[16]={0x4f,0xc9,0x4d,0x14,0x63,0xa9,0x4d,0xe2,0x96,0x47,0x2b,
 
 bool LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nBytes)
 {
+  if((RunAsUser==0)||(*RunAsUser==0)||(UserName==0)||(*UserName==0))
+    return false;
   if (!GetSavePW)
     return false;
   DWORD Type=REG_BINARY;
@@ -146,11 +150,15 @@ bool LoadRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password,DWORD nB
 
 void DeleteRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName)
 {
+  if((RunAsUser==0)||(*RunAsUser==0)||(UserName==0)||(*UserName==0))
+    return;
   RegDelVal(HKLM,RAPASSKEY(RunAsUser),UserName);
 }
 
 void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
 {
+  if((RunAsUser==0)||(*RunAsUser==0)||(UserName==0)||(*UserName==0))
+    return;
   if (!GetSavePW)
     return;
   DATA_BLOB pw={0};
@@ -278,7 +286,7 @@ static void SetUserBitmap(HWND hwnd)
         }
       }
     }
-    EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),1);
+    EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),User[0]!=0);
     TCHAR Pass[PWLEN+1]={0};
     if (LoadRunAsPassword(p->User,User,Pass,PWLEN) 
       && PasswordOK(p->SessionId,User,Pass,false))

@@ -298,9 +298,7 @@ BOOL DoHookDll(char* DllName,char* HostDll)
     {
       if ((((!IsWin7pp)||(sys_hdt[i]->apiDllName==0))&&(stricmp(sys_hdt[i]->DllName,DllName)==0))
         ||(sys_hdt[i]->apiDllName && (stricmp(sys_hdt[i]->apiDllName,DllName)==0)))
-      {
         return (sys_hdt[i]->HostDll==0) || (stricmp(sys_hdt[i]->HostDll,HostDll)==0);
-      }
     }
   }else
   {
@@ -308,9 +306,7 @@ BOOL DoHookDll(char* DllName,char* HostDll)
     {
       if ((((!IsWin7pp)||(hdt[i]->apiDllName==0))&&(stricmp(hdt[i]->DllName,DllName)==0))
         ||(hdt[i]->apiDllName && (stricmp(hdt[i]->apiDllName,DllName)==0)))
-      {
         return (hdt[i]->HostDll==0) || (stricmp(hdt[i]->HostDll,HostDll)==0);
-      }
     }
   }
   return false;
@@ -329,12 +325,8 @@ PROC DoHookFn(char* DllName,char* ImpName)
       {
         if ((((!IsWin7pp)||(sys_hdt[i]->apiDllName==0))&& (stricmp(sys_hdt[i]->DllName,DllName)==0))
           ||(sys_hdt[i]->apiDllName && (stricmp(sys_hdt[i]->apiDllName,DllName)==0)))
-        {
           if (stricmp(sys_hdt[i]->FuncName,ImpName)==0)
-          {
             return sys_hdt[i]->newFunc;
-          }
-        }
       }
     }else
     {
@@ -342,12 +334,8 @@ PROC DoHookFn(char* DllName,char* ImpName)
       {
         if ((((!IsWin7pp)||(hdt[i]->apiDllName==0))&&(stricmp(hdt[i]->DllName,DllName)==0))
           ||(hdt[i]->apiDllName && (stricmp(hdt[i]->apiDllName,DllName)==0)))
-        {
           if (stricmp(hdt[i]->FuncName,ImpName)==0)
-          {
             return hdt[i]->newFunc;
-          }
-        }
       }
     }
   }
@@ -364,17 +352,21 @@ bool NeedHookFn(char* DllName,char* ImpName,void* orgFunc)
     if (l_IsAdmin)
     {
       for(int i=0;i<countof(sys_need_hdt);i++)
+      {
         if ((stricmp(sys_need_hdt[i]->DllName,DllName)==0)
           ||(sys_need_hdt[i]->apiDllName && (stricmp(sys_need_hdt[i]->apiDllName,DllName)==0)))
           if (stricmp(sys_need_hdt[i]->FuncName,ImpName)==0)
             return sys_need_hdt[i]->OrgFunc()==orgFunc;
+      }
     }else
     {
       for(int i=0;i<countof(need_hdt);i++)
+      {
         if ((stricmp(need_hdt[i]->DllName,DllName)==0)
           ||(need_hdt[i]->apiDllName && (stricmp(need_hdt[i]->apiDllName,DllName)==0)))
           if (stricmp(need_hdt[i]->FuncName,ImpName)==0)
             return need_hdt[i]->OrgFunc()==orgFunc;
+      }
     }
   }
   return false;
