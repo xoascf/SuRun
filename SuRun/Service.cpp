@@ -1357,7 +1357,7 @@ BOOL CALLBACK KillProxyDesktopEnum(HWND hwnd, LPARAM lParam)
   return TRUE;
 }
 
-#define W7ExplCOMkey L"CLASSES_ROOT\\AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}"
+#define W7ExplCOMkey L"AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}"
 
 DWORD LSAStartAdminProcess() 
 {
@@ -1436,9 +1436,6 @@ DWORD LSAStartAdminProcess()
         //Special handling for Explorer:
         BOOL orgSP=1;
         PACL pOldDACL = NULL; 
-        PACL pNewDACL = NULL; 
-        PSID pNewOwner = NULL;
-        PSECURITY_DESCRIPTOR pSD = NULL;
         if(bIsExplorer)
         {
           //Before Vista: kill Desktop Proxy
@@ -1456,57 +1453,14 @@ DWORD LSAStartAdminProcess()
             EnumWindows(KillProxyDesktopEnum,0);
           }else if (IsWin7pp) //Win7: Set HKCR\AppID\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}\RunAs:
           {
-            PSID pOldOwner = NULL;
-            DWORD e=GetNamedSecurityInfo(W7ExplCOMkey,SE_REGISTRY_KEY, 
-              OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION, 
-              &pOldOwner, NULL, &pOldDACL, NULL, &pSD);
-            if (e!=ERROR_SUCCESS)
-              DBGTrace1("GetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
-            // Initialize Admin SID
-            EnablePrivilege(SE_TAKE_OWNERSHIP_NAME);
-            EnablePrivilege(SE_RESTORE_NAME);
-            SID_IDENTIFIER_AUTHORITY AdminSidAuth = SECURITY_NT_AUTHORITY;
-            if (!AllocateAndInitializeSid(&AdminSidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,
-              DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&pNewOwner))
-              DBGTrace1("AllocateAndInitializeSid error: %s",GetLastErrorNameStatic());
-            //Take ownership
-            e=SetNamedSecurityInfo(W7ExplCOMkey, SE_REGISTRY_KEY, 
-              OWNER_SECURITY_INFORMATION, pNewOwner, NULL, NULL, NULL);
-            if (e!=ERROR_SUCCESS)
-              DBGTrace1("SetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
-            // Initialize an EXPLICIT_ACCESS structure for an ACE.
-            // The ACE will allow Admins full access to the key.
-            EXPLICIT_ACCESS ea={0};
-            ea.grfAccessPermissions = KEY_ALL_ACCESS;
-            ea.grfAccessMode = SET_ACCESS;
-            ea.grfInheritance= SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-            ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-            ea.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-            ea.Trustee.ptstrName  = (LPTSTR) pNewOwner;
-            // Create a new ACL that merges the new ACE into the existing DACL.
-            e=SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
-            if (e!=ERROR_SUCCESS)
-              DBGTrace1("SetEntriesInAcl error: %s",GetErrorNameStatic(e));
-            //Set DACL
-            e=SetNamedSecurityInfo(W7ExplCOMkey, SE_REGISTRY_KEY, 
-              DACL_SECURITY_INFORMATION,  NULL, NULL, pNewDACL, NULL);
-            if (e!=ERROR_SUCCESS)
-              DBGTrace1("SetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
-            //release ownership
-            e=SetNamedSecurityInfo(W7ExplCOMkey, SE_REGISTRY_KEY, 
-              OWNER_SECURITY_INFORMATION, pOldOwner, NULL, NULL, NULL);
-            if (e!=ERROR_SUCCESS)
-            {
-              TCHAR u[2*DNLEN];
-              GetSIDUserName(pOldOwner,u);
-              DBGTrace2("SetNamedSecurityInfo(Owner=%s) error: %s",u,GetErrorNameStatic(e));
-            }
+            pOldDACL = RegGrantAdminAccess(HKCR,W7ExplCOMkey);
             //Rename
-            if (!RegRenameVal(HKCR,L"AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}",L"RunAs",L"_RunAs"))
+            if (!RegRenameVal(HKCR,W7ExplCOMkey,L"RunAs",L"_RunAs"))
               DBGTrace("RegRenameVal error!");
           }
         }
         //ToDo: Hooks must call ResumeThread, not Service!
+        //but... limited user has no PROCESS_SUSPEND_RESUME or THREAD_SUSPEND_RESUME access
         ResumeThread(pi.hThread);
         if(bIsExplorer)
         {
@@ -1530,18 +1484,12 @@ DWORD LSAStartAdminProcess()
             WaitForSingleObject(pi.hProcess,10000);
             if(!RegRenameVal(HKCR,L"AppID\\{CDCBCFCA-3CDC-436f-A4E2-0E02075250C2}",L"_RunAs",L"RunAs"))
               DBGTrace("RegRenameVal error!");
-            DWORD e=SetNamedSecurityInfo(W7ExplCOMkey, SE_REGISTRY_KEY, 
-              DACL_SECURITY_INFORMATION,  NULL, NULL, pOldDACL, NULL);
-            if (e!=ERROR_SUCCESS)
-              DBGTrace1("SetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
+            if(pOldDACL)
+              RegSetDACL(HKCR,W7ExplCOMkey,pOldDACL);
           }
         }
-        if(pSD) 
-          LocalFree((HLOCAL)pSD); 
-        if(pNewDACL) 
-          LocalFree((HLOCAL)pNewDACL); 
-        if(pNewOwner)
-          FreeSid(pNewOwner);
+        if(pOldDACL)
+          free(pOldDACL);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         g_RunData.NewPID=pi.dwProcessId;
@@ -2698,8 +2646,7 @@ static void HandleHooks()
   GetProcessUserName(g_RunData.CliProcessId,g_RunData.UserName);
   ProcessIdToSessionId(g_RunData.CliProcessId,&g_RunData.SessionID);
   g_RunData.Groups=UserIsInSuRunnersOrAdmins();
-  //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check
-  //if the hooks are still loaded
+  //ToDo: EnumProcesses,EnumProcessModules,GetModuleFileNameEx to check if the hooks are still loaded
   
   //In the first three Minutes after Sytstem start:
   //Wait for the service to start

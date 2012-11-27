@@ -29,7 +29,15 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
-SuRun 1.2.1.1b2 - 2012-11-19
+SuRun 1.2.1.1b4 - 2012-11-27
+----------------------------
+* FIX: When using SuRun /RunAs, if the user name was cleared, SuRun deleted 
+       the HKLM\Security\SuRun Registry key. 
+       All SuRun settings in that registry location were lost.
+       This caused "SuRunners" members to get full access to the system.
+       The Bug appeared with SuRun's /RunAs support in version 1.2.0.0.
+
+SuRun 1.2.1.1b3 - 2012-11-19
 ----------------------------
 * FIX: On all Windows x64 Systems SuRun's hooks did not return a valid 
        process handle until now.

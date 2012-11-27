@@ -112,8 +112,11 @@
 #define SetUsrSetting(u,s,v,d)  if(GetUsrSetting(u,s,d)!=v)\
                                   SetRegInt(HKLM,USERKEY(u),s,v)
 
-#define DelUsrSettings(u)       DelRegKey(HKLM,WHTLSTKEY(u));\
-                                DelRegKey(HKCR,USROPTKEY(u))
+#define DelUsrSettings(u)       if(u && *u) \
+                                { \
+                                  DelRegKey(HKLM,WHTLSTKEY(u)); \
+                                  DelRegKey(HKCR,USROPTKEY(u)); \
+                                }
                                 
 #define DelAllUsrSettings       DelRegKeyChildren(HKLM,SVCKEY);\
                                 DelRegKey(HKCR,SHEXOPTKEY)
@@ -213,7 +216,7 @@
 #define SetUsrOption(u,s,v,d) if(GetUsrOption(u,s,d)!=v)\
                                 SetRegInt(HKCR,USROPTKEY(u),s,v)
 
-#define DelUsrOption(u,s)     RegDelVal(HKCR,USROPTKEY(u),s)
+#define DelUsrOption(u,s)     if (u && *u) RegDelVal(HKCR,USROPTKEY(u),s)
 
 #define GetUserTSA(u)         GetUsrOption(u,_T("ShowTrayAdmin"),2)
 #define SetUserTSA(u,v)       SetUsrOption(u,_T("ShowTrayAdmin"),v,2)

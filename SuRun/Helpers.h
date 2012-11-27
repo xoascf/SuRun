@@ -57,6 +57,9 @@ extern unsigned int _winminor;
 #define SS_REALSIZECONTROL  0x00000040L
 #endif SS_REALSIZECONTROL
 
+bool RegSetDACL(HKEY HK,LPCTSTR SubKey,PACL pACL);
+PACL RegGrantAdminAccess(HKEY HK,LPCTSTR SubKey);
+
 BOOL GetRegAnyPtr(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE* RetVal,DWORD* nBytes);
 BOOL GetRegAnyAlloc(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD* Type,BYTE** RetVal,DWORD* nBytes);
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes);
@@ -176,19 +179,14 @@ DWORD GetProcessFileName(LPWSTR lpFilename,DWORD nSize);
 //ASLR
 inline LPVOID BASE_ADDR(LPVOID LocAddr,HANDLE hProcess)
 {
+  LPVOID p=LocAddr;
   DWORD d;
   HMODULE hMod=0;
-  if(!EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
-  {
-//     DBGTrace1("EnumProcessModules failed",GetLastErrorNameStatic());
-    return LocAddr;
-  }
-  LPVOID p=(LPVOID)((BYTE*)LocAddr-(BYTE*)GetModuleHandle(0)+(BYTE*)hMod);
-// #ifdef _WIN64
-//   DBGTrace2("BASE_ADDR(%I64x)==%I64x",LocAddr,p);
-// #else
-//   DBGTrace2("BASE_ADDR(%x)==%x",LocAddr,p);
-// #endif
+  if(EnumProcessModules(hProcess,&hMod,sizeof(hMod),&d))
+    p=(LPVOID)((BYTE*)LocAddr-(BYTE*)GetModuleHandle(0)+(BYTE*)hMod);
+//  else
+//    DBGTrace1("EnumProcessModules failed",GetLastErrorNameStatic());
+//  DBGTrace2("BASE_ADDR(%p)==%p",LocAddr,p);
   return p;
 }
 

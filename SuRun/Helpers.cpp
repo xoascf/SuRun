@@ -66,6 +66,95 @@ unsigned int _winver = _GetWinVer();
 //  Registry Helper
 //
 //////////////////////////////////////////////////////////////////////////////
+PACL CopyAcl(PACL pFrom)
+{
+  if (!pFrom)
+    return NULL;
+  ACL_SIZE_INFORMATION info;
+  if (!GetAclInformation(pFrom,&info,sizeof(info),AclSizeInformation))
+    return NULL;
+  PACL pTo=(PACL)malloc(info.AclBytesInUse);
+  if (!pTo)
+    return NULL;
+  if (!InitializeAcl(pTo,info.AclBytesInUse,ACL_REVISION))
+    return free(pTo),NULL;
+  for (DWORD i=0;i<info.AceCount;i++)
+  {
+    ACE_HEADER* pace = 0;
+    if(GetAce(pFrom,i,(void**)(&pace)))
+      AddAce(pTo,ACL_REVISION,MAXDWORD,pace,pace->AceSize);
+  }
+  return pTo;
+}
+
+bool RegSetDACL(HKEY HK,LPCTSTR SubKey,PACL pACL)
+{
+  CBigResStr sRegKey(L"%s\\%s",(HK==HKLM)?(L"MACHINE"):((HK==HKCU)?(L"CURRENT_USER"):((HK==HKCR)?(L"CLASSES_ROOT"):((HK==HKEY_USERS)?(L"USERS"):(L"")))),SubKey);
+  DWORD e=SetNamedSecurityInfo(sRegKey,SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION,  NULL, NULL, pACL, NULL);
+  if (e!=ERROR_SUCCESS)
+    DBGTrace2("SetNamedSecurityInfo(%s) error: %s",sRegKey,GetErrorNameStatic(e));
+  return e==ERROR_SUCCESS;
+}
+
+PACL RegGrantAdminAccess(HKEY HK,LPCTSTR SubKey)
+{
+  CBigResStr sRegKey(L"%s\\%s",(HK==HKLM)?(L"MACHINE"):((HK==HKCU)?(L"CURRENT_USER"):((HK==HKCR)?(L"CLASSES_ROOT"):((HK==HKEY_USERS)?(L"USERS"):(L"")))),SubKey);
+  PSECURITY_DESCRIPTOR pSD = NULL;
+  PACL pOldDACL = NULL; 
+  PACL pNewDACL = NULL; 
+  PSID pOldOwner = NULL;
+  PSID pNewOwner = NULL;
+  DWORD e=GetNamedSecurityInfo(sRegKey,SE_REGISTRY_KEY, OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION, &pOldOwner, NULL, &pOldDACL, NULL, &pSD);
+  if (e==ERROR_SUCCESS)
+  {
+    // Initialize Admin SID
+    EnablePrivilege(SE_TAKE_OWNERSHIP_NAME);
+    EnablePrivilege(SE_RESTORE_NAME);
+    SID_IDENTIFIER_AUTHORITY AdminSidAuth = SECURITY_NT_AUTHORITY;
+    if (AllocateAndInitializeSid(&AdminSidAuth,2,SECURITY_BUILTIN_DOMAIN_RID,DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&pNewOwner))
+    {
+      //Take ownership
+      e=SetNamedSecurityInfo(sRegKey, SE_REGISTRY_KEY, OWNER_SECURITY_INFORMATION, pNewOwner, NULL, NULL, NULL);
+      if (e==ERROR_SUCCESS)
+      {
+        // Initialize an EXPLICIT_ACCESS structure for an ACE.
+        // The ACE will allow Admins full access to the key.
+        EXPLICIT_ACCESS ea={KEY_ALL_ACCESS,SET_ACCESS,SUB_CONTAINERS_AND_OBJECTS_INHERIT,{0,NO_MULTIPLE_TRUSTEE,TRUSTEE_IS_SID,TRUSTEE_IS_WELL_KNOWN_GROUP,(LPTSTR)pNewOwner}};
+        // Create a new ACL that merges the new ACE into the existing DACL.
+        e=SetEntriesInAcl(1, &ea, pOldDACL, &pNewDACL);
+        if (e==ERROR_SUCCESS)
+        {
+          //Set DACL
+          e=SetNamedSecurityInfo(sRegKey, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION,  NULL, NULL, pNewDACL, NULL);
+          if (e!=ERROR_SUCCESS)
+            DBGTrace1("SetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
+        }else
+          DBGTrace1("SetEntriesInAcl error: %s",GetErrorNameStatic(e));
+        //release ownership
+        e=SetNamedSecurityInfo(sRegKey, SE_REGISTRY_KEY, OWNER_SECURITY_INFORMATION, pOldOwner, NULL, NULL, NULL);
+        if (e!=ERROR_SUCCESS)
+        {
+          TCHAR u[2*DNLEN];
+          GetSIDUserName(pOldOwner,u);
+          DBGTrace2("SetNamedSecurityInfo(Owner=%s) error: %s",u,GetErrorNameStatic(e));
+        }
+      }else
+        DBGTrace1("SetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
+    }else
+      DBGTrace1("AllocateAndInitializeSid error: %s",GetLastErrorNameStatic());
+  }else
+    DBGTrace1("GetNamedSecurityInfo error: %s",GetErrorNameStatic(e));
+  if(pNewDACL) 
+    LocalFree((HLOCAL)pNewDACL); 
+  if(pNewOwner)
+    FreeSid(pNewOwner);
+  if (pOldDACL)
+    pOldDACL=CopyAcl(pOldDACL);
+  if(pSD) 
+    LocalFree((HLOCAL)pSD); 
+  return pOldDACL;
+}
+
 BOOL GetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* RetVal,DWORD* nBytes)
 {
   HKEY Key;
@@ -116,7 +205,7 @@ BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWOR
 {
   HKEY Key;
   DWORD dwRes=RegOpenKeyEx(HK,SubKey,0,KSAM(KEY_WRITE),&Key);
-  if (dwRes!=ERROR_SUCCESS)
+  if ((dwRes!=ERROR_SUCCESS)&&(dwRes!=ERROR_ACCESS_DENIED))
     dwRes=RegCreateKeyEx(HK,SubKey,0,0,0,KSAM(KEY_WRITE),0,&Key,0);
   if (dwRes==ERROR_SUCCESS)
   {
@@ -125,8 +214,10 @@ BOOL SetRegAny(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,DWORD Type,BYTE* Data,DWOR
       RegFlushKey(Key);
     RegCloseKey(Key);
     return l==ERROR_SUCCESS;
-  }else
+  }else if (dwRes!=ERROR_ACCESS_DENIED)
     DBGTrace3("RegCreateKeyEx(%x,%s) failed: %s",HK,SubKey,GetErrorNameStatic(dwRes));
+  else
+    DBGTrace3("RegOpenKeyEx(%x,%s) failed: %s",HK,SubKey,GetErrorNameStatic(dwRes));
   return FALSE;
 }
 
@@ -141,7 +232,8 @@ BOOL RegDelVal(HKEY HK,LPCTSTR SubKey,LPCTSTR ValName,BOOL bFlush/*=FALSE*/)
       RegFlushKey(Key);
     RegCloseKey(Key);
     return bRet;
-  }
+  }else
+    DBGTrace3("RegOpenKeyEx(%x,%s) failed: %s",HK,SubKey,GetErrorNameStatic(dwRes));
   return FALSE;
 }
 

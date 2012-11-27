@@ -135,6 +135,8 @@ DWORD AlterGroupMember(DWORD Rid,LPCWSTR DomainAndName, BOOL bAdd)
 /////////////////////////////////////////////////////////////////////////////
 BOOL IsInGroupDirect(LPCWSTR Group,LPCWSTR DomainAndName)
 {	
+  if ((DomainAndName==0)||(*DomainAndName==0))
+    return false;
   //CTimeLog l(L"IsInGroupDirect(%s,%s)",Group,DomainAndName);
 	DWORD result = 0;
 	NET_API_STATUS status;
@@ -218,6 +220,8 @@ BOOL IsInGroup(DWORD Rid,LPCWSTR DomainAndName,DWORD SessionId)
 /////////////////////////////////////////////////////////////////////////////
 BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionId)
 {
+  if ((DomainAndName==0)||(*DomainAndName==0))
+    return false;
   if(!GetUseSuRunGrp)
     return TRUE;
   if (IsInGroup(SURUNNERSGROUP,DomainAndName,SessionId))
@@ -230,6 +234,8 @@ BOOL IsInSuRunners(LPCWSTR DomainAndName,DWORD SessionId)
 DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
 {
   //CTimeLog l(L"IsInSuRunnersOrAdmins(%s)",DomainAndName);
+  if ((DomainAndName==0)||(*DomainAndName==0))
+    return 0;
   DWORD dwRet=0;
   {
     CImpersonateSessionUser ilu(SessionID);
@@ -284,6 +290,8 @@ DWORD IsInSuRunnersOrAdmins(LPCWSTR DomainAndName,DWORD SessionID)
 //////////////////////////////////////////////////////////////////////////////
 BOOL BecomeSuRunner(LPCTSTR UserName,DWORD SessionID,bool bIsInAdmins,bool bIsSplitAdmin,BOOL bHimSelf,HWND hwnd)
 {
+  if ((UserName==0)||(*UserName==0))
+    return 0;
   //Is User member of SuRunners?
   CResStr sCaption(IDS_APPNAME);
   if(bHimSelf)
@@ -398,6 +406,8 @@ HBITMAP USERLIST::GetUserBitmap(int nUser)
 
 HBITMAP USERLIST::GetUserBitmap(LPTSTR UserName)
 {
+  if ((UserName==0)||(*UserName==0))
+    return 0;
   TCHAR un[2*UNLEN+2];
   _tcscpy(un,UserName);
   PathStripPath(un);
@@ -422,6 +432,9 @@ SIZE USERLIST::GetUserBitmapSize(int nUser)
 
 SIZE USERLIST::GetUserBitmapSize(LPTSTR UserName)
 {
+  SIZE s={0};
+  if ((UserName==0)||(*UserName==0))
+    return s;
   TCHAR un[2*UNLEN+2];
   _tcscpy(un,UserName);
   PathStripPath(un);
@@ -433,7 +446,6 @@ SIZE USERLIST::GetUserBitmapSize(LPTSTR UserName)
     if (_tcsicmp(un,UN)==0)
       return User[i].UserBitmapSize;
   }
-  SIZE s={0};
   return s;
 }
 
@@ -476,6 +488,8 @@ void USERLIST::LoadUserBitmaps()
 
 int USERLIST::FindUser(LPTSTR UserName)
 {
+  if ((UserName==0)||(*UserName==0))
+    return -1;
   for (int i=0;i<nUsers;i++)
     if(_tcsicmp(User[i].UserName,UserName)==0)
       return i;
@@ -550,6 +564,8 @@ static USERDATA* UsrRealloc(USERDATA* User,int nUsers)
 
 void USERLIST::Add(LPCWSTR UserName)
 {
+  if ((UserName==0)||(*UserName==0))
+    return;
   if (m_bSkipAdmins && IsInGroup(DOMAIN_ALIAS_RID_ADMINS,UserName,(DWORD)-1))
     return;
   int j=0;
@@ -592,6 +608,8 @@ static void MsgLoop()
 
 void USERLIST::AddGroupUsers(LPWSTR GroupName,BOOL bScanDomain)
 {
+  if ((GroupName==0)||(*GroupName==0))
+    return;
 //  DBGTrace1("AddGroupUsers for Group %s",GroupName);
   TCHAR cn[2*UNLEN+2]={0};
   DWORD cnl=UNLEN;

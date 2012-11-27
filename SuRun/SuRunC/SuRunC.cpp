@@ -152,7 +152,7 @@ wmain( int argc, wchar_t *argv[ ], wchar_t *envp[ ] )
   GetSystemWindowsDirectory(cmd,4096);
   PathAppend(cmd,L"SuRun.exe");
   PathQuoteSpaces(cmd);
-  _tcscat(cmd,L" /RetPID ");
+  _tcscat(cmd,L" /RETPID /CONSOLE ");
   _tcscat(cmd,PathGetArgs(GetCommandLine()));
   
   DWORD dwExCode=-1;

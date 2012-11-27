@@ -256,19 +256,20 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       }else
       {
         //invalid direct argument
+        DBGTrace("SuRun: Invalid usage!");
         return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
       }
-    }
-    bool bShellIsadmin=FALSE;
-    HANDLE hTok=GetShellProcessToken();
-    if(hTok)
-    {
-      bShellIsadmin=IsAdmin(hTok)!=0;
-      CloseHandle(hTok);
     }
     //Convert Command Line
     if (!g_RunData.cmdLine[0])
     {
+      bool bShellIsadmin=FALSE;
+      HANDLE hTok=GetShellProcessToken();
+      if(hTok)
+      {
+        bShellIsadmin=IsAdmin(hTok)!=0;
+        CloseHandle(hTok);
+      }
       //If shell is Admin but User is SuRunner, the Shell must be restarted
       if ((!g_RunData.bRunAs) && g_CliIsInSuRunners && bShellIsadmin)
       {
@@ -304,7 +305,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       break;
     if ((err==ERROR_FILE_NOT_FOUND)||(err==ERROR_ACCESS_DENIED))
       return RETVAL_ACCESSDENIED;
-    DBGTrace2("CreateFile(%s) failed: %s",ServicePipeName,GetErrorNameStatic(err));
+    DBGTrace2("SuRun CreateFile(%s) failed: %s",ServicePipeName,GetErrorNameStatic(err));
     Sleep(250);
   }
   //No Pipe handle: fail!
@@ -351,7 +352,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
           WaitForSingleObject(hProcess,INFINITE);
           CloseHandle(hProcess);
         }else
-          DBGTrace2("OpenProcess(%d) failed: %s",g_RunData.NewPID,GetLastErrorNameStatic());
+          DBGTrace2("SuRun OpenProcess(%d) failed: %s",g_RunData.NewPID,GetLastErrorNameStatic());
       }
       return bRetPID?g_RunData.NewPID:RETVAL_OK;
     }
