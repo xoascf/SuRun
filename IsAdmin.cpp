@@ -277,7 +277,10 @@ BOOL RunAsAdmin(LPCTSTR cmdline,int IDmsg)
     sei.lpParameters=p;
     sei.nShow=SW_SHOWNORMAL;
     if (ShellExecuteEx(&sei) && sei.hProcess)
+    {
+      CloseHandle(sei.hProcess);
       return TRUE;
+    }
     return FALSE;
   }
   //Standard User: Show Logon Dialog

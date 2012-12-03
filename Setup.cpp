@@ -101,6 +101,8 @@ void SavePassword(LPTSTR UserName,LPTSTR Password)
 
 BOOL PasswordExpired(LPTSTR UserName)
 {
+  if ((UserName==0)||(*UserName==0))
+    return TRUE;
   __int64 ft;
   GetSystemTimeAsFileTime((LPFILETIME)&ft);
   __int64 pwto=ft2min*GetPwTimeOut;

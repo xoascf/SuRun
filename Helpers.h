@@ -176,6 +176,9 @@ DWORD GetModuleFileNameAEx(HMODULE hMod,LPSTR lpFilename,DWORD nSize);
 DWORD GetModuleFileNameWEx(HMODULE hMod,LPWSTR lpFilename,DWORD nSize);
 DWORD GetProcessFileName(LPWSTR lpFilename,DWORD nSize);
 
+DWORD GetParentProcessID(DWORD PID);
+//BOOL SetParentProcessID(HANDLE hProcess,DWORD PID);
+BOOL SetProcessUserToken(HANDLE hProcess,HANDLE hUser);
 //ASLR
 inline LPVOID BASE_ADDR(LPVOID LocAddr,HANDLE hProcess)
 {
