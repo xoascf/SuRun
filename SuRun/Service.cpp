@@ -1276,6 +1276,7 @@ BOOL Setup()
   {
     if(!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_PW4SETUP))
       return FALSE;
+    UpdLastRunTime(g_RunData.UserName);
     zero(g_RunPwd);
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
@@ -1293,9 +1294,12 @@ BOOL Setup()
   if (g_CliIsInSuRunners 
     || BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0))
   {
-    if ( (!GetSavePW || PasswordExpired(g_RunData.UserName))
-      && (!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_PW4SETUP)))
+    if ((!GetSavePW) || PasswordExpired(g_RunData.UserName))
+    {
+      if (!ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_PW4SETUP))
         return FALSE;
+      UpdLastRunTime(g_RunData.UserName);
+    }
     zero(g_RunPwd);
     return RunSetup(g_RunData.SessionID,g_RunData.UserName);
   }
@@ -1459,6 +1463,7 @@ DWORD LSAStartAdminProcess()
               DBGTrace("RegRenameVal error!");
           }
         }
+        //SetParentProcessID(pi.hProcess,GetParentProcessID(g_RunData.CliProcessId));
         //ToDo: Hooks must call ResumeThread, not Service!
         //but... limited user has no PROCESS_SUSPEND_RESUME or THREAD_SUSPEND_RESUME access
         ResumeThread(pi.hThread);
@@ -1526,49 +1531,6 @@ DWORD LSAStartAdminProcess()
   return RetVal;
 }
 
-//NtSetInformationProcess
-typedef enum _PROCESSINFOCLASS 
-{ 
-  ProcessBasicInformation, 
-  ProcessQuotaLimits, 
-  ProcessIoCounters, 
-  ProcessVmCounters, 
-  ProcessTimes, 
-  ProcessBasePriority, 
-  ProcessRaisePriority, 
-  ProcessDebugPort, 
-  ProcessExceptionPort, 
-  ProcessAccessToken, 
-  ProcessLdtInformation, 
-  ProcessLdtSize, 
-  ProcessDefaultHardErrorMode, 
-  ProcessIoPortHandlers, 
-  ProcessPooledUsageAndLimits, 
-  ProcessWorkingSetWatch, 
-  ProcessUserModeIOPL, 
-  ProcessEnableAlignmentFaultFixup, 
-  ProcessPriorityClass, 
-  ProcessWx86Information, 
-  ProcessHandleCount, 
-  ProcessAffinityMask, 
-  ProcessPriorityBoost, 
-  ProcessDeviceMap, 
-  ProcessSessionInformation, 
-  ProcessForegroundInformation, 
-  ProcessWow64Information, 
-  MaxProcessInfoClass 
-} PROCESSINFOCLASS; 
-
-typedef struct _PROCESS_ACCESS_TOKEN 
-{ 
-  HANDLE Token; 
-  HANDLE Thread; 
-} PROCESS_ACCESS_TOKEN; 
-
-#define NT_SUCCESS(Status) ((NTSTATUS)(Status) >= 0)
-
-typedef DWORD(CALLBACK * NTSIP)(HANDLE,PROCESSINFOCLASS,PVOID,ULONG);
-
 DWORD DirectStartUserProcess(DWORD ProcId) 
 {
   DWORD RetVal=RETVAL_ACCESSDENIED;
@@ -1595,6 +1557,7 @@ DWORD DirectStartUserProcess(DWORD ProcId)
 UsualWay:
       RetVal=RETVAL_OK;
       g_RunData.NewPID=pi.dwProcessId;
+      //SetParentProcessID(pi.hProcess,GetParentProcessID(g_RunData.CliProcessId));
       CloseHandle(pi.hProcess);
       ResumeThread(pi.hThread);
       CloseHandle(pi.hThread);
@@ -1630,25 +1593,14 @@ UsualWay:
         if (MyCPAU(hAdmin,NULL,g_RunData.cmdLine,NULL,NULL,FALSE,CREATE_UNICODE_ENVIRONMENT|
                     CREATE_SUSPENDED,Env,g_RunData.CurDir,&si,&pi))
         {
-          //This is highly undocumented but ReactOS/Wine/MS use it, so I do too
-          static NTSIP NtSetInformationProcess = NULL;
-          if (!NtSetInformationProcess)
-            NtSetInformationProcess=(NTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
-          if(NtSetInformationProcess)
+          //No need to set the thread token. Threads only use impersonation tokens.
+          if (SetProcessUserToken(pi.hProcess,hUser))
           {
-            EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
-            PROCESS_ACCESS_TOKEN pat={hUser,pi.hThread};
-            DWORD Status=NtSetInformationProcess(pi.hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
-            if (NT_SUCCESS(Status))
-            {
-              if(bCloseAdmin)
-                CloseHandle(hAdmin);
-              goto UsualWay;
-            }
-            DBGTrace1("NtSetInformationProcess failed: %s",GetErrorNameStatic(Status));
-            TerminateProcess(pi.hProcess,(DWORD)-1);
-          }else
-            DBGTrace1("GetProcAddress(\"NtSetInformationProcess\") failed: %s",GetLastErrorNameStatic());
+            if(bCloseAdmin)
+              CloseHandle(hAdmin);
+            goto UsualWay;
+          }
+          TerminateProcess(pi.hProcess,(DWORD)-1);
         }else
           DBGTrace1("CreateProcessAsUser failed: %s",GetLastErrorNameStatic());
         if(bCloseAdmin)

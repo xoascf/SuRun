@@ -29,6 +29,11 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+* CHG: IAT-Hook intercepts ShellExecute and friends because Windows does 
+       not support SEE_MASK_NOCLOSEPROCESS in IShellExecuteHook.
+* CHG: Option "remember password" in RunAs-Dialog is grayed out when SuRun 
+       always asks for the user's password
+
 SuRun 1.2.1.1b4 - 2012-11-27
 ----------------------------
 * FIX: When using SuRun /RunAs, if the user name was cleared, SuRun deleted 

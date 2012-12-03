@@ -600,8 +600,34 @@ static CRITICAL_SECTION l_SxHkCs={0};
 //////////////////////////////////////////////////////////////////////////////
 // IShellExecuteHook
 //////////////////////////////////////////////////////////////////////////////
+class CBoolEnable
+{
+public:
+  CBoolEnable(bool* Enabled)
+  {
+    m_pEnabled=Enabled;
+    m_bEnabled=*m_pEnabled;
+    *m_pEnabled=true;
+  };
+  ~CBoolEnable()
+  {
+    *m_pEnabled=m_bEnabled;
+  };
+private:
+  bool m_bEnabled;
+  bool* m_pEnabled;
+};
+
+static bool bInSex=FALSE;
+
 HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 {
+  if (bInSex)
+  {
+    DBGTrace("SuRun recursive call to ShellExtExecute. Exiting.");
+    return S_FALSE;
+  }
+  CBoolEnable be(&bInSex);
   if (!pei)
   {
     DBGTrace("SuRun ShellExtExecute Error: LPSHELLEXECUTEINFO==NULL");
@@ -627,7 +653,8 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     pei->lpDirectory?pei->lpDirectory:L"(null)",
     pei->lpIDList,
     (((pei->fMask&SEE_MASK_CLASSNAME)==SEE_MASK_CLASSNAME)&& (pei->lpClass))?pei->lpClass:L"(null)",
-    pei->hkeyClass,pei->hProcess);
+    pei->hkeyClass,
+    pei->hProcess);
 #endif DoDBGTrace
   if(!GetUseIShExHook)
     return S_FALSE;
@@ -737,7 +764,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   static RET_PROCESS_INFORMATION rpi;
   zero(rpi);
   if (bRunAs)
-    _stprintf(&cmd[wcslen(cmd)],L" /RUNAS %s",tmp);
+    _stprintf(&cmd[wcslen(cmd)],L" /RUNAS /QUIET /TESTAA %d %p %s",GetCurrentProcessId(),&rpi,tmp);
   else
     _stprintf(&cmd[wcslen(cmd)],L" /QUIET /TESTAA %d %p %s",GetCurrentProcessId(),&rpi,tmp);
   STARTUPINFO si;
@@ -763,7 +790,7 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
         {
           pei->hProcess=OpenProcess(SURUN_PROCESS_ACCESS_FLAGS1,false,rpi.dwProcessId);
           if (!pei->hProcess)
-            DBGTrace3("SuRun ShellExtExecute(%s): OpenProcess(%d) failed: %s",cmd,rpi.dwProcessId,GetLastErrorNameStatic());
+            DBGTrace3("SuRun ShellExtExecute(%s): OpenProcess(%d) failed: %s",tmp,rpi.dwProcessId,GetLastErrorNameStatic());
         }
       }else 
       {
@@ -787,7 +814,18 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
-  return ShellExtExecute(pei);
+  extern BOOL g_IATInit;
+  if(g_IATInit && GetUseIATHook)
+    return S_FALSE;//IAT-Hook handles ShellExecute
+  if(ShellExtExecute(pei)==S_FALSE)
+    return S_FALSE;
+  if(pei->fMask&SEE_MASK_NOCLOSEPROCESS)
+  {
+    DBGTrace("SuRun Warning IShellExecuteHook called with (by Windows) unsupported Flag SEE_MASK_NOCLOSEPROCESS. Closing handle");
+    CloseHandle(pei->hProcess);
+    pei->hProcess=0;
+  }
+  return S_OK;
 }
 
 //////////////////////////////////////////////////////////////////////////////

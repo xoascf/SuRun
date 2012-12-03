@@ -286,10 +286,9 @@ static void SetUserBitmap(HWND hwnd)
         }
       }
     }
-    EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),User[0]!=0);
+    EnableWindow(GetDlgItem(hwnd,IDC_STOREPASS),GetSavePW && (User[0]!=0));
     TCHAR Pass[PWLEN+1]={0};
-    if (LoadRunAsPassword(p->User,User,Pass,PWLEN) 
-      && PasswordOK(p->SessionId,User,Pass,false))
+    if (LoadRunAsPassword(p->User,User,Pass,PWLEN) && PasswordOK(p->SessionId,User,Pass,false))
     {
       SetDlgItemText(hwnd,IDC_PASSWORD,Pass);
       EnableWindow(GetDlgItem(hwnd,IDC_PASSWORD),false);

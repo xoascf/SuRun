@@ -1743,6 +1743,128 @@ DWORD GetProcessFileName(LPWSTR lpFilename,DWORD nSize)
   return GetModuleFileNameWEx(0,lpFilename,nSize);
 }
 
+//NtQueryInformationProcess, NtSetInformationProcess
+typedef enum
+{ 
+  ProcessBasicInformation, 
+  ProcessQuotaLimits, 
+  ProcessIoCounters, 
+  ProcessVmCounters, 
+  ProcessTimes, 
+  ProcessBasePriority, 
+  ProcessRaisePriority, 
+  ProcessDebugPort, 
+  ProcessExceptionPort, 
+  ProcessAccessToken, 
+  ProcessLdtInformation, 
+  ProcessLdtSize, 
+  ProcessDefaultHardErrorMode, 
+  ProcessIoPortHandlers, 
+  ProcessPooledUsageAndLimits, 
+  ProcessWorkingSetWatch, 
+  ProcessUserModeIOPL, 
+  ProcessEnableAlignmentFaultFixup, 
+  ProcessPriorityClass, 
+  ProcessWx86Information, 
+  ProcessHandleCount, 
+  ProcessAffinityMask, 
+  ProcessPriorityBoost, 
+  ProcessDeviceMap, 
+  ProcessSessionInformation, 
+  ProcessForegroundInformation, 
+  ProcessWow64Information, 
+  MaxProcessInfoClass 
+} PROCESSINFOCLASS; 
+
+typedef struct
+{
+  LONG ExitStatus;
+  PVOID PebBaseAddress;
+  ULONG_PTR AffinityMask;
+  LONG BasePriority;
+  ULONG_PTR UniqueProcessId;
+  ULONG_PTR InheritedFromUniqueProcessId;
+} PROCESS_BASIC_INFORMATION;
+
+typedef struct
+{ 
+  HANDLE Token; 
+  HANDLE Thread; 
+} PROCESS_ACCESS_TOKEN; 
+
+#define NT_SUCCESS(Status) ((NTSTATUS)(Status) >= 0)
+
+typedef DWORD(CALLBACK * PROCNTSIP)(HANDLE,PROCESSINFOCLASS,PVOID,ULONG);
+PROCNTSIP NtSetInformationProcess = NULL;
+
+typedef LONG (WINAPI *PROCNTQSIP)(HANDLE,UINT,PVOID,ULONG,PULONG);
+PROCNTQSIP NtQueryInformationProcess = NULL;
+
+DWORD GetParentProcessID(DWORD PID)
+{
+  if(NtQueryInformationProcess==0)
+    NtQueryInformationProcess = (PROCNTQSIP)GetProcAddress(GetModuleHandleA("ntdll"),"NtQueryInformationProcess");
+  if(NtQueryInformationProcess==0)
+    return 0;
+  HANDLE hProcess=OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,PID);
+  if  (!hProcess)
+    return  0;
+  ULONG ulRetLen;
+  PROCESS_BASIC_INFORMATION pbi;
+  DWORD Status=NtQueryInformationProcess(hProcess,ProcessBasicInformation,(void*)&pbi,sizeof(PROCESS_BASIC_INFORMATION),&ulRetLen);
+  if (NT_SUCCESS(Status))
+  {
+    CloseHandle(hProcess); 
+    return (DWORD)pbi.InheritedFromUniqueProcessId;
+  }
+  CloseHandle(hProcess); 
+  DBGTrace1("NtQueryInformationProcess failed: %s",GetErrorNameStatic(Status));
+  return 0;
+}
+
+// NtSetInformationProcess(...,ProcessBasicInformation,...) Does not work
+// BOOL SetParentProcessID(HANDLE hProcess,DWORD PID)
+// {
+//   if(NtQueryInformationProcess==0)
+//     NtQueryInformationProcess = (PROCNTQSIP)GetProcAddress(GetModuleHandleA("ntdll"),"NtQueryInformationProcess");
+//   if(NtQueryInformationProcess==0)
+//     return false;
+//   if (NtSetInformationProcess==0)
+//     NtSetInformationProcess=(PROCNTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
+//   if(NtSetInformationProcess==0)
+//     return false;
+//   ULONG ulRetLen;
+//   PROCESS_BASIC_INFORMATION pbi;
+//   DWORD Status=NtQueryInformationProcess( hProcess,ProcessBasicInformation,(void*)&pbi,sizeof(PROCESS_BASIC_INFORMATION),&ulRetLen);
+//   if (NT_SUCCESS(Status))
+//   {
+//     pbi.InheritedFromUniqueProcessId=PID;
+//     Status=NtSetInformationProcess(hProcess,ProcessBasicInformation,(void*)&pbi,sizeof(PROCESS_BASIC_INFORMATION));
+//     if (NT_SUCCESS(Status))
+//       return true;
+//     DBGTrace1("NtSetInformationProcess failed: %s",GetErrorNameStatic(Status));
+//     return false;
+//   }
+//   DBGTrace1("NtQueryInformationProcess failed: %s",GetErrorNameStatic(Status));
+//   return false;
+// }
+
+BOOL SetProcessUserToken(HANDLE hProcess,HANDLE hUser)
+{
+  if (NtSetInformationProcess==0)
+    NtSetInformationProcess=(PROCNTSIP)GetProcAddress(LoadLibraryA("ntdll.dll"),"NtSetInformationProcess");
+  if(NtSetInformationProcess==0)
+    return false;
+  EnablePrivilege(SE_ASSIGNPRIMARYTOKEN_NAME);
+  //This is highly undocumented but ReactOS/Wine/MS use it, so I do too
+  PROCESS_ACCESS_TOKEN pat={hUser,NULL};
+  DWORD Status=NtSetInformationProcess(hProcess,ProcessAccessToken,&pat,sizeof(PROCESS_ACCESS_TOKEN));
+  if (NT_SUCCESS(Status))
+    return true;
+  DBGTrace1("NtSetInformationProcess failed: %s",GetErrorNameStatic(Status));
+  return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // 
 // GetVersionString
