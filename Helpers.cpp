@@ -915,25 +915,49 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
       }
     }
     //Search AppPaths:
-    if (GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,app),0,path,4096)
-      ||GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,app),0,path,4096))
+    if (GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,app),0,path,4096))
     {
       //Found!
-      _tcscpy(app,path);
-      CHK_BOOL_FN(PathRemoveFileSpec(path));
+      if(!GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,app),L"Path",path,4096))
+      {
+        _tcscpy(app,path);
+        CHK_BOOL_FN(PathRemoveFileSpec(path));
+      }
+      return TRUE;
+    }
+    if (GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,app),0,path,4096))
+    {
+      //Found!
+      if(!GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,app),L"Path",path,4096))
+      {
+        _tcscpy(app,path);
+        CHK_BOOL_FN(PathRemoveFileSpec(path));
+      }
       return TRUE;
     }
     //Not found! Try all Extensions for Executables
     if (ext[0]==0) for (int i=0;i<countof(ExeExts);i++)
     {
-      _stprintf(path,L"%s%s",file,ExeExts[i]);
-      if (GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,path),0,path,4096)
-        ||GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,path),0,path,4096))
+      if (GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,CResStr(L"%s%s",app,ExeExts[i])),0,path,4096))
       {
         //Found!
-        _tcscpy(app,path);
+        if(!GetRegStr(HKCU,CResStr(L"%s\\%s",APP_PATHS,CResStr(L"%s%s",app,ExeExts[i])),L"Path",path,4096))
+        {
+          _tcscpy(app,path);
+          CHK_BOOL_FN(PathRemoveFileSpec(path));
+        }
         _tcscpy(ext,ExeExts[i]);
-        CHK_BOOL_FN(PathRemoveFileSpec(path));
+        return TRUE;
+      }
+      if (GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,CResStr(L"%s%s",app,ExeExts[i])),0,path,4096))
+      {
+        //Found!
+        if(!GetRegStr(HKLM,CResStr(L"%s\\%s",APP_PATHS,CResStr(L"%s%s",app,ExeExts[i])),L"Path",path,4096))
+        {
+          _tcscpy(app,path);
+          CHK_BOOL_FN(PathRemoveFileSpec(path));
+        }
+        _tcscpy(ext,ExeExts[i]);
         return TRUE;
       }
     }
