@@ -2168,6 +2168,10 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
+				RelativePath="..\res\app.manifest"
+				>
+			</File>
+			<File
 				RelativePath="..\res\icon1.ico"
 				>
 			</File>
@@ -2180,18 +2184,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\res\app.manifest"
-			>
-		</File>
-		<File
-			RelativePath="..\res\Shield.png"
-			>
-		</File>
-		<File
-			RelativePath="D:\Download\Shield.png"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

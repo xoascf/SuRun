@@ -909,11 +909,11 @@ TryAgain:
               DWORD ex=0;
               GetExitCodeProcess(pi.hProcess,&ex);
               CloseHandle(pi.hProcess);
-              if (ex!=(~pi.dwProcessId))
+              if (ex!=(0x0FFFFFFF &(~pi.dwProcessId)))
               {
                 DBGTrace4("SuRun: Starting child process try %d failed after %d ms. "
                   L"Expected return value :%X real return value %x",
-                  bRunCount,timeGetTime()-stTime,~pi.dwProcessId,ex);
+                  bRunCount,timeGetTime()-stTime,0x0FFFFFFF &(~pi.dwProcessId),ex);
                 //For YZshadow: Give it four tries
                 if ((bRunCount<4)&&(ex==STATUS_ACCESS_VIOLATION))
                   goto TryAgain;
@@ -1376,6 +1376,16 @@ DWORD LSAStartAdminProcess()
     return RetVal;
   }
   SetTokenInformation(hAdmin,TokenSessionId,&g_RunData.SessionID,sizeof(DWORD));
+//   if (g_RunData.ConsolePID)
+//   {
+//     HANDLE hProcess=OpenProcess(PROCESS_ALL_ACCESS,FALSE,g_RunData.ConsolePID);
+//     if (hProcess && SetProcessUserToken(hProcess,hAdmin))
+//       RetVal=RETVAL_OK;
+//     OpenThread()
+//     CloseHandle(hProcess);
+//     CloseHandle(hAdmin);
+//     return RetVal;
+//   }
   PROCESS_INFORMATION pi={0};
   PROFILEINFO ProfInf = {sizeof(ProfInf),PI_NOUI,g_RunData.UserName,0,0,0,0,0};
   if(LoadUserProfile(hAdmin,&ProfInf))
@@ -1698,7 +1708,7 @@ void SuRun()
           &&(((g_RunData.Groups&IS_IN_SURUNNERS)==0)||(GetRestrictApps(g_RunData.UserName))))
         {
           ResumeClient(RETVAL_ACCESSDENIED);
-          ExitProcess(~GetCurrentProcessId());
+          ExitProcess(0x0FFFFFFF &(~GetCurrentProcessId()));
           for(;;)
             ;
         }
@@ -2727,7 +2737,7 @@ bool HandleServiceStuff()
     {
       SuRun();
       DeleteSafeDesktop(false);
-      ExitProcess(~GetCurrentProcessId());
+      ExitProcess(0x0FFFFFFF &(~GetCurrentProcessId()));
       for(;;)
         ;
     }

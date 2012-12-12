@@ -29,6 +29,22 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.1.1b5 - 2012-12-12
+----------------------------
+* FIX: If you started "SuRun.exe <TypeYourStringHere>/AnyCommand", 
+       AnyCommand did have no extension and any of 
+       AnyCommand.[lnk|cmd|bat|com|pif] were present in  
+       "[HKCU|HKLM]\Software\Microsoft\Windows\CurrentVersion\App Paths" 
+       then SuRun asked for AnyCommand.<ext> to be run as Administrator.
+       Example: If you installed Defraggler and then started 
+       http://www.piriform.com/Defraggler from Explorer, then SuRun asked 
+       if you want to launch C:\Program Files\Defraggler\Defraggler64.exe 
+       with elevated rights.
+* FIX: In any Windows x64 the 32 Bit Hooks started "SuRun32.bin /TestAA" 
+       instead of SuRun.exe. This caused SuRun32.bin to block the hooked 
+       program for a while and to not elevate the to be started program.
+* CHG: Fix for Bug in Online Armor. Online Armor makes any program crash, 
+       that is using the Exit Code (~GetCurrentProcessId()).
 * CHG: IAT-Hook intercepts ShellExecute and friends because Windows does 
        not support SEE_MASK_NOCLOSEPROCESS in IShellExecuteHook.
 * CHG: Option "remember password" in RunAs-Dialog is grayed out when SuRun 

@@ -5,8 +5,8 @@
 #define IDS_USAGE                       1
 #define IDS_ASKOK                       2
 #define IDS_APPNAME                     3
-#define IDS_NODESK                      4
 #define ID_APPLY                        4
+#define IDS_NODESK                      4
 #define IDS_SERVICE_NAME                5
 #define IDS_ASKRUNAS                    6
 #define IDS_UNINSTALLADMIN              7
@@ -105,8 +105,8 @@
 #define IDS_NOIMPORT                    98
 #define IDS_NOEXPORT                    99
 #define IDI_MAINICON                    100
-#define IDS_NOTLOGGEDON                 100
 #define IDS_EMPTYPASS3                  100
+#define IDS_NOTLOGGEDON                 100
 #define IDD_LOGONDLG                    101
 #define IDS_NOTLOGGEDON2                101
 #define IDS_EMPTYPASS2                  102

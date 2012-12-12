@@ -36,34 +36,23 @@ typedef struct
   DWORD CliProcessId;
   DWORD CliThreadId;
   DWORD SessionID;
-  TCHAR WinSta[MAX_PATH];
-  TCHAR Desk[MAX_PATH];
-  TCHAR UserName[UNLEN+UNLEN+2];
-  TCHAR cmdLine[4096];
-  TCHAR CurDir[4096];
-  union
-  {
-    DWORD KillPID;        //SuRun->Service: Process Id to be killed
-    DWORD NewPID;         //Service->SuRun: Process Id of the newly started process
-  };
-  union
-  {
-    struct
-    {
-      DWORD RetPID;     //SuRun->Service: Return PROCESS_INFORMATION to this Process
-      DWORD_PTR RetPtr; //SuRun->Service: Return PROCESS_INFORMATION to this Address
-    };
-    struct
-    {
-      int IconId;       //Service->Tray Warning: ICON Resource Id
-      DWORD TimeOut;    //Service->Tray Window timeout
-    };
-  };
+  WCHAR WinSta[MAX_PATH];
+  WCHAR Desk[MAX_PATH];
+  WCHAR UserName[UNLEN+UNLEN+2];
+  WCHAR cmdLine[4096];
+  WCHAR CurDir[4096];
+  DWORD KillPID;        //SuRun->Service: Process Id to be killed
+  DWORD RetPID;         //SuRun->Service: Return PROCESS_INFORMATION to this Process
+  unsigned __int64 RetPtr;     //SuRun->Service: Return PROCESS_INFORMATION to this Address
+  DWORD NewPID;         //Service->SuRun: Process Id of the newly started process
+  int IconId;           //Service->Tray Warning: ICON Resource Id
+  DWORD TimeOut;        //Service->Tray Window timeout
   bool  bShlExHook;     //we're run from a hook
   bool  beQuiet;        //No message boxes
-  BYTE  bRunAs;         //Bit0=1:do a RunAs Logon Bit1=1: start with low pivileges
+  BYTE  bRunAs;         //Bit0=1:do a RunAs Logon Bit1=1: start with low privileges
   DWORD Groups;         //IS_IN_ADMINS,IS_IN_SURUNNERS
   bool  bShExNoSafeDesk;//if a safe desktop is required, cancel the request
+  //DWORD ConsolePID;     //SuRunC initiated SuRun and the Main Thread of ConsolePID is waiting to be resumed
 }RUNDATA;
 
 #define g_CliIsInAdmins    ((g_RunData.Groups&IS_IN_ADMINS)!=0)

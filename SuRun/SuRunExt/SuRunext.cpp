@@ -741,20 +741,14 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
   //ToDo: use dynamic allocated strings
   if (StrLenW(tmp)+StrLenW(CurDir)>4096-64)
     return LeaveCriticalSection(&l_SxHkCs),S_FALSE;
-  
   ResolveCommandLine(tmp,CurDir,tmp);
-
 //  if(GetRegStr(HKCU,SURUNKEY,L"LastFailedCmd",cmd,4096)
 //    &&(_tcsicmp(tmp,cmd)==0))
 //    return LeaveCriticalSection(&l_SxHkCs),S_FALSE;  
   RegDelVal(HKCU,SURUNKEY,L"LastFailedCmd");
 
   GetSystemWindowsDirectory(cmd,countof(cmd));
-#ifndef _SR32
   SR_PathAppendW(cmd, _T("SuRun.exe"));
-#else _SR32
-  SR_PathAppendW(cmd, _T("SuRun32.bin"));
-#endif _SR32
   SR_PathQuoteSpacesW(cmd);
   if (_wcsnicmp(cmd,tmp,wcslen(cmd))==0)
     //Never start SuRun administrative
@@ -1074,11 +1068,7 @@ DWORD WINAPI InitProc(void* p)
       GetProcessFileName(fMod,4096);
       //Do not set hooks into SuRun!
       GetSystemWindowsDirectory(fNoHook,4096);
-#ifndef _SR32
       SR_PathAppendW(fNoHook, _T("SuRun.exe"));
-#else _SR32
-      SR_PathAppendW(fNoHook, _T("SuRun32.bin"));
-#endif _SR32
       SR_PathQuoteSpacesW(fNoHook);
       l_bSetHook=l_bSetHook && (_tcsicmp(fMod,fNoHook)!=0);
       if(l_bSetHook)

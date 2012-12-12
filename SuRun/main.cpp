@@ -82,7 +82,6 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
     }
   }
-//  LPTSTR sn=GetSvcName();
   DBGTrace1("SuRun started with (%s)",GetCommandLine());
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
@@ -222,7 +221,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
       {
         g_RunData.KillPID=wcstol(Args,0,10);
         Args=PathGetArgs(Args);
-      }else if (!_wcsicmp(c,L"/RESTORE"))
+      }
+//       else if (!_wcsicmp(c,L"/CONSPID"))
+//       {
+//         g_RunData.ConsolePID=wcstol(Args,0,10);
+//         Args=PathGetArgs(Args);
+//       }
+      else if (!_wcsicmp(c,L"/RESTORE"))
       {
         if (!(g_RunData.Groups&IS_IN_ADMINS))
         {
