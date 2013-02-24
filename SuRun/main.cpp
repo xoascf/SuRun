@@ -257,6 +257,7 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         if (Args) for(LPTSTR C=Args-1;C && (*C==0);C--)
           *C=' ';
         Args=c;
+        wcscpy(g_RunData.cmdLine,Args);
         break;
       }else
       {

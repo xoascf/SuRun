@@ -22,6 +22,8 @@ Global
 		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
+		SuRun32 Unicode Debug|Win32 = SuRun32 Unicode Debug|Win32
+		SuRun32 Unicode Debug|x64 = SuRun32 Unicode Debug|x64
 		SuRun32 Unicode Release|Win32 = SuRun32 Unicode Release|Win32
 		SuRun32 Unicode Release|x64 = SuRun32 Unicode Release|x64
 		Unicode Debug|Win32 = Unicode Debug|Win32
@@ -40,6 +42,8 @@ Global
 		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.Release|Win32.ActiveCfg = Release|Win32
 		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.Release|Win32.Build.0 = Release|Win32
 		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.Release|x64.ActiveCfg = Release|Win32
+		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.SuRun32 Unicode Debug|Win32.ActiveCfg = SuRun32 Unicode Debug|Win32
+		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.SuRun32 Unicode Debug|x64.ActiveCfg = SuRun32 Unicode Debug|Win32
 		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.SuRun32 Unicode Release|Win32.ActiveCfg = Release|Win32
 		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.SuRun32 Unicode Release|x64.ActiveCfg = Release|Win32
 		{6A6CCFF6-F29A-441F-9E27-7E82F90968D3}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
@@ -61,6 +65,10 @@ Global
 		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.Release|Win32.Build.0 = x64 Unicode Release|Win32
 		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.Release|x64.ActiveCfg = x64 Unicode Release|x64
 		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.Release|x64.Build.0 = x64 Unicode Release|x64
+		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Debug|Win32.ActiveCfg = SuRun32 Unicode Debug|Win32
+		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Debug|Win32.Build.0 = SuRun32 Unicode Debug|Win32
+		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Debug|x64.ActiveCfg = SuRun32 Unicode Debug|x64
+		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Debug|x64.Build.0 = SuRun32 Unicode Debug|x64
 		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Release|Win32.ActiveCfg = SuRun32 Unicode Release|Win32
 		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Release|Win32.Build.0 = SuRun32 Unicode Release|Win32
 		{EED1FEA4-9C37-4452-A8C0-B01F2ED49C68}.SuRun32 Unicode Release|x64.ActiveCfg = SuRun32 Unicode Release|x64
@@ -88,6 +96,10 @@ Global
 		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.Release|Win32.Build.0 = SuRun32 Unicode Release|Win32
 		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.Release|x64.ActiveCfg = SuRun32 Unicode Release|x64
 		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.Release|x64.Build.0 = SuRun32 Unicode Release|x64
+		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Debug|Win32.ActiveCfg = SuRun32 Unicode Debug|Win32
+		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Debug|Win32.Build.0 = SuRun32 Unicode Debug|Win32
+		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Debug|x64.ActiveCfg = SuRun32 Unicode Debug|x64
+		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Debug|x64.Build.0 = SuRun32 Unicode Debug|x64
 		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Release|Win32.ActiveCfg = SuRun32 Unicode Release|Win32
 		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Release|Win32.Build.0 = SuRun32 Unicode Release|Win32
 		{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}.SuRun32 Unicode Release|x64.ActiveCfg = SuRun32 Unicode Release|x64
@@ -116,6 +128,9 @@ Global
 		{7965D390-1BFC-4729-A404-C3D2064250BB}.Release|Win32.Build.0 = Release|Win32
 		{7965D390-1BFC-4729-A404-C3D2064250BB}.Release|x64.ActiveCfg = Release|x64
 		{7965D390-1BFC-4729-A404-C3D2064250BB}.Release|x64.Build.0 = Release|x64
+		{7965D390-1BFC-4729-A404-C3D2064250BB}.SuRun32 Unicode Debug|Win32.ActiveCfg = SuRun32 Unicode Debug|Win32
+		{7965D390-1BFC-4729-A404-C3D2064250BB}.SuRun32 Unicode Debug|x64.ActiveCfg = SuRun32 Unicode Debug|x64
+		{7965D390-1BFC-4729-A404-C3D2064250BB}.SuRun32 Unicode Debug|x64.Build.0 = SuRun32 Unicode Debug|x64
 		{7965D390-1BFC-4729-A404-C3D2064250BB}.SuRun32 Unicode Release|Win32.ActiveCfg = Release|Win32
 		{7965D390-1BFC-4729-A404-C3D2064250BB}.SuRun32 Unicode Release|x64.ActiveCfg = Release|Win32
 		{7965D390-1BFC-4729-A404-C3D2064250BB}.Unicode Debug|Win32.ActiveCfg = Debug|Win32

@@ -645,19 +645,17 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
     return S_FALSE;
   }
 #ifdef DoDBGTrace
-  DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
-    pei->fMask,
-    pei->lpVerb?pei->lpVerb:L"(null)",
-    pei->lpFile?pei->lpFile:L"(null)",
-    pei->lpParameters?pei->lpParameters:L"(null)",
-    pei->lpDirectory?pei->lpDirectory:L"(null)",
-    pei->lpIDList,
-    (((pei->fMask&SEE_MASK_CLASSNAME)==SEE_MASK_CLASSNAME)&& (pei->lpClass))?pei->lpClass:L"(null)",
-    pei->hkeyClass,
-    pei->hProcess);
+//   DBGTrace9("SuRun ShellExtHook: msk=%X verb=%s, file=%s, parms=%s, dir=%s, idlist=%X, class=%s, hkc=%X, hProc=%X",
+//     pei->fMask,
+//     pei->lpVerb?pei->lpVerb:L"(null)",
+//     pei->lpFile?pei->lpFile:L"(null)",
+//     pei->lpParameters?pei->lpParameters:L"(null)",
+//     pei->lpDirectory?pei->lpDirectory:L"(null)",
+//     pei->lpIDList,
+//     (((pei->fMask&SEE_MASK_CLASSNAME)==SEE_MASK_CLASSNAME)&& (pei->lpClass))?pei->lpClass:L"(null)",
+//     pei->hkeyClass,
+//     pei->hProcess);
 #endif DoDBGTrace
-  if(!GetUseIShExHook)
-    return S_FALSE;
   //Admins don't need the ShellExec Hook!
   if (l_IsAdmin)
     return S_FALSE;
@@ -809,6 +807,8 @@ HRESULT ShellExtExecute(LPSHELLEXECUTEINFOW pei)
 STDMETHODIMP CShellExt::Execute(LPSHELLEXECUTEINFO pei)
 {
   extern BOOL g_IATInit;
+  if(!GetUseIShExHook)
+    return S_FALSE;
   if(g_IATInit && GetUseIATHook)
     return S_FALSE;//IAT-Hook handles ShellExecute
   if(ShellExtExecute(pei)==S_FALSE)
@@ -988,7 +988,7 @@ __declspec(dllexport) void InstallShellExt()
   SetRegStr(HKCR,L"Folder\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #ifdef DoDBGTrace
 //  SetRegStr(HKCR,L"*\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
-  SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
+//   SetRegStr(HKCR,L"lnkfile\\shellex\\ContextMenuHandlers\\SuRun",L"",sGUID);
 #endif DoDBGTrace
   //self Approval
   SetRegStr(HKLM,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
