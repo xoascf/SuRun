@@ -245,6 +245,7 @@
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
 				ModuleDefinitionFile=".\SuRunExt.Def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\ReleaseU/SuRunExt.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
@@ -574,6 +575,7 @@
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
 				ModuleDefinitionFile=".\SuRunExt32.Def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\ReleaseUsr32/SuRunExt32.pdb"
 				GenerateMapFile="true"
 				MapExports="true"
@@ -857,6 +859,170 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="SuRun32 Unicode Debug|Win32"
+			OutputDirectory=".\DebugUsr32"
+			IntermediateDirectory=".\DebugUsr32"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\DebugU/SuRunExt.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;UNICODE;_USRDLL;SuRunEXT_EXPORTS;_SR32"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				PrecompiledHeaderFile=".\DebugUsr32/SuRunExt.pch"
+				AssemblerListingLocation=".\DebugUsr32/"
+				ObjectFile=".\DebugUsr32/"
+				ProgramDataBaseFileName=".\DebugUsr32/"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1031"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="odbc32.lib odbccp32.lib"
+				OutputFile="../DebugUx64/SuRunExt32.dll"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				GenerateManifest="false"
+				ModuleDefinitionFile=".\SuRunExt32.Def"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\DebugUsr32/SuRunExt.pdb"
+				GenerateMapFile="true"
+				MapExports="true"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
+				ImportLibrary=".\DebugUsr32/SuRunExt32.lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="false"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\DebugU/SuRunExt.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="SuRun32 Unicode Debug|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				GenerateManifest="false"
+				RandomizedBaseAddress="2"
+				FixedBaseAddress="1"
+				DataExecutionPrevention="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="false"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -942,6 +1108,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1036,6 +1218,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="IATHook.cpp"
@@ -1114,6 +1312,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1204,6 +1418,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\LogonDlg.cpp"
@@ -1282,6 +1512,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1372,6 +1618,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\LSALogon.cpp"
@@ -1450,6 +1712,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1540,6 +1818,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\sspi_auth.cpp"
@@ -1624,6 +1918,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="SuRunext.cpp"
@@ -1702,6 +2012,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1812,6 +2138,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="SuRunExt32.Def"
@@ -1874,6 +2216,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -1964,6 +2322,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\UserGroups.cpp"
@@ -2048,6 +2422,22 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\WinStaDesk.cpp"
@@ -2126,6 +2516,22 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="x64 Unicode Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

@@ -308,6 +308,103 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="SuRun32 Unicode Debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Debug/InstallSuRun.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				PrecompiledHeaderFile=".\Debug/InstallSuRun.pch"
+				AssemblerListingLocation=".\Debug/"
+				ObjectFile=".\Debug/"
+				ProgramDataBaseFileName=".\Debug/"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1031"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile=".\Debug/InstallSuRun.exe"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				GenerateManifest="false"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\Debug/InstallSuRun.pdb"
+				GenerateMapFile="false"
+				MapExports="true"
+				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				OutputManifestFile="$(OutDir)\$(TargetName).manifest"
+				EmbedManifest="false"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\Debug/InstallSuRun.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -343,6 +440,14 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="InstallSuRun.rc"
@@ -371,6 +476,14 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="SuRun32 Unicode Debug|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -391,6 +504,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\ReleaseUx64\SuRun.exe"
+				>
+			</File>
+			<File
+				RelativePath="..\ReleaseU\SuRun.exe"
+				>
+			</File>
+			<File
 				RelativePath="..\res\SuRun.ico"
 				>
 			</File>
@@ -398,27 +519,19 @@
 				RelativePath="..\ReleaseUx64\SuRun32.bin"
 				>
 			</File>
+			<File
+				RelativePath="..\ReleaseU\SuRunExt.dll"
+				>
+			</File>
+			<File
+				RelativePath="..\ReleaseUx64\SuRunExt.dll"
+				>
+			</File>
+			<File
+				RelativePath="..\ReleaseUx64\SuRunExt32.dll"
+				>
+			</File>
 		</Filter>
-		<File
-			RelativePath="..\ReleaseU\SuRun.exe"
-			>
-		</File>
-		<File
-			RelativePath="..\ReleaseUx64\SuRun.exe"
-			>
-		</File>
-		<File
-			RelativePath="..\ReleaseU\SuRunExt.dll"
-			>
-		</File>
-		<File
-			RelativePath="..\ReleaseUx64\SuRunExt.dll"
-			>
-		</File>
-		<File
-			RelativePath="..\ReleaseUx64\SuRunExt32.dll"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

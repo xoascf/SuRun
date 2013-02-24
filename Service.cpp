@@ -73,7 +73,11 @@
   #ifdef _WIN64
     #pragma comment(lib,"SuRunExt/DebugUx64/SuRunExt.lib")
   #else  _WIN64
-    #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
+    #ifdef _SR32
+      #pragma comment(lib,"SuRunExt/DebugUsr32/SuRunExt32.lib")
+    #else _SR32
+      #pragma comment(lib,"SuRunExt/DebugU/SuRunExt.lib")
+    #endif _SR32
   #endif _WIN64
 
 #endif _DEBUG
@@ -2013,6 +2017,7 @@ void RemoveRegistry()
     DelRegKey(HKCR,CPLREG);
     //Trash
     DelRegKey(HKCR,TRSREG);
+    DelRegKey(HKCR,TRSREG1);
   }
   //Control Panel Applet
   InstLog(CResStr(IDS_REMCPL));

@@ -35,6 +35,7 @@ public:
   CResourceString(int nID,...)
   {
     m_hInst=GetModuleHandle(0);
+    memset(&m_str,0,sizeof(m_str));
     TCHAR S[_S];
     LoadString(m_hInst,nID,S,_S-1);
     va_list va;
@@ -45,6 +46,7 @@ public:
   CResourceString(HINSTANCE hInst,int nID,...)
   {
     m_hInst=hInst;
+    memset(&m_str,0,sizeof(m_str));
     TCHAR S[_S];
     LoadString(m_hInst,nID,S,_S-1);
     va_list va;
@@ -55,6 +57,7 @@ public:
   CResourceString(LPCTSTR s,...)
   {
     m_hInst=GetModuleHandle(0);
+    memset(&m_str,0,sizeof(m_str));
     va_list va;
     va_start(va,s);
     _vsntprintf(m_str,_S-1,s,va);
@@ -63,6 +66,7 @@ public:
   CResourceString(int nID,va_list va)
   {
     m_hInst=GetModuleHandle(0);
+    memset(&m_str,0,sizeof(m_str));
     TCHAR S[_S];
     LoadString(m_hInst,nID,S,_S-1);
     _vsntprintf(m_str,_S-1,S,va);
@@ -70,17 +74,20 @@ public:
   CResourceString(HINSTANCE hInst,va_list va)
   {
     m_hInst=hInst;
+    memset(&m_str,0,sizeof(m_str));
     TCHAR S[_S];
     LoadString(hInst,nID,S,_S-1);
     _vsntprintf(m_str,_S-1,S,va);
   }
   const LPCTSTR operator =(int nID)
   {
+    memset(&m_str,0,sizeof(m_str));
     LoadString(m_hInst,nID,m_str,_S-1);
     return m_str;
   }
   const LPCTSTR operator =(LPCTSTR s)
   {
+    memset(&m_str,0,sizeof(m_str));
     _tcsncpy(m_str,s,_S);
     return m_str;
   }

@@ -29,6 +29,18 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.1.1b7 - 2013-02-24
+----------------------------
+* FIX: SuRun's 23Bit IAT-Hook GPF'd in 32Bit Office Help viewer on x64 Win7
+
+SuRun 1.2.1.1b6 - 2013-01-05
+----------------------------
+* FIX: SuRun's menu item "SuRun: Empty Recycle Bin" was not uninstalled
+* FIX: /SWITCHTO did not work in XPx32
+* CHG: In Windows Vista and later SuRun leaves UAC "Run as administrator" 
+       as it is. This enables <ctrl>+<shift>+<lClick> for pinned programs 
+       in Explorer.
+
 SuRun 1.2.1.1b5 - 2012-12-12
 ----------------------------
 * FIX: If you started "SuRun.exe <TypeYourStringHere>/AnyCommand", 

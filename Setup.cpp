@@ -400,29 +400,27 @@ void ReplaceRunAsWithSuRun(HKEY hKey/*=HKCR*/)
           SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"LegacyDisable",L"");
           SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runasuser"),L"SR_LegacyDisableWasOff",L"1");
         }
-        if (bRunAsOk)
+        if ( (_winmajor<=5)/*WinVista++ use RunAs to elevate and RunAsUser to "Run as"*/ 
+          && (!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable",&t,0,0)))
         {
-          if(!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable",&t,0,0))
-          {
-            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable",L"");
-            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_LegacyDisableWasOff",L"1");
-          }
-          //Enable SuRun on Entry?
-          if (!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun\\command"),L"",&t,NULL,0))
-          {
-            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_SuRunWasOff",L"1");
-            //Set SuRun command name
-            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"),L"",CResStr(IDS_MENUSTR));
-            SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"),L"Icon",L"SuRunExt.dll,1");
-            //Set command
-            TCHAR cmd[4096];
-            GetSystemWindowsDirectory(cmd,4096);
-            PathAppend(cmd,L"SuRun.exe");
-            PathQuoteSpaces(cmd);
-            _tcscat(cmd,L" ");
-            _tcscat(cmd,v);
-            SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun\\command"),L"",t,(BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
-          }
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"LegacyDisable",L"");
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_LegacyDisableWasOff",L"1");
+        }
+        //Enable SuRun on Entry?
+        if (!GetRegAnyPtr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun\\command"),L"",&t,NULL,0))
+        {
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\runas"),L"SR_SuRunWasOff",L"1");
+          //Set SuRun command name
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"),L"",CResStr(IDS_MENUSTR));
+          SetRegStr(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun"),L"Icon",L"SuRunExt.dll,1");
+          //Set command
+          TCHAR cmd[4096];
+          GetSystemWindowsDirectory(cmd,4096);
+          PathAppend(cmd,L"SuRun.exe");
+          PathQuoteSpaces(cmd);
+          _tcscat(cmd,L" ");
+          _tcscat(cmd,v);
+          SetRegAny(hKey,CResStr(L"%s\\%s",s,L"shell\\SuRun\\command"),L"",t,(BYTE*)&cmd,(DWORD)_tcslen(cmd)*sizeof(TCHAR));
         }
       }
     }
