@@ -822,6 +822,8 @@ Cleanup:
 
 BOOL NetworkPathToUNCPath(LPTSTR path)
 {
+  if ((_tcslen(path)>1)&&(path[0]=='\\')&&(path[1]=='\\'))
+    return true;
   if (!PathIsNetworkPath(path))
     return FALSE;
   DWORD cb=4096;
@@ -832,7 +834,7 @@ BOOL NetworkPathToUNCPath(LPTSTR path)
   DWORD dwErr=WNetGetUniversalName(path,UNIVERSAL_NAME_INFO_LEVEL,puni,&cb);
   if (dwErr!=NO_ERROR)
   {
-    DBGTrace1("WNetGetUniversalName failed: %s",GetErrorNameStatic(dwErr));
+    DBGTrace2("WNetGetUniversalName(%s) failed: %s",path,GetErrorNameStatic(dwErr));
     return FALSE;
   }
   _tcscpy(path,puni->lpUniversalName);
