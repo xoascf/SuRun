@@ -30,6 +30,7 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 * FIX: Saving Passwords failed in Windows 2000
+* CHG: command lines with "://" before the first " " are ignored by the hooks
 
 SuRun 1.2.1.1b7 - 2013-02-24
 ----------------------------
