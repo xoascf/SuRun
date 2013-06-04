@@ -164,7 +164,7 @@ void SaveRunAsPassword(LPTSTR RunAsUser,LPTSTR UserName,LPTSTR Password)
   DATA_BLOB pw={0};
   DATA_BLOB entropy={sizeof(KEYPASS),KEYPASS};
   DATA_BLOB PW={(DWORD)(_tcslen(Password)+1)*sizeof(TCHAR),(BYTE*)Password};
-  if (!CryptProtectData(&PW,0,&entropy,0,0,CRYPTPROTECT_UI_FORBIDDEN,&pw))
+  if (!CryptProtectData(&PW,_T("SuRunRAPW"),&entropy,0,0,CRYPTPROTECT_UI_FORBIDDEN,&pw))
     DBGTrace1("CryptProtectData failed: %s",GetLastErrorNameStatic());
   if (pw.cbData)
   {
