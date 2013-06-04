@@ -1010,6 +1010,19 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
   //ToDo: use dynamic allocated strings
   if (StrLenW(CmdLine)+StrLenW(CurDir)>4096-64)
     return false;
+  //Check for URLs...
+  {
+    LPCWSTR dsp=wcsstr(CmdLine,L"://");
+    if (dsp)
+    {
+      //Url after first space is ok
+      LPCWSTR sp=wcsstr(CmdLine,L" ");
+      if (!sp)//No spaces, fail!
+        return false;
+      if (sp>dsp)//first space after url, fail!
+        return false;
+    }
+  }
   //Application
   static TCHAR app[4096];
   zero(app);
