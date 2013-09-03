@@ -32,10 +32,12 @@ extern unsigned int _winmajor;
 extern unsigned int _winminor;
 #endif //_MSC_VER >= 1500
 
-#define IsWin2k ((_winmajor==5)&&(_winminor==0))
-#define IsWin7pp (((_winmajor<<8)|_winminor)>=0x601)
-#define IsWin7 (((_winmajor<<8)|_winminor)==0x601)
-#define IsWin8 (((_winmajor<<8)|_winminor)==0x602)
+#define IsWin2k   (((_winmajor<<8)|_winminor)==0x500)
+#define IsVista   (((_winmajor<<8)|_winminor)==0x600)
+#define IsWin7pp  (((_winmajor<<8)|_winminor)>=0x601)
+#define IsWin7    (((_winmajor<<8)|_winminor)==0x601)
+#define IsWin8    (((_winmajor<<8)|_winminor)==0x602)
+#define IsWin81   (((_winmajor<<8)|_winminor)==0x603)
 
 #ifndef PROCESS_QUERY_LIMITED_INFORMATION 
 #define PROCESS_QUERY_LIMITED_INFORMATION (0x1000)  

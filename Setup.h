@@ -200,13 +200,17 @@
 #define SetShowAutoRuns(b)    SetShExtSetting(ShowAutoRuns,b,1)
 
 //Show App admin status in system tray
-#define TSA_NONE  0 //No TSA
-#define TSA_ALL   1 //TSA for all
-#define TSA_ADMIN 2 //TSA for admins
-#define TSA_TIPS  8 //show balloon tips
+#define TSA_NONE          0 //No TSA
+#define TSA_ALL           1 //TSA for all
+#define TSA_ADMIN         2 //TSA for admins
+#define TSA_TIPS          8 //show balloon tips
+#define TSA_HIDE_NORMAL  16 //hide "green" icon for standard user
 
 #define GetShowTrayAdmin      GetShExtSetting(_T("ShowTrayAdmin"),TSA_ADMIN|TSA_TIPS)
 #define SetShowTrayAdmin(b)   SetShExtSetting(_T("ShowTrayAdmin"),b,TSA_ADMIN|TSA_TIPS)
+
+#define GetHideNormalIcon    ((GetShowTrayAdmin&TSA_HIDE_NORMAL)!=0)
+#define SetHideNormalIcon(b) SetShowTrayAdmin(((GetShowTrayAdmin&(~TSA_HIDE_NORMAL))|(b?TSA_HIDE_NORMAL:0)))
 
 #define GetHandleRunAs    (GetShExtSetting(_T("HandleRunAs"),1)!=0)
 #define SetHandleRunAs(b) SetShExtSetting(_T("HandleRunAs"),b,1)
@@ -236,7 +240,7 @@ inline BOOL ShowTray(LPCTSTR u,BOOL bAdmin,BOOL bSuRunner)
     return (!GetHideFromUser(u)) && (GetUserTSA(u)>0);
   if ((!bAdmin) && GetDefHideSuRun)
     return false;
-  switch (GetShowTrayAdmin & (~TSA_TIPS))
+  switch (GetShowTrayAdmin & (~(TSA_TIPS|TSA_HIDE_NORMAL)))
   {
   case TSA_NONE:
     return false;
@@ -257,7 +261,7 @@ inline BOOL ShowBalloon(LPCTSTR u,BOOL bAdmin,BOOL bSuRunner)
   DWORD tsa=GetShowTrayAdmin;
   if((tsa & TSA_TIPS)==0)
     return false;
-  switch (tsa & (~TSA_TIPS))
+  switch (tsa & (~(TSA_TIPS|TSA_HIDE_NORMAL)))
   {
   case TSA_NONE:
     return false;

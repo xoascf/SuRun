@@ -13,12 +13,11 @@ if "%VC6Dir%"=="\..\.." SET VC6Dir=E:\VStudio
 
 SETLOCAL
 call %VC6Dir%\VC98\Bin\VCVARS32.BAT
+%VC6Dir%\Common\MSDev98\Bin\MSDEV.com /useenv SuRun.dsw /MAKE ALL /CLEAN
 call %MSSDK%\SetEnv.Cmd /X64 /RETAIL
 echo building SuRunX64
-%VC6Dir%\Common\MSDev98\Bin\MSDEV.EXE /useenv SuRun.dsw /MAKE "SuRun - Win32 x64 Unicode Release" /REBUILD /OUT %TMP%\SuRun64.log
+%VC6Dir%\Common\MSDev98\Bin\MSDEV.com /useenv SuRun.dsw /MAKE "SuRun - Win32 x64 Unicode Release"
 ENDLOCAL
-type %TMP%\SuRun64.log
-del %TMP%\SuRun64.log 1>NUL 2>NUL
 
 SETLOCAL
 set MSVCDir=%VC6Dir%\VC98
@@ -27,10 +26,8 @@ call %VC6Dir%\VC98\Bin\VCVARS32.BAT
 call %MSSDK%\SetEnv.Cmd /2000 /RETAIL
 set MSVCVer=6.0
 echo building SuRun32
-%VC6Dir%\Common\MSDev98\Bin\MSDEV.EXE /useenv SuRun.dsw /MAKE "SuRun - Win32 Unicode Release" "SuRun - Win32 SuRun32 Unicode Release" "InstallSuRun - Win32 Release" /REBUILD /OUT %TMP%\SuRun32.log
+%VC6Dir%\Common\MSDev98\Bin\MSDEV.com /useenv SuRun.dsw /MAKE "SuRun - Win32 Unicode Release" "SuRun - Win32 SuRun32 Unicode Release" "InstallSuRun - Win32 Release"
 ENDLOCAL
-type %TMP%\SuRun32.log
-del %TMP%\SuRun32.log 1>NUL 2>NUL
 goto Done
 
 rem compile using VC8 (2005), VC9 (2008) or VC10 (2010)
@@ -38,6 +35,7 @@ rem compile using VC8 (2005), VC9 (2008) or VC10 (2010)
 SETLOCAL
 echo VC8
 call "%VS80COMNTOOLS%vsvars32.bat"
+msbuild SuRun.sln /t:clean 1>NUL 2>NUL
 msbuild SuRun.sln /t:Rebuild /p:Configuration="x64 Unicode Release" /p:Platform=x64
 msbuild SuRun.sln /t:Rebuild /p:Configuration="SuRun32 Unicode Release" /p:Platform=Win32
 msbuild SuRun.sln /t:Rebuild /p:Configuration="Unicode Release" /p:Platform=Win32
@@ -48,6 +46,7 @@ goto Done
 echo VC9
 SETLOCAL
 call "%VS90COMNTOOLS%vsvars32.bat"
+msbuild SuRunVC9.sln /t:clean 1>NUL 2>NUL
 msbuild SuRunVC9.sln /t:Rebuild /p:Configuration="x64 Unicode Release" /p:Platform=x64
 msbuild SuRunVC9.sln /t:Rebuild /p:Configuration="SuRun32 Unicode Release" /p:Platform=Win32
 msbuild SuRunVC9.sln /t:Rebuild /p:Configuration="Unicode Release" /p:Platform=Win32
