@@ -2303,6 +2303,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       ComboBox_InsertString(cb,1,CResStr(IDS_WARNADMIN)); //"All users"
       ComboBox_InsertString(cb,2,CResStr(IDS_WARNADMIN4));//"Administrators"
       ComboBox_SetCurSel(cb,tsa & (~(TSA_TIPS|TSA_HIDE_NORMAL)));
+      CheckDlgButton(hwnd,IDC_TRAY_HIDE_NORM_ICON,(tsa&TSA_HIDE_NORMAL)!=0);
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,(tsa&TSA_TIPS)!=0);
       if (IsWin2k)
         //Win2k:no balloon tips
@@ -2356,6 +2357,8 @@ ApplyChanges:
       SetNoConvUser(IsDlgButtonChecked(hwnd,IDC_NOCONVUSER));
       SetDefHideSuRun(IsDlgButtonChecked(hwnd,IDC_HIDESURUN));
       DWORD tsa=ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN));
+      if (IsDlgButtonChecked(hwnd,IDC_TRAY_HIDE_NORM_ICON))
+        tsa|=TSA_HIDE_NORMAL;
       if (IsDlgButtonChecked(hwnd,IDC_TRAYBALLOON))
         tsa|=TSA_TIPS;
       SetShowTrayAdmin(tsa);
@@ -2369,6 +2372,7 @@ ApplyChanges:
         if (!IsWin2k)
         {
           BOOL bTSA=ComboBox_GetCurSel(GetDlgItem(hwnd,IDC_TRAYSHOWADMIN))>0;
+          EnableWindow(GetDlgItem(hwnd,IDC_TRAY_HIDE_NORM_ICON),bTSA);
           EnableWindow(GetDlgItem(hwnd,IDC_TRAYBALLOON),bTSA);
           if(!bTSA)
             CheckDlgButton(hwnd,IDC_TRAYBALLOON,BST_UNCHECKED);

@@ -29,8 +29,9 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
-SuRun 1.2.1.1b7 - 2013-09-02
+SuRun 1.2.1.1b8 - 2013-09-03
 ----------------------------
+* NEW: Option to hide SuRun's "green smiley" tray icon
 * CHG: command lines with "://" before the first " " are ignored by the hooks
 * CHG: Application Manifest support for Windows 8 and Windows 8.1
 * FIX: Implemented Q&D fix to hook Windows 8.1 "api-ms-win-*-l1-*" DLLs

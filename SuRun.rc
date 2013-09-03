@@ -371,33 +371,35 @@ BEGIN
     LTEXT           "s",IDC_STATIC,392,239,8,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 378, 284
+IDD_SETUP4 DIALOGEX 0, 0, 378, 284
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Poka¿ ikonê w obszarze powiadomieñ dla u¿ytkowników spoza grupy 'SuRunners'",IDC_STATIC,5,5,370,37
-    LTEXT           "Poka¿ status u¿ytkownika dla aktywnego programu w zasobniku paska zadañ",IDC_STATIC,15,16,185,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,210,14,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Poka¿ ikonê w obszarze powiadomieñ dla u¿ytkowników spoza grupy 'SuRunners'",IDC_STATIC,5,5,370,49
+    LTEXT           "Poka¿ status u¿ytkownika dla aktywnego programu w zasobniku paska zadañ",IDC_STATIC,15,17,255,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,273,15,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Hide icon for programs running non elevated as logged on user",IDC_TRAY_HIDE_NORM_ICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,29,349,10
     CONTROL         "Poka¿ podpowiedzi dla aktywnych programów pracuj¹cych z innymi poœwiadczeniami u¿ytkownika",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,27,349,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,40,349,10
     CONTROL         "NIE u¿ywaj pulpitu WinLogon. Twórz w³asny, bezpieczny pulpit.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,44,346,10
-    GROUPBOX        "Jeœli u¿ytkownik spoza grupy 'SuRunners' u¿yje SuRun:",IDC_STATIC,5,58,370,51
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,57,346,10
+    GROUPBOX        "Jeœli u¿ytkownik spoza grupy 'SuRunners' u¿yje SuRun:",IDC_STATIC,5,71,370,51
     CONTROL         "Nigdy nie pytaj Administratorów o przy³¹czenie siê do grupy 'SuRunners'.",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,70,349,8
-    CONTROL         "Nigdy nie pytaj nikogo o przy³¹czenie do siê grupy 'SuRunners'.",IDC_NOCONVUSER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,83,349,8
-    CONTROL         "Ukryj SuRun przed u¿ytkownikami, którzy nie nale¿¹ do grupy 'SuRunners'.",IDC_HIDESURUN,
+    CONTROL         "Nigdy nie pytaj nikogo o przy³¹czenie do siê grupy 'SuRunners'.",IDC_NOCONVUSER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,96,349,8
-    GROUPBOX        "Wygoda u¿ytkowania (ustawienia windows, które mo¿na zmieniæ z pomoc¹ SuRun)",IDC_EXTOPT,5,113,370,90,WS_GROUP
+    CONTROL         "Ukryj SuRun przed u¿ytkownikami, którzy nie nale¿¹ do grupy 'SuRunners'.",IDC_HIDESURUN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,109,349,8
+    GROUPBOX        "Wygoda u¿ytkowania (ustawienia windows, które mo¿na zmieniæ z pomoc¹ SuRun)",IDC_EXTOPT,5,123,370,80,WS_GROUP
     CONTROL         "Zast¹p 'Uruchom jako...' systemu Windows funkcj¹ 'Uruchom jako...' programu SuRun.",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,15,126,295,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,15,133,295,10
     CONTROL         "Pozwól grupie 'SuRunners' zmieniaæ czas systemowy.",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,139,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,146,349,11
     CONTROL         "Pozwól grupie 'SuRunners' zmieniaæ opcje zasilania i wybieraæ schematy zasilania.",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,152,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,160,349,11
     CONTROL         "Poka¿ wszystkim u¿ytkownikom powiadomienia o aktualizacjach dla systemu Windows (jeœli aktualizacje automatyczne s¹ w³¹czone).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,167,349,18
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,171,349,18
     CONTROL         "Wy³¹cz ponowne uruchamianie komputera po wykonaniu zaplanowanych aktualizacji.",IDC_WINUPDBOOT,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,15,188,349,11
     GROUPBOX        "Bezpieczeñstwo systemu Windows (Regu³a zabezpieczeñ któr¹ mo¿na zmieniæ z pomoc¹ SuRun)",IDC_STATIC,5,208,369,60
@@ -1043,31 +1045,33 @@ IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",IDC_STATIC,4,0,369,37
+    GROUPBOX        "Symbol im Infobereich der Taskleiste für Benutzer, die nicht 'SuRunner' sind",IDC_STATIC,4,0,369,47
     LTEXT           "Zeige Benutzerstatus für aktives Programm in der Taskleiste",IDC_STATIC,14,12,191,8
     COMBOBOX        IDC_TRAYSHOWADMIN,213,10,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Symbol verstecken, wenn ein Programm als angemeldeter Benutzer mit eingeschränkten Rechten läuft",IDC_TRAY_HIDE_NORM_ICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,23,349,10
     CONTROL         "Zeige Info, für aktive Programme, die nicht als angemeldeter Benutzer laufen",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,23,346,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,346,10
     CONTROL         "Benutze NICHT den Winlogon Desktop, sondern einen eigenen sicheren Desktop.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,41,346,10
-    GROUPBOX        "Wenn der Benutzer nicht Mitglied der Gruppe 'SuRunners' ist und SuRun benutzen will:",IDC_STATIC,4,54,369,46
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,50,346,10
+    GROUPBOX        "Wenn der Benutzer nicht Mitglied der Gruppe 'SuRunners' ist und SuRun benutzen will:",IDC_STATIC,4,63,369,46
     CONTROL         "Frage Administratoren niemals, ob sie in die Gruppe 'SuRunners' aufgenommen werden wollen",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,65,346,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,74,346,8
     CONTROL         "Frage niemanden, ob er in die Gruppe 'SuRunner' aufgenommen werden will",IDC_NOCONVUSER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,76,346,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,85,346,8
     CONTROL         "Verberge SuRun vor allen eingeschränkten Benutzern, die nicht Mitglied der Gruppe 'SuRunners' sind",IDC_HIDESURUN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,87,346,8
-    GROUPBOX        "Erleichterte Bedienung. (Diese Optionen sind Teil von Windows, die SuRun anpassen kann.)",IDC_EXTOPT,4,104,369,74,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,346,8
+    GROUPBOX        "Erleichterte Bedienung. (Diese Optionen sind Teil von Windows, die SuRun anpassen kann.)",IDC_EXTOPT,4,112,369,66,WS_GROUP
     CONTROL         "Ersetze Windows 'Ausführen als...' durch SuRuns 'Ausführen als...'",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,115,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,121,346,9
     CONTROL         "Gestatte 'SuRunners', das Ändern (und Anzeigen) der Systemzeit",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,127,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,132,346,9
     CONTROL         "Gestatte 'SuRunners' 'Energieoptionen' zu ändern und Energieschemas zu wechseln",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,140,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,143,346,9
     CONTROL         "Windows Updatebenachrichtigungen für alle Benutzer (sofern automatische Updates aktiv sind).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,152,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,154,346,9
     CONTROL         "Keinen automatischen Neustart nach der Installation von Windows Updates durchführen",IDC_WINUPDBOOT,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,165,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,164,346,9
     GROUPBOX        "Windows Sicherheit. (Diese Option ist eine Windows-Sicherheitsrichtlinie, die SuRun anpassen kann.)",IDC_STATIC,4,181,369,39
     CONTROL         "'Administratoren' statt 'Ersteller' als Standard-Besitzer für von Administratoren erstellte Objekte.\nWARNUNG: Ist diese Option deaktiviert, können eingeschränkte Benutzer mit SuRun administrativ erstellte Registry-Schlüssel und Dateien manipulieren.",IDC_OWNERGROUP,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,192,346,25
@@ -1695,33 +1699,35 @@ BEGIN
     LTEXT           "s",IDC_STATIC,358,190,8,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 378, 235
+IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Display an icon in the taskbar notification area for non members of the 'SuRunners' group",IDC_STATIC,3,0,370,37
+    GROUPBOX        "Display an icon in the taskbar notification area for non members of the 'SuRunners' group",IDC_STATIC,3,0,370,47
     LTEXT           "Display user status for the active program in the taskbar 'tray'",IDC_STATIC,11,12,201,8
     COMBOBOX        IDC_TRAYSHOWADMIN,219,10,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Display balloon tips for active programs running with different user credentials",IDC_TRAYBALLOON,
+    CONTROL         "Hide icon for programs running non elevated as logged on user",IDC_TRAY_HIDE_NORM_ICON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,23,349,10
+    CONTROL         "Display balloon tips for active programs running with different user credentials",IDC_TRAYBALLOON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,34,349,10
     CONTROL         "DON'T use WinLogon's desktop. Create an own safe desktop instead.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,40,346,10
-    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,3,52,370,48
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,51,346,10
+    GROUPBOX        "If a non 'SuRunners' user uses SuRun:",IDC_STATIC,3,64,370,48
     CONTROL         "Never ask real Administrators to become member of 'SuRunners'",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,63,349,8
-    CONTROL         "Never ask anyone to become member of 'SuRunners'",IDC_NOCONVUSER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,75,349,8
-    CONTROL         "Hide SuRun from users that are not member of the 'SuRunners' Group",IDC_HIDESURUN,
+    CONTROL         "Never ask anyone to become member of 'SuRunners'",IDC_NOCONVUSER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,87,349,8
-    GROUPBOX        "Convenience settings (These are Windows settings that you can adjust with SuRun)",IDC_EXTOPT,3,104,370,79,WS_GROUP
+    CONTROL         "Hide SuRun from users that are not member of the 'SuRunners' Group",IDC_HIDESURUN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,99,349,8
+    GROUPBOX        "Convenience settings (These are Windows settings that you can adjust with SuRun)",IDC_EXTOPT,3,113,370,70,WS_GROUP
     CONTROL         "Replace Windows' 'Run as...' with SuRun's 'Run as...'",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,115,349,9
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,123,349,9
     CONTROL         "Allow 'SuRunners' to set (and show) the system time.",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,128,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,134,349,11
     CONTROL         "Allow 'SuRunners' to change 'Power Options' and to select power schemes.",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,142,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,146,349,11
     CONTROL         "Show Windows update notifications to all users (if automatic updates are activated).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,156,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,158,349,11
     CONTROL         "No auto-restart for scheduled Automatic Windows Update installations",IDC_WINUPDBOOT,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,170,349,11
     GROUPBOX        "Windows Security (This is a Windows policy that you can adjust with SuRun)",IDC_STATIC,4,186,369,39
@@ -2335,27 +2341,29 @@ IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    GROUPBOX        "Mostrar un icono en el area de notificacion de la barra de tareas para no miembros del grupo 'SuRunners'",IDC_STATIC,3,4,370,37
+    GROUPBOX        "Mostrar un icono en el area de notificacion de la barra de tareas para no miembros del grupo 'SuRunners'",IDC_STATIC,3,4,370,49
     LTEXT           "Estado de usuario para el programa activo en la 'bandeja' de la barra de tareas",IDC_STATIC,11,16,253,8
     COMBOBOX        IDC_TRAYSHOWADMIN,269,14,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Hide icon for programs running non elevated as logged on user",IDC_TRAY_HIDE_NORM_ICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,29,349,10
     CONTROL         "Mostrar notificaciones para programas activos corriendo con diferentes credenciales de usuario",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,27,349,10
-    GROUPBOX        "Si un no usuario de 'SuRunners' usa SuRun:",IDC_STATIC,3,59,370,48
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,40,349,10
+    GROUPBOX        "Si un no usuario de 'SuRunners' usa SuRun:",IDC_STATIC,3,70,370,48
     CONTROL         "Nunca preguntar a Administradores reales si quiere ser miembro de 'SuRunners'",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,70,349,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,81,349,8
     CONTROL         "Never ask anyone to become member of 'SuRunners'",IDC_NOCONVUSER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,82,349,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,93,349,8
     CONTROL         "Ocultar SuRun a los usuarios que no son miembros del Grupo 'SuRunners'",IDC_HIDESURUN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,94,349,8
-    GROUPBOX        "Ajustes convenientes (Estas son configuraciones de Windows que Ud. puede ajustar con SuRun)",IDC_EXTOPT,3,108,370,79,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,105,349,8
+    GROUPBOX        "Ajustes convenientes (Estas son configuraciones de Windows que Ud. puede ajustar con SuRun)",IDC_EXTOPT,3,118,370,69,WS_GROUP
     CONTROL         "Reemplazar Windows' 'Ejecutar como...' con 'Ejecutar como...' de SuRun",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,119,349,9
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,129,349,9
     CONTROL         "Permitir a los 'SuRunners' modificar (y mostrar) la hora del sistema.",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,132,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,139,349,11
     CONTROL         "Permitir a los 'SuRunners' cambiar 'Opciones de Energia' y seleccionar esquemas de energia.",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,146,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,151,349,11
     CONTROL         "Mostrar notificaciones de actualizacion de Windows (si actualizaciones automaticas estan activadas).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,160,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,163,349,11
     CONTROL         "No auto-reiniciar para instalaciones programadas de Actualizaciones Automaticas de Windows",IDC_WINUPDBOOT,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,174,349,11
     GROUPBOX        "Seguridad de Windows (Esta es una directiva de Windows que Ud. puede ajustar con SuRun)",IDC_STATIC,4,188,369,33
@@ -2363,7 +2371,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,197,349,22
     CTEXT           "NOTA: Los cambios en estas configuraciones se tornaran efectivos luego del siguiente inicio de sesion.",IDC_STATIC,6,224,365,8
     CONTROL         "DON'T use WinLogon's desktop. Create an own safe desktop instead.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,46,346,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,57,346,10
 END
 
 IDD_SETUP_MAIN DIALOG  0, 0, 396, 274
@@ -2928,36 +2936,38 @@ BEGIN
     LTEXT           "s",IDC_STATIC,432,190,8,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 394, 235
+IDD_SETUP4 DIALOGEX 0, 0, 405, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Afficher une icône réduite dans la barre des tâches pour les utilisateurs qui ne sont pas membres du groupe 'SuRunners'",IDC_STATIC,3,0,388,37
-    LTEXT           "Indiquer l'utilisateur dans une info-bulle pour les programmes actifs",IDC_STATIC,11,12,239,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,267,10,117,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Afficher une info-bulle pour les programmes actifs lancés avec des autorisations d'utilisateurs différents",IDC_TRAYBALLOON,
+    GROUPBOX        "Afficher une icône réduite dans la barre des tâches pour les utilisateurs qui ne sont pas membres du groupe 'SuRunners'",IDC_STATIC,3,0,400,46
+    LTEXT           "Indiquer l'utilisateur dans une info-bulle pour les programmes actifs",IDC_STATIC,11,12,229,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,243,10,117,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Hide icon for programs running non elevated as logged on user",IDC_TRAY_HIDE_NORM_ICON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,23,349,10
+    CONTROL         "Afficher une info-bulle pour les programmes actifs lancés avec des autorisations d'utilisateurs différents",IDC_TRAYBALLOON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,33,349,10
     CONTROL         "Ne pas utiliser le WinLogon de standard du Bureau. Créer un bureau sécurisé dédié.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,40,346,10
-    GROUPBOX        "Si un utilisateur n'appartenant pas au groupe 'SuRunners' souhaite utiliser SuRun :",IDC_STATIC,3,52,387,48
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,50,346,10
+    GROUPBOX        "Si un utilisateur n'appartenant pas au groupe 'SuRunners' souhaite utiliser SuRun :",IDC_STATIC,3,62,400,46
     CONTROL         "Ne jamais demander à un membre du groupe Admnistrateurs de devenir membre du groupe 'SuRunners'",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,63,349,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,74,349,8
     CONTROL         "Ne jamais demander de devenir membre du groupe 'SuRunners'",IDC_NOCONVUSER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,75,349,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,85,349,8
     CONTROL         "Cacher SuRun pour les utilisateurs n'appartenant pas au groupe 'SuRunners'",IDC_HIDESURUN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,87,257,8
-    GROUPBOX        "Commodités (Réglages de Windows que vous pouvez modifier avec SuRun)",IDC_EXTOPT,3,103,387,72,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,96,257,8
+    GROUPBOX        "Commodités (Réglages de Windows que vous pouvez modifier avec SuRun)",IDC_EXTOPT,3,109,400,65,WS_GROUP
     CONTROL         "Remplacer l'option ""Exécuter en tant qu'utilisateur..."" de Windows par celle de SuRun",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,114,349,9
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,119,349,9
     CONTROL         "Autoriser les membres du groupe 'SuRunners' à modifier (et afficher) l'heure système.",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,125,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,129,349,11
     CONTROL         "Autoriser les membres du groupe 'SuRunners' à modifier les options et les plans d'alimentation.",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,137,349,11
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,140,349,11
     CONTROL         "Afficher les notifications de mises à jour de Windows à tous les utilisateurs (si la mise à jour automatique est active).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,150,375,8
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,152,389,8
     CONTROL         "Pas de redémarrage automatique pour l'installation des mises à jour de Windows",IDC_WINUPDBOOT,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,161,349,11
-    GROUPBOX        "Sécurité Windows (Ceci est une stratégie Windows pouvant être ajustée avec SuRun)",IDC_STATIC,4,177,386,46
+    GROUPBOX        "Sécurité Windows (Ceci est une stratégie Windows pouvant être ajustée avec SuRun)",IDC_STATIC,3,177,400,46
     CONTROL         "Utiliser ""Administrateurs"" au lieu du ""Créateur de l'objet"" comme propriétaire par défaut des objets créés par les administrateurs.",IDC_OWNERGROUP,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,186,347,18
     CTEXT           "ATTENTION : si cette option est désactivée, tout utilisateur pourra modifier les fichiers et les clefs de registre créés en tant qu'Administrateur avec SuRun.",IDC_STATIC,20,205,339,18,SS_RIGHTJUST | SS_REALSIZEIMAGE | 0x2000
@@ -3011,6 +3021,22 @@ BEGIN
     PUSHBUTTON      "&Annuler",IDCANCEL,217,107,68,14
     LISTBOX         IDC_INSTLOG,0,38,363,64,NOT LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_VISIBLE | NOT WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SETUP4, DIALOG
+    BEGIN
+        RIGHTMARGIN, 394
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3509,33 +3535,35 @@ BEGIN
     LTEXT           "s",IDC_STATIC,358,188,8,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 378, 235
+IDD_SETUP4 DIALOGEX 0, 0, 378, 235
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Taakbalk-informatie voor programma's van niet-'SuRunners'",IDC_STATIC,5,1,369,37
-    LTEXT           "Toon gebruikersstatus voor actieve processen",IDC_STATIC,22,12,185,8
-    COMBOBOX        IDC_TRAYSHOWADMIN,213,10,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Taakbalk-informatie voor programma's van niet-'SuRunners'",IDC_STATIC,5,1,369,47
+    LTEXT           "Toon gebruikersstatus voor actieve processen",IDC_STATIC,22,12,174,8
+    COMBOBOX        IDC_TRAYSHOWADMIN,204,10,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Hide icon for programs running non elevated as logged on user",IDC_TRAY_HIDE_NORM_ICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,23,349,10
     CONTROL         "Toon Ballon-Tips voor programma's die niet door de huidige gebruiker gestart zijn",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,23,269,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,34,269,10
     CONTROL         "Geen gebruik maken van standaard WinLogon, maar SuRun's eigen beveiligd bureaublad gebruiken.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,40,334,10
-    GROUPBOX        "Indien een gebruiker geen lid is van de groep 'SuRunners' en SuRun wil gebruiken:",IDC_STATIC,6,52,369,46
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,51,334,10
+    GROUPBOX        "Indien een gebruiker geen lid is van de groep 'SuRunners' en SuRun wil gebruiken:",IDC_STATIC,6,63,369,46
     CONTROL         "Administrators nooit vragen om aan de groep 'SuRunners' toegevoegd te worden",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,63,346,8
-    CONTROL         "Niemand vragen of hij aan de groep 'SuRunners' toegevoegd moet worden",IDC_NOCONVUSER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,74,346,8
-    CONTROL         "SuRun verbergen voor alle gebruikers die geen lid zijn van de groep 'SuRunners'",IDC_HIDESURUN,
+    CONTROL         "Niemand vragen of hij aan de groep 'SuRunners' toegevoegd moet worden",IDC_NOCONVUSER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,85,346,8
-    GROUPBOX        "Gebruiksgemak. (Windows-functies die SuRun kan aanpassen.)",IDC_EXTOPT,5,103,369,74,WS_GROUP
+    CONTROL         "SuRun verbergen voor alle gebruikers die geen lid zijn van de groep 'SuRunners'",IDC_HIDESURUN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,96,346,8
+    GROUPBOX        "Gebruiksgemak. (Windows-functies die SuRun kan aanpassen.)",IDC_EXTOPT,5,111,369,66,WS_GROUP
     CONTROL         "Vervang Windows 'Uitvoeren als...' voor SuRun's 'Uitvoeren als...'",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,114,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,120,346,9
     CONTROL         "'SuRunners' mogen de systeemtijd aanpassen",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,126,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,131,346,9
     CONTROL         "'SuRunners' mogen instellingen van Energiebeheer en Energieschemas aanpassen",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,139,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,143,346,9
     CONTROL         "Windows Update berichten aan alle gebruikers doorgeven (als automatische updates geactiveerd is).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,151,346,9
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,154,346,9
     CONTROL         "Niet automatisch opnieuw starten na installatie van Windows Updates",IDC_WINUPDBOOT,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,164,346,9
     GROUPBOX        "Windows beveiliging. (Windows-functies die SuRun kan aanpassen.)",IDC_STATIC,5,182,369,39
@@ -4106,33 +4134,35 @@ BEGIN
     LTEXT           "s",IDC_STATIC,410,204,8,8
 END
 
-IDD_SETUP4 DIALOG  0, 0, 379, 302
+IDD_SETUP4 DIALOGEX 0, 0, 379, 302
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    GROUPBOX        "Mostrar ícone na área de notificação da barra de tarefas para membros que não pertençam ao grupo 'SuRunners'",IDC_STATIC,3,4,370,49
-    LTEXT           "Mostrar estado do utilizador para o programa ativo na 'bandeja' da barra de\ntarefas",IDC_STATIC,11,18,236,16
-    COMBOBOX        IDC_TRAYSHOWADMIN,257,19,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Mostrar ícone na área de notificação da barra de tarefas para membros que não pertençam ao grupo 'SuRunners'",IDC_STATIC,3,4,370,61
+    LTEXT           "Mostrar estado do utilizador para o programa ativo na 'bandeja' da barra de tarefas",IDC_STATIC,11,17,170,17
+    COMBOBOX        IDC_TRAYSHOWADMIN,191,20,133,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Hide icon for programs running non elevated as logged on user",IDC_TRAY_HIDE_NORM_ICON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,40,349,10
     CONTROL         "Mostrar dicas de balão para programas ativos executados com as credenciais de utilizadores diferentes",IDC_TRAYBALLOON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,40,339,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,53,339,8
     CONTROL         "NÃO USAR o Ambiente de Trabalho da sessão do Windows. Em vez disso, criar um Ambiente de Trabalho seguro próprio.",IDC_NOLOGONDESK,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,57,362,18
-    GROUPBOX        "Se um utilizador não 'SuRunners' usa o SuRun:",IDC_STATIC,3,79,370,54
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,70,362,18
+    GROUPBOX        "Se um utilizador não 'SuRunners' usa o SuRun:",IDC_STATIC,3,90,370,54
     CONTROL         "Nunca pedir que Administradores reais se tornem membros do 'SuRunners'",IDC_NOCONVADMIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,92,249,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,103,249,8
     CONTROL         "Nunca pedir que alguém se torne membro do 'SuRunners'",IDC_NOCONVUSER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,105,197,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,116,197,8
     CONTROL         "Ocultar o SuRun de utilizadores que não sejam membros do grupo 'SuRunners'",IDC_HIDESURUN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,118,349,8
-    GROUPBOX        "Configurações de conveniência (Configurações do Windows que pode ajustar com o SuRun)",IDC_EXTOPT,3,138,370,90,WS_GROUP
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,129,349,8
+    GROUPBOX        "Configurações de conveniência (Configurações do Windows que pode ajustar com o SuRun)",IDC_EXTOPT,3,146,370,82,WS_GROUP
     CONTROL         "Substituir 'Executar como...' com 'SuRun Executar como...'",IDC_DORUNAS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,151,200,8
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,11,157,200,8
     CONTROL         "Permitir que 'SuRunners' definam (e mostrem) a hora do sistema.",IDC_ALLOWTIME,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,164,217,8
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,170,217,8
     CONTROL         "Permitir que 'SuRunners' modifiquem 'Opções de Energia' e selecionem planos de energia.",IDC_SETENERGY,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,178,299,8
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,183,299,8
     CONTROL         "Mostrar notificações do Windows Update para todos os utilizadores (se as atualizações automáticas estiverem ativadas).",IDC_WINUPD4ALL,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,192,360,15
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,195,360,15
     CONTROL         "Desativar a reinicialização automática para instalações automáticas agendadas do Windows Update.",IDC_WINUPDBOOT,
                     "Button",BS_AUTOCHECKBOX | BS_VCENTER | BS_MULTILINE | WS_TABSTOP,11,213,334,8
     GROUPBOX        "Segurança do Windows (Esta é uma política do Windows que pode ajustar com o SuRun)",IDC_STATIC,4,232,369,52
