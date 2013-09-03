@@ -385,6 +385,7 @@ void InitTrayShowAdmin()
   g_NotyData.uID    = 1;
   g_NotyData.uFlags = NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE|NIF_STATE;
   g_NotyData.dwState= NIS_HIDDEN;
+  g_NotyData.dwStateMask= NIS_HIDDEN;
   g_NotyData.uCallbackMessage = WM_USER+1758;
   g_NotyData.uTimeout=10000;
   SetTimer(g_NotyData.hWnd,1,333,0);
