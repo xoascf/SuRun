@@ -29,12 +29,16 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
-* FIX: Saving Passwords failed in Windows 2000
+SuRun 1.2.1.1b7 - 2013-09-02
+----------------------------
 * CHG: command lines with "://" before the first " " are ignored by the hooks
+* CHG: Application Manifest support for Windows 8 and Windows 8.1
+* FIX: Implemented Q&D fix to hook Windows 8.1 "api-ms-win-*-l1-*" DLLs
+* FIX: Saving Passwords failed in Windows 2000
 
 SuRun 1.2.1.1b7 - 2013-02-24
 ----------------------------
-* FIX: SuRun's 23Bit IAT-Hook GPF'd in 32Bit Office Help viewer on x64 Win7
+* FIX: SuRun's 32Bit IAT-Hook GPF'd in 32Bit Office Help viewer on x64 Win7
 
 SuRun 1.2.1.1b6 - 2013-01-05
 ----------------------------

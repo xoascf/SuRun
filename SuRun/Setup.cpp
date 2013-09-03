@@ -2302,7 +2302,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       ComboBox_InsertString(cb,0,CResStr(IDS_WARNADMIN5));//No users
       ComboBox_InsertString(cb,1,CResStr(IDS_WARNADMIN)); //"All users"
       ComboBox_InsertString(cb,2,CResStr(IDS_WARNADMIN4));//"Administrators"
-      ComboBox_SetCurSel(cb,tsa & (~TSA_TIPS));
+      ComboBox_SetCurSel(cb,tsa & (~(TSA_TIPS|TSA_HIDE_NORMAL)));
       CheckDlgButton(hwnd,IDC_TRAYBALLOON,(tsa&TSA_TIPS)!=0);
       if (IsWin2k)
         //Win2k:no balloon tips

@@ -221,15 +221,15 @@ static void DisplayIcon()
   _tcscpy(g_User,User);
   _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
   BOOL bDiffUser=_tcscmp(User,g_RunData.UserName);
+  g_NotyData.dwState=0;
   if (bIsFGAdm==-1)
   {
-    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),
-                                        IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
+    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
+    if (GetHideNormalIcon)
+      g_NotyData.dwState=NIS_HIDDEN;
   }else if (bIsFGAdm)
   {
-    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,
-      MAKEINTRESOURCE(bDiffUser?IDI_ADMIN:(g_CliIsAdmin?IDI_SHADMIN:IDI_SRADMIN)),
-                            IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
+    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(bDiffUser?IDI_ADMIN:(g_CliIsAdmin?IDI_SHADMIN:IDI_SRADMIN)),IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
     if (g_BallonTips && bDiffUser && (CurPID!=LastPID))
     {
       LastPID=CurPID;
@@ -240,9 +240,8 @@ static void DisplayIcon()
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Administrator"),WndTxt,User);
   }else
   {
-    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOADMIN),
-                                        IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
-    if (g_BallonTips && bDiffUser&& (CurPID!=LastPID))
+    g_NotyData.hIcon=(HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOADMIN),IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
+    if (g_BallonTips && bDiffUser && (CurPID!=LastPID))
     {
       LastPID=CurPID;
       BalloonTimeOut.Set(20000);
@@ -250,6 +249,8 @@ static void DisplayIcon()
       _stprintf(g_NotyData.szInfo,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
     }
     _stprintf(g_NotyData.szTip,_T("\"%s\"\n\"%s\" - Standard user"),WndTxt,User);
+    if (GetHideNormalIcon && (!bDiffUser))
+      g_NotyData.dwState=NIS_HIDDEN;
   }
   if (!Shell_NotifyIcon(NIM_MODIFY,&g_NotyData))
   {
@@ -376,16 +377,14 @@ void InitTrayShowAdmin()
   WCLASS.lpfnWndProc  =&WndMainProc;
   RegisterClass(&WCLASS);
   g_NotyData.cbSize= sizeof(NOTIFYICONDATA);
-  g_NotyData.hWnd  = CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE,
-                                    CLASSNAME,_T("SuRunTrayShowAdmin"),
-                                    WS_POPUP,0,0,0,0,0,0,g_hInstance,NULL);
-  g_NotyData.hIcon = (HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),
-                                        IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
+  g_NotyData.hWnd  = CreateWindowEx(WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE,CLASSNAME,_T("SuRunTrayShowAdmin"),WS_POPUP,0,0,0,0,0,0,g_hInstance,NULL);
+  g_NotyData.hIcon = (HICON)LoadImage(g_hInstance,MAKEINTRESOURCE(IDI_NOWINDOW),IMAGE_ICON,16,16,LR_DEFAULTCOLOR);
   
   _stprintf(g_NotyData.szTip,_T("SuRun %s"),GetVersionString());
   g_NotyData.dwInfoFlags=NIIF_INFO|NIIF_NOSOUND;
-  g_NotyData.uID   = 1;
-  g_NotyData.uFlags= NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE;
+  g_NotyData.uID    = 1;
+  g_NotyData.uFlags = NIF_ICON|NIF_TIP|NIF_INFO|NIF_MESSAGE|NIF_STATE;
+  g_NotyData.dwState= NIS_HIDDEN;
   g_NotyData.uCallbackMessage = WM_USER+1758;
   g_NotyData.uTimeout=10000;
   SetTimer(g_NotyData.hWnd,1,333,0);
