@@ -2129,6 +2129,7 @@ void CopyToWinDir(LPCTSTR File)
   CopyFile(SrcFile,DstFile,FALSE);
 }
 
+//the real /UNINSTALL implementation:
 BOOL DeleteService(BOOL bJustStop=FALSE)
 {
   BOOL bRet=FALSE;
