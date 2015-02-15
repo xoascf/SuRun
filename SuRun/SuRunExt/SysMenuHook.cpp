@@ -8,7 +8,7 @@
 // 
 // Feel free to use the SuRun sources for your liking.
 // 
-//                                (c) Kay Bruns (http://kay-bruns.de), 2007,08
+//                                (c) Kay Bruns (http://kay-bruns.de), 2007-15
 //////////////////////////////////////////////////////////////////////////////
 
 #define _WIN32_WINNT 0x0500

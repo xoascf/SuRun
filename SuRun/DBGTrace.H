@@ -8,7 +8,7 @@
 // 
 // Feel free to use the SuRun sources for your liking.
 // 
-//                                                        (c)2007,08 Kay Bruns
+//                                                        (c)2007-15 Kay Bruns
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once

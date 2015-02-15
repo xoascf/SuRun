@@ -48,7 +48,7 @@ BEGIN
             VALUE "FileDescription", "InstallSuRun"
             VALUE "FileVersion", "1, 2, 1, 1"
             VALUE "InternalName", "InstallSuRun"
-            VALUE "LegalCopyright", "Copyright © 2007-2013 Kay Bruns"
+            VALUE "LegalCopyright", "Copyright © 2007-2015 Kay Bruns"
             VALUE "LegalTrademarks", "SuRun"
             VALUE "OriginalFilename", "InstallSuRun.exe"
             VALUE "ProductName", "SuRun"
