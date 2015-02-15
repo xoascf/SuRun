@@ -29,6 +29,47 @@ Deferred Whishlist:
 ------------------------------------------------------------------------------
 SuRun Changes:
 ------------------------------------------------------------------------------
+SuRun 1.2.1.1 - 2015-02-15
+----------------------------
+* NEW: Option to hide SuRun's "green smiley" tray icon
+* NEW: Support for Windows 8 and Windows 8.1
+* CHG: Option "remember password" in RunAs-Dialog is grayed out when SuRun 
+       always asks for the user's password
+* CHG: In Windows Vista and later SuRun does not modify registry settings for 
+       UAC "Run as administrator". 
+       This enables <ctrl>+<shift>+<lClick> for pinned programs in Explorer.
+* CHG: The hooks ignore all command lines with "://" before the first " ".
+       So any http://www.yyy.zzz commands are initially ignored.
+* CHG: IAT-Hook intercepts ShellExecute and friends because Windows does 
+       not support SEE_MASK_NOCLOSEPROCESS in IShellExecuteHook.
+* CHG: A Bug in Online Armor makes any program crash, that is using the Exit 
+       Code (NOT GetCurrentProcessId()), as SuRun did, before this change.
+* FIX: User Bitmap Display on confirmation and runas dialogs did not show
+* FIX: SuRun's menu item "SuRun: Empty Recycle Bin" was not uninstalled
+* FIX: Long command lines were not displayed ok on confirmation dialogs
+* FIX: /SWITCHTO did not work in Windows XP x32.
+* FIX: Saving Passwords failed in Windows 2000
+* FIX: When using SuRun /RunAs, if the user name was cleared, SuRun deleted 
+       the SuRun settings for all users. This caused any "SuRunners" member 
+       to get full access to the system.
+       The Bug appeared with SuRun's /RunAs support in version 1.2.0.0.
+* FIX: Changed permissions of started Programs for Jumplist compatibility.
+* FIX: SuRun's hooks were not x86 and x64 "cross compatible".
+* FIX: SuRun's 32Bit IAT-Hook caused a General Protection Fault in the 
+       32Bit Office Help viewer on x64 Windows 7.
+* FIX: On all Windows x64 Systems SuRun's hooks did not return a valid 
+       process handle.
+* FIX: If a user started "SuRun.exe <TypeYourStringHere>/<AnyCommand>", 
+       <AnyCommand> did have no extension and one of 
+       <AnyCommand>.[lnk|cmd|bat|com|pif] were present in  
+       "[HKCU|HKLM]\Software\Microsoft\Windows\CurrentVersion\App Paths" 
+       then SuRun asked for AnyCommand.<ext> to be run as Administrator.
+       Example: If you installed Defraggler and then started 
+       http://www.piriform.com/Defraggler from Explorer, then SuRun asked 
+       if you want to launch C:\Program Files\Defraggler\Defraggler64.exe 
+       with elevated rights.
+* FIX: ShellExecuteHook asked to start file.exe when file.exe.ext was run
+
 SuRun 1.2.1.1b8 - 2013-09-03
 ----------------------------
 * NEW: Option to hide SuRun's "green smiley" tray icon
@@ -95,7 +136,6 @@ SuRun 1.2.1.1b2 - 2012-11-12
 * FIX: ShellExecuteHook asked to start file.exe when file.exe.ext was run
 * FIX: User Bitmap Display on confirmation and runas dialogs did not show
 * FIX: Long command lines were not displayed ok on confirmation dialogs
-
 
 SuRun 1.2.1.0 - 2011-12-30
 --------------------------
