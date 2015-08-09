@@ -128,7 +128,7 @@ public:
   CHookDescriptor(LPCSTR Dll,LPCSTR Win7Dll,LPCSTR Win8Dll,LPCSTR Win81Dll,LPCSTR Func,PROC nFunc,LPCSTR Host=NULL)
   {
     DllName=Dll;
-    apiDllName=IsWin81?Win81Dll:(IsWin8?Win8Dll:Win7Dll);
+    apiDllName=IsWin81pp?Win81Dll:(IsWin8?Win8Dll:Win7Dll);
     FuncName=Func;
     newFunc=nFunc;
     orgFunc=0;

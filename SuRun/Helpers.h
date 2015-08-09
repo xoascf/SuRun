@@ -38,6 +38,7 @@ extern unsigned int _winminor;
 #define IsWin7    (((_winmajor<<8)|_winminor)==0x601)
 #define IsWin8    (((_winmajor<<8)|_winminor)==0x602)
 #define IsWin81   (((_winmajor<<8)|_winminor)==0x603)
+#define IsWin81pp (((_winmajor<<8)|_winminor)>=0x603)
 
 #ifndef PROCESS_QUERY_LIMITED_INFORMATION 
 #define PROCESS_QUERY_LIMITED_INFORMATION (0x1000)  

@@ -1805,8 +1805,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,1,1
- PRODUCTVERSION 1,2,1,1
+ FILEVERSION 1,2,1,2
+ PRODUCTVERSION 1,2,1,2
  FILEFLAGSMASK 0x0L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -1824,13 +1824,13 @@ BEGIN
             VALUE "Comments", "SuRun, start programs as Administrator, based on the idea of SuDown http://sudown.sourceforge.net"
             VALUE "CompanyName", "http://kay-bruns.de"
             VALUE "FileDescription", "SuperUserRun"
-            VALUE "FileVersion", "1, 2, 1, 1"
+            VALUE "FileVersion", "1, 2, 1, 2"
             VALUE "InternalName", "SuRun"
             VALUE "LegalCopyright", "Copyright © 2007-2015 Kay Bruns"
             VALUE "LegalTrademarks", "SuRun"
             VALUE "OriginalFilename", "SuRun.exe"
             VALUE "ProductName", "SuperUserRun"
-            VALUE "ProductVersion", "1, 2, 1, 1"
+            VALUE "ProductVersion", "1, 2, 1, 2"
         END
     END
     BLOCK "VarFileInfo"
