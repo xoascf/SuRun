@@ -202,6 +202,10 @@ Windows Server 2003 R3 or Visual Studio 2005 or 2008 with x86 and x64 tools.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.2 - 2015-08-09
+----------------------------
+* CHG: Made Hooks Windows X compatible.
+
 SuRun 1.2.1.1 - 2015-02-15
 ----------------------------
 * NEW: Option to hide SuRun's "green smiley" tray icon
