@@ -306,9 +306,9 @@ BEGIN
     PUSHBUTTON      "Przywróæ...",IDC_IMPORT,316,218,63,14
 END
 
-IDD_SETUP2 DIALOG  0, 0, 416, 239
+IDD_SETUP2 DIALOGEX 0, 0, 416, 239
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     COMBOBOX        IDC_USER,96,5,192,217,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Dodaj...",IDC_ADDUSER,291,4,50,14
@@ -328,7 +328,7 @@ BEGIN
     CONTROL         "U¿ytkownik mo¿e uruchamiaæ z uprawnieniami administracyjnymi tylko aplikacje okreœlone poni¿ej:",IDC_RESTRICTED,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,58,352,10
     CONTROL         "Przechowuj i u¿ywaj prawdziwego has³a u¿ytkownika",IDC_STORE_PW,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,70,349,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,70,189,10
     CONTROL         "",IDC_WHITELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,12,92,399,122
     PUSHBUTTON      "Eksport...",IDC_EXPORT,55,217,50,14
     PUSHBUTTON      "Import...",IDC_IMPORT,109,217,50,14
@@ -2871,9 +2871,9 @@ BEGIN
     PUSHBUTTON      "Restauration...",IDC_IMPORT,308,211,63,14
 END
 
-IDD_SETUP2 DIALOG  0, 0, 487, 234
+IDD_SETUP2 DIALOGEX 0, 0, 487, 234
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,4,2,40,37
     LTEXT           "SuRunner",IDC_USRST,50,8,33,8
@@ -2896,14 +2896,14 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,49,241,10
     CONTROL         "Stocker et utiliser le mot de passe réel de l'utilisateur",IDC_STORE_PW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,298,49,179,10
-    GROUPBOX        "Liste des programmes autorisés (Prise en compte immédiate, même en cas d'annulation).",IDS_GRPDESC,44,60,436,173
-    CONTROL         "",IDC_WHITELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,46,70,431,142
-    PUSHBUTTON      "Exporter...",IDC_EXPORT,116,216,50,14
-    PUSHBUTTON      "Importer...",IDC_IMPORT,170,216,50,14
+    GROUPBOX        "Liste des programmes autorisés (Prise en compte immédiate, même en cas d'annulation).",IDS_GRPDESC,0,60,480,173
+    CONTROL         "",IDC_WHITELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOLABELWRAP | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,4,70,473,142
+    PUSHBUTTON      "Exporter...",IDC_EXPORT,74,216,50,14
+    PUSHBUTTON      "Importer...",IDC_IMPORT,128,216,50,14
     PUSHBUTTON      "&Ajouter",IDC_ADDAPP,314,216,50,14
     PUSHBUTTON      "&Editer",IDC_EDITAPP,368,216,50,14
     PUSHBUTTON      "E&ffacer",IDC_DELETE,421,216,50,14
-    LTEXT           "Liste de programmes",IDC_IMEXSTATIC,47,219,68,8
+    LTEXT           "Liste de programmes",IDC_IMEXSTATIC,5,219,68,8
 END
 
 IDD_SETUP3 DIALOGEX 0, 0, 465, 235
