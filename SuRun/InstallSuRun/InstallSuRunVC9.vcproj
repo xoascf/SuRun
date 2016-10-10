@@ -29,6 +29,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -110,6 +112,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -126,6 +130,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -207,8 +213,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="UPXing"
-				CommandLine="upx --lzma &quot;$(TargetPath)&quot;"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -225,6 +231,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -306,6 +314,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -322,6 +332,8 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -403,6 +415,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 	</Configurations>

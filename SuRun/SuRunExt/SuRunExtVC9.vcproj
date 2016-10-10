@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="SuRunExt"
 	ProjectGUID="{DAFA8E39-3DE2-4F20-9379-5EE5999D2BAF}"
+	RootNamespace="SuRunExt"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -31,6 +32,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -114,6 +118,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -127,6 +133,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)&#x0D;&#x0A;"
+				AdditionalDependencies=""
+				Outputs="$(TargetPath)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -177,6 +186,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -193,6 +204,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -278,6 +292,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -291,6 +307,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)&#x0D;&#x0A;"
+				AdditionalDependencies=""
+				Outputs="$(TargetPath)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -341,6 +360,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -354,6 +375,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -406,6 +430,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -422,6 +448,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)&#x0D;&#x0A;"
+				AdditionalDependencies=""
+				Outputs="$(TargetPath)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -506,6 +535,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -522,6 +553,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -608,6 +642,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -621,6 +657,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)&#x0D;&#x0A;"
+				AdditionalDependencies=""
+				Outputs="$(TargetPath)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -671,6 +710,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -687,6 +728,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -770,6 +814,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -784,6 +830,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)&#x0D;&#x0A;"
+				AdditionalDependencies=""
+				Outputs="$(TargetPath)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -857,6 +906,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -873,6 +924,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -956,6 +1010,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -969,6 +1025,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)&#x0D;&#x0A;"
+				AdditionalDependencies=""
+				Outputs="$(TargetPath)"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -1021,6 +1080,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Applying Certificate"
+				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 	</Configurations>

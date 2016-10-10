@@ -59,10 +59,10 @@ LINK32=link.exe
 # ADD LINK32 /nologo /dll /map /debug /machine:I386 /def:".\SuRunExt.Def" /out:"../ReleaseU/SuRunExt.dll" /OPT:REF /IGNORE:4089
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
-WkspDir=.
 TargetPath=..\ReleaseU\SuRunExt.dll
 SOURCE="$(InputPath)"
-PostBuild_Cmds=$(WkspDir)\bin\setdllcharacteristics.exe +d +n $(TargetPath)
+PostBuild_Desc=Applying Certificate
+PostBuild_Cmds=if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 Unicode Debug"
@@ -91,6 +91,12 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib uuid.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 /nologo /dll /debug /machine:I386 /out:"../DebugU/SuRunExt.dll" /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none
+# Begin Special Build Tool
+TargetPath=\SuRun\SuRun\DebugU\SuRunExt.dll
+SOURCE="$(InputPath)"
+PostBuild_Desc=Applying Certificate
+PostBuild_Cmds=if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)
+# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 x64 Unicode Release"
 
@@ -122,10 +128,10 @@ LINK32=link.exe
 # ADD LINK32 bufferoverflowu.lib /nologo /dll /map /debug /machine:IX86 /def:".\SuRunExt.Def" /out:"../ReleaseUx64/SuRunExt.dll" /OPT:REF /IGNORE:4089 /machine:AMD64
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
-WkspDir=.
 TargetPath=..\ReleaseUx64\SuRunExt.dll
 SOURCE="$(InputPath)"
-PostBuild_Cmds=$(WkspDir)\bin\setdllcharacteristics.exe +d +n $(TargetPath)
+PostBuild_Desc=Applying Certificate
+PostBuild_Cmds=if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "SuRunExt - Win32 SuRun32 Unicode Release"
@@ -158,10 +164,10 @@ LINK32=link.exe
 # ADD LINK32 /nologo /dll /map /debug /machine:I386 /def:".\SuRunExt32.Def" /out:"../ReleaseUx64/SuRunExt32.dll" /IGNORE:4089 /OPT:REF
 # SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
-WkspDir=.
 TargetPath=..\ReleaseUx64\SuRunExt32.dll
 SOURCE="$(InputPath)"
-PostBuild_Cmds=$(WkspDir)\bin\setdllcharacteristics.exe +d +n $(TargetPath)
+PostBuild_Desc=Applying Certificate
+PostBuild_Cmds=if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)
 # End Special Build Tool
 
 !ENDIF 
