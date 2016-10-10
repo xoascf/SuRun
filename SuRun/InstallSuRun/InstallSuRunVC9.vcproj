@@ -113,7 +113,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Applying Certificate"
-				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
+				CommandLine="upx --lzma $(TargetPath)&#x0D;&#x0A;if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -214,7 +214,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Applying Certificate"
-				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
+				CommandLine="upx --lzma $(TargetPath)&#x0D;&#x0A;if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -315,7 +315,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Applying Certificate"
-				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
+				CommandLine="upx --lzma $(TargetPath)&#x0D;&#x0A;if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 		<Configuration
@@ -416,7 +416,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Applying Certificate"
-				CommandLine="if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
+				CommandLine="upx --lzma $(TargetPath)&#x0D;&#x0A;if exist $(SolutionDir)..\Cert\certify.cmd $(SolutionDir)..\Cert\certify.cmd $(TargetPath)"
 			/>
 		</Configuration>
 	</Configurations>
@@ -518,11 +518,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ReleaseUx64\SuRun.exe"
+				RelativePath="..\ReleaseU\SuRun.exe"
 				>
 			</File>
 			<File
-				RelativePath="..\ReleaseU\SuRun.exe"
+				RelativePath="..\ReleaseUx64\SuRun.exe"
 				>
 			</File>
 			<File
@@ -534,11 +534,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\ReleaseU\SuRunExt.dll"
+				RelativePath="..\ReleaseUx64\SuRunExt.dll"
 				>
 			</File>
 			<File
-				RelativePath="..\ReleaseUx64\SuRunExt.dll"
+				RelativePath="..\ReleaseU\SuRunExt.dll"
 				>
 			</File>
 			<File
