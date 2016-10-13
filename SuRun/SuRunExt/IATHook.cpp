@@ -719,8 +719,12 @@ BOOL WINAPI ShellExExW(LPSHELLEXECUTEINFOW pei)
 #ifdef DoDBGTrace
 //  TRACExA("%s: call to ShellExExW()",DLLNAME);
 #endif DoDBGTrace
- if (S_OK==ShellExtExecute(pei))
-   return TRUE;
+  HINSTANCE hInstApp=pei->hInstApp;
+  HANDLE hProcess=pei->hProcess;
+  if (S_OK==ShellExtExecute(pei))
+    return TRUE;
+  pei->hInstApp=hInstApp;
+  pei->hProcess=hProcess;
   return ((lpShellExecuteExW)hkShExExW.OrgFunc())(pei);
 }
 
