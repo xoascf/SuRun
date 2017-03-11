@@ -76,18 +76,14 @@ BOOL GetElevatedToken(HANDLE& hToken)
   //Vista++ UAC: Get the elevated token!
   TOKEN_ELEVATION_TYPE et;
   DWORD dwSize=sizeof(et);
-  if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenElevationType,
-    &et,dwSize,&dwSize)
-    &&(et==TokenElevationTypeLimited))
+  if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenElevationType,&et,dwSize,&dwSize) && (et==TokenElevationTypeLimited))
   {
     TOKEN_LINKED_TOKEN lt = {0}; 
     HANDLE hAdmin=0;
     dwSize = sizeof(lt); 
-    if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,
-                            &lt,dwSize,&dwSize))
+    if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,&lt,dwSize,&dwSize))
     {
-      if(DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,
-                          SecurityImpersonation,TokenPrimary,&hAdmin)) 
+      if (IsInAdminGroup(lt.LinkedToken) && DuplicateTokenEx(lt.LinkedToken,MAXIMUM_ALLOWED,0,SecurityImpersonation,TokenPrimary,&hAdmin)) 
       {
         CloseHandle(lt.LinkedToken);
         CloseHandle(hToken);
@@ -112,12 +108,10 @@ void SetHighIL(HANDLE hUser)
     SID_AND_ATTRIBUTES Label;
   } TOKEN_MANDATORY_LABEL, *PTOKEN_MANDATORY_LABEL;
   TOKEN_MANDATORY_LABEL TIL = {0};
-  AllocateAndInitializeSid(&siaMLA,1,0x00003000L/*SECURITY_MANDATORY_HIGH_RID*/,
-    0,0,0,0,0,0,0,&pSidIL );
+  AllocateAndInitializeSid(&siaMLA,1,0x00003000L/*SECURITY_MANDATORY_HIGH_RID*/,0,0,0,0,0,0,0,&pSidIL );
   TIL.Label.Attributes = 0x00000020/*SE_GROUP_INTEGRITY*/;
   TIL.Label.Sid        = pSidIL ;
-  SetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenIntegrityLevel,
-    &TIL,sizeof(TOKEN_MANDATORY_LABEL));
+  SetTokenInformation(hUser,(TOKEN_INFORMATION_CLASS)TokenIntegrityLevel,&TIL,sizeof(TOKEN_MANDATORY_LABEL));
   FreeSid(pSidIL);
 }
 
@@ -181,8 +175,7 @@ MSV1_0_INTERACTIVE_LOGON* GetLogonRequest(LPWSTR domain,LPWSTR user,LPWSTR pass,
   return pRequest;
 }
 
-HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
-                LPWSTR Password,bool bNoAdmin)
+HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,LPWSTR Password,bool bNoAdmin)
 {
   EnablePrivilege(SE_TCB_NAME);
   HANDLE hLSA;
@@ -282,7 +275,10 @@ HANDLE LSALogon(DWORD SessionID,LPWSTR UserName,LPWSTR Domain,
       __leave;
     }
     if (!bNoAdmin)
+    {
       GetElevatedToken(hUser);
+      SetHighIL(hUser);
+    }
   } // try
   __finally
   {
@@ -768,6 +764,7 @@ HANDLE GetAdminToken(DWORD SessionID)
     //Is the Shell token a Vista Split token?
     if(GetElevatedToken(hShell))
     {
+      SetHighIL(hShell);
       hUser=hShell;
       hShell=0;
       __leave;

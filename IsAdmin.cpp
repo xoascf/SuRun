@@ -138,6 +138,28 @@ typedef enum _TOKEN_ELEVATION_TYPE
 } TOKEN_ELEVATION_TYPE, *PTOKEN_ELEVATION_TYPE;
 #endif SYSTEM_MANDATORY_LABEL_NO_WRITE_UP
 
+bool IsInAdminGroup(HANDLE hToken)
+{
+  bool bRet=false;
+  PTOKEN_GROUPS	ptg = GetTokenGroups(hToken);
+  // Initialize Admin SID
+  SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
+  PSID AdminSID = NULL;
+  AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID);
+  //Search Admin group in Token
+  for(UINT i=0;i<ptg->GroupCount;i++)
+    if((ptg->Groups[i].Attributes & (SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY)) 
+      && (IsValidSid(ptg->Groups[i].Sid))
+      && (EqualSid(ptg->Groups[i].Sid,AdminSID)))
+    {
+      bRet=TRUE;
+      break;
+    }
+  FreeSid(AdminSID);
+  free(ptg);
+  return bRet;
+}
+
 BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
 {
   if (_winmajor<6)
@@ -148,9 +170,16 @@ BOOL IsSplitAdmin(HANDLE hToken/*=NULL*/)
   {
     TOKEN_ELEVATION_TYPE elevationType;
     DWORD dwSize;
-    if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenElevationType,
-                            &elevationType,sizeof(elevationType),&dwSize))
-      bRet=elevationType==TokenElevationTypeLimited;
+    if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenElevationType,&elevationType,sizeof(elevationType),&dwSize) && (elevationType==TokenElevationTypeLimited))
+    {
+      TOKEN_LINKED_TOKEN lt = {0}; 
+      dwSize = sizeof(lt); 
+      if (GetTokenInformation(hToken,(TOKEN_INFORMATION_CLASS)TokenLinkedToken,&lt,dwSize,&dwSize))
+      {
+        bRet=IsInAdminGroup(lt.LinkedToken);
+        CloseHandle(lt.LinkedToken);
+      }
+    }
     if (hT==NULL)
       CloseHandle(hToken);
   }
