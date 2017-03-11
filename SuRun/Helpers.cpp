@@ -1008,6 +1008,8 @@ BOOL QualifyPath(LPTSTR app,LPTSTR path,LPTSTR file,LPTSTR ext,LPCTSTR CurDir)
 BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
 {
   //ToDo: use dynamic allocated strings
+  if (((CmdLine==NULL)||((*CmdLine)==NULL))&&((cmd==NULL)||((*cmd)==NULL)))
+    return false;
   if (StrLenW(CmdLine)+StrLenW(CurDir)>4096-64)
     return false;
   //Check for URLs...
@@ -1620,16 +1622,14 @@ DWORD UserIsInSuRunnersOrAdmins(HANDLE hToken)
   SID_IDENTIFIER_AUTHORITY AdminSidAuthority = SECURITY_NT_AUTHORITY;
   PSID AdminSID = NULL;
   // Initialize Admin SID
-  if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,
-    DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
+  if (!AllocateAndInitializeSid(&AdminSidAuthority,2,SECURITY_BUILTIN_DOMAIN_RID,DOMAIN_ALIAS_RID_ADMINS,0,0,0,0,0,0,&AdminSID))
   {
     DBGTrace1("AllocateAndInitializeSid failed: %s",GetLastErrorNameStatic());
     return free(ptg),0; 
   }
   PSID SuRunnersSID=GetAccountSID(SURUNNERSGROUP);
   for(UINT i=0;i<ptg->GroupCount;i++)
-    if((ptg->Groups[i].Attributes & (SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY))
-      &&(IsValidSid(ptg->Groups[i].Sid)))
+    if((ptg->Groups[i].Attributes & (SE_GROUP_ENABLED|SE_GROUP_ENABLED_BY_DEFAULT|SE_GROUP_MANDATORY)) && (IsValidSid(ptg->Groups[i].Sid)))
     {
       if(EqualSid(ptg->Groups[i].Sid,AdminSID))
         dwRet|=IS_IN_ADMINS;

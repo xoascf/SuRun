@@ -16,6 +16,9 @@
 //returns true if the hToken/the current Thread belongs to the Administrators
 BOOL IsAdmin(HANDLE hToken=NULL);
 
+//returns true if the token is in the administrators group
+bool IsInAdminGroup(HANDLE hToken);
+
 //returns true if the user has a non piviliged split token
 BOOL IsSplitAdmin(HANDLE hToken=NULL);
 

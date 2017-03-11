@@ -259,9 +259,13 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
         Args=c;
         wcscpy(g_RunData.cmdLine,Args);
         break;
+//       }else if (!_wcsicmp(c,L"/WHOAMI"))
+//       {
+//         DWORD gr=UserIsInSuRunnersOrAdmins();
+//         return SafeMsgBox(0,(gr&IS_IN_ADMINS)?L"Admin":((gr&IS_SPLIT_ADMIN)?L"Split Admin":((gr&IS_IN_SURUNNERS)?L"SuRunner":L"No Admin")),CResStr(IDS_APPNAME),MB_ICONINFORMATION);
       }else
       {
-        //invalid direct argument
+        //invalid direct argument 
         DBGTrace("SuRun: Invalid usage!");
         return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_ACCESSDENIED;
       }
