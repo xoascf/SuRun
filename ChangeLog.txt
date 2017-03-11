@@ -32,6 +32,8 @@ SuRun Changes:
 
 SuRun 1.2.1.3b1 - 2017-03-11
 ----------------------------
+* NEW: SuRun Executables are digitally signed
+* CHG: Changed SuRun's Context Menu Strings from "<...>" to "SuRun: <...>"
 * FIX: Members of "Power Users" and "Backup Opeators" could not use SuRun
 * FIX: Bug in IAT-Hooks made Internet Explorer Crash on Windows 10
 
