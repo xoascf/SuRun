@@ -774,14 +774,15 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           if(bNotInList)
             wlf=0;
           //Restricted user that does not launch SuRuns Settings?
-          if  (bNotInList 
-            && GetRestrictApps(g_RunData.UserName) 
-            && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
-          {
-            ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
-            //DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
-            continue;
-          }
+//           TODO("Restricted User can do all by specifying admin password");
+//           if  (bNotInList 
+//             && GetRestrictApps(g_RunData.UserName) 
+//             && (_tcsicmp(g_RunData.cmdLine,_T("/SETUP"))!=0))
+//           {
+//             ResumeClient(g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT);
+//             //DBGTrace2("Restriction WhiteList MisMatch: %s: %s",g_RunData.UserName,g_RunData.cmdLine)
+//             continue;
+//           }
           //check if the requested App is Flagged with AutoCancel
           if ((wlf&(FLAG_AUTOCANCEL|FLAG_SHELLEXEC))==FLAG_AUTOCANCEL)
           {
@@ -826,12 +827,12 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
           }
         }else //if (!g_RunData.bRunAs)
         {
-          if ((rd.bRunAs&3)==2)///LOW option:
+          if ((rd.bRunAs&3)==2)//LOW option:
           {
             ResumeClient(DirectStartUserProcess(0),true);
             continue;
           }
-          if (rd.bRunAs&4)
+          if (rd.bRunAs&4)//Username given
           {
             if (_tcsicmp(rd.UserName,_T("SYSTEM"))==0)
             {
@@ -839,6 +840,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
               HANDLE hUser=GetProcessUserToken(g_RunData.CliProcessId);
               DWORD IsIn=UserIsInSuRunnersOrAdmins(hUser);
               CloseHandle(hUser);
+              //Only real Admins or real SuRunners may run as SYSTEM
               if (((IsIn&IS_IN_ADMINS)==0)
                &&(((IsIn&IS_IN_SURUNNERS)==0)||(GetRestrictApps(g_RunData.UserName))))
               {
@@ -1130,7 +1132,10 @@ DWORD PrepareSuRun()
     //safe desktop created...
     if ((!g_CliIsInSuRunners)
       && (!BecomeSuRunner(g_RunData.UserName,g_RunData.SessionID,g_CliIsInAdmins,g_CliIsSplitAdmin,TRUE,0)))
+    {
+      DeleteSafeDesktop(bFadeDesk);
       return RETVAL_CANCELLED;
+    }
     if (!g_CliIsInSuRunners)
     {
       PwOk=GetSavePW && (!PasswordExpired(g_RunData.UserName));
@@ -1142,36 +1147,36 @@ DWORD PrepareSuRun()
     int IDSMsg=(g_RunData.bShlExHook && ((f&FLAG_SHELLEXEC)==0))?IDS_ASKAUTO:IDS_ASKOK;
     if (!PwOk)
     {
-      if (f&FLAG_DONTASK)
+      if (f&FLAG_DONTASK)//Program is known but password expired: Only check password!
       {
-        //Program is known but password expired: Only check password!
-        if(ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,
-            IDS_ASKOK,BeautifyCmdLine(g_RunData.cmdLine))&1)
+        bool bOK=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_ASKOK,BeautifyCmdLine(g_RunData.cmdLine))&1;
+        DeleteSafeDesktop((!bOK) && bFadeDesk);
+        if(!bOK)
+          return RETVAL_CANCELLED;
+        UpdLastRunTime(g_RunData.UserName);
+        if(!NoNeedPw)//Only if we don't have the admin Token:
         {
-          UpdLastRunTime(g_RunData.UserName);
-          DeleteSafeDesktop(FALSE);
-          if(!NoNeedPw)//Only if we don't have the admin Token:
-          {
-            //Save the password for unse in ServiceMain:
-            SavePassword(g_RunData.UserName,g_RunPwd);
-            HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
-            DWORD n=0;
-            if (hUser)
-              CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
-            zero(g_RunPwd);
-            //Do not call CloseHandle(hUser)!
-          }
-          return RETVAL_OK;
+          //Save the password for user in ServiceMain:
+          SavePassword(g_RunData.UserName,g_RunPwd);
+          HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
+          DWORD n=0;
+          if (hUser)
+            CHK_BOOL_FN(GetTokenInformation(hUser,TokenStatistics,&g_AdminTStat,sizeof(g_AdminTStat),&n));
+          zero(g_RunPwd);
+          //Do not call CloseHandle(hUser)!
         }
-        DeleteSafeDesktop(bFadeDesk);
-        return RETVAL_CANCELLED;
+        return RETVAL_OK;
       }
-      l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,
-          IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+
+      //Restricted user, unknown app, password not ok
+      //ToDo: verify admin then Logon user and save password
+      if  ((!NoNeedPw) && GetRestrictApps(g_RunData.UserName))
+        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+      l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
       if((!NoNeedPw)&&(l&1))//Only if we don't have the admin Token:
       {
         PwOk=TRUE;
-        //Save the password for unse in ServiceMain:
+        //Save the password for user in ServiceMain:
         SavePassword(g_RunData.UserName,g_RunPwd);
         HANDLE hUser=LogonAsAdmin(g_RunData.UserName,g_RunPwd);
         DWORD n=0;
@@ -1182,15 +1187,20 @@ DWORD PrepareSuRun()
       }
     }else //if (PwOk):
     {
+      //Restricted user, unknown app: require admin credentials
+      if  (bNotInList && GetRestrictApps(g_RunData.UserName))
+        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+
       l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,
         IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
     }
+
     DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
+    //Cancel:
     if((l&1)==0)
     {
       if (PwOk && (!GetNoRunSetup(g_RunData.UserName)))
       {
-        //Cancel:
         if(g_RunData.bShlExHook)
         {
           //ShellExecHook:
