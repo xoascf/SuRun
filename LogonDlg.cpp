@@ -190,6 +190,7 @@ bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName)
 typedef struct _LOGONDLGPARAMS
 {
   LPCTSTR Msg;
+  LPCTSTR Hint;
   LPTSTR User;
   LPTSTR Password;
   BOOL UserReadonly;
@@ -202,9 +203,10 @@ typedef struct _LOGONDLGPARAMS
   LPTSTR RaUser;
   BOOL bFUS;//Fast User switching
   DWORD SessionId;
-  _LOGONDLGPARAMS(LPCTSTR M,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags,DWORD S)
+  _LOGONDLGPARAMS(LPCTSTR M,LPCTSTR H,LPTSTR Usr,LPTSTR Pwd,BOOL RO,BOOL Adm,DWORD UFlags,DWORD S)
   {
     Msg=M;
+    Hint=H;
     User=Usr;
     Password=Pwd;
     UserReadonly=RO;
@@ -488,6 +490,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           (WPARAM)CreateFont(-14,0,0,0,FW_NORMAL,0,0,0,0,0,0,0,0,_T("MS Shell Dlg")),1);
       if (p->Msg)
         SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
+      if (p->Hint)
+        SetDlgItemText(hwnd,IDC_HINT,p->Hint);
 //#ifndef SuRunEXT_EXPORTS
 //#ifdef DoDBGTrace
 //      {
@@ -525,7 +529,8 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
           EnableWindow(GetDlgItem(hwnd,IDC_SHELLEXECOK),false);
           EnableWindow(GetDlgItem(hwnd,IDC_ALWAYSOK),false);
         }
-      }
+      }else if (p->ForceAdminLogon)
+        EnableWindow(GetDlgItem(hwnd,IDC_USER),true);
       if (IsWindowEnabled(GetDlgItem(hwnd,IDC_USER)))
         SetFocus(GetDlgItem(hwnd,IDC_USER));
       else if (IsWindowEnabled(GetDlgItem(hwnd,IDC_PASSWORD)))
@@ -728,10 +733,9 @@ BOOL Logon(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,false,false,false,SessionId);
+  LOGONDLGPARAMS p(S,NULL,User,Password,false,false,0,SessionId);
   p.Users.SetUsualUsers(SessionId,FALSE);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
-                  0,DialogProc,(LPARAM)&p);
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
 }
 
 DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
@@ -739,21 +743,19 @@ DWORD ValidateCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,true,false,0,SessionId);
+  LOGONDLGPARAMS p(S,NULL,User,Password,true,false,0,SessionId);
   p.Users.Add(User);
   p.Users.LoadUserBitmaps();
-  return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
-                  0,DialogProc,(LPARAM)&p);
+  return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
 }
 
 BOOL ValidateFUSUser(DWORD SessionId,LPTSTR RunAsUser,LPTSTR User)
 {
-  LOGONDLGPARAMS p(0,RunAsUser,0,true,false,0,SessionId);
+  LOGONDLGPARAMS p(NULL,NULL,RunAsUser,NULL,true,false,0,SessionId);
   p.Users.Add(User);
   p.Users.LoadUserBitmaps();
   p.bFUS=TRUE;
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_FUSDLG),
-                  0,DialogProc,(LPARAM)&p);
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_FUSDLG),0,DialogProc,(LPARAM)&p);
 }
 
 BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,LPTSTR LastUser,int IDmsg,...)
@@ -761,14 +763,13 @@ BOOL RunAsLogon(DWORD SessionId,LPTSTR User,LPTSTR Password,LPTSTR LastUser,int 
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,false,false,false,SessionId);
+  LOGONDLGPARAMS p(S,NULL,User,Password,false,false,0,SessionId);
   p.Users.SetUsualUsers(SessionId,FALSE);
   p.Users.Add(LastUser);
   p.Users.LoadUserBitmaps();
   p.bRunAs=TRUE;
   p.RaUser=LastUser;
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),
-                  0,DialogProc,(LPARAM)&p);
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_RUNASDLG),0,DialogProc,(LPARAM)&p);
 }
 
 BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
@@ -776,10 +777,9 @@ BOOL LogonAdmin(DWORD SessionId,LPTSTR User,LPTSTR Password,int IDmsg,...)
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,false,true,false,SessionId);
+  LOGONDLGPARAMS p(S,NULL,User,Password,false,true,0,SessionId);
   p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,SessionId,FALSE);
-  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
-                  0,DialogProc,(LPARAM)&p);
+  return (BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
 }
 
 BOOL LogonAdmin(DWORD SessionId,int IDmsg,...)
@@ -789,10 +789,9 @@ BOOL LogonAdmin(DWORD SessionId,int IDmsg,...)
   CBigResStr S(IDmsg,va);
   TCHAR U[UNLEN+GNLEN+2]={0};
   TCHAR P[PWLEN]={0};
-  LOGONDLGPARAMS p(S,U,P,false,true,false,SessionId);
+  LOGONDLGPARAMS p(S,NULL,U,P,false,true,0,SessionId);
   p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,SessionId,FALSE);
-  BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),
-                    0,DialogProc,(LPARAM)&p);
+  BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_LOGONDLG),0,DialogProc,(LPARAM)&p);
   zero(U);
   zero(P);
   return bRet;
@@ -803,11 +802,10 @@ DWORD LogonCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,DWORD UsrFlag
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,Password,true,false,UsrFlags,SessionId);
+  LOGONDLGPARAMS p(S,NULL,User,Password,true,false,UsrFlags,SessionId);
   p.Users.Add(User);
   p.Users.LoadUserBitmaps();
-  return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),
-                  0,DialogProc,(LPARAM)&p);
+  return (DWORD )DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),0,DialogProc,(LPARAM)&p);
 }
 
 DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...)
@@ -815,11 +813,10 @@ DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...)
   va_list va;
   va_start(va,IDmsg);
   CBigResStr S(IDmsg,va);
-  LOGONDLGPARAMS p(S,User,_T("******"),true,false,UsrFlags,SessionId);
+  LOGONDLGPARAMS p(S,NULL,User,_T("******"),true,false,UsrFlags,SessionId);
   p.Users.Add(User);
   p.Users.LoadUserBitmaps();
-  return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),
-                  0,DialogProc,(LPARAM)&p);
+  return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,DialogProc,(LPARAM)&p);
 }
 
 #ifdef _DEBUG
