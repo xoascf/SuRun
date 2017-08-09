@@ -37,4 +37,10 @@ DWORD LogonCurrentUser(DWORD SessionId,LPTSTR User,LPTSTR Password,DWORD UsrFlag
 
 DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...);
 
+DWORD ValidateAdmin(DWORD SessionId,int IDmsg,...);
+
 bool SavedPasswordOk(DWORD SessionId,LPTSTR RunAsUser,LPTSTR UserName);
+
+#ifdef _DEBUG
+BOOL TestLogonDlg();
+#endif _DEBUG

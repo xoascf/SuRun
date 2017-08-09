@@ -61,6 +61,19 @@ static unsigned int _GetWinVer()
 unsigned int _winver = _GetWinVer();
 #endif  //_MSC_VER
 
+LANGID SetLocale(LANGID locale)
+{
+
+  if ( (_winmajor>5)) 
+  {
+    typedef LANGID (WINAPI *FMSetThreadUILanguage)(LANGID);
+    FMSetThreadUILanguage fnPtr = (FMSetThreadUILanguage)GetProcAddress(GetModuleHandle(_T("kernel32.dll")),"SetThreadUILanguage"); 
+    if(fnPtr)
+      return (*fnPtr)(locale);
+  }
+  return ::SetThreadLocale(MAKELCID(locale,SORT_DEFAULT));
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Registry Helper

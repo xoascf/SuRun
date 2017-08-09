@@ -488,6 +488,7 @@ BEGIN
     IDS_EMPTYPASS2          "UWAGA: Nastêpuj¹ce konta Administratorów nie posiadaj¹ has³a:\n\n%s"
     IDS_SRACCDESC           "Konto pomocnicze dla SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Opró¿nij kosz"
+    IDS_LOGON_AS_ADMIN      "WprowadŸ nazwê i has³o administratora, aby uruchomiæ aplikacjê z podwy¿szonymi uprawnieniami.\n\nW przeciwnym razie naciœnij 'Anuluj'! """
 END
 
 STRINGTABLE 
@@ -1222,6 +1223,7 @@ BEGIN
     IDS_EMPTYPASS2          "WARNUNG: Folgende Administratoren haben kein Kennwort\n\n%s"
     IDS_SRACCDESC           "Hilfskonto für SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Papierkorb leeren"
+    IDS_LOGON_AS_ADMIN      "Geben Sie Namen und Kennwort eines Administrators ein, um die Anwendung mit erhöhten Rechten zu starten.\r\n\r\nAnsonsten drücken Sie 'Abbrechen'!"""
 END
 
 STRINGTABLE 
@@ -1856,6 +1858,7 @@ BEGIN
     IDS_EMPTYPASS2          "WARNING: The following Administrator accounts have no password:\n\n%s"
     IDS_SRACCDESC           "Helper account for SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Empty Recycle Bin"
+    IDS_LOGON_AS_ADMIN      "Enter the name and password of an administrator to start the application with elevated privileges.\n\nOtherwise, press 'Cancel'! """
 END
 
 STRINGTABLE 
@@ -2452,6 +2455,7 @@ BEGIN
     IDS_EMPTYPASS3          "CUIDADO: Las siguientes cuentas de Administrador no tienen clave:\n\n%s"
     IDS_SRACCDESC           "Helper account for SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Vaciar Papelera de reciclaje"
+    IDS_LOGON_AS_ADMIN      "Introduzca el nombre y la contraseña de un administrador para iniciar la aplicación con privilegios elevados.\n\nDe lo contrario, pulse 'Cancelar'! """
 END
 
 STRINGTABLE 
@@ -3055,6 +3059,7 @@ BEGIN
     IDS_EMPTYPASS2          "ATTENTION : Le compte administrateur suivant n'a pas de mot de passe :\n\n%s"
     IDS_SRACCDESC           "Compte d'assistance SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Vider la Corbeille"
+    IDS_LOGON_AS_ADMIN      "Entrez le nom et le mot de passe d'un administrateur pour lancer l'application avec des privilèges élevés.\n\nSinon, appuyez sur 'Annuler'! """
 END
 
 STRINGTABLE 
@@ -3266,7 +3271,7 @@ EXSTYLE WS_EX_NOPARENTNOTIFY
 CAPTION "Toestemming vereist"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_WHTBK,"Static",SS_WHITERECT,0,0,289,65
     LTEXT           "",IDC_HINTBK,0,66,289,56,NOT WS_GROUP
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,286,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,285,1
@@ -3652,6 +3657,7 @@ BEGIN
     IDS_EMPTYPASS2          "WAARSCHUWING: De volgende Administrator gebruikers hebben geen wachtwoord:\n\n%s"
     IDS_SRACCDESC           "Helper gebruiker voor SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Prullenbak leegmaken"
+    IDS_LOGON_AS_ADMIN      "Voer de naam en het wachtwoord van een beheerder in om de toepassing te starten met verhoogde rechten.\n\nAnders, druk op 'Annuleren'! """
 END
 
 STRINGTABLE 
@@ -3895,8 +3901,8 @@ BEGIN
     CONTROL         "",IDC_FRAME1,"Static",SS_ETCHEDHORZ,0,121,286,1
     CONTROL         "",IDC_FRAME2,"Static",SS_ETCHEDHORZ,0,65,286,1
     LTEXT           "",IDC_DLGQUESTION,7,8,274,52,SS_NOPREFIX
-    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,32,30,SS_REALSIZEIMAGE
-    LTEXT           "Se a aplicação deve ser iniciada com direitos administrativos, introduza a palavra-passe.\r\n\r\nCaso contrário, clique 'Cancelar'!",IDC_HINT,46,74,237,32,SS_NOPREFIX
+    ICON            IDI_SHIELD1,IDC_SECICON1,6,73,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Se a aplicação deve ser iniciada com direitos administrativos, introduza a palavra-passe.\r\n\r\nCaso contrário, clique 'Cancelar'!",IDC_HINT,46,74,237,44,SS_NOPREFIX
     CONTROL         "",IDC_USERBITMAP,"Static",SS_ETCHEDFRAME | SS_REALSIZEIMAGE,6,127,47,46
     RTEXT           "&Nome de utilizador:",IDC_USRST,59,137,61,8
     EDITTEXT        IDC_USER,124,135,158,12,WS_DISABLED
@@ -4235,6 +4241,7 @@ BEGIN
     IDS_EMPTYPASS2          "AVISO: As seguintes contas de Administrador não têm palavra-passe:\n\n%s"
     IDS_SRACCDESC           "Conta de ajudante para o SuRun"
     IDS_EMPTYRECYCLEBIN     "SuRun: Esvaziar Reciclagem"
+    IDS_LOGON_AS_ADMIN      "Digite o nome e a senha de um administrador para iniciar o aplicativo com privilégios elevados.\n\nCaso contrário, pressione 'Cancelar'! """
 END
 
 STRINGTABLE 

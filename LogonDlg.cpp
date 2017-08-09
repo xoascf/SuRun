@@ -491,7 +491,11 @@ INT_PTR CALLBACK DialogProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
       if (p->Msg)
         SetDlgItemText(hwnd,IDC_DLGQUESTION,p->Msg);
       if (p->Hint)
+      {
         SetDlgItemText(hwnd,IDC_HINT,p->Hint);
+        if (p->ForceAdminLogon)
+          EnableWindow(GetDlgItem(hwnd,IDC_ALWAYSOK),false);
+      }
 //#ifndef SuRunEXT_EXPORTS
 //#ifdef DoDBGTrace
 //      {
@@ -819,89 +823,73 @@ DWORD AskCurrentUserOk(DWORD SessionId,LPTSTR User,DWORD UsrFlags,int IDmsg,...)
   return (DWORD)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRACK),0,DialogProc,(LPARAM)&p);
 }
 
+DWORD ValidateAdmin(DWORD SessionId,int IDmsg,...)
+{
+  va_list va;
+  va_start(va,IDmsg);
+  CBigResStr S(IDmsg,va);
+  CBigResStr S2(IDS_LOGON_AS_ADMIN);
+  TCHAR U[UNLEN+GNLEN+2]={0};
+  TCHAR P[PWLEN]={0};
+  LOGONDLGPARAMS p(S,S2,U,P,false,true,0,SessionId);
+  p.Users.SetGroupUsers(DOMAIN_ALIAS_RID_ADMINS,SessionId,FALSE);
+  BOOL bRet=(BOOL)DialogBoxParam(GetModuleHandle(0),MAKEINTRESOURCE(IDD_CURUSRLOGON),0,DialogProc,(LPARAM)&p);
+  zero(U);
+  zero(P);
+  return bRet;
+}
+
 #ifdef _DEBUG
+void TestLogonDlgMain()
+{
+  TCHAR User[4096]=L"Kay\\Kay";
+  TCHAR Password[4096]={0};
+  BOOL l;
+  l=Logon(0,User,Password,IDS_ASKAUTO,L"Logon");
+  DBGTrace2("Logon returned %d: %s",l,GetLastErrorNameStatic());
+  l=ValidateCurrentUser(0,User,Password,IDS_ASKOK,L"ValidateCurrentUser");
+  DBGTrace2("ValidateCurrentUser returned %d: %s",l,GetLastErrorNameStatic());
+  l=ValidateFUSUser(0,User,User);
+  DBGTrace2("ValidateFUSUser returned %d: %s",l,GetLastErrorNameStatic());
+  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"RunAsLogon");
+  DBGTrace2("RunAsLogon returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonAdmin(0,IDS_NOADMIN2,L"LogonAdmin1");
+  DBGTrace2("LogonAdmin returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonAdmin(0,User,Password,IDS_NOADMIN2,L"LogonAdmin2");
+  DBGTrace2("LogonAdmin returned %d: %s",l,GetLastErrorNameStatic());
+  l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"LogonCurrentUser");
+  DBGTrace2("LogonCurrentUser returned %d: %s",l,GetLastErrorNameStatic());
+  l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"AskCurrentUserOk");
+  DBGTrace2("AskCurrentUserOk returned %d: %s",l,GetLastErrorNameStatic());
+  l=ValidateAdmin(0,IDS_ASKOK,L"ValidateAdmin");
+  DBGTrace2("ValidateAdmin returned %d: %s",l,GetLastErrorNameStatic());
+}
+
 BOOL TestLogonDlg()
 {
   INITCOMMONCONTROLSEX icce={sizeof(icce),ICC_USEREX_CLASSES|ICC_WIN95_CLASSES};
   InitCommonControlsEx(&icce);
-  TCHAR User[4096]=L"KAY_ARBEIT\\Kay";
-  TCHAR Password[4096]={0};
-
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-
-  BOOL l;
-//   l=ValidateCurrentUser(0,User,Password,IDS_ASKOK,L"C:\\Windows\\Explorer.exe");
-//   if (l==-1)
-//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-// 
-// 
-//   l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
-//   if (l==-1)
-//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//   
-//   
-// //  return 1;
-// 
-//   l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
-//   if (l==-1)
-//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//   l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
-//   if (l==-1)
-//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//   l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
-//   if (l==-1)
-//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-//   l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"cmd");
-//   if (l==-1)
-//     DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  return 1;
-
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-
-  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-
-  SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
-  
-  l=RunAsLogon(0,User,Password,User,IDS_ASKRUNAS,L"C:\\Windows\\Explorer.exe");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=Logon(0,User,Password,IDS_ASKAUTO,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(0,IDS_NOADMIN2,L"BRUNS\\NixDu");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonAdmin(0,User,Password,IDS_NOSURUNNER);
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=LogonCurrentUser(0,User,Password,0,IDS_ASKOK,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-  l=AskCurrentUserOk(0,User,0,IDS_ASKOK,L"cmd");
-  if (l==-1)
-    DBGTrace2("DialogBoxParam returned %d: %s",l,GetLastErrorNameStatic());
-
-//  ::ExitProcess(0);
+  SetLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
+  SafeMsgBox(0,L"German",L"Locale",MB_OK);
+  TestLogonDlgMain();
+  SetLocale(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US));
+  SafeMsgBox(0,L"English",L"Locale",MB_OK);
+  TestLogonDlgMain();
+  SetLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
+  SafeMsgBox(0,L"Dutch",L"Locale",MB_OK);
+  TestLogonDlgMain();
+  SetLocale(MAKELCID(MAKELANGID(LANG_SPANISH,SUBLANG_SPANISH),SORT_DEFAULT));
+  SafeMsgBox(0,L"Spanish",L"Locale",MB_OK);
+  TestLogonDlgMain();
+  SetLocale(MAKELCID(MAKELANGID(LANG_POLISH,SUBLANG_DEFAULT),SORT_DEFAULT));
+  SafeMsgBox(0,L"Polish",L"Locale",MB_OK);
+  TestLogonDlgMain();
+  SetLocale(MAKELCID(MAKELANGID(LANG_FRENCH,SUBLANG_FRENCH),SORT_DEFAULT));
+  SafeMsgBox(0,L"French",L"Locale",MB_OK);
+  TestLogonDlgMain();
+  SetLocale(MAKELCID(MAKELANGID(LANG_PORTUGUESE,SUBLANG_PORTUGUESE),SORT_DEFAULT));
+  SafeMsgBox(0,L"Portuguese",L"Locale",MB_OK);
+  TestLogonDlgMain();
   return TRUE;
 }
 

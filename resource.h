@@ -115,6 +115,7 @@
 #define IDI_SHIELD0                     104
 #define IDS_EMPTYRECYCLEBIN             104
 #define IDI_SHIELD2                     105
+#define IDS_LOGON_AS_ADMIN              105
 #define IDI_SHIELD1                     106
 #define IDD_SETUP                       107
 #define IDD_CURUSRLOGON                 108
