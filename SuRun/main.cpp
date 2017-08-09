@@ -43,6 +43,10 @@
 #pragma comment(lib,"bin/Crypt32x86.lib")
 #endif _WIN64
 
+// #ifdef _DEBUG
+// #include "LogonDlg.h"
+// #endif _DEBUG
+
 extern RUNDATA g_RunData;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -83,29 +87,19 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
     }
   }
   DBGTrace1("SuRun started with (%s)",GetCommandLine());
+// #ifdef _DEBUG
+//   TestLogonDlg();
+//   return 0;
+// #endif _DEBUG
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
-  case 1:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN),SORT_DEFAULT));
-    break;
-  case 2:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US),SORT_DEFAULT));
-    break;
-  case 3:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH),SORT_DEFAULT));
-    break;
-  case 4:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_SPANISH,SUBLANG_SPANISH),SORT_DEFAULT));
-    break;
-  case 5:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_POLISH,SUBLANG_DEFAULT),SORT_DEFAULT));
-    break;
-  case 6:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_FRENCH,SUBLANG_FRENCH),SORT_DEFAULT));
-    break;
-  case 7:
-    SetThreadLocale(MAKELCID(MAKELANGID(LANG_PORTUGUESE,SUBLANG_PORTUGUESE),SORT_DEFAULT));
-    break;
+  case 1: SetLocale(MAKELANGID(LANG_GERMAN,SUBLANG_GERMAN));         break;
+  case 2: SetLocale(MAKELANGID(LANG_ENGLISH,SUBLANG_ENGLISH_US));    break;
+  case 3: SetLocale(MAKELANGID(LANG_DUTCH,SUBLANG_DUTCH));           break;
+  case 4: SetLocale(MAKELANGID(LANG_SPANISH,SUBLANG_SPANISH));       break;
+  case 5: SetLocale(MAKELANGID(LANG_POLISH,SUBLANG_DEFAULT));        break;
+  case 6: SetLocale(MAKELANGID(LANG_FRENCH,SUBLANG_FRENCH));         break;
+  case 7: SetLocale(MAKELANGID(LANG_PORTUGUESE,SUBLANG_PORTUGUESE)); break;
   }
   HideAppStartCursor();
   if(HandleServiceStuff())

@@ -1169,8 +1169,11 @@ DWORD PrepareSuRun()
       //Restricted user, unknown app, password not ok
       if  ((!NoNeedPw) && GetRestrictApps(g_RunData.UserName))
       {
-        //ToDo: verify admin then Logon user and save password
-        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+        //Verify Admin, then Logon user and save password
+        l=ValidateAdmin(g_RunData.SessionID,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+        if ((l&1)==0)
+          return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+        SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
       }
       l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
       if((!NoNeedPw)&&(l&1))//Only if we don't have the admin Token:
@@ -1190,12 +1193,13 @@ DWORD PrepareSuRun()
       //Restricted user, password ok, unknown app
       if  (bNotInList && GetRestrictApps(g_RunData.UserName))
       {
-        //ToDo: verify admin then start app elevated as user
-        return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
-      }
-      l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+        //Verify Admin, then Logon user and save password
+        l=ValidateAdmin(g_RunData.SessionID,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+        if ((l&1)==0)
+          return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
+      }else
+        l=AskCurrentUserOk(g_RunData.SessionID,g_RunData.UserName,f,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
     }
-
     DeleteSafeDesktop(bFadeDesk && ((l&1)==0));
     //Cancel:
     if((l&1)==0)
