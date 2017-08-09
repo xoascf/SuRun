@@ -1165,7 +1165,6 @@ DWORD PrepareSuRun()
         }
         return RETVAL_OK;
       }
-
       //Restricted user, unknown app, password not ok
       if  ((!NoNeedPw) && GetRestrictApps(g_RunData.UserName))
       {
@@ -1174,8 +1173,9 @@ DWORD PrepareSuRun()
         if ((l&1)==0)
           return g_RunData.bShlExHook?RETVAL_SX_NOTINLIST:RETVAL_RESTRICT;
         SetWhiteListFlag(g_RunData.UserName,g_RunData.cmdLine,FLAG_SHELLEXEC,(l&4)!=0);
-      }
-      l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
+        l=ValidateCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,IDS_ENTER_PW);
+      }else
+        l=LogonCurrentUser(g_RunData.SessionID,g_RunData.UserName,g_RunPwd,f,IDSMsg,BeautifyCmdLine(g_RunData.cmdLine));
       if((!NoNeedPw)&&(l&1))//Only if we don't have the admin Token:
       {
         PwOk=TRUE;
