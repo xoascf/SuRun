@@ -33,6 +33,7 @@ SuRun Changes:
 SuRun 1.2.1.3b3 - 2017-08-20
 ----------------------------
 * NEW: SuRun detects renamed computer and imports user's settings
+* FIX: User Bitmaps for Domain Users were not shown
 
 SuRun 1.2.1.3b2 - 2017-08-09
 ----------------------------

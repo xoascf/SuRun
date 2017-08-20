@@ -668,6 +668,7 @@ void CheckRenamedCoputer()
     if ((_tcslen(cn_old)!=_tcslen(cn_cur))||(_tcsicmp(cn_old,cn_cur)))
     {
       RenameRegKey(HKLM,CBigResStr(SVCKEY _T("\\%s"),cn_old),CBigResStr(SVCKEY _T("\\%s"),cn_cur));
+      RenameRegKey(HKCR,CBigResStr(SHEXOPTKEY _T("\\%s"),cn_old),CBigResStr(SHEXOPTKEY _T("\\%s"),cn_cur));
       DelRegKey(HKLM,CBigResStr(SVCKEY _T("\\RunAs\\%s"),cn_old));
     }
 

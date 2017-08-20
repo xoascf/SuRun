@@ -1962,55 +1962,90 @@ LPCTSTR GetVersionString()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DWORD LoadFile(LPCTSTR FName, BYTE** Buf, DWORD Ofs=0, DWORD nBytes=0)
+{
+  if (Buf==0)
+    return 0;
+  *Buf=NULL;
+  HANDLE f=CreateFile(FName,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,0,OPEN_EXISTING,0,0);
+  if (f==INVALID_HANDLE_VALUE)
+    return 0;
+  if (nBytes==0)
+    nBytes=GetFileSize(f,0)-Ofs;
+  *Buf=(BYTE*)malloc(nBytes);
+  if (*Buf==NULL)
+  {
+    CloseHandle(f);
+    return 0;
+  }
+  DWORD n=0;
+  if(Ofs)
+    SetFilePointer(f,Ofs,0,FILE_BEGIN);
+  ReadFile(f,*Buf,nBytes,&n,0);
+  CloseHandle(f);
+  return n;
+}
+
 HBITMAP LoadUserBitmap(LPCTSTR UserName)
 {
   TCHAR Pic[UNLEN+1];
   _tcscpy(Pic,UserName);
-  PathStripPath(Pic);
-  if (_winmajor>=6)
-  {
-    //Vista++: Load User bitmap from registry:
-    DWORD UserID=0;
-    if (GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),L"",&UserID,0,0)
-      &&  UserID)
-    {
-      BYTE* bmp=0;
-      DWORD type=0;
-      DWORD nBytes=0;
-      HBITMAP hbm=0;
-      if(GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),
-                        L"UserTile",&type,&bmp,&nBytes))
-      {
-        BITMAPFILEHEADER* bmfh=(BITMAPFILEHEADER*)(&bmp[16]);
-        BITMAPINFO* bmi=(BITMAPINFO*)(&bmp[16+sizeof(BITMAPFILEHEADER)]);
-        void* Bits=(void*)(&bmp[16+bmfh->bfOffBits]);
-        HDC dc=GetDC(0);
-        hbm=CreateDIBitmap(dc,&bmi->bmiHeader,CBM_INIT,Bits,bmi,DIB_RGB_COLORS);
-        ReleaseDC(0,dc);
-      }
-      free(bmp);
-      if (hbm)
-        return hbm;
-    }
-    //User bitmap not in registry: try to load bitmap
-    HBITMAP bm=(HBITMAP)LoadImage(0,CResStr(L"C:\\Users\\All Users\\Microsoft\\User Account Pictures\\%s.bmp",Pic),
-                                  IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
-    if (bm)
-      return bm;
-    //no success, load default user picture
-    return (HBITMAP)LoadImage(0,L"C:\\Users\\All Users\\Microsoft\\User Account Pictures\\user.bmp",
-                                IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
-  }
+  //DBGTrace1("LoadUserBitmap: %s",Pic);
   TCHAR PicDir[4096];
   GetRegStr(HKEY_LOCAL_MACHINE,
     _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"),
     _T("Common AppData"),PicDir,4096);
   PathUnquoteSpaces(PicDir);
   PathAppend(PicDir,_T("Microsoft\\User Account Pictures"));
-  PathAppend(PicDir,Pic);
-  PathAddExtension(PicDir,_T(".bmp"));
-  //DBGTrace1("LoadUserBitmap: %s",Pic);
-  return (HBITMAP)LoadImage(0,PicDir,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+  //1st try Domain user: "c:\ProgramData\Microsoft\User Account Pictures\<Domain>+<User>.dat"
+  {
+    if (_tcschr(Pic,L'\\'))
+      *_tcschr(Pic,L'\\')=L'+';
+    HBITMAP hbm=0;
+    BYTE* bmp=NULL;
+    if (LoadFile(CResStr(L"%s\\%s.dat",PicDir,Pic),&bmp))
+    {
+      BITMAPFILEHEADER* bmfh=(BITMAPFILEHEADER*)(&bmp[16]);
+      BITMAPINFO* bmi=(BITMAPINFO*)(&bmp[16+sizeof(BITMAPFILEHEADER)]);
+      void* Bits=(void*)(&bmp[16+bmfh->bfOffBits]);
+      HDC dc=GetDC(0);
+      hbm=CreateDIBitmap(dc,&bmi->bmiHeader,CBM_INIT,Bits,bmi,DIB_RGB_COLORS);
+      ReleaseDC(0,dc);
+    }
+    free(bmp);
+    if (hbm)
+      return hbm;
+  }
+  _tcscpy(Pic,UserName);
+  PathStripPath(Pic);
+  //Vista++: Load User bitmap from registry:
+  DWORD UserID=0;
+  if (GetRegAnyPtr(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\Names\\%s",Pic),L"",&UserID,0,0)
+    &&  UserID)
+  {
+    BYTE* bmp=0;
+    DWORD type=0;
+    DWORD nBytes=0;
+    HBITMAP hbm=0;
+    if(GetRegAnyAlloc(HKLM,CResStr(L"SAM\\SAM\\Domains\\Account\\Users\\%08X",UserID),L"UserTile",&type,&bmp,&nBytes))
+    {
+      BITMAPFILEHEADER* bmfh=(BITMAPFILEHEADER*)(&bmp[16]);
+      BITMAPINFO* bmi=(BITMAPINFO*)(&bmp[16+sizeof(BITMAPFILEHEADER)]);
+      void* Bits=(void*)(&bmp[16+bmfh->bfOffBits]);
+      HDC dc=GetDC(0);
+      hbm=CreateDIBitmap(dc,&bmi->bmiHeader,CBM_INIT,Bits,bmi,DIB_RGB_COLORS);
+      ReleaseDC(0,dc);
+    }
+    free(bmp);
+    if (hbm)
+      return hbm;
+  }
+  //User bitmap not in registry: try to load bitmap
+  HBITMAP bm=(HBITMAP)LoadImage(0,CResStr(L"%s\\%s.bmp",PicDir,Pic),IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+  if (bm)
+    return bm;
+  //no success, load default user picture
+  return (HBITMAP)LoadImage(0,CResStr(L"%s\\user.bmp",PicDir),IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
