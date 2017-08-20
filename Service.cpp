@@ -656,6 +656,25 @@ BOOL InjectIATHook(LPTSTR ProcName)
   return FALSE;
 }
 
+void CheckRenamedCoputer()
+{
+  DWORD cnl=2*UNLEN;
+  TCHAR cn_cur[2*UNLEN+1]={0};
+  TCHAR cn_old[2*UNLEN+1]={0};
+  if (!GetComputerName(cn_cur,&cnl))
+    return;
+  if (GetRegStr(HKLM,SVCKEY,L"ComputerName",cn_old,2*UNLEN) && (_tcslen(cn_old)>0))
+  {
+    if ((_tcslen(cn_old)!=_tcslen(cn_cur))||(_tcsicmp(cn_old,cn_cur)))
+    {
+      RenameRegKey(HKLM,CBigResStr(SVCKEY _T("\\%s"),cn_old),CBigResStr(SVCKEY _T("\\%s"),cn_cur));
+      DelRegKey(HKLM,CBigResStr(SVCKEY _T("\\RunAs\\%s"),cn_old));
+    }
+
+  }
+  SetRegStr(HKLM,SVCKEY,L"ComputerName",cn_cur);
+}
+
 extern TOKEN_STATISTICS g_AdminTStat;
 DWORD DirectStartUserProcess(DWORD ProcId);//forward decl
 DWORD LSAStartAdminProcess(); //forward decl
@@ -724,6 +743,7 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     return; 
   }
   RestoreUserPasswords();
+  CheckRenamedCoputer();
   if (GetUseSVCHook)
     InjectIATHook(L"services.exe");
   //Steal token from LSASS.exe to get SeCreateTokenPrivilege in Vista
