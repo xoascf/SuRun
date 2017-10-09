@@ -163,7 +163,7 @@ BEGIN
             VALUE "FileDescription", "Shell extension for SuRun"
             VALUE "FileVersion", "1, 2, 1, 3"
             VALUE "InternalName", "SuRun right-click menu extension"
-            VALUE "LegalCopyright", "Copyright © 2007-2015 Kay Bruns"
+            VALUE "LegalCopyright", "Copyright © 2007-2017 Kay Bruns"
             VALUE "LegalTrademarks", "SuRun Context Menu Extension"
             VALUE "OriginalFilename", "SuRunExt.dll"
             VALUE "ProductName", "SuRun Context Menu Extension"
