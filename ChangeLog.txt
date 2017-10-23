@@ -30,6 +30,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.3rc1 - 2017-10-23
+----------------------------
+* CHG: Made Hooks Windows 10 1709 compatible.
+
 SuRun 1.2.1.3b3 - 2017-08-20
 ----------------------------
 * NEW: SuRun detects renamed computer and imports user's settings

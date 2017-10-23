@@ -125,10 +125,10 @@ public:
   PROC newFunc;
   PROC orgFunc;
   LPCSTR HostDll;
-  CHookDescriptor(LPCSTR Dll,LPCSTR Win7Dll,LPCSTR Win8Dll,LPCSTR Win81Dll,LPCSTR Func,PROC nFunc,LPCSTR Host=NULL)
+  CHookDescriptor(LPCSTR Dll,LPCSTR Win7Dll,LPCSTR Win8Dll,LPCSTR Win81Dll,LPCSTR Win1709Dll,LPCSTR Func,PROC nFunc,LPCSTR Host=NULL)
   {
     DllName=Dll;
-    apiDllName=IsWin81pp?Win81Dll:(IsWin8?Win8Dll:Win7Dll);
+    apiDllName=IsWin1709pp?Win1709Dll:IsWin81pp?Win81Dll:(IsWin8?Win8Dll:Win7Dll);
     FuncName=Func;
     newFunc=nFunc;
     orgFunc=0;
@@ -150,61 +150,110 @@ public:
 
 //Standard Hooks: These must be implemented!
 //BTW: "api-ms-win-core..." names are defined in apisetschema.dll
-static CHookDescriptor hkLdLibA  ("kernel32.dll",NULL,NULL,NULL,"LoadLibraryA",(PROC)LoadLibA);
-static CHookDescriptor hkLdLibW  ("kernel32.dll",NULL,NULL,NULL,"LoadLibraryW",(PROC)LoadLibW);
+static CHookDescriptor hkLdLibA  ("kernel32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "LoadLibraryA",(PROC)LoadLibA);
+
+static CHookDescriptor hkLdLibW  ("kernel32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "LoadLibraryW",(PROC)LoadLibW);
 static CHookDescriptor hkLdLibXA ("kernel32.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-0.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-1.dll",
-                                  "api-ms-win-core-libraryloader-l1-2-0.dll",
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-libraryloader-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-libraryloader-l1-2-0.dll",//Win81
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win1709
                                   "LoadLibraryExA",(PROC)LoadLibExA);
 static CHookDescriptor hkLdLibXW ("kernel32.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-0.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-1.dll",
-                                  "api-ms-win-core-libraryloader-l1-2-0.dll",
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-libraryloader-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-libraryloader-l1-2-0.dll",//Win81
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win1709
                                   "LoadLibraryExW",(PROC)LoadLibExW);
 static CHookDescriptor hkGetPAdr ("kernel32.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-0.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-1.dll",
-                                  "api-ms-win-core-libraryloader-l1-2-0.dll",
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-libraryloader-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-libraryloader-l1-2-0.dll",//Win81
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win1709
                                   "GetProcAddress",(PROC)GetProcAddr);
 static CHookDescriptor hkFreeLib ("kernel32.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-0.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-1.dll",
-                                  "api-ms-win-core-libraryloader-l1-2-0.dll",
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-libraryloader-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-libraryloader-l1-2-0.dll",//Win81
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win1709
                                   "FreeLibrary",(PROC)FreeLib);
 static CHookDescriptor hkFrLibXT ("kernel32.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-0.dll",
-                                  "api-ms-win-core-libraryloader-l1-1-1.dll",
-                                  "api-ms-win-core-libraryloader-l1-2-0.dll",
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-libraryloader-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-libraryloader-l1-2-0.dll",//Win81
+                                  "api-ms-win-core-libraryloader-l1-1-0.dll",//Win1709
                                   "FreeLibraryAndExitThread",(PROC)FreeLibAndExitThread);
 //User Hooks:
 static CHookDescriptor hkCrProcA ("kernel32.dll",
-                                  "api-ms-win-core-processthreads-l1-1-0.dll",
-                                  "api-ms-win-core-processthreads-l1-1-1.dll",
-                                  "api-ms-win-core-processthreads-l1-1-2.dll",
+                                  "api-ms-win-core-processthreads-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-processthreads-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-processthreads-l1-1-2.dll",//Win81
+                                  "api-ms-win-core-processthreads-l1-1-0.dll",//Win1709
                                   "CreateProcessA",(PROC)CreateProcA);
 static CHookDescriptor hkCrProcW ("kernel32.dll",
-                                  "api-ms-win-core-processthreads-l1-1-0.dll",
-                                  "api-ms-win-core-processthreads-l1-1-1.dll",
-                                  "api-ms-win-core-processthreads-l1-1-2.dll",
+                                  "api-ms-win-core-processthreads-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-processthreads-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-processthreads-l1-1-2.dll",//Win81
+                                  "api-ms-win-core-processthreads-l1-1-0.dll",//Win1709
                                   "CreateProcessW",(PROC)CreateProcW);
 
-static CHookDescriptor hkCrPAUA  ("advapi32.dll",NULL,NULL,NULL,"CreateProcessAsUserA",(PROC)CreatePAUA);
+static CHookDescriptor hkCrPAUA  ("advapi32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "CreateProcessAsUserA",(PROC)CreatePAUA);
 
 //Windows XP: only hook calls from umpnpmgr.dll to advapi32.dlls "CreateProcessAsUserW"
 static CHookDescriptor hkCrPAUW  ("advapi32.dll",
-                                  "api-ms-win-core-processthreads-l1-1-0.dll",
-                                  "api-ms-win-core-processthreads-l1-1-1.dll",
-                                  "api-ms-win-core-processthreads-l1-1-2.dll",
+                                  "api-ms-win-core-processthreads-l1-1-0.dll",//Win7
+                                  "api-ms-win-core-processthreads-l1-1-1.dll",//Win8
+                                  "api-ms-win-core-processthreads-l1-1-2.dll",//Win81
+                                  "api-ms-win-core-processthreads-l1-1-0.dll",//Win1709
                                   "CreateProcessAsUserW",(PROC)CreatePAUW,"umpnpmgr.dll");
 
-static CHookDescriptor hkSwDesk  ("user32.dll",NULL,NULL,NULL,"SwitchDesktop",(PROC)SwitchDesk);
+static CHookDescriptor hkSwDesk ("user32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "SwitchDesktop",(PROC)SwitchDesk);
 
 //TEMP!!!
-static CHookDescriptor hkShExExW("shell32.dll",NULL,NULL,NULL,"ShellExecuteExW",(PROC)ShellExExW);
-static CHookDescriptor hkShExExA("shell32.dll",NULL,NULL,NULL,"ShellExecuteExA",(PROC)ShellExExA);
-static CHookDescriptor hkShExW("shell32.dll",NULL,NULL,NULL,"ShellExecuteW",(PROC)ShellExW);
-static CHookDescriptor hkShExA("shell32.dll",NULL,NULL,NULL,"ShellExecuteA",(PROC)ShellExA);
+static CHookDescriptor hkShExExW ("shell32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "ShellExecuteExW",(PROC)ShellExExW);
+static CHookDescriptor hkShExExA ("shell32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "ShellExecuteExA",(PROC)ShellExExA);
+static CHookDescriptor hkShExW   ("shell32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "ShellExecuteW",(PROC)ShellExW);
+static CHookDescriptor hkShExA   ("shell32.dll",
+                                  NULL,//Win7
+                                  NULL,//Win8
+                                  NULL,//Win81
+                                  NULL,//Win1709
+                                  "ShellExecuteA",(PROC)ShellExA);
 //END TEMP!!!
 
 //Functions that, if present in the IAT, cause the module to be hooked

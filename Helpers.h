@@ -43,6 +43,7 @@ extern unsigned int _winminor;
 #define IsWin81pp (_winver>=0x603)
 #define IsWin10   (_winver==0xA00)
 #define IsWin10pp (_winver>=0xA00)
+#define IsWin1709pp ((_winver>=0xA00)&&(_osver>=16299))
 
 LANGID SetLocale(LANGID locale);
 
