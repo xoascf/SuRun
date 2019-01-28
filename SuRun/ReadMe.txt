@@ -202,9 +202,25 @@ Windows Server 2003 R3 or Visual Studio 2005 or 2008 with x86 and x64 tools.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.3 - 2019-01-28
+----------------------------
+* NEW: SuRun Executables are digitally signed
+* NEW: SuRun detects renamed computer and imports user's settings
+* NEW: Moderated Restricted Surunners. ("User can only run predefined programs 
+			 with elevated rights")
+	     If a restricted SuRunner tries to run a non validated Programm with 
+	     elevated rights, SuRun will now ask for Administrator credentials to 
+	     launch the program elevated in the user's context.
+* CHG: Made Hooks Windows 10 1709 compatible.
+* CHG: Changed SuRun's Context Menu Strings from "<...>" to "SuRun: <...>"
+* FIX: Members of "Power Users" and "Backup Opeators" could not use SuRun
+* FIX: Bug in IAT-Hooks made Internet Explorer Crash on Windows 10
+* FIX: User Bitmaps for Domain Users were not shown
+* FIX: Fixed Spanish Resources
+
 SuRun 1.2.1.2 - 2015-08-09
 ----------------------------
-* CHG: Made Hooks Windows X compatible.
+* CHG: Made Hooks Windows 10 compatible.
 
 SuRun 1.2.1.1 - 2015-02-15
 ----------------------------
