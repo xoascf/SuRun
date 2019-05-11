@@ -24,19 +24,19 @@
 
 //#define _TEST_STABILITY
 
-// static WCHAR SuRun_Beta[]={0x03B2,'3',
-// static WCHAR SuRun_Beta[]={'r','c','1',
-// #ifdef _TEST_STABILITY
-//     'a',
-// #endif _TEST_STABILITY
-//     0};
-//#define BetaVer SuRun_Beta
-// 
-// #define DoDBGTrace
+static WCHAR SuRun_Beta[]={0x03B2,'1',
+//static WCHAR SuRun_Beta[]={'r','c','1',
+#ifdef _TEST_STABILITY
+    'a',
+#endif _TEST_STABILITY
+    0};
+#define BetaVer SuRun_Beta
 
-// #ifdef BetaVer
-// #define DoDBGTrace
-// #endif
+#define DoDBGTrace
+
+#ifdef BetaVer
+#define DoDBGTrace
+#endif
 
 // #ifdef _DEBUG 
 // #define DoDBGTrace
