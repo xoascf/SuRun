@@ -628,34 +628,53 @@ Cleanup:
 
 BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account)
 {
-  DWORD dwRes;
-  PACL pDACL = NULL;
-  PSECURITY_DESCRIPTOR pSD = NULL;
-  SID *pSID=NULL;
-  TRUSTEE tr={0};
-  ACCESS_MASK am=0;
   if (NULL == KeyName) 
     return 0;
-  // Get a pointer to the existing DACL.
-  dwRes = GetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION, NULL, NULL, &pDACL, NULL, &pSD);
-  if (ERROR_SUCCESS != dwRes) 
-  { 
-    DBGTrace3( "HasRegistryKeyAccess(\"%s\", \"%s\") GetNamedSecurityInfo failed %s", KeyName, Account, GetErrorNameStatic(dwRes));
-    goto Cleanup; 
-  }
-  BuildTrusteeWithName(&tr,Account);
-  dwRes=GetEffectiveRightsFromAcl(pDACL,&tr,&am);
-  if (dwRes!=ERROR_SUCCESS)
+  PSID AccountSID=GetAccountSID(Account);
+  if (AccountSID==NULL)
+    return false;
+  DWORD dwRes;
+  PEXPLICIT_ACCESS pea=NULL;
+  DWORD n=0;
   {
-    DBGTrace3( "GetEffectiveRightsFromAcl(\"%s\", \"%s\") failed %s", KeyName, Account, GetErrorNameStatic(dwRes));
-    am=0;
+    PACL pDACL = NULL;
+    PSECURITY_DESCRIPTOR pSD = NULL;
+    // Get a pointer to the existing DACL.
+    dwRes = GetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION, NULL, NULL, &pDACL, NULL, &pSD);
+    if (ERROR_SUCCESS != dwRes) 
+    { 
+      DBGTrace3( "HasRegistryKeyAccess(\"%s\", \"%s\") GetNamedSecurityInfo failed %s", KeyName, Account, GetErrorNameStatic(dwRes));
+      if(pSD != NULL) 
+        LocalFree((HLOCAL) pSD); 
+      free(AccountSID);
+      return false;
+    }
+    dwRes = GetExplicitEntriesFromAcl(pDACL,&n,&pea);
+    if(pSD != NULL) 
+      LocalFree((HLOCAL) pSD); 
+    if (ERROR_SUCCESS != dwRes) 
+    { 
+      DBGTrace3( "HasRegistryKeyAccess(\"%s\", \"%s\") GetExplicitEntriesFromAcl failed %s", KeyName, Account, GetErrorNameStatic(dwRes));
+      free(AccountSID);
+      return false;
+    }
   }
-Cleanup:
-  if(pSD != NULL) 
-    LocalFree((HLOCAL) pSD); 
-  if (pSID != NULL)
-    free(pSID);
-  return (am&KEY_WRITE)==KEY_WRITE;
+  for (DWORD i=0;i<n;i++)
+  {
+    if ((pea[i].grfAccessMode==GRANT_ACCESS) && ((pea[i].grfAccessPermissions&KEY_WRITE)==KEY_WRITE) && (pea[i].Trustee.TrusteeForm==TRUSTEE_IS_SID))
+    {
+      if (EqualSid(AccountSID,pea[i].Trustee.ptstrName))
+      {
+        free(AccountSID);
+        LocalFree(pea);
+        return true;
+      }
+    }
+  }
+  free(AccountSID);
+  if (pea!=NULL)
+    LocalFree(pea);
+  return false;
 }
 
 BOOL HasRegistryKeyAccess(LPTSTR KeyName,DWORD Rid)

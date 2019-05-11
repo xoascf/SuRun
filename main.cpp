@@ -91,12 +91,12 @@ int WINAPI WinMain(HINSTANCE hInst,HINSTANCE hPrevInst,LPSTR lpCmdLine,int nCmdS
 #ifdef _DEBUG
 //   CreateEvent(0,1,0,WATCHDOG_EVENT_NAME);
 //   DoWatchDog(L"Winlogon",L"Default",GetCurrentProcessId());
-//   if (HasRegistryKeyAccess(_T("CURRENT_USER\\Software\\SuRun"),_T("SuRunners")))
-//     DBGTrace("1 ok");
 //   if (HasRegistryKeyAccess(_T("MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Controls Folder\\PowerCfg"),_T("SuRunners")))
 //     DBGTrace("2 ok");
+//   if (HasRegistryKeyAccess(_T("CURRENT_USER\\Software\\SuRun"),_T("SuRunners")))
+//     DBGTrace("1 ok");
 //   TestLogonDlg();
-//   return 0;
+  return 0;
 #endif _DEBUG
   switch (GetRegInt(HKLM,SURUNKEY,L"Language",0))
   {
