@@ -22,6 +22,7 @@
 #include <MMSYSTEM.H>
 #include "DynWTSAPI.h"
 #include <Tlhelp32.h>
+#include <Sddl.h>
 
 #include "Helpers.h"
 #include "ResStr.h"
@@ -630,28 +631,30 @@ BOOL HasRegistryKeyAccess(LPTSTR KeyName,LPTSTR Account)
   DWORD dwRes;
   PACL pDACL = NULL;
   PSECURITY_DESCRIPTOR pSD = NULL;
+  SID *pSID=NULL;
   TRUSTEE tr={0};
   ACCESS_MASK am=0;
   if (NULL == KeyName) 
     return 0;
   // Get a pointer to the existing DACL.
-  dwRes = GetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION,  
-    NULL, NULL, &pDACL, NULL, &pSD);
+  dwRes = GetNamedSecurityInfo(KeyName, SE_REGISTRY_KEY, DACL_SECURITY_INFORMATION, NULL, NULL, &pDACL, NULL, &pSD);
   if (ERROR_SUCCESS != dwRes) 
   { 
-    DBGTrace1( "GetNamedSecurityInfo failed %s", GetErrorNameStatic(dwRes));
+    DBGTrace3( "HasRegistryKeyAccess(\"%s\", \"%s\") GetNamedSecurityInfo failed %s", KeyName, Account, GetErrorNameStatic(dwRes));
     goto Cleanup; 
-  }  
-  // Initialize an EXPLICIT_ACCESS structure for an ACE.
+  }
   BuildTrusteeWithName(&tr,Account);
-  if (GetEffectiveRightsFromAcl(pDACL,&tr,&am)!=ERROR_SUCCESS)
+  dwRes=GetEffectiveRightsFromAcl(pDACL,&tr,&am);
+  if (dwRes!=ERROR_SUCCESS)
   {
-    DBGTrace1( "GetEffectiveRightsFromAcl failed %s", GetErrorNameStatic(dwRes));
+    DBGTrace3( "GetEffectiveRightsFromAcl(\"%s\", \"%s\") failed %s", KeyName, Account, GetErrorNameStatic(dwRes));
     am=0;
   }
 Cleanup:
   if(pSD != NULL) 
     LocalFree((HLOCAL) pSD); 
+  if (pSID != NULL)
+    free(pSID);
   return (am&KEY_WRITE)==KEY_WRITE;
 }
 

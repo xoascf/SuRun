@@ -30,6 +30,10 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.4b1 - 2019-01-28
+----------------------------
+* FIX: SuRun's "H.I.P.S. Warning" Window did not show on user's desktop
+
 SuRun 1.2.1.3 - 2019-01-28
 ----------------------------
 * Released 1.2.1.3

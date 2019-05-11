@@ -14,6 +14,7 @@
 #define _WIN32_WINNT 0x0500
 #define WINVER       0x0500
 #include <windows.h>
+#include <winbase.h>
 #include "DBGTrace.h"
 #include "Service.h"
 #include "Setup.h"
@@ -35,6 +36,7 @@ public:
 	~CWDMsgWnd();
   bool MsgLoop();
 protected:
+  void Destroy();
   bool m_Clicked;
   HWND m_hWnd;
   HFONT m_hFont;
@@ -93,6 +95,7 @@ CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
     m_wr.right+=2*GetSystemMetrics(SM_CXDLGFRAME)+10+16+5;
     m_wr.bottom+=2*GetSystemMetrics(SM_CYDLGFRAME)+GetSystemMetrics(SM_CYSMCAPTION)+10;
     OffsetRect(&m_wr,rd.right-m_wr.right+m_wr.left,rd.bottom-m_wr.bottom+m_wr.top);
+    DeleteObject(MemDC);
   }
   m_bkBrush=CreateSolidBrush(GetSysColor(COLOR_WINDOW));
   WNDCLASS wc={0};
@@ -119,7 +122,6 @@ CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
   HWND s=CreateWindowEx(0,_T("Static"),Text,WS_CHILD|WS_VISIBLE|SS_ICON|SS_CENTERIMAGE,
     cr.left,cr.top,cr.right-cr.left,cr.bottom-cr.top,m_hWnd,0,0,0);
   SendMessage(s,STM_SETIMAGE,IMAGE_ICON,(LPARAM)m_Icon);
-  s=0;
   //Static:
   GetClientRect(m_hWnd,&cr);
   InflateRect(&cr,-5,-5);
@@ -133,13 +135,25 @@ CWDMsgWnd::CWDMsgWnd(LPCTSTR Text,int IconId)
   SetWindowPos(m_hWnd,0,m_wr.left,m_wr.top,0,0,SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE);
 }
 
-CWDMsgWnd::~CWDMsgWnd()
+void CWDMsgWnd::Destroy()
 {
   if (IsWindow(m_hWnd))
     DestroyWindow(m_hWnd);
-  DeleteObject(m_hFont);
-  DestroyIcon(m_Icon);
-  DeleteObject(m_bkBrush);
+  m_hWnd=0;
+  if (m_hFont)
+    DeleteObject(m_hFont);
+  m_hFont=0;
+  if (m_Icon)
+    DestroyIcon(m_Icon);
+  m_Icon=0;
+  if (m_bkBrush)
+    DeleteObject(m_bkBrush);
+  m_bkBrush=0;
+}
+
+CWDMsgWnd::~CWDMsgWnd()
+{
+  Destroy();
 }
 
 bool CWDMsgWnd::MsgLoop()
@@ -173,11 +187,14 @@ LRESULT CALLBACK CWDMsgWnd::WinProc(UINT msg,WPARAM wParam,LPARAM lParam)
   switch (msg)
   {
   case WM_CLOSE:
-    DestroyWindow(m_hWnd);
+    ShowWindow(m_hWnd,SW_HIDE);
+    UpdateWindow(m_hWnd);
+    Destroy();
     return 0;
   case WM_CTLCOLORSTATIC:
     SetTextColor((HDC)wParam,GetSysColor(COLOR_WINDOWTEXT));
     SetBkMode((HDC)wParam,TRANSPARENT);
+    //fall through
   case WM_CTLCOLORDLG:
     return (DWORD_PTR)m_bkBrush;
   case WM_MOVING:
@@ -232,9 +249,84 @@ static void EnsureProcRunning(DWORD PID,LPCTSTR UserDesk)
     ExitProcess(0);
   }
 }
+typedef struct
+{
+  LPCTSTR SafeDesk;
+  LPCTSTR UserDesk;
+  DWORD ParentPID;
+  BOOL bShowUserDesk;
+}WatchDogParams;
+
+static DWORD WINAPI StuckWndProc(void* p)
+{
+  //This is silly: If a thread own a GDI object on a Desktop, it cannot create a Window on a different Desktop, 
+  //so we show the SuRunStuck Message in a separate thread to close all handles
+  WatchDogParams* wdp=((WatchDogParams*)p);
+  SetProcWinStaDesk(0,wdp->SafeDesk);
+  //Switch to the user desktop
+  SwitchToDesk(wdp->SafeDesk);
+  CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SURUNSTUCK),IDI_SHIELD2);
+  while (WaitForSingleObject(g_WatchDogEvent,0)==WAIT_TIMEOUT)
+  {
+    //Exit if SuRun was killed
+    EnsureProcRunning(wdp->ParentPID,wdp->UserDesk);
+    if (!w->MsgLoop())
+    {
+      delete w;
+      wdp->bShowUserDesk=TRUE;
+      return 1;
+    }
+  }
+  delete w;
+  wdp->bShowUserDesk=FALSE;
+  return 0;
+}
+
+
+static DWORD WINAPI BackWndProc(void* p)
+{
+  WatchDogParams* wdp=((WatchDogParams*)p);
+  //Set Access to the user Desktop
+  HANDLE hTok=0;
+  OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hTok);
+  SetAccessToWinDesk(hTok,0,wdp->UserDesk,true);
+  SetProcWinStaDesk(0,wdp->UserDesk);
+  //Switch to the user desktop
+  SwitchToDesk(wdp->UserDesk);
+  //Show Window
+  CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD0);
+  //Turn off Hooks when displaying the user desktop!
+  DWORD bIATHk=GetUseIATHook;
+  DWORD bIShHk=GetUseIShExHook;
+  SetUseIATHook(0);
+  SetUseIShExHook(0);
+  while (w->MsgLoop())
+  {
+    //Exit if SuRun was killed
+    EnsureProcRunning(wdp->ParentPID,wdp->UserDesk);
+    Sleep(10);
+  }
+  delete w;
+  w=0;
+  //Turn on Hooks if they where on!
+  SetUseIShExHook(bIShHk);
+  SetUseIATHook(bIATHk);
+  //Switch back to SuRun's desktop
+  SwitchToDesk(wdp->SafeDesk);
+  //Revoke access from user desktop
+  SetProcWinStaDesk(0,wdp->SafeDesk);
+  SetAccessToWinDesk(hTok,0,wdp->UserDesk,false);
+  CloseHandle(hTok);
+  hTok=0;
+  return 0;
+}
 
 void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
 {
+  WatchDogParams wdp;
+  wdp.SafeDesk=SafeDesk;
+  wdp.UserDesk=UserDesk;
+  wdp.ParentPID=ParentPID;
   SetProcWinStaDesk(0,SafeDesk);
   g_WatchDogEvent=OpenEvent(EVENT_ALL_ACCESS,0,WATCHDOG_EVENT_NAME);
   if (!g_WatchDogEvent)
@@ -249,56 +341,18 @@ void DoWatchDog(LPCTSTR SafeDesk,LPCTSTR UserDesk,DWORD ParentPID)
     //Exit if SuRun was killed
     EnsureProcRunning(ParentPID,UserDesk);
     ResetEvent(g_WatchDogEvent);
-    BOOL bShowUserDesk=FALSE;
+    wdp.bShowUserDesk=FALSE;
     if (WaitForSingleObject(g_WatchDogEvent,2000)==WAIT_TIMEOUT) 
     {
-      CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SURUNSTUCK),IDI_SHIELD2);
-      while (WaitForSingleObject(g_WatchDogEvent,0)==WAIT_TIMEOUT)
-      {
-        //Exit if SuRun was killed
-        EnsureProcRunning(ParentPID,UserDesk);
-        if (!w->MsgLoop())
-        {
-          bShowUserDesk=TRUE;
-          break;
-        }
-      }
-      delete w;
+      HANDLE wt=CreateThread(0,0,StuckWndProc,&wdp,0,0);
+      WaitForSingleObject(wt,INFINITE);
+      CloseHandle(wt);
     }
-    if(bShowUserDesk)
+    if(wdp.bShowUserDesk)
     {
-      //Set Access to the user Desktop
-      HANDLE hTok=0;
-      OpenProcessToken(GetCurrentProcess(),TOKEN_ALL_ACCESS,&hTok);
-      SetAccessToWinDesk(hTok,0,UserDesk,true);
-      SetProcWinStaDesk(0,UserDesk);
-      //Switch to the user desktop
-      SwitchToDesk(UserDesk);
-      //Show Window
-      CWDMsgWnd* w=new CWDMsgWnd(CBigResStr(IDS_SWITCHBACK),IDI_SHIELD0);
-      //Turn off Hooks when displaying the user desktop!
-      DWORD bIATHk=GetUseIATHook;
-      DWORD bIShHk=GetUseIShExHook;
-      SetUseIATHook(0);
-      SetUseIShExHook(0);
-      while (w->MsgLoop())
-      {
-        //Exit if SuRun was killed
-        EnsureProcRunning(ParentPID,UserDesk);
-        Sleep(10);
-      }
-      delete w;
-      w=0;
-      //Turn on Hooks if they where on!
-      SetUseIShExHook(bIShHk);
-      SetUseIATHook(bIATHk);
-      //Switch back to SuRun's desktop
-      SwitchToDesk(SafeDesk);
-      //Revoke access from user desktop
-      SetProcWinStaDesk(0,SafeDesk);
-      SetAccessToWinDesk(hTok,0,UserDesk,false);
-      CloseHandle(hTok);
-      hTok=0;
+      HANDLE wt=CreateThread(0,0,BackWndProc,&wdp,0,0);
+      WaitForSingleObject(wt,INFINITE);
+      CloseHandle(wt);
     }
   }
   //DoWatchDog never returns! 
