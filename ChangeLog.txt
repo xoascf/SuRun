@@ -30,7 +30,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
-SuRun 1.2.1.4b1 - 2019-01-28
+SuRun 1.2.1.4 - 2019-09-24
+----------------------------
+* Released 1.2.1.4
+
+SuRun 1.2.1.4b1 - 2019-05-11
 ----------------------------
 * FIX: SuRun's "H.I.P.S. Warning" Window did not show on user's desktop
 * FIX: GetEffectiveRightsFromAcl BUGs in Windows 10 1809, replaced the function
