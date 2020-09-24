@@ -202,6 +202,10 @@ Windows Server 2003 R3 or Visual Studio 2005 or 2008 with x86 and x64 tools.
 Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.4 - 2020-09-24 (silent update)
+----------------------------
+* FIX: Control Panel As Administrator did not work anymore in Windows 10 2004
+
 SuRun 1.2.1.4 - 2019-09-24
 ----------------------------
 * FIX: SuRun's "H.I.P.S. Warning" Window did not show on user's desktop

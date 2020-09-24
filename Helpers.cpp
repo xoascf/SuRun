@@ -1113,7 +1113,7 @@ BOOL ResolveCommandLine(IN LPWSTR CmdLine,IN LPCWSTR CurDir,OUT LPTSTR cmd)
       _tcscpy(args,L"/n, ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
     else
       //Vista: Control Panel is beneath desktop!
-      _tcscpy(args,L"/n, ::{26EE0668-A00A-44D7-9371-BEB064C98683}");
+      _tcscpy(args,L"/n, ::{21EC2020-3AEA-1069-A2DD-08002B30309D}");
   }else if (((!_wcsicmp(app,L"ncpa.cpl")) && (args[0]==0))
     ||(fExist && (!_wcsicmp(path,SysDir)) && (!_wcsicmp(file,L"ncpa")) && (!_wcsicmp(ext,L".cpl"))))
   {
