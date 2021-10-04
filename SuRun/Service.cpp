@@ -743,6 +743,14 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
     DBGTrace2("RegisterServiceCtrlHandler(%s) failed: %s",GetSvcName(),GetLastErrorNameStatic());
     return; 
   }
+  //Set Service Status to "running"
+  g_ss.dwCurrentState     = SERVICE_RUNNING; 
+  g_ss.dwCheckPoint       = 0;
+  g_ss.dwWaitHint         = 0;
+  SetServiceStatus(g_hSS,&g_ss);
+  //Wait to start the services, because else Windows deletes credentials
+  DBGTrace1( "SuRun Service start delay: %d s",max(0,min(600,GetRegInt(HKLM,SURUNKEY,L"StartDelay",0))));
+  Sleep(max(0,min(600,GetRegInt(HKLM,SURUNKEY,L"StartDelay",0)))*1000);
   RestoreUserPasswords();
   CheckRenamedCoputer();
   if (GetUseSVCHook)
@@ -757,11 +765,6 @@ VOID WINAPI ServiceMain(DWORD argc,LPTSTR *argv)
   if (g_hPipe!=INVALID_HANDLE_VALUE)
   {
     AllowAccess(g_hPipe);
-    //Set Service Status to "running"
-    g_ss.dwCurrentState     = SERVICE_RUNNING; 
-    g_ss.dwCheckPoint       = 0;
-    g_ss.dwWaitHint         = 0;
-    SetServiceStatus(g_hSS,&g_ss);
     DBGTrace("SuRun Service running");
     CTimeOut cto;
     while (g_hPipe!=INVALID_HANDLE_VALUE)
@@ -2299,7 +2302,7 @@ BOOL InstallService()
   _tcscat(SvcFile,_T(" /ServiceRun"));
   SC_HANDLE hdlServ = CreateService(hdlSCM,GetSvcName(),SvcDisplayText,STANDARD_RIGHTS_REQUIRED,
                           SERVICE_WIN32_OWN_PROCESS,SERVICE_AUTO_START,
-                          SERVICE_ERROR_NORMAL,SvcFile,L"PlugPlay",0,0,0,0);
+                          SERVICE_ERROR_NORMAL,SvcFile,L"SpoolerGroup",0,0,0,0);
   if (!hdlServ) 
   {
     DBGTrace1("CreateService failed: %s",GetLastErrorNameStatic());

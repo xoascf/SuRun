@@ -397,7 +397,7 @@ void TRACEx(LPCTSTR s,...)
 //    char Sa[4096]={0};
 //	  WideCharToMultiByte(CP_ACP,0,S,_tcslen(S),Sa,4096,NULL,NULL);
 //	  DbgOutA(Sa);
-//     WriteLog(S);
+    WriteLog(S);
   }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
     OutputDebugStringA("FATAL: Exception in TRACEx");
@@ -427,7 +427,7 @@ void TRACExA(LPCSTR s,...)
     }
 //    DbgOutA(S);
     OutputDebugStringA(S);
-//     WriteLogA(S);
+    WriteLogA(S);
   }__except((GetExceptionCode()!=DBG_PRINTEXCEPTION_C)?EXCEPTION_EXECUTE_HANDLER:EXCEPTION_CONTINUE_SEARCH)
   {
     OutputDebugStringA("FATAL: Exception in TRACExA");
