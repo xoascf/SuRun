@@ -2282,6 +2282,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
   case WM_INITDIALOG:
     {
       CheckDlgButton(hwnd,IDC_NOLOGONDESK,GetUseWinLogonDesk==0);
+      SetDlgItemInt(hwnd,IDC_START_DELAY,max(0,min(600,GetRegInt(HKLM,SURUNKEY,L"StartDelay",0))),false);
       CheckDlgButton(hwnd,IDC_DORUNAS,GetHandleRunAs);
       if(GetUseSuRunGrp)
       {
@@ -2333,6 +2334,7 @@ INT_PTR CALLBACK SetupDlg4Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
     {
 ApplyChanges:
       SetUseWinLogonDesk(IsDlgButtonChecked(hwnd,IDC_NOLOGONDESK)==0);
+      SetRegInt(HKLM,SURUNKEY,L"StartDelay",max(0,min(600,GetDlgItemInt(hwnd,IDC_START_DELAY,0,0))));
       switch (IsDlgButtonChecked(hwnd,IDC_DORUNAS))
       {
       case BST_CHECKED:

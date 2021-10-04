@@ -30,6 +30,11 @@ Deferred Whishlist:
 SuRun Changes:
 ------------------------------------------------------------------------------
 
+SuRun 1.2.1.5 - 2021-09-16
+----------------------------
+* FIX: SuRun got a new option to delay the service start. This is a workaround
+       to Stop Windows from deleting saved credentials.
+
 SuRun 1.2.1.4 - 2020-09-24 (silent update)
 ----------------------------
 * FIX: Control Panel As Administrator did not work anymore in Windows 10 2004
