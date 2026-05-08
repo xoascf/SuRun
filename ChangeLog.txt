@@ -3,6 +3,7 @@
 
 ToDo
 ---------------------
+* Eclipse (JAVA) and SuRuns IAT Hook conflict
 * "*" at the end of a command means "anything from here matches"
 * Switchable Easy/Expert Settings
 * Configurable "Do not display messages" Option
